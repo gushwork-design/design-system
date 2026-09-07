@@ -7,13 +7,13 @@
   },
   "metadata": {
     "description": "Gushwork's internal Claude Code plugins. Design system today; slides, flyers and internal tools as they are added.",
-    "version": "1.44.0"
+    "version": "1.45.0"
   },
   "plugins": [
     {
       "name": "gushwork-design",
       "description": "Gushwork's governed design system. Two surface-scoped skills \u2014 marketing web and product dashboard \u2014 over one shared foundation of tokens, voice, and shared atoms, measured from the Gush Design System v2.0 Figma file.",
-      "version": "1.44.0",
+      "version": "1.45.0",
       "author": {
         "name": "Gushwork Design",
         "email": "design@gushwork.ai"

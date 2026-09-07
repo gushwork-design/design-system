@@ -104,6 +104,12 @@
       "breaking": false,
       "doc": "folds.md"
     },
+    "case-study-page": {
+      "version": "1.44.0",
+      "changed": "2026-09-07",
+      "breaking": false,
+      "doc": "../../skills/gushwork-web/templates/case-study/README.md"
+    },
     "fold-other": {
       "version": "1.10.0",
       "changed": "2026-08-07",
