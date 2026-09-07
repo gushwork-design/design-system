@@ -24,6 +24,7 @@ reports its own stale date.**
 
 | Version | Date | What changed | Commit | Session |
 |---|---|---|---|---|
+| **v1.45.0** | 07 Sep 2026 15:27 | the case-study page template, and five page rules that came with it | [`a065155`](https://github.com/gushwork-design/gushwork-design/commit/a0651559c41bb3c2af51d3c560481ab270a79f33) | [Case-study template release](claude://resume/e8320d8a-e3ee-41ca-bc00-2b7132121300) |
 | **v1.44.0** | 01 Sep 2026 19:53 | the plugin moves to design@gushwork.ai, and drift notices reach every surface | [`19e58c9`](https://github.com/gushwork-design/gushwork-design/commit/19e58c95ae920d254f400ef7e749acf6449f99ef) | [Moving the plugin to design@gushwork.ai](claude://resume/5cf1ed9e-d859-496e-a0c8-0b4a15563507) |
 | **v1.43.0** | 01 Sep 2026 14:55 | the lead-magnet skill, and a stamp that can see it | [`2aaed30`](https://github.com/gushwork-design/gushwork-design/commit/2aaed30fc364ed536a23e2a6fefa032058795e6b) | [Can AI find your business — lead magnet PDF](claude://resume/3d40ae5b-83e5-4492-9851-6fa5fd6cd690) |
 | **v1.42.0** | 28 Aug 2026 14:04 | the unavailable state, and a doc that pointed at nothing | [`6aadb8b`](https://github.com/gushwork-design/gushwork-design/commit/6aadb8bf59783e607318cf349541eaa59c7beb34) | [Gushwork design plugin fails to load](claude://resume/59c33991-9d00-4350-80e6-a4ccfe4ff66b) |
