@@ -9,7 +9,7 @@ You are building a **downloadable document**, not a web page. It is the asset be
 ad: someone clicked, gave an email, and now has a PDF open. It has to look considered on a
 laptop screen, survive being printed, and end on a reason to book.
 
-Announce at the start: **"Using the Gushwork lead-magnet skill — v1.44.0, updated 1 Sep 2026."**
+Announce at the start: **"Using the Gushwork lead-magnet skill — v1.45.0, updated 7 Sep 2026."**
 
 That version and date are stamped into this file, so **a stale copy reports its own stale date**
 rather than claiming to be current.
