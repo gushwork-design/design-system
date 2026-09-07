@@ -1,0 +1,836 @@
+<!doctype html>
+<!-- gushwork-build:{"pluginVersion":"1.44.0","surface":"web","createdBy":"utsav.singh@gushwork.ai","createdAt":"2026-09-07",
+     "registry":"https://gushwork-design.vercel.app/exports/web/component-registry.json",
+     "changelog":"https://gushwork-design.vercel.app/preview/changelog-sheet.html",
+     "components":["page-build","navbar","footer","hero","fold-other","testimonial","cta","button","input-fields","client-avatar","image"]} -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Case study — Gushwork template</title>
+
+<!-- Tokens are the contract. Every colour, type step, radius and space below is a --gw-* var
+     except where a comment says OFF-TOKEN. Do not add values here; report the gap instead. -->
+<link rel="stylesheet" href="../../../../foundation/tokens.css">
+
+<style>
+/* ==========================================================================
+   FONTS — self-hosted from the repo. Never a CDN face. See output-targets.md
+   ========================================================================== */
+@font-face{font-family:'Vert Grotesk Display';src:url('../../../../fonts/Vert_Grotesk_Display_VF.ttf') format('truetype-variations');font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:'Inter';src:url('../../../../fonts/Inter-VariableFont_opsz_wght.ttf') format('truetype-variations');font-weight:100 900;font-style:normal;font-display:swap}
+
+/* ==========================================================================
+   TEMPLATE-LOCAL FIGURES
+   Three tiers, per the skill: tokens for colour/type/radius/shadow/space;
+   documented layout figures used exactly; chosen figures declared as chosen.
+   ========================================================================== */
+:root{
+  /* Measured off Figma `case-study-with-image` (2PbNu2kGHalHhMUfFyFoeG, 495:3382),
+     the CTA fold from 495:3478, the quote card from 1060:7647, and the rail card
+     and footer from the live gushwork.ai case-study page. */
+  --cs-content-w: 1280px;   /* hero content column (1440 frame − 80 × 2) */
+  --cs-article-w: 720px;    /* prose column */
+  --cs-side-w: 280px;       /* sidebar column */
+  --cs-gutter: 80px;        /* hero side padding */
+  --cs-cta-w: 1400px;       /* CTA photo card */
+  --cs-nav-h: 60px;
+
+  /* OFF-TOKEN — no variable exists for any of these. Each is a value the
+     component actually uses. Reported in
+     notices/2026-09-07-case-study-page-template.md */
+  --cs-rule: #e1e3e8;       /* hero stats rule. Nearest token neutral-100 #e7e8e9
+                               is visibly lighter. */
+  --cs-radius-32: 32px;     /* quote-card corners. Radius ramp stops at 20 then 60. */
+  --cs-radius-2: 2px;       /* quote-card notched corner. */
+  --cs-radius-80: 80px;     /* the asymmetric "tell" corner on image frames. */
+  --cs-radius-120: 120px;   /* TL;DR Solution card corner (live page only). */
+  --cs-radius-40: 40px;     /* CTA glass card. */
+  --cs-radius-9: 8.879px;   /* CTA inline button — the measured value, not a step. */
+  --cs-display-52: 52px;    /* CTA heading. Ramp has h2 56 and h3 44, nothing between. */
+
+  /* CHOSEN, not measured — no documented figure exists for these */
+  --cs-sticky-top: 80px;    /* navbar 60 + space-20, so the rail clears the fixed bar */
+  --cs-nav-solid-at: 32px;  /* scroll distance before the navbar takes its background;
+                               the live site flips somewhere between 20 and 40 */
+  --cs-texture-cell: 24px;  /* blueprint grid pitch, read off the rendered hero */
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--gw-color-white);color:var(--gw-color-neutral-800);
+  font:var(--gw-text-body-16-reg);letter-spacing:var(--gw-text-body-16-reg-tracking);
+  -webkit-font-smoothing:antialiased;
+}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+h1,h2,h3,h4,p,figure,figcaption,blockquote{margin:0}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+
+/* Every section ground is full-bleed; only the CONTENT column is capped. The Figma
+   frame is 1440, but a fixed 1440 shell leaves white gutters on a wider display —
+   the surfaces have to reach the viewport edge. */
+.cs-shell{width:100%;position:relative;overflow-x:clip}
+.cs-inner{width:100%;max-width:var(--cs-content-w);margin:0 auto;padding:0 var(--gw-space-20)}
+
+/* ==========================================================================
+   NAVBAR — navbar/navbar, Type=Brand. Fixed, transparent over the hero, taking a
+   white-80% background once scrolled — the live site adds `is-scrolled` and
+   transitions background-color over 0.4s. No blur, no shadow, no border there.
+   ========================================================================== */
+.cs-nav{
+  position:fixed;inset:0 0 auto;z-index:100;height:var(--cs-nav-h);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 var(--cs-gutter);
+  transition:background-color .4s ease;
+}
+.cs-nav[data-scrolled]{background:var(--gw-color-neutral-alpha-80-white)}
+.cs-logo{display:flex;align-items:center;gap:4.8px;height:24px}
+.cs-logo img{height:24px;width:auto}
+.cs-nav-right{display:flex;align-items:center;gap:var(--gw-space-32)}
+.cs-nav-links{display:flex;align-items:center;gap:var(--gw-space-12)}
+/* Button, Style=Text/ black, Size=Small (34) — ghost nav link */
+.cs-nav-link{
+  display:inline-flex;align-items:center;gap:var(--gw-space-4);
+  height:32px;padding:var(--gw-space-8) var(--gw-space-12);
+  border-radius:var(--gw-radius-8);
+  font:var(--gw-text-body-14-med);letter-spacing:var(--gw-text-body-14-med-tracking);
+  color:var(--gw-color-black);
+}
+.cs-nav-link:hover{background:var(--gw-color-neutral-50)}
+/* Button, Style=Blue/ Filled, Size=Small (34). Figma r6 + 0.89px white@10% stroke. */
+.cs-nav-cta{
+  display:inline-flex;align-items:center;justify-content:center;
+  height:32px;padding:var(--gw-space-8) var(--gw-space-12);
+  background:var(--gw-color-primary-500);color:var(--gw-color-white);
+  border:1px solid var(--gw-color-neutral-alpha-10-white);
+  border-radius:6px; /* OFF-TOKEN: measured 6, ramp has 4 then 8 */
+  font:var(--gw-text-body-14-med);letter-spacing:var(--gw-text-body-14-med-tracking);
+}
+.cs-nav-cta:hover{background:var(--gw-color-primary-600)}
+/* Phone-only menu button. Declared before the media query — equal specificity,
+   so source order decides. */
+.cs-nav-burger{display:none;width:28px;height:28px;place-items:center;color:var(--gw-color-black)}
+.cs-nav-burger svg{width:20px;height:20px;fill:currentColor}
+
+/* ==========================================================================
+   HERO — fold/ Hero, Layout=Split. Figma 1440 × 920.
+   Surface neutral-50, full-bleed, bottom corners 20. Flat top: heroes never get
+   a top radius.
+   ========================================================================== */
+.cs-hero{
+  position:relative;
+  background:var(--gw-color-neutral-50);
+  border-radius:0 0 var(--gw-radius-20) var(--gw-radius-20);
+  padding:180px 0 var(--gw-space-80);
+  overflow:clip;
+  /* Figma frame is FIXED 1440 × 920 with SPACE_BETWEEN. min-height reproduces it
+     at default content and lets a longer title grow instead of clipping. */
+  min-height:920px;
+  display:flex;flex-direction:column;
+}
+/* Figma `bg`: blurred swoosh stroke + blueprint dot grid @60% + bottom fade.
+   The grid is white dotted rules on a 24px pitch, dots every 4.8px along each rule. */
+.cs-hero-bg{position:absolute;inset:0 0 auto;height:856px;pointer-events:none;overflow:clip}
+.cs-hero-grid{
+  position:absolute;inset:0;opacity:.6;
+  background-image:
+    radial-gradient(circle at .5px .5px, var(--gw-color-white) .6px, transparent .7px),
+    radial-gradient(circle at .5px .5px, var(--gw-color-white) .6px, transparent .7px);
+  background-size: 4.8px var(--cs-texture-cell), var(--cs-texture-cell) 4.8px;
+}
+/* Vector 66 — 2432 × 956 stroke neutral-300 at 112px, Figma layer blur 280 (≈ CSS 140).
+   Anchored right so it holds its position behind the media as the page widens. */
+.cs-hero-swoosh{
+  position:absolute;right:-540px;top:101px;width:2432px;height:956px;
+  border:112px solid var(--gw-color-neutral-300);
+  border-radius:50%;filter:blur(140px);opacity:.55;
+}
+.cs-hero-fade{
+  position:absolute;inset:auto 0 0;height:282px;
+  background:linear-gradient(to bottom,#f1f2f300,var(--gw-color-neutral-50));
+}
+.cs-hero-body{position:relative;flex:1 1 auto;display:flex;flex-direction:column;justify-content:space-between;gap:var(--gw-space-80)}
+
+/* Top row — text fills, media 580, gap 64 */
+.cs-hero-top{display:flex;align-items:center;gap:64px}
+.cs-hero-text{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:var(--gw-space-24)}
+
+/* Breadcrumb. Figma: gap 4, Inter Medium 12/16, neutral-600. */
+.cs-crumbs{display:flex;align-items:center;gap:var(--gw-space-4)}
+.cs-crumbs a,.cs-crumbs span{
+  font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking);
+  color:var(--gw-color-neutral-600);
+}
+.cs-crumbs a:hover{color:var(--gw-color-black)}
+.cs-crumbs svg{width:11px;height:10px;flex:none;fill:var(--gw-color-neutral-600)}
+
+.cs-hero-heads{display:flex;flex-direction:column;gap:var(--gw-space-16)}
+/* h3 token: 700 44px/1.2 display. No full stop, ever — see foundation/voice.md. */
+.cs-hero-title{
+  font:var(--gw-text-h3);letter-spacing:var(--gw-text-h3-tracking);
+  color:var(--gw-color-black);
+}
+/* Meta row: Inter Medium 18/1.6 neutral-800, 4px neutral-500 dot, gap 12 */
+.cs-hero-meta{display:flex;align-items:center;gap:var(--gw-space-12)}
+.cs-hero-meta span{
+  font:var(--gw-text-body-18-med);letter-spacing:var(--gw-text-body-18-med-tracking);
+  color:var(--gw-color-neutral-800);
+}
+.cs-hero-meta i{width:4px;height:4px;border-radius:var(--gw-radius-full);background:var(--gw-color-neutral-500);flex:none}
+
+/* image — Figma is two rows: 240 + fill, then fill + 240, 10px gaps, tiles r12
+   with a white@20% inset hairline. The narrow bottom-right tile carries the 80px
+   "tell" corner. Drop one photo per slot, or keep one and delete the rest. */
+.cs-hero-media{flex:none;width:580px;height:400px;display:flex;flex-direction:column;gap:10px}
+.cs-hero-row{flex:1 1 0;display:flex;gap:10px;min-height:0}
+.cs-hero-row .cs-slot{flex:1 1 auto;min-width:0}
+.cs-hero-row .cs-slot--narrow{flex:none;width:240px}
+.cs-slot{
+  position:relative;overflow:hidden;
+  background:var(--gw-color-neutral-300);
+  border:1px solid var(--gw-color-neutral-alpha-20-white);
+  border-radius:var(--gw-radius-12);
+  display:grid;place-items:center;
+}
+.cs-slot--tell{border-bottom-right-radius:var(--cs-radius-80)}
+.cs-slot img{width:100%;height:100%;object-fit:cover}
+.cs-slot-label{
+  font:var(--gw-text-body-12-reg);letter-spacing:var(--gw-text-body-12-reg-tracking);
+  color:var(--gw-color-neutral-700);text-transform:uppercase;text-align:center;
+}
+
+/* Stats row — 3 up, gap 224, 1px rule above, 32px top padding */
+.cs-stats{
+  display:flex;gap:224px;
+  padding-top:var(--gw-space-32);
+  border-top:1px solid var(--cs-rule); /* OFF-TOKEN colour */
+}
+.cs-stat{width:220px;display:flex;flex-direction:column;gap:10px}
+.cs-stat b{
+  font:var(--gw-text-h5);letter-spacing:var(--gw-text-h5-tracking);
+  color:var(--gw-color-neutral-900);
+}
+.cs-stat span{
+  font:var(--gw-text-body-16-med);letter-spacing:var(--gw-text-body-16-med-tracking);
+  color:var(--gw-color-neutral-600);
+}
+
+/* ==========================================================================
+   ARTICLE — fold/ other. Prose 720 + sidebar 280, gap 40, inside a 1040 column.
+   ========================================================================== */
+.cs-article{background:var(--gw-color-white)}
+.cs-article-inner{
+  width:100%;max-width:1040px;margin:0 auto;
+  display:flex;align-items:flex-start;gap:var(--gw-space-40);
+  padding:var(--gw-space-120) var(--gw-space-20) var(--gw-space-160);
+}
+.cs-prose{
+  flex:none;width:var(--cs-article-w);
+  display:flex;flex-direction:column;gap:var(--gw-space-60);
+}
+.cs-block{display:flex;flex-direction:column;gap:var(--gw-space-16)}
+/* h4 token: 700 38px/1.2 display. Headings are neutral/black, not neutral-900. */
+.cs-block h2{
+  font:var(--gw-text-h4);letter-spacing:var(--gw-text-h4-tracking);
+  color:var(--gw-color-black);
+}
+.cs-copy{display:flex;flex-direction:column;gap:var(--gw-space-32)}
+.cs-copy p,.cs-block > p{
+  font:var(--gw-text-body-18-reg);letter-spacing:var(--gw-text-body-18-reg-tracking);
+  color:var(--gw-color-neutral-800);
+}
+.cs-figure{width:100%;border-radius:var(--gw-radius-16);overflow:hidden;background:var(--gw-color-neutral-300);aspect-ratio:720 / 374;display:grid;place-items:center}
+.cs-figure img{width:100%;height:100%;object-fit:cover}
+
+/* --------------------------------------------------------------------------
+   TL;DR — OPTIONAL BLOCK. Delete this section and its markup if the story does
+   not need a Problem / Challenge / Solution summary.
+   Not in the Figma frame; measured off the live page. NEW ELEMENT — declared in
+   notices/2026-09-07-case-study-page-template.md
+   -------------------------------------------------------------------------- */
+.cs-tldr{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px;
+  background:var(--gw-color-neutral-50);
+  border-radius:var(--gw-radius-16);
+}
+.cs-tldr-card{
+  background:var(--gw-color-white);border-radius:var(--gw-radius-12);
+  padding:var(--gw-space-24);
+  display:flex;flex-direction:column;gap:10px;
+}
+.cs-tldr-card h3{
+  font:var(--gw-text-body-14-sem);letter-spacing:var(--gw-text-body-14-sem-tracking);
+  color:var(--gw-color-neutral-850);
+}
+.cs-tldr-card p{
+  font:var(--gw-text-body-18-reg);letter-spacing:var(--gw-text-body-18-reg-tracking);
+  color:var(--gw-color-neutral-800);
+}
+.cs-tldr-card--wide{
+  grid-column:1 / -1;padding:45px var(--gw-space-24);
+  border-bottom-right-radius:var(--cs-radius-120); /* OFF-TOKEN radius */
+}
+
+/* --------------------------------------------------------------------------
+   PULL QUOTE — `testimonial-card-web`, Figma 1060:7647. 720 × 182.
+   neutral/black, corners 32/32/2/32, pad 24, gap 24. The blue “ glyph is
+   `visible: false` in the node, so it ships hidden. The role is textCase UPPER.
+   -------------------------------------------------------------------------- */
+.cs-quote{
+  background:var(--gw-color-black);color:var(--gw-color-white);
+  padding:var(--gw-space-24);
+  display:flex;flex-direction:column;gap:var(--gw-space-24);
+  /* OFF-TOKEN radii: 32 and 2 */
+  border-radius:var(--cs-radius-32) var(--cs-radius-32) var(--cs-radius-2) var(--cs-radius-32);
+}
+.cs-quote-mark{width:31px;height:24px;fill:var(--gw-color-primary-500)}
+/* `visible:false` in the node. The HTML `hidden` attribute does not hide an
+   SVG element, so this is an explicit class — drop it to unhide the glyph. */
+.cs-quote-mark.is-hidden{display:none}
+.cs-quote p{
+  font:var(--gw-text-body-18-med);letter-spacing:var(--gw-text-body-18-med-tracking);
+  color:var(--gw-color-white);
+}
+/* client/avatar — grayscale, per the surface default. 72 × 52 pill, white@20%. */
+.cs-byline{display:flex;align-items:center;gap:var(--gw-space-12)}
+.cs-byline-photo{
+  flex:none;width:72px;height:52px;overflow:hidden;
+  background:var(--gw-color-neutral-alpha-20-white);
+  border-radius:var(--gw-radius-full);
+  display:grid;place-items:center;
+}
+.cs-byline-photo img{width:100%;height:100%;object-fit:cover;filter:grayscale(1)}
+.cs-byline-photo .cs-slot-label{color:var(--gw-color-neutral-alpha-60-white)}
+.cs-byline-text{display:flex;flex-direction:column;gap:6px}
+.cs-byline-text b{
+  font:var(--gw-text-body-16-med);letter-spacing:var(--gw-text-body-16-med-tracking);
+  color:var(--gw-color-white);
+}
+.cs-byline-text span{
+  font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking);
+  color:var(--gw-color-neutral-400);text-transform:uppercase;
+}
+
+/* --------------------------------------------------------------------------
+   SIDEBAR — one card, the live site's rail CTA (measured off
+   gushwork.link/case-study/doug-machines). Sticky, flush with the prose top.
+   -------------------------------------------------------------------------- */
+.cs-aside{
+  flex:none;width:var(--cs-side-w);
+  position:sticky;top:var(--cs-sticky-top);
+}
+.cs-card{
+  background:var(--gw-color-neutral-25);
+  border:1px solid var(--gw-color-neutral-50);
+  border-radius:var(--gw-radius-16);
+  padding:var(--gw-space-20);
+}
+/* Overlapping avatar pair, 70 × 40. The live asset is `cta-peopl.webp`, which is
+   not in this repo, so the template ships two placeholder discs — a maintainer
+   should add the real asset to assets/. Flagged in the notice. */
+.cs-card-people{width:70px;height:40px;position:relative;margin-bottom:var(--gw-space-12)}
+.cs-card-people i{
+  position:absolute;top:0;width:40px;height:40px;border-radius:var(--gw-radius-full);
+  background:var(--gw-color-neutral-200);border:2px solid var(--gw-color-neutral-25);
+}
+.cs-card-people i:first-child{left:0}
+.cs-card-people i:last-child{left:30px}
+/* Display at 20px is off the h-ramp (h7 is 22). Measured 600 20/28. */
+.cs-card h3{
+  font:600 20px/28px var(--gw-font-display);
+  color:var(--gw-color-black);
+  margin-bottom:var(--gw-space-16);
+}
+/* Button, Style=Blue/ Filled, Size=Regular (44) */
+.cs-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:var(--gw-space-8);
+  height:44px;padding:var(--gw-space-12) var(--gw-space-16);
+  background:var(--gw-color-primary-500);color:var(--gw-color-white);
+  border-radius:var(--gw-radius-10);
+  font:var(--gw-text-body-14-med);letter-spacing:var(--gw-text-body-14-med-tracking);
+}
+.cs-btn:hover{background:var(--gw-color-primary-600)}
+
+/* ==========================================================================
+   CTA FOLD — Figma 495:3478 / 495:3516. Ground neutral-50 full-bleed with top
+   corners 20 (it stacks onto the white article), padding 100 / 0 / 20.
+   Card 1400 × 600 on primary-500, radius 20, photo + 20% black + left scrim.
+   ========================================================================== */
+.cs-tail{
+  background:var(--gw-color-neutral-50);
+  border-radius:var(--gw-radius-20) var(--gw-radius-20) 0 0;
+  margin-top:calc(-1 * var(--gw-radius-20));
+  padding:var(--gw-space-100) var(--gw-space-20) var(--gw-space-20);
+  display:flex;flex-direction:column;align-items:center;
+}
+.cs-cta{
+  position:relative;width:100%;max-width:var(--cs-cta-w);min-height:600px;
+  background:var(--gw-color-primary-500);
+  border-radius:var(--gw-radius-20);overflow:clip;
+  display:flex;align-items:center;
+  padding:0 60px;
+}
+.cs-cta-photo{position:absolute;inset:0;display:grid;place-items:center}
+.cs-cta-photo img{width:100%;height:100%;object-fit:cover}
+.cs-cta-photo::after{content:"";position:absolute;inset:0;background:var(--gw-color-neutral-alpha-20-black)}
+/* Measured as a to-bottom gradient rotated -90 and flipped, 780.67 long — i.e. a
+   left-anchored horizontal scrim from 80% black to transparent. */
+.cs-cta-scrim{
+  position:absolute;inset:0 auto 0 0;width:780px;
+  background:linear-gradient(to right,#000000cc,#00000000);
+}
+.cs-cta-body{position:relative;width:528px;display:flex;flex-direction:column;gap:var(--gw-space-40)}
+.cs-cta-heads{display:flex;flex-direction:column;gap:var(--gw-space-16)}
+.cs-cta-heads h2{
+  /* OFF-RAMP: measured 52px. h2 is 56, h3 is 44 — nothing between. */
+  font:700 var(--cs-display-52)/1.2 var(--gw-font-display);
+  color:var(--gw-color-white);
+}
+.cs-cta-heads p{
+  font:var(--gw-text-body-18-med);letter-spacing:var(--gw-text-body-18-med-tracking);
+  color:var(--gw-color-neutral-alpha-80-white);
+}
+.cs-cta-form{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+/* inline-input — neutral-50 fill, 2px white@30% border, r12, pl-16 pr-8 py-8 */
+.cs-inline{
+  display:flex;align-items:center;justify-content:space-between;gap:var(--gw-space-8);
+  padding:var(--gw-space-8) var(--gw-space-8) var(--gw-space-8) var(--gw-space-16);
+  background:var(--gw-color-neutral-50);
+  border:2px solid var(--gw-color-neutral-alpha-30-white);
+  border-radius:var(--gw-radius-12);overflow:clip;
+}
+.cs-inline input{
+  flex:1 1 auto;min-width:0;border:0;background:none;outline:none;
+  font:var(--gw-text-body-16-med);letter-spacing:var(--gw-text-body-16-med-tracking);
+  color:var(--gw-color-black);
+}
+.cs-inline input::placeholder{color:var(--gw-color-neutral-700)}
+.cs-inline button{
+  flex:none;display:inline-flex;align-items:center;justify-content:center;
+  padding:10px var(--gw-space-12);
+  background:var(--gw-color-primary-500);color:var(--gw-color-white);
+  border-radius:var(--cs-radius-9); /* OFF-TOKEN: measured 8.879 */
+  font:var(--gw-text-body-16-med);letter-spacing:var(--gw-text-body-16-med-tracking);
+  line-height:24px;
+}
+.cs-inline button:hover{background:var(--gw-color-primary-600)}
+.cs-cta-note{
+  padding:0 var(--gw-space-20);
+  font:var(--gw-text-body-14-med);letter-spacing:var(--gw-text-body-14-med-tracking);
+  color:var(--gw-color-neutral-alpha-60-white);
+}
+.cs-cta-note a{text-decoration:underline}
+/* Glass testimonial — Figma `Notifications` 495:3534. Hug, pad 32, gap 80,
+   cross-axis end. Backdrop blur 10 + white@10% at mix-blend-mode luminosity,
+   2px white@10% border, corners 40/40/8/40, centred +343 from the card middle. */
+.cs-cta-glass{
+  position:absolute;top:50%;left:50%;
+  transform:translate(calc(-50% + 343px),-50%);
+  display:flex;flex-direction:column;align-items:flex-end;gap:var(--gw-space-80);
+  padding:var(--gw-space-32);max-width:390px;
+  border:2px solid var(--gw-color-neutral-alpha-10-white);
+  border-radius:var(--cs-radius-40) var(--cs-radius-40) var(--gw-radius-8) var(--cs-radius-40);
+  color:var(--gw-color-white);
+}
+.cs-cta-glass::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:var(--gw-color-neutral-alpha-10-white);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  mix-blend-mode:luminosity;
+}
+.cs-cta-glass > *{position:relative}
+/* OFF-RAMP: Vert Grotesk Display Medium 32/1.2. The h5 step is 32 at weight 600. */
+.cs-cta-glass blockquote{
+  width:100%;
+  font:500 32px/1.2 var(--gw-font-display);
+  color:var(--gw-color-white);
+}
+.cs-cta-glass .cs-byline-photo{background:var(--gw-color-neutral-alpha-30-white)}
+.cs-cta-glass .cs-byline-text span{color:var(--gw-color-neutral-alpha-50-white)}
+
+/* ==========================================================================
+   FOOTER — measured off the live site (`footer.nfooter_section_v1`).
+   neutral/black, padding-top 100, inner column 1280, two halves at gap 100,
+   link columns 3-up at gap 52 capped to 600.
+   Copyright and legal are neutral-400 — RULED, R9. The live site ships
+   neutral-700 there, ~2.3:1 on black, which fails the 4.5:1 floor.
+   ========================================================================== */
+.cs-footer{
+  background:var(--gw-color-black);color:var(--gw-color-white);
+  border-radius:var(--gw-radius-20) var(--gw-radius-20) 0 0;
+  margin-top:calc(-1 * var(--gw-radius-20));
+  padding:var(--gw-space-100) 0 0;
+  overflow:clip;
+}
+.cs-footer-inner{max-width:var(--cs-content-w);margin:0 auto;padding:0 var(--gw-space-20)}
+.cs-footer-main{display:grid;grid-template-columns:1fr 1fr;gap:var(--gw-space-16) var(--gw-space-100)}
+.cs-footer-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:52px;max-width:600px}
+.cs-footer-col h4{
+  font:var(--gw-text-body-12-sem);letter-spacing:var(--gw-text-body-12-sem-tracking);
+  color:var(--gw-color-white);
+}
+.cs-footer-list{display:flex;flex-direction:column;gap:var(--gw-space-12);margin-top:var(--gw-space-16)}
+.cs-footer-list a{
+  font:400 16px/1.2 var(--gw-font-body);letter-spacing:var(--gw-text-body-16-reg-tracking);
+  color:var(--gw-color-neutral-400);
+}
+.cs-footer-list a:hover{color:var(--gw-color-white)}
+.cs-footer-comp{display:flex;flex-direction:column;gap:22px}
+.cs-footer-addr{display:flex;flex-wrap:wrap;align-items:center;gap:48px var(--gw-space-100)}
+.cs-footer-addr p{
+  max-width:184px;
+  font:400 12px/1.4 var(--gw-font-body);letter-spacing:var(--gw-text-body-12-reg-tracking);
+  color:var(--gw-color-neutral-alpha-60-white);
+}
+.cs-footer-legal{
+  display:flex;align-items:center;justify-content:space-between;gap:var(--gw-space-24);
+  margin-top:var(--gw-space-80);padding:6px 0 var(--gw-space-12);flex-wrap:wrap;
+  font:var(--gw-text-body-12-reg);letter-spacing:var(--gw-text-body-12-reg-tracking);
+  color:var(--gw-color-neutral-400); /* R9 — not the live site's neutral-700 */
+}
+.cs-footer-legal div{display:flex;gap:var(--gw-space-24)}
+.cs-footer-legal a{color:var(--gw-color-neutral-400)}
+.cs-footer-legal a:hover{color:var(--gw-color-white)}
+/* Full-width wordmark band. The live asset is `updated-footer-bg.webp`, not in
+   this repo, so this is a labelled slot — flagged in the notice. */
+.cs-footer-band{
+  margin-top:112px;height:180px;display:grid;place-items:center;
+  background:var(--gw-color-neutral-alpha-10-white);
+}
+
+/* ==========================================================================
+   PHONE — Breakpoint=Phone. Container 343. Grids collapse to one column,
+   buttons go full width. Hero geometry measured off `case-study-page/ mobile`
+   (495:3559): padding 120 / 16 / 60 / 16, stack gap 40, media 343 × 237.
+   Phone TYPE steps are the documented breakpoint rules, not measured off that
+   frame — it only covers the hero. See the README.
+   ========================================================================== */
+@media (max-width:767px){
+  .cs-nav{height:auto;padding:var(--gw-space-16)}
+  .cs-nav-links,.cs-nav-right .cs-nav-cta{display:none}
+  .cs-nav-burger{display:grid}
+
+  /* Phone hero hugs its content. The 920 desktop floor is a Figma frame height,
+     not a phone one — the mobile frame is 375 × 1116 overall. */
+  .cs-hero{padding:var(--gw-space-120) 0 var(--gw-space-60);min-height:0}
+  .cs-inner{padding:0 var(--gw-space-16)}
+  .cs-hero-body{gap:var(--gw-space-40)}
+  .cs-hero-top{flex-direction:column;align-items:stretch;gap:var(--gw-space-40)}
+  .cs-hero-title{font:var(--gw-text-h6);letter-spacing:var(--gw-text-h6-tracking)}
+  .cs-hero-meta span{font:var(--gw-text-body-16-med)}
+  .cs-hero-media{width:100%;height:237px}
+  .cs-hero-row .cs-slot--narrow{flex:1 1 auto;width:auto}
+  .cs-hero-swoosh{right:-1200px}
+  .cs-stats{flex-direction:column;gap:var(--gw-space-24)}
+  .cs-stat{width:100%}
+  .cs-stat b{font:var(--gw-text-h7-bold);letter-spacing:var(--gw-text-h7-bold-tracking)}
+
+  .cs-article-inner{flex-direction:column;padding:var(--gw-space-60) var(--gw-space-16) var(--gw-space-40);gap:var(--gw-space-40)}
+  .cs-prose{width:100%;gap:var(--gw-space-40)}
+  .cs-block h2{font:var(--gw-text-h6-bold);letter-spacing:var(--gw-text-h6-bold-tracking)}
+  .cs-copy p,.cs-block > p,.cs-tldr-card p{font:var(--gw-text-body-16-reg);letter-spacing:var(--gw-text-body-16-reg-tracking)}
+  .cs-tldr{grid-template-columns:1fr}
+  .cs-tldr-card--wide{padding:var(--gw-space-24)}
+  .cs-quote{padding:var(--gw-space-20)}
+  .cs-aside{position:static;width:100%}
+  .cs-btn{width:100%}
+
+  .cs-tail{padding:var(--gw-space-60) var(--gw-space-16) var(--gw-space-20)}
+  .cs-cta{flex-direction:column;align-items:stretch;justify-content:center;gap:var(--gw-space-32);padding:var(--gw-space-32) var(--gw-space-20);min-height:0}
+  .cs-cta-scrim{inset:auto 0 0 0;width:auto;height:100%;background:linear-gradient(to top,#000000cc,#00000066)}
+  .cs-cta-body{width:100%}
+  .cs-cta-heads h2{font:var(--gw-text-h6-bold);letter-spacing:var(--gw-text-h6-bold-tracking)}
+  .cs-inline{flex-direction:column;align-items:stretch}
+  .cs-inline button{width:100%}
+  .cs-cta-glass{position:relative;top:auto;left:auto;transform:none;max-width:none;align-items:flex-start;gap:var(--gw-space-32)}
+  .cs-cta-glass blockquote{font:500 22px/1.4 var(--gw-font-display)}
+
+  .cs-footer{padding:var(--gw-space-60) 0 0}
+  .cs-footer-inner{padding:0 var(--gw-space-16)}
+  .cs-footer-main{grid-template-columns:1fr;gap:var(--gw-space-40)}
+  .cs-footer-cols{grid-template-columns:1fr;gap:var(--gw-space-32);max-width:none}
+  .cs-footer-addr{gap:var(--gw-space-24)}
+  .cs-footer-legal{flex-direction:column;align-items:flex-start;margin-top:var(--gw-space-40)}
+  .cs-footer-band{margin-top:var(--gw-space-60);height:100px}
+}
+</style>
+</head>
+<body>
+
+<div class="cs-shell">
+
+  <!-- ====================================================================
+       NAVBAR — navbar/navbar, Type inherits from the page (Brand). Fixed.
+       ==================================================================== -->
+  <nav class="cs-nav" id="cs-nav">
+    <a class="cs-logo" href="/" aria-label="Gushwork home">
+      <img src="../../../../assets/logo/gushwork-logo-original.svg" alt="Gushwork">
+    </a>
+    <div class="cs-nav-right">
+      <div class="cs-nav-links">
+        <a class="cs-nav-link" href="/case-study">Case Study</a>
+        <a class="cs-nav-link" href="/blog">Blog</a>
+        <a class="cs-nav-link" href="/pricing">Pricing</a>
+      </div>
+      <a class="cs-nav-cta" href="/demo">Book a Demo</a>
+      <button class="cs-nav-burger" aria-label="Open menu">
+        <svg viewBox="0 0 256 256" aria-hidden="true"><path d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12ZM40 76h176a12 12 0 0 0 0-24H40a12 12 0 0 0 0 24Zm176 104H40a12 12 0 0 0 0 24h176a12 12 0 0 0 0-24Z"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ====================================================================
+       HERO — fold/ Hero, Layout=Split
+       ==================================================================== -->
+  <header class="cs-hero">
+    <div class="cs-hero-bg" aria-hidden="true">
+      <div class="cs-hero-grid"></div>
+      <div class="cs-hero-swoosh"></div>
+      <div class="cs-hero-fade"></div>
+    </div>
+
+    <div class="cs-hero-body cs-inner">
+      <div class="cs-hero-top">
+        <div class="cs-hero-text">
+
+          <!-- Breadcrumb. Two levels; a third ("Home") is built and hidden in Figma. -->
+          <nav class="cs-crumbs" aria-label="Breadcrumb">
+            <a href="/customers">Customers</a>
+            <svg viewBox="0 0 256 256" aria-hidden="true"><path d="M181.66 133.66l-80 80a8 8 0 0 1-11.32-11.32L164.69 128 90.34 53.66a8 8 0 0 1 11.32-11.32l80 80a8 8 0 0 1 0 11.32Z"/></svg>
+            <span aria-current="page">Client name</span>
+          </nav>
+
+          <div class="cs-hero-heads">
+            <!-- Lead with the outcome and the number. No full stop. -->
+            <h1 class="cs-hero-title">Client name gets 25 qualified leads in the first 30 days of AI search</h1>
+            <div class="cs-hero-meta">
+              <span>Industry</span>
+              <i aria-hidden="true"></i>
+              <span>Country</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- image — four slots. Drop one photo per slot, or keep one and delete
+             the rest. The 80px corner belongs on the bottom-right slot. -->
+        <div class="cs-hero-media">
+          <div class="cs-hero-row">
+            <div class="cs-slot cs-slot--narrow"><span class="cs-slot-label">Logo</span></div>
+            <div class="cs-slot"><span class="cs-slot-label">Image</span></div>
+          </div>
+          <div class="cs-hero-row">
+            <div class="cs-slot"><span class="cs-slot-label">Image</span></div>
+            <div class="cs-slot cs-slot--narrow cs-slot--tell"><span class="cs-slot-label">Image</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Three outcome numbers. Numbers lead; the label explains. -->
+      <div class="cs-stats">
+        <div class="cs-stat"><b>25+ leads</b><span>generated through AI search in four weeks</span></div>
+        <div class="cs-stat"><b>20,000+</b><span>times the brand appeared in buyer searches</span></div>
+        <div class="cs-stat"><b>8x growth</b><span>in leads generated in two months</span></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ====================================================================
+       ARTICLE + SIDEBAR — fold/ other
+       ==================================================================== -->
+  <section class="cs-article">
+    <div class="cs-article-inner">
+      <article class="cs-prose">
+
+        <div class="cs-block">
+          <h2>The customer — a 40-year leader with no online visibility</h2>
+          <p>Two or three paragraphs on who they are and what was not working. Name the market, the buyer, and the gap. Keep the claim specific: what they had, and the one thing they did not.</p>
+        </div>
+
+        <!-- OPTIONAL: TL;DR. Delete this whole block if the story does not need it. -->
+        <div class="cs-tldr">
+          <div class="cs-tldr-card">
+            <h3>Problem</h3>
+            <p>One sentence on what was broken, in the client's terms.</p>
+          </div>
+          <div class="cs-tldr-card">
+            <h3>Challenge</h3>
+            <p>One sentence on why it was hard — the buyer behaviour, the market, the constraint.</p>
+          </div>
+          <div class="cs-tldr-card cs-tldr-card--wide">
+            <h3>Solution</h3>
+            <p>Two sentences on what we built and how the channel changed. End on the outcome, not the activity.</p>
+          </div>
+        </div>
+
+        <div class="cs-block">
+          <h2>Impact — immediate results, lasting transformation</h2>
+          <div class="cs-copy">
+            <p>Open with the number. Then the mechanism that produced it.</p>
+            <figure class="cs-figure"><span class="cs-slot-label">Dashboard or result image — 720 × 374</span></figure>
+            <p>Follow the image with what it shows and why it matters to the business, not to the channel.</p>
+          </div>
+        </div>
+
+        <!-- testimonial-card-web (1060:7647). Real client, real number. -->
+        <figure class="cs-quote">
+          <!-- visible:false in the Figma node. Kept so the design is recoverable. -->
+          <svg class="cs-quote-mark is-hidden" viewBox="0 0 31 24" aria-hidden="true"><path d="M0 24V13.7C0 6.13 4.6 1.05 12.4 0l1.4 4.2c-4.3 1-6.7 3.5-7 7.4H14V24H0Zm17 0V13.7C17 6.13 21.6 1.05 29.4 0L31 4.2c-4.4 1-6.8 3.5-7.1 7.4H31V24H17Z"/></svg>
+          <p>&ldquo;A quote that carries a number and a change, in the client's own words rather than ours.&rdquo;</p>
+          <figcaption class="cs-byline">
+            <!-- client/avatar — drop the real client photo here. Grayscale is applied
+                 in CSS. Never substitute the dashboard `Avatar` character asset. -->
+            <span class="cs-byline-photo"><span class="cs-slot-label">Photo</span></span>
+            <span class="cs-byline-text">
+              <b>Client name</b>
+              <span>Role, Company, Country</span>
+            </span>
+          </figcaption>
+        </figure>
+
+        <div class="cs-block">
+          <h2>What this means for your business</h2>
+          <p>Generalise from the story without overclaiming. One paragraph, addressed to the reader as "you".</p>
+        </div>
+
+        <div class="cs-block">
+          <h2>Ready to build your growth story</h2>
+          <p>One short paragraph, then hand off to the CTA fold below. No button here — in-fold CTAs are opt-in and the worked page examples hide them.</p>
+        </div>
+      </article>
+
+      <!-- Rail CTA, taken from the live site. One card, sticky. -->
+      <aside class="cs-aside">
+        <div class="cs-card">
+          <!-- Placeholder for the `cta-peopl` avatar pair — see the notice. -->
+          <div class="cs-card-people" aria-hidden="true"><i></i><i></i></div>
+          <h3>Discover AI agents that help businesses get more qualified leads.</h3>
+          <a class="cs-btn" href="/demo">Book a Demo</a>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       CTA FOLD — fold/ CTA, Figma 495:3516
+       ==================================================================== -->
+  <section class="cs-tail">
+    <div class="cs-cta">
+      <div class="cs-cta-photo" aria-hidden="true"><span class="cs-slot-label">CTA photo 1400 × 600</span></div>
+      <div class="cs-cta-scrim" aria-hidden="true"></div>
+
+      <div class="cs-cta-body">
+        <div class="cs-cta-heads">
+          <h2>See How This Works for Your Business</h2>
+          <p>Unsure about how many leads you&rsquo;ll get?</p>
+        </div>
+        <form class="cs-cta-form" action="/demo" method="post">
+          <div class="cs-inline">
+            <label for="cs-email-cta" hidden>Work email</label>
+            <input id="cs-email-cta" type="email" name="email"
+                   placeholder="What&rsquo;s your work email?" autocomplete="email"
+                   data-1p-ignore="true" data-lpignore="true" data-form-type="other">
+            <button type="submit">Book a Demo</button>
+          </div>
+          <p class="cs-cta-note">Have Questions? <a href="/contact">Ask Anything here.</a></p>
+        </form>
+      </div>
+
+      <!-- Glass testimonial — `Notifications` 495:3534 -->
+      <figure class="cs-cta-glass">
+        <blockquote>&ldquo;The results came fast &ndash; 14 leads in just 3 weeks.&rdquo;</blockquote>
+        <figcaption class="cs-byline">
+          <span class="cs-byline-photo"><span class="cs-slot-label">Photo</span></span>
+          <span class="cs-byline-text">
+            <b>Client name</b>
+            <span>Role, Company, Country</span>
+          </span>
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       FOOTER — measured off the live site. Real link content, never placeholders.
+       ==================================================================== -->
+  <footer class="cs-footer">
+    <div class="cs-footer-inner">
+      <div class="cs-footer-main">
+        <div class="cs-footer-cols">
+          <div class="cs-footer-col">
+            <h4>Platform</h4>
+            <div class="cs-footer-list">
+              <a href="/platform/brand-memory">Brand Memory</a>
+              <a href="/platform/page-creation-engine">Page Creation Engine</a>
+              <a href="/platform/cms">AI-First CMS</a>
+              <a href="/platform/leads-dashboard">Leads Dashboard</a>
+              <a href="/platform/analytics">Analytics</a>
+            </div>
+          </div>
+          <div class="cs-footer-col">
+            <h4>Solutions</h4>
+            <div class="cs-footer-list">
+              <a href="/solutions/ai-search-agent">AI Search Agent</a>
+              <a href="/solutions/lead-conversion">Lead Conversion</a>
+              <a href="/solutions/paid-boost">Paid Boost</a>
+            </div>
+          </div>
+          <div class="cs-footer-col">
+            <h4>Company</h4>
+            <div class="cs-footer-list">
+              <a href="/pricing">Pricing</a>
+              <a href="/careers">Careers</a>
+              <a href="/customers">Customers</a>
+              <a href="/alternatives">Alternatives</a>
+              <a href="/announcements">Announcements</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="cs-footer-comp">
+          <div class="cs-footer-addr">
+            <p>Regents Inc, 16192 Coastal Hwy, Lewes, DE 19958, United States</p>
+            <p>Delfin Technologies India Pvt Ltd, 578, 9th A Main Rd, Indiranagar, Bengaluru, Karnataka 560038, India</p>
+          </div>
+          <div class="cs-footer-addr">
+            <p>+1 (888) 451 5522</p>
+            <p>growth@gushwork.ai</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- The live site writes these in title case. page-shell.md finding 3 says
+           write them corrected; the year is not baked in here. -->
+      <div class="cs-footer-legal">
+        <span>&copy; 2026 Gushwork &middot; All rights reserved</span>
+        <div>
+          <a href="/privacy">Privacy policy</a>
+          <a href="/terms">Terms of use</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Wordmark band. Live asset is `updated-footer-bg.webp` — not in this repo. -->
+    <div class="cs-footer-band"><span class="cs-slot-label">Footer wordmark band — full width</span></div>
+  </footer>
+</div>
+
+<script>
+/* Navbar takes a background once scrolled off the hero, matching the live site's
+   `is-scrolled` behaviour. Threshold is template-local — see --cs-nav-solid-at. */
+(function () {
+  var nav = document.getElementById('cs-nav');
+  if (!nav) return;
+  var at = parseInt(getComputedStyle(document.documentElement)
+            .getPropertyValue('--cs-nav-solid-at'), 10) || 32;
+  function sync() {
+    if (window.scrollY > at) nav.setAttribute('data-scrolled', '');
+    else nav.removeAttribute('data-scrolled');
+  }
+  addEventListener('scroll', sync, { passive: true });
+  sync();
+})();
+</script>
+</body>
+</html>

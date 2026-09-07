@@ -32,6 +32,7 @@ Any commits listed means they are behind: tell them to run
 | **Text fields — shared with dashboard, all 14 variants** | `foundation/text-field.md` |
 | Declaring anything you had to build yourself | `foundation/new-component-notice.md` |
 | **What to emit — React or static HTML** | `foundation/output-targets.md` |
+| **Page templates — start here before composing from scratch** | `templates/` |
 
 ### The rulings that bite on this surface
 
@@ -121,6 +122,7 @@ Full detail in `exports/web/button.md`.
 |---|---|---|
 | Any marketing page | `page-build` | `page-shell.md` |
 | An empty page to compose freely | `page-build` with `Blank=yes` | `page-shell.md` |
+| A customer case study | **`templates/case-study/`** — a measured page, not a fold | `templates/case-study/README.md` |
 | Top nav | `navbar/navbar` — `Type` inherits from the page | `page-shell.md` |
 | Bottom of page | `footer/footer` — `Type` inherits | `page-shell.md` |
 | The opening fold | `fold/ Hero` — `Layout` = `Home` / `Centered` / `Split` / `Form` | `folds.md` |
@@ -144,6 +146,48 @@ Full detail in `exports/web/button.md`.
 | A client logo | `Client Logos` — **never fabricate one** | `fold-elements.md` |
 | Stock / product imagery | `image` — pick `category` first | `images.md` |
 | A status pill anywhere | **Badge** | `foundation/shared-components.md` |
+
+## Templates — a measured page beats a composed one
+
+`templates/` holds whole pages already measured off Figma and rendered. When one matches the
+request, **copy it and fill it in** — do not recompose the page from folds. The template
+carries the geometry, the off-token flags and the build stamp, and re-deriving those by hand
+is how a page ends up plausible but wrong.
+
+| Template | For | Base |
+|---|---|---|
+| `templates/case-study/` | One customer story as a page — hero with outcome numbers, prose column with a sticky rail CTA, closing CTA | Figma `case-study-with-image`, `2PbNu2kGHalHhMUfFyFoeG` / `495:3382`, with the navbar, rail card and footer from the live site |
+
+```bash
+cp -r skills/gushwork-web/templates/case-study skills/gushwork-web/templates/<client-slug>
+```
+
+Each template's README records what it was measured from, **where the live site disagrees with
+that source and which one won**, and every off-token value it carries. Read it before editing
+— the disagreements are the part you would otherwise rediscover.
+
+### Standing rules from the case-study review — 7 Sep 2026
+
+These came out of a correction pass on the case-study template and apply to any page on this
+surface, not just that one.
+
+1. **No related-stories carousel unless it is asked for.** Removed from the case-study
+   template on 7 Sep 2026. When one is requested it must **function and use real stories** —
+   real thumbnails, titles and industries, working prev/next. Placeholder cards behind a
+   scroll shim are not the deliverable.
+2. **Section grounds are full-bleed; only the content column is capped.** Never put a
+   `max-width` on the page shell. The Figma frame is 1440, but a 1440 shell leaves white
+   gutters on a wider display. Cap the content at `--gw-content-width` and centre it.
+3. **The navbar is fixed, not absolute.** Transparent over a light hero, taking
+   `--gw-color-neutral-alpha-80-white` once scrolled, `background-color` transitioning over
+   0.4s. No blur, no shadow, no border — the live site has none.
+4. **Verify at 1440 *and* a wider viewport.** A 1440-only check cannot catch a re-introduced
+   width cap, which is the thing most likely to regress.
+5. **A sticky rail starts flush with the prose.** No leading offset; the sticky top only needs
+   to clear the fixed navbar.
+
+The lead-magnet document template is at repo-root `templates/lead-magnet/` and belongs to
+`gushwork-lead-magnet`, not this skill.
 
 ## Cross-surface: which one?
 
