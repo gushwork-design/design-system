@@ -81,6 +81,16 @@ were replaced with the live site's rail CTA on Utsav's call. It sits flush with 
 
 ## Filling it in
 
+**`<title>` and `<meta name="description">` are placeholders too — the same rule applies to
+them as everything else on this list, and they're easy to forget because nothing on the
+rendered page shows they're wrong.** Update both for every case study:
+
+- **Title**: `<Client> Case Study | Gushwork`. Not `<Client> Case Study | Gushwork | Gushwork`
+  — that double is a live-site quirk, not a pattern to copy.
+- **Description**: client + industry + the single strongest hero stat, ≤160 characters so
+  Google doesn't truncate it. Pull the stat from the same three numbers already going into
+  the hero — don't invent a fourth.
+
 **Replace every placeholder.** `Client name`, `Industry`, `Country`, `Role, Company, Country`
 and the slot labels are all stubs. Copy guidance is in `foundation/voice.md`; the two that
 catch people here:
