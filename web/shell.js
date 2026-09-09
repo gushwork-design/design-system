@@ -81,7 +81,8 @@
       items: [
         { label: 'Claude Plugin', href: '/internal/claude-plugin', icon: 'sparkle' },
         { label: 'Mini Tools',    href: '/internal/mini-tools',    icon: 'toolbox' },
-        { label: 'Change Log',    href: '/internal/changelog',     icon: 'stack-overflow-logo' }
+        { label: 'Change Log',    href: '/internal/changelog',     icon: 'stack-overflow-logo' },
+        { label: 'Staging',       href: '/internal/staging',       icon: 'squares-four' }
       ]
     }
   ];
@@ -724,7 +725,8 @@
 })();
 
 /* PAGE_THEME_SNIPPET — put this in every page's <head>, before the
-   stylesheets, so the theme is set before first paint:
+   stylesheets, so the theme is set before first paint. Defaults to light,
+   not the OS preference — see scripts/_add_shell.py's THEME_SNIPPET for why:
 
-   <script>try{var t=localStorage.getItem('gw-theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+   <script>try{var t=localStorage.getItem('gw-theme')||'light';document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 */
