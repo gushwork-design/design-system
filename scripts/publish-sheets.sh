@@ -275,5 +275,14 @@ cd "$STAGE"
 if [ "$MODE" = preview ]; then
   vercel deploy --yes
 else
-  vercel deploy --prod --yes
+  DEPLOY_URL="$(vercel deploy --prod --yes)"
+  echo "$DEPLOY_URL"
+  # `vercel deploy --prod` promotes this deployment as Production, but does not
+  # by itself repoint gushwork-design.vercel.app — that domain is not in this
+  # team's Domains list (`vercel domains ls` shows 0), so it never picks up a
+  # CLI-triggered deploy automatically the way a Git-branch deploy would. Every
+  # publish before this one needed a manual `vercel alias set` afterward to make
+  # the short URL match what was just shipped. Do it here so that step can't be
+  # forgotten.
+  vercel alias set "$DEPLOY_URL" gushwork-design.vercel.app
 fi
