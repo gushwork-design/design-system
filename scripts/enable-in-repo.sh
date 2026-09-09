@@ -33,7 +33,7 @@ if os.path.exists(path):
 before = json.dumps(data, sort_keys=True)
 
 data.setdefault("extraKnownMarketplaces", {})["gushwork"] = {
-    "source": {"source": "github", "repo": "gushwork-design/gushwork-design"}
+    "source": {"source": "github", "repo": "gushwork-design/design-system"}
 }
 data.setdefault("enabledPlugins", {})["gushwork-design@gushwork"] = True
 

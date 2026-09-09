@@ -15,7 +15,7 @@ binary's own schema, not from guesswork.
 ## 1. One command
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/gushwork-design/gushwork-design/main/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/gushwork-design/design-system/main/scripts/install.sh | bash
 ```
 
 Marketplace, plugin, and auto-update in one idempotent pass — `scripts/install.sh` checks the two
@@ -23,7 +23,7 @@ prerequisites up front and names the missing one instead of failing three steps 
 underlying commands, if you'd rather run them yourself:
 
 ```bash
-claude plugin marketplace add gushwork-design/gushwork-design && claude plugin install gushwork-design@gushwork
+claude plugin marketplace add gushwork-design/design-system && claude plugin install gushwork-design@gushwork
 ```
 
 Fine for a handful of people. It does not scale, and it is invisible — you cannot tell who ran
@@ -39,7 +39,7 @@ gets the design system with no commands and no instructions to follow.
 **One command per repo.** Run this from the root of the repo you want it in:
 
 ```bash
-gh api repos/gushwork-design/gushwork-design/contents/scripts/enable-in-repo.sh \
+gh api repos/gushwork-design/design-system/contents/scripts/enable-in-repo.sh \
   -H "Accept: application/vnd.github.raw" | bash
 ```
 
@@ -58,7 +58,7 @@ Or write it by hand — `.claude/settings.json` in each product repo:
     "gushwork": {
       "source": {
         "source": "github",
-        "repo": "gushwork-design/gushwork-design"
+        "repo": "gushwork-design/design-system"
       }
     }
   },
@@ -105,7 +105,7 @@ nothing.
 ```json
 {
   "strictKnownMarketplaces": [
-    { "source": "github", "repo": "gushwork-design/gushwork-design" }
+    { "source": "github", "repo": "gushwork-design/design-system" }
   ],
   "blockedMarketplaces": []
 }
@@ -130,7 +130,7 @@ The flag lives per-machine in `~/.claude/plugins/known_marketplaces.json`:
 ```json
 {
   "gushwork": {
-    "source": { "source": "github", "repo": "gushwork-design/gushwork-design" },
+    "source": { "source": "github", "repo": "gushwork-design/design-system" },
     "autoUpdate": true
   }
 }
@@ -175,7 +175,7 @@ For an MDM payload, or to set the flag before anyone has started a session, the 
 still works:
 
 ```bash
-gh api repos/gushwork-design/gushwork-design/contents/scripts/enable-autoupdate.sh \
+gh api repos/gushwork-design/design-system/contents/scripts/enable-autoupdate.sh \
   -H "Accept: application/vnd.github.raw" | bash
 ```
 
@@ -224,7 +224,7 @@ instructions — send this:
 > numbers are illustrative — don't put it in a deck yet; and if a session opens by telling you a
 > newer version is out, take it before you build, because the components it names have moved.
 >
-> Detail if you want it: https://github.com/gushwork-design/gushwork-design/blob/main/ONBOARDING.md
+> Detail if you want it: https://github.com/gushwork-design/design-system/blob/main/ONBOARDING.md
 
 [`ONBOARDING.md`](ONBOARDING.md) is the fuller version — three steps and the reference material
 for when something looks wrong. It covers the four ways output goes off-system, which is what

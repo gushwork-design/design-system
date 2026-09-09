@@ -23,7 +23,7 @@ No output, or "command not found"? Install it first: https://docs.claude.com/en/
 reach the repo and have git authenticated on this machine:
 
 ```bash
-git ls-remote https://github.com/gushwork-design/gushwork-design.git HEAD
+git ls-remote https://github.com/gushwork-design/design-system.git HEAD
 ```
 
 A commit sha means you're set. An error means one of two things — **ask Utsav to add you as a
@@ -43,7 +43,7 @@ gh auth login && gh auth setup-git
 **One line, in any terminal:**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/gushwork-design/gushwork-design/main/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/gushwork-design/design-system/main/scripts/install.sh | bash
 ```
 
 It adds the marketplace, installs the plugin, and turns on auto-update. Every step is idempotent,
@@ -56,7 +56,7 @@ steps later.
 ```
 Set up the Gushwork Design System plugin for me:
 
-1. Run: claude plugin marketplace add gushwork-design/gushwork-design
+1. Run: claude plugin marketplace add gushwork-design/design-system
 2. Run: claude plugin install gushwork-design@gushwork
 3. Verify with: claude plugin list
 
@@ -66,7 +66,7 @@ Then tell me to restart Claude Code, and give me three lines on how to use it.
 **Or by hand**, if you'd rather watch each step:
 
 ```bash
-claude plugin marketplace add gushwork-design/gushwork-design && claude plugin install gushwork-design@gushwork
+claude plugin marketplace add gushwork-design/design-system && claude plugin install gushwork-design@gushwork
 ```
 
 The step that used to be third — hand-editing `autoUpdate` into `known_marketplaces.json` — is
@@ -141,7 +141,7 @@ which is exactly why the check speaks at the *start* of a session rather than th
 | Nothing happened when I pasted the commands | You pasted into claude.ai instead of Claude Code |
 | `claude plugin list` doesn't show it | Run the install again — a declined plugin won't re-prompt on its own |
 | No "Using the Gushwork … skill" line | You didn't restart; or ask for the skill by name |
-| `marketplace add` fails | Most likely **git isn't authenticated, or your work org restricts marketplaces** — the repo is public, so plain access is not the usual cause. Run `git ls-remote https://github.com/gushwork-design/gushwork-design.git HEAD`: an error there means git itself cannot reach GitHub — `gh auth login && gh auth setup-git`. If that succeeds and `marketplace add` still fails, your work org restricts marketplaces |
+| `marketplace add` fails | Most likely **git isn't authenticated, or your work org restricts marketplaces** — the repo is public, so plain access is not the usual cause. Run `git ls-remote https://github.com/gushwork-design/design-system.git HEAD`: an error there means git itself cannot reach GitHub — `gh auth login && gh auth setup-git`. If that succeeds and `marketplace add` still fails, your work org restricts marketplaces |
 | Output looks generic | You're in a scratch folder, not a real product repo |
 | Values don't match Figma | You're on a stale version — see [Updates find you](#updates-find-you) |
 

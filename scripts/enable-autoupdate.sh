@@ -32,7 +32,7 @@ if entry is None:
     sys.exit(
         "the 'gushwork' marketplace is not installed on this machine.\n"
         "  run this first, then re-run:\n"
-        "    claude plugin marketplace add gushwork-design/gushwork-design\n"
+        "    claude plugin marketplace add gushwork-design/design-system\n"
         "    claude plugin install gushwork-design@gushwork"
     )
 
