@@ -69,7 +69,7 @@ One short lead-in line, one fenced block, one link:
 > ```
 > Hi Utsav — built 1 new element + 8 deviations while making the Meta Ads dashboard.
 > All token-safe, nothing new added to the palette or type ramp.
-> Detail: https://github.com/gushwork-design/gushwork-design/blob/main/notices/2026-08-06-meta-ads.md
+> Detail: https://github.com/gushwork-design/design-system/blob/main/notices/2026-08-06-meta-ads.md
 > Worth your eye: the card-layout KPI cap — I overrode a measured split.
 > ```
 >

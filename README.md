@@ -17,7 +17,7 @@ and a hard stop rather than an invented component when something genuinely doesn
 ```
 Set up the Gushwork Design System plugin for me:
 
-1. Run: claude plugin marketplace add gushwork-design/gushwork-design
+1. Run: claude plugin marketplace add gushwork-design/design-system
 2. Run: claude plugin install gushwork-design@gushwork
 3. In ~/.claude/plugins/known_marketplaces.json, set "autoUpdate": true on the
    "gushwork" entry. Leave everything else in that file alone.
@@ -30,7 +30,7 @@ By hand, if you prefer: `claude plugin install` resolves a plugin **name from a 
 a git URL. This repo is its own single-plugin marketplace, so add it once, then install:
 
 ```bash
-claude plugin marketplace add gushwork-design/gushwork-design && claude plugin install gushwork-design@gushwork
+claude plugin marketplace add gushwork-design/design-system && claude plugin install gushwork-design@gushwork
 ```
 
 `scripts/install.sh` does all three steps and is safe to re-run.

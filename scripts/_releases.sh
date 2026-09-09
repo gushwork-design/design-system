@@ -20,7 +20,7 @@
 # Records are newest-first, one per line, fields split on US (0x1f).
 set -euo pipefail
 
-REPO="https://github.com/gushwork-design/gushwork-design"
+REPO="https://github.com/gushwork-design/design-system"
 MANIFEST=".claude-plugin/plugin.json"
 
 # Releases that predate the Session: trailer. Attribution is FIRST-HAND ONLY — transcript
