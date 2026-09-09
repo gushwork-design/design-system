@@ -308,7 +308,7 @@
     </div>
     <p class="lede">Release notes for the Gushwork design system, including new
        components, corrected measurements, and rulings by version. This page is
-       generated from <a class="lnk" href="https://github.com/gushwork-design/gushwork-design/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer">CHANGELOG.md</a>
+       generated from <a class="lnk" href="https://github.com/gushwork-design/design-system/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer">CHANGELOG.md</a>
        on GitHub.</p>
     <p class="hd__meta"><strong>v1.44.0</strong> · last updated 01 Sep 2026, 19:53</p>
   </header>
@@ -323,7 +323,7 @@
       <div class="body">
         <p class="body__sum">the plugin moves to design@gushwork.ai, and drift notices reach every surface</p>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/19e58c95ae920d254f400ef7e749acf6449f99ef" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>19e58c9</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/19e58c95ae920d254f400ef7e749acf6449f99ef" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>19e58c9</a>
           <a class="meta__l" href="claude://resume/5cf1ed9e-d859-496e-a0c8-0b4a15563507"><svg class="gl"><use href="#i-chat"/></svg>Moving the plugin to design@gushwork.ai</a>
         </div>
       </div>
@@ -342,7 +342,7 @@
           <div class="prose"><p>The stamp needed fixing before it could ship. scripts/stamp-release.sh hardcoded two skill names, and its announce-line regex was \w+, which cannot match a hyphen — so gushwork-lead-magnet was skipped and its announce line sat at v1.42.0 while both manifests read v1.43.0. That is the exact drift the announce line exists to expose, and a stale copy would have reported itself current. The loop now names all three and the pattern is [\w-]+.</p><p>The earlier stamp of this version aborted partway on that same skill, which is why preview/install.html was still on v1.42.0 in four places. Re-running the fixed script carried all six targets to v1.43.0 together.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/2aaed30fc364ed536a23e2a6fefa032058795e6b" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>2aaed30</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/2aaed30fc364ed536a23e2a6fefa032058795e6b" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>2aaed30</a>
           <a class="meta__l" href="claude://resume/3d40ae5b-83e5-4492-9851-6fa5fd6cd690"><svg class="gl"><use href="#i-chat"/></svg>Can AI find your business — lead magnet PDF</a>
         </div>
       </div>
@@ -361,7 +361,7 @@
           <div class="prose"><p>1. There was no ruling for &quot;we could not read this&quot;. states.md ruled empty and loading on 7 Aug and stopped there, but failed is a third condition, not a shade of either: empty means we read the source and it held nothing; unavailable means we could not read it at all. With five stores behind one page, any one can fail while the others are fine, so the state belongs to the card that failed rather than to the page.</p><p>The ruling is one line — an element that encodes a quantity is REMOVED, never zeroed. A progress bar at 0%, a percentage of 0%, a sub-line of &quot;of 0&quot; and a value of &quot;—&quot; are all measurements; they say &quot;we looked, and the answer is nothing&quot;, which is a different claim from &quot;we could not look&quot; and is the one a reader acts on.</p><p>The principle was already half-ruled. The loading section says never render a 0 or a dash while data is in flight, because a 0 that means &quot;not loaded&quot; reads as &quot;we got no leads&quot;. What was missing was its scope, not its reasoning. R10 points the same way for toasts.</p><p>Scope is any data-bearing card or section, ruled ahead of Figma as the rest of states.md already is. The card keeps its surface, radius, padding, label and footprint so the page does not change shape when a store goes down; only the parts carrying a quantity change. No new token of any kind — status-dot Status=behind, Badge Color=Red, and the value dropping to body-14-med on neutral-500 are all existing variants. The proposal specified Badge Tone=danger; Badge has no Tone property, and the correction is recorded.</p><p>2. output-targets.md told every build to import from components/dashboard/ before writing a component. That folder does not exist and never did — there is not one .tsx or .jsx in the plugin — so anyone following the instruction hit a wall. It now points at the measured specs in exports/, which is what the folder would have been compiled from. Whether to build it for real is a separate decision and is in the backlog, not settled here.</p><p>stat-card and metric-card bump to 1.42.0, breaking: false — existing builds render correctly, they simply have no failure treatment, so owners get the amber notice rather than the red one. metric-card&#x27;s existing card-layout FINDING is preserved alongside the new note. kpi-card and analytics-card are in scope for the ruling but are v1 section-elements and absent from the registry, so nothing was bumped there.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/6aadb8bf59783e607318cf349541eaa59c7beb34" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>6aadb8b</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/6aadb8bf59783e607318cf349541eaa59c7beb34" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>6aadb8b</a>
           <a class="meta__l" href="claude://resume/59c33991-9d00-4350-80e6-a4ccfe4ff66b"><svg class="gl"><use href="#i-chat"/></svg>Gushwork design plugin fails to load</a>
         </div>
       </div>
@@ -381,7 +381,7 @@
           <div class="prose"><p>Hook load failed: Duplicate hooks file detected: ./hooks/hooks.json resolves to already-loaded file .../gushwork-design/1.41.0/hooks/hooks.json</p><p>The whole plugin fails to load, not just the hook — both skills go with it. So the one release whose headline was &quot;updates that find you&quot; is the release that silently takes the design system away from anyone who installs it. Anyone already running autoUpdate got it at their next start; the hook meant to turn autoUpdate on for everyone else cannot run, because it lives inside the plugin that no longer loads.</p><p>The fix is to delete the key. hooks/hooks.json does not move and is not renamed — it loads from the standard path, which is where it already was. manifest.hooks is only for ADDITIONAL hook files. check-update.test.sh still passes 13/13.</p><p>Bumped rather than corrected in place on 1.41.0: the cache is keyed by version (~/.claude/plugins/cache/&lt;marketplace&gt;/&lt;plugin&gt;/&lt;version&gt;/) and version is the field <code>plugin update</code> compares, so a fix that does not move it does not reach a machine already holding a broken 1.41.0.</p><p>One thing to carry into the next release: <code>claude plugin validate .</code> does NOT catch this. It finds .claude-plugin/marketplace.json first, validates the marketplace manifest and returns before any plugin-level check runs — it passes cleanly on the broken 1.41.0. Step 5 of the release flow in CONTRIBUTING.md cannot be trusted for plugin-manifest errors. <code>claude plugin list</code> reading &quot;enabled&quot; after an install is the check that would have caught it in seconds.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/3d44b207153d058832722cc146f30111d80100ff" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>3d44b20</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/3d44b207153d058832722cc146f30111d80100ff" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>3d44b20</a>
           <a class="meta__l" href="claude://resume/59c33991-9d00-4350-80e6-a4ccfe4ff66b"><svg class="gl"><use href="#i-chat"/></svg>Gushwork design plugin fails to load</a>
         </div>
       </div>
@@ -400,7 +400,7 @@
           <div class="prose"><p>1. A SessionStart hook, shipped inside the plugin (hooks/hooks.json -&gt; scripts/check-update.sh). ROLLOUT.md said autoUpdate is per-machine, unsettable from repo settings, so &quot;either your MDM payload writes it, or people run this once&quot; — and a skipped flag means emitting last month&#x27;s colours with full confidence. The hook arrives with the plugin, so it runs whether or not anyone flipped anything: it sets the flag once, and names the components that changed and which are breaking for a screen built on the old ones. It also closes the other half of that gap — auto-update lands a version but takes effect only on the NEXT start, so the session that could warn you is the one that did not know.</p><p>It is silent when there is nothing to say, capped at a 10s hook timeout with a 3s fetch and a 6h cache, and every failure path exits 0. check-drift.sh said push was impossible for a git-clone plugin; a pull at session start is the closest honest thing, and it needs no stamp in the file.</p><p>2. version.json, generated at publish time by scripts/version-json.sh and served from the root of the deploy. Never committed — it is a projection of marketplace.json and component-registry.json, so a committed copy could only be a second thing to go stale. The hook reads it over HTTPS and falls back to a git fetch in the marketplace clone. Reading a public URL is the point: the thing that tells you that you are behind must not require the access that being behind might have cost you. Same reasoning that already puts component-registry.json on that deploy.</p><p>3. One-line install. scripts/install.sh already did all three steps idempotently; nothing pointed at it. It now leads INSTALL.md, ROLLOUT.md and the install page, and the raw python one-liner that hand-edited known_marketplaces.json is gone from both routes — the hook does that now. The page gains a &quot;Staying current&quot; section, reusing existing classes and no new tokens.</p><p>Also repairs a live skew: v1.40.0 moved plugin.json and both SKILL.md announce lines but not marketplace.json or preview/install.html, because stamp-release.sh was never run for it. The marketplace advertised 1.39.0 for ten days and the live install page told readers that anything below 1.39.0 was stale. publish-sheets.sh now refuses to deploy when those version fields disagree, which is the gate that would have caught it.</p><p>scripts/check-update.test.sh covers the hook: 13 assertions over behind/current/ ahead, breaking-component reporting, malformed payloads, a missing plugin root, a dead endpoint under a time cap, and the autoUpdate flip being idempotent and refusing an unparseable config. It caught two real bugs on the first pass — an ERR trap that swallowed the git fallback, and a backgrounded timeout that held stdout open for the full timeout on every capped call.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/f194df864fa5b34c5eb37b0754fa2b43e2409aab" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>f194df8</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/f194df864fa5b34c5eb37b0754fa2b43e2409aab" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>f194df8</a>
           <a class="meta__l" href="claude://resume/79ae8e54-cda3-4da9-9b12-c5875098cfcc"><svg class="gl"><use href="#i-chat"/></svg>Learning from shadcn&#x27;s install and update model</a>
         </div>
       </div>
@@ -419,7 +419,7 @@
           <div class="prose"><p>exports/dashboard/v2/phone.md is new — the phone shell measured off GW Dashbords 515:2176 and 515:2343. This closes the &quot;no phone dashboard spec exists&quot; gap that every earlier version of exports/dashboard/ recorded.</p><p>Three bugs fixed in the shipped reference builder:</p><ul><li>tokens.css is not safe to flatten. --gw-motion-fast is declared twice, and a last-match-wins read emitted 0ms unconditionally: every transition dead for every user, reduced-motion guard discarded. Same exposure covers the whole --gw-bp-* set.</li><li>:focus-visible emitted 2px solid primary-500, bypassing the ruled --gw-focus-ring. Right geometry, wrong colour, and the reference was teaching the deviation.</li><li>A reduced-motion guard placed before :root loses to the later declaration at equal specificity and silently does nothing.</li></ul><p>A supplied reference now defines content AND structure, ruled after a one-page postmortem was rebuilt as a nine-page app — every figure faithful, every component on-system, still the wrong deliverable. The interview asks &quot;one page or many?&quot; first.</p><p>Dead controls: a measured component&#x27;s anatomy is not a checklist. page-header&#x27;s action button, control Kind=user&#x27;s sign-out and dashboard-switcher&#x27;s menu all shipped doing nothing.</p><p>Findings reported, not fixed: light badge tints fail 4.5:1 at their own label size (3.15 / 3.07 / 4.28); v2 metric-card cannot fit card-layout&#x27;s measured 196 analytics slot; the phone title is a sixth display size with no token; build-rules.md&#x27;s &quot;leave the first column unsized&quot; only holds in a shared grid.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/7d4b9d63ba32067a4efd7db0a68c22cd707a58c9" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>7d4b9d6</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/7d4b9d63ba32067a4efd7db0a68c22cd707a58c9" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>7d4b9d6</a>
           <span class="none">no session recorded</span>
         </div>
       </div>
@@ -438,7 +438,7 @@
           <div class="prose"><p>The corrections most likely to be in an existing build:</p><p>badge     dark tints are &lt;Tone&gt;/Alpha/10 with a &lt;Tone&gt;/300 label. Green and amber had NO dark override and were painting light /25 tints on a dark surface. topbar    a button glyph binds to the same variable as its label, not the muted icon colour. Sync Now is Neutral/50 in dark; Compare carries a fill and a stronger stroke. sidebar   nav column is SPACE_BETWEEN over two blocks; footer takes a 1.5px Neutral/100 top stroke; nav icons follow their label. ring      the band is 2px, from arcData.innerRadius 0.8 — not the 5px stroke. It was 2.5x too heavy. tooltip   the light bubble is Neutral/900, not black.</p><p>New: ring, dashboard-switcher and date-range-picker, specified in exports/dashboard/v2/overlays.md and built on the Figma sheet as 09-overlays.</p><p>New: build stamps and drift notices. A dashboard outlives the session that made it and nothing can be pushed to its owner, so every build now records the components it used and the version it used them at. scripts/check-drift.sh reads that for an agent; the page itself reads it on load and tells its owner what changed, with a prompt to paste and a link to the changelog. Every failure path is silent — a dashboard that cannot phone home is still a working dashboard.</p><p>Two rules that cost real time and are now written down:</p><p>strokesIncludedInLayout decides whether a stroke is layout or paint. Two frames with identical sizing gave opposite results. The note this repo used to carry — &quot;INSIDE consumes on HUG, not on FIXED&quot; — fitted the numbers and was wrong.</p><p>A hover needs contrast against its text AND separation from its surface. Checking only the first misses the hover that equals the surface it lands on and renders as no hover at all. Four of those shipped.</p><p>preview/_verify_gtm_command_center.py locks all of it behind 202 assertions.</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/cb4b177e07a76e305df3798be3335d91ac863f0b" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>cb4b177</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/cb4b177e07a76e305df3798be3335d91ac863f0b" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>cb4b177</a>
           <a class="meta__l" href="claude://resume/1d76ea71-a078-4d02-a629-cbbfe1407b30"><svg class="gl"><use href="#i-chat"/></svg>Gushwork dashboard component sheet and GTM build</a>
         </div>
       </div>
@@ -457,7 +457,7 @@
           <div class="prose"><p>exports/dashboard/v2/  26 sets + 1 component, 155 variants, 21 themed. Supersedes only what was replaced: Graph, toast, dashboard-build, login-screen, avatar, build-rules, the Sections ladder and every hover/focus/disabled ruling are untouched and still authoritative. Old files keep their filenames with supersession banners.</p><p>DECISIONS  R14 screens beat library · R15 the display ramp has no tokens, use the literal spec and say so · R16 dark is a Theme variant on surface-bearing components only.</p><p>preview/gtm-command-center.html  the overview screen built from frame 236:31785 and made interactive: sortable headers, real dropdown menus, working pagination, live filter, light/dark, sidebar collapse, tooltips. Colours and Inter type are pulled by name from tokens.css at build time — the generator exits rather than falling back.</p><p>preview/review-sheet.html  93 light + 21 dark specimens under 03 · Dashboard.</p><p>Two things stay open and are not silently closed: these components live in the product file and are not published to the library, and the display ramp still needs library variables.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/3b880f18a13f36db951026d1066710d654bb69a6" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>3b880f1</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/3b880f18a13f36db951026d1066710d654bb69a6" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>3b880f1</a>
           <span class="none">no session recorded</span>
         </div>
       </div>
@@ -476,7 +476,7 @@
           <div class="prose"><p>It is now <code>badge</code> 1582:628 at Theme=Light, Color=Blue, Icon=no, Size=Small, every value read off the measured table in exports/web/component-library.md: height 24, 8px horizontal padding, <code>Radius/8</code>, and the Light-theme pairing of {Color}/Alpha/10 fill with {Color}/500 text. <code>Blue</code> is a real value of the Color axis that the written rule never documented.</p><p>The trap worth restating: THE TYPE RAMP CHANGES WEIGHT WITH SIZE — body-12-med → body-14-sem → body-18-sem. Small is Medium, everything above it is Semi Bold. It is not one style at three sizes, and reading the size off the ramp without reading the weight is how the Large version came out wrong.</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/30203b95ec01f739f1b93ca31b5b03d75dc869c2" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>30203b9</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/30203b95ec01f739f1b93ca31b5b03d75dc869c2" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>30203b9</a>
           <a class="meta__l" href="claude://resume/bea0dbdb-01ec-4ba8-b87d-473775b0cec7"><svg class="gl"><use href="#i-chat"/></svg>Changelog sheet</a>
         </div>
       </div>
@@ -495,7 +495,7 @@
           <div class="prose"><p>Bigger, to hold its own next to a 38px heading: <code>body-18-med</code> at <code>--gw-radius-12</code> with 8/16 padding, rather than the 12px pill it was. Reads &quot;Gushwork Design Plugin&quot; — the plugin is the thing being versioned here, and the old &quot;Gushwork Design&quot; named the wrong noun.</p><p>Measured: 20px gap, both centred on the same pixel, 45 high against a 38px title.</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/650fe02745e4768e5cc74802eba2dd072463bcdb" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>650fe02</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/650fe02745e4768e5cc74802eba2dd072463bcdb" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>650fe02</a>
           <a class="meta__l" href="claude://resume/bea0dbdb-01ec-4ba8-b87d-473775b0cec7"><svg class="gl"><use href="#i-chat"/></svg>Changelog sheet</a>
         </div>
       </div>
@@ -514,7 +514,7 @@
           <div class="prose"><p>Two deliberate exceptions, and they are why this is not a <code>&lt;base target&gt;</code>:</p><ul><li>The release index&#x27;s <code>#v1-30-0</code> anchors are the same page. A new tab there would open a second copy of the sheet on every click.</li><li>The <code>claude://resume</code> links hand off to a protocol handler. The browser has no page to render, so a new tab is left blank.</li></ul><p><code>rel=&quot;noopener noreferrer&quot;</code> goes on every one. <code>target=&quot;_blank&quot;</code> alone hands the opened page a live <code>window.opener</code> handle back to this one.</p><p>Verified in the browser rather than by grep: of 102 anchors, all 43 external carry both attributes, and all 41 in-page anchors and all 18 protocol links carry neither.</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/f3635dbad93e3f2b5c6ede6d96d72afc77ccdd3e" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>f3635db</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/f3635dbad93e3f2b5c6ede6d96d72afc77ccdd3e" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>f3635db</a>
           <a class="meta__l" href="claude://resume/bea0dbdb-01ec-4ba8-b87d-473775b0cec7"><svg class="gl"><use href="#i-chat"/></svg>Changelog sheet</a>
         </div>
       </div>
@@ -533,7 +533,7 @@
           <div class="prose"><p>The sticky &quot;Releases&quot; label got the same treatment: its background is what hides rows passing under it, so it now reaches the gap below itself instead of letting a half-clipped version number show through.</p><p>THE BRAND IS A BADGE, RIGHT-ALIGNED WITH THE TITLE, replacing the eyebrow above it. Same job — saying which system this belongs to — without pushing the title down the page. h1 drops its bottom margin so the two align on their centres rather than around the heading&#x27;s spacing; measured, both centre on the same pixel and the badge sits flush with the header&#x27;s right edge.</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/57e8cddf90b71ff896fd15e8ece5b582d7448b89" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>57e8cdd</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/57e8cddf90b71ff896fd15e8ece5b582d7448b89" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>57e8cdd</a>
           <a class="meta__l" href="claude://resume/bea0dbdb-01ec-4ba8-b87d-473775b0cec7"><svg class="gl"><use href="#i-chat"/></svg>Changelog sheet</a>
         </div>
       </div>
@@ -552,7 +552,7 @@
           <div class="prose"><p>That last line is the useful correction: the skills announce their own version at the start of a session, and <code>claude plugin list</code> lags a marketplace refresh and under-reports. The old text pointed at plugin.json, which answers a maintainer&#x27;s question, not a reader&#x27;s.</p><p>THE FAVICON IS THE INTERNAL MARK — the symbol knocked out in white on a black rounded square, not the bare brand-blue symbol, which disappears against light browser chrome at 16px. Composed from assets/logo/gushwork-symbol-white.svg with the Figma layer wrappers stripped; the two paths are untouched, the square is --gw-color-black at --gw-radius-20, and the symbol sits at 52% centred. All four hosted pages carry it.</p><p>THE FOOTER NOTE IS GONE. It explained the sheet&#x27;s own derivation to an audience that came to read what changed, and its lead sentence had already gone stale: once changelog.sh was fixed both logs carried the same count, so it rendered &quot;carried 39 of them and silently dropped v1.20.0&quot;, which is nonsense. That history lives in CONTRIBUTING.md, where maintainers look. <code>MD_ROWS</code> is removed from the generator with it.</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/e1767bceeb91bcaf7a699c9c0fdd5de79a1e3eca" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>e1767bc</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/e1767bceeb91bcaf7a699c9c0fdd5de79a1e3eca" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>e1767bc</a>
           <a class="meta__l" href="claude://resume/bea0dbdb-01ec-4ba8-b87d-473775b0cec7"><svg class="gl"><use href="#i-chat"/></svg>Changelog sheet</a>
         </div>
       </div>
@@ -571,7 +571,7 @@
           <div class="prose"><p>THE DISCLOSURE CARET FOLLOWS ITS LABEL. It was a right-caret before the words; it is now <code>CaretDown</code> after them, flipping 180 on open. A chevron after the text is the affordance people already read as &quot;expand&quot;, and down describes what the control will do. Bold weight per the icon table in foundation/shared-components.md — nav-style carets are Bold, and that same file forbids substituting a text glyph for the real one.</p><p>THE RELEASE INDEX FOLLOWS THE PAGE. The version whose release sits at the top goes semibold; the tint only supports it. The index also scrolls itself so the active row stays in view, which at thirty-eight entries it otherwise often was not. <code>font-variant-numeric</code> is re-declared on the active rule because the <code>font</code> shorthand resets it, and losing tabular figures made the column jitter as the weight changed.</p><p>SLIM ROUNDED SCROLLBARS on both the index and the page — the default chrome is heavy next to 12px rows. Both <code>scrollbar-width</code>/<code>-color</code> and <code>::-webkit-scrollbar</code> are declared: the first covers Firefox, the second Safari and Chrome, and neither is a fallback for the other.</p><p>THE GUSHWORK SYMBOL IS THE FAVICON, on all four hosted pages. Inlined as an SVG data URI rather than linked, so it cannot 404 on a host that did not copy assets/. Built from assets/logo/gushwork-symbol-original.svg by stripping the five nested Figma &lt;g&gt; layer wrappers; the two paths and the brand blue are untouched, and that #0070FF is exactly --gw-color-primary-500.</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/dbebdfc0f77b0e4ba8d87816ddf57c73ff3dd37b" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>dbebdfc</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/dbebdfc0f77b0e4ba8d87816ddf57c73ff3dd37b" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>dbebdfc</a>
           <a class="meta__l" href="claude://resume/bea0dbdb-01ec-4ba8-b87d-473775b0cec7"><svg class="gl"><use href="#i-chat"/></svg>Changelog sheet</a>
         </div>
       </div>
@@ -590,7 +590,7 @@
           <div class="prose"><p>DETAIL NOW COMES FROM THE COMMIT BODY. The table could only ever show a subject; the sheet renders the body too, as paragraphs and bullet lists, with the <code>Session:</code> trailer stripped. The first block shows by default and the rest sits behind a Full notes disclosure, because bodies here run past twenty lines and thirty-seven of them expanded is not a page anyone reads. Write release commits accordingly: the subject is the sentence people read, the first paragraph is the summary they see.</p><p>Rendering moved to <code>scripts/_changelog_sheet.py</code> — bash derives, python renders. Markdown support is deliberately just backticks, ** and bare URLs: a changelog needing a full markdown engine is one whose commit messages have stopped being commit messages.</p><p>Three things this shook out:</p><ul><li><code>_releases.sh</code> gained a sixth field and <code>changelog.sh</code> still read five, so <code>read</code> folded the whole body into <code>session</code> and printed it inside the Session link. Every consumer of a record must read every field.</li><li>BSD <code>tr</code> does not understand <code>\x1e</code>. Encoding body newlines with it translated the literal characters <code>e</code>, <code>x</code> and <code>1</code> instead and shredded every body. It is <code>\036</code>, octal.</li><li>A <code>&lt;code&gt;</code> chip bound to a 14px token rendered small inside the 16px lede and knocked the line off its baseline. Chips now inherit size and line-height; weight and family are the only type properties they own.</li></ul></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/8023f6e39a1e9e7c1372a129613be984664c7bbd" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>8023f6e</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/8023f6e39a1e9e7c1372a129613be984664c7bbd" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>8023f6e</a>
           <a class="meta__l" href="claude://resume/bea0dbdb-01ec-4ba8-b87d-473775b0cec7"><svg class="gl"><use href="#i-chat"/></svg>Changelog sheet</a>
         </div>
       </div>
@@ -609,7 +609,7 @@
           <div class="prose"><p>THE PAGES ARE NEVER EDITED. The script stages a copy in a temp directory and deploys that, keeping the repo&#x27;s own layout, so the URLs are /preview/&lt;sheet&gt;.html and not one line of any sheet had to change. <code>scripts/publish-index.html</code> is the entry point — a deploy needs one or the root 404s — and is the only page that exists solely to be hosted.</p><p>It refuses to ship a stale changelog: <code>release-log.sh --check</code> runs first. It also follows each sheet&#x27;s ../assets/ references, so a new sheet with assets publishes without editing the script — add its path to SHEETS and go.</p><p>The Vercel MCP cannot do this. <code>deploy_to_vercel</code> takes files inline in the tool call and this tree is 2.4 MB — three font TTFs plus a 490 KB review sheet — so the CLI is the only path. If <code>vercel whoami</code> fails, <code>vercel login</code>; never put a token on the command line.</p><p>Hosting is for reading and reviewing. The plugin is still how you build.</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/bd1aef27385099265cd9ede90119adc5b1b2c9f1" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>bd1aef2</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/bd1aef27385099265cd9ede90119adc5b1b2c9f1" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>bd1aef2</a>
           <a class="meta__l" href="claude://resume/bea0dbdb-01ec-4ba8-b87d-473775b0cec7"><svg class="gl"><use href="#i-chat"/></svg>Changelog sheet</a>
         </div>
       </div>
@@ -629,7 +629,7 @@
           <div class="prose"><p>Fixed from the measured geometry already in the repo, not redrawn: <code>exports/dashboard/login-screen.md</code> records the glyph as 14.065 x 11.816 centred in an 18px slot, harvested to <code>assets/icons/arrow-right.svg</code>. Its <code>d</code> is now inlined. Verified in the browser — three arrows, getBBox 14.06 x 11.82, console clean.</p><p>The fill stays on the parent &lt;svg&gt; and off the path, so the glyph keeps inheriting currentColor. Putting it on the path is the trap documented in the website-performance build: strip a wrapper that carries <code>fill</code> and every glyph renders black.</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/ab41ec739ea97b80fca63cb4cb361e5d94273082" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>ab41ec7</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/ab41ec739ea97b80fca63cb4cb361e5d94273082" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>ab41ec7</a>
           <a class="meta__l" href="claude://resume/bea0dbdb-01ec-4ba8-b87d-473775b0cec7"><svg class="gl"><use href="#i-chat"/></svg>Changelog sheet</a>
         </div>
       </div>
@@ -648,7 +648,7 @@
           <div class="prose"><p>THE SHEET. <code>preview/changelog-sheet.html</code> renders the release history on-brand: the measured table-row (padding 12/24, neutral-200 border, cells body-14-med neutral-600, header body-14-sem neutral-800, hover neutral-25), the section shell and the &quot;With Dropdown&quot; stat cells, all from tokens.css. Generated by <code>scripts/changelog-sheet.sh</code> — never hand-written, so it cannot drift.</p><p>Two additions, both new rules rather than new values, and both listed on the sheet itself: a sticky table header, and a primary badge reusing the primary-alpha-10 / primary-500 pairing the section icon tile already uses. No new colour, size, radius or shadow.</p><p>A RELEASE IS A VERSION BUMP, NOT A COMMIT SUBJECT. <code>changelog.sh</code> defined a release as a commit whose subject started <code>vX.Y.Z</code>. That convention began at v1.19.0, so the log carried 11 of 34 releases and silently dropped v1.20.0 — the login screen — because its commit was titled &quot;Add dashboard-login-screen&quot;. A subject is a habit; the version field in plugin.json is what <code>plugin update</code> actually compares. The derivation now reads that field, and nothing that shipped can be lost by writing a commit message the wrong way.</p><p><code>scripts/_releases.sh</code> holds that derivation once and both renderings consume it, so the markdown and the sheet cannot disagree. <code>scripts/release-log.sh</code> rebuilds both; <code>--check</code> fails if either is stale.</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/76ab96d5ad81f1ec8aa79510fd6615b570b07310" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>76ab96d</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/76ab96d5ad81f1ec8aa79510fd6615b570b07310" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>76ab96d</a>
           <a class="meta__l" href="claude://resume/bea0dbdb-01ec-4ba8-b87d-473775b0cec7"><svg class="gl"><use href="#i-chat"/></svg>Changelog sheet</a>
         </div>
       </div>
@@ -664,7 +664,7 @@
         <p class="body__sum">fall back to the backfill table when a trailer has no uuid</p>
         <div class="prose"><p>v1.27.0 carried a Session: trailer written before the &quot;&lt;uuid&gt; &lt;title&gt;&quot; shape existed, so it was present-but-unlinkable and the backfill never fired. The lookup now runs whenever the trailer does not start with a uuid, not only when it is missing.</p></div>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/5a8df70cce32dde46da01cfdabdc9cbae07972b5" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>5a8df70</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/5a8df70cce32dde46da01cfdabdc9cbae07972b5" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>5a8df70</a>
           <a class="meta__l" href="claude://resume/5a7c696b-5bbf-4aee-adf8-603e744f9018"><svg class="gl"><use href="#i-chat"/></svg>Gushwork Design System plugin</a>
         </div>
       </div>
@@ -683,7 +683,7 @@
           <div class="prose"><p>Claude.app registers a claude:// URL scheme with a <code>resume</code> route that reopens a CLI session and fails with &quot;its transcript may have been removed&quot; when the id does not resolve, so it addresses local sessions by uuid. The Session: trailer now carries &quot;&lt;uuid&gt; &lt;title&gt;&quot; and renders as [title](claude://resume/&lt;uuid&gt;).</p><p>The link only resolves on the machine holding the transcript, so it is a pointer for the maintainer; teammates use the commit link. Chat CONTENT stays out of the repo entirely — the repo is public. A uuid and a title leak nothing.</p><p>Backfilled the nine prior releases from first-hand knowledge only. Transcript greps looked tempting and are not trustworthy: forked sessions duplicate each other&#x27;s history, so a session that merely MENTIONS a version reads as its author. Two different greps produced two different, both-wrong attributions before I noticed.</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/6388221e9e506db19c6281d1165ff0c41f24ad16" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>6388221</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/6388221e9e506db19c6281d1165ff0c41f24ad16" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>6388221</a>
           <a class="meta__l" href="claude://resume/5a7c696b-5bbf-4aee-adf8-603e744f9018"><svg class="gl"><use href="#i-chat"/></svg>Gushwork Design System plugin</a>
         </div>
       </div>
@@ -702,7 +702,7 @@
           <div class="prose"><p>CHANGELOG.md is generated by scripts/changelog.sh from git history, so it cannot drift from what actually shipped. A row appears for every commit whose subject starts vX.Y.Z; the subject after the dash is the summary, and each row links to its commit on GitHub.</p><p>The Session column comes from a <code>Session:</code> trailer on the release commit, and holds the chat&#x27;s TITLE rather than a link. Chat sessions are machine-local ids with no shareable URL, so a link would be dead for anyone but its author — and this repo is public, so ids, transcript paths and chat content stay out of it.</p><p>stamp-release.sh now prints the commit shape to use, and CONTRIBUTING documents the two-step release. Backfilled all 8 prior releases; their Session column is blank, which is honest — they predate the convention.</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/732d4dff9b864016028460b97ae381bc268fd624" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>732d4df</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/732d4dff9b864016028460b97ae381bc268fd624" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>732d4df</a>
           <a class="meta__l" href="claude://resume/5a7c696b-5bbf-4aee-adf8-603e744f9018"><svg class="gl"><use href="#i-chat"/></svg>Gushwork Design System plugin</a>
         </div>
       </div>
@@ -721,7 +721,7 @@
           <div class="prose"><p>creatorInfo carries a date AND a time (R12):</p><p>Created and owned by Utsav on 8 Aug 2026 at 5:47 pm.</p><p>Format is <code>D MMM YYYY at h:mm am/pm</code> — no leading zero on the day or the hour, three-letter month, lowercase meridiem. This is the only place the system writes a timestamp, so the format is fixed here rather than left to each build.</p><p>build-rules.md — two additions:</p><ul><li>dashboard-login-screen scales on BOTH axes. dashboard-build is fixed in width and fluid in height, so one factor from innerWidth is enough; the login screen is fixed at 1440x840 and its 800px panel has to stay square. A width-only factor stretches it vertically on a short viewport.</li><li>Guard the fit factor against a zero viewport. A tab that has not been laid out reports innerWidth/innerHeight 0, making the factor 0 and collapsing the screen to nothing — it renders blank rather than broken, which reads as a build failure.</li></ul><p>text-field.md — do not animate the label between 14 and 12. Nothing in the set specifies motion there, and font-size does not composite; in practice it held the old size until an unrelated repaint and reported 14px on a Filled field.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/499cdde30f8d32b21cbff129a906a42c775da22d" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>499cdde</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/499cdde30f8d32b21cbff129a906a42c775da22d" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>499cdde</a>
           <a class="meta__l" href="claude://resume/5eeaa384-81a5-460f-8fff-20a987090035"><svg class="gl"><use href="#i-chat"/></svg>Website performance dashboard</a>
         </div>
       </div>
@@ -740,7 +740,7 @@
           <div class="prose"><p>R12 — two of the six are not free copy:</p><ul><li>creatorInfo is attribution, always &quot;Created and owned by {first name} on {date}.&quot;, both values off the dashboard record.</li><li>welcomeDescription says what the dashboard is and how to use it. Not a greeting (the title already greets) and not a status report on what happened while the user was away.</li></ul><p>R13 — the left panel&#x27;s geometry:</p><ul><li>Title to subtext is 24, not the measured 32. Moves welcomeDescription to y 96; the 600x355 block, creatorInfo at 405 and the panel tiling are unchanged. A Figma-side fix to report.</li><li>welcomeDescription is always exactly two lines — 56px reserved and clamped at two. The panel is a tiling that only closes if each block holds its height, so a one-line subtext collapses the rhythm and a three-line one pushes creatorInfo out of its box. The clamp is a backstop: the practical ceiling is ~121 chars at the 600 column, and it is punctuation-sensitive — 121 with a comma wraps to two, the same sentence at 122 with an em-dash wraps to three and truncates.</li></ul><p>Ruled by Utsav, 8 Aug 2026.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/bdfa56ac2a1af971479edc8be9f7aacad18b0608" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>bdfa56a</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/bdfa56ac2a1af971479edc8be9f7aacad18b0608" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>bdfa56a</a>
           <a class="meta__l" href="claude://resume/5eeaa384-81a5-460f-8fff-20a987090035"><svg class="gl"><use href="#i-chat"/></svg>Website performance dashboard</a>
         </div>
       </div>
@@ -760,7 +760,7 @@
           <div class="prose"><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/d8c6bb82267a94a5d8152ec7dd5935aa22fe4f80" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>d8c6bb8</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/d8c6bb82267a94a5d8152ec7dd5935aa22fe4f80" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>d8c6bb8</a>
           <a class="meta__l" href="claude://resume/5a7c696b-5bbf-4aee-adf8-603e744f9018"><svg class="gl"><use href="#i-chat"/></svg>Gushwork Design System plugin</a>
         </div>
       </div>
@@ -779,7 +779,7 @@
           <div class="prose"><p>section/With Dropdown: the structure tree in sections.md came from annotations and was wrong in four places. The metric value is Vert Grotesk Display Medium 18, not 20px. The first data card holds 10 identical cells, not 6 plus 2 compact ones; the second holds 6, not 9. Its data card has no border, where section/Container&#x27;s inner card has a 1px neutral/50 one — two sections that read as siblings are built differently. Its data row is drawn 1036 wide inside a 1028 content box and is clipped by 8px, so build it width:100%. Its header control is section/section-element/dropdown 2142:583 at 466 wide, not controls/dropdown, and it carries two hand-built badges of which the second is a green Active status that is part of the component rather than example content.</p><p>section/table: 1084x674, tiling exactly as 12+28+16+606+12. The collapse caret is not vertically centred — the title block centres at y=14 and the caret at y=26, 12px apart, with the caret overflowing the 28-tall header by 4. section/Container centres the two correctly, so this is section/table alone. Build it centred.</p><p>Still provisional: table-row Type=Header remains ruled rather than measured, and is flagged as such. Of five rulings checked across these two passes, one held.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/8a77366a9bb98c52220057109ee003f4af33154d" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>8a77366</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/8a77366a9bb98c52220057109ee003f4af33154d" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>8a77366</a>
           <a class="meta__l" href="claude://resume/5a7c696b-5bbf-4aee-adf8-603e744f9018"><svg class="gl"><use href="#i-chat"/></svg>Gushwork Design System plugin</a>
         </div>
       </div>
@@ -798,7 +798,7 @@
           <div class="prose"><p>controls/dropdown was wrong in five places. Both its sections had been RULED on the belief Figma recorded only sizes; Figma had everything. Menu border is neutral/50 not neutral-100, options are button-12-med not body-12-med, option hover is neutral/50 not neutral-25, and the menu is 160 wide against a 144 trigger, right-aligned rather than matching it. The fifth matters most: the ruling specified a 12px primary-500 Check for the selected option, and no check, tick or mark of any kind exists in the symbol. A build following it renders an affordance the design does not have. The Color=White ruling also described its border as matching &quot;how the Grey variant is constructed&quot; — Grey has no ring at all, it is a bare fill.</p><p>table-row: the ruled neutral/25 hover is correct, now confirmed rather than assumed. State=Selected was never recorded and is the same neutral/25 — a selected row is distinguished only by a 16px black checkbox, so hovering a selected row changes nothing. Cell text binds a raw #6a7077 (R4).</p><p>section/Container is fully correct. First component in either pass needing no correction.</p><p>The chart palette blocker was a misreading. Graph Type=Line has no second series: its data is four SVG assets, and the shape read as a colourless second series is the gradient area fill under the one line, #0070FF 30% to 0%. Line is single-series by design. Only Grouped Bar needed a palette, and R11 rules it — two of its three raw hexes sit within a few units of primary-200 and yellow-200 and are treated as those tokens unbound; the third is a violet with no ramp in the system, added as --gw-color-chart-violet. Three series is the ceiling.</p><p>Also found: an undocumented tooltip inside Graph Type=Line, now recorded; and two one-off colour drifts, one label in Bar and one in Grouped Bar, each a single element differing from its siblings.</p><p>Not done: section/With Dropdown and section/table remain unread, as does table-row Type=Header. Flagged provisional given the 15-of-17 rate.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/281a6062579a00f318e6e762df475e3acb18953a" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>281a606</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/281a6062579a00f318e6e762df475e3acb18953a" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>281a606</a>
           <a class="meta__l" href="claude://resume/5a7c696b-5bbf-4aee-adf8-603e744f9018"><svg class="gl"><use href="#i-chat"/></svg>Gushwork Design System plugin</a>
         </div>
       </div>
@@ -817,7 +817,7 @@
           <div class="prose"><p>R0  spec vs Figma — the measurement wins; settles all four RECONCILIATION conflicts R1  input/text-field is a shared atom, foundation/text-field.md, both skills own it R2  the text field has no hover state — State=Hover is byte-identical to Default R3  the Google button is 48 / radius 12 / no arrow, in both variants R4  titles use --gw-color-neutral-black, never raw #000000 R5  sub-pixel borders round to 1px — scaled instances, not design values R6  Yellow Warning builds --gw-color-yellow-500, not the off-palette #c18c0b R7  avatar backgrounds are the -25 step of their own hue; Blue and Orange drifted R8  the image typos are a documentation bug, not a key bug R9  on dark surfaces text is at most --gw-color-neutral-400 R10 errors never auto-dismiss; the 4s timer pauses on hover and focus</p><p>The text field is measured across all 14 variants. Its fill is neutral/50 in every one — it never changes, not on hover, not on focus, not on error. State=Hover is identical to Default, so the field has no hover treatment, which is the one documented exception to &quot;every interactive element has a hover state&quot;; that rule is about click targets. It is a floating-label field whose label shrinks on Filled but not on Selected. A warning grows it 56 to 76, and 76 assumes the message fits one line at 400 wide. Feedback=Yellow Warning binds #c18c0b, which is in no ramp — R6 builds yellow-500. All 14 are on the review sheet, and the three status glyphs are harvested to assets/icons/.</p><p>Withdrawn: the text field hover ruled at neutral-100, a third answer Figma does not have. CONTRIBUTING.md now requires confirming the source is silent before filling the silence — open the exact symbol whose value you are about to rule. The mirror case matters as much: verifying the field&#x27;s hover really is identical turned &quot;no hover&quot; into a finding about the design rather than a gap to paper over.</p><p>Also a correction between two of our own files. component-library.md reported the image typos as variant keys, read out of a structure blob; images.md had checked the canvas and found the real keys spelled correctly. I drafted R8 backwards from the first before the second corrected it. Standing rule recorded: where two of our own files disagree, the one that measured the canvas wins.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/49f980b5e265631985af7f908b3c92bdc206a4ba" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>49f980b</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/49f980b5e265631985af7f908b3c92bdc206a4ba" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>49f980b</a>
           <a class="meta__l" href="claude://resume/5a7c696b-5bbf-4aee-adf8-603e744f9018"><svg class="gl"><use href="#i-chat"/></svg>Gushwork Design System plugin</a>
         </div>
       </div>
@@ -836,7 +836,7 @@
           <div class="prose"><p>The lattice had two causes, both mine: BG 2323:21853 carries opacity 0.3, which sits on the parent and so never appeared in a per-cell read; and 400 cells each bordered on four sides doubled every shared edge to 2px, because Figma centre-aligns strokes and CSS puts borders inside the box. Each cell now draws right and bottom only. Three cells are filled neutral/900 — (15,7) (14,8) (6,15) — which I had missed entirely.</p><p>The Google mark was a text &quot;G&quot; placeholder; the real four-path asset and the ArrowRight are harvested to assets/. The buttons and fields were rendering all along — hover states are now live, which is what made them look inert.</p><p>button.md carried three ruled hover values written on the belief that the State=Hover symbols had no fill. They do, and all three rulings were wrong: Primary neutral/850 not neutral-900, Outline neutral/35 not neutral-25, Ghost neutral/50 not neutral-25. Figma&#x27;s hovers are one step stronger than the guess every time. Anything built against the ruled values has slightly wrong hovers.</p><p>Also corrected from node coordinates: the black button is 50 tall, not 48 (py-16 around an 18px icon); its shadow is --gw-shadow-s3, not the raw value Tailwind reports after flattening spread; the field/button gap is 16; the right column is at x=900 with per-variant y of 263/292/200, all centring at 420. The Google variant&#x27;s y I had guessed at 314 — it is 292.</p><p>input/text-field 1562:705 is a web component. The dashboard library has no field of its own, so this dashboard screen is the one place in the set that reaches across the surface boundary. Flagged for a ruling, not resolved.</p><p>review-sheet.html had no meta charset, so every em-dash and arrow in it rendered as mojibake over HTTP.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/8de9b9b85cfef0c8579f18714ed454b3b8ba31c5" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>8de9b9b</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/8de9b9b85cfef0c8579f18714ed454b3b8ba31c5" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>8de9b9b</a>
           <a class="meta__l" href="claude://resume/5a7c696b-5bbf-4aee-adf8-603e744f9018"><svg class="gl"><use href="#i-chat"/></svg>Gushwork Design System plugin</a>
         </div>
       </div>
@@ -855,7 +855,7 @@
           <div class="prose"><p>Type=Password gives a field and a black Continue; Type=Google gives a single Google button and no field; Type=Google + Email gives both with an OR divider.</p><p>The black button matches the measured Button Large-plus-icon geometry exactly (pl-24 pr-20 py-16, radius 12) and adds a drop shadow the Button set does not carry.</p><p>Four things flagged rather than normalised, all in the notice: the Google button is 72/radius-16/with-arrow in one variant and 48/radius-12/no-arrow in the other; dashboardTitle binds a raw #000000 where the system uses neutral/black; the 0.81px border is a 1px border on a scaled instance; and the logo tile reports spacing/8 while rendering 15 because it is scaled 2x.</p><p>Also noted: Vert Grotesk Display Medium 60 has no token — the display ramp has h1 at 60 Bold, not Medium.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/5c2d3b495e632043c791ee88fbc3da01b53a77e3" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>5c2d3b4</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/5c2d3b495e632043c791ee88fbc3da01b53a77e3" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>5c2d3b4</a>
           <span class="none">no session recorded</span>
         </div>
       </div>
@@ -874,7 +874,7 @@
           <div class="prose"><ul><li>controls/toggle State=On measured neutral/900 — the &quot;blue is data, black is interaction state&quot; ruling and the Figma file already agreed; only builds were rendering it blue.</li><li>user-card has no background fill on any state; only the menu tile changes (neutral/50) — which is what &quot;the row is not a control&quot; means in measured form.</li></ul><p>Corrected against that pass: the toast message column is 276px, not 292 — it was computed from the padding this repo used to record inverted.</p><p>RULED (tokens.css gains a &quot;RULED, not harvested from Figma&quot; section):</p><ul><li>--gw-motion-fast 120ms with a reduced-motion guard.</li><li>--gw-focus-ring / --gw-focus-offset. No component in Figma defines focus, so keyboard users got whatever the browser did.</li><li>--gw-toast-dismiss 4000ms, closing a gap toast.md recorded as undefined.</li></ul><p>RULED in exports:</p><ul><li>Blue carries data and status; black carries interaction state.</li><li>1440 is the minimum dashboard width; below it scale the shell. Reflow, shrink and scroll each fail differently — all three recorded.</li><li>card-layout variants are never rearranged responsively.</li><li>Rail &quot;Dashboard title&quot; is the dashboard&#x27;s name, not the company&#x27;s.</li><li>Nav group label and user-card row are not interactive targets.</li></ul><p>NEW:</p><ul><li>controls/toggle Size=X-Small 36x20, extending the set&#x27;s own ramp.</li><li>exports/dashboard/states.md — focus, hover, empty and loading, none of which had an owner.</li><li>Appearances for dropdown Color=White, State=Open menus, Style=Calendar, table-row Type=Header and State=Hover, user-card State=Clicked menu.</li></ul><p>DEFECTS FIXED in preview/_meta_ads_app.css:</p><ul><li>.sec__caret sized its span but not its svg, so carets rendered 300x150.</li><li>.li:hover applied to the nav group label, which has no hover variant.</li><li>.cl--side .kpi{min-width:0} removed: it defeated the 286 floor.</li><li>.kpi took a fixed height while the analytics grid sized to content.</li></ul><p>Documents the icon-sprite trap in shared-components.md, and closes the notice with a Resolved block giving every item a verdict.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/9af46490b7be124ec8c6bab69bb7fc70c02345f8" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>9af4649</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/9af46490b7be124ec8c6bab69bb7fc70c02345f8" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>9af4649</a>
           <a class="meta__l" href="claude://resume/5eeaa384-81a5-460f-8fff-20a987090035"><svg class="gl"><use href="#i-chat"/></svg>Website performance dashboard</a>
         </div>
       </div>
@@ -893,7 +893,7 @@
           <div class="prose"><p>Double-checking before writing caught three claims that were themselves wrong, all extrapolated from a single Ghost symbol:</p><ul><li>Large is NOT always asymmetric. Large Text Only is px-24; only Large with an icon is pl-24 pr-20. Medium stays symmetric even with an icon.</li><li>Disabled does NOT simply dim the label. Primary swaps its fill to neutral/200 and keeps white text; only Outline and Ghost drop the label to neutral/250.</li><li>Small padding is px-12 py-8, which had been guessed at 0 16px.</li></ul><p>Button render and button.md rebuilt from the verified per-symbol reads.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/3eb5b219bee251e34cfdcea74109138cf9b514ba" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>3eb5b21</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/3eb5b219bee251e34cfdcea74109138cf9b514ba" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>3eb5b21</a>
           <span class="none">no session recorded</span>
         </div>
       </div>
@@ -912,7 +912,7 @@
           <div class="prose"><p>dashboard-build re-verified box by box off 2140:16479. The gap really is 0: 8 + 260 + 1164 + 8 = 1440, where the annotation&#x27;s gap:8 would give 1448. The rail is 880 and the container 872, so the rail runs 8px lower. side-panel carries gap:60, the user-card wrapper is 64 tall around a 48-tall card, and the gap within a list-group is 0.</p><p>Avatar Admin=true confirmed correct as rendered. The sample screen is rebuilt to these coordinates with the real header structure.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/d857ed4173cc83e45d3b836f85e66e3e1c928b1b" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>d857ed4</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/d857ed4173cc83e45d3b836f85e66e3e1c928b1b" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>d857ed4</a>
           <span class="none">no session recorded</span>
         </div>
       </div>
@@ -931,7 +931,7 @@
           <div class="prose"><p>progress-bar: the Target glyph is 12px inside a p-4 tile, not a 20px icon, and the label is Inter Semi Bold 14. Fill is a measured 814 wide.</p><p>user-card: no background fill on any state — the sheet had white. The menu tile picks up neutral/50 on Hover and Clicked, and Clicked opens a 140-wide dropdown-options above the row.</p><p>Nine components re-measured so far, nine had errors. button.md carries the corrected table with a note that its earlier values came from instances.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/c734e92300d3ddac07af908455e7eb7ff10fe7a5" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>c734e92</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/c734e92300d3ddac07af908455e7eb7ff10fe7a5" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>c734e92</a>
           <span class="none">no session recorded</span>
         </div>
       </div>
@@ -950,7 +950,7 @@
           <div class="prose"><p>kpi-card: the Mode names are inverted. Mode=light, Mode4 and Mode6 render on neutral/900; Mode=dark, Mode3 and Mode5 render on neutral/25. The sheet had it backwards and showed 3 of 6. Height is content-driven, not a fixed 198.</p><p>controls/toggle: On is neutral/900, not blue. Built as two white knobs with one at opacity 0, p-4 and gap-4, which is what produces 44x24, 52x28 and 60x32.</p><p>controls/tab: five tabs, not three. gap-8, and every label is neutral/900 — inactive tabs are not greyed. Selected carries a 16px drop shadow.</p><p>analytics-card: p-12 and gap-20, not p-16 and gap-8.</p><p>user-card: no background fill on any state; only Default was drawn.</p><p>dashboard Button: Large is radius 12 with asymmetric pl-24 pr-20, not radius 8.</p><p>Also fixes a patching bug of my own: the non-greedy regex used to swap a group stopped at the first nested &lt;/div&gt;&lt;/div&gt;&lt;/div&gt; and truncated the file. Group replacement now walks div depth. Restored from the last commit and re-applied.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/ffe8a1e9a3403c744c6e3c41842bdb04739413bf" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>ffe8a1e</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/ffe8a1e9a3403c744c6e3c41842bdb04739413bf" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>ffe8a1e</a>
           <span class="none">no session recorded</span>
         </div>
       </div>
@@ -969,7 +969,7 @@
           <div class="prose"><p>Fixes table-row: col-price is a fixed 200, not a flexible first column. The other five are 120 inside a flex-1 group with gap 40. The export said so; the render did not.</p><p>Confirms section/card-layout needs no change — its variants are 1084x198, 1084x198 and 1084x300, and the 1164x856 reported for the set is the wrapper frame with 40px padding.</p><p>Notice extended with the addendum, including the finding that every cell in section/section-element/table binds a raw #6a7077 rather than neutral/600.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/1ef99f5085111baa9c2260dc7faa6eb26a6dbf3c" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>1ef99f5</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/1ef99f5085111baa9c2260dc7faa6eb26a6dbf3c" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>1ef99f5</a>
           <span class="none">no session recorded</span>
         </div>
       </div>
@@ -989,7 +989,7 @@
           <div class="prose"><p>toast.md described the padding as &quot;16px 8px&quot;. The component is px-16 py-8 — 8 vertical, 16 horizontal. As CSS shorthand the file said the opposite, and the review sheet was built from it, so every toast rendered with inverted padding.</p><p>The Error fill was rendered #fef2f2; the component binds red/25 #fff1f2.</p><p>The set has 8 variants, Mode x State. Only the four Light ones were drawn. Dark collapses all four fills to neutral/900 on a neutral/800 border and carries the state in the icon colour alone — now shown.</p><p>Also corrected in the export: the set node is 1579:614, not 2146:17848, and alignment is flex-start rather than centre.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/3ad6616a232780becacb8f30613d56bfde8d732f" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>3ad6616</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/3ad6616a232780becacb8f30613d56bfde8d732f" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>3ad6616</a>
           <span class="none">no session recorded</span>
         </div>
       </div>
@@ -1009,7 +1009,7 @@
           <div class="prose"><p>Also uses the committed face-vector-4.svg at its measured 14.114 x 10.713 rotated 24.01 degrees, and puts the head at left calc(50% + 9px) rather than centred. Neither is guessable and both are load-bearing to the character.</p><p>The five fills make the two documented anomalies visible side by side: Blue&#x27;s background is primary-50 where Red, Yellow and Green use their -25 step, and Orange abandons its hue entirely for neutral-50.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/cedf644b7086deaa0f3dc955b256c28b7820ba04" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>cedf644</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/cedf644b7086deaa0f3dc955b256c28b7820ba04" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>cedf644</a>
           <span class="none">no session recorded</span>
         </div>
       </div>
@@ -1028,7 +1028,7 @@
           <div class="prose"><p>Every component documented in exports/dashboard/ is now rendered from its measured values. Checked by name against the export list — nothing missing.</p><p>Grouped Bar carries its three series colours as measured and labelled untokenised: #fed14a, #9784ff and #a1cdfe. The purple appears nowhere else in the system and there is no purple in the palette, which the sheet now shows rather than describes.</p><p>Line reproduces the measured vertical white grid rules and the sampled area gradient, #e4efff at the line through #eff6ff to #f9fbff at the baseline.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/507646360627c715003b468bf3070a060bd4975f" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>5076463</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/507646360627c715003b468bf3070a060bd4975f" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>5076463</a>
           <span class="none">no session recorded</span>
         </div>
       </div>
@@ -1048,7 +1048,7 @@
           <div class="prose"><p>section-elements.md already documented this correctly and even warned about the instance conflict. Two exports disagreed and the wrong one was read, so the sample screen shipped a bold rail — the same defect this project already fixed once. dashboard-build.md now carries the corrected values and a note saying which file wins.</p><p>Also corrected there: it claimed list-item&#x27;s hover and selected fills were not measured. They are — neutral/25 and neutral/50.</p><p>The dashboard title tile was an invented lightning bolt. It is now the real gushwork-symbol-white.svg from assets/logo, in the measured black tile at radius 8 with 8px padding around a 16px symbol.</p><p>Audited the sample against the set: eleven checks, all passing, no Bold 700 anywhere in it.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/791d9170c17a7ae78d6660310bd7cd57b0cec779" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>791d917</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/791d9170c17a7ae78d6660310bd7cd57b0cec779" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>791d917</a>
           <span class="none">no session recorded</span>
         </div>
       </div>
@@ -1067,7 +1067,7 @@
           <div class="prose"><p>Adds a complete dashboard-build screen at its measured 1440 x 888: shell on neutral/100, rail 260 wide with no fill at radius 20, container 1164 white at radius 20, nav rows Inter Bold 14 on neutral/900 and group labels Inter Bold 10 uppercase on neutral/400 — the two values that were wrong twice before being measured. The KPI row uses the card-layout=1 split of 400 plus a six-cell analytics grid, and the header carries a Sample data badge because the numbers are invented.</p><p>Structure validated: ten nav targets all resolve, section and div tags balanced.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/56f9360bdb5e2f6ed79e6f320b0188b2d7ce6a2e" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>56f9360</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/56f9360bdb5e2f6ed79e6f320b0188b2d7ce6a2e" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>56f9360</a>
           <span class="none">no session recorded</span>
         </div>
       </div>
@@ -1086,7 +1086,7 @@
           <div class="prose"><p>The 19 web/ component-library sets with no measured internals are now listed by name, node id and variant count rather than omitted — visible as gaps instead of silently absent. Same for the page shell: page-build, navbar, footer, announcement-banner and the 13 fold-elements, with a note that footer/.../list-item is a broken component set and cannot be read until fixed.</p><p>Nothing is drawn from annotations. Every render on the sheet traces to a measured value.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/bc28d27de275a4704cd20f51fbdecf45fcf076c4" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>bc28d27</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/bc28d27de275a4704cd20f51fbdecf45fcf076c4" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>bc28d27</a>
           <span class="none">no session recorded</span>
         </div>
       </div>
@@ -1105,7 +1105,7 @@
           <div class="prose"><p>Wide content now scrolls inside its own container instead of pushing the page sideways: the folds render at a fixed 1000px and were overflowing once the nav took 206px of the width.</p><p>CONTRIBUTING gains the rule this was for: a measurement that has not been rendered has not been checked, so every new component, element or pattern goes on the sheet under its Figma page and group, with its node id, and with any unmeasured states left visibly empty. Never render from a guess — both CTA errors came from inferring rather than reading, and a plausible render is worse than an empty slot because it gets approved.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/aafdd7d9b602a30d8d76c734526cbf177b7449c3" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>aafdd7d</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/aafdd7d9b602a30d8d76c734526cbf177b7449c3" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>aafdd7d</a>
           <span class="none">no session recorded</span>
         </div>
       </div>
@@ -1124,7 +1124,7 @@
           <div class="prose"><p>Button is 220 exactly: six styles at the full 3x3x4 matrix plus two Special styles with two variants each. Heights 36/44/56 and the widths are identical across all six full styles — except Large + Icon Only, which is 58x58 where every other Icon Only squares off against its row height.</p><p>Usage rules for all ten groups transcribed from their Info Frames, with the conflicts named now that they can be checked against measurement:</p><ul><li>badge&#x27;s rule calls the default &quot;Grey&quot; when the value is Neutral, and omits Blue, which is real and built</li><li>input-fields&#x27; four dropdown names match none of the actual values, and &quot;Success (green check)&quot; is the value Verified</li><li>the card rule cites &quot;the system-wide button rule&quot; for &quot;Book a demo&quot; while the button rule says &quot;Book a call&quot; — the cross-reference is false</li><li>the Special button instructions are unbuildable: both exist only at Large + Trailing, so &quot;Medium in all folds&quot; and any disabled state cannot resolve</li><li>ai-agents names nine agents against 20 variants, so the undocumented tenth is almost certainly <code>other</code></li><li>tooltip&#x27;s &quot;Arrow position&quot; is the property <code>Position</code></li><li>image says 47 options then lists 46 in the same blob; 46 is correct</li></ul><p>Also recorded: no Radius variable is bound anywhere in Button, so the 8 and 12 px corners are raw values and a variable change would not reach the most-used component in the system. And image&#x27;s [decide before handoff] on the startegy-and-pages and serivce-cards typos is still open and load-bearing, since those strings are variant keys.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/e7c8cedff1d9dc8520795bc4d316d150c7bc4d6f" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>e7c8ced</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/e7c8cedff1d9dc8520795bc4d316d150c7bc4d6f" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>e7c8ced</a>
           <span class="none">no session recorded</span>
         </div>
       </div>
@@ -1143,7 +1143,7 @@
           <div class="prose"><p>It contains no second navbar and no second Button set, which disproves the README&#x27;s standing hypothesis that a second set would dissolve most of the RECONCILIATION conflicts into &quot;two components, document both&quot;, and confirms Utsav&#x27;s 6 Aug ruling by measurement rather than assertion. The conflicts are real disagreements and measured wins.</p><p>The &quot;21 component sets&quot; figure in earlier inventories was counting 21 stray hidden Frame 2147223955 nodes at the page root. The count was right, the interpretation was not.</p><p>Newly surfaced: badge carries 108 variants against a rule documenting six colours, and it is the component both surfaces share; input/card is an input type absent from the rules; and two unnamed sets ship inside input-fields as Frame 2147259995 and Frame 2147259996. image is confirmed at 46 variants, settling docs that variously claimed 47, 46 and a table summing to 45.</p><p>Stated plainly in the file: this is an inventory, not an appearance pass. None of the 23 sets has had its internals measured yet, and Button, badge and image are 374 of the 525 variants between them.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/f2ddb538a60b4a4a81b1ac69341743aca0a21450" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>f2ddb53</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/f2ddb538a60b4a4a81b1ac69341743aca0a21450" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>f2ddb53</a>
           <span class="none">no session recorded</span>
         </div>
       </div>
@@ -1162,7 +1162,7 @@
           <div class="prose"><p>Hero Layout=Centered is tinted: neutral/25 fill, py-120 and gap-160, the largest spacing in the system. Its heading is h1 60 and its subhead uses neutral/700 where other folds use neutral/600. The primary is the black button on neutral/black, not blue and not neutral/900 — blue belongs to Type=Ads. It ships &quot;Book a demo&quot;, confirming the split against the six content folds.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/dd2c723af3e4a19fd4a92a870fa623463b07cd61" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>dd2c723</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/dd2c723af3e4a19fd4a92a870fa623463b07cd61" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>dd2c723</a>
           <span class="none">no session recorded</span>
         </div>
       </div>
@@ -1181,7 +1181,7 @@
           <div class="prose"><p>Measured Cards Grid (small), fold-element/heading and Video.</p><p>Corrects my own earlier claim: the Show Card toggles do exist, on Cards Grid (small) — as Show Card 4 and Show Card 5, two booleans defaulting to false, so it renders three cards and tops out at five. The shared-toggles rule&#x27;s &quot;3-6&quot; was wrong on both the range and which fold it describes.</p><p>Also measured: the shared heading is 800 wide and Cards Grid overrides it to 620; Card Style=4 puts the icon in a filled black 40px tile where Style=1 uses a bare 24px glyph; and Video&#x27;s play button is glassmorphic — translucent black over a 2px translucent white border with a 2px backdrop blur — which does not survive being rebuilt as a plain button.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/5a274c2a4b6af3c47a2e2e304f4e3d7260c8cf50" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>5a274c2</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/5a274c2a4b6af3c47a2e2e304f4e3d7260c8cf50" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>5a274c2</a>
           <span class="none">no session recorded</span>
         </div>
       </div>
@@ -1200,7 +1200,7 @@
           <div class="prose"><p>Two off-pattern findings on Testimonial, both left as measured with the decision flagged rather than silently normalised: the quote is Vert Grotesk Semibold 44, which is not a token — h3 is 44 Bold and the display ramp has no 44 Semibold — and it colours the quote neutral/900 where every other fold heading uses neutral/black.</p><p>Timeline is not a dark full-bleed fold as described but a dark rounded card: neutral/black at radius 20 with p-60. Its tabs are a staircase in 56px steps, which is the whole visual idea; even spacing would flatten it. The active tab is the fold&#x27;s single blue fill.</p><p>Avatar measurements confirm exports/web/avatar.md exactly — 64x48, radius 100, 72x48 photo in a 64 clip. Recorded that it was already correct.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/d487605cadcc23125b4e30d7186eee219bcb5890" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>d487605</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/d487605cadcc23125b4e30d7186eee219bcb5890" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>d487605</a>
           <span class="none">no session recorded</span>
         </div>
       </div>
@@ -1219,7 +1219,7 @@
           <div class="prose"><p>Two corrections that change how folds get built:</p><ul><li>fold/ Cards Grid has no Show Card 3-6 properties. The shared-toggles rule says to use them instead of deleting instances; on the fold that rule most obviously describes they do not exist. Its real axes are Card Style (1-4), Card Image (With/Without) and Card Layout — where Grid is Desktop-only and Single/Stacked are Phone-only, so asking for Grid on Phone resolves to nothing. It hard-builds six cards in two rows of three.</li></ul><ul><li>Fold width is 1240/343, with three exceptions: Hero and AI Agents are full-bleed at 1440/375, and Comparison Table is 1242/337 for no reason — a defect, not to be reproduced.</li></ul><p>Also measured: Cards Grid&#x27;s two card rows use different gaps, 8 then 10, which makes row one&#x27;s cards 2px wider since they are flex-1. Recorded as a drawing slip with an instruction to use 10 for both rather than ship the misalignment. And Card Image=With roughly doubles the fold height, 1549 against 639-841.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/94d9c7e102baa3d208056d8875d49cab3e2d36a8" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>94d9c7e</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/94d9c7e102baa3d208056d8875d49cab3e2d36a8" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>94d9c7e</a>
           <span class="none">no session recorded</span>
         </div>
       </div>
@@ -1238,7 +1238,7 @@
           <div class="prose"><p>The significant find is systemic: Figma&#x27;s letterSpacing magnitude is a PERCENT of font size, not px. body-18-med reports -0.2 and renders -0.036px at 18px; body-16-med renders -0.032px; body-18-sem reports -0.6 and renders -0.108px. tokens.css had read all of them as px, making every tracking value 5-6x too wide. All 18 converted to em, with the three confirmations recorded in the file so the wrong reading is not reintroduced.</p><p>Two corrections to the known-issues list: Body/body-18-med does exist, and colors/secondary/500-main (#111827) is a live collection bound by a shipping fold rather than a stray legacy value. colors/neutral/white has no token.</p><p>Also measured: fold headings bind colors/neutral/black #0d0d0d, not neutral-900 — the latter is the dashboard text colour, and mixing them is subtle enough to pass review.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/d7299f58f631766bddcd4104eeb2346baca162be" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>d7299f5</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/d7299f58f631766bddcd4104eeb2346baca162be" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>d7299f5</a>
           <span class="none">no session recorded</span>
         </div>
       </div>
@@ -1257,7 +1257,7 @@
           <div class="prose"><p>scripts/stamp-release.sh writes the version and today&#x27;s date into all four places at once (both manifests, both announce lines) so they cannot drift apart. Tested: rejects a malformed version, updates all four, manifests still validate.</p><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/364eeb13153cd5289e7353eeedcfdde0d3e278a7" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>364eeb1</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/364eeb13153cd5289e7353eeedcfdde0d3e278a7" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>364eeb1</a>
           <span class="none">no session recorded</span>
         </div>
       </div>
@@ -1276,7 +1276,7 @@
           <div class="prose"><p>Also:</p><ul><li>ONBOARDING.md, the five-minute read that travels with the share link</li><li>foundation/output-targets.md — Next.js on Vercel, services on Railway, plain CSS over the tokens rather than a parallel Tailwind palette</li><li>CONTRIBUTING.md — the Figma measuring discipline, which is maintainer-only. Building needs exports/ and never Figma; both skills now say so, and the dashboard build sequence verifies against exports/ instead of Figma.</li><li>README gains the propagation chain: Figma alone ships nothing, both version fields must be bumped, and there is no auto-update.</li><li>gushwork-web states plainly that its unmeasured components are a draft.</li></ul><p>Co-Authored-By: Claude Opus 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/bc465978ca515115a132bf4af2328d397b8f0979" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>bc46597</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/bc465978ca515115a132bf4af2328d397b8f0979" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>bc46597</a>
           <span class="none">no session recorded</span>
         </div>
       </div>
@@ -1295,7 +1295,7 @@
           <div class="prose"><ul><li>foundation/ — 188 design tokens pulled from Figma *variables* (the canvas swatch labels have drifted from a superseded palette), plus voice and the atoms genuinely shared across both surfaces.</li><li>skills/gushwork-web — marketing surfaces. Composition ladder atoms → fold-elements → Folds → Page Build, with Brand/Ads as the governing page-level axis.</li><li>skills/gushwork-dashboard — product surfaces. section-elements → Sections → Dashboard Build. Black/outline/ghost actions, never a blue button fill.</li><li>exports/ — variant enumerations, dimensions and node IDs, kept out of the SKILL.md files so each stays lean enough to load on every invocation.</li></ul><p>Buttons, Avatars and Logos exist separately per surface by design; both skills carry a cross-surface pointer. Badge is shared. Both skills fall back rather than invent a component when a request has no match.</p><p>Figma inconsistencies are flagged inline rather than silently smoothed over — where a rule and its component disagree, the exports document the component, since that is what renders. No Figma variants were renamed.</p><p>Co-Authored-By: Claude Fable 5 &lt;noreply@anthropic.com&gt;</p></div>
         </details>
         <div class="meta">
-          <a class="meta__l" href="https://github.com/gushwork-design/gushwork-design/commit/4a36d4847d61cf5990f1ff28627a8308d5d3ecb2" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>4a36d48</a>
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/4a36d4847d61cf5990f1ff28627a8308d5d3ecb2" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>4a36d48</a>
           <span class="none">no session recorded</span>
         </div>
       </div>

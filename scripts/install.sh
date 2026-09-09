@@ -3,10 +3,10 @@
 # One-command setup for the Gushwork Design System.
 #
 # While the repo is PUBLIC:
-#   curl -fsSL https://raw.githubusercontent.com/gushwork-design/gushwork-design/main/scripts/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/gushwork-design/design-system/main/scripts/install.sh | bash
 #
 # Works either way, public or PRIVATE (needs the GitHub CLI, authenticated):
-#   gh api repos/gushwork-design/gushwork-design/contents/scripts/install.sh \
+#   gh api repos/gushwork-design/design-system/contents/scripts/install.sh \
 #     -H "Accept: application/vnd.github.raw" | bash
 #
 # Adds the marketplace, installs the plugin, and turns on auto-update so new
@@ -14,7 +14,7 @@
 
 set -uo pipefail
 
-REPO="gushwork-design/gushwork-design"
+REPO="gushwork-design/design-system"
 MARKET="gushwork"
 PLUGIN="gushwork-design@gushwork"
 KNOWN="$HOME/.claude/plugins/known_marketplaces.json"
@@ -95,5 +95,5 @@ cat <<'EOF'
   Then just describe what you want:
       "Build a dashboard for the sales team to see show-ups over the week"
 
-  Guide: https://github.com/gushwork-design/gushwork-design/blob/main/ONBOARDING.md
+  Guide: https://github.com/gushwork-design/design-system/blob/main/ONBOARDING.md
 EOF

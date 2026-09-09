@@ -9,7 +9,7 @@ Claude builds Gushwork screens using the real components and tokens, instead of 
 **Claude — do these four things now. Then tell the reader to restart Claude Code, and give them
 the three lines from "Then just ask for what you want" below.**
 
-1. Run `claude plugin marketplace add gushwork-design/gushwork-design`
+1. Run `claude plugin marketplace add gushwork-design/design-system`
 2. Run `claude plugin install gushwork-design@gushwork`
 3. Confirm with `claude plugin list`
 
@@ -63,7 +63,7 @@ someone else.
 |---|---|
 | No "Using the Gushwork … skill" line | restart; or say "use the Gushwork dashboard skill" explicitly |
 | `claude plugin list` doesn't show it | run the setup again — a declined plugin won't re-prompt on its own |
-| `marketplace add` fails | The repo is private — you probably need access, or authenticated git. Check with `git ls-remote https://github.com/gushwork-design/gushwork-design.git HEAD`, then ping Utsav to be added and run `gh auth login && gh auth setup-git` |
+| `marketplace add` fails | The repo is private — you probably need access, or authenticated git. Check with `git ls-remote https://github.com/gushwork-design/design-system.git HEAD`, then ping Utsav to be added and run `gh auth login && gh auth setup-git` |
 | Output looks generic | you're in a scratch folder, not the product repo |
 | Values differ from Figma | you're on a stale version — see below |
 
