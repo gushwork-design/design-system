@@ -167,11 +167,21 @@ done
 # /internal/* and /admin/*, and the root is outside both. A machine that is behind must be
 # able to find that out without the access being behind might have cost it.
 bash scripts/version-json.sh > "$STAGE/version.json"
-python3 - "$STAGE/version.json" <<'VJ'
-import json, sys
+
+# siteHash — what scripts/check-site.sh compares against to tell "I pushed" apart from
+# "it's live". Computed from the SOURCE tree (web/ + preview/), not $STAGE, via the same
+# scripts/_site_hash.sh both sides share — see its header for why $STAGE itself is the
+# wrong thing to hash.
+. scripts/_site_hash.sh
+SITE_HASH="$(site_hash)"
+
+SITE_HASH="$SITE_HASH" python3 - "$STAGE/version.json" <<'VJ'
+import json, os, sys
 d = json.load(open(sys.argv[1]))
+d["siteHash"] = os.environ["SITE_HASH"]
+json.dump(d, open(sys.argv[1], "w"), indent=2)
 v, n = d["version"], len(d["components"])
-print(f"  version.json -> v{v}, {n} components")
+print(f"  version.json -> v{v}, {n} components, siteHash {d['siteHash'][:12]}…")
 VJ
 
 # search-index.json — what the topbar's palette searches. Built from the STAGED copies, after
