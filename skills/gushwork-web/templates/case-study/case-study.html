@@ -1,13 +1,42 @@
 <!doctype html>
-<!-- gushwork-build:{"pluginVersion":"1.44.0","surface":"web","createdBy":"utsav.singh@gushwork.ai","createdAt":"2026-09-07",
+<!-- gushwork-build:{"pluginVersion":"1.45.0","surface":"web","createdBy":"utsav.singh@gushwork.ai","createdAt":"2026-09-07",
      "registry":"https://gushwork-design.vercel.app/exports/web/component-registry.json",
      "changelog":"https://gushwork-design.vercel.app/preview/changelog-sheet.html",
-     "components":["page-build","navbar","footer","hero","fold-other","testimonial","cta","button","input-fields","client-avatar","image"]} -->
+     "components":["page-build","navbar","footer","hero","fold-other","testimonial","button","client-avatar","image"]} -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Case study — Gushwork template</title>
+<!-- UPDATE PER CASE STUDY — do not ship the generic template copy below.
+     Title: "<Client> Case Study | Gushwork" — the live site's own pattern
+     says "Gushwork" twice; drop the duplicate. Description: client + industry
+     + the single strongest hero stat, ≤160 chars so Google doesn't truncate it. -->
+<title>Cutting Edge Plasma Case Study | Gushwork</title>
+<meta name="description" content="See how Cutting Edge Plasma ranked #1 for CNC searches across the Midwest, drove 4,000+ visitors, and generated 50+ leads with Gushwork's AI-powered SEO.">
+
+<!-- OG image — rendered from og-source.html in this same folder (inspired by
+     assets/og/_source.html's pattern, designed from 1607:425), not written by
+     hand. UPDATE PER CASE STUDY along with the title/description above: swap
+     og-source.html's headline/photo/logo for the new case, re-render it at
+     exactly 1200×630, replace cutting-edge-plasma-og.png, and point the URLs
+     below at wherever this page and image actually get hosted — gushwork.ai
+     here is illustrative, this template doesn't control deployment. -->
+<meta property="og:type" content="article">
+<meta property="og:title" content="Cutting Edge Plasma Case Study | Gushwork">
+<meta property="og:description" content="See how Cutting Edge Plasma ranked #1 for CNC searches across the Midwest, drove 4,000+ visitors, and generated 50+ leads with Gushwork's AI-powered SEO.">
+<meta property="og:url" content="https://www.gushwork.ai/case-study/cutting-edge-plasma">
+<meta property="og:image" content="https://www.gushwork.ai/images/case-study/cutting-edge-plasma-og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Cutting Edge Plasma Case Study | Gushwork">
+<meta name="twitter:description" content="See how Cutting Edge Plasma ranked #1 for CNC searches across the Midwest, drove 4,000+ visitors, and generated 50+ leads with Gushwork's AI-powered SEO.">
+<meta name="twitter:image" content="https://www.gushwork.ai/images/case-study/cutting-edge-plasma-og.png">
+
+<!-- No component literally named "favicon" in this skill — this is
+     shared-components.md's own ruling for the symbol-only mark on marketing
+     surfaces: blue, Only Symbol=yes, never the dashboard's internal-use tile. -->
+<link rel="icon" type="image/svg+xml" href="../../../../assets/logo/gushwork-symbol-original.svg">
 
 <!-- Tokens are the contract. Every colour, type step, radius and space below is a --gw-* var
      except where a comment says OFF-TOKEN. Do not add values here; report the gap instead. -->
@@ -33,7 +62,6 @@
   --cs-article-w: 720px;    /* prose column */
   --cs-side-w: 280px;       /* sidebar column */
   --cs-gutter: 80px;        /* hero side padding */
-  --cs-cta-w: 1400px;       /* CTA photo card */
   --cs-nav-h: 60px;
 
   /* OFF-TOKEN — no variable exists for any of these. Each is a value the
@@ -41,19 +69,25 @@
      notices/2026-09-07-case-study-page-template.md */
   --cs-rule: #e1e3e8;       /* hero stats rule. Nearest token neutral-100 #e7e8e9
                                is visibly lighter. */
-  --cs-radius-32: 32px;     /* quote-card corners. Radius ramp stops at 20 then 60. */
-  --cs-radius-2: 2px;       /* quote-card notched corner. */
   --cs-radius-80: 80px;     /* the asymmetric "tell" corner on image frames. */
   --cs-radius-120: 120px;   /* TL;DR Solution card corner (live page only). */
-  --cs-radius-40: 40px;     /* CTA glass card. */
-  --cs-radius-9: 8.879px;   /* CTA inline button — the measured value, not a step. */
-  --cs-display-52: 52px;    /* CTA heading. Ramp has h2 56 and h3 44, nothing between. */
+  --cs-grid-line: #ebecee;  /* hero background grid lines. Pixel-sampled off the Figma
+                               render (495:3383) — two adjacent px read 235,236,238 and
+                               235,237,238, i.e. the same colour ± 1-unit AA noise.
+                               Nearest ramp step, neutral-100 #e7e8e9, is visibly darker;
+                               this sits almost on top of neutral-50, which is the point. */
+  --cs-figure-pad-x: 52px;  /* generated-figure side padding. Backed out of 1675:12236's
+                               own numbers: 720 wide, two 300px cards, 16px gap between
+                               them — (720 − 600 − 16) ÷ 2 = 52, not a step on the spacing
+                               ramp (which jumps 48→56). Vertical padding IS a real
+                               token, --gw-space-60, from the same arithmetic. */
 
   /* CHOSEN, not measured — no documented figure exists for these */
   --cs-sticky-top: 80px;    /* navbar 60 + space-20, so the rail clears the fixed bar */
-  --cs-nav-solid-at: 32px;  /* scroll distance before the navbar takes its background;
-                               the live site flips somewhere between 20 and 40 */
-  --cs-texture-cell: 24px;  /* blueprint grid pitch, read off the rendered hero */
+  --cs-texture-cell: 40px;  /* hero grid pitch — pixel-counted off the Figma render:
+                               40px on-center in both axes. Same pitch as the slides
+                               ground (--gw-slide-grid-pitch), which may be worth
+                               promoting to one shared token — flagged, not decided here. */
 }
 
 *,*::before,*::after{box-sizing:border-box}
@@ -75,21 +109,35 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .cs-inner{width:100%;max-width:var(--cs-content-w);margin:0 auto;padding:0 var(--gw-space-20)}
 
 /* ==========================================================================
-   NAVBAR — navbar/navbar, Type=Brand. Fixed, transparent over the hero, taking a
-   white-80% background once scrolled — the live site adds `is-scrolled` and
-   transitions background-color over 0.4s. No blur, no shadow, no border there.
+   NAVBAR — navbar/navbar, Type=Brand. Fixed, always opaque — a deliberate
+   departure from the live site, which stays transparent over the hero and
+   only takes a white-80% background once scrolled (confirmed: `is-scrolled`
+   → rgba(255,255,255,.8), the token this file already used). Made fully
+   opaque, and always on rather than scroll-triggered, because it now frames
+   a permanent reading-progress bar — that only reads correctly if the bar
+   beneath it is never hidden or half-transparent.
    ========================================================================== */
 .cs-nav{
   position:fixed;inset:0 0 auto;z-index:100;height:var(--cs-nav-h);
   display:flex;align-items:center;justify-content:space-between;
   padding:0 var(--cs-gutter);
-  transition:background-color .4s ease;
+  background:var(--gw-color-white);
 }
-.cs-nav[data-scrolled]{background:var(--gw-color-neutral-alpha-80-white)}
+/* ONE stroke at the bottom of the navbar, not two — a separate static hairline
+   plus this fill read as two parallel lines running together. 4px, full-bleed:
+   0% at the top of the page, 100% at the bottom. Width is set by the scroll
+   listener below. */
+.cs-nav-progress{
+  position:absolute;left:0;bottom:0;height:4px;width:0%;
+  background:var(--gw-color-primary-500);
+  transition:width .1s linear;
+}
 .cs-logo{display:flex;align-items:center;gap:4.8px;height:24px}
 .cs-logo img{height:24px;width:auto}
 .cs-nav-right{display:flex;align-items:center;gap:var(--gw-space-32)}
-.cs-nav-links{display:flex;align-items:center;gap:var(--gw-space-12)}
+/* Hidden for now, per Utsav — markup stays (not deleted) since this is a
+   "for now," not a removal call. */
+.cs-nav-links{display:none;align-items:center;gap:var(--gw-space-12)}
 /* Button, Style=Text/ black, Size=Small (34) — ghost nav link */
 .cs-nav-link{
   display:inline-flex;align-items:center;gap:var(--gw-space-4);
@@ -99,6 +147,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
   color:var(--gw-color-black);
 }
 .cs-nav-link:hover{background:var(--gw-color-neutral-50)}
+.cs-nav-link svg{width:10px;height:10px;flex:none;fill:currentColor}
 /* Button, Style=Blue/ Filled, Size=Small (34). Figma r6 + 0.89px white@10% stroke. */
 .cs-nav-cta{
   display:inline-flex;align-items:center;justify-content:center;
@@ -123,22 +172,37 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
   position:relative;
   background:var(--gw-color-neutral-50);
   border-radius:0 0 var(--gw-radius-20) var(--gw-radius-20);
-  padding:180px 0 var(--gw-space-80);
+  /* 150 / 60, measured off the live nhero_section at a verified 1440px viewport
+     (innerWidth read back in the same call — the browser pane's own width
+     varies and isn't 1440 by default, which is what produced two earlier wrong
+     readings: 40 for the bottom pad, then a wrong TOTAL of 1190). */
+  padding:150px 0 60px;
   overflow:clip;
-  /* Figma frame is FIXED 1440 × 920 with SPACE_BETWEEN. min-height reproduces it
-     at default content and lets a longer title grow instead of clipping. */
-  min-height:920px;
+  /* Floor for a short title, not a target height — the real target is
+     content-driven. min-height 1190 (from the same bad reading above) forced
+     `justify-content:space-between` on .cs-hero-body to stretch real slack
+     into the gap between the media row and the stats row, which is the
+     visible "too long" bug. 820 ≈ this template's own natural content height
+     (150 + 400 media + 80 gap + ~130 stats + 60), so space-between has
+     nothing extra to distribute — confirm the rendered height after any
+     content change, since a floor this close to natural can still bind. */
+  min-height:820px;
   display:flex;flex-direction:column;
 }
-/* Figma `bg`: blurred swoosh stroke + blueprint dot grid @60% + bottom fade.
-   The grid is white dotted rules on a 24px pitch, dots every 4.8px along each rule. */
-.cs-hero-bg{position:absolute;inset:0 0 auto;height:856px;pointer-events:none;overflow:clip}
+/* Figma `bg`: a flat square-line grid + blurred swoosh stroke + bottom fade.
+   The grid was built here as white dots at a 24px pitch and read back as
+   invisible — white-on-neutral-50 has almost no contrast, which is the "the
+   background is missing" report. Re-sampled off the Figma render (495:3383):
+   solid 1px lines, --cs-grid-line, 40px pitch, no fade toward the edges — it
+   is uniform across the whole hero, unlike the slides ground it borrows its
+   pitch from. */
+.cs-hero-bg{position:absolute;inset:0;pointer-events:none;overflow:clip}
 .cs-hero-grid{
-  position:absolute;inset:0;opacity:.6;
+  position:absolute;inset:0;
   background-image:
-    radial-gradient(circle at .5px .5px, var(--gw-color-white) .6px, transparent .7px),
-    radial-gradient(circle at .5px .5px, var(--gw-color-white) .6px, transparent .7px);
-  background-size: 4.8px var(--cs-texture-cell), var(--cs-texture-cell) 4.8px;
+    linear-gradient(to right, var(--cs-grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--cs-grid-line) 1px, transparent 1px);
+  background-size: var(--cs-texture-cell) var(--cs-texture-cell);
 }
 /* Vector 66 — 2432 × 956 stroke neutral-300 at 112px, Figma layer blur 280 (≈ CSS 140).
    Anchored right so it holds its position behind the media as the page widens. */
@@ -157,14 +221,27 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .cs-hero-top{display:flex;align-items:center;gap:64px}
 .cs-hero-text{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:var(--gw-space-24)}
 
-/* Breadcrumb. Figma: gap 4, Inter Medium 12/16, neutral-600. */
-.cs-crumbs{display:flex;align-items:center;gap:var(--gw-space-4)}
-.cs-crumbs a,.cs-crumbs span{
-  font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking);
-  color:var(--gw-color-neutral-600);
+/* eyebrow — exact values from get_design_context on 1669:10310 (the eyebrow's
+   own node). Two things the first pass got wrong from a screenshot guess:
+   the icon is SealCheck (the scalloped/wavy-edge seal-with-checkmark glyph —
+   assets/icons/regular/seal-check.svg), not a plain CheckCircle; the Figma
+   layer is still misleadingly NAMED "SealQuestion" (matching atoms.md's
+   documented default) but the actual asset resolved is SealCheck. Padding is
+   8/4, not 8/12; gap is 4, not 8; label line-height is 1 (leading-none), not
+   the body ramp's 1.4. */
+.cs-eyebrow{
+  display:inline-flex;align-items:center;gap:var(--gw-space-4);
+  align-self:flex-start;
+  padding:var(--gw-space-4) var(--gw-space-8);
+  background:var(--gw-color-white);
+  border:0.5px solid var(--gw-color-neutral-100);
+  border-radius:var(--gw-radius-full);
 }
-.cs-crumbs a:hover{color:var(--gw-color-black)}
-.cs-crumbs svg{width:11px;height:10px;flex:none;fill:var(--gw-color-neutral-600)}
+.cs-eyebrow svg{width:14px;height:14px;flex:none;fill:var(--gw-color-neutral-900)}
+.cs-eyebrow span{
+  font:500 12px/1 var(--gw-font-body);letter-spacing:0;
+  color:var(--gw-color-neutral-900);
+}
 
 .cs-hero-heads{display:flex;flex-direction:column;gap:var(--gw-space-16)}
 /* h3 token: 700 44px/1.2 display. No full stop, ever — see foundation/voice.md. */
@@ -180,21 +257,144 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 }
 .cs-hero-meta i{width:4px;height:4px;border-radius:var(--gw-radius-full);background:var(--gw-color-neutral-500);flex:none}
 
-/* image — Figma is two rows: 240 + fill, then fill + 240, 10px gaps, tiles r12
-   with a white@20% inset hairline. The narrow bottom-right tile carries the 80px
-   "tell" corner. Drop one photo per slot, or keep one and delete the rest. */
-.cs-hero-media{flex:none;width:580px;height:400px;display:flex;flex-direction:column;gap:10px}
-.cs-hero-row{flex:1 1 0;display:flex;gap:10px;min-height:0}
-.cs-hero-row .cs-slot{flex:1 1 auto;min-width:0}
-.cs-hero-row .cs-slot--narrow{flex:none;width:240px}
+/* image — ONE slot, per the user's own Figma frame (1669:2658), replacing the
+   four-slot grid measured off the earlier John Maye frame. r12 with the 80px
+   "tell" corner bottom-right; the white@20% inset hairline stays. */
+.cs-hero-media{flex:none;width:580px;height:400px}
 .cs-slot{
-  position:relative;overflow:hidden;
+  position:relative;width:100%;height:100%;overflow:hidden;
   background:var(--gw-color-neutral-300);
   border:1px solid var(--gw-color-neutral-alpha-20-white);
   border-radius:var(--gw-radius-12);
+  border-bottom-right-radius:var(--cs-radius-80);
   display:grid;place-items:center;
 }
-.cs-slot--tell{border-bottom-right-radius:var(--cs-radius-80)}
+/* Client-logo overlay — Figma 1669:4387. 180×80, white, radius-8, no border or
+   shadow (checked the raw SVG export: a plain `rect rx="8" fill="white"`, no
+   second layer for either). Holds a logo fetched at build time for bulk
+   generation. Sized as a fixed box with generous inset padding so a fetched
+   logo of any aspect ratio sits centred without touching the edges or
+   distorting — the reference's own example logo happens to fill the box
+   edge-to-edge, but that won't hold for most real logos. If the fetch fails,
+   the onerror handler below hides the whole box rather than showing a
+   broken-image glyph or an empty white card. */
+.cs-hero-logo{
+  position:absolute;left:15px;top:15px;z-index:1;
+  width:180px;height:80px;
+  background:var(--gw-color-white);
+  border-radius:var(--gw-radius-8);
+  padding:var(--gw-space-12);
+  display:grid;place-items:center;
+}
+.cs-hero-logo img{max-width:100%;max-height:100%;object-fit:contain}
+
+/* ----------------------------------------------------------------------
+   GENERATED HERO — sector icon, for bulk case studies with no client
+   photography. NEW ELEMENT — declared in
+   notices/2026-09-07-generated-hero-cards.md. A large duotone icon, chosen
+   from the case's own industry text against the existing Phosphor set
+   already vendored at assets/icons/ (1512 icons — no image generation call,
+   no per-client asset to source, fully deterministic from data already on
+   hand). Keeps the hero slot's own frame (r12, 80px tell corner) as the
+   outer silhouette; only the content inside is generated.
+
+   Duotone icons are two paths sharing one `fill="currentColor"` — one at
+   full opacity, one at 20% — so setting `color` on the wrapper tints both
+   automatically. See assets/icons/duotone/gear.svg for the pattern.
+
+   TO GENERATE A NEW CASE STUDY'S HERO: match the industry string against a
+   keyword table (manufacturing/CNC → gear or factory; healthcare/medical →
+   stethoscope or heart; packaging → package; consulting/compliance →
+   shield or briefcase; logistics/distribution → warehouse or truck;
+   generic fallback → buildings) and inline that icon's <path> data here. */
+.cs-hero-media--icon{
+  display:grid;place-items:center;
+  background:var(--gw-color-primary-25);
+  border-radius:var(--gw-radius-12);
+  border-bottom-right-radius:var(--cs-radius-80);
+}
+.cs-hero-media--icon svg{width:200px;height:200px;color:var(--gw-color-primary-500)}
+
+/* ----------------------------------------------------------------------
+   GENERATED FIGURE — the article's inline "Dashboard or result image" slot,
+   for the same no-photography case. Two dashboard-style number+chart cards
+   built from the case's own stats. NEW ELEMENT — same notice as above.
+
+   Chart styling is exports/dashboard/sections.md's measured `Graph,
+   Type=Line` verbatim — stroke @2px, gradient fill 30%→0%, neutral-100 grid
+   lines. That doc is explicit this reading is "CURRENT — not superseded"
+   and holds regardless of surface, so it's the one dashboard-only spec
+   reused here rather than invented fresh. Everything else (card shell,
+   type) is gushwork-web's own tokens. Green (--gw-color-green-500) on the
+   first card, blue (--gw-color-primary-500) on the second, per the user's
+   own reference — the source doc's "single-series, no categorical palette"
+   describes ONE line per card, not one colour across every card.
+
+   TO GENERATE A NEW CASE STUDY'S FIGURE: swap each card's label/value/
+   caption text and replace the <path> `d` + gridline positions with that
+   case's own numbers. The curve is illustrative — it renders a plausible
+   upward trend ending at the real headline number, not a literal
+   day-by-day plot; no case study's raw time-series data is being invented
+   as fact.
+
+   Structure and spacing measured from get_design_context on 1675:12236
+   itself. Its own numbers are almost all a clean value scaled ×1.2 (9.6→8,
+   19.2→16, 7.2→6, 0.6→0.5 border) — a Figma "fit" artifact, not an
+   authored size, so the ×1.2 is divided back out rather than copied
+   verbatim (same call as DECISIONS.md R5 on sub-pixel strokes elsewhere in
+   this system). Two things that ARE structural and were missing entirely
+   before this pass: the header row sits on its own 1px divider, and the
+   chart carries real y-axis + x-axis labels — not just bare gridlines. */
+.cs-figure.cs-figure--generated{
+  display:flex;align-items:stretch;gap:var(--gw-space-16);
+  padding:var(--gw-space-60) var(--cs-figure-pad-x);
+  background:var(--gw-color-primary-25);
+}
+.cs-growth-card{
+  flex:1 1 0;min-width:0;display:flex;flex-direction:column;
+  background:var(--gw-color-white);
+  border:1px solid var(--gw-color-neutral-100);
+  border-radius:var(--gw-radius-8);
+  box-shadow:var(--gw-shadow-s2);
+}
+.cs-growth-card-header{
+  padding:var(--gw-space-8) var(--gw-space-12);
+  border-bottom:1px solid var(--gw-color-neutral-100);
+}
+.cs-growth-card-label{
+  font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking);
+  color:var(--gw-color-black);
+}
+.cs-growth-card-body{
+  flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:var(--gw-space-12);
+  padding:var(--gw-space-16);
+}
+/* OFF-RAMP: measured ~20px (19.2, ×1.2-scaled from 16 — but 16 is a body
+   size, not a display one, and this reads as a display numeral in the
+   reference). Kept at 20 rather than forced onto the h-ramp; nothing on
+   the ramp sits between body-16 and h7's 22. */
+.cs-growth-card-value{
+  font:700 20px/1.4 var(--gw-font-display);
+  color:var(--gw-color-black);
+}
+.cs-growth-card-caption{
+  font:var(--gw-text-body-12-reg);letter-spacing:var(--gw-text-body-12-reg-tracking);
+  color:var(--gw-color-neutral-500);
+}
+.cs-growth-card-chart{display:flex;flex:1 1 0;min-height:0;gap:var(--gw-space-12)}
+.cs-growth-card-yaxis{
+  flex:none;display:flex;flex-direction:column;justify-content:space-between;
+  padding-bottom:16px; /* clears the x-axis label row so 0 lines up with the chart's own baseline */
+  font:var(--gw-text-body-10-reg);letter-spacing:var(--gw-text-body-10-reg-tracking);
+  color:var(--gw-color-neutral-500);
+}
+.cs-growth-card-plot{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.cs-growth-card-plot svg{width:100%;height:auto;display:block;flex:1 1 0;min-height:0}
+.cs-growth-card-xaxis{
+  display:flex;justify-content:space-between;
+  font:var(--gw-text-body-10-reg);letter-spacing:var(--gw-text-body-10-reg-tracking);
+  color:var(--gw-color-neutral-500);
+}
 .cs-slot img{width:100%;height:100%;object-fit:cover}
 .cs-slot-label{
   font:var(--gw-text-body-12-reg);letter-spacing:var(--gw-text-body-12-reg-tracking);
@@ -282,8 +482,9 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
   background:var(--gw-color-black);color:var(--gw-color-white);
   padding:var(--gw-space-24);
   display:flex;flex-direction:column;gap:var(--gw-space-24);
-  /* OFF-TOKEN radii: 32 and 2 */
-  border-radius:var(--cs-radius-32) var(--cs-radius-32) var(--cs-radius-2) var(--cs-radius-32);
+  /* Updated per the user's own Figma frame (1669:2658): 20/20/8/20, not
+     32/32/2/32 — and both are real tokens now, no off-token declaration needed. */
+  border-radius:var(--gw-radius-20) var(--gw-radius-20) var(--gw-radius-8) var(--gw-radius-20);
 }
 .cs-quote-mark{width:31px;height:24px;fill:var(--gw-color-primary-500)}
 /* `visible:false` in the node. The HTML `hidden` attribute does not hide an
@@ -321,32 +522,38 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
   flex:none;width:var(--cs-side-w);
   position:sticky;top:var(--cs-sticky-top);
 }
+/* Exact values from get_design_context on 1669:9877 (small enough for the
+   MCP transport, unlike its parent page) — every prior number here (16 radius,
+   1px neutral-50 border, shadow-card, 20/600/28 heading) was a screenshot
+   guess and wrong on all four counts. */
 .cs-card{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:var(--gw-space-32);
   background:var(--gw-color-neutral-25);
-  border:1px solid var(--gw-color-neutral-50);
-  border-radius:var(--gw-radius-16);
-  padding:var(--gw-space-20);
+  /* 1px per Utsav's direct call — get_design_context measured 2px, overridden. */
+  border:1px solid var(--gw-color-neutral-100);
+  border-radius:var(--gw-radius-20);
+  padding:var(--gw-space-24);
+  /* Shadows/S3 exactly — the design's own resolved token, not a guess: */
+  box-shadow:var(--gw-shadow-s3);
 }
-/* Overlapping avatar pair, 70 × 40. The live asset is `cta-peopl.webp`, which is
-   not in this repo, so the template ships two placeholder discs — a maintainer
-   should add the real asset to assets/. Flagged in the notice. */
-.cs-card-people{width:70px;height:40px;position:relative;margin-bottom:var(--gw-space-12)}
-.cs-card-people i{
-  position:absolute;top:0;width:40px;height:40px;border-radius:var(--gw-radius-full);
-  background:var(--gw-color-neutral-200);border:2px solid var(--gw-color-neutral-25);
-}
-.cs-card-people i:first-child{left:0}
-.cs-card-people i:last-child{left:30px}
-/* Display at 20px is off the h-ramp (h7 is 22). Measured 600 20/28. */
+.cs-card-content{display:flex;flex-direction:column;gap:10px;width:100%}
+/* Overlapping avatar pair, 70 × 40. The live asset, `cta-peopl.webp`, is now
+   vendored at assets/case-study/ — added 7 Sep 2026, closing the gap the
+   notice flagged. */
+.cs-card-people{width:70px;height:40px}
+.cs-card-people img{width:100%;height:100%;object-fit:contain}
+/* This IS a token — Headings/h7-bold, resolved by name in the design context
+   response. Not a hand-picked 20/600/28. */
 .cs-card h3{
-  font:600 20px/28px var(--gw-font-display);
+  font:var(--gw-text-h7-bold);letter-spacing:var(--gw-text-h7-bold-tracking);
   color:var(--gw-color-black);
-  margin-bottom:var(--gw-space-16);
 }
-/* Button, Style=Blue/ Filled, Size=Regular (44) */
+/* Button, Style=Blue/ Filled, Size=Regular (44). Full-width in this card
+   specifically — 1669:2658 fills the card, unlike a typical inline CTA. */
 .cs-btn{
-  display:inline-flex;align-items:center;justify-content:center;gap:var(--gw-space-8);
-  height:44px;padding:var(--gw-space-12) var(--gw-space-16);
+  display:flex;align-items:center;justify-content:center;gap:var(--gw-space-8);
+  width:100%;height:44px;padding:var(--gw-space-12) var(--gw-space-16);
   background:var(--gw-color-primary-500);color:var(--gw-color-white);
   border-radius:var(--gw-radius-10);
   font:var(--gw-text-body-14-med);letter-spacing:var(--gw-text-body-14-med-tracking);
@@ -354,151 +561,124 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .cs-btn:hover{background:var(--gw-color-primary-600)}
 
 /* ==========================================================================
-   CTA FOLD — Figma 495:3478 / 495:3516. Ground neutral-50 full-bleed with top
-   corners 20 (it stacks onto the white article), padding 100 / 0 / 20.
-   Card 1400 × 600 on primary-500, radius 20, photo + 20% black + left scrim.
-   ========================================================================== */
-.cs-tail{
-  background:var(--gw-color-neutral-50);
-  border-radius:var(--gw-radius-20) var(--gw-radius-20) 0 0;
-  margin-top:calc(-1 * var(--gw-radius-20));
-  padding:var(--gw-space-100) var(--gw-space-20) var(--gw-space-20);
-  display:flex;flex-direction:column;align-items:center;
-}
-.cs-cta{
-  position:relative;width:100%;max-width:var(--cs-cta-w);min-height:600px;
-  background:var(--gw-color-primary-500);
-  border-radius:var(--gw-radius-20);overflow:clip;
-  display:flex;align-items:center;
-  padding:0 60px;
-}
-.cs-cta-photo{position:absolute;inset:0;display:grid;place-items:center}
-.cs-cta-photo img{width:100%;height:100%;object-fit:cover}
-.cs-cta-photo::after{content:"";position:absolute;inset:0;background:var(--gw-color-neutral-alpha-20-black)}
-/* Measured as a to-bottom gradient rotated -90 and flipped, 780.67 long — i.e. a
-   left-anchored horizontal scrim from 80% black to transparent. */
-.cs-cta-scrim{
-  position:absolute;inset:0 auto 0 0;width:780px;
-  background:linear-gradient(to right,#000000cc,#00000000);
-}
-.cs-cta-body{position:relative;width:528px;display:flex;flex-direction:column;gap:var(--gw-space-40)}
-.cs-cta-heads{display:flex;flex-direction:column;gap:var(--gw-space-16)}
-.cs-cta-heads h2{
-  /* OFF-RAMP: measured 52px. h2 is 56, h3 is 44 — nothing between. */
-  font:700 var(--cs-display-52)/1.2 var(--gw-font-display);
-  color:var(--gw-color-white);
-}
-.cs-cta-heads p{
-  font:var(--gw-text-body-18-med);letter-spacing:var(--gw-text-body-18-med-tracking);
-  color:var(--gw-color-neutral-alpha-80-white);
-}
-.cs-cta-form{display:flex;flex-direction:column;gap:var(--gw-space-12)}
-/* inline-input — neutral-50 fill, 2px white@30% border, r12, pl-16 pr-8 py-8 */
-.cs-inline{
-  display:flex;align-items:center;justify-content:space-between;gap:var(--gw-space-8);
-  padding:var(--gw-space-8) var(--gw-space-8) var(--gw-space-8) var(--gw-space-16);
-  background:var(--gw-color-neutral-50);
-  border:2px solid var(--gw-color-neutral-alpha-30-white);
-  border-radius:var(--gw-radius-12);overflow:clip;
-}
-.cs-inline input{
-  flex:1 1 auto;min-width:0;border:0;background:none;outline:none;
-  font:var(--gw-text-body-16-med);letter-spacing:var(--gw-text-body-16-med-tracking);
-  color:var(--gw-color-black);
-}
-.cs-inline input::placeholder{color:var(--gw-color-neutral-700)}
-.cs-inline button{
-  flex:none;display:inline-flex;align-items:center;justify-content:center;
-  padding:10px var(--gw-space-12);
-  background:var(--gw-color-primary-500);color:var(--gw-color-white);
-  border-radius:var(--cs-radius-9); /* OFF-TOKEN: measured 8.879 */
-  font:var(--gw-text-body-16-med);letter-spacing:var(--gw-text-body-16-med-tracking);
-  line-height:24px;
-}
-.cs-inline button:hover{background:var(--gw-color-primary-600)}
-.cs-cta-note{
-  padding:0 var(--gw-space-20);
-  font:var(--gw-text-body-14-med);letter-spacing:var(--gw-text-body-14-med-tracking);
-  color:var(--gw-color-neutral-alpha-60-white);
-}
-.cs-cta-note a{text-decoration:underline}
-/* Glass testimonial — Figma `Notifications` 495:3534. Hug, pad 32, gap 80,
-   cross-axis end. Backdrop blur 10 + white@10% at mix-blend-mode luminosity,
-   2px white@10% border, corners 40/40/8/40, centred +343 from the card middle. */
-.cs-cta-glass{
-  position:absolute;top:50%;left:50%;
-  transform:translate(calc(-50% + 343px),-50%);
-  display:flex;flex-direction:column;align-items:flex-end;gap:var(--gw-space-80);
-  padding:var(--gw-space-32);max-width:390px;
-  border:2px solid var(--gw-color-neutral-alpha-10-white);
-  border-radius:var(--cs-radius-40) var(--cs-radius-40) var(--gw-radius-8) var(--cs-radius-40);
-  color:var(--gw-color-white);
-}
-.cs-cta-glass::before{
-  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
-  background:var(--gw-color-neutral-alpha-10-white);
-  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  mix-blend-mode:luminosity;
-}
-.cs-cta-glass > *{position:relative}
-/* OFF-RAMP: Vert Grotesk Display Medium 32/1.2. The h5 step is 32 at weight 600. */
-.cs-cta-glass blockquote{
-  width:100%;
-  font:500 32px/1.2 var(--gw-font-display);
-  color:var(--gw-color-white);
-}
-.cs-cta-glass .cs-byline-photo{background:var(--gw-color-neutral-alpha-30-white)}
-.cs-cta-glass .cs-byline-text span{color:var(--gw-color-neutral-alpha-50-white)}
+   FOOTER — realigned to the documented `footer/footer` component
+   (exports/web/page-shell.md, Figma set 1720:3801), not the live-site
+   measurement this file used before. Utsav asked "do you have footer in
+   any skill?" — yes, and the live-measured values here disagreed with it
+   on nearly every number: padding (100→80), inner width (1320→1240, the
+   real --gw-content-width token), column gap (52→60), title-to-list gap
+   (0→20), link gap (16→12), heading colour (white→neutral-200), link
+   weight/colour (14-reg neutral-100 → 14-med neutral-400), and the social
+   buttons (bare 16px icons → 28px tiles). All corrected to the doc below.
 
-/* ==========================================================================
-   FOOTER — measured off the live site (`footer.nfooter_section_v1`).
-   neutral/black, padding-top 100, inner column 1280, two halves at gap 100,
-   link columns 3-up at gap 52 capped to 600.
-   Copyright and legal are neutral-400 — RULED, R9. The live site ships
-   neutral-700 there, ~2.3:1 on black, which fails the 4.5:1 floor.
+   Three things NOT brought in line, on purpose:
+   1. Legal casing stays Title Case. The doc argues sentence case from
+      voice.md, but the live site AND the user's own case-study Figma frame
+      (1669:2658) both render Title Case — a live disagreement with the
+      shared spec, not a live-site quirk to silently fix.
+   2. No CTA banner, newsletter row, or "Agents working 24/7" marquee — the
+      documented Brand footer has all three. The CTA banner specifically
+      would reintroduce something close to the CTA fold Utsav asked removed
+      from directly above this footer; the other two are real, un-small
+      additions nobody has asked for yet. Flagged, not built.
+   3. The GUSHWORK wordmark band (.cs-footer-band, below) isn't part of the
+      documented component at all — it's this template's own live-site
+      match, kept as-is on Utsav's explicit instruction.
+
+   Copyright/legal colour stays neutral-400 — RULED, R9 either way: the
+   doc's own neutral-600/700 both fail 4.5:1 on black.
    ========================================================================== */
 .cs-footer{
   background:var(--gw-color-black);color:var(--gw-color-white);
   border-radius:var(--gw-radius-20) var(--gw-radius-20) 0 0;
   margin-top:calc(-1 * var(--gw-radius-20));
-  padding:var(--gw-space-100) 0 0;
+  padding:var(--gw-space-80) 0 0;
   overflow:clip;
 }
-.cs-footer-inner{max-width:var(--cs-content-w);margin:0 auto;padding:0 var(--gw-space-20)}
+.cs-footer-inner{max-width:var(--gw-content-width);margin:0 auto;padding:0 var(--gw-space-20)}
 .cs-footer-main{display:grid;grid-template-columns:1fr 1fr;gap:var(--gw-space-16) var(--gw-space-100)}
-.cs-footer-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:52px;max-width:600px}
+.cs-footer-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gw-space-60);max-width:600px}
 .cs-footer-col h4{
   font:var(--gw-text-body-12-sem);letter-spacing:var(--gw-text-body-12-sem-tracking);
-  color:var(--gw-color-white);
+  color:var(--gw-color-neutral-200);
 }
-.cs-footer-list{display:flex;flex-direction:column;gap:var(--gw-space-12);margin-top:var(--gw-space-16)}
+.cs-footer-list{display:flex;flex-direction:column;gap:var(--gw-space-12);margin-top:var(--gw-space-20)}
 .cs-footer-list a{
-  font:400 16px/1.2 var(--gw-font-body);letter-spacing:var(--gw-text-body-16-reg-tracking);
+  font:var(--gw-text-body-14-med);letter-spacing:var(--gw-text-body-14-med-tracking);
   color:var(--gw-color-neutral-400);
 }
 .cs-footer-list a:hover{color:var(--gw-color-white)}
 .cs-footer-comp{display:flex;flex-direction:column;gap:22px}
-.cs-footer-addr{display:flex;flex-wrap:wrap;align-items:center;gap:48px var(--gw-space-100)}
-.cs-footer-addr p{
+/* Pixel-measured off 1669:2658's footer crop after the user flagged the
+   placement as wrong: the two "address blocks" are NOT two stacked rows —
+   they're two SIDE-BY-SIDE columns, and phone + email sit under the US
+   address specifically (same x as it, nothing under the India address).
+   The old markup grouped [US addr, India addr] in one block and [phone,
+   email] in another, then stacked those two blocks — which put both
+   addresses at the same x, wrong on every axis. 48/100 gap is the same
+   figure previously (wrongly) applied one level up. */
+.cs-footer-addr-row{display:flex;flex-wrap:wrap;gap:48px var(--gw-space-100)}
+.cs-footer-addr-col{display:flex;flex-direction:column;gap:var(--gw-space-16)}
+/* Phone and email are one contact pair, not two unrelated lines — tighter
+   gap than the 16px that separates them from the address above. CHOSEN, not
+   measured: no prior reading of this specific gap existed to correct. */
+.cs-footer-contact{display:flex;flex-direction:column;gap:var(--gw-space-8)}
+/* Social row — sized per the documented component: 28×28 tiles, radius-8 (the
+   doc's own measured 7.226 isn't a token and reads as a scaling artefact, same
+   call as elsewhere in this file), 14px glyphs — was bare 16px icons. Icon
+   glyphs themselves match the live site's own SVGs exactly, inlined with
+   fill="currentColor" rather than vendored, same pattern as the breadcrumb
+   chevron and nav burger above; their own fill was #959BA4, i.e. neutral-500
+   exactly, not a raw hex. Kept in normal flow (right-aligned, above the
+   divider) rather than the doc's absolute positioning — same visual result,
+   without depending on a container this template doesn't have. */
+/* margin-top separates this from .cs-footer-main above; .cs-footer-legal's
+   own margin-top (below) is now the short "little above the stroke" gap —
+   moving social here didn't fix the gap on its own, since legal's 80px
+   margin-top applied to whatever sat above it regardless. Split into two
+   purposeful gaps instead of one 80px catch-all. */
+/* justify-content, not margin-left:auto — that only pushed this rightward
+   while it was a flex ITEM inside another flex row (.cs-footer-comp). As a
+   plain sibling of .cs-footer-main now, it's a full-width block on its own,
+   so its own icons need to be aligned right internally instead. */
+.cs-footer-social{display:flex;justify-content:flex-end;gap:var(--gw-space-16);margin-top:var(--gw-space-40)}
+.cs-footer-social a{
+  width:28px;height:28px;display:grid;place-items:center;
+  border-radius:var(--gw-radius-8);color:var(--gw-color-neutral-500);
+}
+.cs-footer-social svg{width:14px;height:14px;fill:currentColor}
+.cs-footer-social a:hover{color:var(--gw-color-white)}
+/* Same rule for the tel:/mailto: <a>s as the plain <p> address line — they're
+   one visual group, and a bare <a> would otherwise fall back to the browser's
+   default blue/underline. */
+.cs-footer-addr-col p,.cs-footer-addr-col a{
   max-width:184px;
   font:400 12px/1.4 var(--gw-font-body);letter-spacing:var(--gw-text-body-12-reg-tracking);
   color:var(--gw-color-neutral-alpha-60-white);
 }
+.cs-footer-addr-col a:hover{color:var(--gw-color-white)}
 .cs-footer-legal{
   display:flex;align-items:center;justify-content:space-between;gap:var(--gw-space-24);
-  margin-top:var(--gw-space-80);padding:6px 0 var(--gw-space-12);flex-wrap:wrap;
+  margin-top:var(--gw-space-16);padding:6px 0 var(--gw-space-12);flex-wrap:wrap;
   font:var(--gw-text-body-12-reg);letter-spacing:var(--gw-text-body-12-reg-tracking);
-  color:var(--gw-color-neutral-400); /* R9 — not the live site's neutral-700 */
+  color:var(--gw-color-neutral-400); /* R9 — not the doc's neutral-600/700, both fail 4.5:1 on black */
+  /* Divider — pixel-sampled off 1669:2658 at (35,35,35) on a (13,13,13) ground,
+     a ~22/255 lift that's almost exactly white-at-10% composited on black. */
+  border-top:1px solid var(--gw-color-neutral-alpha-10-white);
 }
 .cs-footer-legal div{display:flex;gap:var(--gw-space-24)}
 .cs-footer-legal a{color:var(--gw-color-neutral-400)}
 .cs-footer-legal a:hover{color:var(--gw-color-white)}
-/* Full-width wordmark band. The live asset is `updated-footer-bg.webp`, not in
-   this repo, so this is a labelled slot — flagged in the notice. */
-.cs-footer-band{
-  margin-top:112px;height:180px;display:grid;place-items:center;
-  background:var(--gw-color-neutral-alpha-10-white);
-}
+/* Copyright is 12-med per the doc; the legal links beside it stay 12-reg
+   (the row's own base font) — the two differ by weight in the spec. */
+.cs-footer-legal > span{font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking)}
+/* Full-width wordmark band. The live asset, `updated-footer-bg.webp`, is a
+   plain 2880×352 image — static position, no blend mode, no filter, the
+   watermark look is baked into its own alpha. Vendored at assets/case-study/,
+   added 7 Sep 2026. Live nests it as a FOOTER-level sibling of the padded
+   inner column, i.e. full-bleed, not capped — matched here. */
+.cs-footer-band{margin-top:112px}
+.cs-footer-band img{width:100%;height:auto;display:block}
 
 /* ==========================================================================
    PHONE — Breakpoint=Phone. Container 343. Grids collapse to one column,
@@ -512,8 +692,8 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
   .cs-nav-links,.cs-nav-right .cs-nav-cta{display:none}
   .cs-nav-burger{display:grid}
 
-  /* Phone hero hugs its content. The 920 desktop floor is a Figma frame height,
-     not a phone one — the mobile frame is 375 × 1116 overall. */
+  /* Phone hero hugs its content. The desktop height floor is a Figma/live
+     header height, not a phone one — the mobile frame is 375 × 1116 overall. */
   .cs-hero{padding:var(--gw-space-120) 0 var(--gw-space-60);min-height:0}
   .cs-inner{padding:0 var(--gw-space-16)}
   .cs-hero-body{gap:var(--gw-space-40)}
@@ -521,7 +701,21 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
   .cs-hero-title{font:var(--gw-text-h6);letter-spacing:var(--gw-text-h6-tracking)}
   .cs-hero-meta span{font:var(--gw-text-body-16-med)}
   .cs-hero-media{width:100%;height:237px}
-  .cs-hero-row .cs-slot--narrow{flex:1 1 auto;width:auto}
+  .cs-hero-media--icon svg{width:120px;height:120px}
+  /* Two cards side-by-side don't fit a 343px column — stack them instead,
+     and drop the figure's fixed aspect-ratio since a stacked pair needs
+     more height than 720:374 allows. The 60/52 padding is sized for the
+     720-wide desktop figure — at 343px it would eat almost the whole
+     column, so it steps down to a plain --gw-space-16 here. */
+  /* Dropping aspect-ratio leaves nothing giving the cards a definite height —
+     each card's internal flex:1 chain (body → chart-row → plot) has nothing
+     concrete to grow into without one, so the chart area, axis labels, and
+     x-axis collapse to near-zero instead of rendering. height:280px alone
+     didn't fix it: the base rule's flex:1 1 0 sets an explicit flex-basis,
+     which overrides height for sizing purposes regardless — flex-basis
+     itself has to be overridden too, or the height is simply ignored. */
+  .cs-figure.cs-figure--generated{aspect-ratio:auto;flex-direction:column;padding:var(--gw-space-16)}
+  .cs-figure.cs-figure--generated .cs-growth-card{flex:0 0 auto;height:280px}
   .cs-hero-swoosh{right:-1200px}
   .cs-stats{flex-direction:column;gap:var(--gw-space-24)}
   .cs-stat{width:100%}
@@ -535,25 +729,16 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
   .cs-tldr-card--wide{padding:var(--gw-space-24)}
   .cs-quote{padding:var(--gw-space-20)}
   .cs-aside{position:static;width:100%}
-  .cs-btn{width:100%}
-
-  .cs-tail{padding:var(--gw-space-60) var(--gw-space-16) var(--gw-space-20)}
-  .cs-cta{flex-direction:column;align-items:stretch;justify-content:center;gap:var(--gw-space-32);padding:var(--gw-space-32) var(--gw-space-20);min-height:0}
-  .cs-cta-scrim{inset:auto 0 0 0;width:auto;height:100%;background:linear-gradient(to top,#000000cc,#00000066)}
-  .cs-cta-body{width:100%}
-  .cs-cta-heads h2{font:var(--gw-text-h6-bold);letter-spacing:var(--gw-text-h6-bold-tracking)}
-  .cs-inline{flex-direction:column;align-items:stretch}
-  .cs-inline button{width:100%}
-  .cs-cta-glass{position:relative;top:auto;left:auto;transform:none;max-width:none;align-items:flex-start;gap:var(--gw-space-32)}
-  .cs-cta-glass blockquote{font:500 22px/1.4 var(--gw-font-display)}
 
   .cs-footer{padding:var(--gw-space-60) 0 0}
   .cs-footer-inner{padding:0 var(--gw-space-16)}
   .cs-footer-main{grid-template-columns:1fr;gap:var(--gw-space-40)}
   .cs-footer-cols{grid-template-columns:1fr;gap:var(--gw-space-32);max-width:none}
-  .cs-footer-addr{gap:var(--gw-space-24)}
+  .cs-footer-addr-row{gap:var(--gw-space-24)}
   .cs-footer-legal{flex-direction:column;align-items:flex-start;margin-top:var(--gw-space-40)}
-  .cs-footer-band{margin-top:var(--gw-space-60);height:100px}
+  /* Not needed on phone — a giant wordmark reads as branding on a wide desktop
+     footer; on a 375-wide screen it's mostly clipped text with nothing behind it. */
+  .cs-footer-band{display:none}
 }
 </style>
 </head>
@@ -569,16 +754,26 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
       <img src="../../../../assets/logo/gushwork-logo-original.svg" alt="Gushwork">
     </a>
     <div class="cs-nav-right">
+      <!-- Full set per 1669:2658 — was a 3-link subset (Case Study/Blog/Pricing)
+           that didn't match the frame the user built. -->
       <div class="cs-nav-links">
-        <a class="cs-nav-link" href="/case-study">Case Study</a>
-        <a class="cs-nav-link" href="/blog">Blog</a>
+        <a class="cs-nav-link" href="/who-its-for">Who It&rsquo;s For</a>
+        <a class="cs-nav-link" href="/platform">Platform
+          <svg viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66 101.66l-80 80a8 8 0 0 1-11.32 0l-80-80a8 8 0 0 1 11.32-11.32L128 164.69l74.34-74.35a8 8 0 0 1 11.32 11.32Z"/></svg>
+        </a>
+        <a class="cs-nav-link" href="/solutions">Solutions
+          <svg viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66 101.66l-80 80a8 8 0 0 1-11.32 0l-80-80a8 8 0 0 1 11.32-11.32L128 164.69l74.34-74.35a8 8 0 0 1 11.32 11.32Z"/></svg>
+        </a>
+        <a class="cs-nav-link" href="/case-study">Customers</a>
         <a class="cs-nav-link" href="/pricing">Pricing</a>
       </div>
-      <a class="cs-nav-cta" href="/demo">Book a Demo</a>
+      <a class="cs-nav-cta" href="https://www.gushwork.ai/demo">Book a Demo</a>
       <button class="cs-nav-burger" aria-label="Open menu">
         <svg viewBox="0 0 256 256" aria-hidden="true"><path d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12ZM40 76h176a12 12 0 0 0 0-24H40a12 12 0 0 0 0 24Zm176 104H40a12 12 0 0 0 0 24h176a12 12 0 0 0 0-24Z"/></svg>
       </button>
     </div>
+    <!-- Fills 0→100% with how much of the page has been scrolled. -->
+    <div class="cs-nav-progress" id="cs-nav-progress" role="progressbar" aria-label="Reading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
   </nav>
 
   <!-- ====================================================================
@@ -595,43 +790,63 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
       <div class="cs-hero-top">
         <div class="cs-hero-text">
 
-          <!-- Breadcrumb. Two levels; a third ("Home") is built and hidden in Figma. -->
-          <nav class="cs-crumbs" aria-label="Breadcrumb">
-            <a href="/customers">Customers</a>
-            <svg viewBox="0 0 256 256" aria-hidden="true"><path d="M181.66 133.66l-80 80a8 8 0 0 1-11.32-11.32L164.69 128 90.34 53.66a8 8 0 0 1 11.32-11.32l80 80a8 8 0 0 1 0 11.32Z"/></svg>
-            <span aria-current="page">Client name</span>
-          </nav>
+          <!-- eyebrow — Type=Default, icon on. Figma 1669:2658. -->
+          <!-- Icon is SealCheck — assets/icons/regular/seal-check.svg, inlined. -->
+          <div class="cs-eyebrow">
+            <svg viewBox="0 0 256 256" aria-hidden="true"><path d="M225.86,102.82c-3.77-3.94-7.67-8-9.14-11.57-1.36-3.27-1.44-8.69-1.52-13.94-.15-9.76-.31-20.82-8-28.51s-18.75-7.85-28.51-8c-5.25-.08-10.67-.16-13.94-1.52-3.56-1.47-7.63-5.37-11.57-9.14C146.28,23.51,138.44,16,128,16s-18.27,7.51-25.18,14.14c-3.94,3.77-8,7.67-11.57,9.14C88,40.64,82.56,40.72,77.31,40.8c-9.76.15-20.82.31-28.51,8S41,67.55,40.8,77.31c-.08,5.25-.16,10.67-1.52,13.94-1.47,3.56-5.37,7.63-9.14,11.57C23.51,109.72,16,117.56,16,128s7.51,18.27,14.14,25.18c3.77,3.94,7.67,8,9.14,11.57,1.36,3.27,1.44,8.69,1.52,13.94.15,9.76.31,20.82,8,28.51s18.75,7.85,28.51,8c5.25.08,10.67.16,13.94,1.52,3.56,1.47,7.63,5.37,11.57,9.14C109.72,232.49,117.56,240,128,240s18.27-7.51,25.18-14.14c3.94-3.77,8-7.67,11.57-9.14,3.27-1.36,8.69-1.44,13.94-1.52,9.76-.15,20.82-.31,28.51-8s7.85-18.75,8-28.51c.08-5.25.16-10.67,1.52-13.94,1.47-3.56,5.37-7.63,9.14-11.57C232.49,146.28,240,138.44,240,128S232.49,109.73,225.86,102.82Zm-11.55,39.29c-4.79,5-9.75,10.17-12.38,16.52-2.52,6.1-2.63,13.07-2.73,19.82-.1,7-.21,14.33-3.32,17.43s-10.39,3.22-17.43,3.32c-6.75.1-13.72.21-19.82,2.73-6.35,2.63-11.52,7.59-16.52,12.38S132,224,128,224s-9.15-4.92-14.11-9.69-10.17-9.75-16.52-12.38c-6.1-2.52-13.07-2.63-19.82-2.73-7-.1-14.33-.21-17.43-3.32s-3.22-10.39-3.32-17.43c-.1-6.75-.21-13.72-2.73-19.82-2.63-6.35-7.59-11.52-12.38-16.52S32,132,32,128s4.92-9.15,9.69-14.11,9.75-10.17,12.38-16.52c2.52-6.1,2.63-13.07,2.73-19.82.1-7,.21-14.33,3.32-17.43S70.51,56.9,77.55,56.8c6.75-.1,13.72-.21,19.82-2.73,6.35-2.63,11.52-7.59,16.52-12.38S124,32,128,32s9.15,4.92,14.11,9.69,10.17,9.75,16.52,12.38c6.1,2.52,13.07,2.63,19.82,2.73,7,.1,14.33.21,17.43,3.32s3.22,10.39,3.32,17.43c.1,6.75.21,13.72,2.73,19.82,2.63,6.35,7.59,11.52,12.38,16.52S224,124,224,128,219.08,137.15,214.31,142.11ZM173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34Z"/></svg>
+            <span>Case Study</span>
+          </div>
 
           <div class="cs-hero-heads">
-            <!-- Lead with the outcome and the number. No full stop. -->
-            <h1 class="cs-hero-title">Client name gets 25 qualified leads in the first 30 days of AI search</h1>
+            <!-- Sample data: gushwork.ai/case-study/cutting-edge-plasma, verbatim —
+                 including its Title Case. That casing ships live; the voice rule
+                 governs what this template authors, not a real headline reproduced
+                 as sample content. Same precedent as the rail card title below. -->
+            <h1 class="cs-hero-title">From Chasing CNC Buyers To Getting Found On Google</h1>
             <div class="cs-hero-meta">
-              <span>Industry</span>
+              <span>CNC Equipment</span>
               <i aria-hidden="true"></i>
-              <span>Country</span>
+              <span>USA</span>
             </div>
           </div>
         </div>
 
-        <!-- image — four slots. Drop one photo per slot, or keep one and delete
-             the rest. The 80px corner belongs on the bottom-right slot. -->
+        <!-- image — one slot (1669:2658). Three ways to fill it, in order of
+             preference:
+             (a) a real client photo — `.cs-slot` + `<img>`. Used here: a
+                 stock photo (Unsplash, free-licensed, no login/API key
+                 needed), since no client-supplied photography exists.
+             (b) stock photography search failed to turn up anything
+                 relevant — `.cs-hero-media--icon`, a duotone Phosphor icon
+                 chosen from the case's industry text. CSS still defined
+                 below for this fallback; not what's used in this instance.
+             (c) Envato Elements was asked about and ruled out — it needs a
+                 login this session won't perform. An AI image-generation
+                 tool (Weave) is also available but spends real credits and
+                 needs per-run approval, so it wasn't reached for either,
+                 given option (a) worked on the first search. -->
         <div class="cs-hero-media">
-          <div class="cs-hero-row">
-            <div class="cs-slot cs-slot--narrow"><span class="cs-slot-label">Logo</span></div>
-            <div class="cs-slot"><span class="cs-slot-label">Image</span></div>
-          </div>
-          <div class="cs-hero-row">
-            <div class="cs-slot"><span class="cs-slot-label">Image</span></div>
-            <div class="cs-slot cs-slot--narrow cs-slot--tell"><span class="cs-slot-label">Image</span></div>
+          <div class="cs-slot">
+            <img src="../../../../assets/case-study/sample/cutting-edge-plasma-cnc-milling.jpg" alt="CNC mill cutting an aluminum part, coolant spraying the cutting head">
+            <!-- Client-logo overlay — Figma 1669:4387. src points at a fetch
+                 this build never actually ran (no real client-logo fetch step
+                 exists yet), so onerror fires and the box hides itself —
+                 demonstrating the "couldn't fetch → hide" half of the ask
+                 honestly rather than faking a found logo. Wire a real fetch
+                 in before generating a case study for real. -->
+            <div class="cs-hero-logo">
+              <img src="../../../../assets/case-study/sample/cutting-edge-plasma-logo.png" alt="Cutting Edge Plasma logo"
+                   onerror="this.closest('.cs-hero-logo').style.display='none'">
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Three outcome numbers. Numbers lead; the label explains. -->
+      <!-- Three outcome numbers, verbatim from the live sample. -->
       <div class="cs-stats">
-        <div class="cs-stat"><b>25+ leads</b><span>generated through AI search in four weeks</span></div>
-        <div class="cs-stat"><b>20,000+</b><span>times the brand appeared in buyer searches</span></div>
-        <div class="cs-stat"><b>8x growth</b><span>in leads generated in two months</span></div>
+        <div class="cs-stat"><b>#1 rankings</b><span>for high-intent searches across Midwest states</span></div>
+        <div class="cs-stat"><b>4,000+</b><span>Visitors to their site</span></div>
+        <div class="cs-stat"><b>50+ leads</b><span>Generated since they started working with us</span></div>
       </div>
     </div>
   </header>
@@ -643,33 +858,111 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
     <div class="cs-article-inner">
       <article class="cs-prose">
 
+        <!-- Sample copy below is gushwork.ai/case-study/cutting-edge-plasma, condensed
+             into this template's own section shape. Paragraph text is verbatim or
+             lightly trimmed from the live page; h2s are this template's own structural
+             labels, not headings the live page carries. -->
         <div class="cs-block">
-          <h2>The customer — a 40-year leader with no online visibility</h2>
-          <p>Two or three paragraphs on who they are and what was not working. Name the market, the buyer, and the gap. Keep the claim specific: what they had, and the one thing they did not.</p>
+          <h2>The customer — a strong product, invisible online</h2>
+          <p>Cutting Edge Plasma had a good product, strong reviews, and a clear buyer base: fabrication shops, custom metalwork businesses, and hobbyists looking for CNC plasma cutting tables, router tables, and laser systems. But the website was not bringing in buyers. Steve Fisher, the owner of Cutting Edge Plasma, was doing most of the sales work himself.</p>
         </div>
 
         <!-- OPTIONAL: TL;DR. Delete this whole block if the story does not need it. -->
         <div class="cs-tldr">
           <div class="cs-tldr-card">
             <h3>Problem</h3>
-            <p>One sentence on what was broken, in the client's terms.</p>
+            <p>Cutting Edge Plasma had strong products and reviews, but the website was not generating consistent inbound.</p>
           </div>
           <div class="cs-tldr-card">
             <h3>Challenge</h3>
-            <p>One sentence on why it was hard — the buyer behaviour, the market, the constraint.</p>
+            <p>CNC equipment buyers search by machine type, table size, material, geography, and use case. Generic product pages were not enough to capture that intent.</p>
           </div>
           <div class="cs-tldr-card cs-tldr-card--wide">
             <h3>Solution</h3>
-            <p>Two sentences on what we built and how the channel changed. End on the outcome, not the activity.</p>
+            <p>Gushwork revamped the website, built search pages around how buyers look for CNC tables, and helped Cutting Edge Plasma rank for high-intent searches across Midwest states.</p>
           </div>
         </div>
 
         <div class="cs-block">
-          <h2>Impact — immediate results, lasting transformation</h2>
+          <h2>What the first 90 days showed</h2>
           <div class="cs-copy">
-            <p>Open with the number. Then the mechanism that produced it.</p>
-            <figure class="cs-figure"><span class="cs-slot-label">Dashboard or result image — 720 × 374</span></figure>
-            <p>Follow the image with what it shows and why it matters to the business, not to the channel.</p>
+            <p>In the first 90 days, the channel started bringing in buyers who matched Cutting Edge Plasma&rsquo;s market. Fabrication shops. Custom metalwork businesses. Independent operators. People who arrived with a specific machine in mind and submitted inquiries through the site.</p>
+            <!-- No client photography exists for bulk case studies — generated
+                 from the case's own stats instead. See the CSS comment above
+                 .cs-figure--generated for how to regenerate this per case. -->
+            <figure class="cs-figure cs-figure--generated">
+              <div class="cs-growth-card">
+                <div class="cs-growth-card-header">
+                  <span class="cs-growth-card-label">Total Visitors (90 days)</span>
+                </div>
+                <div class="cs-growth-card-body">
+                  <div>
+                    <span class="cs-growth-card-value">4,000+</span><br>
+                    <span class="cs-growth-card-caption">Visitors to their site</span>
+                  </div>
+                  <div class="cs-growth-card-chart">
+                    <div class="cs-growth-card-yaxis" aria-hidden="true">
+                      <span>4.5K</span><span>3K</span><span>1.5K</span><span>0</span>
+                    </div>
+                    <div class="cs-growth-card-plot">
+                      <svg viewBox="0 0 240 90" preserveAspectRatio="none" aria-hidden="true">
+                        <defs>
+                          <linearGradient id="cs-chart-grad-1" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#16a34a" stop-opacity="0.3"/>
+                            <stop offset="100%" stop-color="#16a34a" stop-opacity="0"/>
+                          </linearGradient>
+                        </defs>
+                        <line x1="0" y1="4" x2="240" y2="4" stroke="#e7e8e9"/>
+                        <line x1="0" y1="32" x2="240" y2="32" stroke="#e7e8e9"/>
+                        <line x1="0" y1="60" x2="240" y2="60" stroke="#e7e8e9"/>
+                        <line x1="0" y1="88" x2="240" y2="88" stroke="#e7e8e9"/>
+                        <path d="M0,80 C40,79 80,72 120,58 C160,44 190,24 240,4 L240,90 L0,90 Z" fill="url(#cs-chart-grad-1)"/>
+                        <path d="M0,80 C40,79 80,72 120,58 C160,44 190,24 240,4" fill="none" stroke="#16a34a" stroke-width="2"/>
+                      </svg>
+                      <div class="cs-growth-card-xaxis" aria-hidden="true">
+                        <span>Month 1</span><span>Month 2</span><span>Month 3</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="cs-growth-card">
+                <div class="cs-growth-card-header">
+                  <span class="cs-growth-card-label">Total Leads (90 days)</span>
+                </div>
+                <div class="cs-growth-card-body">
+                  <div>
+                    <span class="cs-growth-card-value">50+ Leads</span><br>
+                    <span class="cs-growth-card-caption">Generated since they started working with us</span>
+                  </div>
+                  <div class="cs-growth-card-chart">
+                    <div class="cs-growth-card-yaxis" aria-hidden="true">
+                      <span>60</span><span>40</span><span>20</span><span>0</span>
+                    </div>
+                    <div class="cs-growth-card-plot">
+                      <svg viewBox="0 0 240 90" preserveAspectRatio="none" aria-hidden="true">
+                        <defs>
+                          <linearGradient id="cs-chart-grad-2" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#0070ff" stop-opacity="0.3"/>
+                            <stop offset="100%" stop-color="#0070ff" stop-opacity="0"/>
+                          </linearGradient>
+                        </defs>
+                        <line x1="0" y1="4" x2="240" y2="4" stroke="#e7e8e9"/>
+                        <line x1="0" y1="32" x2="240" y2="32" stroke="#e7e8e9"/>
+                        <line x1="0" y1="60" x2="240" y2="60" stroke="#e7e8e9"/>
+                        <line x1="0" y1="88" x2="240" y2="88" stroke="#e7e8e9"/>
+                        <path d="M0,84 C50,84 90,82 130,70 C170,58 200,32 240,6 L240,90 L0,90 Z" fill="url(#cs-chart-grad-2)"/>
+                        <path d="M0,84 C50,84 90,82 130,70 C170,58 200,32 240,6" fill="none" stroke="#0070ff" stroke-width="2"/>
+                      </svg>
+                      <div class="cs-growth-card-xaxis" aria-hidden="true">
+                        <span>Month 1</span><span>Month 2</span><span>Month 3</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </figure>
+            <p>The lead dashboard notification flow also helped. When an inquiry came in, Steve received a text alert and could call while the buyer was still warm. On the QBR, he called the real-time notifications one of the most practically useful parts of the setup.</p>
           </div>
         </div>
 
@@ -677,77 +970,43 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
         <figure class="cs-quote">
           <!-- visible:false in the Figma node. Kept so the design is recoverable. -->
           <svg class="cs-quote-mark is-hidden" viewBox="0 0 31 24" aria-hidden="true"><path d="M0 24V13.7C0 6.13 4.6 1.05 12.4 0l1.4 4.2c-4.3 1-6.7 3.5-7 7.4H14V24H0Zm17 0V13.7C17 6.13 21.6 1.05 29.4 0L31 4.2c-4.4 1-6.8 3.5-7.1 7.4H31V24H17Z"/></svg>
-          <p>&ldquo;A quote that carries a number and a change, in the client's own words rather than ours.&rdquo;</p>
+          <p>&ldquo;What you guys are doing is far superior to what I was doing.&rdquo;</p>
           <figcaption class="cs-byline">
-            <!-- client/avatar — drop the real client photo here. Grayscale is applied
-                 in CSS. Never substitute the dashboard `Avatar` character asset. -->
-            <span class="cs-byline-photo"><span class="cs-slot-label">Photo</span></span>
+            <!-- client/avatar — real photo, grayscale applied in CSS. Never
+                 substitute the dashboard `Avatar` character asset. -->
+            <span class="cs-byline-photo">
+              <img src="../../../../assets/case-study/sample/cutting-edge-plasma-steve-fisher.webp" alt="Steve Fisher">
+            </span>
             <span class="cs-byline-text">
-              <b>Client name</b>
-              <span>Role, Company, Country</span>
+              <b>Steve Fisher</b>
+              <span>Owner, Cutting Edge Plasma</span>
             </span>
           </figcaption>
         </figure>
 
         <div class="cs-block">
-          <h2>What this means for your business</h2>
-          <p>Generalise from the story without overclaiming. One paragraph, addressed to the reader as "you".</p>
+          <h2>Why this story matters</h2>
+          <p>Cutting Edge Plasma did not need more abstract marketing activity. Steve needed buyers who were already looking for CNC equipment to find him before they found someone else. Gushwork helped build that path — buyers are finding him on Google and AI search engines.</p>
         </div>
 
         <div class="cs-block">
           <h2>Ready to build your growth story</h2>
-          <p>One short paragraph, then hand off to the CTA fold below. No button here — in-fold CTAs are opt-in and the worked page examples hide them.</p>
+          <p>The channel is now bringing in buyers from the exact geography Steve wanted to focus on. The sales work is still his — but the top of the funnel has changed.</p>
         </div>
       </article>
 
-      <!-- Rail CTA, taken from the live site. One card, sticky. -->
+      <!-- Rail CTA — Figma 1669:9877. Sticky, one card. -->
       <aside class="cs-aside">
         <div class="cs-card">
-          <!-- Placeholder for the `cta-peopl` avatar pair — see the notice. -->
-          <div class="cs-card-people" aria-hidden="true"><i></i><i></i></div>
-          <h3>Discover AI agents that help businesses get more qualified leads.</h3>
-          <a class="cs-btn" href="/demo">Book a Demo</a>
+          <div class="cs-card-content">
+            <div class="cs-card-people" aria-hidden="true">
+              <img src="../../../../assets/case-study/cta-peopl.webp" alt="">
+            </div>
+            <h3>Discover AI agents that help businesses get more qualified leads.</h3>
+          </div>
+          <a class="cs-btn" href="https://www.gushwork.ai/demo">Book a Demo</a>
         </div>
       </aside>
-    </div>
-  </section>
-
-  <!-- ====================================================================
-       CTA FOLD — fold/ CTA, Figma 495:3516
-       ==================================================================== -->
-  <section class="cs-tail">
-    <div class="cs-cta">
-      <div class="cs-cta-photo" aria-hidden="true"><span class="cs-slot-label">CTA photo 1400 × 600</span></div>
-      <div class="cs-cta-scrim" aria-hidden="true"></div>
-
-      <div class="cs-cta-body">
-        <div class="cs-cta-heads">
-          <h2>See How This Works for Your Business</h2>
-          <p>Unsure about how many leads you&rsquo;ll get?</p>
-        </div>
-        <form class="cs-cta-form" action="/demo" method="post">
-          <div class="cs-inline">
-            <label for="cs-email-cta" hidden>Work email</label>
-            <input id="cs-email-cta" type="email" name="email"
-                   placeholder="What&rsquo;s your work email?" autocomplete="email"
-                   data-1p-ignore="true" data-lpignore="true" data-form-type="other">
-            <button type="submit">Book a Demo</button>
-          </div>
-          <p class="cs-cta-note">Have Questions? <a href="/contact">Ask Anything here.</a></p>
-        </form>
-      </div>
-
-      <!-- Glass testimonial — `Notifications` 495:3534 -->
-      <figure class="cs-cta-glass">
-        <blockquote>&ldquo;The results came fast &ndash; 14 leads in just 3 weeks.&rdquo;</blockquote>
-        <figcaption class="cs-byline">
-          <span class="cs-byline-photo"><span class="cs-slot-label">Photo</span></span>
-          <span class="cs-byline-text">
-            <b>Client name</b>
-            <span>Role, Company, Country</span>
-          </span>
-        </figcaption>
-      </figure>
     </div>
   </section>
 
@@ -757,78 +1016,115 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
   <footer class="cs-footer">
     <div class="cs-footer-inner">
       <div class="cs-footer-main">
+        <!-- Absolute gushwork.ai URLs, not relative — this page isn't hosted
+             on that domain, so relative paths would 404 wherever it's actually
+             served or previewed. -->
         <div class="cs-footer-cols">
           <div class="cs-footer-col">
             <h4>Platform</h4>
             <div class="cs-footer-list">
-              <a href="/platform/brand-memory">Brand Memory</a>
-              <a href="/platform/page-creation-engine">Page Creation Engine</a>
-              <a href="/platform/cms">AI-First CMS</a>
-              <a href="/platform/leads-dashboard">Leads Dashboard</a>
-              <a href="/platform/analytics">Analytics</a>
+              <a href="https://www.gushwork.ai/brand-memory">Brand Memory</a>
+              <a href="https://www.gushwork.ai/page-creation-engine">Page Creation Engine</a>
+              <a href="https://www.gushwork.ai/ai-first-cms">AI-First CMS</a>
+              <a href="https://www.gushwork.ai/leads-dashboard">Leads Dashboard</a>
+              <a href="https://www.gushwork.ai/analytics">Analytics</a>
             </div>
           </div>
           <div class="cs-footer-col">
             <h4>Solutions</h4>
             <div class="cs-footer-list">
-              <a href="/solutions/ai-search-agent">AI Search Agent</a>
-              <a href="/solutions/lead-conversion">Lead Conversion</a>
-              <a href="/solutions/paid-boost">Paid Boost</a>
+              <a href="https://www.gushwork.ai/solutions/ai-search">AI Search Agent</a>
+              <a href="https://www.gushwork.ai/solutions/lead-conversion">Lead Conversion</a>
+              <a href="https://www.gushwork.ai/solutions/paid-boost">Paid Boost</a>
             </div>
           </div>
           <div class="cs-footer-col">
             <h4>Company</h4>
             <div class="cs-footer-list">
-              <a href="/pricing">Pricing</a>
-              <a href="/careers">Careers</a>
-              <a href="/customers">Customers</a>
-              <a href="/alternatives">Alternatives</a>
-              <a href="/announcements">Announcements</a>
+              <a href="https://www.gushwork.ai/pricing">Pricing</a>
+              <a href="https://www.gushwork.ai/careers">Careers</a>
+              <a href="https://www.gushwork.ai/case-study">Customers</a>
+              <a href="https://www.gushwork.ai/gushwork-alternatives">Alternatives</a>
+              <a href="https://www.gushwork.ai/affiliate">Affiliate</a>
             </div>
           </div>
         </div>
 
         <div class="cs-footer-comp">
-          <div class="cs-footer-addr">
-            <p>Regents Inc, 16192 Coastal Hwy, Lewes, DE 19958, United States</p>
-            <p>Delfin Technologies India Pvt Ltd, 578, 9th A Main Rd, Indiranagar, Bengaluru, Karnataka 560038, India</p>
-          </div>
-          <div class="cs-footer-addr">
-            <p>+1 (888) 451 5522</p>
-            <p>growth@gushwork.ai</p>
+          <div class="cs-footer-addr-row">
+            <div class="cs-footer-addr-col">
+              <p>Gushwork, Regents Inc, 16192 Coastal Hwy, Lewes, DE 19958, United States</p>
+              <!-- tel:/mailto: — the live site has these clickable, not plain text. -->
+              <div class="cs-footer-contact">
+                <a href="tel:+18884515522">+1 (888) 451 5522</a>
+                <a href="mailto:growth@gushwork.ai">growth@gushwork.ai</a>
+              </div>
+            </div>
+            <div class="cs-footer-addr-col">
+              <p>Gushwork, 578, 9th A Main Rd, Indiranagar, Bengaluru, Karnataka 560038, India</p>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- The live site writes these in title case. page-shell.md finding 3 says
-           write them corrected; the year is not baked in here. -->
+      <!-- Moved out of .cs-footer-comp — sitting inside that column tied its
+           position to the ADDRESS block's height (via margin-top:auto on a
+           stretched flex column), which just meant "wherever the shorter
+           side happens to end," not "close to the divider." Now a normal-flow
+           sibling directly above .cs-footer-legal, so its distance to the
+           stroke is one fixed, small gap — independent of how tall the nav
+           columns or address block are for any given case study. -->
+      <div class="cs-footer-social">
+        <a href="https://www.linkedin.com/company/gushwork" aria-label="Gushwork on LinkedIn">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M14.8156 0H1.18125C0.528125 0 0 0.515625 0 1.15313V14.8438C0 15.4813 0.528125 16 1.18125 16H14.8156C15.4688 16 16 15.4813 16 14.8469V1.15313C16 0.515625 15.4688 0 14.8156 0ZM4.74687 13.6344H2.37188V5.99687H4.74687V13.6344ZM3.55938 4.95625C2.79688 4.95625 2.18125 4.34062 2.18125 3.58125C2.18125 2.82188 2.79688 2.20625 3.55938 2.20625C4.31875 2.20625 4.93437 2.82188 4.93437 3.58125C4.93437 4.3375 4.31875 4.95625 3.55938 4.95625ZM13.6344 13.6344H11.2625V9.92188C11.2625 9.0375 11.2469 7.89687 10.0281 7.89687C8.79375 7.89687 8.60625 8.8625 8.60625 9.85938V13.6344H6.2375V5.99687H8.5125V7.04063H8.54375C8.85937 6.44063 9.63438 5.80625 10.7875 5.80625C13.1906 5.80625 13.6344 7.3875 13.6344 9.44375V13.6344V13.6344Z"/></svg>
+        </a>
+        <a href="https://x.com/gushwork" aria-label="Gushwork on X">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M12.2175 1.26929H14.4665L9.5531 6.88495L15.3333 14.5266H10.8075L7.26265 9.89198L3.20659 14.5266H0.956247L6.21158 8.52002L0.666626 1.26929H5.30737L8.51156 5.50551L12.2175 1.26929ZM11.4282 13.1805H12.6744L4.63022 2.54471H3.29293L11.4282 13.1805Z"/></svg>
+        </a>
+        <a href="https://www.instagram.com/gushwork.ai/" aria-label="Gushwork on Instagram">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.44062C10.1375 1.44062 10.3906 1.45 11.2313 1.4875C12.0125 1.52187 12.4344 1.65313 12.7156 1.7625C13.0875 1.90625 13.3563 2.08125 13.6344 2.35938C13.9156 2.64063 14.0875 2.90625 14.2313 3.27813C14.3406 3.55938 14.4719 3.98437 14.5063 4.7625C14.5438 5.60625 14.5531 5.85938 14.5531 7.99375C14.5531 10.1313 14.5438 10.3844 14.5063 11.225C14.4719 12.0063 14.3406 12.4281 14.2313 12.7094C14.0875 13.0813 13.9125 13.35 13.6344 13.6281C13.3531 13.9094 13.0875 14.0813 12.7156 14.225C12.4344 14.3344 12.0094 14.4656 11.2313 14.5C10.3875 14.5375 10.1344 14.5469 8 14.5469C5.8625 14.5469 5.60938 14.5375 4.76875 14.5C3.9875 14.4656 3.56563 14.3344 3.28438 14.225C2.9125 14.0813 2.64375 13.9063 2.36563 13.6281C2.08438 13.3469 1.9125 13.0813 1.76875 12.7094C1.65938 12.4281 1.52813 12.0031 1.49375 11.225C1.45625 10.3813 1.44688 10.1281 1.44688 7.99375C1.44688 5.85625 1.45625 5.60312 1.49375 4.7625C1.52813 3.98125 1.65938 3.55938 1.76875 3.27813C1.9125 2.90625 2.0875 2.6375 2.36563 2.35938C2.64688 2.07813 2.9125 1.90625 3.28438 1.7625C3.56563 1.65313 3.99063 1.52187 4.76875 1.4875C5.60938 1.45 5.8625 1.44062 8 1.44062ZM8 0C5.82813 0 5.55625 0.009375 4.70313 0.046875C3.85313 0.084375 3.26875 0.221875 2.7625 0.41875C2.23438 0.625 1.7875 0.896875 1.34375 1.34375C0.896875 1.7875 0.625 2.23438 0.41875 2.75938C0.221875 3.26875 0.084375 3.85 0.046875 4.7C0.009375 5.55625 0 5.82813 0 8C0 10.1719 0.009375 10.4438 0.046875 11.2969C0.084375 12.1469 0.221875 12.7313 0.41875 13.2375C0.625 13.7656 0.896875 14.2125 1.34375 14.6563C1.7875 15.1 2.23438 15.375 2.75938 15.5781C3.26875 15.775 3.85 15.9125 4.7 15.95C5.55313 15.9875 5.825 15.9969 7.99688 15.9969C10.1688 15.9969 10.4406 15.9875 11.2938 15.95C12.1438 15.9125 12.7281 15.775 13.2344 15.5781C13.7594 15.375 14.2063 15.1 14.65 14.6563C15.0938 14.2125 15.3688 13.7656 15.5719 13.2406C15.7688 12.7313 15.9063 12.15 15.9438 11.3C15.9813 10.4469 15.9906 10.175 15.9906 8.00313C15.9906 5.83125 15.9813 5.55938 15.9438 4.70625C15.9063 3.85625 15.7688 3.27188 15.5719 2.76563C15.375 2.23438 15.1031 1.7875 14.6563 1.34375C14.2125 0.9 13.7656 0.625 13.2406 0.421875C12.7313 0.225 12.15 0.0875 11.3 0.05C10.4438 0.009375 10.1719 0 8 0Z"/><path d="M8 3.89062C5.73125 3.89062 3.89062 5.73125 3.89062 8C3.89062 10.2688 5.73125 12.1094 8 12.1094C10.2688 12.1094 12.1094 10.2688 12.1094 8C12.1094 5.73125 10.2688 3.89062 8 3.89062ZM8 10.6656C6.52813 10.6656 5.33437 9.47188 5.33437 8C5.33437 6.52813 6.52813 5.33437 8 5.33437C9.47188 5.33437 10.6656 6.52813 10.6656 8C10.6656 9.47188 9.47188 10.6656 8 10.6656Z"/><path d="M13.2312 3.72805C13.2312 4.2593 12.8 4.68743 12.2719 4.68743C11.7406 4.68743 11.3125 4.25618 11.3125 3.72805C11.3125 3.1968 11.7438 2.76868 12.2719 2.76868C12.8 2.76868 13.2312 3.19993 13.2312 3.72805Z"/></svg>
+        </a>
+      </div>
+
+      <!-- The live site renders these Title Case with a pipe separator — matched
+           here per finding 3 in exports/web/page-shell.md. (The prior revision of
+           this file wrote sentence case and a middle dot; the README already
+           claimed the corrected form, the markup just didn't do it yet.) -->
       <div class="cs-footer-legal">
-        <span>&copy; 2026 Gushwork &middot; All rights reserved</span>
+        <span>&copy; 2026 Gushwork | All Rights Reserved</span>
         <div>
-          <a href="/privacy">Privacy policy</a>
-          <a href="/terms">Terms of use</a>
+          <!-- /privacy-policy and /terms-and-conditions are the real paths —
+               the live-site scrape this template was built from had /privacy
+               and /terms, which don't match the site's actual URLs. -->
+          <a href="https://www.gushwork.ai/privacy-policy">Privacy Policy</a>
+          <a href="https://www.gushwork.ai/terms-and-conditions">Terms &amp; Conditions</a>
         </div>
       </div>
     </div>
 
-    <!-- Wordmark band. Live asset is `updated-footer-bg.webp` — not in this repo. -->
-    <div class="cs-footer-band"><span class="cs-slot-label">Footer wordmark band — full width</span></div>
+    <!-- Wordmark band — assets/case-study/updated-footer-bg.webp -->
+    <div class="cs-footer-band">
+      <img src="../../../../assets/case-study/updated-footer-bg.webp" alt="" aria-hidden="true">
+    </div>
   </footer>
 </div>
 
 <script>
-/* Navbar takes a background once scrolled off the hero, matching the live site's
-   `is-scrolled` behaviour. Threshold is template-local — see --cs-nav-solid-at. */
+/* Reading progress: how much of the page has been scrolled, 0-100%. Denominator
+   is the whole document, not just the article — "how much of the case study
+   has been read" reads most naturally as page progress, matching the common
+   blog reading-progress pattern, not an article-only sub-range. */
 (function () {
-  var nav = document.getElementById('cs-nav');
-  if (!nav) return;
-  var at = parseInt(getComputedStyle(document.documentElement)
-            .getPropertyValue('--cs-nav-solid-at'), 10) || 32;
+  var bar = document.getElementById('cs-nav-progress');
+  if (!bar) return;
   function sync() {
-    if (window.scrollY > at) nav.setAttribute('data-scrolled', '');
-    else nav.removeAttribute('data-scrolled');
+    var max = document.documentElement.scrollHeight - innerHeight;
+    var pct = max > 0 ? Math.min(100, Math.max(0, (scrollY / max) * 100)) : 0;
+    bar.style.width = pct + '%';
+    bar.setAttribute('aria-valuenow', Math.round(pct));
   }
   addEventListener('scroll', sync, { passive: true });
+  addEventListener('resize', sync, { passive: true });
   sync();
 })();
 </script>

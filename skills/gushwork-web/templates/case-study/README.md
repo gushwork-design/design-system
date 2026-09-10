@@ -81,6 +81,16 @@ were replaced with the live site's rail CTA on Utsav's call. It sits flush with 
 
 ## Filling it in
 
+**`<title>` and `<meta name="description">` are placeholders too — the same rule applies to
+them as everything else on this list, and they're easy to forget because nothing on the
+rendered page shows they're wrong.** Update both for every case study:
+
+- **Title**: `<Client> Case Study | Gushwork`. Not `<Client> Case Study | Gushwork | Gushwork`
+  — that double is a live-site quirk, not a pattern to copy.
+- **Description**: client + industry + the single strongest hero stat, ≤160 characters so
+  Google doesn't truncate it. Pull the stat from the same three numbers already going into
+  the hero — don't invent a fourth.
+
 **Replace every placeholder.** `Client name`, `Industry`, `Country`, `Role, Company, Country`
 and the slot labels are all stubs. Copy guidance is in `foundation/voice.md`; the two that
 catch people here:
@@ -105,8 +115,22 @@ reproduced verbatim on Utsav's instruction, and the rule governs what you write,
 already ships. Do not "fix" it.
 
 **Images.** Every grey panel is a slot with its target size in the label. Drop real
-photography in; never fabricate a client logo, photo, or quote. Two slots stand in for assets
-that exist on the live site but not in this repo, and a maintainer should add them:
+photography in; never fabricate a client logo, photo, or quote.
+
+**Sourcing the hero photo — no API key needed.** Search unsplash.com directly on the client's
+industry or the physical thing they make or do ("CNC milling", not "B2B software" — concrete
+beats abstract). Filter to free results: skip anything marked **Unsplash+**, a separate paid
+tier that's watermarked and won't actually download. Download the largest size offered, then
+downscale before committing it — 1100px wide covers this template's 580×400 slot at retina
+density, so `sips -Z 1100 photo.jpg` rather than shipping a multi-megabyte original. Save it as
+`assets/case-study/sample/<client-slug>-<subject>.jpg`, next to the other sample assets, and
+point `.cs-slot`'s `<img>` at it. If a reasonable search turns up nothing relevant, use
+`.cs-hero-media--icon` instead (documented directly above that rule in the CSS) — a duotone icon
+picked from the industry text beats a generic stock photo that doesn't actually relate to the
+client.
+
+Two slots stand in for assets that exist on the live site but not in this repo, and a maintainer
+should add them:
 
 | Slot | Live asset |
 |---|---|
