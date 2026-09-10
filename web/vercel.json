@@ -47,16 +47,6 @@
       "source": "/preview/:path*",
       "destination": "/",
       "permanent": false
-    },
-    {
-      "source": "/internal/staging/homepage-neo",
-      "destination": "https://gushwork-homepage-neo.vercel.app",
-      "permanent": false
-    },
-    {
-      "source": "/internal/staging/case-study-gen-studio",
-      "destination": "https://case-study-engine-omega.vercel.app",
-      "permanent": false
     }
   ],
   "headers": [
