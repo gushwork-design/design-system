@@ -18,13 +18,19 @@ MARKER = "gw-shell-injected"
 
 # Apply a STORED theme choice before first paint, or an explicit dark pick
 # flashes light on every load. Has to be blocking, so it cannot live in
-# shell.js (which is deferred). It deliberately does NOT fall back to
-# matchMedia: with nothing stored, no attribute is written and the CSS
-# prefers-color-scheme block decides, which is what lets the page follow a
-# live OS change.
+# shell.js (which is deferred).
+#
+# Defaults to 'light' rather than leaving the attribute unset. It used to
+# leave nothing stored unset and let the CSS prefers-color-scheme block
+# decide — deliberately, so the page followed the OS. That meant a
+# first-time visitor on a dark-OS machine got a dark page with no toggle
+# ever touched, which read as "the site is broken" rather than "the site
+# respected your OS". The site now always opens light until someone
+# explicitly picks dark via the toggle; that choice is what persists
+# across visits, not the OS setting.
 THEME_SNIPPET = (
-    "<script>try{var t=localStorage.getItem('gw-theme');"
-    "if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>"
+    "<script>try{var t=localStorage.getItem('gw-theme')||'light';"
+    "document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>"
 )
 
 

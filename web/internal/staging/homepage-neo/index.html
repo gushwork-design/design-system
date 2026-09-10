@@ -1,0 +1,2814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- vercel.json sets cleanUrls + trailingSlash:false, so this page is
+     served without a trailing slash and relative asset paths would
+     resolve one level up. This is what keeps assets/ resolving. -->
+<base href="/internal/staging/homepage-neo/">
+<title>Gushwork — AI services that run the work, you run the business</title>
+<!-- assets/logo/gushwork-symbol-original.svg from the design system — the mark
+     web pages use (page-shell.md: gushwork-logo, Type=Original). Copied verbatim. -->
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<!-- gushwork-build:{"pluginVersion":"1.44.0","surface":"web","createdBy":"Utsav Singh","createdAt":"9 Sep 2026","registry":"https://gushwork-design.vercel.app/exports/web/component-registry.json","changelog":"https://gushwork-design.vercel.app/preview/changelog-sheet.html","components":["page-build","navbar","footer","button","eyebrow","gushwork-logo"]} -->
+<!--
+  NEW / CUSTOM elements on this page — none of these are in exports/web/folds.md
+  or fold-elements.md. Built from tokens per the "compose from what exists first,
+  then build it and declare it" rule in the gushwork-web skill. Pending library
+  review before anything here is promoted into the shared component set.
+
+  1. Hero product-visual (browser-chrome dashboard mockup, notification toast,
+     chat-transcript card, scrolling stat ticker) — folds.md's fold/ Hero has no
+     such visual; this is a bespoke composition built from tokens.
+  2. Gradient heading text ("AI services", "we build the AI") — linear-gradient
+     background-clip:text on Vert Grotesk Bold. Not a documented heading treatment.
+  3. Product-code badge on a card (AEO / CRM / ERP / CSM pill next to a card title)
+     — not part of the documented Card / Information spec.
+  4. Tabbed step-row + video placeholder fold ("Built to your business, run by
+     us") — a 4-step tab row with a progress-fill underline over a video block.
+     Matches neither fold/Timeline nor fold/ Video.
+  5. Two-column "old way / Gushwork way" comparison — reuses the layer name
+     fold/Comparison Table in Figma but is a different layout from the documented
+     4-column competitor table.
+  6. Asymmetric 3-card video-testimonial row (1 large quote card + 2 small) and
+     the adjoining "Your Marketing Team on Autopilot" 4-column feature panel —
+     neither matches fold/ Testimonial Style=Video or Style=Single.
+  7. 12-card, 3-column reviews grid with a fade + "Show more" disclosure — no
+     review-grid fold exists in the library (Card / Review is a single card type).
+  8. Closing-CTA illustration (dot-grid + two labelled agent cards) — a third
+     footer/footer-elements/cta-image variant beyond the two documented ones
+     (Testimonial, AI Search Engines).
+
+  Known off-token / open findings surfaced while building (not corrected
+  silently — see DECISIONS.md R0 for why):
+  - Hero H1 renders at 64px; --gw-text-h1 is 700 60px/1.2.
+  - Hero CTA button label renders at 16px; the button ramp's Medium step is
+    --gw-text-button-16 (this one *is* on-ramp) but the button height/radius
+    here (44/12) reads closer to Large's 56/12 mixed with Medium's 44 height —
+    built as measured (44 tall, radius-12).
+  - Card-grid card titles use Vert Grotesk Semibold 22px — no h7-sem token
+    exists (h7 is Medium 500, h7-bold is 700).
+  - "Lead Management" and "Client Support" cards both carry badge text "CSM"
+    in the source file — kept as measured, flagged as a likely copy-paste slip.
+  - The reviews grid's duplicate "Prana, The Sound Artist" card (identical text
+    + avatar, present twice in Figma) was collapsed to one instance rather than
+    shipped twice — an editorial call, not a fabrication; the design owner may
+    want a real 12th review sourced to fill the slot.
+  - Copyright year corrected to the current year (Figma bakes in 2025).
+  - Navbar in this Figma file omits the "Platform" nav item (4 links, not the
+    usual 5) — built as measured.
+-->
+<link rel="stylesheet" href="/foundation/tokens.css">
+<style>
+
+/* ============================================================================
+   RESET + BASE
+   ============================================================================ */
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scrollbar-width:none;-ms-overflow-style:none}
+/* no visible scrollbar anywhere — scrolling still works */
+::-webkit-scrollbar{width:0;height:0;display:none}
+/* Figma's own text engine renders noticeably lighter/crisper than a browser's
+   default grayscale AA at the same nominal weight — a well-known Figma→browser
+   gap, not a wrong font-weight value (verified: tokens.css already declares
+   every "medium" text at true weight 500, the self-hosted Inter variable font
+   loads with the correct 100–900 wght range, and a canvas ink-density probe
+   confirmed the axis interpolates correctly across 300–700). antialiased
+   smoothing is the standard fix for this specific mismatch. */
+body{margin:0;background:var(--gw-color-neutral-25);color:var(--gw-color-black);font:var(--gw-text-body-16-reg);letter-spacing:var(--gw-text-body-16-reg-tracking);
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;padding:0}
+ul{margin:0;padding:0;list-style:none}
+h1,h2,h3,h4,p{margin:0}
+/* Every inline glyph in this file relies on this — none of the raw <svg>
+   tags carry fill="currentColor" themselves, so without this rule every
+   icon on the page silently renders SVG-default black regardless of the
+   `color` set on it. See shared-components.md's icon-fill gotcha. */
+.icon{display:block;flex:none;fill:currentColor}
+:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+
+.wrap{max-width:calc(var(--gw-content-width) + 2*var(--gw-content-margin));margin:0 auto;padding:0 var(--gw-content-margin)}
+/* Below 1440 the cap is the .fold-shell's usable width (100vw - 2*16), not the
+   viewport, so the padding has to absorb the shell's margins to keep the content
+   column at exactly --gw-content-width. 1272 = 1240 + 32. */
+@media (max-width:1440px){ .wrap{padding:0 max(40px, calc((100vw - 1272px)/2))} }
+@media (max-width:767px){ .wrap{padding:0 20px} }
+
+.section{padding:0}
+
+/* fold-shell — every fold from "Tell us what your business needs" through
+   the reviews grid sits inside ONE shared white rounded card (node 197:17998
+   in Figma: fill white, radius-20, shadow-s4, 1px neutral-100 border, 16px
+   inset from the viewport edge, 120px top/bottom padding, folds spaced 200px
+   apart inside it) — not flat against the page background like the rest of
+   the page. Verified against the real node, not the flattened codegen guess.
+   The 16px inset is on all four sides, including top/bottom — confirmed via
+   the plugin API (abs Y of the card vs its footer/hero neighbors), since my
+   first pass at this only checked the invisible neutral-25 outer wrapper
+   (zero gap to the footer) instead of the visible white card 16px inside it. */
+.fold-shell{background:var(--gw-color-white);border:1px solid var(--gw-color-neutral-100);
+  border-radius:var(--gw-radius-20);box-shadow:var(--gw-shadow-s4);margin:16px;
+  padding:120px 0;display:flex;flex-direction:column;gap:200px;overflow:hidden}
+@media (max-width:767px){
+  .fold-shell{margin:8px;padding:60px 0;gap:80px}
+}
+
+/* ---- buttons -------------------------------------------------------------- */
+/* Sizes/fills/radii/shadow verified against exports/web/button.md — Medium is
+   44 tall / radius-8 / padding 16px 20px (not 12px, my first pass had this
+   wrong); every style carries --gw-shadow-s2 except Special (unused here). */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--gw-space-8);
+  height:44px;padding:16px 20px;border-radius:var(--gw-radius-8);box-shadow:var(--gw-shadow-s2);
+  font:var(--gw-text-button-16);letter-spacing:0;white-space:nowrap;transition:background var(--gw-motion-fast),box-shadow var(--gw-motion-fast)}
+.btn .icon{width:18px;height:18px}
+.btn--black{background:var(--gw-color-black);color:var(--gw-color-white)}
+.btn--black:hover{background:var(--gw-color-neutral-900)}
+.btn--blue{background:var(--gw-color-primary-500);color:#fff}
+.btn--blue:hover{background:var(--gw-color-primary-600)}
+.btn--white{background:var(--gw-color-white);color:var(--gw-color-black)}
+.btn--white:hover{background:var(--gw-color-neutral-50)}
+.btn--outline-black{background:none;color:var(--gw-color-black);box-shadow:inset 0 0 0 2px var(--gw-color-neutral-100),var(--gw-shadow-s2)}
+.btn--outline-black:hover{background:var(--gw-color-neutral-25)}
+/* Real values pulled from the library component (Style=Outlined / white,
+   node 1618:12257) via get_design_context — my first pass guessed an inset
+   box-shadow ring at alpha-30-white with no fill; the actual button has a
+   real 2px border at alpha-10-white (not 30) PLUS a translucent
+   alpha-10-black fill with a 2px backdrop-blur behind it — a frosted-glass
+   button, not a flat outline. */
+.btn--outline-white{background:var(--gw-color-neutral-alpha-10-black);border:2px solid var(--gw-color-neutral-alpha-10-white);
+  color:#fff;backdrop-filter:blur(2px)}
+.btn--outline-white:hover{background:var(--gw-color-neutral-alpha-10-white)}
+.btn--small{height:36px;padding:8px 12px;font:var(--gw-text-button-14)}
+/* Style=Special/ With People — button.md: only exists at Size=Large.
+   56 tall, radius-12, asymmetric 16/20/16/24 padding (extra on the leading
+   side for the avatar stack), 12px icon gap (not the usual 8), button-18
+   label. My first pass reused the generic Medium black button with avatars
+   bolted on — wrong component. */
+.btn--people{height:56px;padding:16px 20px 16px 24px;border-radius:var(--gw-radius-12);gap:var(--gw-space-12);font:var(--gw-text-button-18)}
+@media (max-width:767px){ .btn{width:100%} }
+
+/* ---- eyebrow ---------------------------------------------------------------*/
+/* eyebrow, Type=Trustpilot — atoms.md: white pill, 0.5px stroke (NOT a
+   shadow — an earlier pass guessing --gw-shadow-s2 here is called out as
+   wrong in the spec itself), asymmetric 4/4/4/8 padding, the Trustpilot
+   mark sits between "on" and "Trustpilot", caret sits in its own chip. */
+.eyebrow{display:inline-flex;align-items:center;gap:var(--gw-space-4);height:24px;
+  padding:4px 4px 4px 8px;border-radius:var(--gw-radius-full);background:var(--gw-color-white);
+  border:0.5px solid var(--gw-color-neutral-100);
+  font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking);color:var(--gw-color-neutral-900)}
+.eyebrow .icon{width:14px;height:14px}
+.eyebrow .trustpilot-mark{color:#00b67a}
+/* Bare caret, no chip background — confirmed against the actual Figma
+   render, which shows no pill behind the arrow despite atoms.md describing
+   a chip fill here. */
+.eyebrow .caret-chip{display:inline-flex;align-items:center}
+.eyebrow .caret-chip .icon{width:12px;height:12px;color:var(--gw-color-neutral-500)}
+
+/* ---- section heading block --------------------------------------------- */
+.hd{display:flex;flex-direction:column;align-items:center;gap:var(--gw-space-20);text-align:center;max-width:800px;margin:0 auto}
+.hd h2{font:var(--gw-text-h2);letter-spacing:var(--gw-text-h2-tracking);color:var(--gw-color-black)}
+.hd p{font:var(--gw-text-body-18-med);letter-spacing:var(--gw-text-body-18-med-tracking);color:var(--gw-color-neutral-600);max-width:680px}
+.hd--wide p{max-width:800px}
+.grad{background:linear-gradient(120deg,#0070ff 11%,#94c3ff 140%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.cg-heading{text-align:center;font:700 56px/1.2 var(--gw-font-display);max-width:800px;margin:0 auto;color:var(--gw-color-black)}
+@media (max-width:767px){ .hd h2{font:var(--gw-text-h5-bold);letter-spacing:var(--gw-text-h5-bold-tracking)} }
+
+/* ============================================================================
+   NAVBAR — navbar/navbar, Type=Brand. Three-part layout: logo left, nav
+   links centred in the bar, CTA right — matches the Figma component.
+   ============================================================================ */
+.nav{position:sticky;top:0;z-index:100;background:var(--gw-color-neutral-25);border-bottom:1px solid var(--gw-color-neutral-100)}
+.nav-in{height:var(--gw-bp-navbar-h);display:grid;grid-template-columns:1fr auto 1fr;align-items:center;max-width:calc(var(--gw-content-width) + 2*var(--gw-content-margin));margin:0 auto;padding:0 var(--gw-content-margin)}
+.nav-logo{justify-self:start}
+.nav-logo svg{height:22px;width:auto;display:block}
+.nav-links{grid-column:2;display:flex;align-items:center}
+.nav-actions{grid-column:3;justify-self:end;display:flex;align-items:center;gap:var(--gw-space-32)}
+.nav-item{display:inline-flex;align-items:center;gap:6px;height:36px;padding:8px 20px;border-radius:var(--gw-radius-8);white-space:nowrap;
+  font:var(--gw-text-body-14-med);letter-spacing:var(--gw-text-body-14-med-tracking);color:var(--gw-color-neutral-800);position:relative}
+.nav-item:hover{background:var(--gw-color-neutral-50)}
+.nav-item .icon{width:14px;height:14px;color:var(--gw-color-neutral-800)}
+.nav-drop{position:absolute;top:calc(100% + 8px);left:0;width:280px;background:var(--gw-color-white);
+  border:1px solid var(--gw-color-neutral-100);border-radius:var(--gw-radius-12);box-shadow:var(--gw-shadow-s4);
+  padding:8px;opacity:0;visibility:hidden;transform:translateY(4px);transition:opacity var(--gw-motion-fast),transform var(--gw-motion-fast);z-index:50}
+.nav-has-drop:hover .nav-drop{opacity:1;visibility:visible;transform:translateY(0)}
+.nav-drop a{display:block;padding:10px 12px;border-radius:var(--gw-radius-8)}
+.nav-drop a:hover{background:var(--gw-color-neutral-50)}
+.nav-drop b{display:block;font:var(--gw-text-body-14-sem);color:var(--gw-color-black)}
+.nav-drop span{display:block;font:var(--gw-text-body-12-reg);color:var(--gw-color-neutral-600);margin-top:2px}
+.nav-cta{background:var(--gw-color-black);color:#fff;border:0.888px solid var(--gw-color-neutral-alpha-10-white);box-shadow:var(--gw-shadow-button)}
+.nav-burger{display:none;width:36px;height:36px;align-items:center;justify-content:center;border-radius:var(--gw-radius-8)}
+.nav-burger .icon{width:20px;height:20px}
+.nav-burger:hover{background:var(--gw-color-neutral-50)}
+.nav-mobile{display:none;position:fixed;inset:60px 0 0 0;background:var(--gw-color-neutral-25);z-index:90;padding:20px;flex-direction:column;gap:4px}
+.nav-mobile.is-open{display:flex}
+.nav-mobile a{display:block;padding:14px 12px;font:var(--gw-text-button-16);border-bottom:1px solid var(--gw-color-neutral-100)}
+.nav-mobile .btn{margin-top:16px}
+@media (max-width:900px){
+  .nav-links,.nav-actions>.nav-cta{display:none}
+  .nav-in{grid-template-columns:1fr auto}
+  .nav-burger{display:flex}
+}
+
+/* ============================================================================
+   HERO — bg neutral-25. H1 renders 64px here (off the documented 60px h1 step).
+   ============================================================================ */
+.hero{background:var(--gw-color-neutral-25);padding:120px 0;position:relative;overflow:hidden}
+.hero-text{display:flex;flex-direction:column;align-items:center;gap:var(--gw-space-20);text-align:center;max-width:872px;margin:0 auto}
+.hero-text h1{font:700 64px/1.2 var(--gw-font-display);color:var(--gw-color-black)}
+.hero-text .body{font:var(--gw-text-body-18-med);letter-spacing:var(--gw-text-body-18-med-tracking);color:var(--gw-color-neutral-600);max-width:678px}
+.hero-cta-row{display:flex;flex-direction:column;align-items:center;gap:var(--gw-space-12);margin-top:8px}
+.hero-btn-group{display:flex;align-items:center;gap:12px}
+.avatar-stack{display:flex;align-items:center}
+.avatar-stack img{width:32px;height:32px;border-radius:999px;border:1px solid var(--gw-color-black);object-fit:cover;margin-left:-8px}
+.avatar-stack img:first-child{margin-left:0}
+.hero-subcta{font:var(--gw-text-body-14-med);letter-spacing:var(--gw-text-body-14-med-tracking);color:var(--gw-color-neutral-600)}
+.hero-subcta u{text-decoration-color:var(--gw-color-neutral-400);text-underline-offset:2px}
+
+/* dashboard mockup */
+.hero-visual{margin-top:60px;position:relative}
+/* Rebuilt against get_design_context on 243:5840 — real traffic-light
+   colors (were flat gray), real nav items/copy, and a 2-bar Aug/Sep chart
+   (was 8 bars of random heights). */
+/* the shared containing block for all three draggable hero elements */
+.hero-stage{position:relative;width:100%;max-width:1080px;margin:0 auto}
+.mock{position:relative;z-index:1;width:100%;background:var(--gw-color-neutral-50);border:2px solid var(--gw-color-neutral-100);
+  border-radius:var(--gw-radius-20);padding:8px;box-shadow:0 16px 16px rgba(88,92,95,.1)}
+/* ============================================================================
+   HERO — grab cursor + hover tag, on three draggable elements
+   Cursor glyph: Figma 311:12456 ("pointing") is a Figma *widget*, so it has no
+   exportable vectors — assets/cursor-grab.svg redraws that glyph, with the
+   native `grab` keyword as the fallback.
+   Tag: Figma 311:12462 — pad 8/12, r40, rgba(1,1,9,.5), background-blur 8,
+   Inter Medium 14/100%, white. Its top-left sits +13,+14 from the glyph box's
+   top-left in the comp; with the hotspot at the palm (12,13 in a 24 box, where
+   the glyph starts at 4,4) that is a +5,+5 offset from the pointer.
+   ============================================================================ */
+.hover-media{cursor:url("assets/cursor-grab.svg") 12 13, grab;touch-action:none}
+.hover-media.is-dragging{cursor:url("assets/cursor-grab.svg") 12 13, grabbing}
+/* let go outside the frame and it slides home */
+.hover-media.is-returning{transition:transform .42s cubic-bezier(.22,.61,.36,1)}
+@media (prefers-reduced-motion:reduce){ .hover-media.is-returning{transition:none} }
+/* The tag is clipped to one shared layer, not to each element: mock-chat is
+   240px wide and its label is 239px, so per-element clipping would cut it in
+   half. As an absolutely-positioned layer it clips the tag without putting
+   overflow on .hero-visual itself, which would crop mock-chat's left overhang.
+   It spans the full viewport width — dragging reaches the screen edges, and a
+   card out there still needs its tag — anchored by centring on .hero-visual,
+   which is itself centred in the viewport. */
+.hover-clip{position:absolute;top:0;bottom:0;left:50%;width:100vw;transform:translateX(-50%);
+  z-index:50;overflow:hidden;pointer-events:none}
+.hover-tag{position:absolute;left:0;top:0;padding:8px 12px;border-radius:40px;
+  background:rgba(1,1,9,.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  color:var(--gw-color-white);font:500 14px/14px var(--gw-font-body);letter-spacing:0;
+  white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s ease;will-change:transform}
+.hover-tag.is-visible{opacity:1}
+@media (prefers-reduced-motion:reduce){ .hover-tag{transition:none} }
+/* no cursor and no hover tag on touch — dragging still works */
+@media (hover:none){ .hover-clip{display:none} .hover-media{cursor:grab} }
+.mock-bar{display:flex;gap:6px;padding:6px 4px 10px}
+.mock-bar i{width:10px;height:10px;border-radius:999px}
+.mock-bar i:nth-child(1){background:#ff5f57}
+.mock-bar i:nth-child(2){background:#febc2e}
+.mock-bar i:nth-child(3){background:#28c840}
+.mock-body{background:var(--gw-color-neutral-25);border:2px solid var(--gw-color-neutral-100);border-radius:var(--gw-radius-16);
+  display:grid;grid-template-columns:180px 1fr;overflow:hidden;min-height:520px}
+.mock-side{background:#fff;border-right:1px solid #e5e7eb;padding:20px 16px;display:flex;flex-direction:column;justify-content:space-between}
+.mock-logo{display:flex;align-items:center;gap:10px}
+.mock-logo .leaf{width:22px;height:22px;color:#54b96e;flex:none}
+.mock-logo b{display:block;font:700 14px/1 var(--gw-font-body);color:#0d0d0d}
+.mock-logo span{display:block;margin-top:2px;font:500 12px/1 var(--gw-font-body);color:#6b7280}
+.mock-nav-groups{display:flex;flex-direction:column;gap:16px;margin-top:20px}
+.mock-nav-group{display:flex;flex-direction:column;gap:6px}
+.mock-nav-group span{display:block;font:700 10px/1 var(--gw-font-body);letter-spacing:.04em;text-transform:uppercase;color:#6b7280}
+.mock-nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;font:500 12px/1 var(--gw-font-body);color:#0d0d0d}
+.mock-nav-item .icon{width:16px;height:16px;color:#0d0d0d}
+.mock-nav-item.on{background:#effdf1;color:#54b96e;font-weight:600}
+.mock-nav-item.on .icon{color:#54b96e}
+.mock-side .logout{display:flex;align-items:center;justify-content:space-between;background:#f3f4f6;border-radius:8px;padding:10px}
+.mock-side .logout span{font:600 11px/1 var(--gw-font-body);color:#6b7280}
+.mock-side .logout .icon{width:16px;height:16px;color:#6b7280}
+.mock-main{background:#f3f4f6;padding:24px 24px 16px;position:relative;display:flex;flex-direction:column;gap:24px}
+.mock-topbar{display:flex;align-items:center;justify-content:space-between}
+.mock-tabs{display:flex;gap:8px}
+.mock-tab{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:100px;font:500 12px/1 var(--gw-font-body);color:#6b7280;background:#fff;border:1px solid #e5e7eb}
+.mock-tab .icon{width:12px;height:12px}
+.mock-tab.on{background:#54b96e;color:#fff;font-weight:600;border-color:#54b96e}
+.mock-actions{display:flex;align-items:center;gap:12px}
+.mock-iconbtn{width:30px;height:30px;border-radius:100px;background:#fff;border:1px solid #e5e7eb;display:grid;place-items:center}
+.mock-iconbtn .icon{width:14px;height:14px;color:#0d0d0d}
+.mock-user{display:flex;align-items:center;gap:8px}
+.mock-user .av{width:28px;height:28px;border-radius:100px;background:#e0f2e3;display:grid;place-items:center;font:700 11px/1 var(--gw-font-body);color:#8cd19e}
+.mock-user span{font:600 12px/1 var(--gw-font-body);color:#0d0d0d}
+.mock-user .icon{width:12px;height:12px;color:#0d0d0d}
+.mock-h1{font:600 22px/1 var(--gw-font-body);color:#0d0d0d}
+.mock-h1 + p{margin-top:2px;font:400 11px/1 var(--gw-font-body);color:#737373}
+.mock-card{background:#fff;box-shadow:0 2px 2px rgba(27,28,29,.04);border-radius:18px;padding:12px 16px 10px}
+.mock-card-title{font:500 12px/1 var(--gw-font-body);color:#0d0d0d;margin-bottom:12px}
+.mock-metrics{display:flex;gap:8px}
+.mock-metrics-stack{width:160px;flex:none;display:flex;flex-direction:column;gap:4px}
+.mock-metric{background:#fff;border:1px solid #f3f4f6;border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;gap:4px}
+.mock-metric i{display:block;height:10px;width:70%;border-radius:4px;background:#f3f4f6}
+.mock-metric i.v{height:16px;width:85%;background:#e5e7eb}
+.mock-metric i.s{height:10px;width:60%;background:#f3f4f6}
+.mock-chart-area{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}
+.mock-chart{height:160px;display:flex;align-items:flex-end;justify-content:center;gap:60px;border-top:1px dashed #e5e7eb;position:relative}
+.mock-chart::before{content:"";position:absolute;left:0;right:0;top:40px;border-top:1px dashed #cfd1d4}
+.mock-bar-col{display:flex;flex-direction:column;align-items:center;gap:6px}
+.mock-bar-col b{display:block;width:60px;border-radius:6px 6px 0 0}
+.mock-bar-col b.aug{height:72px;background:#8cd19e}
+.mock-bar-col b.sep{height:120px;background:#e0f2e3}
+.mock-bar-col i{display:block;height:10px;width:56px;border-radius:4px;background:#f3f4f6}
+.mock-legend{display:flex;justify-content:center;gap:16px}
+.mock-legend span{display:flex;align-items:center;gap:6px;font:400 10px/1 var(--gw-font-body);color:#f3f4f6}
+.mock-legend i{width:10px;height:10px;border-radius:4px;flex:none}
+.mock-legend i.a{background:#8cd19e}
+.mock-legend i.b{background:#e0f2e3}
+.mock-legend-bar{height:10px;width:56px;border-radius:4px;background:#f3f4f6}
+.mock-table-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:4px}
+.mock-table-head b{font:600 13px/1 var(--gw-font-body);color:#0d0d0d}
+.mock-viewall{display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:100px;border:1px solid #e5e7eb}
+.mock-viewall i{height:12px;width:44px;border-radius:4px;background:#f3f4f6}
+.mock-viewall .icon{width:10px;height:10px;color:#0d0d0d}
+.mock-table-row{display:grid;grid-template-columns:1.4fr .7fr .8fr .95fr .95fr .95fr .5fr;gap:8px;align-items:center;padding:6px 12px}
+.mock-table-row.head{background:#f3f4f6;border-radius:8px}
+.mock-table-row:not(.head){border-top:1px solid #f3f4f6}
+.mock-table-row i{display:block;height:10px;background:#e5e7eb;border-radius:4px}
+.mock-table-row.head i{background:#e5e7eb;height:10px}
+.mock-table-row i.dim{background:#f3f4f6}
+.mock-table-row .badge{background:#f3f4f6;height:16px;border-radius:100px}
+.mock-table-row .action{background:#f3f4f6;width:12px;height:12px;border-radius:4px;justify-self:center}
+
+/* get_design_context on 239:3274, exact — my first two passes both
+   guessed wrong sizes/weights/colors instead of pulling this. */
+.mock-toast{position:absolute;z-index:2;right:-78px;top:112px;width:352px;background:var(--gw-color-white);
+  border:2px solid var(--gw-color-neutral-100);border-radius:var(--gw-radius-12);box-shadow:0 13.884px 17.354px rgba(88,92,95,.16);padding:12px;display:flex;flex-direction:column;gap:11px}
+.mock-toast .head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.mock-toast .who{display:flex;align-items:center;gap:8px}
+.mock-toast .mark{width:24px;height:24px;border-radius:6px;background:var(--gw-color-primary-500);color:#fff;flex:none;display:grid;place-items:center}
+.mock-toast .mark svg{width:12px;height:12px}
+.mock-toast .who b{font:500 14px/1 var(--gw-font-body);color:var(--gw-color-neutral-400)}
+.mock-toast .head time{font:500 14px/1 var(--gw-font-body);color:var(--gw-color-neutral-400)}
+.mock-toast p{font:700 16px/24px var(--gw-font-body);letter-spacing:-0.032px;color:var(--gw-color-neutral-900)}
+.mock-toast span{display:block;font:500 14px/1 var(--gw-font-body);color:var(--gw-color-neutral-400)}
+
+/* Rebuilt against the real node (239:3273) — not chat bubbles. Each speaker
+   is an avatar-dot + bold name, with plain text underneath; the company
+   list fades out toward the bottom, and the input pill overlaps the fade,
+   pinned to the card's bottom edge. */
+/* Rebuilt against get_design_context on 239:3273, exact. Real border is
+   6px solid rgba(231,232,233,.2) — not a 1px neutral-100 hairline — plus a
+   2px backdrop-blur; the input pill is normal flow (32 tall), not floated
+   absolute, so it paints over the fade via z-index rather than position. */
+.mock-chat{position:absolute;z-index:3;left:-88px;bottom:122px;width:240px;height:280px;
+  border:6px solid transparent;border-radius:var(--gw-radius-20);
+  background:linear-gradient(var(--gw-color-white),var(--gw-color-white)) padding-box,
+    linear-gradient(335deg,rgba(231,232,233,.2) 0%,rgba(213,213,213,.8) 100%) border-box;
+  backdrop-filter:blur(2px);
+  box-shadow:var(--gw-shadow-s3);padding:8px;display:flex;flex-direction:column;gap:10px;overflow:hidden}
+.mock-chat .content{flex:1;min-height:0;padding:16px;display:flex;flex-direction:column;gap:20px}
+.mock-chat .msg{display:flex;gap:8px;align-items:flex-start}
+.mock-chat .avatar{width:16px;height:16px;border-radius:999px;flex:none;margin-top:1px;display:grid;place-items:center}
+.mock-chat .avatar--buyer{background:#99c6ff}
+.mock-chat .avatar--bot img{display:block;width:16px;height:16px}
+.mock-chat .msg-text{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0}
+.mock-chat .msg-text b{display:block;font:500 12px/1 var(--gw-font-body);color:var(--gw-color-black)}
+.mock-chat .msg-text p{font:500 10px/15px var(--gw-font-body);color:var(--gw-color-neutral-800)}
+.mock-chat .list{margin-top:12px;display:flex;flex-direction:column;gap:4px}
+.mock-chat .list li{list-style:none;font:500 10px/15px var(--gw-font-body);color:var(--gw-color-neutral-800);opacity:.7}
+.mock-chat .list li.hl{color:var(--gw-color-black);opacity:1}
+.mock-chat .fade{position:absolute;left:0;right:0;bottom:0;height:79px;background:linear-gradient(to bottom,rgba(255,255,255,0) 0%,#fff 60.3%);pointer-events:none}
+.mock-chat .input-row{position:relative;z-index:1;flex:none;margin:0 8px 8px;height:32px;background:var(--gw-color-neutral-50);border-radius:40px;
+  display:flex;align-items:center;justify-content:space-between;padding:0 5px 0 12px}
+.mock-chat .input-row span{font:500 10px/1 var(--gw-font-body);color:var(--gw-color-neutral-400)}
+.mock-chat .send{width:20px;height:20px;border-radius:40px;background:var(--gw-color-neutral-900);flex:none;display:grid;place-items:center}
+.mock-chat .send .icon{width:10px;height:10px;color:#fff}
+@media (max-width:900px){ .mock-toast,.mock-chat{display:none} }
+@media (max-width:640px){ .mock-body{grid-template-columns:1fr} .mock-side{display:none} }
+
+/* Rebuilt against the real node (194:9919) — Inter Medium 12, tracking
+   -0.072px (-0.6%), uppercase throughout; the value is its own neutral-50
+   chip next to a plain neutral-500 label, not a "label · value" pill. */
+/* "Agents working 24/7" + its rule are fixed on the left; only the stat
+   chips scroll, in the space to the right of them. */
+.ticker{margin-top:40px;padding:0 12px;display:flex;align-items:center;gap:8px}
+.ticker-scroll{flex:1;min-width:0;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 88%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 88%,transparent)}
+.ticker-track{display:flex;align-items:center;gap:8px;width:max-content;animation:ticker 26s linear infinite}
+.ticker-lede{flex:none;display:flex;align-items:center;gap:8px}
+.ticker-dots{width:16px;height:16px;flex:none}
+.ticker-label{font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking);text-transform:uppercase;color:var(--gw-color-neutral-500);white-space:nowrap}
+.ticker-rule{width:1px;height:14px;background:var(--gw-color-neutral-200);flex:none}
+.ticker-stat{display:flex;align-items:center;gap:4px;padding-left:20px}
+.ticker-stat .ticker-label{white-space:nowrap}
+.ticker-chip{font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking);color:var(--gw-color-neutral-700);background:var(--gw-color-neutral-50);padding:4px 6px;border-radius:var(--gw-radius-4);white-space:nowrap}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){ .ticker-track{animation:none} }
+
+/* stats + trusted-by + video card */
+.hero-band{margin-top:60px;background:var(--gw-color-neutral-50);border-radius:var(--gw-radius-20);padding:4px}
+.stat-row{display:flex;gap:4px}
+.stat-card{flex:1;background:var(--gw-color-neutral-25);border-radius:var(--gw-radius-16);padding:40px;text-align:center}
+.stat-card b{display:block;font:var(--gw-text-h6);letter-spacing:var(--gw-text-h6-tracking);color:var(--gw-color-neutral-900)}
+.stat-card span{display:block;margin-top:6px;font:var(--gw-text-body-14-med);letter-spacing:var(--gw-text-body-14-med-tracking);color:var(--gw-color-neutral-600)}
+.trusted-label{text-align:center;padding:16px 0;font:var(--gw-text-body-12-sem);letter-spacing:var(--gw-text-body-12-sem-tracking);text-transform:uppercase;color:var(--gw-color-neutral-400)}
+.trust-row{display:flex;gap:4px}
+.logo-grid{flex:1;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,1fr);gap:4px}
+/* client-logo-card, State=hover/default (fold-elements.md) — every 5s a new set of
+   4 of the 8 cards (measured positions, 3 real patterns from Figma) gets the "+"
+   affordance and a real :hover reveal. The reveal content itself has no verified
+   real copy for 7 of the 8 companies, so it ships as an honest skeleton placeholder
+   (same visual language as the hero dashboard mockup) rather than a fabricated quote
+   or number — per instruction, not guessed. */
+.logo-card{position:relative;background:var(--gw-color-neutral-25);border-radius:var(--gw-radius-16);display:flex;align-items:center;justify-content:center;padding:24px;min-height:130px}
+.logo-card img{max-height:32px;max-width:100%;width:auto;filter:grayscale(1);opacity:.65}
+.logo-card .plus-badge{position:absolute;top:8px;right:8px;padding:4px;border-radius:75px;background:var(--gw-color-neutral-50);backdrop-filter:blur(3px);
+  display:none;align-items:center;justify-content:center}
+.logo-card .plus-badge .icon{width:12px;height:12px;color:var(--gw-color-neutral-600)}
+.logo-card.is-active .plus-badge{display:flex}
+.logo-card .reveal{position:absolute;left:50%;bottom:calc(100% + 12px);transform:translateX(-50%);width:280px;
+  background:var(--gw-color-white);border-radius:var(--gw-radius-16);box-shadow:var(--gw-shadow-s4);padding:20px;
+  display:flex;flex-direction:column;gap:12px;opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity var(--gw-motion-fast);z-index:20;text-align:left}
+.logo-card.is-active:hover .reveal{opacity:1;visibility:visible}
+.reveal-skel{background:var(--gw-color-neutral-50);border-radius:4px;height:12px}
+.reveal-skel + .reveal-skel{margin-top:8px}
+.reveal--quote .reveal-skel:nth-child(1){width:100%}
+.reveal--quote .reveal-skel:nth-child(2){width:90%}
+.reveal--quote .reveal-skel:nth-child(3){width:60%}
+.reveal--stat .reveal-num{height:28px;width:45%;background:var(--gw-color-neutral-100);border-radius:6px}
+.reveal--stat .reveal-label{margin-top:8px;height:12px;width:65%;background:var(--gw-color-neutral-50);border-radius:4px}
+.reveal-link{display:flex;align-items:center;gap:6px;font:var(--gw-text-link-14);letter-spacing:var(--gw-text-link-14-tracking);color:var(--gw-color-primary-500)}
+.reveal-link .icon{width:12px;height:12px}
+.video-card{width:320px;flex:none;position:relative;border-radius:var(--gw-radius-12);overflow:hidden}
+.video-card img{width:100%;height:100%;object-fit:cover;min-height:284px;transition:transform .3s ease}
+.video-card:hover img{transform:scale(1.06)}
+.video-card .scrim{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.9),rgba(0,0,0,0) 50%)}
+.video-card .play{position:absolute;top:12px;right:12px;padding:4px;border-radius:75px;background:rgba(1,1,9,.2);backdrop-filter:blur(3px);display:grid;place-items:center;transition:background var(--gw-motion-fast)}
+.video-card .play .icon{width:16px;height:16px;color:#fff;transition:color var(--gw-motion-fast)}
+.video-card:hover .play{background:#fff}
+.video-card:hover .play .icon{color:#000}
+.video-card .content{position:absolute;left:12px;bottom:12px;display:flex;flex-direction:column;align-items:flex-start;gap:16px}
+.video-card .badge-logo{height:32px;min-height:0;width:auto;object-fit:contain;display:block}
+.video-card .stat{color:#fff}
+.video-card .stat b{display:block;font:var(--gw-text-h6);letter-spacing:var(--gw-text-h6-tracking)}
+.video-card .stat span{display:block;margin-top:8px;font:var(--gw-text-body-14-med);letter-spacing:var(--gw-text-body-14-med-tracking);color:rgba(255,255,255,.8)}
+@media (max-width:900px){ .trust-row{flex-direction:column} .video-card{width:100%} .logo-grid{grid-template-columns:repeat(2,1fr)} .stat-row{flex-direction:column} }
+
+/* ============================================================================
+   CARDS GRID — "Tell us what your business needs, we build the AI for it"
+   Custom card treatment: white/2px-neutral-50 border/S3 shadow/20px radius,
+   24px pad, Vert Grotesk Semibold 22 titles — measured deviations from the
+   documented fold/ Cards Grid spec (see notice above).
+   ============================================================================ */
+.cg-grid{margin-top:60px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+/* Card internals corrected against the real per-card design context
+   (nodes 205:20293 etc.): title+badge sit in ONE horizontal row (gap 12,
+   items-center) — they were wrongly stacked as separate flex-column
+   children before. The illustration is not an inset box either: it's
+   absolutely positioned, flush to the card's bottom/left/right edges
+   (260px tall, ~full card width, bottom:-1px), bleeding past the 24px
+   text padding rather than sitting inside it. */
+.cg-card{position:relative;height:420px;background:var(--gw-color-white);border:2px solid var(--gw-color-neutral-50);
+  border-radius:var(--gw-radius-20);box-shadow:var(--gw-shadow-s3);padding:24px;overflow:hidden}
+.cg-head{display:flex;flex-direction:column;gap:8px}
+.cg-title-row{display:flex;align-items:center;gap:12px}
+.cg-badge{font:var(--gw-text-body-14-sem);letter-spacing:var(--gw-text-body-14-sem-tracking);
+  color:var(--gw-color-primary-500);background:var(--gw-color-primary-alpha-10);padding:2px 8px;border-radius:var(--gw-radius-4)}
+.cg-card h3{font:600 22px/1.4 var(--gw-font-display);color:var(--gw-color-black)}
+.cg-card p{font:var(--gw-text-body-16-med);letter-spacing:var(--gw-text-body-16-med-tracking);color:var(--gw-color-neutral-600)}
+/* The preview PNGs are now clean per-card illustration sub-node exports
+   (e.g. 205:20300 for Lead Engine) at their own native ~407×260 — no card
+   chrome (white bg/border/shadow) baked in, unlike the earlier flattened
+   whole-card captures. That old approach needed a fixed-height clip window
+   plus a translateY crop to hide the baked-in title/badge/border/shadow;
+   none of that is needed anymore. object-fit:cover is kept only as a
+   safety net in case a given export's aspect ratio isn't pixel-identical
+   to the 407:260 container, so it still fills cleanly with no distortion
+   or gaps. */
+.cg-preview{position:absolute;left:0;right:0;bottom:0;height:260px;overflow:hidden}
+.cg-preview img{width:100%;height:100%;object-fit:cover;display:block}
+.cg-card--blank .cg-head{height:100%;justify-content:flex-start}
+@media (max-width:900px){ .cg-grid{grid-template-columns:1fr} }
+
+/* ============================================================================
+   TABS + VIDEO — "Built to your business, run by us" (new fold-element)
+   ============================================================================ */
+.tabs-row{margin-top:60px;display:flex;gap:24px;padding:0 60px}
+.tab{flex:1;text-align:center;cursor:pointer;background:none;border:none;padding:0 0 16px;display:flex;flex-direction:column;gap:20px}
+.tab-label{font:600 20px/1.4 var(--gw-font-display);color:var(--gw-color-neutral-900)}
+.tab-track{height:4px;border-radius:999px;background:var(--gw-color-neutral-50);position:relative;overflow:hidden}
+.tab-fill{position:absolute;left:0;top:0;height:100%;width:0%;border-radius:999px;background:var(--gw-color-black)}
+/* Added via JS a frame after .is-active, so the width:0%→100% transition
+   actually animates instead of snapping (a transition needs a committed
+   starting value before the target changes to run). 5s to match one tab's
+   on-screen dwell time before auto-advancing to the next. */
+.tab-fill.is-filling{width:100%;transition:width 5s linear}
+/* Icon sits at the true center of the whole box; the caption is pinned near
+   the bottom on its own, not grouped/centered together with the icon as one
+   unit — matches the reference (icon center = box center, caption anchored
+   with its own bottom padding, independent of the icon's position). */
+.tabs-video{position:relative;margin-top:32px;background:var(--gw-color-neutral-50);border-radius:var(--gw-radius-20);height:400px;overflow:clip}
+.tabs-video .icon{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:120px;height:120px;color:var(--gw-color-neutral-200)}
+.tabs-caption{position:absolute;left:0;right:0;bottom:40px;margin:0;padding:0 40px;text-align:center;
+  font:var(--gw-text-body-18-med);letter-spacing:var(--gw-text-body-18-med-tracking);color:var(--gw-color-neutral-600)}
+@media (max-width:900px){ .tabs-row{flex-direction:column;gap:16px;padding:0} .tab{padding-bottom:0} }
+
+/* ============================================================================
+   COMPARISON — "Software gives you tools, we give you outcomes"
+   NOT the documented 4-column fold/Comparison Table — a 2-column old-way vs
+   Gushwork-way layout, despite reusing that layer name in Figma.
+   ============================================================================ */
+.cmp-heading{max-width:640px}
+.cmp-cols{margin-top:60px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.cmp-card{background:var(--gw-color-white);border:2px solid var(--gw-color-neutral-50);border-radius:var(--gw-radius-20);padding:40px}
+.cmp-card--right{box-shadow:var(--gw-shadow-s3);border-color:var(--gw-color-neutral-50)}
+.cmp-head{display:flex;align-items:center;gap:10px;padding-bottom:20px;margin-bottom:24px;border-bottom:1px solid var(--gw-color-neutral-100)}
+.cmp-head h3{font:600 26px/1.2 var(--gw-font-display);color:var(--gw-color-black)}
+.cmp-mark{width:32px;height:32px;border-radius:var(--gw-radius-8);background:var(--gw-color-primary-500);display:grid;place-items:center;flex:none}
+.cmp-mark img{width:16px;height:16px}
+.cmp-rows{display:flex;flex-direction:column;gap:24px}
+.cmp-row{display:flex;align-items:baseline;gap:16px}
+.cmp-tag{flex:none;font:var(--gw-text-body-14-sem);letter-spacing:var(--gw-text-body-14-sem-tracking);color:var(--gw-color-neutral-600);
+  background:var(--gw-color-neutral-50);padding:4px 8px;border-radius:var(--gw-radius-4);white-space:nowrap}
+.cmp-val{font:var(--gw-text-body-18-med);letter-spacing:var(--gw-text-body-18-med-tracking);color:var(--gw-color-neutral-600)}
+@media (max-width:900px){ .cmp-cols{grid-template-columns:1fr} .cmp-row{flex-direction:column;gap:8px} }
+
+/* ============================================================================
+   TESTIMONIAL ROW + AUTOPILOT PANEL — "See what changes when Gushwork starts
+   running"
+   ============================================================================ */
+/* Re-measured against the real instance (node 222:23987) via get_design_context
+   rather than the flattened doc numbers — several real values differ from what
+   I'd built: border is a literal #e1e3e8 (not the shared neutral-100 token,
+   which is a different #e7e8e9 on this page — a real inconsistency in the
+   source file, kept as measured); the card shadow is a bespoke 0/16/16/0 blur
+   (not --gw-shadow-s3's 32/-12); the quote block pads 60px top/bottom (not
+   40) with a 60px gap down to a signature line I was missing entirely; the
+   play pill uses neutral-alpha-20-black + alpha-10-white border at 0.75px
+   with 3px blur (not my guessed 45%-black/20%-white/1px/2px); narrow-card
+   play buttons pad 20px around the icon (56×56 effective, not a fixed 44×44
+   box); and the bottom gradient is a contained 125px band to 90% black, not
+   a full-height 85% fade. */
+.tm-row{margin-top:60px;display:flex;gap:10px;align-items:stretch}
+/* Real structure (node 222:23988): the CARD pads 10px on all sides around
+   its content, and the photo is its OWN rounded-12 element inset inside
+   that padding — not flush with the card's own 20px radius the way I'd
+   built it. Wide card's quote-block and photo sit 24px apart inside that
+   10px frame. */
+/* The height has to be DEFINITE: .tm-photo's <img> is height:100%, and with
+   an indefinite parent that percentage falls back to auto — the portrait
+   photos then drove the card to ~950px tall. That stayed hidden while the
+   always-present quote block set the height; once the quote can collapse to
+   zero, nothing else constrains it. 331 / 224 / 311 / 204 are Figma's own
+   numbers, usable as-is because the 1px stroke is an INSET SHADOW rather
+   than a border — a Figma stroke doesn't consume layout, and a real border
+   under border-box would eat 2px off every child (photo 309 not 311).
+   Gap is 0 while collapsed: a 24px gap next to a zero-width quote still
+   stole 24px from the photo (178 instead of 204). */
+.tm-card{position:relative;height:331px;padding:10px;border-radius:var(--gw-radius-20);overflow:hidden;background:var(--gw-color-white);
+  box-shadow:inset 0 0 0 1px #e1e3e8, 0 16px 16px rgba(88,92,95,.1);
+  display:flex;align-items:stretch;gap:0;flex:0 0 224px;cursor:pointer;transition:flex-grow .4s ease,gap .4s ease}
+/* "Expanded" (cards.md) — any card can become the wide one. flex-grow does
+   the expand/collapse (basis stays 224 so the browser has something fixed
+   to interpolate from); the quote block separately grows/fades in via its
+   own flex-grow + opacity so it doesn't just pop in at full width. */
+.tm-card.is-wide{flex:2 0 224px;gap:24px;cursor:default}
+.tm-quote{flex:0 0 0%;width:0;padding:0;overflow:hidden;opacity:0;display:flex;flex-direction:column;justify-content:center;gap:var(--gw-space-60);
+  transition:flex-grow .4s ease,width .4s ease,padding .4s ease,opacity .25s ease}
+.tm-card.is-wide .tm-quote{flex:1 1 0%;width:auto;padding:60px 30px;opacity:1;transition:flex-grow .4s ease,width .4s ease,padding .4s ease,opacity .3s ease .1s}
+.tm-quote p{font:var(--gw-text-body-18-reg);letter-spacing:var(--gw-text-body-18-reg-tracking);color:var(--gw-color-black);white-space:normal}
+/* Figma renders the client's name in Balfontheim as a stylised signature.
+   The face isn't part of the design system's shipped set (tokens.css only
+   self-hosts Inter + Vert Grotesk), so the @font-face lives here rather
+   than in tokens.css — that file is a copy of the plugin's own and would
+   lose this on the next re-sync. Vendored from the installed copy at
+   ~/Library/Fonts, i.e. the same file Figma renders with. */
+@font-face{
+  font-family:'Balfontheim';
+  src:url('/fonts/Balfontheim-Signature.ttf') format('truetype');
+  font-weight:400;
+  font-style:normal;
+  font-display:swap;
+}
+.tm-sig{font:44px/1 'Balfontheim',cursive;color:var(--gw-color-primary-500);letter-spacing:-0.088px;white-space:nowrap}
+/* collapsed: photo fills the card (204 at design width). expanded: pinned to
+   the measured 240 with the quote absorbing the remainder — a flex ratio
+   instead let the photo shrink with the viewport (114px at 915 wide). */
+.tm-photo{flex:1 1 auto;position:relative;min-width:0;border-radius:var(--gw-radius-12);overflow:hidden;transition:flex-basis .4s ease}
+.tm-card.is-wide .tm-photo{flex:0 0 240px}
+.tm-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.tm-photo .scrim{position:absolute;left:0;right:0;bottom:0;height:125px;background:linear-gradient(to top,rgba(0,0,0,.9),rgba(0,0,0,0))}
+.tm-photo .play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:inline-flex;align-items:center;gap:8px;
+  background:var(--gw-color-neutral-alpha-20-black);backdrop-filter:blur(3px);border:0.75px solid var(--gw-color-neutral-alpha-10-white);
+  border-radius:999px;color:#fff;padding:20px;transition:padding .4s ease}
+.tm-card.is-wide .tm-photo .play{padding:10px 12px;font:var(--gw-text-body-14-med)}
+.tm-photo .play .icon{width:16px;height:16px}
+.tm-photo .play .play-label{display:none;white-space:nowrap}
+.tm-card.is-wide .tm-photo .play .play-label{display:inline}
+.tm-meta{position:absolute;left:10px;right:10px;bottom:10px;color:#fff;display:flex;flex-direction:column;gap:6px}
+.tm-meta b{display:block;font:var(--gw-text-body-14-med);letter-spacing:var(--gw-text-body-14-med-tracking)}
+.tm-meta span{display:block;font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking);color:rgba(255,255,255,.8)}
+@media (max-width:900px){
+  .tm-row{flex-direction:column}
+  /* stacked: cards hug their own content, so the photo needs its own
+     definite height instead of inheriting the 331 row height */
+  .tm-card{flex-direction:column;flex-basis:auto;height:auto}
+  .tm-card.is-wide .tm-quote{width:auto}
+  .tm-photo{flex:none;height:220px}
+}
+
+/* Border color is the literal #e1e3e8 measured off node 222:24029 — same
+   token-vs-real-value gap as the testimonial cards' border, not the shared
+   neutral-100 token (#e7e8e9). Kept as measured. */
+.ap-panel{margin-top:20px;border:1px solid #e1e3e8;border-radius:var(--gw-radius-20);padding:40px}
+.ap-intro{display:flex;align-items:flex-start;justify-content:space-between;gap:20px}
+.ap-intro p{font:600 22px/1.4 var(--gw-font-display);max-width:900px}
+.ap-intro b{color:var(--gw-color-primary-500);font-weight:600}
+.ap-intro .icon{width:40px;height:40px;color:var(--gw-color-primary-500);flex:none}
+.ap-cols{margin-top:40px;display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.ap-col{padding-left:24px;border-left:1px solid #e1e3e8}
+.ap-col:first-child{padding-left:0;border-left:none}
+.ap-col h4{font:var(--gw-text-body-16-sem);letter-spacing:var(--gw-text-body-16-sem-tracking);color:var(--gw-color-black);margin-bottom:8px}
+.ap-col p{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);color:var(--gw-color-neutral-600)}
+@media (max-width:900px){ .ap-cols{grid-template-columns:1fr 1fr;row-gap:24px} .ap-col:nth-child(3){padding-left:0;border-left:none} }
+@media (max-width:560px){ .ap-cols{grid-template-columns:1fr} .ap-col{padding-left:0;border-left:none;border-top:1px solid #e1e3e8;padding-top:16px} .ap-col:first-child{border-top:none;padding-top:0} .ap-intro{flex-direction:column} }
+
+/* ============================================================================
+   REVIEWS — "Love from our customers"
+   Figma 216:23552. Grid 1240x798 (collapsed), 3 cols of 406.67 with 10px gaps
+   both ways. Fade = Rectangle 44303: 480 tall, white 0 -> white at 82.6%.
+   Button 216:23685: 88x32, r8, neutral-50 fill, 1px white stroke, 52px up
+   from the grid's bottom edge.
+   ============================================================================ */
+.rv-wrap{position:relative;margin-top:60px}
+.rv-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+  max-height:798px;overflow:hidden;transition:max-height .45s ease}
+/* one more fade-window (480px) of content on expand */
+.rv-wrap.is-expanded .rv-cols{max-height:1278px}
+.rv-col{display:flex;flex-direction:column;gap:10px}
+.rv-card{background:var(--gw-color-white);box-shadow:inset 0 0 0 1px #e1e3e8;border-radius:var(--gw-radius-16);padding:20px;
+  display:flex;flex-direction:column;gap:24px}
+.rv-card--feat{box-shadow:inset 0 0 0 1px #e1e3e8, 0 16px 32px rgba(88,92,95,.1)}
+/* revealed by "Show more" */
+.rv-card--more{display:none}
+.rv-wrap.is-expanded .rv-card--more{display:flex}
+.rv-head{display:flex;align-items:center;gap:12px}
+.rv-head img{flex:0 0 64px;width:64px;height:48px;border-radius:999px;object-fit:cover;
+  background:var(--gw-color-neutral-200);display:block}
+.rv-who{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:4px}
+.rv-who b{font:var(--gw-text-body-16-sem);letter-spacing:var(--gw-text-body-16-sem-tracking);color:var(--gw-color-black)}
+.rv-who span{font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking);color:var(--gw-color-neutral-700)}
+.rv-card p{margin:0;font:var(--gw-text-body-14-med);letter-spacing:var(--gw-text-body-14-med-tracking);color:var(--gw-color-neutral-800)}
+.rv-fade{position:absolute;left:0;right:0;bottom:0;height:480px;
+  background:linear-gradient(to bottom,rgba(255,255,255,0),#fff 82.6%);
+  display:flex;align-items:flex-end;justify-content:center;padding-bottom:52px;pointer-events:none}
+.rv-more{pointer-events:auto;background:var(--gw-color-neutral-50);color:var(--gw-color-black);
+  box-shadow:inset 0 0 0 1px var(--gw-color-white);padding:8px 12px;border-radius:var(--gw-radius-8);
+  font:var(--gw-text-link-12);letter-spacing:var(--gw-text-link-12-tracking)}
+.rv-more:hover{background:var(--gw-color-neutral-100)}
+@media (max-width:900px){ .rv-cols{grid-template-columns:1fr;max-height:798px} .rv-wrap.is-expanded .rv-cols{max-height:1278px} }
+
+/* ============================================================================
+   FOOTER — ported verbatim (structure, class names, values) from
+   skills/gushwork-web/templates/case-study/case-study.html in the
+   gushwork-design repo (case-study-bulk-gen-and-og branch), per Utsav's
+   "take footer from here, DO NOT TAKE ANYTHING ELSE" instruction. That file's
+   own header comment documents this footer as realigned to the documented
+   `footer/footer` component (exports/web/page-shell.md, Figma set 1720:3801)
+   after disagreeing with a live-site measurement on nearly every value —
+   trust its numbers over re-deriving them here.
+   ============================================================================ */
+.cs-footer{
+  background:var(--gw-color-black);color:var(--gw-color-white);
+  border-radius:var(--gw-radius-20) var(--gw-radius-20) 0 0;
+  /* 16px frame on top/left/right (0 bottom — the wordmark band runs to the
+     edge), per node 145:8971. This is the black margin the CTA sits inside;
+     I'd removed it entirely when making the blue full-width, which was too
+     far — the blue should fill the width *within* this frame, not replace it. */
+  padding:var(--gw-space-16) var(--gw-space-16) 0;
+  overflow:clip;
+}
+/* CTA — measured directly off the real instance (node 145:8971) via the
+   Figma plugin API (get_metadata SSE'd out on this node every time). Footer
+   itself pads 16px top/left/right, 0 bottom; the CTA sits flush in that
+   16px frame (not capped to the 1240 content column like the links below
+   it) at 1408×440, radius-16 on all four corners — not just the top like a
+   plain card. Left column: 60px left padding (not the usual 100 content
+   margin), heading/paragraph gap 16, text-block-to-buttons gap 40, button
+   gap 8 (not 12). Right illustration is exactly 600 wide, full 440 height,
+   flush to the right edge. */
+/* .cs-cta is the full-bleed blue background — spans the footer's full width
+   (no cap, no radius/margin of its own; it fills whatever .cs-footer gives
+   it and inherits the footer's own top-20 clip). .cs-cta-content is the
+   separate "content frame": capped at page width (content-width +
+   2×content-margin) and centred, so the fixed-800px text column and the
+   flush-right illustration stay put as a unit at any viewport width instead
+   of drifting apart — only the blue behind them extends further. */
+/* Fills the full width of the footer's 16px frame (no max-width cap, so it
+   keeps filling at any viewport) and carries the measured radius-16 on all
+   four corners, since it sits inset rather than flush to the footer edge. */
+.cs-cta{background:var(--gw-color-primary-500);border-radius:var(--gw-radius-16);overflow:hidden}
+/* no horizontal padding: Figma puts the heading's glyphs 60px from the CTA's
+   own left edge, and .cs-cta-left's 60px padding already does that. The
+   extra 16px was pushing the text to 76px and making its box overlap the
+   right-anchored illustration by 8px at the design width. */
+.cs-cta-content{max-width:calc(var(--gw-content-width) + 2*var(--gw-content-margin));margin:0 auto;
+  display:flex;align-items:stretch;min-height:440px}
+.cs-cta-left{flex:0 0 800px;padding-left:60px;display:flex;flex-direction:column;justify-content:center;gap:var(--gw-space-40)}
+.cs-cta-copy{display:flex;flex-direction:column;gap:var(--gw-space-16);max-width:740px}
+.cs-cta-copy h2{font:700 44px/1.2 var(--gw-font-display);color:#fff}
+.cs-cta-copy p{font:var(--gw-text-body-16-med);letter-spacing:var(--gw-text-body-16-med-tracking);color:var(--gw-color-neutral-alpha-80-white)}
+.cs-cta-btns{display:flex;gap:var(--gw-space-8)}
+/* CTA illustration — footer/footer-elements/cta-image, Image=AI Agents,
+   Color=Blue (node I145:8971;1728:3794;1711:20782). Pulled as structured
+   data via the plugin API rather than transcribed from the generated JSX:
+   143 individual 40px grid cells forming the irregular blob shape (not a
+   uniform grid — a plain CSS background-image grid can't reproduce this),
+   2 unlabeled 60×60 agent-icons, and 2 labeled cards. My first pass had the
+   two cards' positions swapped and both sharing one copy line ("Finds where
+   buyers search") — the real copy differs per card, and "Paid Boost Agent"
+   sits upper-left (132,126) while "Research Agent" sits lower-right
+   (412,326), not the reverse. Generated from a coordinate list via JS,
+   same pattern as the marquee, rather than hand-writing 143 static divs. */
+/* flex:1 (not a fixed 600px) so this column always fills whatever space is
+   left of the 800px text column, flush to the CTA's own right edge with no
+   gap — a fixed 600px left an ~8px sliver of plain blue showing on the
+   right, since 800+600 doesn't quite reach the real CTA content width. The
+   600×440 illustration itself stays fixed-size, anchored to the right edge
+   of this now-flexible column via .cs-cta-illustration below, so its own
+   measured coordinates don't need to change. */
+/* The column stays in flow (so it reserves space and the text can't be
+   overlapped, and it still clips the illustration at narrow widths), but its
+   right edge is pulled out to the blue block's right edge so the illustration
+   hugs it instead of stopping at the capped content frame. The offset is how
+   far the centred 1440 frame sits from the blue edge: blue = 100vw - 32 (the
+   footer's own frame), so that's max(0, (100vw - 1472) / 2). */
+.cs-cta-right{flex:1;position:relative;overflow:hidden;
+  margin-right:calc(-1 * max(0px, (100vw - 1472px) / 2))}
+.cs-cta-illustration{position:absolute;top:0;right:0;width:600px;height:440px}
+.cs-cta-grid i{position:absolute;width:40px;height:40px;border:1px solid var(--gw-color-primary-400);box-sizing:border-box}
+.cs-cta-icon{position:absolute;width:60px;height:60px;border-radius:var(--gw-radius-8);background:var(--gw-color-primary-400)}
+.cs-cta-icon i{position:absolute;width:8px;height:8px;border-radius:2px;background:var(--gw-color-primary-100)}
+.cs-cta-card{position:absolute;display:flex;align-items:center;gap:12px;background:var(--gw-color-primary-400);
+  border-radius:var(--gw-radius-12);padding:4px;min-width:280px}
+.cs-cta-card .cs-cta-icon{position:relative;flex:none}
+.cs-cta-card-text{display:flex;flex-direction:column;gap:4px;white-space:nowrap}
+.cs-cta-card-text b{font:600 18px/1.6 var(--gw-font-body);letter-spacing:-0.108px;color:#fff}
+.cs-cta-card-text span{font:500 12px/1 var(--gw-font-body);color:var(--gw-color-neutral-alpha-60-white)}
+@media (max-width:900px){
+  .cs-cta-content{flex-direction:column;min-height:0}
+  .cs-cta-left{flex:none;max-width:none;padding:40px 20px;width:100%}
+  /* stacked — no capped frame to escape, so drop the pull-out offset */
+  .cs-cta-right{flex:none;width:100%;height:280px;margin-right:0}
+  .cs-cta-btns{flex-direction:column;align-items:stretch}
+}
+.cs-footer-inner{max-width:var(--gw-content-width);margin:0 auto;padding:var(--gw-space-80) var(--gw-space-20) 0}
+.cs-footer-main{display:grid;grid-template-columns:1fr 1fr;gap:var(--gw-space-16) var(--gw-space-100)}
+.cs-footer-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gw-space-60);max-width:600px}
+.cs-footer-col h4{
+  font:var(--gw-text-body-12-sem);letter-spacing:var(--gw-text-body-12-sem-tracking);
+  color:var(--gw-color-neutral-200);
+}
+.cs-footer-list{display:flex;flex-direction:column;gap:var(--gw-space-12);margin-top:var(--gw-space-20)}
+.cs-footer-list a{
+  font:var(--gw-text-body-14-med);letter-spacing:var(--gw-text-body-14-med-tracking);
+  color:var(--gw-color-neutral-400);
+}
+.cs-footer-list a:hover{color:var(--gw-color-white)}
+.cs-footer-comp{display:flex;flex-direction:column;gap:22px}
+.cs-footer-addr-row{display:flex;flex-wrap:wrap;gap:48px var(--gw-space-100)}
+.cs-footer-addr-col{display:flex;flex-direction:column;gap:var(--gw-space-16)}
+.cs-footer-contact{display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.cs-footer-social{display:flex;justify-content:flex-end;gap:var(--gw-space-16);margin-top:var(--gw-space-40)}
+.cs-footer-social a{
+  width:28px;height:28px;display:grid;place-items:center;
+  border-radius:var(--gw-radius-8);color:var(--gw-color-neutral-500);
+}
+.cs-footer-social svg{width:14px;height:14px;fill:currentColor}
+.cs-footer-social a:hover{color:var(--gw-color-white)}
+.cs-footer-addr-col p,.cs-footer-addr-col a{
+  max-width:184px;
+  font:400 12px/1.4 var(--gw-font-body);letter-spacing:var(--gw-text-body-12-reg-tracking);
+  color:var(--gw-color-neutral-alpha-60-white);
+}
+.cs-footer-addr-col a:hover{color:var(--gw-color-white)}
+.cs-footer-legal{
+  display:flex;align-items:center;justify-content:space-between;gap:var(--gw-space-24);
+  margin-top:var(--gw-space-16);padding:6px 0 var(--gw-space-12);flex-wrap:wrap;
+  font:var(--gw-text-body-12-reg);letter-spacing:var(--gw-text-body-12-reg-tracking);
+  color:var(--gw-color-neutral-400);
+  border-top:1px solid var(--gw-color-neutral-alpha-10-white);
+}
+.cs-footer-legal div{display:flex;gap:var(--gw-space-24)}
+.cs-footer-legal a{color:var(--gw-color-neutral-400)}
+.cs-footer-legal a:hover{color:var(--gw-color-white)}
+.cs-footer-legal > span{font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking)}
+.cs-footer-band{margin-top:112px}
+.cs-footer-band img{width:100%;height:auto;display:block}
+@media (max-width:767px){
+  .cs-footer-inner{padding:var(--gw-space-60) var(--gw-space-16) 0}
+  .cs-footer-main{grid-template-columns:1fr;gap:var(--gw-space-40)}
+  .cs-footer-cols{grid-template-columns:1fr;gap:var(--gw-space-32);max-width:none}
+  .cs-footer-addr-row{gap:var(--gw-space-24)}
+  .cs-footer-legal{flex-direction:column;align-items:flex-start;margin-top:var(--gw-space-40)}
+  .cs-footer-band{display:none}
+}
+
+/* Consolidated last so it wins the cascade over the desktop rules above at
+   equal selector specificity (source order, not just @media, decides ties). */
+@media (max-width:767px){
+  .hero{padding:60px 0}
+  .hero-text h1{font:700 40px/1.15 var(--gw-font-display)}
+  .hero-visual{margin-top:40px}
+  .cg-heading{font:700 32px/1.2 var(--gw-font-display)}
+}
+
+/* ============================================================================
+   CHAT WIDGET — the floating "Ask anything" bar + panel, ported from the
+   chat-widget package and reskinned to Figma 224:27182. The ids and .chatw-*
+   class names are unchanged so the widget's own JS hooks still line up.
+
+   Bar, measured off 224:27182 (600x106): shell r12, white, 2px neutral-100,
+   shadow 0 16px 40px #585c5f@0.16, 8px padding, 8px gap. Label row: "Ask
+   anything..." Inter Medium 14/100% neutral-800. Input row 584x52: r8,
+   neutral-50, 1px neutral-100, padding 8/12/8/16, gap 10, 16px text, Sparkle
+   16px neutral-400, send button 32x32 r8 neutral-900 with a white ArrowUp.
+   Every colour in the comp mapped to an existing token.
+
+   The panel, history dropdown and suggestion chips are not in the comp —
+   those are the package's own, re-toned from its dark theme to match the bar.
+
+   Note: the widget's SVGs use .chatw-svg, NOT this page's global .icon — that
+   rule sets fill:currentColor, and CSS beats a presentation attribute, so it
+   would fill the stroke-only glyphs solid.
+   ============================================================================ */
+.chatw-stack{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);
+  width:min(600px,calc(100vw - 32px));z-index:60;
+  --chatw-panel-h:min(420px,58vh);--chatw-panel-gap:12px;
+  font-family:var(--gw-font-body);pointer-events:none}
+.chatw-svg{display:block;flex:none}
+
+/* ---- the bar ---- */
+.chatw-bar{position:relative;background:var(--gw-color-white);padding:8px;
+  display:flex;flex-direction:column;gap:8px;
+  border-radius:var(--gw-radius-12);
+  box-shadow:inset 0 0 0 2px var(--gw-color-neutral-100), 0 16px 40px rgba(88,92,95,.16);
+  opacity:0;transform:translateY(24px);pointer-events:none;
+  transition:opacity .3s ease,transform .3s ease}
+.chatw-bar.visible{opacity:1;transform:translateY(0);pointer-events:auto}
+@media (prefers-reduced-motion:reduce){ .chatw-bar{transition:opacity .3s ease;transform:none} }
+
+.chatw-label{display:flex;align-items:center;gap:10px;height:30px;flex:none;padding:8px}
+.chatw-label span{font:500 14px/1 var(--gw-font-body);letter-spacing:0;color:var(--gw-color-neutral-800)}
+.chatw-bar form{display:flex;align-items:center;gap:10px;height:52px;flex:none;
+  padding:8px 12px 8px 16px;border-radius:var(--gw-radius-8);
+  background:var(--gw-color-neutral-50);box-shadow:inset 0 0 0 1px var(--gw-color-neutral-100)}
+.chatw-bar .chatw-sparkle{width:16px;height:16px;color:var(--gw-color-neutral-400)}
+.chatw-field{position:relative;flex:1;min-width:0;display:flex}
+.chatw-bar input{flex:1;min-width:0;background:none;border:0;outline:none;
+  font:500 16px/1 var(--gw-font-body);color:var(--gw-color-black)}
+/* the ghost sits over the empty input rather than in its ::placeholder, so the
+   caret can be its own element and take the comp's heavier, darker styling */
+.chatw-ghost{position:absolute;left:0;top:50%;transform:translateY(-50%);
+  display:flex;align-items:center;max-width:100%;overflow:hidden;
+  pointer-events:none;white-space:nowrap;
+  font:500 16px/1 var(--gw-font-body);color:var(--gw-color-neutral-400)}
+/* An author `display` beats the UA's [hidden]{display:none}, so setting
+   .hidden alone left the element laid out and its caret still drawing next to
+   the "Continue chatting..." placeholder. This is what actually hides it. */
+.chatw-ghost[hidden]{display:none}
+.chatw-ghost::after{content:"";flex:none;width:2px;height:15px;margin-left:1.5px;
+  background:var(--gw-color-neutral-800);
+  animation:chatw-caret 1.06s steps(1,end) infinite}
+@keyframes chatw-caret{0%,50%{opacity:1}50.01%,100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){ .chatw-ghost::after{animation:none} }
+.chatw-bar input::placeholder{color:var(--gw-color-neutral-400);font-weight:500}
+/* solid at all times — 224:27553 is neutral-900 at full opacity, and the
+   dimmed-when-empty state I had before read as disabled while the typewriter
+   was filling the field */
+.chatw-bar form button{width:32px;height:32px;flex:none;border:0;cursor:pointer;
+  border-radius:var(--gw-radius-8);background:var(--gw-color-neutral-900);
+  display:grid;place-items:center;
+  transition:background .15s ease}
+.chatw-bar form button .chatw-svg{width:16px;height:16px;color:var(--gw-color-white)}
+.chatw-bar form button:hover{background:var(--gw-color-black)}
+
+/* ---- gushy, standing on the bar's top edge ----
+   Masters are 240x240 (270:9199 / 9186 / 9240). The comp places them at 0.22x
+   with the body's 160x178 box landing at ~36x40 and the feet exactly on the
+   bar's top edge. viewBox "30 10 200 200" leaves room for the thought bubble
+   without rescaling the body between states. */
+/* The wrapper owns the horizontal walk (animating `left`, whose percentages
+   resolve against the bar). The svg owns the bob, and an inner <g> owns the
+   facing flip — three separate elements because they'd otherwise all be
+   fighting over one `transform`. */
+.chatw-gushy-wrap{position:absolute;left:14px;bottom:calc(100% - 4px);
+  width:45px;height:45px;pointer-events:none;
+  transition:transform .25s ease}
+/* with the panel open he stands on ITS top edge instead of the bar's — up by
+   the panel's height plus the gap between them. The walk animates `left`, so
+   `transform` is free for this. */
+.chatw-stack.panel-open .chatw-gushy-wrap{
+  transform:translateY(calc(-1 * (var(--chatw-panel-h) + var(--chatw-panel-gap))))}
+@media (prefers-reduced-motion:reduce){ .chatw-gushy-wrap{transition:none} }
+.chatw-gushy{display:block;width:100%;height:100%;overflow:visible;
+  animation:chatw-bob 3.2s ease-in-out infinite}
+.chatw-gushy[data-facing="left"] .g-all{transform:scaleX(-1);
+  transform-box:view-box;transform-origin:center}
+
+/* pose parts: hidden by default, switched on per state */
+.chatw-gushy .g-legs-walk,.chatw-gushy .g-arm-wave,.chatw-gushy .g-arm-type,
+.chatw-gushy .g-eyes-think,.chatw-gushy .g-eyes-work,
+.chatw-gushy .g-laptop,.chatw-gushy .g-bubble{display:none}
+
+.chatw-gushy[data-state="waving"] .g-arm-down{display:none}
+.chatw-gushy[data-state="waving"] .g-arm-wave{display:inline}
+
+.chatw-gushy[data-state="walking"] .g-legs-still{display:none}
+.chatw-gushy[data-state="walking"] .g-legs-walk{display:inline}
+
+.chatw-gushy[data-state="thinking"] .g-eyes-fwd{display:none}
+.chatw-gushy[data-state="thinking"] .g-eyes-think,
+.chatw-gushy[data-state="thinking"] .g-bubble{display:inline}
+
+.chatw-gushy[data-state="working"] .g-eyes-fwd,
+.chatw-gushy[data-state="working"] .g-arm-left{display:none}
+.chatw-gushy[data-state="working"] .g-eyes-work,
+.chatw-gushy[data-state="working"] .g-arm-type,
+.chatw-gushy[data-state="working"] .g-laptop{display:inline}
+
+/* motion */
+.chatw-gushy[data-state="waving"] .g-arm-wave{
+  transform-origin:162.743px 177.691px;
+  animation:chatw-wave .52s ease-in-out infinite alternate}
+.chatw-gushy[data-state="walking"]{animation:chatw-step .42s ease-in-out infinite}
+.chatw-gushy[data-state="thinking"]{animation:chatw-bob 3.2s ease-in-out infinite, chatw-lean 2.4s ease-in-out infinite}
+.chatw-gushy[data-state="thinking"] .g-dot{animation:chatw-dot 1.2s ease-in-out infinite}
+.chatw-gushy[data-state="working"] .g-arm-type{transform-origin:80px 152px;
+  animation:chatw-type .28s ease-in-out infinite alternate}
+.chatw-gushy .g-eye{transform-box:fill-box;transform-origin:center;
+  animation:chatw-blink 5.4s ease-in-out infinite}
+
+/* the walk itself — 14px in from one end of the bar to 14px in from the other */
+.chatw-gushy-wrap.is-walking-right{animation:chatw-walk-r var(--gushy-walk,4.2s) linear forwards}
+.chatw-gushy-wrap.is-walking-left{animation:chatw-walk-l var(--gushy-walk,4.2s) linear forwards}
+@keyframes chatw-walk-r{from{left:14px}to{left:calc(100% - 59px)}}
+@keyframes chatw-walk-l{from{left:calc(100% - 59px)}to{left:14px}}
+
+@keyframes chatw-dot{0%,60%,100%{fill:#e7e8e9}30%{fill:#bbbec4}}
+@keyframes chatw-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2.5px)}}
+@keyframes chatw-step{0%,100%{transform:translateY(0)}50%{transform:translateY(-3.5px)}}
+@keyframes chatw-wave{from{transform:rotate(-13deg)}to{transform:rotate(13deg)}}
+@keyframes chatw-lean{0%,100%{rotate:0deg}50%{rotate:-3.5deg}}
+@keyframes chatw-type{from{transform:rotate(0deg)}to{transform:rotate(-7deg)}}
+/* eyelid: a quick squash, held shut for a sliver of the cycle */
+@keyframes chatw-blink{0%,92%,100%{transform:scaleY(1)}95%,97%{transform:scaleY(.12)}}
+@media (prefers-reduced-motion:reduce){
+  .chatw-gushy,.chatw-gushy *,.chatw-gushy-wrap{animation:none!important}
+}
+
+/* ---- suggestion chips: the tag styling from Figma 311:12462 ---- */
+.chatw-suggestions{position:absolute;left:0;right:0;bottom:calc(100% + 52px);
+  display:flex;flex-direction:column;align-items:flex-start;gap:8px;
+  opacity:0;pointer-events:none;transition:opacity .2s ease}
+.chatw-suggestions.visible{opacity:1;pointer-events:auto}
+.chatw-suggestion{max-width:100%;padding:8px 12px;border:0;cursor:pointer;
+  border-radius:40px;background:rgba(1,1,9,.5);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  color:var(--gw-color-white);font:500 14px/14px var(--gw-font-body);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left}
+.chatw-suggestion:hover{background:rgba(1,1,9,.68)}
+
+/* ---- the panel ---- */
+.chatw-panel{position:absolute;left:0;right:0;bottom:calc(100% + var(--chatw-panel-gap));
+  height:var(--chatw-panel-h);opacity:0;transform:translateY(12px);
+  pointer-events:none;transition:opacity .25s ease,transform .25s ease}
+.chatw-panel.open{opacity:1;transform:translateY(0);pointer-events:auto}
+.chatw-panel-shell{position:relative;width:100%;height:100%;display:flex;flex-direction:column;
+  overflow:hidden;background:var(--gw-color-white);border-radius:var(--gw-radius-16);
+  box-shadow:inset 0 0 0 2px var(--gw-color-neutral-100), var(--gw-shadow-s4)}
+.chatw-panel-header{display:flex;align-items:center;justify-content:space-between;gap:8px;
+  flex:none;padding:12px 16px;border-bottom:1px solid var(--gw-color-neutral-100)}
+.chatw-panel-title{display:flex;align-items:center;gap:8px;flex:1;min-width:0;padding:0;
+  border:0;background:none;cursor:pointer;text-align:left;
+  font:var(--gw-text-body-16-sem);letter-spacing:var(--gw-text-body-16-sem-tracking);color:var(--gw-color-black)}
+.chatw-panel-title .chatw-svg{width:16px;height:16px;color:var(--gw-color-primary-500)}
+.chatw-history-caret{width:14px!important;height:14px!important;color:var(--gw-color-neutral-400);transition:transform .15s ease}
+.chatw-panel-title[aria-expanded="true"] .chatw-history-caret{transform:rotate(180deg)}
+#chatwPanelTitleText{display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#chatwPanelTitleText.title-animate{animation:chatw-title-slide-up .3s ease}
+@keyframes chatw-title-slide-up{from{transform:translateY(8px);opacity:0}to{transform:translateY(0);opacity:1}}
+.chatw-panel-close{width:24px;height:24px;flex:none;display:grid;place-items:center;
+  border:0;background:none;cursor:pointer;border-radius:var(--gw-radius-8);color:var(--gw-color-neutral-400)}
+.chatw-panel-close .chatw-svg{width:16px;height:16px}
+.chatw-panel-close:hover{background:var(--gw-color-neutral-50);color:var(--gw-color-black)}
+
+.chatw-history-dropdown{display:none;position:absolute;top:56px;left:8px;right:8px;z-index:5;
+  background:var(--gw-color-white);border:1px solid var(--gw-color-neutral-100);
+  border-radius:var(--gw-radius-12);box-shadow:var(--gw-shadow-s4);padding:4px;
+  max-height:calc(100% - 68px);overflow-y:auto}
+.chatw-history-dropdown.open{display:block}
+.chatw-history-list{display:flex;flex-direction:column;gap:2px}
+.chatw-history-row{display:flex;align-items:center;gap:10px;width:100%;padding:8px;
+  border:0;background:none;cursor:pointer;text-align:left;font-family:inherit;
+  border-radius:var(--gw-radius-8);transition:background .15s ease}
+.chatw-history-row:hover,.chatw-history-row.active{background:var(--gw-color-primary-alpha-10)}
+.chatw-history-row .chatw-svg{width:24px;height:24px;padding:5px;border-radius:6px;
+  background:var(--gw-color-black);color:var(--gw-color-white)}
+.chatw-history-preview{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font:var(--gw-text-body-14-med);letter-spacing:var(--gw-text-body-14-med-tracking);color:var(--gw-color-neutral-800)}
+.chatw-history-time{flex:none;font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-400)}
+.chatw-history-empty{margin:0;padding:16px 8px;text-align:center;
+  font:var(--gw-text-body-14-med);color:var(--gw-color-neutral-400)}
+.chatw-history-new{display:flex;align-items:center;gap:8px;width:100%;padding:10px 8px;margin-top:4px;
+  border:0;border-top:1px solid var(--gw-color-neutral-100);background:none;cursor:pointer;
+  border-radius:var(--gw-radius-8);font:var(--gw-text-body-14-sem);color:var(--gw-color-neutral-800);
+  transition:background .15s ease,color .15s ease}
+.chatw-history-new:hover{background:var(--gw-color-primary-alpha-10);color:var(--gw-color-primary-500)}
+.chatw-history-new .chatw-svg{width:16px;height:16px}
+
+.chatw-panel-messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px;
+  position:relative;
+  mask-image:linear-gradient(to bottom,transparent 0,#000 20px);
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 20px)}
+.chatw-panel-messages > *:first-child{margin-top:auto}
+.chatw-panel-scroll-btn{position:absolute;left:50%;bottom:12px;transform:translateX(-50%) scale(.8);
+  width:32px;height:32px;border-radius:999px;border:1px solid var(--gw-color-neutral-100);
+  background:var(--gw-color-white);color:var(--gw-color-black);cursor:pointer;
+  display:grid;place-items:center;box-shadow:var(--gw-shadow-s3);
+  opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease}
+.chatw-panel-scroll-btn .chatw-svg{width:16px;height:16px}
+.chatw-panel-scroll-btn.visible{opacity:1;pointer-events:auto;transform:translateX(-50%) scale(1)}
+
+.chatw-message{font:var(--gw-text-body-14-med);letter-spacing:var(--gw-text-body-14-med-tracking);line-height:1.45}
+.chatw-message.user{align-self:flex-end;max-width:85%;padding:10px 14px;
+  border-radius:var(--gw-radius-8);background:var(--gw-color-black);color:var(--gw-color-white)}
+.chatw-message.assistant{align-self:stretch;color:var(--gw-color-neutral-800)}
+.chatw-message.assistant strong{color:var(--gw-color-black);font-weight:600}
+.chatw-contact-buttons{align-self:stretch;display:flex;flex-wrap:wrap;gap:8px;margin-top:-4px}
+.chatw-contact-btn{padding:10px;border-radius:var(--gw-radius-8);text-decoration:none;
+  background:var(--gw-color-neutral-50);border:1px solid var(--gw-color-neutral-100);
+  font:var(--gw-text-body-14-med);line-height:1;color:var(--gw-color-black)}
+.chatw-contact-btn:hover{background:var(--gw-color-primary-500);border-color:var(--gw-color-primary-500);color:var(--gw-color-white)}
+.chatw-typing{align-self:flex-start;display:flex;align-items:center;gap:4px;padding:8px 0}
+.chatw-typing span{width:4px;height:4px;border-radius:50%;background:var(--gw-color-neutral-300);
+  animation:chatw-typing-bounce 1.2s ease-in-out infinite}
+.chatw-typing span:nth-child(2){animation-delay:.15s}
+.chatw-typing span:nth-child(3){animation-delay:.3s}
+@keyframes chatw-typing-bounce{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+@media (prefers-reduced-motion:reduce){ .chatw-typing span{animation:none} }
+
+@media (max-width:767px){
+  .chatw-stack{bottom:12px;--chatw-panel-h:min(380px,54vh)}
+  .chatw-gushy{left:10px;width:38px;height:38px}
+}
+</style>
+</head>
+<body data-chat-context="the Gushwork homepage">
+
+<!-- =========================================================================
+     NAVBAR
+     ========================================================================= -->
+<header class="nav">
+  <div class="nav-in">
+    <a class="nav-logo" href="#" aria-label="Gushwork home">
+      <svg viewBox="0 0 421 80" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M76.6088 4.56344C77.5025 2.36058 75.8495 0 73.4723 0H9.14286C4.0934 0 0 4.0934 0 9.14286V66.7778C0 72.018 5.17081 75.6829 9.9603 73.5568C40.8494 59.8449 64.3785 34.7075 76.6088 4.56344Z" fill="#0070FF"/><path d="M32.5161 80C31.4022 80 30.9357 78.5531 31.8259 77.8835C54.9007 60.5265 71.4338 35.8047 78.7658 8.0522C78.9403 7.39154 80 7.51618 80 8.19951V70.8571C80 75.9066 75.9066 80 70.8571 80H32.5161Z" fill="#0070FF"/><path d="M393.954 45.0034L389.254 39.8255L410.204 17.2021H419.445L393.954 45.0034ZM386.625 57.0321V5.99988H394.193V57.0321H386.625ZM411.877 57.0321L397.22 35.2052L402.159 29.9476L420.958 57.0321H411.877Z" fill="#111827"/><path d="M366.463 35.6042C366.463 31.3026 367.286 27.7976 368.933 25.0891C370.579 22.3807 372.703 20.3626 375.305 19.035C377.908 17.7073 380.643 17.0435 383.51 17.0435V24.2129C381.121 24.2129 378.837 24.5846 376.66 25.3281C374.535 26.0185 372.783 27.1868 371.402 28.8331C370.074 30.4263 369.41 32.6037 369.41 35.3653L366.463 35.6042ZM361.843 57.0328V17.2028H369.41V57.0328H361.843Z" fill="#111827"/><path d="M336.622 57.9884C332.639 57.9884 329.134 57.1122 326.107 55.3597C323.08 53.554 320.69 51.0846 318.938 47.9513C317.238 44.818 316.389 41.2067 316.389 37.1175C316.389 33.0283 317.238 29.417 318.938 26.2837C320.637 23.1505 323 20.7075 326.028 18.955C329.055 17.1494 332.533 16.2466 336.463 16.2466C340.393 16.2466 343.871 17.1494 346.898 18.955C349.926 20.7075 352.289 23.1505 353.988 26.2837C355.688 29.417 356.537 33.0283 356.537 37.1175C356.537 41.2067 355.688 44.818 353.988 47.9513C352.289 51.0846 349.926 53.554 346.898 55.3597C343.925 57.1122 340.499 57.9884 336.622 57.9884ZM336.622 51.058C339.012 51.058 341.136 50.4738 342.995 49.3055C344.854 48.084 346.288 46.4377 347.297 44.3666C348.359 42.2954 348.89 39.8791 348.89 37.1175C348.89 34.356 348.359 31.9396 347.297 29.8684C346.288 27.7973 344.827 26.1775 342.915 25.0092C341.004 23.7877 338.853 23.177 336.463 23.177C334.02 23.177 331.869 23.7877 330.011 25.0092C328.152 26.1775 326.691 27.7973 325.629 29.8684C324.567 31.9396 324.036 34.356 324.036 37.1175C324.036 39.8791 324.567 42.2954 325.629 44.3666C326.691 46.4377 328.178 48.084 330.09 49.3055C332.002 50.4738 334.179 51.058 336.622 51.058Z" fill="#111827"/><path d="M295.547 57.0322L309.009 17.2021H316.577L303.035 57.0322H295.547ZM268.701 57.0322L281.925 17.2021H288.776L275.711 57.0322H268.701ZM268.144 57.0322L254.602 17.2021H262.249L275.393 57.0322H268.144ZM295.547 57.0322L282.483 17.2021H289.413L302.557 57.0322H295.547Z" fill="#111827"/><path d="M218.174 57.0326V6.00235H225.662V57.0326H218.174ZM245.736 57.0326V36.6396H253.224V57.0326H245.736ZM245.736 36.6396C245.736 33.0284 245.311 30.2934 244.462 28.4346C243.612 26.5228 242.444 25.1951 240.957 24.4516C239.523 23.7081 237.876 23.3098 236.018 23.2567C232.725 23.2567 230.176 24.3985 228.37 26.6821C226.565 28.9657 225.662 32.1786 225.662 36.321H222.475C222.475 32.1255 223.086 28.5408 224.308 25.5669C225.582 22.5398 227.361 20.2296 229.645 18.6364C231.982 17.0432 234.743 16.2466 237.93 16.2466C241.063 16.2466 243.771 16.8839 246.055 18.1585C248.338 19.433 250.118 21.4246 251.392 24.133C252.667 26.7883 253.277 30.2934 253.224 34.6481V36.6396H245.736Z" fill="#111827"/><path d="M198.232 57.9884C195.417 57.9884 192.895 57.5636 190.664 56.7139C188.487 55.8642 186.628 54.7224 185.088 53.2885C183.601 51.8546 182.486 50.2349 181.742 48.4292L188.274 45.5615C189.124 47.2078 190.399 48.562 192.098 49.6241C193.797 50.6863 195.683 51.2173 197.754 51.2173C200.037 51.2173 201.923 50.7925 203.41 49.9428C204.897 49.0931 205.64 47.8982 205.64 46.3581C205.64 44.8711 205.083 43.7027 203.967 42.853C202.852 42.0033 201.232 41.3129 199.108 40.7819L195.364 39.826C191.647 38.8169 188.752 37.3034 186.681 35.2853C184.663 33.2673 183.654 30.9837 183.654 28.4346C183.654 24.5578 184.902 21.5573 187.398 19.433C189.894 17.3087 193.585 16.2466 198.471 16.2466C200.861 16.2466 203.038 16.5918 205.003 17.2822C207.021 17.9725 208.72 18.955 210.101 20.2296C211.535 21.5041 212.544 23.0177 213.128 24.7702L206.755 27.638C206.118 26.0448 205.029 24.8764 203.489 24.1329C201.949 23.3363 200.144 22.938 198.072 22.938C195.948 22.938 194.275 23.416 193.054 24.3719C191.832 25.2747 191.222 26.5493 191.222 28.1956C191.222 29.0984 191.726 29.9747 192.735 30.8244C193.797 31.621 195.337 32.2848 197.356 32.8159L201.657 33.8515C204.259 34.4887 206.41 35.4712 208.11 36.7989C209.809 38.0734 211.084 39.5339 211.933 41.1802C212.783 42.7734 213.208 44.4462 213.208 46.1988C213.208 48.5886 212.544 50.6863 211.216 52.4919C209.942 54.2444 208.163 55.5986 205.879 56.5546C203.649 57.5105 201.1 57.9884 198.232 57.9884Z" fill="#111827"/><path d="M169.393 57.0322L168.915 49.7034V17.2021H176.403V57.0322H169.393ZM141.353 37.5951V17.2021H148.92V37.5951H141.353ZM148.92 37.5951C148.92 41.1533 149.319 43.8883 150.115 45.8001C150.965 47.7119 152.133 49.0396 153.62 49.7831C155.107 50.5266 156.78 50.9249 158.639 50.978C161.878 50.978 164.401 49.8362 166.206 47.5526C168.012 45.269 168.915 42.0561 168.915 37.9138H172.181C172.181 42.1092 171.544 45.7204 170.269 48.7475C169.048 51.7215 167.295 54.0051 165.012 55.5983C162.728 57.1915 159.94 57.9881 156.647 57.9881C153.567 57.9881 150.859 57.3508 148.522 56.0762C146.238 54.8017 144.459 52.8102 143.185 50.1017C141.963 47.3933 141.353 43.8883 141.353 39.5866V37.5951H148.92Z" fill="#111827"/><path d="M114.72 74.0001C112.065 74.0001 109.648 73.7346 107.471 73.2035C105.294 72.7255 103.461 72.1679 101.975 71.5306C100.488 70.8934 99.3723 70.3358 98.6288 69.8578L101.497 63.724C102.187 64.1488 103.169 64.6268 104.444 65.1578C105.719 65.742 107.206 66.22 108.905 66.5917C110.604 67.0166 112.49 67.229 114.561 67.229C117.004 67.229 119.181 66.7245 121.093 65.7155C123.005 64.7595 124.492 63.246 125.554 61.1748C126.669 59.1037 127.227 56.4483 127.227 53.2088V17.2025H134.794V53.0495C134.794 57.6167 133.918 61.4404 132.166 64.5206C130.466 67.6539 128.103 70.0171 125.076 71.6103C122.102 73.2035 118.65 74.0001 114.72 74.0001ZM114.003 56.4749C110.392 56.4749 107.232 55.6517 104.524 54.0054C101.868 52.306 99.7706 49.9693 98.2305 46.9954C96.7435 43.9683 96 40.4898 96 36.5599C96 32.4707 96.7435 28.9125 98.2305 25.8854C99.7706 22.8584 101.868 20.4951 104.524 18.7957C107.232 17.0963 110.392 16.2466 114.003 16.2466C117.296 16.2466 120.164 17.0963 122.606 18.7957C125.102 20.4951 127.014 22.8849 128.342 25.9651C129.723 28.9922 130.413 32.5503 130.413 36.6396C130.413 40.5694 129.723 44.0479 128.342 47.075C127.014 50.049 125.102 52.3591 122.606 54.0054C120.164 55.6517 117.296 56.4749 114.003 56.4749ZM115.915 50.1021C118.145 50.1021 120.084 49.5179 121.73 48.3496C123.376 47.1281 124.678 45.5084 125.634 43.4903C126.589 41.4192 127.067 39.0559 127.067 36.4006C127.067 33.7452 126.589 31.4085 125.634 29.3905C124.678 27.3724 123.35 25.8058 121.651 24.6905C120.004 23.5222 118.066 22.938 115.835 22.938C113.499 22.938 111.427 23.5222 109.622 24.6905C107.869 25.8058 106.489 27.3724 105.48 29.3905C104.471 31.4085 103.966 33.7452 103.966 36.4006C103.966 39.0559 104.471 41.4192 105.48 43.4903C106.542 45.5084 107.949 47.1281 109.702 48.3496C111.507 49.5179 113.578 50.1021 115.915 50.1021Z" fill="#111827"/></svg>
+    </a>
+      <nav class="nav-links">
+        <a class="nav-item" href="#">Who It's For</a>
+        <div class="nav-item nav-has-drop" tabindex="0">
+          Platform
+          <svg class="icon" viewBox="0 0 256 256"><path d="M216.49,104.49l-80,80a12,12,0,0,1-17,0l-80-80a12,12,0,0,1,17-17L128,159l71.51-71.52a12,12,0,0,1,17,17Z"/></svg>
+          <div class="nav-drop">
+            <a href="#"><b>Brand Memory</b></a>
+            <a href="#"><b>Page Creation Engine</b></a>
+            <a href="#"><b>AI-First CMS</b></a>
+            <a href="#"><b>Leads Dashboard</b></a>
+            <a href="#"><b>Analytics</b></a>
+          </div>
+        </div>
+        <div class="nav-item nav-has-drop" tabindex="0">
+          Solutions
+          <svg class="icon" viewBox="0 0 256 256"><path d="M216.49,104.49l-80,80a12,12,0,0,1-17,0l-80-80a12,12,0,0,1,17-17L128,159l71.51-71.52a12,12,0,0,1,17,17Z"/></svg>
+          <div class="nav-drop">
+            <a href="#"><b>AI Search Agent</b><span>Get qualified leads from AI search engines.</span></a>
+            <a href="#"><b>Lead Conversion</b><span>Turn more visitors into qualified conversions.</span></a>
+            <a href="#"><b>Paid Boost</b><span>Generate qualified leads from paid campaigns.</span></a>
+          </div>
+        </div>
+        <a class="nav-item" href="#">Customers</a>
+        <a class="nav-item" href="#">Pricing</a>
+      </nav>
+      <div class="nav-actions">
+        <a class="btn btn--black btn--small nav-cta" href="#demo">Book a Demo</a>
+        <button class="nav-burger" id="burgerBtn" aria-label="Open menu" aria-expanded="false">
+          <svg class="icon" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z"/></svg>
+        </button>
+      </div>
+  </div>
+  <div class="nav-mobile" id="navMobile">
+    <a href="#">Who It's For</a>
+    <a href="#">Platform</a>
+    <a href="#">Solutions</a>
+    <a href="#">Customers</a>
+    <a href="#">Pricing</a>
+    <a class="btn btn--black" href="#demo">Book a Demo</a>
+  </div>
+</header>
+
+<!-- =========================================================================
+     HERO
+     ========================================================================= -->
+<section class="hero" id="heroInteractive">
+  <div class="wrap">
+    <div class="hero-text">
+      <span class="eyebrow">
+        Rated 4.5 on
+        <svg class="icon trustpilot-mark" viewBox="0 0 256 256"><path d="M234.29,114.85l-45,38.83L203,211.75a16.4,16.4,0,0,1-24.5,17.82L128,198.49,77.47,229.57A16.4,16.4,0,0,1,53,211.75l13.76-58.07-45-38.83A16.46,16.46,0,0,1,31.08,86l59-4.76,22.76-55.08a16.36,16.36,0,0,1,30.27,0l22.75,55.08,59,4.76a16.46,16.46,0,0,1,9.37,28.86Z"/></svg>
+        Trustpilot
+        <span class="caret-chip"><svg class="icon" viewBox="0 0 256 256"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg></span>
+      </span>
+      <h1><span class="grad">AI services</span> that run the<br>work, you run the business</h1>
+      <p class="body">We build the custom AI services your business needs and run them for you. You get the outcomes without hiring teams; the decisions stay yours.</p>
+      <div class="hero-cta-row">
+        <div class="hero-btn-group">
+          <a class="btn btn--black btn--people" href="#demo">
+            <span class="avatar-stack">
+              <img src="assets/avatar-cta-man.jpg" alt="">
+              <img src="assets/avatar-cta-woman.jpg" alt="">
+            </span>
+            Book a Demo
+            <svg class="icon" viewBox="0 0 256 256"><path d="M204,64V168a12,12,0,0,1-24,0V93L72.49,200.49a12,12,0,0,1-17-17L163,76H88a12,12,0,0,1,0-24H192A12,12,0,0,1,204,64Z"/></svg>
+          </a>
+        </div>
+        <p class="hero-subcta">Not sure? <u>Calculate ROI with us</u></p>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <!-- one shared tag for all three hover targets, clipped to the stage -->
+      <div class="hover-clip" id="heroHoverClip" aria-hidden="true">
+        <div class="hover-tag" id="heroHoverTag"></div>
+      </div>
+      <!-- .hero-stage owns the geometry .mock used to (max-width 1080, centred)
+           so the dashboard and the two floating cards are siblings sharing one
+           containing block, and each can be dragged on its own. -->
+      <div class="hero-stage">
+        <div class="mock hover-media" data-hover-tag="Systems created only for you">
+          <div class="mock-bar"><i></i><i></i><i></i></div>
+          <div class="mock-body">
+            <div class="mock-side">
+              <div>
+                <div class="mock-logo">
+                  <svg class="icon leaf" viewBox="0 0 256 256"><path d="M247.63,47.89a8,8,0,0,0-7.52-7.52c-51.76-3-93.32,12.74-111.18,42.22-11.8,19.49-11.78,43.16-.16,65.74a71.34,71.34,0,0,0-14.17,27L98.33,159c7.82-16.33,7.52-33.35-1-47.49-13.2-21.79-43.67-33.47-81.5-31.25a8,8,0,0,0-7.52,7.52c-2.23,37.83,9.46,68.3,31.25,81.5A45.82,45.82,0,0,0,63.44,176,54.58,54.58,0,0,0,87,170.33l25,25V224a8,8,0,0,0,16,0V194.51a55.61,55.61,0,0,1,12.27-35,73.91,73.91,0,0,0,33.31,8.4,60.9,60.9,0,0,0,31.83-8.86C234.89,141.21,250.67,99.65,247.63,47.89ZM47.81,155.6C32.47,146.31,23.79,124.32,24,96c28.32-.24,50.31,8.47,59.6,23.81,4.85,8,5.64,17.33,2.46,26.94L61.65,122.34a8,8,0,0,0-11.31,11.31l24.41,24.41C65.14,161.24,55.82,160.45,47.81,155.6Zm149.31-10.22c-13.4,8.11-29.15,8.73-45.15,2l53.69-53.7a8,8,0,0,0-11.31-11.31L140.65,136c-6.76-16-6.15-31.76,2-45.15,13.94-23,47-35.82,89.33-34.83C232.94,98.34,220.14,131.44,197.12,145.38Z"/></svg>
+                  <span><b>Your Company</b><span>Brand OS</span></span>
+                </div>
+                <div class="mock-nav-groups">
+                  <div class="mock-nav-group">
+                    <span>Overview</span>
+                    <div class="mock-nav-item on"><svg class="icon" viewBox="0 0 256 256"><path d="M224,200h-8V40a8,8,0,0,0-8-8H152a8,8,0,0,0-8,8V80H96a8,8,0,0,0-8,8v40H48a8,8,0,0,0-8,8v64H32a8,8,0,0,0,0,16H224a8,8,0,0,0,0-16ZM160,48h40V200H160ZM104,96h40V200H104ZM56,144H88v56H56Z"/></svg>Sales</div>
+                    <div class="mock-nav-item"><svg class="icon" viewBox="0 0 256 256"><path d="M117.25,157.92a60,60,0,1,0-66.5,0A95.83,95.83,0,0,0,3.53,195.63a8,8,0,1,0,13.4,8.74,80,80,0,0,1,134.14,0,8,8,0,0,0,13.4-8.74A95.83,95.83,0,0,0,117.25,157.92ZM40,108a44,44,0,1,1,44,44A44.05,44.05,0,0,1,40,108Zm210.14,98.7a8,8,0,0,1-11.07-2.33A79.83,79.83,0,0,0,172,168a8,8,0,0,1,0-16,44,44,0,1,0-16.34-84.87,8,8,0,1,1-5.94-14.85,60,60,0,0,1,55.53,105.64,95.83,95.83,0,0,1,47.22,37.71A8,8,0,0,1,250.14,206.7Z"/></svg>Team</div>
+                  </div>
+                  <div class="mock-nav-group">
+                    <span>Work</span>
+                    <div class="mock-nav-item"><svg class="icon" viewBox="0 0 256 256"><path d="M256,136a8,8,0,0,1-8,8H232v16a8,8,0,0,1-16,0V144H200a8,8,0,0,1,0-16h16V112a8,8,0,0,1,16,0v16h16A8,8,0,0,1,256,136Zm-57.87,58.85a8,8,0,0,1-12.26,10.3C165.75,181.19,138.09,168,108,168s-57.75,13.19-77.87,37.15a8,8,0,0,1-12.25-10.3c14.94-17.78,33.52-30.41,54.17-37.17a68,68,0,1,1,71.9,0C164.6,164.44,183.18,177.07,198.13,194.85ZM108,152a52,52,0,1,0-52-52A52.06,52.06,0,0,0,108,152Z"/></svg>Leads</div>
+                    <div class="mock-nav-item"><svg class="icon" viewBox="0 0 256 256"><path d="M230.14,58.87A8,8,0,0,0,224,56H62.68L56.6,22.57A8,8,0,0,0,48.73,16H24a8,8,0,0,0,0,16h18L67.56,172.29a24,24,0,0,0,5.33,11.27,28,28,0,1,0,44.4,8.44h45.42A27.75,27.75,0,0,0,160,204a28,28,0,1,0,28-28H91.17a8,8,0,0,1-7.87-6.57L80.13,152h116a24,24,0,0,0,23.61-19.71l12.16-66.86A8,8,0,0,0,230.14,58.87ZM104,204a12,12,0,1,1-12-12A12,12,0,0,1,104,204Zm96,0a12,12,0,1,1-12-12A12,12,0,0,1,200,204Zm4-74.57A8,8,0,0,1,196.1,136H77.22L65.59,72H214.41Z"/></svg>Orders</div>
+                  </div>
+                  <div class="mock-nav-group">
+                    <span>Reports</span>
+                    <div class="mock-nav-item"><svg class="icon" viewBox="0 0 256 256"><path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,16V158.75l-26.07-26.06a16,16,0,0,0-22.63,0l-20,20-44-44a16,16,0,0,0-22.62,0L40,149.37V56ZM40,172l52-52,80,80H40Zm176,28H194.63l-36-36,20-20L216,181.38V200ZM144,100a12,12,0,1,1,12,12A12,12,0,0,1,144,100Z"/></svg>Monthly Snapshot</div>
+                    <div class="mock-nav-item"><svg class="icon" viewBox="0 0 256 256"><path d="M117.25,157.92a60,60,0,1,0-66.5,0A95.83,95.83,0,0,0,3.53,195.63a8,8,0,1,0,13.4,8.74,80,80,0,0,1,134.14,0,8,8,0,0,0,13.4-8.74A95.83,95.83,0,0,0,117.25,157.92ZM40,108a44,44,0,1,1,44,44A44.05,44.05,0,0,1,40,108Zm210.14,98.7a8,8,0,0,1-11.07-2.33A79.83,79.83,0,0,0,172,168a8,8,0,0,1,0-16,44,44,0,1,0-16.34-84.87,8,8,0,1,1-5.94-14.85,60,60,0,0,1,55.53,105.64,95.83,95.83,0,0,1,47.22,37.71A8,8,0,0,1,250.14,206.7Z"/></svg>Customers</div>
+                  </div>
+                </div>
+              </div>
+              <div class="logout"><span>Log out</span><svg class="icon" viewBox="0 0 256 256"><path d="M120,216a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V40a8,8,0,0,1,8-8h64a8,8,0,0,1,0,16H56V208h56A8,8,0,0,1,120,216Zm109.66-93.66-40-40a8,8,0,0,0-11.32,11.32L204.69,120H112a8,8,0,0,0,0,16h92.69l-26.35,26.34a8,8,0,0,0,11.32,11.32l40-40A8,8,0,0,0,229.66,122.34Z"/></svg></div>
+            </div>
+            <div class="mock-main">
+              <div class="mock-topbar">
+                <div class="mock-tabs">
+                  <span class="mock-tab on"><svg class="icon" viewBox="0 0 256 256"><path d="M104,40H56A16,16,0,0,0,40,56v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V56A16,16,0,0,0,104,40Zm0,64H56V56h48v48Zm96-64H152a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V56A16,16,0,0,0,200,40Zm0,64H152V56h48v48Zm-96,32H56a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V152A16,16,0,0,0,104,136Zm0,64H56V152h48v48Zm96-64H152a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V152A16,16,0,0,0,200,136Zm0,64H152V152h48v48Z"/></svg>Dashboard</span>
+                  <span class="mock-tab"><svg class="icon" viewBox="0 0 256 256"><path d="M240,128a8,8,0,0,1-8,8H204.94l-37.78,75.58A8,8,0,0,1,160,216h-.4a8,8,0,0,1-7.08-5.14L95.35,60.76,63.28,131.31A8,8,0,0,1,56,136H24a8,8,0,0,1,0-16H50.85L88.72,36.69a8,8,0,0,1,14.76.46l57.51,151,31.85-63.71A8,8,0,0,1,200,120h32A8,8,0,0,1,240,128Z"/></svg>Activity</span>
+                  <span class="mock-tab"><svg class="icon" viewBox="0 0 256 256"><path d="M117.25,157.92a60,60,0,1,0-66.5,0A95.83,95.83,0,0,0,3.53,195.63a8,8,0,1,0,13.4,8.74,80,80,0,0,1,134.14,0,8,8,0,0,0,13.4-8.74A95.83,95.83,0,0,0,117.25,157.92ZM40,108a44,44,0,1,1,44,44A44.05,44.05,0,0,1,40,108Zm210.14,98.7a8,8,0,0,1-11.07-2.33A79.83,79.83,0,0,0,172,168a8,8,0,0,1,0-16,44,44,0,1,0-16.34-84.87,8,8,0,1,1-5.94-14.85,60,60,0,0,1,55.53,105.64,95.83,95.83,0,0,1,47.22,37.71A8,8,0,0,1,250.14,206.7Z"/></svg>Team</span>
+                  <span class="mock-tab"><svg class="icon" viewBox="0 0 256 256"><path d="M232,208a8,8,0,0,1-8,8H32a8,8,0,0,1-8-8V48a8,8,0,0,1,16,0V156.69l50.34-50.35a8,8,0,0,1,11.32,0L128,132.69,180.69,80H160a8,8,0,0,1,0-16h40a8,8,0,0,1,8,8v40a8,8,0,0,1-16,0V91.31l-58.34,58.35a8,8,0,0,1-11.32,0L96,123.31l-56,56V200H224A8,8,0,0,1,232,208Z"/></svg>Reports</span>
+                </div>
+                <div class="mock-actions">
+                  <span class="mock-iconbtn"><svg class="icon" viewBox="0 0 256 256"><path d="M224,48H32a8,8,0,0,0-8,8V192a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A8,8,0,0,0,224,48ZM203.43,64,128,133.15,52.57,64ZM216,192H40V74.19l82.59,75.71a8,8,0,0,0,10.82,0L216,74.19V192Z"/></svg></span>
+                  <span class="mock-iconbtn"><svg class="icon" viewBox="0 0 256 256"><path d="M221.8,175.94C216.25,166.38,208,139.33,208,104a80,80,0,1,0-160,0c0,35.34-8.26,62.38-13.81,71.94A16,16,0,0,0,48,200H88.81a40,40,0,0,0,78.38,0H208a16,16,0,0,0,13.8-24.06ZM128,216a24,24,0,0,1-22.62-16h45.24A24,24,0,0,1,128,216ZM48,184c7.7-13.24,16-43.92,16-80a64,64,0,1,1,128,0c0,36.05,8.28,66.73,16,80Z"/></svg></span>
+                  <div class="mock-user">
+                    <span class="av">JD</span>
+                    <span>John Doe</span>
+                    <svg class="icon" viewBox="0 0 256 256"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div class="mock-h1">Performance</div>
+                <p>Performance for Aug 2026</p>
+              </div>
+              <div class="mock-card">
+                <div class="mock-card-title">Overview and money coming</div>
+                <div class="mock-metrics">
+                  <div class="mock-metrics-stack">
+                    <div class="mock-metric"><i></i><i class="v"></i><i class="s"></i></div>
+                    <div class="mock-metric"><i></i><i class="v"></i><i class="s"></i></div>
+                    <div class="mock-metric"><i></i><i class="v"></i><i class="s"></i></div>
+                  </div>
+                  <div class="mock-chart-area">
+                    <div class="mock-chart">
+                      <div class="mock-bar-col"><b class="aug"></b><i></i></div>
+                      <div class="mock-bar-col"><b class="sep"></b><i></i></div>
+                    </div>
+                    <div class="mock-legend">
+                      <span><i class="a"></i><span class="mock-legend-bar"></span></span>
+                      <span><i class="b"></i><span class="mock-legend-bar"></span></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="mock-card">
+                <div class="mock-table-head">
+                  <b>Recent Activity</b>
+                  <span class="mock-viewall"><i></i><svg class="icon" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></span>
+                </div>
+                <div class="mock-table-row head"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                <div class="mock-table-row"><i></i><i class="dim"></i><i></i><span class="badge"></span><i class="dim"></i><i></i><span class="action"></span></div>
+                <div class="mock-table-row"><i></i><i class="dim"></i><i></i><span class="badge"></span><i class="dim"></i><i></i><span class="action"></span></div>
+                <div class="mock-table-row"><i></i><i class="dim"></i><i></i><span class="badge"></span><i class="dim"></i><i></i><span class="action"></span></div>
+                <div class="mock-table-row" style="border-top:none"><i></i><i class="dim"></i><i></i><span class="badge"></span><i class="dim"></i><i></i><span class="action"></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+          <div class="mock-toast hover-media" data-hover-tag="Get leads on autopilot">
+            <div class="head">
+              <span class="who">
+                <span class="mark"><svg class="icon" viewBox="0 0 80 80"><path d="M76.6088 4.56344C77.5025 2.36058 75.8495 0 73.4723 0H9.14286C4.0934 0 0 4.0934 0 9.14286V66.7778C0 72.018 5.17081 75.6829 9.9603 73.5568C40.8494 59.8449 64.3785 34.7075 76.6088 4.56344Z"/><path d="M32.5161 80C31.4022 80 30.9357 78.5531 31.8259 77.8835C54.9007 60.5265 71.4338 35.8047 78.7658 8.0522C78.9403 7.39154 80 7.51618 80 8.19951V70.8571C80 75.9066 75.9066 80 70.8571 80H32.5161Z"/></svg></span>
+                <b>GUSHWORK</b>
+              </span>
+              <time>1h ago</time>
+            </div>
+            <p>Liam Carter from VertexCo filled the form.</p>
+            <span>Contact now!</span>
+          </div>
+
+          <div class="mock-chat hover-media" data-hover-tag="Show up in your buyer searches">
+            <div class="content">
+              <div class="msg">
+                <span class="avatar avatar--buyer"></span>
+                <div class="msg-text"><b>Your Buyer</b><p>best cable manufacturers in california, specifically for heavy use</p></div>
+              </div>
+              <div class="msg">
+                <span class="avatar avatar--bot"><img src="assets/icon-openai-mark.svg" alt="ChatGPT" width="16" height="16"></span>
+                <div class="msg-text">
+                  <b>ChatGPT</b>
+                  <p>Sure! Here are some of the best cable manufactures in California area:</p>
+                  <ul class="list">
+                    <li class="hl">Your Company</li>
+                    <li>South Way Cable</li>
+                    <li>Cornerz Cable</li>
+                    <li>California Insulated Wire Co.</li>
+                    <li>M.V. Cables</li>
+                    <li>California Wires &amp; Cables</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="fade"></div>
+            <div class="input-row">
+              <span>Ask anything</span>
+              <span class="send"><svg class="icon" viewBox="0 0 256 256"><path d="M205.66,117.66a8,8,0,0,1-11.32,0L136,59.31V216a8,8,0,0,1-16,0V59.31L61.66,117.66a8,8,0,0,1-11.32-11.32l72-72a8,8,0,0,1,11.32,0l72,72A8,8,0,0,1,205.66,117.66Z"/></svg></span>
+            </div>
+          </div>
+      </div>
+
+      <div class="ticker">
+        <div class="ticker-lede">
+          <svg class="ticker-dots" aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="11.0771" y="15.9981" width="4.92282" height="4.92282" rx="0.615353" transform="rotate(-90 11.0771 15.9981)" fill="#66A9FF"/>
+<rect x="5.53857" y="10.4614" width="4.92282" height="4.92282" rx="0.615353" transform="rotate(-90 5.53857 10.4614)" fill="#66A9FF"/>
+<rect x="11.0771" y="4.92284" width="4.92282" height="4.92282" rx="0.615353" transform="rotate(-90 11.0771 4.92284)" fill="#66A9FF"/>
+<rect x="6.99296e-07" y="15.9981" width="4.92282" height="4.92282" rx="0.615353" transform="rotate(-90 6.99296e-07 15.9981)" fill="#66A9FF"/>
+<rect x="6.99296e-07" y="4.92284" width="4.92282" height="4.92282" rx="0.615353" transform="rotate(-90 6.99296e-07 4.92284)" fill="#66A9FF"/>
+</svg>
+          <span class="ticker-label">Agents working 24/7</span>
+        </div>
+        <span class="ticker-rule"></span>
+        <div class="ticker-scroll">
+          <div class="ticker-track">
+            <span class="ticker-stat"><span class="ticker-label">Quotes sent today</span><span class="ticker-chip">1,204</span></span>
+            <span class="ticker-stat"><span class="ticker-label">Invoices raised</span><span class="ticker-chip">3,880</span></span>
+            <span class="ticker-stat"><span class="ticker-label">Leads qualified</span><span class="ticker-chip">566</span></span>
+            <span class="ticker-stat"><span class="ticker-label">Orders moved</span><span class="ticker-chip">742</span></span>
+            <span class="ticker-stat"><span class="ticker-label">Tickets closed</span><span class="ticker-chip">912</span></span>
+            <span class="ticker-stat"><span class="ticker-label">Quotes sent today</span><span class="ticker-chip">1,204</span></span>
+            <span class="ticker-stat"><span class="ticker-label">Invoices raised</span><span class="ticker-chip">3,880</span></span>
+            <span class="ticker-stat"><span class="ticker-label">Leads qualified</span><span class="ticker-chip">566</span></span>
+            <span class="ticker-stat"><span class="ticker-label">Orders moved</span><span class="ticker-chip">742</span></span>
+            <span class="ticker-stat"><span class="ticker-label">Tickets closed</span><span class="ticker-chip">912</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-band">
+        <div class="stat-row">
+          <div class="stat-card"><b>$800/mo</b><span>Starting Price</span></div>
+          <div class="stat-card"><b>100K</b><span>Page Generated</span></div>
+          <div class="stat-card"><b>$10M+</b><span>Revenue Influenced</span></div>
+        </div>
+        <div class="trusted-label">Trusted by 1000+ clients worldwide</div>
+        <div class="trust-row">
+          <div class="logo-grid" id="logoGrid">
+            <div class="logo-card" data-idx="0">
+              <img src="assets/logo-vantage.png" alt="Vantage">
+              <span class="plus-badge"><svg class="icon" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg></span>
+              <div class="reveal reveal--stat"><div class="reveal-num"></div><div class="reveal-label"></div><a class="reveal-link" href="#">View case study<svg class="icon" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a></div>
+            </div>
+            <div class="logo-card" data-idx="1">
+              <img src="assets/logo-respect.svg" alt="Respect Manufacturing">
+              <span class="plus-badge"><svg class="icon" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg></span>
+              <div class="reveal reveal--quote"><div class="reveal-skel"></div><div class="reveal-skel"></div><div class="reveal-skel"></div><a class="reveal-link" href="#">View case study<svg class="icon" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a></div>
+            </div>
+            <div class="logo-card" data-idx="2">
+              <img src="assets/logo-fiama.png" alt="Fiama">
+              <span class="plus-badge"><svg class="icon" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg></span>
+              <div class="reveal reveal--stat"><div class="reveal-num"></div><div class="reveal-label"></div><a class="reveal-link" href="#">View case study<svg class="icon" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a></div>
+            </div>
+            <div class="logo-card" data-idx="3">
+              <img src="assets/logo-meridian.svg" alt="Meridian">
+              <span class="plus-badge"><svg class="icon" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg></span>
+              <div class="reveal reveal--quote"><div class="reveal-skel"></div><div class="reveal-skel"></div><div class="reveal-skel"></div><a class="reveal-link" href="#">View case study<svg class="icon" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a></div>
+            </div>
+            <div class="logo-card" data-idx="4">
+              <img src="assets/logo-zoho.png" alt="Zoho">
+              <span class="plus-badge"><svg class="icon" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg></span>
+              <div class="reveal reveal--stat"><div class="reveal-num"></div><div class="reveal-label"></div><a class="reveal-link" href="#">View case study<svg class="icon" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a></div>
+            </div>
+            <div class="logo-card" data-idx="5">
+              <img src="assets/logo-mjplastics.svg" alt="MJ Plastics">
+              <span class="plus-badge"><svg class="icon" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg></span>
+              <div class="reveal reveal--quote"><div class="reveal-skel"></div><div class="reveal-skel"></div><div class="reveal-skel"></div><a class="reveal-link" href="#">View case study<svg class="icon" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a></div>
+            </div>
+            <div class="logo-card" data-idx="6">
+              <img src="assets/logo-trashtruckrental.svg" alt="TrashTruckRental.com">
+              <span class="plus-badge"><svg class="icon" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg></span>
+              <div class="reveal reveal--stat"><div class="reveal-num"></div><div class="reveal-label"></div><a class="reveal-link" href="#">View case study<svg class="icon" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a></div>
+            </div>
+            <div class="logo-card" data-idx="7">
+              <img src="assets/logo-tossabledigits.svg" alt="Tossable Digits">
+              <span class="plus-badge"><svg class="icon" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg></span>
+              <div class="reveal reveal--quote"><div class="reveal-skel"></div><div class="reveal-skel"></div><div class="reveal-skel"></div><a class="reveal-link" href="#">View case study<svg class="icon" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a></div>
+            </div>
+          </div>
+          <div class="video-card">
+            <img src="assets/photo-ryan-cimo.jpg" alt="Ryan Cimo, Fraxtional">
+            <div class="scrim"></div>
+            <span class="play"><svg class="icon" viewBox="0 0 256 256"><path d="M204,64V168a12,12,0,0,1-24,0V93L72.49,200.49a12,12,0,0,1-17-17L163,76H88a12,12,0,0,1,0-24H192A12,12,0,0,1,204,64Z"/></svg></span>
+            <div class="content">
+              <img class="badge-logo" src="assets/logo-fraxtional-badge.svg" alt="Fraxtional">
+              <span class="stat"><b>40+ Leads</b><span>Generated per month</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================================
+     FOLD SHELL — every fold from here through the reviews grid sits inside
+     ONE shared white rounded card (Figma node 197:17998: fill white,
+     radius-20, shadow-s4, 1px neutral-100 border). Confirmed by inspecting
+     the raw node paint, not the flattened per-fold codegen output.
+     ========================================================================= -->
+<div class="fold-shell">
+
+<!-- =========================================================================
+     CARDS GRID — Tell us what your business needs, we build the AI for it
+     ========================================================================= -->
+<section class="section">
+  <div class="wrap">
+    <h2 class="cg-heading">
+      Tell us what your business<br>needs, <span class="grad">we build the AI</span> for it
+    </h2>
+    <div class="cg-grid">
+      <div class="cg-card">
+        <div class="cg-head">
+          <div class="cg-title-row"><h3>Lead Engine</h3><span class="cg-badge">AEO</span></div>
+          <p>Get found across AI search and Google with qualified leads piped to your inbox.</p>
+        </div>
+        <div class="cg-preview"><img src="assets/cards-01-lead-engine.png" alt=""></div>
+      </div>
+      <div class="cg-card">
+        <div class="cg-head">
+          <div class="cg-title-row"><h3>Lead Management</h3><span class="cg-badge">CSM</span></div>
+          <p>Capture, qualify, and route every inbound lead, so none slips through the cracks.</p>
+        </div>
+        <div class="cg-preview"><img src="assets/cards-05-lead-management.png" alt=""></div>
+      </div>
+      <div class="cg-card">
+        <div class="cg-head">
+          <div class="cg-title-row"><h3>Resource Planning</h3><span class="cg-badge">ERP</span></div>
+          <p>Orders, inventory, invoicing, and collections in one place, without the spreadsheet relay.</p>
+        </div>
+        <div class="cg-preview"><img src="assets/cards-03-resource-planning.png" alt=""></div>
+      </div>
+      <div class="cg-card">
+        <div class="cg-head">
+          <div class="cg-title-row"><h3>Client Support</h3><span class="cg-badge">CSM</span></div>
+          <p>Onboard, support, renew, and grow accounts, with full context.</p>
+        </div>
+        <div class="cg-preview"><img src="assets/cards-04-client-support.png" alt=""></div>
+      </div>
+      <div class="cg-card">
+        <div class="cg-head">
+          <div class="cg-title-row"><h3>Customer Relations</h3><span class="cg-badge">CRM</span></div>
+          <p>Qualify, follow up, quote, and track every deal, so nothing hot goes cold.</p>
+        </div>
+        <div class="cg-preview"><img src="assets/cards-02-customer-relations.png" alt=""></div>
+      </div>
+      <div class="cg-card cg-card--blank">
+        <div class="cg-head">
+          <h3>Something else?</h3>
+          <p>If your business needs it, we can build it.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================================
+     TABS + VIDEO — Built to your business, run by us
+     ========================================================================= -->
+<section class="section">
+  <div class="wrap">
+    <div class="hd hd--wide">
+      <h2>Built to your business, run by us</h2>
+      <p>From a first call to a working system in weeks, not months. No yearlong project, no new hires, no team to manage — we build it to fit your business, run it, and keep improving it.</p>
+    </div>
+    <div class="tabs-row" id="tabsRow">
+      <button class="tab is-active" data-tab="0">
+        <span class="tab-label">We get brand context</span>
+        <span class="tab-track"><span class="tab-fill"></span></span>
+      </button>
+      <button class="tab" data-tab="1">
+        <span class="tab-label">We build it for you</span>
+        <span class="tab-track"><span class="tab-fill"></span></span>
+      </button>
+      <button class="tab" data-tab="2">
+        <span class="tab-label">We run it all</span>
+        <span class="tab-track"><span class="tab-fill"></span></span>
+      </button>
+      <button class="tab" data-tab="3">
+        <span class="tab-label">It compounds</span>
+        <span class="tab-track"><span class="tab-fill"></span></span>
+      </button>
+    </div>
+    <div class="tabs-video">
+      <svg class="icon" viewBox="0 0 256 256"><path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,160H40V56H216V200ZM172.28,118.87l-56-32A8,8,0,0,0,104,93.71v64.58a8,8,0,0,0,12.28,6.84l56-32a8,8,0,0,0,0-13.68ZM120,144.57v-33.14L148.44,128Z"/></svg>
+      <p class="tabs-caption" id="tabsCaption">Understanding your products, pricing, buyers, and workflows.</p>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================================
+     COMPARISON — Software gives you tools, we give you outcomes
+     ========================================================================= -->
+<section class="section">
+  <div class="wrap">
+    <div class="hd cmp-heading">
+      <h2>Software gives you tools,<br>we give you outcomes</h2>
+    </div>
+    <div class="cmp-cols">
+      <div class="cmp-card">
+        <div class="cmp-head"><h3>The old way</h3></div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-tag">Setup</span><span class="cmp-val">You wire tools together, or hire an agency for months</span></div>
+          <div class="cmp-row"><span class="cmp-tag">Who runs it</span><span class="cmp-val">You do — or your team, after a handoff</span></div>
+          <div class="cmp-row"><span class="cmp-tag">Gets better over time</span><span class="cmp-val">No</span></div>
+          <div class="cmp-row"><span class="cmp-tag">You stay in control</span><span class="cmp-val">On your own, or left guessing</span></div>
+          <div class="cmp-row"><span class="cmp-tag">You get</span><span class="cmp-val">Tools and invoices to manage</span></div>
+        </div>
+      </div>
+      <div class="cmp-card cmp-card--right">
+        <div class="cmp-head">
+          <span class="cmp-mark"><img src="assets/compare-gushwork-icon.svg" alt=""></span>
+          <h3>Gushwork way</h3>
+        </div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-tag">Setup</span><span class="cmp-val">We build it, in weeks</span></div>
+          <div class="cmp-row"><span class="cmp-tag">Who runs it</span><span class="cmp-val">We do</span></div>
+          <div class="cmp-row"><span class="cmp-tag">Gets better over time</span><span class="cmp-val">Yes — shared memory</span></div>
+          <div class="cmp-row"><span class="cmp-tag">You stay in control</span><span class="cmp-val">Review and approve; humans in the loop</span></div>
+          <div class="cmp-row"><span class="cmp-tag">You get</span><span class="cmp-val">Outcomes</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================================
+     TESTIMONIAL ROW + AUTOPILOT PANEL — See what changes when Gushwork
+     starts running
+     ========================================================================= -->
+<section class="section">
+  <div class="wrap">
+    <div class="hd">
+      <h2>See what changes when Gushwork starts running</h2>
+      <p>Real outcomes from businesses that stopped stitching tools together and let one AI system run the work, from first touch to closed deal and beyond.</p>
+    </div>
+
+    <!-- Card / Testimonial's "Expanded" property (cards.md): clicking a
+         narrow card expands it and collapses whichever was wide. Every card
+         carries the same quote+photo structure now (previously only the
+         hard-coded wide card had one); Greg Jones' and Stephanie Snyder's
+         quotes reuse their real reviews already sourced for the "Love from
+         our customers" grid below — the actual Figma instances for these
+         two cards have no quote/signature authored at all (verified via the
+         plugin API: only a hidden "Play Video" label, no quote frame), so
+         there's no dedicated copy to pull instead of that real, already-
+         vetted content. -->
+    <div class="tm-row" id="tmRow">
+      <div class="tm-card is-wide" data-card="ryan">
+        <div class="tm-quote">
+          <p>“Customer flow went from relatively unpredictable to predictable. I now get two to three to four incoming opportunities a week.”</p>
+          <span class="tm-sig">Ryan Cimo</span>
+        </div>
+        <div class="tm-photo">
+          <img src="assets/photo-ryan-cimo.jpg" alt="Ryan Cimo">
+          <div class="scrim"></div>
+          <span class="play"><svg class="icon" viewBox="0 0 256 256"><path d="M232.4,114.49,88.32,26.35a16,16,0,0,0-16.2-.3A15.86,15.86,0,0,0,64,39.87V216.13A15.94,15.94,0,0,0,80,232a16.07,16.07,0,0,0,8.36-2.35L232.4,141.51a15.81,15.81,0,0,0,0-27ZM80,215.94V40l143.83,88Z"/></svg><span class="play-label">Play Video</span></span>
+          <div class="tm-meta"><b>Ryan Cimo, CEO &amp; Founder</b><span>Fraxtional</span></div>
+        </div>
+      </div>
+      <div class="tm-card" data-card="greg">
+        <div class="tm-quote">
+          <p>“Gushwork is like having an entire marketing team in a single dashboard. They get you inbound leads on your website & it's magical!”</p>
+          <span class="tm-sig">Greg Jones</span>
+        </div>
+        <div class="tm-photo">
+          <img src="assets/photo-greg-jones.jpg" alt="Greg Jones">
+          <div class="scrim"></div>
+          <span class="play"><svg class="icon" viewBox="0 0 256 256"><path d="M232.4,114.49,88.32,26.35a16,16,0,0,0-16.2-.3A15.86,15.86,0,0,0,64,39.87V216.13A15.94,15.94,0,0,0,80,232a16.07,16.07,0,0,0,8.36-2.35L232.4,141.51a15.81,15.81,0,0,0,0-27ZM80,215.94V40l143.83,88Z"/></svg><span class="play-label">Play Video</span></span>
+          <div class="tm-meta"><b>Greg Jones, President</b><span>Midwest Power Products</span></div>
+        </div>
+      </div>
+      <div class="tm-card" data-card="stephanie">
+        <div class="tm-quote">
+          <p>“Gushwork has saved me time, money and a whole lot of headaches.”</p>
+          <span class="tm-sig">Stephanie Snyder</span>
+        </div>
+        <div class="tm-photo">
+          <img src="assets/photo-stephanie-snyder.jpg" alt="Stephanie Snyder">
+          <div class="scrim"></div>
+          <span class="play"><svg class="icon" viewBox="0 0 256 256"><path d="M232.4,114.49,88.32,26.35a16,16,0,0,0-16.2-.3A15.86,15.86,0,0,0,64,39.87V216.13A15.94,15.94,0,0,0,80,232a16.07,16.07,0,0,0,8.36-2.35L232.4,141.51a15.81,15.81,0,0,0,0-27ZM80,215.94V40l143.83,88Z"/></svg><span class="play-label">Play Video</span></span>
+          <div class="tm-meta"><b>Stephanie Snyder, Manager</b><span>Source Equipment</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ap-panel">
+      <div class="ap-intro">
+        <p><b>Your Marketing Team on Autopilot.</b> Gushwork replaces scattered tools, manual coordination, and constant task management with one AI system that keeps running.</p>
+        <svg class="icon" viewBox="0 0 256 256"><path d="M219.71,117.38a12,12,0,0,0-7.25-8.52L161.28,88.39l10.59-70.61a12,12,0,0,0-20.64-10l-112,120a12,12,0,0,0,4.31,19.33l51.18,20.47L84.13,238.22a12,12,0,0,0,20.64,10l112-120A12,12,0,0,0,219.71,117.38ZM113.6,203.55l6.27-41.77a12,12,0,0,0-7.41-12.92L68.74,131.37,142.4,52.45l-6.27,41.77a12,12,0,0,0,7.41,12.92l43.72,17.49Z"/></svg>
+      </div>
+      <div class="ap-cols">
+        <div class="ap-col"><h4>No new marketing hires</h4><p>Run more marketing work without hiring a full-fledged team or an agency.</p></div>
+        <div class="ap-col"><h4>No scattered tool stack</h4><p>Avoid stitching together research tools, content tools, website tools, analytics tools, and automation software.</p></div>
+        <div class="ap-col"><h4>No constant coordination</h4><p>The agents keep working in the background, so your team is not stuck briefing, checking, and chasing every task.</p></div>
+        <div class="ap-col"><h4>Outcome-focused</h4><p>Gushwork focuses on business outcomes, not charts that never become real buyer conversations.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================================
+     REVIEWS — Love from our customers
+     ========================================================================= -->
+<section class="section">
+  <div class="wrap">
+    <div class="hd">
+      <h2>Love from our customers</h2>
+      <p>Gushwork is a single AI growth system with specialized agents that work together in the background, so you do not need to manage every task, channel, or workflow.</p>
+    </div>
+
+    <div class="rv-wrap" id="rvWrap">
+      <div class="rv-cols">
+        <div class="rv-col">
+          <div class="rv-card">
+            <div class="rv-head"><img src="assets/avatar-reviews-01-sindi-holmlund.png" alt="" width="64" height="48"><span class="rv-who"><b>Sindi Holmlund</b><span>Owner, Poison Free Private Label</span></span></div>
+            <p>After spending thousands on ads that mostly brought &lsquo;tire kickers,&rsquo; I started with Gushwork and began receiving QUALIFIED leads within the first month. Unlike other channels, these leads are making orders and turning into new accounts. This company is worth the money, and I highly recommend them if you want more customers for your business.</p>
+          </div>
+          <div class="rv-card rv-card--feat">
+            <div class="rv-head"><img src="assets/avatar-reviews-02-stephanie-snyder.png" alt="" width="64" height="48"><span class="rv-who"><b>Stephanie Snyder</b><span>Owner, Source Equipment</span></span></div>
+            <p>Gushwork has saved me time, money and a whole lot of headaches.</p>
+          </div>
+          <div class="rv-card">
+            <div class="rv-head"><img src="assets/avatar-reviews-03-ishay-tentser.png" alt="" width="64" height="48"><span class="rv-who"><b>Ishay Tentser</b><span>CEO &amp; Co-Founder, Timelines</span></span></div>
+            <p>Always happy to work with the Gushwork Team. They are real marketing ninjas and an integral part of our team. I see them as a valuable partner for our growth.</p>
+          </div>
+          <div class="rv-card">
+            <div class="rv-head"><img src="assets/avatar-reviews-04-david-eldridge.png" alt="" width="64" height="48"><span class="rv-who"><b>David Eldridge</b><span>Co-Owner, Percy&rsquo;s Lawn Care</span></span></div>
+            <p>I am loving the teamwork! It seems we all got a common goal. It&rsquo;s a pleasure working with y&rsquo;all.</p>
+          </div>
+          <div class="rv-card rv-card--more">
+            <div class="rv-head"><img src="assets/avatar-reviews-09-greg-jones.png" alt="" width="64" height="48"><span class="rv-who"><b>Greg Jones</b><span>President, Midwest Power Products</span></span></div>
+            <p>Gushwork is like having an entire marketing team in a single dashboard. They get you inbound leads on your website &amp; it&rsquo;s magical!</p>
+          </div>
+          <div class="rv-card rv-card--more">
+            <div class="rv-head"><img src="assets/avatar-reviews-10-alexis-jones.png" alt="" width="64" height="48"><span class="rv-who"><b>Alexis Jones</b><span>VP Sales &amp; Marketing, Respect Manufacturing</span></span></div>
+            <p>You are amazing, we will have to hire more sales at this wonderful rate!</p>
+          </div>
+          <div class="rv-card rv-card--more">
+            <div class="rv-head"><img src="assets/avatar-reviews-11-abhijith-hk.png" alt="" width="64" height="48"><span class="rv-who"><b>Abhijith HK</b><span>Founder &amp; CEO, Codewave</span></span></div>
+            <p>From the start, their approach was a breath of fresh air. They didn&rsquo;t come in with cookie-cutter solutions but took the time to understand what really mattered &mdash; driving traffic and generating qualified leads.</p>
+          </div>
+          <div class="rv-card rv-card--more">
+            <div class="rv-head"><img src="assets/avatar-reviews-05-ryan-cimo.png" alt="" width="64" height="48"><span class="rv-who"><b>Ryan Cimo</b><span>CEO &amp; Founder, Fraxtional</span></span></div>
+            <p>The leads keep rolling in! You all are doing amazing work. Just landed two contracts from people finding us online. Total contract values of $150,000.</p>
+          </div>
+        </div>
+        <div class="rv-col">
+          <div class="rv-card">
+            <div class="rv-head"><img src="assets/avatar-reviews-05-ryan-cimo.png" alt="" width="64" height="48"><span class="rv-who"><b>Ryan Cimo</b><span>CEO &amp; Founder, Fraxtional</span></span></div>
+            <p>The leads keep rolling in! You all are doing amazing work. Just landed two contracts from people finding us online. Total contract values of $150,000.</p>
+          </div>
+          <div class="rv-card">
+            <div class="rv-head"><img src="assets/avatar-reviews-06-jeff-divorse.png" alt="" width="64" height="48"><span class="rv-who"><b>Jeff Divorse</b><span>Owner, John Maye Company</span></span></div>
+            <p>10-12 leads in the second month and it went up from that point now we have more than 120+ qualified leads in 4 months.</p>
+          </div>
+          <div class="rv-card">
+            <div class="rv-head"><img src="assets/avatar-reviews-07-prana.png" alt="" width="64" height="48"><span class="rv-who"><b>Prana</b><span>Founder, The Sound Artist</span></span></div>
+            <p>Gushwork is one of the best growth partners I have come across. They have taken complete ownership of my website. Their AI stack with efficient human workforce is helping me double my traffic every 2 months, especially localized traffic. I look at them as an integral part of my team!</p>
+          </div>
+          <div class="rv-card">
+            <div class="rv-head"><img src="assets/avatar-reviews-08-vignesh-ramalingam.png" alt="" width="64" height="48"><span class="rv-who"><b>Vignesh Ramalingam</b><span>Marketing Leader, Field Drive</span></span></div>
+            <p>People seeing our full range of features, from facial recognition to real-time analytics, and it&rsquo;s leading to meaningful partnerships across the globe. This growth in visibility is exactly what we were aiming for.</p>
+          </div>
+          <div class="rv-card rv-card--more">
+            <div class="rv-head"><img src="assets/avatar-reviews-01-sindi-holmlund.png" alt="" width="64" height="48"><span class="rv-who"><b>Sindi Holmlund</b><span>Owner, Poison Free Private Label</span></span></div>
+            <p>After spending thousands on ads that mostly brought &lsquo;tire kickers,&rsquo; I started with Gushwork and began receiving QUALIFIED leads within the first month. Unlike other channels, these leads are making orders and turning into new accounts. This company is worth the money, and I highly recommend them if you want more customers for your business.</p>
+          </div>
+          <div class="rv-card rv-card--more">
+            <div class="rv-head"><img src="assets/avatar-reviews-02-stephanie-snyder.png" alt="" width="64" height="48"><span class="rv-who"><b>Stephanie Snyder</b><span>Owner, Source Equipment</span></span></div>
+            <p>Gushwork has saved me time, money and a whole lot of headaches.</p>
+          </div>
+          <div class="rv-card rv-card--more">
+            <div class="rv-head"><img src="assets/avatar-reviews-03-ishay-tentser.png" alt="" width="64" height="48"><span class="rv-who"><b>Ishay Tentser</b><span>CEO &amp; Co-Founder, Timelines</span></span></div>
+            <p>Always happy to work with the Gushwork Team. They are real marketing ninjas and an integral part of our team. I see them as a valuable partner for our growth.</p>
+          </div>
+          <div class="rv-card rv-card--more">
+            <div class="rv-head"><img src="assets/avatar-reviews-04-david-eldridge.png" alt="" width="64" height="48"><span class="rv-who"><b>David Eldridge</b><span>Co-Owner, Percy&rsquo;s Lawn Care</span></span></div>
+            <p>I am loving the teamwork! It seems we all got a common goal. It&rsquo;s a pleasure working with y&rsquo;all.</p>
+          </div>
+        </div>
+        <div class="rv-col">
+          <div class="rv-card">
+            <div class="rv-head"><img src="assets/avatar-reviews-07-prana.png" alt="" width="64" height="48"><span class="rv-who"><b>Prana</b><span>Founder, The Sound Artist</span></span></div>
+            <p>Gushwork is one of the best growth partners I have come across. They have taken complete ownership of my website. Their AI stack with efficient human workforce is helping me double my traffic every 2 months, especially localized traffic. I look at them as an integral part of my team!</p>
+          </div>
+          <div class="rv-card">
+            <div class="rv-head"><img src="assets/avatar-reviews-09-greg-jones.png" alt="" width="64" height="48"><span class="rv-who"><b>Greg Jones</b><span>President, Midwest Power Products</span></span></div>
+            <p>Gushwork is like having an entire marketing team in a single dashboard. They get you inbound leads on your website &amp; it&rsquo;s magical!</p>
+          </div>
+          <div class="rv-card">
+            <div class="rv-head"><img src="assets/avatar-reviews-10-alexis-jones.png" alt="" width="64" height="48"><span class="rv-who"><b>Alexis Jones</b><span>VP Sales &amp; Marketing, Respect Manufacturing</span></span></div>
+            <p>You are amazing, we will have to hire more sales at this wonderful rate!</p>
+          </div>
+          <div class="rv-card">
+            <div class="rv-head"><img src="assets/avatar-reviews-11-abhijith-hk.png" alt="" width="64" height="48"><span class="rv-who"><b>Abhijith HK</b><span>Founder &amp; CEO, Codewave</span></span></div>
+            <p>From the start, their approach was a breath of fresh air. They didn&rsquo;t come in with cookie-cutter solutions but took the time to understand what really mattered &mdash; driving traffic and generating qualified leads.</p>
+          </div>
+          <div class="rv-card rv-card--more">
+            <div class="rv-head"><img src="assets/avatar-reviews-06-jeff-divorse.png" alt="" width="64" height="48"><span class="rv-who"><b>Jeff Divorse</b><span>Owner, John Maye Company</span></span></div>
+            <p>10-12 leads in the second month and it went up from that point now we have more than 120+ qualified leads in 4 months.</p>
+          </div>
+          <div class="rv-card rv-card--more">
+            <div class="rv-head"><img src="assets/avatar-reviews-08-vignesh-ramalingam.png" alt="" width="64" height="48"><span class="rv-who"><b>Vignesh Ramalingam</b><span>Marketing Leader, Field Drive</span></span></div>
+            <p>People seeing our full range of features, from facial recognition to real-time analytics, and it&rsquo;s leading to meaningful partnerships across the globe. This growth in visibility is exactly what we were aiming for.</p>
+          </div>
+          <div class="rv-card rv-card--more">
+            <div class="rv-head"><img src="assets/avatar-reviews-05-ryan-cimo.png" alt="" width="64" height="48"><span class="rv-who"><b>Ryan Cimo</b><span>CEO &amp; Founder, Fraxtional</span></span></div>
+            <p>The leads keep rolling in! You all are doing amazing work. Just landed two contracts from people finding us online. Total contract values of $150,000.</p>
+          </div>
+          <div class="rv-card rv-card--more">
+            <div class="rv-head"><img src="assets/avatar-reviews-01-sindi-holmlund.png" alt="" width="64" height="48"><span class="rv-who"><b>Sindi Holmlund</b><span>Owner, Poison Free Private Label</span></span></div>
+            <p>After spending thousands on ads that mostly brought &lsquo;tire kickers,&rsquo; I started with Gushwork and began receiving QUALIFIED leads within the first month. Unlike other channels, these leads are making orders and turning into new accounts. This company is worth the money, and I highly recommend them if you want more customers for your business.</p>
+          </div>
+        </div>
+      </div>
+      <div class="rv-fade">
+        <button class="rv-more" id="rvMoreBtn" aria-expanded="false">Show more</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div><!-- /.fold-shell -->
+
+<!-- =========================================================================
+     FOOTER — ported verbatim from gushwork-design's
+     skills/gushwork-web/templates/case-study/case-study.html
+     (case-study-bulk-gen-and-og branch), per Utsav's instruction. No CTA
+     slot in this version — see the CSS block's header comment.
+     ========================================================================= -->
+<footer class="cs-footer">
+  <div class="cs-cta">
+    <div class="cs-cta-content">
+      <div class="cs-cta-left">
+        <div class="cs-cta-copy">
+          <h2>How much could you grow<br>if the work ran itself?</h2>
+          <p>Gushwork builds the AI services your business needs — leads, sales, operations, support — then runs them for you, with human experts in the loop. Book a demo and we'll show you your own business running on it.</p>
+        </div>
+        <div class="cs-cta-btns">
+          <a class="btn btn--white" href="#demo">Book a Demo
+            <svg class="icon" viewBox="0 0 256 256"><path d="M204,64V168a12,12,0,0,1-24,0V93L72.49,200.49a12,12,0,0,1-17-17L163,76H88a12,12,0,0,1,0-24H192A12,12,0,0,1,204,64Z"/></svg>
+          </a>
+          <a class="btn btn--outline-white" href="#roi">Calculate ROI with Gushwork</a>
+        </div>
+      </div>
+      <div class="cs-cta-right" aria-hidden="true" id="ctaIllustration"></div>
+    </div>
+  </div>
+  <div class="cs-footer-inner">
+    <div class="cs-footer-main">
+      <div class="cs-footer-cols">
+        <div class="cs-footer-col">
+          <h4>Platform</h4>
+          <div class="cs-footer-list">
+            <a href="#">Brand Memory</a>
+            <a href="#">Page Creation Engine</a>
+            <a href="#">AI-First CMS</a>
+            <a href="#">Leads Dashboard</a>
+            <a href="#">Analytics</a>
+          </div>
+        </div>
+        <div class="cs-footer-col">
+          <h4>Solutions</h4>
+          <div class="cs-footer-list">
+            <a href="#">AI Search Agent</a>
+            <a href="#">Lead Conversion</a>
+            <a href="#">Paid Boost</a>
+          </div>
+        </div>
+        <div class="cs-footer-col">
+          <h4>Company</h4>
+          <div class="cs-footer-list">
+            <a href="#">Pricing</a>
+            <a href="#">Customers</a>
+            <a href="#">Careers</a>
+            <a href="#">Announcements</a>
+            <a href="#">Alternatives</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="cs-footer-comp">
+        <div class="cs-footer-addr-row">
+          <div class="cs-footer-addr-col">
+            <p>Gushwork, Regents Inc, 16192 Coastal Hwy, Lewes, DE 19958, United States</p>
+            <div class="cs-footer-contact">
+              <a href="tel:+18884515522">+1 (888) 451 5522</a>
+              <a href="mailto:growth@gushwork.ai">growth@gushwork.ai</a>
+            </div>
+          </div>
+          <div class="cs-footer-addr-col">
+            <p>Gushwork, 578, 9th A Main Rd, Indiranagar, Bengaluru, Karnataka 560038, India</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cs-footer-social">
+      <a href="#" aria-label="Gushwork on LinkedIn"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M14.8156 0H1.18125C0.528125 0 0 0.515625 0 1.15313V14.8438C0 15.4813 0.528125 16 1.18125 16H14.8156C15.4688 16 16 15.4813 16 14.8469V1.15313C16 0.515625 15.4688 0 14.8156 0ZM4.74687 13.6344H2.37188V5.99687H4.74687V13.6344ZM3.55938 4.95625C2.79688 4.95625 2.18125 4.34062 2.18125 3.58125C2.18125 2.82188 2.79688 2.20625 3.55938 2.20625C4.31875 2.20625 4.93437 2.82188 4.93437 3.58125C4.93437 4.3375 4.31875 4.95625 3.55938 4.95625ZM13.6344 13.6344H11.2625V9.92188C11.2625 9.0375 11.2469 7.89687 10.0281 7.89687C8.79375 7.89687 8.60625 8.8625 8.60625 9.85938V13.6344H6.2375V5.99687H8.5125V7.04063H8.54375C8.85937 6.44063 9.63438 5.80625 10.7875 5.80625C13.1906 5.80625 13.6344 7.3875 13.6344 9.44375V13.6344V13.6344Z"/></svg></a>
+      <a href="#" aria-label="Gushwork on X"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M12.2175 1.26929H14.4665L9.5531 6.88495L15.3333 14.5266H10.8075L7.26265 9.89198L3.20659 14.5266H0.956247L6.21158 8.52002L0.666626 1.26929H5.30737L8.51156 5.50551L12.2175 1.26929ZM11.4282 13.1805H12.6744L4.63022 2.54471H3.29293L11.4282 13.1805Z"/></svg></a>
+      <a href="#" aria-label="Gushwork on Instagram"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.44062C10.1375 1.44062 10.3906 1.45 11.2313 1.4875C12.0125 1.52187 12.4344 1.65313 12.7156 1.7625C13.0875 1.90625 13.3563 2.08125 13.6344 2.35938C13.9156 2.64063 14.0875 2.90625 14.2313 3.27813C14.3406 3.55938 14.4719 3.98437 14.5063 4.7625C14.5438 5.60625 14.5531 5.85938 14.5531 7.99375C14.5531 10.1313 14.5438 10.3844 14.5063 11.225C14.4719 12.0063 14.3406 12.4281 14.2313 12.7094C14.0875 13.0813 13.9125 13.35 13.6344 13.6281C13.3531 13.9094 13.0875 14.0813 12.7156 14.225C12.4344 14.3344 12.0094 14.4656 11.2313 14.5C10.3875 14.5375 10.1344 14.5469 8 14.5469C5.8625 14.5469 5.60938 14.5375 4.76875 14.5C3.9875 14.4656 3.56563 14.3344 3.28438 14.225C2.9125 14.0813 2.64375 13.9063 2.36563 13.6281C2.08438 13.3469 1.9125 13.0813 1.76875 12.7094C1.65938 12.4281 1.52813 12.0031 1.49375 11.225C1.45625 10.3813 1.44688 10.1281 1.44688 7.99375C1.44688 5.85625 1.45625 5.60312 1.49375 4.7625C1.52813 3.98125 1.65938 3.55938 1.76875 3.27813C1.9125 2.90625 2.0875 2.6375 2.36563 2.35938C2.64688 2.07813 2.9125 1.90625 3.28438 1.7625C3.56563 1.65313 3.99063 1.52187 4.76875 1.4875C5.60938 1.45 5.8625 1.44062 8 1.44062ZM8 0C5.82813 0 5.55625 0.009375 4.70313 0.046875C3.85313 0.084375 3.26875 0.221875 2.7625 0.41875C2.23438 0.625 1.7875 0.896875 1.34375 1.34375C0.896875 1.7875 0.625 2.23438 0.41875 2.75938C0.221875 3.26875 0.084375 3.85 0.046875 4.7C0.009375 5.55625 0 5.82813 0 8C0 10.1719 0.009375 10.4438 0.046875 11.2969C0.084375 12.1469 0.221875 12.7313 0.41875 13.2375C0.625 13.7656 0.896875 14.2125 1.34375 14.6563C1.7875 15.1 2.23438 15.375 2.75938 15.5781C3.26875 15.775 3.85 15.9125 4.7 15.95C5.55313 15.9875 5.825 15.9969 7.99688 15.9969C10.1688 15.9969 10.4406 15.9875 11.2938 15.95C12.1438 15.9125 12.7281 15.775 13.2344 15.5781C13.7594 15.375 14.2063 15.1 14.65 14.6563C15.0938 14.2125 15.3688 13.7656 15.5719 13.2406C15.7688 12.7313 15.9063 12.15 15.9438 11.3C15.9813 10.4469 15.9906 10.175 15.9906 8.00313C15.9906 5.83125 15.9813 5.55938 15.9438 4.70625C15.9063 3.85625 15.7688 3.27188 15.5719 2.76563C15.375 2.23438 15.1031 1.7875 14.6563 1.34375C14.2125 0.9 13.7656 0.625 13.2406 0.421875C12.7313 0.225 12.15 0.0875 11.3 0.05C10.4438 0.009375 10.1719 0 8 0Z"/><path d="M8 3.89062C5.73125 3.89062 3.89062 5.73125 3.89062 8C3.89062 10.2688 5.73125 12.1094 8 12.1094C10.2688 12.1094 12.1094 10.2688 12.1094 8C12.1094 5.73125 10.2688 3.89062 8 3.89062ZM8 10.6656C6.52813 10.6656 5.33437 9.47188 5.33437 8C5.33437 6.52813 6.52813 5.33437 8 5.33437C9.47188 5.33437 10.6656 6.52813 10.6656 8C10.6656 9.47188 9.47188 10.6656 8 10.6656Z"/><path d="M13.2312 3.72805C13.2312 4.2593 12.8 4.68743 12.2719 4.68743C11.7406 4.68743 11.3125 4.25618 11.3125 3.72805C11.3125 3.1968 11.7438 2.76868 12.2719 2.76868C12.8 2.76868 13.2312 3.19993 13.2312 3.72805Z"/></svg></a>
+    </div>
+
+    <div class="cs-footer-legal">
+      <span>© <span id="copyYear">2026</span> Gushwork | All Rights Reserved</span>
+      <div>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms &amp; Conditions</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="cs-footer-band">
+    <img src="assets/updated-footer-bg.webp" alt="" aria-hidden="true">
+  </div>
+</footer>
+
+
+<!-- =========================================================================
+     CHAT WIDGET — ported from the chat-widget package, reskinned to Figma
+     224:27182. Ids match the package's JS hooks exactly.
+     ========================================================================= -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="chatw-caret-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.1" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="chatw-arrow-up" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6" stroke="currentColor" stroke-width="2.1" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="chatw-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.1" fill="none" stroke-linecap="round"/></symbol>
+  <!-- Sparkle, from the design system's own icon set (as instanced at 224:27185) -->
+  <symbol id="chatw-sparkle" viewBox="0 0 256 256"><path d="M208,144a15.78,15.78,0,0,1-10.42,14.94l-51.65,19-19,51.61a15.92,15.92,0,0,1-29.88,0L78,178l-51.62-19a15.92,15.92,0,0,1,0-29.88l51.65-19,19-51.61a15.92,15.92,0,0,1,29.88,0l19,51.65,51.61,19A15.78,15.78,0,0,1,208,144ZM152,48h16V64a8,8,0,0,0,16,0V48h16a8,8,0,0,0,0-16H184V16a8,8,0,0,0-16,0V32H152a8,8,0,0,0,0,16Zm88,32h-8V72a8,8,0,0,0-16,0v8h-8a8,8,0,0,0,0,16h8v8a8,8,0,0,0,16,0V96h8a8,8,0,0,0,0-16Z" fill="currentColor"/></symbol>
+  <symbol id="chatw-message-circle" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" stroke="currentColor" stroke-width="2.1" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</defs></svg>
+
+<div class="chatw-stack" id="chatwStack">
+
+  <div class="chatw-suggestions" id="chatwSuggestions">
+    <button type="button" class="chatw-suggestion">&#8220;What does Gushwork actually do?&#8221;</button>
+    <button type="button" class="chatw-suggestion">&#8220;How much does it cost?&#8221;</button>
+    <button type="button" class="chatw-suggestion">&#8220;How long until it&#8217;s live?&#8221;</button>
+  </div>
+
+  <div class="chatw-panel" id="chatwPanel">
+    <div class="chatw-panel-shell">
+      <div class="chatw-panel-header">
+        <button type="button" class="chatw-panel-title" id="chatwHistoryToggle" aria-expanded="false">
+          <svg class="chatw-svg"><use href="#chatw-sparkle"/></svg>
+          <span id="chatwPanelTitleText">Gushy</span>
+          <svg class="chatw-svg chatw-history-caret"><use href="#chatw-caret-down"/></svg>
+        </button>
+        <button type="button" class="chatw-panel-close" id="chatwPanelClose" aria-label="Close chat">
+          <svg class="chatw-svg"><use href="#chatw-caret-down"/></svg>
+        </button>
+      </div>
+      <div class="chatw-history-dropdown" id="chatwHistoryDropdown">
+        <div class="chatw-history-list" id="chatwHistoryList"></div>
+        <button type="button" class="chatw-history-new" id="chatwNewConversation">
+          <svg class="chatw-svg"><use href="#chatw-plus"/></svg> New conversation
+        </button>
+      </div>
+      <div class="chatw-panel-messages" id="chatwPanelMessages"></div>
+      <button type="button" class="chatw-panel-scroll-btn" id="chatwScrollBtn" aria-label="Scroll to latest">
+        <svg class="chatw-svg"><use href="#chatw-caret-down"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="chatw-bar" id="chatwBar">
+    <!-- gushy — one drawing, states toggled by CSS off data-state. Geometry is
+         verbatim from the 240x240 masters: 270:9199 (standing), 270:9186
+         (waving, arm rotated -101.315deg), 270:9240 (thinking, eyes shifted
+         to 80/120,65 plus the bubble). The masters' white background rect is
+         dropped so it sits on the bar transparently. -->
+    <!-- gushy — one drawing, poses toggled by CSS off data-state. Geometry is
+         verbatim from the 240x240 masters: 270:9199 standing, 270:9186 waving,
+         270:9240 thinking, 270:9272 walking, 270:9296 working. The masters'
+         white background rect is dropped so he sits on the bar transparently.
+         viewBox starts at x=24 because the working pose's laptop reaches x=28,
+         further left than the body's own x=40. -->
+    <span class="chatw-gushy-wrap" id="chatwGushyWrap">
+    <svg class="chatw-gushy" id="chatwGushy" data-state="standing" data-facing="right"
+         viewBox="24 10 200 200" aria-hidden="true">
+      <g class="g-all">
+        <rect x="56" y="40" width="128" height="88" rx="14" fill="#e7e8e9"/>
+        <path d="M171 24C187.016 24 200 36.9837 200 53V116C200 132.016 187.016 145 171 145H69C52.9837 145 40 132.016 40 116V53C40 36.9837 52.9837 24 69 24H171ZM70 40C62.268 40 56 46.268 56 54V114C56 121.732 62.268 128 70 128H170C177.732 128 184 121.732 184 114V54C184 46.268 177.732 40 170 40H70Z" fill="#0070ff"/>
+
+        <!-- legs: straight, or mid-stride for the walk -->
+        <g class="g-legs-still">
+          <path d="M88 141C88 139.895 88.8954 139 90 139H110C111.105 139 112 139.895 112 141V194C112 198.418 108.418 202 104 202H96C91.5817 202 88 198.418 88 194V141Z" fill="#0070ff"/>
+          <path d="M128 141C128 139.895 128.895 139 130 139H150C151.105 139 152 139.895 152 141V194C152 198.418 148.418 202 144 202H136C131.582 202 128 198.418 128 194V141Z" fill="#0070ff"/>
+        </g>
+        <g class="g-legs-walk">
+          <path d="M94.4611 140.182C94.5441 139.08 95.5042 138.255 96.6057 138.338L116.549 139.84C117.651 139.923 118.476 140.883 118.393 141.985L114.411 194.835C114.08 199.241 110.239 202.543 105.833 202.211L97.8557 201.61C93.4499 201.279 90.1474 197.438 90.4793 193.032L94.4611 140.182Z" fill="#0070ff"/>
+          <path d="M127.917 141.464C127.876 140.36 128.738 139.432 129.841 139.391L149.828 138.652C150.932 138.611 151.859 139.473 151.9 140.577L153.86 193.54C154.023 197.956 150.576 201.667 146.161 201.831L138.166 202.127C133.751 202.29 130.039 198.843 129.876 194.428L127.917 141.464Z" fill="#0070ff"/>
+        </g>
+
+        <rect x="102" y="139" width="34" height="38" rx="2" fill="#0070ff"/>
+        <rect x="56" y="152" width="24" height="40" rx="8" fill="#0070ff" class="g-arm-left"/>
+        <rect class="g-arm-type" x="80" y="152" width="24" height="40" rx="8" transform="rotate(90 80 152)" fill="#0070ff"/>
+        <rect class="g-arm-down" x="160" y="152" width="24" height="40" rx="8" fill="#0070ff"/>
+        <g class="g-arm-wave"><rect x="162.743" y="177.691" width="24" height="40" rx="8" transform="rotate(-101.315 162.743 177.691)" fill="#0070ff"/></g>
+
+        <!-- eyes: forward, glancing away to think, or down at the laptop -->
+        <g class="g-eyes-fwd">
+          <rect class="g-eye" x="104" y="56" width="24" height="40" rx="8" fill="#0070ff"/>
+          <rect class="g-eye" x="144" y="56" width="24" height="40" rx="8" fill="#0070ff"/>
+        </g>
+        <g class="g-eyes-think">
+          <rect x="80" y="65" width="24" height="40" rx="8" fill="#0070ff"/>
+          <rect x="120" y="65" width="24" height="40" rx="8" fill="#0070ff"/>
+        </g>
+        <g class="g-eyes-work">
+          <rect x="80" y="64" width="24" height="40" rx="8" fill="#0070ff"/>
+          <rect x="120" y="64" width="24" height="40" rx="8" fill="#0070ff"/>
+        </g>
+
+        <!-- the laptop, with its </> glyph -->
+        <g class="g-laptop">
+          <rect x="28" y="96" width="88" height="56" rx="8" fill="#262a2e"/>
+          <path d="M77.9999 124.897L74.1768 126.92V125.599L76.7943 124.336L76.759 124.405V124.242L76.7943 124.31L74.1768 123.047V121.726L77.9999 123.749V124.897Z" fill="#bbbec4"/>
+          <path d="M73.3941 120L71.602 128H70.6055L72.3976 120H73.3941Z" fill="#bbbec4"/>
+          <path d="M66 124.897V123.749L69.8231 121.726V123.047L67.2056 124.31L67.2409 124.242V124.405L67.2056 124.336L69.8231 125.599V126.92L66 124.897Z" fill="#bbbec4"/>
+        </g>
+
+        <g class="g-bubble">
+          <rect x="153" y="17" width="70" height="38" rx="7" fill="#ffffff" stroke="#bbbec4" stroke-width="2"/>
+          <rect class="g-dot" x="168" y="32" width="8" height="8" rx="4" fill="#e7e8e9"/>
+          <rect class="g-dot" x="184" y="32" width="8" height="8" rx="4" fill="#bbbec4"/>
+          <rect class="g-dot" x="200" y="32" width="8" height="8" rx="4" fill="#e7e8e9"/>
+        </g>
+      </g>
+    </svg>
+    </span>
+
+    <div class="chatw-label"><span id="chatwStatus">Ask anything...</span></div>
+    <form id="chatwForm">
+      <svg class="chatw-svg chatw-sparkle"><use href="#chatw-sparkle"/></svg>
+      <span class="chatw-field">
+        <input type="text" id="chatwInput" autocomplete="off" aria-label="Ask anything">
+        <!-- typewriter placeholder, exactly the state 224:27186 depicts: typed
+             text in neutral-400 Inter Medium, caret in neutral-800 Inter Bold -->
+        <span class="chatw-ghost" id="chatwGhost" aria-hidden="true"><span id="chatwGhostText"></span></span>
+      </span>
+      <button type="submit" aria-label="Send">
+        <svg class="chatw-svg"><use href="#chatw-arrow-up"/></svg>
+      </button>
+    </form>
+  </div>
+
+</div>
+
+<script>
+document.getElementById('copyYear').textContent = new Date().getFullYear();
+
+// mobile nav
+var burger = document.getElementById('burgerBtn');
+var navMobile = document.getElementById('navMobile');
+burger.addEventListener('click', function(){
+  var open = navMobile.classList.toggle('is-open');
+  burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+});
+
+// tabs — each tab's underline bar fills over 5s, then auto-advances to the
+// next (looping). Clicking a tab jumps straight to it and restarts the timer.
+(function(){
+  var tabsRow = document.getElementById('tabsRow');
+  var tabs = Array.prototype.slice.call(tabsRow.querySelectorAll('.tab'));
+  var caption = document.getElementById('tabsCaption');
+  var captions = [
+    'Understanding your products, pricing, buyers, and workflows.',
+    'Service tailored to you. Live in weeks, not a yearlong project.',
+    'Agents work in the background, human experts in the loop.',
+    'Everything shares one memory, so it gets sharper the longer it runs.'
+  ];
+  var DURATION = 5000;
+  var current = 0;
+  var advanceTimer = null;
+
+  function activate(index){
+    current = index;
+    tabs.forEach(function(t, i){
+      var fill = t.querySelector('.tab-fill');
+      t.classList.toggle('is-active', i === index);
+      fill.classList.remove('is-filling');
+      if (i === index) {
+        // Force reflow so removing/re-adding the class actually restarts
+        // the width transition instead of the browser coalescing it away.
+        void fill.offsetWidth;
+        fill.classList.add('is-filling');
+      }
+    });
+    caption.textContent = captions[index];
+    clearTimeout(advanceTimer);
+    advanceTimer = setTimeout(function(){
+      activate((current + 1) % tabs.length);
+    }, DURATION);
+  }
+
+  tabsRow.addEventListener('click', function(e){
+    var tab = e.target.closest('.tab');
+    if (!tab) return;
+    activate(tabs.indexOf(tab));
+  });
+
+  activate(0);
+})();
+
+// testimonials — clicking a card expands it and collapses whichever was
+// wide ("Expanded" in cards.md). Ignore clicks on an already-wide card.
+var tmRow = document.getElementById('tmRow');
+tmRow.addEventListener('click', function(e){
+  var card = e.target.closest('.tm-card');
+  if (!card || card.classList.contains('is-wide')) return;
+  tmRow.querySelectorAll('.tm-card').forEach(function(c){ c.classList.remove('is-wide'); });
+  card.classList.add('is-wide');
+});
+
+// ---------------------------------------------------------------------------
+// hero — hover tag + drag, on .hover-media elements
+//
+// One shared tag element inside a single stage-level clip layer. One
+// pointermove listener on the document rather than per-element enter/leave, so
+// the target is recomputed fresh every move via closest() and adjacent hit
+// areas can't leave stale state behind.
+// ---------------------------------------------------------------------------
+(function(){
+  var clipEl  = document.getElementById('heroHoverClip'); // the tag's own box
+  var stageEl = document.querySelector('.hero-stage');    // bounds vertical drag
+  var tag   = document.getElementById('heroHoverTag');
+  var media = [].slice.call(document.querySelectorAll('.hover-media[data-hover-tag]'));
+  if (!clipEl || !stageEl || !tag || !media.length) return;
+
+  var EASE  = 0.25;            // 0-1: higher = snappier, lower = more trailing
+  var OFF_X = 5, OFF_Y = 5;    // measured off Figma 311:12455
+  var GAP   = 8;               // breathing room before the tag flips sides
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var hovered = null;
+  var targetX = 0, targetY = 0, curX = 0, curY = 0, raf = null, pendingSince = 0;
+
+  function paint(){ tag.style.transform = 'translate(' + curX + 'px,' + curY + 'px)'; }
+  function snap(){ curX = targetX; curY = targetY; paint(); }
+
+  function schedule(){ pendingSince = performance.now(); raf = requestAnimationFrame(tick); }
+
+  function tick(){
+    pendingSince = 0;
+    curX += (targetX - curX) * EASE;
+    curY += (targetY - curY) * EASE;
+    paint();
+    if (Math.abs(targetX - curX) > 0.1 || Math.abs(targetY - curY) > 0.1) { schedule(); }
+    else { raf = null; }
+  }
+
+  // If a frame was requested and never ran, rAF is starved (a background tab,
+  // some headless/embedded contexts). Track the cursor exactly rather than
+  // leaving the tag frozen at a stale position — losing the trailing feel is
+  // the only cost.
+  function starved(){ return raf !== null && pendingSince !== 0 && performance.now() - pendingSince > 250; }
+
+  function hide(){
+    tag.classList.remove('is-visible');
+    hovered = null;
+    if (raf) cancelAnimationFrame(raf);
+    raf = null; pendingSince = 0;
+  }
+
+  function place(el, clientX, clientY){
+    // set the text first — the flip test below needs the tag's real width
+    if (tag.textContent !== el.dataset.hoverTag) tag.textContent = el.dataset.hoverTag;
+
+    var box = clipEl.getBoundingClientRect();
+    var x = clientX - box.left, y = clientY - box.top;
+    var tw = tag.offsetWidth, th = tag.offsetHeight;
+
+    // flip to the other side of the cursor rather than run off the stage
+    targetX = (x + OFF_X + tw > box.width  - GAP) ? x - OFF_X - tw : x + OFF_X;
+    targetY = (y + OFF_Y + th > box.height - GAP) ? y - OFF_Y - th : y + OFF_Y;
+
+    // snap on first entry so the tag doesn't fly in across the whole stage
+    if (el !== hovered) { hovered = el; snap(); }
+
+    tag.classList.add('is-visible');
+    if (reduce || starved()) snap();
+    if (!raf) schedule();
+  }
+
+  // ---- drag: transform-only, so no layout is disturbed ----
+  // All three are siblings inside .hero-stage, so each moves on its own.
+  //
+  // Stacking order is kept as a back-to-front list rather than an
+  // ever-climbing counter: grabbing an element moves it to the end of the list
+  // and the whole list is renumbered, so the order persists after release
+  // until something else is grabbed, and z-index can never creep past
+  // .hover-clip (50) and swallow the tag.
+  var drag = null;
+  var order = media.slice().sort(function(a, b){
+    return (parseInt(getComputedStyle(a).zIndex, 10) || 0) -
+           (parseInt(getComputedStyle(b).zIndex, 10) || 0);
+  });
+
+  function toFront(el){
+    var i = order.indexOf(el);
+    if (i > -1) order.splice(i, 1);
+    order.push(el);
+    order.forEach(function(e, n){ e.style.zIndex = n + 1; });
+  }
+
+  media.forEach(function(el){
+    el._dx = 0; el._dy = 0;
+    el.addEventListener('pointerdown', function(e){
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      // topmost element under the pointer wins, not the one whose box is biggest
+      if (e.target.closest('.hover-media') !== el) return;
+      if (el.classList.contains('is-returning')) {      // grab it mid-slide
+        var live = liveOffset(el);
+        el.classList.remove('is-returning');
+        el._dx = live[0]; el._dy = live[1];
+        el.style.transform = 'translate(' + el._dx + 'px,' + el._dy + 'px)';
+      }
+      drag = { el: el, x: e.clientX, y: e.clientY, dx: el._dx, dy: el._dy };
+      el.classList.add('is-dragging');
+      toFront(el);
+      el.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    });
+    el.addEventListener('transitionend', function(e){
+      if (e.propertyName === 'transform') el.classList.remove('is-returning');
+    });
+  });
+
+  // Nothing is clamped while you drag — it only has to be inside the frame when
+  // you let go. The frame is the screen sideways and .hero-stage (the dashboard
+  // box) vertically, and the test is the element's CENTRE, so a card may hang
+  // well over an edge before it counts as outside.
+  function outsideFrame(el){
+    // clientWidth, not innerWidth: excludes a scrollbar's gutter where one shows
+    var vw  = document.documentElement.clientWidth;
+    var box = stageEl.getBoundingClientRect();
+    var b   = el.getBoundingClientRect();
+    var cx  = b.left + b.width / 2, cy = b.top + b.height / 2;
+    return cx < 0 || cx > vw || cy < box.top || cy > box.bottom;
+  }
+
+  // Reads the offset actually on screen, which is not el._dx/_dy mid-slide.
+  function liveOffset(el){
+    var m = getComputedStyle(el).transform;
+    if (!m || m === 'none') return [0, 0];
+    var n = m.match(/matrix\(([^)]+)\)/);
+    if (!n) return [el._dx, el._dy];
+    var v = n[1].split(',');
+    return [parseFloat(v[4]) || 0, parseFloat(v[5]) || 0];
+  }
+
+  function goHome(el){
+    el._dx = 0; el._dy = 0;
+    el.classList.add('is-returning');
+    el.style.transform = '';
+    // transitionend normally clears it; this covers an element already at home,
+    // where no transition fires at all
+    setTimeout(function(){ el.classList.remove('is-returning'); }, 500);
+  }
+
+  function endDrag(){
+    if (!drag) return;
+    var el = drag.el;
+    el.classList.remove('is-dragging');
+    drag = null;
+    if (outsideFrame(el)) goHome(el);
+  }
+
+  document.addEventListener('pointermove', function(e){
+    if (drag) {
+      var el = drag.el;
+      el._dx = drag.dx + (e.clientX - drag.x);
+      el._dy = drag.dy + (e.clientY - drag.y);
+      el.style.transform = 'translate(' + el._dx + 'px,' + el._dy + 'px)';
+      place(el, e.clientX, e.clientY);
+      return;
+    }
+    var el = e.target.closest ? e.target.closest('.hover-media[data-hover-tag]') : null;
+    if (!el) { hide(); return; }
+    place(el, e.clientX, e.clientY);
+  }, { passive: true });
+
+  document.addEventListener('pointerup', endDrag);
+  document.addEventListener('pointercancel', endDrag);
+  document.addEventListener('pointerleave', hide);   // pointer left the window
+})();
+
+// reviews — show more
+var rvWrap    = document.getElementById('rvWrap');
+var rvMoreBtn = document.getElementById('rvMoreBtn');
+rvMoreBtn.addEventListener('click', function(){
+  var open = rvWrap.classList.toggle('is-expanded');
+  rvMoreBtn.textContent = open ? 'Show less' : 'Show more';
+  rvMoreBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+});
+
+// client-logo-card hover states — 3 measured patterns (which 4 of 8 cards are
+// hoverable), rotating every 5s. Positions taken directly from the 3 variant
+// frames in Figma (node 288:11165).
+(function(){
+  var patterns = [[1,3,6,7],[0,2,5,7],[0,3,5,6]];
+  var cards = Array.prototype.slice.call(document.querySelectorAll('#logoGrid .logo-card'));
+  var i = 0;
+  function apply(pattern){
+    cards.forEach(function(c){
+      var idx = parseInt(c.dataset.idx, 10);
+      c.classList.toggle('is-active', pattern.indexOf(idx) !== -1);
+    });
+  }
+  apply(patterns[0]);
+  setInterval(function(){
+    i = (i + 1) % patterns.length;
+    apply(patterns[i]);
+  }, 5000);
+})();
+
+// CTA illustration — footer/footer-elements/cta-image, Image=AI Agents.
+// Coordinates pulled via the Figma plugin API (143 grid cells, 2 unlabeled
+// icons, 2 labeled cards) rather than hand-authored, since a plain CSS
+// background-image grid can't reproduce the irregular blob shape.
+(function(){
+  var el = document.getElementById('ctaIllustration');
+  if (!el) return;
+  var cells = [[160,0],[200,0],[240,0],[280,0],[320,0],[360,0],[400,0],[440,0],[480,0],[520,0],[560,0],
+    [120,40],[160,40],[200,40],[240,40],[280,40],[320,40],[360,40],[400,40],[440,40],[480,40],[520,40],[560,40],
+    [120,80],[160,80],[200,80],[240,80],[280,80],[320,80],[360,80],[400,80],[440,80],[480,80],[520,80],[560,80],
+    [80,120],[40,120],[0,120],[40,40],[120,120],[160,120],[200,120],[240,120],[280,120],[320,120],[360,120],[400,120],[440,120],[480,120],[520,120],
+    [80,160],[560,120],[40,160],[120,160],[160,160],[200,160],[240,160],[280,160],[320,160],[360,160],[400,160],[440,160],[480,160],
+    [80,200],[520,160],[560,160],[40,200],[120,200],[160,200],[200,200],[240,200],[280,200],[320,200],[360,200],[400,200],[440,200],[480,200],[520,200],[560,200],
+    [80,240],[120,240],[160,240],[200,240],[240,240],[280,240],[320,240],[360,240],[400,240],[440,240],[480,240],[520,240],[560,240],
+    [0,280],[40,320],[120,280],[80,280],[120,320],[160,280],[200,280],[240,280],[280,280],[320,280],[360,280],[400,280],[440,280],[480,280],[520,280],[560,280],
+    [160,320],[200,320],[240,320],[280,320],[320,320],[360,320],[400,320],[440,320],[480,320],[520,320],[560,320],
+    [120,360],[160,360],[200,360],[240,360],[280,360],[320,360],[360,360],[400,360],[440,360],[480,360],[520,360],[560,360],
+    [120,400],[160,400],[200,400],[240,400],[280,400],[320,400],[360,400],[400,400],[440,400],[480,400],[520,400],[560,400]];
+  var dotPatterns = {
+    a: [[31,11],[41,11],[21,21],[31,21],[41,21],[21,31],[31,31],[11,41]],
+    b: [[21,11],[31,11],[21,21],[21,31],[21,41],[31,21],[31,31],[41,21],[41,31],[11,21],[11,31]],
+    research: [[11,11],[21,11],[31,11],[11,21],[31,21],[11,31],[21,31],[31,31],[31,41],[21,41],[41,41]],
+    paidboost: [[11,11],[21,11],[31,11],[41,11],[11,21],[21,21],[31,21],[41,21],[11,31],[21,31],[41,31],[21,41]]
+  };
+  function dots(name){
+    return dotPatterns[name].map(function(d){ return '<i style="left:' + d[0] + 'px;top:' + d[1] + 'px"></i>'; }).join('');
+  }
+  var html = '<div class="cs-cta-grid">' + cells.map(function(c){ return '<i style="left:' + c[0] + 'px;top:' + c[1] + 'px"></i>'; }).join('') + '</div>';
+  html += '<div class="cs-cta-icon" style="left:170px;top:290px">' + dots('a') + '</div>';
+  html += '<div class="cs-cta-icon" style="left:490px;top:49px">' + dots('b') + '</div>';
+  html += '<div class="cs-cta-card" style="left:412px;top:326px"><div class="cs-cta-icon">' + dots('research') + '</div><div class="cs-cta-card-text"><b>Research Agent</b><span>Finds where buyers search</span></div></div>';
+  html += '<div class="cs-cta-card" style="left:132px;top:126px"><div class="cs-cta-icon">' + dots('paidboost') + '</div><div class="cs-cta-card-text"><b>Paid Boost Agent</b><span>Drives leads with ads.</span></div></div>';
+  el.innerHTML = '<div class="cs-cta-illustration">' + html + '</div>';
+})();
+
+// ---------------------------------------------------------------------------
+// CHAT WIDGET — the package's chat-widget.js, wrapped in an IIFE (this page
+// declares its other handlers at top level) with three changes:
+//   · CONFIG points at /api/chat and names the assistant Gushy
+//   · the SVG class is chatw-svg, never this page's global .icon
+//   · gushy's state and the bar's label row are driven off the submit flow
+// Everything else is the package as shipped.
+// ---------------------------------------------------------------------------
+(function(){
+  var CHATW_CONFIG = {
+    endpoint: '/api/chat',
+    defaultTitle: 'Gushy',
+    greetingTitle: 'Gushy',
+    // reveal the bar once the visitor is half a viewport down, so it doesn't
+    // compete with the hero's own mock; 0 shows it immediately
+    revealAfterScrollFraction: 0.5,
+    // shown under a reply when the backend flags contact:true. These point at
+    // the page's own CTA anchors — swap in real URLs when they exist.
+    contactLinks: [
+      { label: 'Book a Demo', href: '#demo' },
+      { label: 'Calculate ROI', href: '#roi' },
+    ],
+  };
+  var IDLE_STATUS = 'Ask anything...';
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var chatwBar = document.getElementById('chatwBar');
+  var chatwPanel = document.getElementById('chatwPanel');
+  var chatwSuggestions = document.getElementById('chatwSuggestions');
+  var chatwForm = document.getElementById('chatwForm');
+  var chatwInput = document.getElementById('chatwInput');
+  var chatwSubmitBtn = chatwForm && chatwForm.querySelector('button[type="submit"]');
+  var chatwPanelMessages = document.getElementById('chatwPanelMessages');
+  var chatwPanelClose = document.getElementById('chatwPanelClose');
+  var chatwScrollBtn = document.getElementById('chatwScrollBtn');
+  var chatwPanelTitleText = document.getElementById('chatwPanelTitleText');
+  var chatwHistoryToggle = document.getElementById('chatwHistoryToggle');
+  var chatwHistoryDropdown = document.getElementById('chatwHistoryDropdown');
+  var chatwHistoryList = document.getElementById('chatwHistoryList');
+  var chatwNewConversation = document.getElementById('chatwNewConversation');
+  var chatwGushy = document.getElementById('chatwGushy');
+  var chatwGushyWrap = document.getElementById('chatwGushyWrap');
+  var chatwStack = document.getElementById('chatwStack');
+  var chatwGhost = document.getElementById('chatwGhost');
+  var chatwGhostText = document.getElementById('chatwGhostText');
+  var chatwStatus = document.getElementById('chatwStatus');
+  if (!chatwBar || !chatwForm || !chatwInput) return;
+
+  var chatwHistory = [];
+  var chatwHasChatted = false;
+
+  // ---- gushy's routine + the bar's label row ----
+  // On appearing he waves, walks the length of the bar and back, then settles
+  // at his laptop 10s in and stays there. Answering interrupts him to think;
+  // he goes back to the laptop afterwards rather than restarting the walk.
+  var WAVE_MS = 1600, WALK_MS = 4200, WORK_AT_MS = 10000;   // 1600 + 2*4200 = 10000
+  var gushyTimers = [];
+  function gushyClear(){ gushyTimers.forEach(clearTimeout); gushyTimers = []; }
+  function gushyLater(fn, ms){ gushyTimers.push(setTimeout(fn, ms)); }
+
+  function gushyPose(state, facing){
+    if (!chatwGushy) return;
+    chatwGushy.dataset.state = state;
+    if (facing) chatwGushy.dataset.facing = facing;
+  }
+  function gushyWalk(dir){
+    if (!chatwGushyWrap) return;
+    chatwGushyWrap.classList.remove('is-walking-right', 'is-walking-left');
+    void chatwGushyWrap.offsetWidth;                 // restart the animation
+    chatwGushyWrap.style.left = '';                  // let the keyframes drive it
+    chatwGushyWrap.classList.add(dir === 'right' ? 'is-walking-right' : 'is-walking-left');
+    gushyPose('walking', dir);
+  }
+  function gushyStopWalk(parkLeft){
+    if (!chatwGushyWrap) return;
+    chatwGushyWrap.classList.remove('is-walking-right', 'is-walking-left');
+    if (parkLeft) chatwGushyWrap.style.left = '14px';
+  }
+  function gushySettleToWork(){
+    gushyClear();
+    gushyStopWalk(true);
+    gushyPose('working', 'right');
+  }
+  // the whole arc, from the moment the bar appears
+  function gushyStartRoutine(){
+    if (!chatwGushy) return;
+    gushyClear();
+    gushyStopWalk(true);
+    gushyPose('waving', 'right');
+    gushyLater(function(){ gushyWalk('right'); }, WAVE_MS);
+    gushyLater(function(){ gushyWalk('left'); }, WAVE_MS + WALK_MS);
+    gushyLater(gushySettleToWork, WORK_AT_MS);
+  }
+  // a quick wave that doesn't restart the arc — used on focus and after a reply
+  function gushyWaveThen(state){
+    gushyClear();
+    gushyStopWalk(true);
+    gushyPose('waving', 'right');
+    gushyLater(function(){ gushyPose(state, 'right'); }, WAVE_MS);
+  }
+  function chatwSetStatus(text){ if (chatwStatus) chatwStatus.textContent = text; }
+
+  // ---- typewriter placeholder ----
+  // First-time visitors get suggested questions typed into the empty input, the
+  // state 224:27186 shows mid-keystroke. Deliberately different from the three
+  // suggestion chips so the two don't read as the same list twice. Every one is
+  // answerable from the endpoint's own facts.
+  var GHOST_QUESTIONS = [
+    'Does it work for everyone?',
+    'What can Gushwork run for me?',
+    'Do humans stay in the loop?',
+    'What does it cost to start?',
+    'How fast can this go live?',
+    'What happens after a demo?'
+  ];
+  var GHOST_TYPE = 55, GHOST_DELETE = 28, GHOST_HOLD = 1700, GHOST_GAP = 380;
+  var ghostTimer = null, ghostQ = 0, ghostChars = 0, ghostDeleting = false;
+
+  // The ghost overlays the input, so exactly one of the two may ever be
+  // showing — otherwise they render on top of each other.
+  function syncPlaceholder(){
+    if (chatwGhost && !chatwGhost.hidden) { chatwInput.placeholder = ''; return; }
+    if (chatwHasChatted) { chatwInput.placeholder = 'Continue chatting...'; return; }
+    chatwInput.placeholder = IDLE_STATUS;   // "Ask anything..." — what a click lands on
+  }
+  function ghostShow(text){
+    if (!chatwGhost) return;
+    chatwGhostText.textContent = text;
+    chatwGhost.hidden = false;
+    syncPlaceholder();
+  }
+  function ghostStop(){
+    clearTimeout(ghostTimer); ghostTimer = null;
+    if (chatwGhost) chatwGhost.hidden = true;
+    syncPlaceholder();
+  }
+  function ghostEligible(){
+    return !!chatwGhost && !chatwHasChatted && !chatwInput.value && document.activeElement !== chatwInput;
+  }
+  function ghostTick(){
+    // eligibility can lapse mid-run — a conversation resumes, the field gets
+    // focus, something is typed. Bail rather than keep painting over it.
+    if (!ghostEligible()) { ghostStop(); return; }
+    var q = GHOST_QUESTIONS[ghostQ], delay;
+    if (!ghostDeleting) {
+      ghostChars++;
+      if (ghostChars >= q.length) { ghostDeleting = true; delay = GHOST_HOLD; }
+      else delay = GHOST_TYPE;
+    } else {
+      ghostChars--;
+      if (ghostChars <= 0) {
+        ghostDeleting = false;
+        ghostQ = (ghostQ + 1) % GHOST_QUESTIONS.length;
+        delay = GHOST_GAP;
+      } else delay = GHOST_DELETE;
+    }
+    ghostShow(q.slice(0, ghostChars));
+    ghostTimer = setTimeout(ghostTick, delay);
+  }
+  function ghostStart(){
+    if (!ghostEligible()) return;
+    clearTimeout(ghostTimer);
+    if (reduce) { ghostShow(GHOST_QUESTIONS[0]); return; }   // no cycling, no typing
+    ghostChars = 0; ghostDeleting = false;
+    ghostShow('');
+    ghostTimer = setTimeout(ghostTick, GHOST_GAP);
+  }
+
+  // ---- conversation persistence (localStorage, per origin) ----
+  var CHATW_STORAGE_KEY = 'chatw-conversations';
+  var CHATW_ACTIVE_KEY = 'chatw-active-id';
+  var CHATW_MAX_STORED = 8;
+  var chatwConversations = [];
+  var chatwActiveId = null;
+
+  try {
+    var raw = localStorage.getItem(CHATW_STORAGE_KEY);
+    var parsed = raw ? JSON.parse(raw) : [];
+    if (Array.isArray(parsed)) chatwConversations = parsed;
+  } catch (e) { /* storage unavailable — history just won't persist */ }
+
+  function chatwSaveConversations(){
+    try { localStorage.setItem(CHATW_STORAGE_KEY, JSON.stringify(chatwConversations.slice(0, CHATW_MAX_STORED))); }
+    catch (e) { /* storage unavailable */ }
+  }
+  function chatwSetActiveId(id){
+    chatwActiveId = id;
+    try { if (id) localStorage.setItem(CHATW_ACTIVE_KEY, id); else localStorage.removeItem(CHATW_ACTIVE_KEY); }
+    catch (e) { /* storage unavailable */ }
+  }
+  function chatwRelativeTime(ts){
+    var minutes = Math.floor((Date.now() - ts) / 60000);
+    if (minutes < 1) return 'Just now';
+    if (minutes < 60) return minutes + 'm ago';
+    var hours = Math.floor(minutes / 60);
+    if (hours < 24) return hours + 'h ago';
+    return Math.floor(hours / 24) + 'd ago';
+  }
+  function chatwPersistActive(){
+    if (!chatwHistory.length) return;
+    if (!chatwActiveId) chatwSetActiveId('c' + Date.now());
+    var first = chatwHistory.filter(function(m){ return m.role === 'user'; })[0];
+    var existing = chatwConversations.filter(function(c){ return c.id === chatwActiveId; })[0];
+    var convo = existing || { id: chatwActiveId };
+    convo.preview = (first && first.content) || 'Conversation';
+    convo.title = (chatwPanelTitleText && chatwPanelTitleText.textContent) || CHATW_CONFIG.defaultTitle;
+    convo.messages = chatwHistory.slice();
+    convo.updatedAt = Date.now();
+    chatwConversations = [convo].concat(chatwConversations.filter(function(c){ return c.id !== chatwActiveId; }));
+    chatwSaveConversations();
+  }
+
+  function chatwSetPanelOpen(isOpen){
+    if (chatwPanel) chatwPanel.classList.toggle('open', isOpen);
+    // gushy's perch is keyed off the stack, not the bar — .expanded also fires
+    // on plain focus, when the panel stays shut
+    if (chatwStack) chatwStack.classList.toggle('panel-open', isOpen);
+    chatwBar.classList.toggle('expanded', isOpen);
+  }
+  function chatwSetPanelTitle(text){
+    if (!chatwPanelTitleText || chatwPanelTitleText.textContent === text) return;
+    chatwPanelTitleText.textContent = text;
+    chatwPanelTitleText.classList.remove('title-animate');
+    void chatwPanelTitleText.offsetWidth;   // restart the animation on repeat calls
+    chatwPanelTitleText.classList.add('title-animate');
+  }
+  function chatwSetSuggestionsVisible(v){ if (chatwSuggestions) chatwSuggestions.classList.toggle('visible', v); }
+  function chatwSetHistoryOpen(isOpen){
+    if (chatwHistoryDropdown) chatwHistoryDropdown.classList.toggle('open', isOpen);
+    if (chatwHistoryToggle) chatwHistoryToggle.setAttribute('aria-expanded', String(isOpen));
+    if (isOpen) chatwRenderHistoryList();
+  }
+
+  // Reveal past the threshold, and fully collapse on the way back up rather
+  // than leaving the bar floating over the top of the page.
+  var barWasVisible = null;
+  var revealChatwBar = function(){
+    var past = window.scrollY > window.innerHeight * CHATW_CONFIG.revealAfterScrollFraction;
+    chatwBar.classList.toggle('visible', past);
+    if (!past) {
+      chatwSetPanelOpen(false);
+      chatwSetHistoryOpen(false);
+      chatwSetSuggestionsVisible(false);
+      chatwBar.classList.remove('expanded');
+    }
+    // only on the edge — a scroll event fires constantly, and restarting the
+    // routine on every one would leave him waving forever
+    if (past !== barWasVisible) {
+      barWasVisible = past;
+      if (past) { gushyStartRoutine(); ghostStart(); }
+      else { gushyClear(); gushyStopWalk(true); gushyPose('standing', 'right'); ghostStop(); }
+    }
+  };
+  window.addEventListener('scroll', revealChatwBar, { passive: true });
+  // NB: the first evaluation happens after the resume block below, not here.
+  // Browsers restore scroll position on reload, so on a restored scroll this
+  // would fire the reveal edge — and start the typewriter — while
+  // chatwHasChatted was still false, before the stored conversation had set
+  // it. Both placeholders then rendered on top of each other.
+
+  if (chatwSuggestions) {
+    chatwSuggestions.querySelectorAll('.chatw-suggestion').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        chatwInput.value = btn.textContent.replace(/[“”]/g, '');
+        chatwForm.requestSubmit();
+      });
+    });
+  }
+
+  // Any element on the page can hand a question to the widget with
+  // data-ask="the question" — clicking it reveals the bar and submits.
+  document.querySelectorAll('[data-ask]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      chatwBar.classList.add('visible');
+      chatwInput.value = btn.dataset.ask;
+      chatwForm.requestSubmit();
+    });
+  });
+
+  if (chatwPanelMessages) {
+    chatwPanelMessages.addEventListener('scroll', function(){
+      var fromBottom = chatwPanelMessages.scrollHeight - chatwPanelMessages.scrollTop - chatwPanelMessages.clientHeight;
+      if (chatwScrollBtn) chatwScrollBtn.classList.toggle('visible', fromBottom > 40);
+    });
+  }
+  if (chatwScrollBtn) {
+    chatwScrollBtn.addEventListener('click', function(){
+      if (chatwPanelMessages) chatwPanelMessages.scrollTo({ top: chatwPanelMessages.scrollHeight, behavior: 'smooth' });
+    });
+  }
+
+  chatwInput.addEventListener('focus', function(){
+    ghostStop();
+    chatwBar.classList.add('expanded');
+    if (chatwHasChatted) chatwSetPanelOpen(true);
+    else { chatwSetSuggestionsVisible(true); gushyWaveThen('working'); }
+  });
+  chatwInput.addEventListener('input', function(){
+    if (chatwSubmitBtn) chatwSubmitBtn.classList.toggle('has-text', chatwInput.value.trim().length > 0);
+  });
+  // left empty without asking anything — pick the suggestions back up
+  chatwInput.addEventListener('blur', function(){ setTimeout(ghostStart, 120); });
+
+  // A short "Label:" opening an assistant block gets bolded, so a multi-part
+  // answer reads as sections instead of one dense paragraph.
+  var CHATW_BLOCK_LABEL_RE = /^([A-Za-z][A-Za-z \/]{0,24}:)\s*/;
+
+  function chatwAddMessage(role, text){
+    var el = document.createElement('div');
+    el.className = 'chatw-message ' + role;
+    var m = role === 'assistant' && text.match(CHATW_BLOCK_LABEL_RE);
+    if (m) {
+      var strong = document.createElement('strong');
+      strong.textContent = m[1];
+      el.append(strong, document.createTextNode(' ' + text.slice(m[0].length)));
+    } else {
+      el.textContent = text;
+    }
+    if (chatwPanelMessages) { chatwPanelMessages.appendChild(el); chatwPanelMessages.scrollTop = chatwPanelMessages.scrollHeight; }
+    return el;
+  }
+  function chatwAddTypingIndicator(){
+    var el = document.createElement('div');
+    el.className = 'chatw-typing';
+    el.innerHTML = '<span></span><span></span><span></span>';
+    if (chatwPanelMessages) { chatwPanelMessages.appendChild(el); chatwPanelMessages.scrollTop = chatwPanelMessages.scrollHeight; }
+    return el;
+  }
+  function chatwAddContactButtons(){
+    if (!CHATW_CONFIG.contactLinks.length) return;
+    var wrap = document.createElement('div');
+    wrap.className = 'chatw-contact-buttons';
+    CHATW_CONFIG.contactLinks.forEach(function(link){
+      var a = document.createElement('a');
+      a.className = 'chatw-contact-btn';
+      a.href = link.href;
+      a.textContent = link.label;
+      if (/^https?:/i.test(link.href)) { a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+      wrap.appendChild(a);
+    });
+    if (chatwPanelMessages) { chatwPanelMessages.appendChild(wrap); chatwPanelMessages.scrollTop = chatwPanelMessages.scrollHeight; }
+  }
+  // The backend flags contact:true whenever a reply points at a demo, which is
+  // most of them — so the row would land under every single message. Gate it on
+  // a cooldown here: the model's judgement can't be relied on to space these
+  // out, and the buttons from the previous time are still in the transcript.
+  var CONTACT_COOLDOWN = 4;               // assistant replies between showings
+  var assistantReplies = 0, lastContactReply = -Infinity;
+  function chatwResetContactGate(loadedAssistantCount){
+    assistantReplies = loadedAssistantCount || 0;
+    // treat a resumed conversation as though it just showed them, rather than
+    // greeting a returning visitor with the CTA row again
+    lastContactReply = loadedAssistantCount ? assistantReplies : -Infinity;
+  }
+  function chatwAddAssistantReply(text, title, showContact){
+    text.split(/\n{2,}/).map(function(b){ return b.trim(); }).filter(Boolean)
+        .forEach(function(b){ chatwAddMessage('assistant', b); });
+    assistantReplies++;
+    if (showContact && assistantReplies - lastContactReply >= CONTACT_COOLDOWN) {
+      chatwAddContactButtons();
+      lastContactReply = assistantReplies;
+    }
+    if (title) chatwSetPanelTitle(title);
+  }
+
+  function chatwRenderHistoryList(){
+    if (!chatwHistoryList) return;
+    chatwHistoryList.innerHTML = '';
+    if (!chatwConversations.length) {
+      var empty = document.createElement('p');
+      empty.className = 'chatw-history-empty';
+      empty.textContent = 'No conversations yet.';
+      chatwHistoryList.appendChild(empty);
+      return;
+    }
+    chatwConversations.forEach(function(convo){
+      var row = document.createElement('button');
+      row.type = 'button';
+      row.className = 'chatw-history-row' + (convo.id === chatwActiveId ? ' active' : '');
+      var icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      icon.setAttribute('class', 'chatw-svg');
+      icon.innerHTML = '<use href="#chatw-message-circle"></use>';
+      var preview = document.createElement('span');
+      preview.className = 'chatw-history-preview';
+      preview.textContent = convo.preview || 'Conversation';
+      var time = document.createElement('span');
+      time.className = 'chatw-history-time';
+      time.textContent = chatwRelativeTime(convo.updatedAt);
+      row.append(icon, preview, time);
+      row.addEventListener('click', function(){ chatwSwitchConversation(convo.id); });
+      chatwHistoryList.appendChild(row);
+    });
+  }
+  function chatwLoadConversationIntoView(convo){
+    chatwSetActiveId(convo.id);
+    chatwHistory.length = 0;
+    chatwHistory.push.apply(chatwHistory, convo.messages);
+    if (chatwPanelMessages) chatwPanelMessages.innerHTML = '';
+    convo.messages.forEach(function(m){ chatwAddMessage(m.role, m.content); });
+    chatwResetContactGate(convo.messages.filter(function(m){ return m.role === 'assistant'; }).length);
+    chatwHasChatted = true;
+    chatwInput.placeholder = 'Continue chatting...';
+    chatwSetPanelTitle(convo.title || CHATW_CONFIG.defaultTitle);
+  }
+  function chatwSwitchConversation(id){
+    var convo = chatwConversations.filter(function(c){ return c.id === id; })[0];
+    if (!convo) return;
+    chatwLoadConversationIntoView(convo);
+    chatwSetHistoryOpen(false);
+    chatwSetPanelOpen(true);
+    chatwSetSuggestionsVisible(false);
+  }
+  function chatwStartNewConversation(){
+    chatwSetActiveId(null);
+    chatwHistory.length = 0;
+    if (chatwPanelMessages) chatwPanelMessages.innerHTML = '';
+    chatwHasChatted = false;
+    chatwResetContactGate(0);
+    chatwInput.placeholder = '';
+    chatwSetStatus(IDLE_STATUS);
+    gushySettleToWork();
+    chatwSetPanelTitle(CHATW_CONFIG.defaultTitle);
+    chatwSetHistoryOpen(false);
+    chatwSetSuggestionsVisible(true);
+    chatwInput.focus();
+  }
+
+  if (chatwHistoryToggle) {
+    chatwHistoryToggle.addEventListener('click', function(e){
+      e.stopPropagation();
+      chatwSetHistoryOpen(!(chatwHistoryDropdown && chatwHistoryDropdown.classList.contains('open')));
+    });
+  }
+  if (chatwNewConversation) chatwNewConversation.addEventListener('click', chatwStartNewConversation);
+
+  // Resume whichever thread the visitor was last looking at.
+  (function(){
+    var storedActiveId = null;
+    try { storedActiveId = localStorage.getItem(CHATW_ACTIVE_KEY); } catch (e) {}
+    var toResume = chatwConversations.filter(function(c){ return c.id === storedActiveId; })[0] || chatwConversations[0];
+    if (toResume && toResume.messages && toResume.messages.length) chatwLoadConversationIntoView(toResume);
+  })();
+
+  // now that chatwHasChatted reflects the stored history, settle the bar
+  revealChatwBar();
+
+  // Two short synthesized tones — a blip on send, a two-note chime on reply.
+  // Nothing to load, no extra request. Delete this block and its two call
+  // sites if you don't want sound.
+  var chatwAudioCtx = null;
+  function chatwGetAudioCtx(){
+    if (chatwAudioCtx) return chatwAudioCtx;
+    var Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return null;
+    chatwAudioCtx = new Ctx();
+    return chatwAudioCtx;
+  }
+  function chatwPlayTone(freq, startAt, durationS, peakGain){
+    var ctx = chatwGetAudioCtx();
+    if (!ctx) return;
+    var osc = ctx.createOscillator(), gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    var t0 = ctx.currentTime + startAt;
+    gain.gain.setValueAtTime(0, t0);
+    gain.gain.linearRampToValueAtTime(peakGain, t0 + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.001, t0 + durationS);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(t0); osc.stop(t0 + durationS + 0.02);
+  }
+  // A fresh AudioContext is 'suspended' until resume()'s promise settles —
+  // scheduling synchronously right after calling resume() loses the first
+  // play of a visit to that race.
+  function chatwWithAudioCtx(fn){
+    var ctx = chatwGetAudioCtx();
+    if (!ctx) return;
+    if (ctx.state === 'suspended') ctx.resume().then(fn).catch(function(){});
+    else fn();
+  }
+  function chatwPlaySentSound(){
+    try { chatwWithAudioCtx(function(){ chatwPlayTone(880, 0, 0.08, 0.22); }); } catch (e) {}
+  }
+  function chatwPlayReceivedSound(){
+    try { chatwWithAudioCtx(function(){ chatwPlayTone(660, 0, 0.09, 0.2); chatwPlayTone(880, 0.07, 0.11, 0.2); }); } catch (e) {}
+  }
+
+  chatwForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    var q = chatwInput.value.trim();
+    if (!q) return;
+
+    var isFirstReply = chatwHistory.length === 0;
+    ghostStop();
+    chatwHasChatted = true;
+    chatwSetSuggestionsVisible(false);
+    chatwSetPanelOpen(true);
+    if (isFirstReply) chatwSetPanelTitle(CHATW_CONFIG.greetingTitle);
+    chatwHistory.push({ role: 'user', content: q });
+    chatwAddMessage('user', q);
+    chatwPlaySentSound();
+
+    chatwInput.value = '';
+    chatwInput.placeholder = 'Message...';
+    if (chatwSubmitBtn) chatwSubmitBtn.classList.remove('has-text');
+    chatwInput.disabled = true;
+    gushyClear();
+    gushyStopWalk(true);
+    gushyPose('thinking', 'right');
+    chatwSetStatus('Thinking…');
+    var typingEl = chatwAddTypingIndicator();
+
+    fetch(CHATW_CONFIG.endpoint, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ messages: chatwHistory, pageContext: document.body.dataset.chatContext || '' }),
+    }).then(function(res){
+      return res.json().then(function(data){ return { ok: res.ok, data: data }; });
+    }).then(function(r){
+      var answer = r.ok ? r.data.answer : (r.data.error || "Sorry, something went wrong on my end — try again in a bit.");
+      typingEl.remove();
+      // no CTA row on a failed request — an outage isn't a sales moment
+      chatwAddAssistantReply(answer, r.ok ? r.data.title : null, r.ok ? r.data.contact : false);
+      chatwPlayReceivedSound();
+      chatwHistory.push({ role: 'assistant', content: answer });
+      chatwPersistActive();
+    }).catch(function(){
+      typingEl.remove();
+      chatwAddAssistantReply("Couldn't reach the server — try again in a bit.", null, false);
+      chatwPlayReceivedSound();
+      // deliberately not persisted: the catch path stores no assistant message,
+      // so persisting here would leave a dangling user turn that reappears
+      // alone on the next load
+      chatwHistory.pop();
+    }).then(function(){
+      chatwInput.disabled = false;
+      chatwInput.placeholder = 'Continue chatting...';
+      chatwInput.focus();
+      chatwSetStatus(IDLE_STATUS);
+      if (isFirstReply) gushyWaveThen('working'); else gushySettleToWork();
+    });
+  });
+
+  if (chatwPanelClose) {
+    chatwPanelClose.addEventListener('click', function(){
+      chatwSetPanelOpen(false);
+      chatwSetHistoryOpen(false);
+      if (chatwHasChatted) chatwInput.placeholder = 'Continue chatting...';
+    });
+  }
+
+  document.addEventListener('click', function(e){
+    var insideHistory = (chatwHistoryDropdown && chatwHistoryDropdown.contains(e.target)) ||
+                        (chatwHistoryToggle && chatwHistoryToggle.contains(e.target));
+    if (!insideHistory) chatwSetHistoryOpen(false);
+
+    var inside = chatwBar.contains(e.target) ||
+                 (chatwPanel && chatwPanel.contains(e.target)) ||
+                 (chatwSuggestions && chatwSuggestions.contains(e.target)) ||
+                 (e.target.closest && e.target.closest('[data-ask]'));
+    if (inside) return;
+
+    if (chatwPanel && chatwPanel.classList.contains('open')) {
+      chatwSetPanelOpen(false);
+      if (chatwHasChatted) chatwInput.placeholder = 'Continue chatting...';
+    } else {
+      chatwBar.classList.remove('expanded');
+    }
+    chatwSetSuggestionsVisible(false);
+  });
+
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') chatwSetHistoryOpen(false);
+  });
+})();
+</script>
+</body>
+</html>
