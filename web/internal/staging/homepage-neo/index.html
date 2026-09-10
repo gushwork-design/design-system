@@ -2248,9 +2248,13 @@ rvMoreBtn.addEventListener('click', function(){
     endpoint: '/api/chat',
     defaultTitle: 'Gushy',
     greetingTitle: 'Gushy',
-    // reveal the bar once the visitor is half a viewport down, so it doesn't
-    // compete with the hero's own mock; 0 shows it immediately
-    revealAfterScrollFraction: 0.5,
+    // Reveal the bar once the visitor is past .hero-band — the stats row, the
+    // trusted-by label and the client logo grid. Anchoring to the element
+    // rather than a scroll fraction means it lands at the same point in the
+    // page whatever the viewport height or how the band reflows.
+    revealAfterSelector: '.hero-band',
+    // used only if that element is ever removed or renamed
+    revealFallbackFraction: 0.5,
     // shown under a reply when the backend flags contact:true. These point at
     // the page's own CTA anchors — swap in real URLs when they exist.
     contactLinks: [
@@ -2471,8 +2475,21 @@ rvMoreBtn.addEventListener('click', function(){
   // Reveal past the threshold, and fully collapse on the way back up rather
   // than leaving the bar floating over the top of the page.
   var barWasVisible = null;
+  // The scroll position at which the band's bottom edge reaches the bottom of
+  // the viewport, i.e. the visitor has just cleared it. Cached rather than
+  // measured on every scroll event, and recomputed whenever layout can move:
+  // late-loading images in the logo grid shift this by a lot.
+  var revealAt = null;
+  function computeRevealAt(){
+    var el = CHATW_CONFIG.revealAfterSelector
+      && document.querySelector(CHATW_CONFIG.revealAfterSelector);
+    revealAt = el
+      ? el.getBoundingClientRect().bottom + window.scrollY - window.innerHeight
+      : window.innerHeight * CHATW_CONFIG.revealFallbackFraction;
+  }
   var revealChatwBar = function(){
-    var past = window.scrollY > window.innerHeight * CHATW_CONFIG.revealAfterScrollFraction;
+    if (revealAt === null) computeRevealAt();
+    var past = window.scrollY > revealAt;
     chatwBar.classList.toggle('visible', past);
     if (!past) {
       chatwSetPanelOpen(false);
@@ -2489,6 +2506,9 @@ rvMoreBtn.addEventListener('click', function(){
     }
   };
   window.addEventListener('scroll', revealChatwBar, { passive: true });
+  window.addEventListener('resize', function(){ computeRevealAt(); revealChatwBar(); });
+  // the logo grid's images settle after load and move the band's bottom edge
+  window.addEventListener('load', function(){ computeRevealAt(); revealChatwBar(); });
   // NB: the first evaluation happens after the resume block below, not here.
   // Browsers restore scroll position on reload, so on a restored scroll this
   // would fire the reveal edge — and start the typewriter — while
