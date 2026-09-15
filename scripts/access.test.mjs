@@ -69,5 +69,17 @@ t('an unknown access level is not a wildcard', normalise({ routes: [{ path: '/x'
 t('non-addresses are filtered out of the admin list', normalise({ routes: [{ path: '/x' }], admins: ['nope', 'a@b.co'] }).admins, ['a@b.co']);
 t('the compiled fallback is the old two tiers', defaultRules().routes.map(r => r.access), ['admin', 'internal']);
 
+/* The unconfigured path — no Edge Config store — is what every deployment
+   serves until a store is attached, and it is the one the page crashed on:
+   defaultRules() omitted `groups`/`people`, so the UI's r.groups.map threw.
+   Consumers treat a route as whatever normalise() produces, so these must
+   agree on shape. */
+for (const r of defaultRules().routes) {
+  t(`default route ${r.path} carries a groups array`, Array.isArray(r.groups), true);
+  t(`default route ${r.path} carries a people array`, Array.isArray(r.people), true);
+}
+t('defaults survive a round-trip through normalise',
+  normalise(defaultRules()).routes, defaultRules().routes);
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

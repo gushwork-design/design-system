@@ -44,10 +44,15 @@ export function defaultRules() {
     version: 1,
     admins,
     groups: {},
-    /* Longest prefix wins, so order here is presentation, not precedence. */
+    /* Longest prefix wins, so order here is presentation, not precedence.
+       `groups` and `people` are spelled out rather than left undefined: every
+       consumer treats a route as the shape normalise() produces, and a route
+       from here reaches exactly the same code. Omitting them crashed the
+       access-control page on the one path that matters most — the unconfigured
+       one, which is what every project sees before a store is attached. */
     routes: [
-      { path: '/admin',    access: 'admin' },
-      { path: '/internal', access: 'internal' }
+      { path: '/admin',    access: 'admin',    groups: [], people: [] },
+      { path: '/internal', access: 'internal', groups: [], people: [] }
     ]
   };
 }

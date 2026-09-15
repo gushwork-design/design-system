@@ -241,8 +241,8 @@
     }).join('');
 
     var people = [].concat(
-      r.groups.map(function (g) { return '@' + g; }),
-      r.people
+      (r.groups || []).map(function (g) { return '@' + g; }),
+      r.people || []
     ).join(', ');
 
     return el(
@@ -327,7 +327,7 @@
   }
 
   function groupsCard() {
-    var names = Object.keys(draft.groups).sort();
+    var names = Object.keys(draft.groups || {}).sort();
     var card = el(
       '<section class="ac-card">' +
         '<div class="ac-card__hd">' +
@@ -398,8 +398,8 @@
   }
 
   function adminsCard() {
-    var owners = meta.owners.map(function (e) { return e.toLowerCase(); });
-    var extra = draft.admins.filter(function (e) { return owners.indexOf(e) === -1; });
+    var owners = (meta.owners || []).map(function (e) { return e.toLowerCase(); });
+    var extra = (draft.admins || []).filter(function (e) { return owners.indexOf(e) === -1; });
 
     var card = el(
       '<section class="ac-card">' +
@@ -541,9 +541,19 @@
     .then(function (r) { return r.json().then(function (b) { return { ok: r.ok, b: b }; }); })
     .then(function (out) {
       if (!out.ok) throw new Error(out.b && out.b.error || 'Could not load the rules.');
-      meta  = out.b;
-      state = clone(out.b.rules);
-      draft = clone(out.b.rules);
+      meta = out.b;
+      /* Fill in anything the server left off before a single card renders.
+         The page is the last place that should be discovering a rule has no
+         `groups` array — it renders, it does not validate. */
+      var r = out.b.rules || {};
+      r.admins = r.admins || [];
+      r.groups = r.groups || {};
+      r.routes = (r.routes || []).map(function (x) {
+        return { path: x.path, access: x.access,
+                 groups: x.groups || [], people: x.people || [] };
+      });
+      state = clone(r);
+      draft = clone(r);
       document.getElementById('ac-state').innerHTML = '';
       document.getElementById('ac-app').hidden = false;
       render();
