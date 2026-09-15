@@ -39,6 +39,8 @@
     'lock-simple':         'M208,76H180V56A52,52,0,0,0,76,56V76H48A20,20,0,0,0,28,96V208a20,20,0,0,0,20,20H208a20,20,0,0,0,20-20V96A20,20,0,0,0,208,76ZM100,56a28,28,0,0,1,56,0V76H100ZM204,204H52V100H204Z',
     'sign-out':            'M124,216a12,12,0,0,1-12,12H48a12,12,0,0,1-12-12V40A12,12,0,0,1,48,28h64a12,12,0,0,1,0,24H60V204h52A12,12,0,0,1,124,216Zm108.49-96.49-40-40a12,12,0,0,0-17,17L195,116H112a12,12,0,0,0,0,24h83l-19.52,19.51a12,12,0,0,0,17,17l40-40A12,12,0,0,0,232.49,119.51Z',
     'x':                   'M208.49,191.51a12,12,0,0,1-17,17L128,145,64.49,208.49a12,12,0,0,1-17-17L111,128,47.51,64.49a12,12,0,0,1,17-17L128,111l63.51-63.52a12,12,0,0,1,17,17L145,128Z',
+    'gear':                'M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Zm88-29.84q.06-2.16,0-4.32l14.92-18.64a8,8,0,0,0,1.48-7.06,107.21,107.21,0,0,0-10.88-26.25,8,8,0,0,0-6-3.93l-23.72-2.64q-1.48-1.56-3-3L186,40.54a8,8,0,0,0-3.94-6,107.71,107.71,0,0,0-26.25-10.87,8,8,0,0,0-7.06,1.49L130.16,40Q128,40,125.84,40L107.2,25.11a8,8,0,0,0-7.06-1.48A107.6,107.6,0,0,0,73.89,34.51a8,8,0,0,0-3.93,6L67.32,64.27q-1.56,1.49-3,3L40.54,70a8,8,0,0,0-6,3.94,107.71,107.71,0,0,0-10.87,26.25,8,8,0,0,0,1.49,7.06L40,125.84Q40,128,40,130.16L25.11,148.8a8,8,0,0,0-1.48,7.06,107.21,107.21,0,0,0,10.88,26.25,8,8,0,0,0,6,3.93l23.72,2.64q1.49,1.56,3,3L70,215.46a8,8,0,0,0,3.94,6,107.71,107.71,0,0,0,26.25,10.87,8,8,0,0,0,7.06-1.49L125.84,216q2.16.06,4.32,0l18.64,14.92a8,8,0,0,0,7.06,1.48,107.21,107.21,0,0,0,26.25-10.88,8,8,0,0,0,3.93-6l2.64-23.72q1.56-1.48,3-3L215.46,186a8,8,0,0,0,6-3.94,107.71,107.71,0,0,0,10.87-26.25,8,8,0,0,0-1.49-7.06Zm-16.1-6.5a73.93,73.93,0,0,1,0,8.68,8,8,0,0,0,1.74,5.48l14.19,17.73a91.57,91.57,0,0,1-6.23,15L187,173.11a8,8,0,0,0-5.1,2.64,74.11,74.11,0,0,1-6.14,6.14,8,8,0,0,0-2.64,5.1l-2.51,22.58a91.32,91.32,0,0,1-15,6.23l-17.74-14.19a8,8,0,0,0-5-1.75h-.48a73.93,73.93,0,0,1-8.68,0,8,8,0,0,0-5.48,1.74L100.45,215.8a91.57,91.57,0,0,1-15-6.23L82.89,187a8,8,0,0,0-2.64-5.1,74.11,74.11,0,0,1-6.14-6.14,8,8,0,0,0-5.1-2.64L46.43,170.6a91.32,91.32,0,0,1-6.23-15l14.19-17.74a8,8,0,0,0,1.74-5.48,73.93,73.93,0,0,1,0-8.68,8,8,0,0,0-1.74-5.48L40.2,100.45a91.57,91.57,0,0,1,6.23-15L69,82.89a8,8,0,0,0,5.1-2.64,74.11,74.11,0,0,1,6.14-6.14A8,8,0,0,0,82.89,69L85.4,46.43a91.32,91.32,0,0,1,15-6.23l17.74,14.19a8,8,0,0,0,5.48,1.74,73.93,73.93,0,0,1,8.68,0,8,8,0,0,0,5.48-1.74L155.55,40.2a91.57,91.57,0,0,1,15,6.23L173.11,69a8,8,0,0,0,2.64,5.1,74.11,74.11,0,0,1,6.14,6.14,8,8,0,0,0,5.1,2.64l22.58,2.51a91.32,91.32,0,0,1,6.23,15l-14.19,17.74A8,8,0,0,0,199.87,123.66Z',
+    'arrow-right':         'M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z',
     'list':                'M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z'
   };
 
@@ -80,9 +82,18 @@
       tier: 'internal',
       items: [
         { label: 'Claude Plugin', href: '/internal/claude-plugin', icon: 'sparkle' },
-        { label: 'Mini Tools',    href: '/internal/mini-tools',    icon: 'toolbox' },
-        { label: 'Change Log',    href: '/internal/changelog',     icon: 'stack-overflow-logo' },
-        { label: 'Staging',       href: '/internal/staging',       icon: 'squares-four' }
+        { label: 'Tools & Templates', href: '/internal/tools',     icon: 'toolbox' },
+        { label: 'Change Log',    href: '/internal/changelog',     icon: 'stack-overflow-logo' }
+      ]
+    },
+    /* Staging is drawn as its own group in 683:5282 because it is a GTM
+       surface, not a design-system one. Same `internal` tier — the split is
+       about who the page is FOR, not who can open it. */
+    {
+      label: 'For GTM',
+      tier: 'internal',
+      items: [
+        { label: 'Staging',       href: '/internal/staging',       icon: 'stack-overflow-logo' }
       ]
     }
   ];
@@ -93,9 +104,15 @@
     label: 'Admin',
     tier: 'admin',
     items: [
+      /* Labelled Access Control per the Figma rail, but still pointing at the
+         catalogue: the page that grants and revokes access does not exist yet.
+         Ruled by Utsav 15 Sep 2026 — catalogue and review sheet merge later,
+         and this row takes over the merged page when it lands. */
+      { label: 'Access Control', href: '/admin/catalogue',   icon: 'gear' },
       { label: 'Review Sheet', href: '/admin/review-sheet', icon: 'checks' },
-      { label: 'Catalogue',    href: '/admin/catalogue',    icon: 'squares-four' },
-      { label: 'Workflow',     href: '/admin/workflow',     icon: 'flow-arrow' }
+      /* Was 'flow-arrow', which is not in ICON — the row drew an empty <path>.
+         683:5282 gives Workflow the same stacked glyph as Change Log. */
+      { label: 'Workflow',     href: '/admin/workflow',     icon: 'stack-overflow-logo' }
     ]
   };
 
@@ -215,7 +232,7 @@
     if (!session.gate && !session.signedIn) return '';
     if (!session.signedIn) {
       return '<button class="gw-signin" type="button" data-open-modal>' +
-        GOOGLE_G + '<span>Sign in</span></button>';
+        GOOGLE_G + '<span>Continue with Google</span></button>';
     }
     var initial = (session.name || session.email || '?').trim().charAt(0).toUpperCase();
     var avatar = session.picture
@@ -248,7 +265,8 @@
 
     if (m.google) {
       body += '<a class="gw-modal__btn" data-google-btn href="/api/auth/login">' +
-        GOOGLE_G + '<span>Continue with Google</span></a>';
+        GOOGLE_G + '<span>Continue with Google</span>' +
+        '<span class="gw-modal__btnarrow">' + icon('arrow-right') + '</span></a>';
     }
     if (m.google && m.password) {
       body += '<div class="gw-modal__or"><span>or</span></div>';
@@ -276,9 +294,9 @@
           '<button class="gw-modal__x" type="button" data-close-modal aria-label="Close">' +
             icon('x') + '</button>' +
           '<span class="gw-modal__chip" style="color:var(--gw-color-white)">' + MARK + '</span>' +
-          '<h2 class="gw-modal__title" id="gw-modal-title">Sign in to continue</h2>' +
-          '<p class="gw-modal__sub">This part of the design system is for the Gushwork ' +
-             'team.</p>' +
+          '<h2 class="gw-modal__title" id="gw-modal-title">You&rsquo;ll need to log in</h2>' +
+          '<p class="gw-modal__sub">Log in using your Gushwork email id to get ' +
+             'access.</p>' +
           body +
           '<p class="gw-modal__note">' + note + '</p>' +
         '</div>' +

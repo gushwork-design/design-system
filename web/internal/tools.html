@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tools &amp; Templates — Gushwork Design</title>
+<meta name="robots" content="noindex">
+<script>try{var t=localStorage.getItem('gw-theme')||'light';document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20width%3D%2280%22%20height%3D%2280%22%20rx%3D%2220%22%20fill%3D%22%230d0d0d%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="/foundation/tokens.css">
+<link rel="stylesheet" href="/shell.css">
+<script src="/shell.js" defer></script>
+<style>
+  .tools{display:grid;gap:12px}
+  .tool{display:grid;gap:4px;padding:20px 22px;text-decoration:none;
+        background:var(--gw-color-white);border:1px solid var(--gw-color-neutral-100);
+        border-radius:12px;transition:border-color 140ms ease}
+  .tool:hover{border-color:var(--gw-color-primary-500)}
+  .tool:focus-visible{outline:2px solid var(--gw-color-primary-500);outline-offset:2px}
+  .tool__name{font-family:var(--gw-font-display);font-size:16px;font-weight:600;
+              color:var(--gw-color-black)}
+  .tool__what{font-size:14px;line-height:1.55;color:var(--gw-color-neutral-700)}
+  .tool__meta{font-size:12.5px;color:var(--gw-color-neutral-400);margin-top:2px}
+
+  /* A template is not a page you open, so its card is not a link. It states what the thing is
+     and where it lives; you get it by installing the plugin, not by downloading it from here.
+     The catalogue hands over a pointer — a copy taken from a page goes stale the moment the
+     template moves, and nothing tells the person holding it. */
+  .tpl{display:grid;gap:4px;padding:20px 22px;background:var(--gw-color-white);
+       border:1px solid var(--gw-color-neutral-100);border-radius:12px}
+  .tpl__name{font-family:var(--gw-font-display);font-size:16px;font-weight:600;
+             color:var(--gw-color-black)}
+  .tpl__what{font-size:14px;line-height:1.55;color:var(--gw-color-neutral-700)}
+  .tpl__path{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12.5px;
+             color:var(--gw-color-neutral-600);background:var(--gw-color-neutral-25);
+             border:1px solid var(--gw-color-neutral-100);border-radius:6px;
+             padding:3px 8px}
+  .tpl__foot{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+  /* Copies a prompt rather than pretending to launch anything. These templates only exist
+     once the plugin is installed locally, so a link out to the web would promise something
+     it cannot deliver — the honest action is to hand you the words. */
+  .use{font-family:var(--gw-font-body);font-size:13px;font-weight:600;line-height:1;
+       color:var(--gw-color-black);background:var(--gw-color-white);
+       border:1px solid var(--gw-color-neutral-200);border-radius:10px;
+       padding:9px 14px;cursor:pointer;transition:border-color 140ms ease,color 140ms ease}
+  .use:hover{border-color:var(--gw-color-primary-500);color:var(--gw-color-primary-600)}
+  .use:focus-visible{outline:2px solid var(--gw-color-primary-500);outline-offset:2px}
+  .use[data-done="1"]{border-color:var(--gw-color-primary-500);color:var(--gw-color-primary-600)}
+  .use__hint{font-size:12.5px;color:var(--gw-color-neutral-400)}
+  .lede{font-size:14px;line-height:1.6;color:var(--gw-color-neutral-700);margin:0 0 4px;max-width:70ch}
+  .lede a{color:var(--gw-color-primary-600)}
+</style>
+</head>
+<body data-gw-page="tools">
+
+<div class="gw-col">
+  <div class="gw-section gw-stack-40">
+    <div class="gw-prose gw-stack-20">
+      <h2>Tools &amp; Templates</h2>
+      <p>The small utilities that mint official assets, and the starting points you copy
+         rather than rebuild.</p>
+    </div>
+
+    <div class="gw-prose gw-stack-20">
+      <h3>Tools</h3>
+      <p class="lede">Hosted here. Open one, fill it in, export.</p>
+    </div>
+    <div class="tools">
+      <a class="tool" href="/internal/employee-id-card">
+        <span class="tool__name">Employee ID Card Generator</span>
+        <span class="tool__what">Fills a card from a name, role and photo, then exports print-ready
+          PNG and PDF for front and back.</span>
+        <span class="tool__meta">Moved here 15 Sep 2026 from its own Vercel project · no backend</span>
+      </a>
+      <a class="tool" href="/internal/email-signature">
+        <span class="tool__name">Email Signature Creator</span>
+        <span class="tool__what">Builds an on-brand email signature from a name, title and photo,
+          ready to paste straight into Gmail or Outlook.</span>
+        <span class="tool__meta">Moved here 15 Sep 2026 from a private Netlify project · no backend</span>
+      </a>
+    </div>
+
+    <div class="gw-prose gw-stack-20">
+      <h3>Templates</h3>
+      <p class="lede">These are not downloads. Each one lives in the design system itself, so
+         <a href="/internal/claude-plugin">installing the plugin</a> is how you get them — and how
+         you keep getting them when they change. Copy a template to a new name and fill it in;
+         tokens, fonts and brand assets resolve out of the repo, so no template owns its own copy
+         of anything.</p>
+    </div>
+    <div class="tools">
+      <div class="tpl">
+        <span class="tpl__name">Case study page</span>
+        <span class="tpl__what">One customer story, told as a page. Hero with the outcome numbers,
+          a prose column with a sticky rail CTA, and the closing CTA fold. Ships with an
+          <code>og-source.html</code> for the social card. Nothing to build — open it in a browser.</span>
+        <span class="tpl__foot"><code class="tpl__path">skills/gushwork-web/templates/case-study/</code><button class="use" type="button" data-prompt="Use the Gushwork case-study page template at skills/gushwork-web/templates/case-study/ to build a case study page. Copy the folder to a new client slug first, then fill it in from the brief I give you next. Keep every value on the design system's tokens.">Use in Claude</button><span class="use__hint">copies a prompt</span></span>
+      </div>
+      <div class="tpl">
+        <span class="tpl__name">Lead magnet</span>
+        <span class="tpl__what">The downloadable PDF behind an ad landing page. US Letter, nine
+          pages, print-ready and text-selectable. Render it with <code>render.sh</code>.</span>
+        <span class="tpl__foot"><code class="tpl__path">templates/lead-magnet/</code><button class="use" type="button" data-prompt="Use the Gushwork lead-magnet template at templates/lead-magnet/ to build a lead magnet from the brief I give you next. It is US Letter, nine pages, print-ready. Render it with render.sh when the content is done.">Use in Claude</button><span class="use__hint">copies a prompt</span></span>
+      </div>
+      <div class="tpl">
+        <span class="tpl__name">Slide deck</span>
+        <span class="tpl__what">The base for every Gushwork deck. Eleven layouts at 1920 × 1080 on
+          the blue blueprint ground. The reference build doubles as the layout library.</span>
+        <span class="tpl__foot"><code class="tpl__path">templates/slide-deck/</code><button class="use" type="button" data-prompt="Use the Gushwork slide-deck template at templates/slide-deck/ to build a deck from the brief I give you next. Eleven layouts at 1920x1080 are already in it — pick from them rather than inventing new ones.">Use in Claude</button><span class="use__hint">copies a prompt</span></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+/* Clipboard needs a user gesture and a secure context; both hold here. execCommand is the
+   fallback for browsers without the async API, and if BOTH fail the button says so rather
+   than claiming success — a button that lies about copying is worse than one that cannot. */
+(function () {
+  function flash(btn, text) {
+    var original = btn.textContent;
+    btn.textContent = text;
+    btn.setAttribute('data-done', '1');
+    setTimeout(function () {
+      btn.textContent = original;
+      btn.removeAttribute('data-done');
+    }, 2000);
+  }
+  function legacy(text) {
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      return ok;
+    } catch (e) { return false; }
+  }
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest ? e.target.closest('.use') : null;
+    if (!btn) return;
+    var text = btn.getAttribute('data-prompt') || '';
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(
+        function () { flash(btn, 'Copied — paste into Claude Code'); },
+        function () { flash(btn, legacy(text) ? 'Copied — paste into Claude Code' : 'Press Cmd+C to copy'); }
+      );
+    } else {
+      flash(btn, legacy(text) ? 'Copied — paste into Claude Code' : 'Press Cmd+C to copy');
+    }
+  });
+})();
+</script>
+</body></html>

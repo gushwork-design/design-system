@@ -229,6 +229,21 @@
   letter-spacing: var(--gw-text-h6-tracking);
   color: var(--s-heading);
 }
+/* Inline link inside body copy — measured 683:3971 `Start here`: Primary/500,
+   underlined, trailing arrow. Sits in the text flow, so it inherits the
+   18/med body font rather than setting its own. */
+.gw-prose a.gw-inline-link {
+  color: var(--gw-color-primary-500);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  white-space: nowrap;
+}
+.gw-prose a.gw-inline-link:hover { color: var(--gw-color-primary-600); }
+.gw-prose a.gw-inline-link:focus-visible {
+  outline: var(--gw-focus-ring); outline-offset: var(--gw-focus-offset);
+  border-radius: var(--gw-radius-2);
+}
+
 .gw-stack-20 { display: flex; flex-direction: column; gap: var(--gw-space-20); }
 .gw-stack-40 { display: flex; flex-direction: column; gap: var(--gw-space-40); }
 
@@ -640,6 +655,12 @@
   transition: box-shadow var(--gw-motion-fast);
 }
 .gw-modal__btn:hover { box-shadow: var(--gw-shadow-s2); }
+/* Trailing arrow on the Google button — 683:4571 sets it right after the
+   label, so it rides with the centred group rather than pinning to the edge.
+   The G mark is already sized by the rule below; this keeps the arrow to the
+   same 16 without inheriting it. */
+.gw-modal__btnarrow { display: flex; }
+.gw-modal__btnarrow svg { width: 16px; height: 16px; display: block; }
 /* Primary treatment for the password submit — the Google button has to stay
    white with its own mark, so the two cannot share one look. */
 .gw-modal__btn--primary {

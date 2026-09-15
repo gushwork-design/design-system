@@ -1,10 +1,19 @@
 # Case-study page template
 
+**This is the placeholder template. Copy it — do not read it for worked copy.**
+Every fillable string is a `{{TOKEN}}`; `bash scripts/check-placeholders.sh <file>` fails
+while any remain, and the pre-push hook warns about them.
+
+A worked, fully-filled instance lives at `skills/gushwork-web/examples/cutting-edge-plasma/`
+— read that to see what "filled in" looks like. Copying an example instead of this template
+is the mistake this split exists to prevent: you inherit that client's numbers and quote,
+and they look like copy you wrote until someone checks.
+
 One customer story, told as a page. Hero with the outcome numbers, a prose column with a
 sticky rail CTA, and the closing CTA fold.
 
 ```bash
-cp -r skills/gushwork-web/templates/case-study skills/gushwork-web/templates/<client-slug>
+cp -r skills/gushwork-web/templates/case-study skills/gushwork-web/examples/<client-slug>
 ```
 
 Open `case-study.html` in a browser. Nothing to build, no dependencies — tokens, fonts and
@@ -117,6 +126,16 @@ already ships. Do not "fix" it.
 **Images.** Every grey panel is a slot with its target size in the label. Drop real
 photography in; never fabricate a client logo, photo, or quote.
 
+**The hero takes a photograph.** Client-supplied first — that is a **brief field**, not a
+search; their plant is the only image that is actually theirs. If it has not arrived, use
+free-licensed stock per the note below.
+
+The duotone-icon hero was **withdrawn 15 Sep 2026** and its CSS removed from the template. Do
+not reinstate it. A pre-cleared stock library was also considered and rejected — Gushwork's
+clients run from CNC equipment to medical to home services, so a fixed set is either too
+shallow to ever match or a curation job that goes stale. If no photograph can be found for a
+case, that is a blocker to raise, not something to route around with an illustration.
+
 **Sourcing the hero photo — no API key needed.** Search unsplash.com directly on the client's
 industry or the physical thing they make or do ("CNC milling", not "B2B software" — concrete
 beats abstract). Filter to free results: skip anything marked **Unsplash+**, a separate paid
@@ -124,10 +143,9 @@ tier that's watermarked and won't actually download. Download the largest size o
 downscale before committing it — 1100px wide covers this template's 580×400 slot at retina
 density, so `sips -Z 1100 photo.jpg` rather than shipping a multi-megabyte original. Save it as
 `assets/case-study/sample/<client-slug>-<subject>.jpg`, next to the other sample assets, and
-point `.cs-slot`'s `<img>` at it. If a reasonable search turns up nothing relevant, use
-`.cs-hero-media--icon` instead (documented directly above that rule in the CSS) — a duotone icon
-picked from the industry text beats a generic stock photo that doesn't actually relate to the
-client.
+point `.cs-slot`'s `<img>` at it. If a reasonable search turns up nothing relevant, say so and
+ask for client photography — do not settle for a generic stock image that has no relationship
+to the client.
 
 Two slots stand in for assets that exist on the live site but not in this repo, and a maintainer
 should add them:

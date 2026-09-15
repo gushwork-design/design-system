@@ -1,0 +1,12 @@
+{
+  "name": "gushwork-slide-deck",
+  "private": true,
+  "type": "module",
+  "description": "Gushwork slide deck template — HTML source plus a .pptx build path",
+  "scripts": {
+    "pptx": "node build-pptx.mjs"
+  },
+  "dependencies": {
+    "pptxgenjs": "^3.12.0"
+  }
+}

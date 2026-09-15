@@ -5,12 +5,18 @@
 #
 #   bash scripts/stamp-release.sh 1.2.0
 #
-# Touches four places:
+# Touches these places:
 #   .claude-plugin/plugin.json       version   <- what `claude plugin list` shows
 #   .claude-plugin/marketplace.json  version   <- the marketplace entry
 #   skills/gushwork-web/SKILL.md     announce line
 #   skills/gushwork-dashboard/SKILL.md
 #   skills/gushwork-lead-magnet/SKILL.md
+#   skills/gushwork-slides/SKILL.md
+#
+# The skill list is hardcoded, so ADDING A SURFACE MEANS ADDING IT HERE. A new
+# skill that is missing from this list is never stamped: it keeps whatever
+# version it was authored with while everything around it moves, which is the
+# exact drift the announce line exists to expose.
 #
 # The announce line matters most: a teammate on a stale copy sees that copy's
 # own stale date, which is how drift becomes visible without anyone checking.
@@ -46,7 +52,7 @@ p.write_text(json.dumps(m, indent=2) + "\n")
 print(f"  marketplace.json     -> {v}")
 
 pat = re.compile(r'(Using the Gushwork [\w-]+ skill — v)[0-9.]+(, updated )[^."]+')
-for name in ("gushwork-web", "gushwork-dashboard", "gushwork-lead-magnet"):
+for name in ("gushwork-web", "gushwork-dashboard", "gushwork-lead-magnet", "gushwork-slides"):
     p = root / "skills" / name / "SKILL.md"
     t = p.read_text()
     t2, n = pat.subn(lambda x: f"{x.group(1)}{v}{x.group(2)}{d}", t)

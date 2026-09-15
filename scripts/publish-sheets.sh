@@ -21,7 +21,7 @@
 #   /style-guide            holding page        public
 #   /downloads              holding page        public
 #   /internal/claude-plugin  = install.html     @gushwork.ai
-#   /internal/mini-tools     holding page       @gushwork.ai
+#   /internal/tools          tools + templates  @gushwork.ai
 #   /internal/changelog      = changelog-sheet  @gushwork.ai
 #   /admin/review-sheet      = review-sheet     ADMIN_EMAILS only
 #   /admin/catalogue         = catalogue        ADMIN_EMAILS only

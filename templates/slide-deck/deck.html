@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roadmap to Generate 10 Qualified Leads Monthly — Gushwork</title>
+
+<!-- gushwork-build:{"pluginVersion":"1.45.0","surface":"slides","createdBy":"gushwork-slides","createdAt":"2026-09-07","registry":"https://gushwork-design.vercel.app/exports/slides/component-registry.json","changelog":"https://gushwork-design.vercel.app/preview/changelog-sheet.html","components":["ground","cover","title-bar","content-card","media-well","icon-tile","step-card","eyebrow","feature-row","lead-paragraph","rule-label","annotation","layout-split-card","layout-feature-list","layout-step-row","layout-full-bleed","layout-pricing","layout-divider","layout-big-number","layout-testimonial","layout-two-up","layout-closer"]} -->
+
+<link rel="stylesheet" href="../../foundation/tokens.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css">
+
+<style>
+/* ==========================================================================
+   Fonts. Vert Grotesk Display is the display face — R21. Plus Jakarta Sans is
+   declared as the next family in --gw-font-slide-display and only takes over
+   where Vert cannot load, which in practice means a .pptx or Slides export.
+   Caveat is the script face, for margin annotations only.
+   ====================================================================== */
+@font-face {
+  font-family: 'Vert Grotesk Display';
+  src: url('../../fonts/Vert_Grotesk_Display_VF.ttf') format('truetype-variations');
+  font-weight: 300 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  src: url('../../fonts/PlusJakartaSans-VariableFont_wght.ttf') format('truetype-variations');
+  font-weight: 200 800; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Caveat';
+  src: url('../../fonts/Caveat-VariableFont_wght.ttf') format('truetype-variations');
+  font-weight: 400 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('../../fonts/Inter-VariableFont_opsz_wght.ttf') format('truetype-variations');
+  font-weight: 100 900; font-style: normal; font-display: swap;
+}
+
+/* --- Viewer chrome. Not part of the design — strip it for export. -------- */
+* { box-sizing: border-box; }
+body {
+  margin: 0; padding: 24px;
+  background: var(--gw-color-neutral-25);
+  font-family: var(--gw-font-body);
+  /* Fit-to-viewport scale, set by the viewer script at the end of <body>.
+     A CSS-only min() cannot do this — dividing a length by a number yields a
+     length, not the unitless ratio scale() needs. Never scale the slide's own
+     units; only this transform changes. */
+  --s: 1;
+}
+.deck { display: flex; flex-direction: column; gap: 24px; align-items: center; }
+.frame {
+  width: calc(1920px * var(--s));
+  height: calc(1080px * var(--s));
+  flex: none;
+  box-shadow: var(--gw-shadow-s3);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.slide {
+  width: var(--gw-slide-w); height: var(--gw-slide-h);
+  transform: scale(var(--s)); transform-origin: top left;
+  position: relative; overflow: hidden;
+}
+@media print {
+  body { padding: 0; background: none; }
+  .deck { gap: 0; }
+  .frame { box-shadow: none; border-radius: 0; page-break-after: always; }
+}
+/* Export mode — ?export=1 renders true 1:1 with no viewer chrome, so a
+   headless capture is exactly 1920x1080. Adding &slide=N isolates one slide,
+   which is how render.sh gets per-slide PNGs. */
+body.export { padding: 0; background: none; }
+body.export .deck { gap: 0; }
+body.export .frame { box-shadow: none; border-radius: 0; }
+body.export .frame[hidden] { display: none !important; }
+
+/* ==========================================================================
+   THE GROUND — exports/slides/deck.md. primary-500 under a 40px/1px lattice
+   at 30%, whose fill ramps from primary-500 at centre to white at the edge,
+   so the grid is invisible mid-frame and emerges at the corners. The mask
+   reproduces that ramp; assets/slides/slide-ground.svg is the .pptx twin.
+   ====================================================================== */
+.ground { background: var(--gw-color-primary-500); }
+.ground::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    linear-gradient(to right,  var(--gw-color-white) var(--gw-slide-grid-line), transparent var(--gw-slide-grid-line)),
+    linear-gradient(to bottom, var(--gw-color-white) var(--gw-slide-grid-line), transparent var(--gw-slide-grid-line));
+  background-size: var(--gw-slide-grid-pitch) var(--gw-slide-grid-pitch);
+  background-position: -0.5px -0.5px;
+  opacity: var(--gw-slide-grid-opacity);
+  -webkit-mask-image: radial-gradient(var(--gw-slide-grid-radius-x) var(--gw-slide-grid-radius-y)
+      at var(--gw-slide-grid-origin-x) var(--gw-slide-grid-origin-y), transparent 0%, #000 100%);
+          mask-image: radial-gradient(var(--gw-slide-grid-radius-x) var(--gw-slide-grid-radius-y)
+      at var(--gw-slide-grid-origin-x) var(--gw-slide-grid-origin-y), transparent 0%, #000 100%);
+}
+
+/* --- Title bar. On the ground, outside the card. ------------------------- */
+.title {
+  position: absolute; left: var(--gw-slide-title-x); top: var(--gw-slide-title-y);
+  width: 1723.2px;
+  font: var(--gw-text-slide-title); letter-spacing: var(--gw-text-slide-title-tracking);
+  color: var(--gw-color-white); margin: 0;
+}
+.title.two-line { width: 1523.2px; }
+
+/* --- Logo mark. Every slide but the cover. Its 65.7 right margin does not
+       match the title's 40 — measured, optical, deliberate. -------------- */
+.mark {
+  position: absolute; left: 1815.6px; top: 61.8px; width: 38.7px; height: 38.7px;
+}
+
+/* --- Content card ------------------------------------------------------- */
+.card {
+  position: absolute;
+  left: var(--gw-slide-margin); right: var(--gw-slide-margin);
+  top: 178.2px; height: 884px;
+  background: var(--gw-color-white);
+  border: var(--gw-slide-card-border) solid var(--gw-color-neutral-200);
+  border-radius: var(--gw-radius-36);
+}
+.two-line ~ .card { top: 282.8px; height: 777.3px; }
+.card.bleed { top: 176px; border-radius: var(--gw-radius-32); overflow: hidden; }
+
+/* ==========================================================================
+   ELEMENTS — exports/slides/elements.md
+
+   COORDINATE RULE. exports/ records every number in SLIDE coordinates, but
+   these elements are children of .card, so their offsets are CARD-relative.
+   Subtract the card's content origin: x - 21.3, y - 179.5 (standard card) or
+   y - 284.1 (below a two-line title, which is where the step row and rule
+   label were measured). Pasting a slide coordinate straight into a card-
+   relative property shifts the whole card's contents down and right — it
+   looks plausible because everything moves together.
+   ====================================================================== */
+/* The well is a TEXTURE-FILLED FRAME, not an image slot. In the source its
+   roundRect carries fill=none and a pale dashed graph-paper PNG sits inside
+   it, with a transparent cutout (a device shot, a portrait) layered on top.
+   Dropping a photo straight in as the fill loses the texture and reads flat.
+   No border — the card's own border already separates it from the ground. */
+.well {
+  position: absolute; left: 18.7px; top: 14.5px; width: 779px; height: 852.3px;
+  border-radius: var(--gw-radius-28); overflow: hidden;
+  background: url('../../assets/slides/well-texture.png') center / cover;
+}
+/* The cutout. `contain` because a cutout must never be cropped, and anchored
+   to the BOTTOM so the device rises out of the frame as it does in the source.
+   The 76% height is CHOSEN, not measured: at full height the cutout collides
+   with the lead paragraph, which sits over the well's top 156px, and dark
+   copy over a white phone screen is illegible. 76% clears it by ~48px. */
+.well img {
+  position: absolute; inset: auto 0 0 0; height: 76%; width: 100%;
+  object-fit: contain; object-position: center bottom; display: block;
+}
+
+.lead {
+  position: absolute; left: 47.7px; top: 48px; width: 694.6px; margin: 0;
+  font: var(--gw-text-h6); font-weight: 500; line-height: 1.4;
+  font-family: var(--gw-font-body);
+  color: var(--gw-color-neutral-850);
+}
+/* The body-copy emphasis mechanism. One phrase per paragraph, and it must be
+   the outcome, not the mechanism. */
+.lead b { font-weight: 600; color: var(--gw-color-primary-500); }
+
+/* Feature rows: a flex column on a fixed 40px gap. The reference deck's four
+   irregular pitches (157.2 / 177.2 / 186.4 / 148.0) were approximating this. */
+.rows {
+  position: absolute; left: 872.1px; top: 74.2px; right: 20.9px;
+  display: flex; flex-direction: column; gap: 40px;
+}
+/* 24 is chosen, not measured: the source's text box starts 5.9 after the tile
+   but carries PowerPoint's default 0.1in text inset, so the visual gap is
+   ~25. Rounded to 24. */
+.row { display: flex; gap: 24px; align-items: flex-start; }
+.tile {
+  flex: none; width: 86px; height: 86px;
+  border: 1px solid var(--gw-color-neutral-200);
+  border-radius: var(--gw-radius-16);
+  display: grid; place-items: center;
+  /* Hairline square, no fill. Not a blue chip, not a filled circle. */
+}
+.tile i { font-size: 45.6px; color: var(--gw-color-primary-500); }
+.row h3 {
+  margin: 0 0 10px; font: var(--gw-text-h5); color: var(--gw-color-black);
+}
+.row p {
+  margin: 0; font: var(--gw-text-body-22-reg); line-height: 1.15;
+  color: var(--gw-color-neutral-600);
+}
+
+/* Step row. Max four — five will not fit at this pitch. */
+/* Left/right insets put the row at slide x 51.3..1876.3, matching the source.
+   Cards take `flex:1` rather than a fixed 441.7 so the width follows from the
+   container: four cards resolve to 441.3 (measured 441.7) and two to 902.5.
+   A fixed width plus a rounded gap overruns the card — that is how the
+   two-up layout first shipped 15px past the slide edge. */
+.steps {
+  position: absolute; left: 30px; right: 22.4px; top: 28.1px;
+  display: flex; gap: var(--gw-slide-gap);
+}
+.step {
+  flex: 1; min-width: 0; height: 463.8px;
+  background: var(--gw-color-primary-25);
+  border-radius: var(--gw-radius-40);
+  padding: 32.5px 27.3px;
+  display: flex; flex-direction: column;
+}
+.eyebrow {
+  font: var(--gw-text-body-22-sem); text-transform: uppercase;
+  color: var(--gw-color-primary-500); line-height: 1.4; margin: 0;
+}
+.step h3 { margin: 25px 0 0; font: var(--gw-text-h5); color: var(--gw-color-black); }
+/* The footnote sits low on purpose — the gap is what stops four cards reading
+   as four paragraphs. Do not close it up. */
+.step .foot {
+  margin: auto 0 0; font: var(--gw-text-body-22-reg);
+  color: var(--gw-color-neutral-700); line-height: 1.4;
+}
+.step .glyph { margin: 28px 0 0; font-size: 47.6px; color: var(--gw-color-primary-500); }
+
+/* Rule label: a centred micro-label with a hairline out to each side. The
+   source sets it at 18.67px, under the 22px floor — built at 22 instead. */
+.rule-label {
+  position: absolute; left: 47.3px; right: 47.3px; top: 596.1px;
+  display: flex; align-items: center; gap: 24px;
+}
+.rule-label::before, .rule-label::after {
+  content: ""; flex: 1; height: 1px; background: var(--gw-color-neutral-200);
+}
+.rule-label span {
+  font: var(--gw-text-body-22-reg); color: var(--gw-color-neutral-400);
+  text-transform: uppercase; white-space: nowrap;
+}
+
+/* Margin annotation — R-kept 7 Sep 2026. One per slide. Must point at
+   something specific. Never load-bearing. */
+.annotation {
+  position: absolute; width: 150.6px;
+  font: var(--gw-text-slide-annotation);
+  color: var(--gw-color-primary-500); text-align: center;
+  transform: rotate(4.6deg);
+}
+.annotation-arc {
+  position: absolute; width: 66.8px; height: 204px;
+  border: 1px solid var(--gw-color-primary-500);
+  border-radius: 50%;
+  border-right-color: transparent; border-top-color: transparent;
+  transform: rotate(68.8deg);
+}
+
+/* ==========================================================================
+   THE COVER — exports/slides/cover.md. Figma-measured, node 99:5280.
+   Own geometry, own texture stack. Nothing here generalises.
+   ====================================================================== */
+.cover-frame {
+  position: absolute; inset: var(--gw-slide-cover-inset);
+  background: var(--gw-color-primary-500);
+  border: var(--gw-slide-cover-border) solid var(--gw-color-neutral-alpha-20-white);
+  border-radius: var(--gw-radius-32);
+  backdrop-filter: blur(var(--gw-slide-cover-blur));   /* R23 — measured, cover only */
+  overflow: hidden;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 20px;
+}
+.cover-swoosh {
+  position: absolute; width: 1892.49px; height: 1062.39px;
+  left: calc(50% - 57.51px); top: calc(50% - 178.88px);
+  transform: translate(-50%, -50%);
+}
+/* The prospect's OWN homepage, ghosted. Not a texture — see cover.md.
+   SWAP THIS PER DECK. Shipping another company's site here is a real error.
+   Save the screenshot small (~123px wide) and let the upscale blur it. */
+.cover-ghost {
+  position: absolute; width: 2156.2px; height: 1682.06px;
+  left: calc(50% - 51.55px); top: calc(50% - 68.68px);
+  transform: translate(-50%, -50%);
+  background: url('../../assets/slides/cover-site-ghost-example.png') top left / 3794.99px;
+  mix-blend-mode: overlay; opacity: 0.2;
+}
+/* The cover's own lattice: 25.6px DASHED primary-400. Not the ground's 40px
+   solid white one. Two grids, two jobs — never substitute. */
+.cover-lattice {
+  position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+  width: 1538.03px; display: flex; flex-wrap: wrap; opacity: 0.6;
+}
+.cover-lattice i {
+  width: 25.634px; height: 25.634px; flex: none;
+  border: 1.068px dashed var(--gw-color-primary-400);
+}
+.cover-text {
+  position: relative; width: 1140px; padding: 48px;
+  display: flex; flex-direction: column; gap: 32px; align-items: flex-start;
+}
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 12px 16px;
+  background: var(--gw-color-neutral-25);
+  border: 1px solid var(--gw-color-neutral-50);
+  border-radius: var(--gw-radius-80);
+  box-shadow: var(--gw-shadow-s4);   /* s4 retuned tighter in source; see cover.md */
+  font-family: var(--gw-font-body); font-weight: 500; font-size: 20px;
+  line-height: 1.4; letter-spacing: -0.32px; color: var(--gw-color-black);
+}
+.chip i { font-size: 22px; color: var(--gw-color-primary-500); }
+/* The cover emphasis mechanism: frame words at 60% white, the claim solid. */
+.cover-title {
+  margin: 0;
+  font: var(--gw-text-slide-cover);
+  letter-spacing: var(--gw-text-slide-cover-tracking);
+  color: var(--gw-color-neutral-alpha-60-white);
+}
+.cover-title b { font-weight: inherit; color: var(--gw-color-white); }
+.wordmark { position: absolute; left: 55.4px; bottom: 33.6px; height: 37px; }
+.cover-url {
+  position: absolute; right: 40px; bottom: 40px;
+  font: var(--gw-text-body-22-reg); color: var(--gw-color-neutral-alpha-60-white);
+}
+
+/* ==========================================================================
+   AUTHORED LAYOUTS — no source has these. exports/slides/layouts.md.
+   Treat as a first draft and say so on handover.
+   ====================================================================== */
+.centred {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 32px; text-align: center; padding: 0 200px;
+}
+.centred .eyebrow { color: var(--gw-color-neutral-alpha-60-white); }
+.centred h2 {
+  margin: 0; font: var(--gw-text-slide-title); color: var(--gw-color-white);
+}
+.stat { margin: 0; font: var(--gw-text-slide-cover); color: var(--gw-color-white); }
+.stat-sub {
+  margin: 0; font: var(--gw-text-h6); font-family: var(--gw-font-body);
+  color: var(--gw-color-neutral-alpha-60-white); max-width: 1100px;
+}
+.quote {
+  position: absolute; left: 857.7px; top: 60.5px; right: 20.9px;
+  display: flex; flex-direction: column; gap: 40px;
+}
+.quote blockquote {
+  margin: 0; font: var(--gw-text-h3); color: var(--gw-color-black);
+}
+.quote figcaption {
+  font: var(--gw-text-body-22-med); color: var(--gw-color-neutral-700);
+}
+/* AUTHORED. Height is CHOSEN, not measured: the cards stretch to fill the
+   card with a symmetric 28.1 inset, rather than inheriting the step card's
+   measured 463.8 and leaving 285px of dead space under a two-item row. */
+.two-up {
+  position: absolute; left: 30px; right: 22.4px; top: 28.1px; bottom: 28.1px;
+  display: flex; gap: var(--gw-slide-gap);
+}
+.two-up .step { height: auto; }
+.two-up .step.alt { background: var(--gw-color-neutral-25); }
+
+/* Press-card strip. Real outlets, flattened in the source — see elements.md.
+   Cannot be re-typeset; rebuild from real elements if the copy must change. */
+.press {
+  position: absolute; left: 797.7px; top: 573.3px; width: 1079.4px; height: 209.2px;
+}
+.press img { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+/* Pricing */
+.price-head {
+  position: absolute; left: 112.9px; top: 115.3px; width: 801px; margin: 0;
+  font: var(--gw-text-h3); color: var(--gw-color-black);
+}
+.price-sub {
+  position: absolute; left: 112.9px; top: 186.5px; width: 1045.4px; margin: 0;
+  font: var(--gw-text-h6); font-family: var(--gw-font-body); font-weight: 500;
+  color: var(--gw-color-neutral-600);
+}
+.price-sub b { font-weight: 700; color: var(--gw-color-primary-500); }
+/* Both dimensions explicit. The source image is 1612x508 and the slot is
+   1800.8x567.4 — aspect 3.173 vs 3.174, so it scales without distortion. Set
+   width alone and the natural height overruns the slide by 185px. */
+.price-table {
+  position: absolute; left: 20.9px; top: 238.5px;
+  width: 1800.8px; height: 567.4px;
+}
+.price-table img { width: 100%; height: 100%; display: block; }
+/* The proof goes last and goes centred — the only centred text on a content slide. */
+.price-foot {
+  position: absolute; left: 385.7px; top: 758.3px; width: 979.4px; margin: 0;
+  font: var(--gw-text-h6); font-weight: 700; text-align: center;
+  color: var(--gw-color-black);
+}
+</style>
+</head>
+<body>
+<div class="deck">
+
+<!-- ========== 1. COVER — Figma-measured (99:5280) ========== -->
+<div class="frame" id="slide-1"><section class="slide ground">
+  <div class="cover-frame">
+    <img class="cover-swoosh" src="../../assets/slides/cover-swoosh.svg" alt="">
+    <!-- SWAP: the prospect's homepage, ghosted. See cover.md. -->
+    <div class="cover-ghost"></div>
+    <div class="cover-lattice">
+      <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+      <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+      <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+      <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+      <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+      <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+    </div>
+    <div class="cover-text">
+      <span class="chip"><i class="ph-fill ph-seal-check"></i>Designed for manufacturers and distributors</span>
+      <h1 class="cover-title">Roadmap to <b>generate 10 qualified leads monthly</b> for machine tool builders</h1>
+    </div>
+    <img class="wordmark" src="../../assets/logo/gushwork-logo-white.svg" alt="Gushwork">
+    <span class="cover-url">www.gushwork.ai</span>
+  </div>
+</section></div>
+
+<!-- ========== 2. SPLIT CARD — export-derived. The workhorse. ========== -->
+<div class="frame" id="slide-2"><section class="slide ground">
+  <h2 class="title">You'll be in good hands</h2>
+  <img class="mark" src="../../assets/logo/gushwork-symbol-white.svg" alt="">
+  <div class="card">
+    <!-- Texture only. Drop a transparent cutout in as an <img> when you have one. -->
+    <div class="well"></div>
+    <p class="lead">Most small and medium business websites stay invisible to Google and AI.
+      <b>We make them discoverable.</b></p>
+    <div class="press"><img src="../../assets/slides/press-cards.png" alt="Coverage in CB Insights, The Economic Times, TechCrunch and Financial Express"></div>
+  </div>
+</section></div>
+
+<!-- ========== 3. FEATURE LIST — export-derived ========== -->
+<div class="frame" id="slide-3"><section class="slide ground">
+  <h2 class="title">Our approach: intent-led AI SEO</h2>
+  <img class="mark" src="../../assets/logo/gushwork-symbol-white.svg" alt="">
+  <div class="card">
+    <div class="well"><img src="../../assets/slides/phone-serp.png" alt="A phone showing Your Brand ranking first for &quot;manufacturers near me&quot;"></div>
+    <p class="lead">We turn your website into a lead magnet with an automated AI SEO engine, so you
+      <b>show up where buyers search</b> and convert visitors into revenue.</p>
+    <div class="rows">
+      <div class="row"><div class="tile"><i class="ph ph-magnifying-glass"></i></div>
+        <div><h3>Find the demand</h3><p>Identify 1,000+ real search queries your buyers are asking.</p></div></div>
+      <div class="row"><div class="tile"><i class="ph ph-chart-line-up"></i></div>
+        <div><h3>Outsmart the competition</h3><p>Scrape top results, then publish stronger, data-backed pages.</p></div></div>
+      <div class="row"><div class="tile"><i class="ph ph-stack"></i></div>
+        <div><h3>Publish at scale</h3><p>Launch 100+ targeted pages yearly.</p></div></div>
+      <div class="row"><div class="tile"><i class="ph ph-broadcast"></i></div>
+        <div><h3>AI feed</h3><p>An AI-optimised feed that boosts Google rankings and AI mentions.</p></div></div>
+    </div>
+  </div>
+</section></div>
+
+<!-- ========== 4. STEP ROW — export-derived. Max four. ========== -->
+<div class="frame" id="slide-4"><section class="slide ground">
+  <h2 class="title two-line">Low touch from your end,<br>highly managed from ours</h2>
+  <img class="mark" src="../../assets/logo/gushwork-symbol-white.svg" alt="">
+  <div class="card">
+    <div class="steps">
+      <div class="step"><p class="eyebrow">Beginning</p><h3>Onboarding call</h3>
+        <i class="ph-fill ph-rocket-launch glyph"></i>
+        <p class="foot">With your customer growth strategist, senior growth strategist and account executive.</p></div>
+      <div class="step"><p class="eyebrow">Ongoing updates</p><h3>Strategic progress updates</h3>
+        <i class="ph-fill ph-chart-line-up glyph"></i>
+        <p class="foot">Delivered to you.</p></div>
+      <div class="step"><p class="eyebrow">Monthly</p><h3>Monthly catch up</h3>
+        <i class="ph-fill ph-calendar-check glyph"></i>
+        <p class="foot">With your customer growth strategist.</p></div>
+      <div class="step"><p class="eyebrow">Quarterly</p><h3>Quarterly business review</h3>
+        <i class="ph-fill ph-presentation-chart glyph"></i>
+        <p class="foot">With our head of client success and your customer growth strategist.</p></div>
+    </div>
+    <!-- The source runs a channel-logo strip here, labelled by .rule-label.
+         Both are omitted: the logos are ~20 separate files in the source deck
+         and a label with nothing under it labels nothing. .rule-label is
+         specced in exports/slides/elements.md when you do have a strip. -->
+  </div>
+</section></div>
+
+<!-- ========== 5. FULL-BLEED CARD — export-derived ========== -->
+<div class="frame" id="slide-5"><section class="slide ground">
+  <h2 class="title">John Maye Company: a case study</h2>
+  <img class="mark" src="../../assets/logo/gushwork-symbol-white.svg" alt="">
+  <div class="card bleed">
+    <img src="../../assets/slides/case-study-john-maye.png" alt=""
+         style="position:absolute;left:18.7px;top:20.5px;width:1816.8px;height:862.2px;object-fit:cover;border-radius:var(--gw-radius-28)">
+  </div>
+</section></div>
+
+<!-- ========== 6. PRICING — export-derived ========== -->
+<div class="frame" id="slide-6"><section class="slide ground">
+  <h2 class="title">Simple pricing that ramps with ROI</h2>
+  <img class="mark" src="../../assets/logo/gushwork-symbol-white.svg" alt="">
+  <div class="card">
+    <h3 class="price-head">Choose your speed to qualified leads</h3>
+    <p class="price-sub"><b>Save $2,400 a year</b> with an annual subscription or upfront payment.</p>
+    <div class="price-table"><img src="../../assets/slides/pricing-table.png" alt=""></div>
+    <p class="price-foot">650+ businesses worldwide trust us to generate high-intent leads</p>
+  </div>
+</section></div>
+
+<!-- ========== 7. SECTION DIVIDER — AUTHORED ========== -->
+<div class="frame" id="slide-7"><section class="slide ground">
+  <div class="centred">
+    <p class="eyebrow">Part two</p>
+    <h2>What the first 90 days look like</h2>
+  </div>
+</section></div>
+
+<!-- ========== 8. BIG NUMBER — AUTHORED ========== -->
+<div class="frame" id="slide-8"><section class="slide ground">
+  <img class="mark" src="../../assets/logo/gushwork-symbol-white.svg" alt="">
+  <div class="centred">
+    <p class="stat">1.3M</p>
+    <p class="stat-sub">search impressions in 12 months, from a site that ranked for nothing</p>
+  </div>
+</section></div>
+
+<!-- ========== 9. TESTIMONIAL — AUTHORED ========== -->
+<div class="frame" id="slide-9"><section class="slide ground">
+  <h2 class="title">Don't just take our word for it</h2>
+  <img class="mark" src="../../assets/logo/gushwork-symbol-white.svg" alt="">
+  <div class="card">
+    <div class="well"></div>
+    <figure class="quote">
+      <blockquote>We went from invisible to page one in four months, and the leads that come
+        through now already know what we do.</blockquote>
+      <figcaption>Replace with a real customer, company and number.</figcaption>
+    </figure>
+  </div>
+</section></div>
+
+<!-- ========== 10. TWO-UP COMPARE — AUTHORED ========== -->
+<div class="frame" id="slide-10"><section class="slide ground">
+  <h2 class="title">Before and after</h2>
+  <img class="mark" src="../../assets/logo/gushwork-symbol-white.svg" alt="">
+  <div class="card">
+    <div class="two-up">
+      <div class="step alt"><p class="eyebrow" style="color:var(--gw-color-neutral-600)">Before</p>
+        <h3>Ranked for nothing</h3>
+        <p class="foot">No organic pipeline. Every lead bought.</p></div>
+      <div class="step"><p class="eyebrow">After</p>
+        <h3>100+ pages ranking</h3>
+        <p class="foot">Qualified inbound, arriving without spend.</p></div>
+    </div>
+  </div>
+</section></div>
+
+<!-- ========== 11. CLOSER — AUTHORED. Measure the real one in GW-Slides. ========== -->
+<div class="frame" id="slide-11"><section class="slide ground">
+  <div class="centred"><h2>Thank you</h2></div>
+</section></div>
+
+</div>
+
+<script>
+/* Viewer chrome only — not part of the design. Fits one 1920x1080 slide to the
+   viewport. render.sh forces --s:1 via the print path, so exports are 1:1. */
+(function () {
+  var q = new URLSearchParams(location.search);
+
+  if (q.has('export')) {
+    // True 1:1. No padding, no shadow, no fit — a 1920x1080 capture is exact.
+    document.body.classList.add('export');
+    document.body.style.setProperty('--s', 1);
+    var only = q.get('slide');
+    if (only) {
+      document.querySelectorAll('.frame').forEach(function (f, i) {
+        f.hidden = String(i + 1) !== only;
+      });
+    }
+    return;
+  }
+
+  var fit = function () {
+    var s = Math.min(1, (document.documentElement.clientWidth - 48) / 1920);
+    document.body.style.setProperty('--s', s);
+  };
+  fit();
+  addEventListener('resize', fit);
+})();
+</script>
+</body>
+</html>

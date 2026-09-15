@@ -11,27 +11,34 @@
      Title: "<Client> Case Study | Gushwork" — the live site's own pattern
      says "Gushwork" twice; drop the duplicate. Description: client + industry
      + the single strongest hero stat, ≤160 chars so Google doesn't truncate it. -->
-<title>Cutting Edge Plasma Case Study | Gushwork</title>
-<meta name="description" content="See how Cutting Edge Plasma ranked #1 for CNC searches across the Midwest, drove 4,000+ visitors, and generated 50+ leads with Gushwork's AI-powered SEO.">
+<!-- ============================================================
+     PLACEHOLDER TEMPLATE - every double-brace token below must be replaced.
+     `bash scripts/check-placeholders.sh <file>` fails while any remain.
+     A worked, fully-filled instance lives at
+     skills/gushwork-web/examples/cutting-edge-plasma/ - read it to see
+     what "filled in" looks like, but COPY THIS FILE, not that one.
+     ============================================================ -->
+<title>{{CLIENT_NAME}} Case Study | Gushwork</title>
+<meta name="description" content="{{META_DESCRIPTION - client + industry + the single strongest hero stat, <=160 chars}}">
 
 <!-- OG image — rendered from og-source.html in this same folder (inspired by
      assets/og/_source.html's pattern, designed from 1607:425), not written by
      hand. UPDATE PER CASE STUDY along with the title/description above: swap
      og-source.html's headline/photo/logo for the new case, re-render it at
-     exactly 1200×630, replace cutting-edge-plasma-og.png, and point the URLs
+     exactly 1200×630, replace {{CLIENT_SLUG}}-og.png, and point the URLs
      below at wherever this page and image actually get hosted — gushwork.ai
      here is illustrative, this template doesn't control deployment. -->
 <meta property="og:type" content="article">
-<meta property="og:title" content="Cutting Edge Plasma Case Study | Gushwork">
-<meta property="og:description" content="See how Cutting Edge Plasma ranked #1 for CNC searches across the Midwest, drove 4,000+ visitors, and generated 50+ leads with Gushwork's AI-powered SEO.">
-<meta property="og:url" content="https://www.gushwork.ai/case-study/cutting-edge-plasma">
-<meta property="og:image" content="https://www.gushwork.ai/images/case-study/cutting-edge-plasma-og.png">
+<meta property="og:title" content="{{CLIENT_NAME}} Case Study | Gushwork">
+<meta property="og:description" content="{{META_DESCRIPTION}}">
+<meta property="og:url" content="https://www.gushwork.ai/case-study/{{CLIENT_SLUG}}">
+<meta property="og:image" content="https://www.gushwork.ai/images/case-study/{{CLIENT_SLUG}}-og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Cutting Edge Plasma Case Study | Gushwork">
-<meta name="twitter:description" content="See how Cutting Edge Plasma ranked #1 for CNC searches across the Midwest, drove 4,000+ visitors, and generated 50+ leads with Gushwork's AI-powered SEO.">
-<meta name="twitter:image" content="https://www.gushwork.ai/images/case-study/cutting-edge-plasma-og.png">
+<meta name="twitter:title" content="{{CLIENT_NAME}} Case Study | Gushwork">
+<meta name="twitter:description" content="{{META_DESCRIPTION}}">
+<meta name="twitter:image" content="https://www.gushwork.ai/images/case-study/{{CLIENT_SLUG}}-og.png">
 
 <!-- No component literally named "favicon" in this skill — this is
      shared-components.md's own ruling for the symbol-only mark on marketing
@@ -98,6 +105,11 @@ body{
   -webkit-font-smoothing:antialiased;
 }
 img{display:block;max-width:100%}
+/* The rule above sets `display` on every img, and ANY author display rule beats the
+   UA stylesheet's [hidden]{display:none} — so without this, `el.hidden = true` on an
+   img does nothing and you get the broken-image glyph plus its alt text. Same class
+   of bug the README records for the pull quote's SVG. Fixed once, here. */
+[hidden]{display:none!important}
 a{color:inherit;text-decoration:none}
 h1,h2,h3,h4,p,figure,figcaption,blockquote{margin:0}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
@@ -287,33 +299,19 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
   display:grid;place-items:center;
 }
 .cs-hero-logo img{max-width:100%;max-height:100%;object-fit:contain}
-
-/* ----------------------------------------------------------------------
-   GENERATED HERO — sector icon, for bulk case studies with no client
-   photography. NEW ELEMENT — declared in
-   notices/2026-09-07-generated-hero-cards.md. A large duotone icon, chosen
-   from the case's own industry text against the existing Phosphor set
-   already vendored at assets/icons/ (1512 icons — no image generation call,
-   no per-client asset to source, fully deterministic from data already on
-   hand). Keeps the hero slot's own frame (r12, 80px tell corner) as the
-   outer silhouette; only the content inside is generated.
-
-   Duotone icons are two paths sharing one `fill="currentColor"` — one at
-   full opacity, one at 20% — so setting `color` on the wrapper tints both
-   automatically. See assets/icons/duotone/gear.svg for the pattern.
-
-   TO GENERATE A NEW CASE STUDY'S HERO: match the industry string against a
-   keyword table (manufacturing/CNC → gear or factory; healthcare/medical →
-   stethoscope or heart; packaging → package; consulting/compliance →
-   shield or briefcase; logistics/distribution → warehouse or truck;
-   generic fallback → buildings) and inline that icon's <path> data here. */
-.cs-hero-media--icon{
-  display:grid;place-items:center;
-  background:var(--gw-color-primary-25);
-  border-radius:var(--gw-radius-12);
-  border-bottom-right-radius:var(--cs-radius-80);
+/* Shown only when no logo has been dropped in yet — the onerror handler on the
+   <img> reveals it. Same grey-slot treatment as the hero image placeholder. */
+.cs-hero-logo-label{
+  font:var(--gw-text-body-12-reg);letter-spacing:var(--gw-text-body-12-reg-tracking);
+  color:var(--gw-color-neutral-700);text-transform:uppercase;text-align:center;
 }
-.cs-hero-media--icon svg{width:200px;height:200px;color:var(--gw-color-primary-500)}
+.cs-hero-logo:has(.cs-hero-logo-label:not([hidden])){background:var(--gw-color-neutral-100)}
+
+/* The duotone-icon hero (.cs-hero-media--icon) was WITHDRAWN 15 Sep 2026 and its
+   CSS removed. It was declared in notices/2026-09-07-generated-hero-cards.md; the
+   generated FIGURE in that same notice stands and is still used below. This hero
+   takes a photograph — if none can be found, raise it rather than substituting
+   an illustration. */
 
 /* ----------------------------------------------------------------------
    GENERATED FIGURE — the article's inline "Dashboard or result image" slot,
@@ -701,7 +699,6 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
   .cs-hero-title{font:var(--gw-text-h6);letter-spacing:var(--gw-text-h6-tracking)}
   .cs-hero-meta span{font:var(--gw-text-body-16-med)}
   .cs-hero-media{width:100%;height:237px}
-  .cs-hero-media--icon svg{width:120px;height:120px}
   /* Two cards side-by-side don't fit a 343px column — stack them instead,
      and drop the figure's fixed aspect-ratio since a stacked pair needs
      more height than 720:374 allows. The 60/52 padding is sized for the
@@ -798,55 +795,70 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
           </div>
 
           <div class="cs-hero-heads">
-            <!-- Sample data: gushwork.ai/case-study/cutting-edge-plasma, verbatim —
-                 including its Title Case. That casing ships live; the voice rule
-                 governs what this template authors, not a real headline reproduced
-                 as sample content. Same precedent as the rail card title below. -->
-            <h1 class="cs-hero-title">From Chasing CNC Buyers To Getting Found On Google</h1>
+            <!-- Lead with the OUTCOME and the NUMBER, sentence case, and no full
+                 stop - not trailing, and not internal either. See voice.md.
+                 Good:  "Acme gets 25 qualified leads in their first 30 days"
+                 Bad:   "A case study in digital transformation." -->
+            <h1 class="cs-hero-title">{{HERO_TITLE}}</h1>
             <div class="cs-hero-meta">
-              <span>CNC Equipment</span>
+              <span>{{INDUSTRY}}</span>
               <i aria-hidden="true"></i>
-              <span>USA</span>
+              <span>{{COUNTRY}}</span>
             </div>
           </div>
         </div>
 
-        <!-- image — one slot (1669:2658). Three ways to fill it, in order of
-             preference:
-             (a) a real client photo — `.cs-slot` + `<img>`. Used here: a
-                 stock photo (Unsplash, free-licensed, no login/API key
-                 needed), since no client-supplied photography exists.
-             (b) stock photography search failed to turn up anything
-                 relevant — `.cs-hero-media--icon`, a duotone Phosphor icon
-                 chosen from the case's industry text. CSS still defined
-                 below for this fallback; not what's used in this instance.
-             (c) Envato Elements was asked about and ruled out — it needs a
-                 login this session won't perform. An AI image-generation
-                 tool (Weave) is also available but spends real credits and
-                 needs per-run approval, so it wasn't reached for either,
-                 given option (a) worked on the first search. -->
+        <!-- image — one slot (1669:2658). This hero takes a PHOTOGRAPH.
+             1. Client-supplied photography — always first choice.
+             2. Free-licensed stock (Unsplash; skip Unsplash+), searched on the
+                physical thing the client makes. See the README.
+             The duotone-icon hero was withdrawn 15 Sep 2026 — do not reinstate
+             it. Envato needs a login; Weave spends credits and needs per-run
+             approval. If no photograph can be found, that is a blocker to
+             raise, not a thing to route around. -->
         <div class="cs-hero-media">
           <div class="cs-slot">
-            <img src="../../../../assets/case-study/sample/cutting-edge-plasma-cnc-milling.jpg" alt="CNC mill cutting an aluminum part, coolant spraying the cutting head">
-            <!-- Client-logo overlay — Figma 1669:4387. src points at a fetch
-                 this build never actually ran (no real client-logo fetch step
-                 exists yet), so onerror fires and the box hides itself —
-                 demonstrating the "couldn't fetch → hide" half of the ask
-                 honestly rather than faking a found logo. Wire a real fetch
-                 in before generating a case study for real. -->
+            <!-- REAL client page: client-supplied photography. This is a BRIEF
+                 FIELD, not something to go and find. If the client has not sent
+                 photography, ask for it - their plant is the only image that is
+                 actually theirs.
+
+                 If it has not arrived, use free-licensed stock: search the
+                 physical thing they make ("CNC milling", not "B2B software"),
+                 skip Unsplash+ results, downscale to 1100px, and record the
+                 attribution in the page README.
+
+                 The grey slot label below shows through until an image is
+                 dropped in. -->
+            <div class="cs-slot-label">Hero image — 580 × 400</div>
+            <!-- Client-logo overlay — Figma 1669:4387, 180 × 80, white, radius-8,
+                 inset 15px, no border or shadow.
+
+                 TO FILL: fetch the client's logo (their site's header, press kit,
+                 or LinkedIn banner), save it as
+                 assets/case-study/sample/<client-slug>-logo.png — transparent PNG
+                 or SVG, trimmed of its own whitespace since the box adds 12px of
+                 padding — and replace {{CLIENT_SLUG}}. Until then the grey
+                 "Client logo" placeholder below shows in its place.
+
+                 SAMPLE-DATA pages (R24): leave it unfilled. A real client's mark
+                 above invented numbers reads as participation. The placeholder
+                 reads as unfinished, which is what the page is. -->
             <div class="cs-hero-logo">
-              <img src="../../../../assets/case-study/sample/cutting-edge-plasma-logo.png" alt="Cutting Edge Plasma logo"
-                   onerror="this.closest('.cs-hero-logo').style.display='none'">
+              <img src="../../../../assets/case-study/sample/{{CLIENT_SLUG}}-logo.png" alt="{{CLIENT_NAME}} logo"
+                   onerror="this.hidden=true;this.nextElementSibling.hidden=false">
+              <span class="cs-hero-logo-label" hidden>Client logo</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Three outcome numbers, verbatim from the live sample. -->
+      <!-- Three REAL outcome numbers. Never invent these. If the engagement has
+           no numbers yet, the page is not ready to be written. -->
       <div class="cs-stats">
-        <div class="cs-stat"><b>#1 rankings</b><span>for high-intent searches across Midwest states</span></div>
-        <div class="cs-stat"><b>4,000+</b><span>Visitors to their site</span></div>
-        <div class="cs-stat"><b>50+ leads</b><span>Generated since they started working with us</span></div>
+        <div class="cs-stat"><b>{{STAT_1_VALUE}}</b><span>{{STAT_1_LABEL}}</span></div>
+        <div class="cs-stat"><b>{{STAT_2_VALUE}}</b><span>{{STAT_2_LABEL}}</span></div>
+        <div class="cs-stat"><b>{{STAT_3_VALUE}}</b><span>{{STAT_3_LABEL}}</span></div>
       </div>
     </div>
   </header>
@@ -858,35 +870,41 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
     <div class="cs-article-inner">
       <article class="cs-prose">
 
-        <!-- Sample copy below is gushwork.ai/case-study/cutting-edge-plasma, condensed
-             into this template's own section shape. Paragraph text is verbatim or
-             lightly trimmed from the live page; h2s are this template's own structural
-             labels, not headings the live page carries. -->
+        <!-- The h2s are structural labels, not fixed copy - rewrite them for the
+             story. Keep the shape: who they are -> what changed -> why it matters.
+             No full stops in any h2. -->
         <div class="cs-block">
-          <h2>The customer — a strong product, invisible online</h2>
-          <p>Cutting Edge Plasma had a good product, strong reviews, and a clear buyer base: fabrication shops, custom metalwork businesses, and hobbyists looking for CNC plasma cutting tables, router tables, and laser systems. But the website was not bringing in buyers. Steve Fisher, the owner of Cutting Edge Plasma, was doing most of the sales work himself.</p>
+          <h2>{{H2_WHO_THEY_ARE}}</h2>
+          <p>{{WHO_THEY_ARE — what the client sells, who buys it, and the specific way they were invisible. Concrete nouns, not "digital transformation".}}</p>
         </div>
 
         <!-- OPTIONAL: TL;DR. Delete this whole block if the story does not need it. -->
         <div class="cs-tldr">
           <div class="cs-tldr-card">
             <h3>Problem</h3>
-            <p>Cutting Edge Plasma had strong products and reviews, but the website was not generating consistent inbound.</p>
+            <p>{{TLDR_PROBLEM — one sentence, what was not working}}</p>
           </div>
           <div class="cs-tldr-card">
             <h3>Challenge</h3>
-            <p>CNC equipment buyers search by machine type, table size, material, geography, and use case. Generic product pages were not enough to capture that intent.</p>
+            <p>{{TLDR_CHALLENGE — how this industry's buyers actually search, and why the old pages could not match it}}</p>
           </div>
           <div class="cs-tldr-card cs-tldr-card--wide">
             <h3>Solution</h3>
-            <p>Gushwork revamped the website, built search pages around how buyers look for CNC tables, and helped Cutting Edge Plasma rank for high-intent searches across Midwest states.</p>
+            <p>{{TLDR_SOLUTION — what Gushwork built, in the buyer's language}}</p>
           </div>
+        </div>
+
+        <!-- OPTIONAL but usually the strongest block: how buyers in THIS industry
+             search. Delete if the story does not need it. -->
+        <div class="cs-block">
+          <h2>{{H2_HOW_BUYERS_SEARCH}}</h2>
+          <p>{{HOW_BUYERS_SEARCH — the specific queries, specs or geographies this industry searches on. This is the block that makes a case study useful to the next prospect rather than flattering to the last one.}}</p>
         </div>
 
         <div class="cs-block">
           <h2>What the first 90 days showed</h2>
           <div class="cs-copy">
-            <p>In the first 90 days, the channel started bringing in buyers who matched Cutting Edge Plasma&rsquo;s market. Fabrication shops. Custom metalwork businesses. Independent operators. People who arrived with a specific machine in mind and submitted inquiries through the site.</p>
+            <p>{{FIRST_90_DAYS — who started arriving, named by segment}}</p>
             <!-- No client photography exists for bulk case studies — generated
                  from the case's own stats instead. See the CSS comment above
                  .cs-figure--generated for how to regenerate this per case. -->
@@ -897,12 +915,12 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
                 </div>
                 <div class="cs-growth-card-body">
                   <div>
-                    <span class="cs-growth-card-value">4,000+</span><br>
-                    <span class="cs-growth-card-caption">Visitors to their site</span>
+                    <span class="cs-growth-card-value">{{STAT_2_VALUE}}</span><br>
+                    <span class="cs-growth-card-caption">{{STAT_2_LABEL}}</span>
                   </div>
                   <div class="cs-growth-card-chart">
                     <div class="cs-growth-card-yaxis" aria-hidden="true">
-                      <span>4.5K</span><span>3K</span><span>1.5K</span><span>0</span>
+                      <span>{{CHART_1_Y4}}</span><span>{{CHART_1_Y3}}</span><span>{{CHART_1_Y2}}</span><span>0</span>
                     </div>
                     <div class="cs-growth-card-plot">
                       <svg viewBox="0 0 240 90" preserveAspectRatio="none" aria-hidden="true">
@@ -932,12 +950,12 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
                 </div>
                 <div class="cs-growth-card-body">
                   <div>
-                    <span class="cs-growth-card-value">50+ Leads</span><br>
-                    <span class="cs-growth-card-caption">Generated since they started working with us</span>
+                    <span class="cs-growth-card-value">{{STAT_3_VALUE}}</span><br>
+                    <span class="cs-growth-card-caption">{{STAT_3_LABEL}}</span>
                   </div>
                   <div class="cs-growth-card-chart">
                     <div class="cs-growth-card-yaxis" aria-hidden="true">
-                      <span>60</span><span>40</span><span>20</span><span>0</span>
+                      <span>{{CHART_2_Y4}}</span><span>{{CHART_2_Y3}}</span><span>{{CHART_2_Y2}}</span><span>0</span>
                     </div>
                     <div class="cs-growth-card-plot">
                       <svg viewBox="0 0 240 90" preserveAspectRatio="none" aria-hidden="true">
@@ -962,36 +980,43 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
                 </div>
               </div>
             </figure>
-            <p>The lead dashboard notification flow also helped. When an inquiry came in, Steve received a text alert and could call while the buyer was still warm. On the QBR, he called the real-time notifications one of the most practically useful parts of the setup.</p>
+            <p>{{WHAT_ELSE_HELPED — a second, concrete mechanism. Delete if there is not a real one.}}</p>
           </div>
         </div>
 
-        <!-- testimonial-card-web (1060:7647). Real client, real number. -->
+        <!-- testimonial-card-web (1060:7647). A REAL quote, cleared by the client,
+             with a real name and title. Never invent one, and never attach a real
+             person's photograph to a quote they did not give. If the quote is not
+             cleared yet, leave these tokens in place - the placeholder check will
+             stop the page shipping, which is the point.
+             Sample-data pages: see R24 in DECISIONS.md. Sample NUMBERS are allowed;
+             an invented named person, a borrowed photo or a real client logo are not. -->
         <figure class="cs-quote">
           <!-- visible:false in the Figma node. Kept so the design is recoverable. -->
           <svg class="cs-quote-mark is-hidden" viewBox="0 0 31 24" aria-hidden="true"><path d="M0 24V13.7C0 6.13 4.6 1.05 12.4 0l1.4 4.2c-4.3 1-6.7 3.5-7 7.4H14V24H0Zm17 0V13.7C17 6.13 21.6 1.05 29.4 0L31 4.2c-4.4 1-6.8 3.5-7.1 7.4H31V24H17Z"/></svg>
-          <p>&ldquo;What you guys are doing is far superior to what I was doing.&rdquo;</p>
+          <p>&ldquo;{{QUOTE}}&rdquo;</p>
           <figcaption class="cs-byline">
             <!-- client/avatar — real photo, grayscale applied in CSS. Never
                  substitute the dashboard `Avatar` character asset. -->
             <span class="cs-byline-photo">
-              <img src="../../../../assets/case-study/sample/cutting-edge-plasma-steve-fisher.webp" alt="Steve Fisher">
+              <img src="../../../../assets/case-study/sample/{{CLIENT_SLUG}}-{{QUOTE_PHOTO}}.webp" alt="{{QUOTE_NAME}}"
+                   onerror="this.closest('.cs-byline-photo').style.display='none'">
             </span>
             <span class="cs-byline-text">
-              <b>Steve Fisher</b>
-              <span>Owner, Cutting Edge Plasma</span>
+              <b>{{QUOTE_NAME}}</b>
+              <span>{{QUOTE_TITLE}}, {{CLIENT_NAME}}</span>
             </span>
           </figcaption>
         </figure>
 
         <div class="cs-block">
-          <h2>Why this story matters</h2>
-          <p>Cutting Edge Plasma did not need more abstract marketing activity. Steve needed buyers who were already looking for CNC equipment to find him before they found someone else. Gushwork helped build that path — buyers are finding him on Google and AI search engines.</p>
+          <h2>{{H2_WHY_IT_MATTERS}}</h2>
+          <p>{{WHY_IT_MATTERS — the transferable lesson, written so the next prospect recognises themselves in it}}</p>
         </div>
 
         <div class="cs-block">
           <h2>Ready to build your growth story</h2>
-          <p>The channel is now bringing in buyers from the exact geography Steve wanted to focus on. The sales work is still his — but the top of the funnel has changed.</p>
+          <p>{{CLOSING — what changed, and what is still the client's own work}}</p>
         </div>
       </article>
 

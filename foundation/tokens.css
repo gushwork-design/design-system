@@ -672,6 +672,71 @@
      Toast auto-dismiss. Ruled by Utsav, 7 Aug 2026 — see exports/dashboard/toast.md,
      which previously recorded this as undefined. */
   --gw-toast-dismiss: 4000ms;
+
+  /* ==========================================================================
+     SLIDES
+     Added 7 Sep 2026 for the slides surface. Measured from GW-Slides
+     (file R9JgCTytCKSgyBL4efP7hz) and from the Manufacturing sales deck's
+     Google Slides export, which is that file two conversions downstream.
+
+     Where the two disagree, Figma wins — R0. The export's drift is recorded
+     in exports/slides/deck.md rather than encoded here.
+     ---------------------------------------------------------------------- */
+
+  /* --- Slide geometry ------------------------------------------------------
+     Every slide is 1920x1080. The ground bleeds full-frame; the content card
+     insets by --gw-slide-margin and the cover's inner frame by 40. */
+  --gw-slide-w: 1920px;
+  --gw-slide-h: 1080px;
+  --gw-slide-margin: 20px;   /* content card inset from every slide edge */
+  --gw-slide-gap: 20px;      /* gap between step cards, measured 19.4 */
+  --gw-slide-title-x: 40px;  /* title box left edge */
+  --gw-slide-title-y: 38px;  /* title box top edge, measured 38.2 */
+  --gw-slide-cover-inset: 40px;  /* cover inner frame, measured in Figma */
+
+  /* --- Slide display face -------------------------------------------------
+     Ruled by Utsav, 7 Sep 2026. Vert Grotesk Display is first preference and
+     is what GW-Slides actually uses. Plus Jakarta Sans is the sanctioned
+     fallback ONLY because Google Slides cannot load a custom face — every
+     .pptx and Slides export lands on it. Do not "fix" a deck that renders in
+     Plus Jakarta Sans after an export round-trip; that is the fallback doing
+     its job. Caveat is the script face, for margin annotations only. */
+  --gw-font-slide-display: 'Vert Grotesk Display', 'Plus Jakarta Sans',
+                           ui-sans-serif, system-ui, sans-serif;
+  --gw-font-slide-script:  'Caveat', ui-sans-serif, system-ui, cursive;
+
+  /* --- Slide type ---------------------------------------------------------
+     The slide ramp runs above h1 (60px), so it needs its own steps. The cover
+     title is measured off the Figma node at 90px; the in-deck title at 72px
+     is the export doubled, and is the one value here still awaiting a Figma
+     measurement. Everything at 22px and below maps onto the shared ramp --
+     use --gw-text-body-22-* and --gw-text-h5/h6, not a slide-specific step. */
+  --gw-text-slide-cover: 600 90px/1.2 var(--gw-font-slide-display);
+  --gw-text-slide-cover-tracking: -0.32px;
+  --gw-text-slide-title: 700 72px/1.2 var(--gw-font-slide-display);
+  --gw-text-slide-title-tracking: 0;
+  --gw-text-slide-annotation: 600 27px/1 var(--gw-font-slide-script);
+
+  /* --- Slide ground -------------------------------------------------------
+     assets/slides/slide-ground.svg is primary-500 under a 40px/1px lattice at
+     30% opacity, whose fill ramps from primary-500 at centre to white at the
+     edge -- so the grid is invisible mid-frame and emerges at the corners.
+     These tokens rebuild it in CSS; the SVG is for the .pptx path, which has
+     no CSS. Keep the two in step. */
+  --gw-slide-grid-pitch: 40px;
+  --gw-slide-grid-line: 1px;
+  --gw-slide-grid-opacity: 0.3;
+  --gw-slide-grid-origin-x: 922.746px;   /* radial centre, off-centre by design */
+  --gw-slide-grid-origin-y: 540px;
+  --gw-slide-grid-radius-x: 1951.42px;
+  --gw-slide-grid-radius-y: 1881.56px;
+
+  /* --- Slide surfaces ----------------------------------------------------
+     The cover's blur is deliberate and measured. It does NOT license blur on
+     product surfaces, where the no-glass rule still stands. */
+  --gw-slide-cover-blur: 12px;
+  --gw-slide-cover-border: 4px;
+  --gw-slide-card-border: 1.3px;
 }
 
 @media (prefers-reduced-motion: reduce) {

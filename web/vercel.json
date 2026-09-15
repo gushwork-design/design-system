@@ -24,6 +24,11 @@
       "permanent": false
     },
     {
+      "source": "/internal/mini-tools",
+      "destination": "/internal/tools",
+      "permanent": false
+    },
+    {
       "source": "/admin/review",
       "destination": "/admin/review-sheet",
       "permanent": false
