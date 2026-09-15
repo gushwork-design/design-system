@@ -71,6 +71,33 @@ display face is the brand and a fallback is silently off-brand. Verify by **meas
 text width**, not with `document.fonts.check()`, which returns true for a face that is merely
 *declared* and 404s.
 
+### Which face you may actually use, per target
+
+The paragraph above was written for the React target and read as absolute everywhere, which is
+why "it rendered in Inter" keeps getting reported as drift. Sometimes it *is* drift and
+sometimes it is the only legal outcome, and nothing said which — so the rule was followed at
+random. It is absolute in every target that can reach the files, and a target that cannot
+reach them cannot be held to it.
+
+`skills/gushwork-slides` already rules this way for its own surface (**R21**: Vert first, Plus
+Jakarta as fallback, because Slides cannot load a custom face and every export substitutes).
+This is that same ruling generalised.
+
+| Target | Display face | May it fall back? |
+|---|---|---|
+| **React in a repo** | `next/font/local` → `fonts/Vert_Grotesk_Display_VF.ttf` | **No.** The files are committed; a fallback is a bug |
+| **Standalone HTML on this machine** | `@font-face` with a relative path into `fonts/` | **No.** The files are one directory away |
+| **Hosted on the design site** | `@font-face` → `/fonts/…` on the deploy | **No.** `publish-sheets.sh` copies the faces and `vercel.json` already sets `Access-Control-Allow-Origin` on `/fonts/` |
+| **A published Artifact or other sandboxed page** | Inter, from Google Fonts | **Yes — and it is the only option.** The sandbox admits stylesheets only from `fonts.googleapis.com` and font files only from `fonts.gstatic.com`, so a licensed local face cannot load at all. Name Vert first in the stack anyway, so it resolves on a machine that has it |
+| **Slides export** | Vert first, Plus Jakarta as fallback | **Yes** — R21. Every export substitutes |
+
+**How to report it.** A build in one of the two fallback rows is not drifting and should not be
+filed as such. A build in the top three rows that renders in Inter or `system-ui` *is* drifting,
+and the fix is to load the committed face rather than to relax this table. Say which row a build
+sits in when you report it, and the report answers itself.
+
+Check a file against this table with `bash scripts/check-fonts.sh <file> --target <row>`.
+
 **Railway holds the data; Vercel holds the screen.** Which means the shell renders before the
 numbers arrive — always. So:
 

@@ -54,26 +54,76 @@ authorization-code flow, which only a Web application client supports.
 
 ## 1. Create the OAuth client
 
-Google Cloud Console → **APIs & Services → Credentials**, in whichever project
-you want to own this. `gushwork-assignments-portal` already exists and would
+Google Cloud Console → **Google Auth Platform**, in whichever project you want
+to own this.
+
+**The console moved.** This used to live under *APIs & Services → Credentials*
+with a single "OAuth consent screen" page. As of 15 Sep 2026 it is its own
+product with the settings split across tabs, so the old single-page walkthrough
+no longer matches what you see:
+
+| Old | Now |
+|---|---|
+| Consent screen — app name, logo, emails | **Branding** |
+| Consent screen — user type, test users, publish | **Audience** |
+| Consent screen — scopes | **Data Access** |
+| Credentials — OAuth client IDs | **Clients** |
+
+Do them in that order: Branding must be filled before Audience will let you
+publish, and the client in Clients is the last step. `gushwork-assignments-portal` already exists and would
 do; a separate project is also fine.
 
 1. **Configure the OAuth consent screen** first, if the project has none.
-   - User type **Internal** — this alone restricts sign-in to the Workspace
-     org, on top of the domain check the callback does.
+   - User type: **Internal if it is offered, otherwise External.**
+
+     **Internal requires the project to sit inside a Google Cloud
+     organisation**, which is a different thing from having a Workspace
+     account. Checked on 15 Sep 2026 signed in as `utsav.singh@gushwork.ai`:
+     the project picker showed **"No organization"** and a single personal
+     project, so Internal was not available and **External is what this is set
+     up with**. If a super-admin later provisions a Cloud org, switching to
+     Internal is a consent-screen setting, not a code change.
+
+     **Choosing External costs less than it sounds.** The consent screen was
+     never the gate — `api/auth/callback.js` requires `email_verified` *and* an
+     address on `ALLOWED_DOMAIN`, read off Google's verified claim rather than
+     the `hd` hint the browser sends, which a user can edit. A stranger can
+     begin a sign-in and is refused at the callback. What External loses is a
+     second, org-level layer, not the door itself.
+
+     **If you pick External you must publish the app.** Left in *Testing*, only
+     explicitly added test users can sign in, capped at 100, with refresh
+     tokens expiring after 7 days — colleagues will simply be refused. Press
+     **Publish app** to move it to *Production*. No verification review is
+     required: this flow asks only for `openid`, `email` and `profile`, which
+     Google classes as non-sensitive.
    - App name: `Gushwork Design`. Support email: yours.
    - No extra scopes. The default `openid`, `email` and `profile` are all the
      flow asks for.
 
-2. **Create Credentials → OAuth client ID**
+2. **Clients → Create client**
    - Application type: **Web application**
    - Name: `gushwork-design site`
+   - Check the existing list first. A project that has been used for anything
+     else may already hold a client — add a new one rather than editing one you
+     do not recognise.
    - **Authorised redirect URIs** — add one per hostname that will serve the
-     site. The callback path is always `/api/auth/callback`:
+     site. `redirectUri()` in `api/_session.js` builds the callback from the
+     **host of the incoming request**, so every hostname that can serve a
+     sign-in needs its own entry or Google rejects it with
+     `redirect_uri_mismatch`. The callback path is always `/api/auth/callback`.
+
+     **Both of these are live and both are required** — this list said only the
+     `.vercel.app` one until 15 Sep 2026, which would have failed on the real
+     domain:
 
      ```
+     https://design.gushwork.ai/api/auth/callback
      https://gushwork-design.vercel.app/api/auth/callback
      ```
+
+     `design.gushwork.ai` is the alias `publish-sheets.sh` deploys to and the
+     one people actually open, so if you add only one, add that.
 
      Preview deployments get their own hostname, so a preview cannot complete
      a sign-in unless you add its URL too. Add the preview URL while you are

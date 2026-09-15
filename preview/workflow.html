@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Workflow — Gushwork Design System</title>
+<link rel="stylesheet" href="../foundation/tokens.css">
+<style>
+/* ============================================================================
+   How design runs — three diagrams of one system.
+
+   HOSTED TARGET, so this carries the REAL display face: tokens.css declares the
+   @font-face rules against ../fonts/, which resolves to /fonts/ on the deploy, and
+   publish-sheets.sh copies the faces up. See the per-target table in
+   foundation/output-targets.md — this page is the "hosted on the design site" row,
+   and `bash scripts/check-fonts.sh preview/workflow.html --target hosted` asserts it.
+
+   LIGHT THEME ONLY, matching preview/changelog-sheet.html and preview/board.html.
+
+   NO STATE BY COLOUR ALONE. Every lane carries its name, every arrow a label, every
+   gap a number repeated in the list beneath it. Strip all colour and nothing is lost
+   but emphasis.
+
+   The drawings are on-token: custom properties resolve inside inline SVG presentation
+   attributes. THREE LITERALS REMAIN — #d00416, #ffebed and #28385c — because the repo
+   tokens.css carries no error ramp and no tertiary slate. They come from the packaged
+   skill's palette. Fold them into foundation/tokens.css and these disappear.
+   ========================================================================== */
+:root{
+  --ground:var(--gw-color-neutral-25);
+  --surface:var(--gw-color-white);
+  --ink:var(--gw-color-black);
+  --ink-2:var(--gw-color-neutral-700);
+  --ink-3:var(--gw-color-neutral-600);
+  --muted:var(--gw-color-neutral-400);
+  --rule:var(--gw-color-neutral-100);
+  --accent:var(--gw-color-primary-500);
+  --flag:#d00416;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink-2);
+     font-family:var(--gw-font-body);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding:44px 28px 72px}
+header{border-bottom:1px solid var(--rule);padding-bottom:24px}
+h1{font-family:var(--gw-font-display);font-size:clamp(28px,4vw,40px);line-height:1.1;
+   letter-spacing:-.026em;font-weight:600;color:var(--ink);margin:0 0 12px;max-width:22ch}
+.standfirst{font-size:16px;color:var(--ink-3);margin:0;max-width:66ch}
+.block{margin-top:56px}
+.eyebrow{display:flex;align-items:baseline;gap:10px;margin-bottom:6px;padding-top:14px;
+         border-top:2px solid var(--ink)}
+.eyebrow i{font-style:normal;font-family:var(--gw-font-display);font-size:12px;font-weight:700;
+           color:var(--gw-color-primary-600);background:var(--gw-color-primary-50);
+           border:1px solid var(--gw-color-primary-100);border-radius:6px;padding:1px 7px}
+.eyebrow h2{font-family:var(--gw-font-display);font-size:20px;line-height:1.25;letter-spacing:-.016em;
+            font-weight:600;color:var(--ink);margin:0}
+.lede{font-size:14px;color:var(--ink-3);margin:0 0 18px;max-width:74ch}
+figure{margin:0}
+.figframe{background:var(--surface);border:1px solid var(--rule);border-radius:16px;
+          padding:20px 16px 10px;overflow-x:auto}
+svg.flow{display:block;width:100%;height:auto}
+/* Diagram labels are UI text, so they take the body face; the display face is for the page's
+   own headings. A CSS rule beats the SVG presentation attributes, so the drawings need no edit. */
+svg.flow text{font-family:var(--gw-font-body)}
+#d1{min-width:820px}#d2{min-width:860px}#d3{min-width:760px}
+figcaption{margin-top:14px;font-size:13.5px;color:var(--ink-3);max-width:76ch}
+figcaption strong{color:var(--ink);font-weight:600}
+ol.gaps{list-style:none;margin:22px 0 0;padding:0;display:grid;gap:12px}
+ol.gaps li{display:grid;grid-template-columns:28px 1fr;gap:14px;background:var(--surface);
+           border:1px solid var(--rule);border-left:3px solid var(--flag);border-radius:12px;padding:14px 18px}
+.num{width:25px;height:25px;border-radius:7px;background:var(--flag);color:var(--gw-color-white);
+     font-family:var(--gw-font-display);font-size:13px;font-weight:600;display:grid;place-items:center;margin-top:1px}
+ol.gaps b{display:block;font-family:var(--gw-font-display);font-size:15px;color:var(--ink);margin-bottom:3px}
+ol.gaps p{margin:0;font-size:13.5px}
+ol.gaps em{color:var(--ink);font-style:normal;font-weight:600}
+code{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:.87em;
+     background:var(--gw-color-neutral-50);padding:1px 5px;border-radius:4px;color:var(--gw-color-neutral-900)}
+.note{margin-top:18px;background:var(--surface);border:1px solid var(--rule);
+      border-left:3px solid var(--accent);border-radius:12px;padding:15px 19px}
+.note b{font-family:var(--gw-font-display);font-size:15px;color:var(--ink);display:block;margin-bottom:3px}
+.note p{margin:0;font-size:13.5px}
+footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--rule);font-size:13px;
+       color:var(--muted);display:flex;flex-wrap:wrap;gap:12px 28px}
+@media(max-width:620px){.wrap{padding:32px 18px 56px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>How design runs</h1>
+  <p class="standfirst">Three views of the same system: which lane a request goes down, when design is
+  involved at all, and where nothing checks the result.</p>
+</header>
+
+<div class="block">
+  <div class="eyebrow"><i>1</i><h2>Routing a request</h2></div>
+  <p class="lede">Three gates, three lanes. The dashed path is the rule that makes the model compound
+  instead of silting up.</p>
+  <figure><div class="figframe"><svg id="d1" class="flow" viewBox="0 0 1000 664" role="img"
+           aria-label="A design request passes three gates. If it is brand-defining or high-stakes it goes to the Desk lane. Otherwise, if the input shape is not known in advance it goes to the Skill lane. Otherwise, if it needs no durable address and no non-technical maker it also goes to Skill; if it does, it goes to the Tool lane. Desk output that turns out to be a pattern becomes a template in the library, which feeds the Skill lane, and becomes a Tool once the input tightens.">
+        <defs>
+          <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="var(--gw-color-black)"/>
+          </marker>
+          <marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="var(--gw-color-primary-500)"/>
+          </marker>
+        </defs>
+
+        <g font-family="Inter, sans-serif" font-size="10.5" font-weight="600" fill="var(--gw-color-neutral-400)" letter-spacing="0.09em">
+          <text x="60" y="20">THE GATES</text>
+          <text x="600" y="20">THE LANE</text>
+          <text x="830" y="20">WHAT COMPOUNDS</text>
+        </g>
+
+        <g stroke="var(--gw-color-black)" stroke-width="1.6" fill="none" marker-end="url(#a)">
+          <line x1="150" y1="78" x2="150" y2="108"/>
+          <line x1="380" y1="141" x2="596" y2="141"/>
+          <line x1="220" y1="170" x2="220" y2="246"/>
+          <polyline points="380,279 490,279 490,348 596,348"/>
+          <line x1="220" y1="308" x2="220" y2="406"/>
+          <polyline points="380,439 520,439 520,370 596,370"/>
+          <polyline points="220,468 220,577 596,577"/>
+        </g>
+
+        <g stroke="var(--gw-color-primary-500)" stroke-width="1.8" fill="none" marker-end="url(#ab)" stroke-dasharray="6 4">
+          <polyline points="690,170 690,250 905,250 905,326"/>
+          <line x1="826" y1="352" x2="784" y2="352"/>
+          <polyline points="905,388 905,601 784,601"/>
+        </g>
+
+        <g font-family="Inter, sans-serif" font-size="11.5" font-weight="600" fill="var(--gw-color-black)">
+          <text x="470" y="132" text-anchor="middle">yes</text>
+          <text x="232" y="212">no</text>
+          <text x="404" y="270">no</text>
+          <text x="232" y="362">yes</text>
+          <text x="404" y="430">no</text>
+          <text x="232" y="524">yes</text>
+        </g>
+        <g font-family="Inter, sans-serif" font-size="11" fill="var(--gw-color-primary-600)">
+          <text x="700" y="242">if it turns out to be a pattern</text>
+          <text x="805" y="344" text-anchor="end">feeds</text>
+          <text x="897" y="595" text-anchor="end">once the input tightens</text>
+        </g>
+
+        <rect x="60" y="30" width="180" height="48" rx="10" fill="var(--gw-color-black)"/>
+        <text x="150" y="60" font-family="Inter, sans-serif" font-size="13.5" font-weight="600"
+              fill="var(--gw-color-white)" text-anchor="middle">a request arrives</text>
+
+        <g fill="var(--gw-color-white)" stroke="var(--gw-color-neutral-100)" stroke-width="1">
+          <rect x="60" y="108" width="320" height="62" rx="10"/>
+          <rect x="60" y="246" width="320" height="62" rx="10"/>
+          <rect x="60" y="406" width="320" height="62" rx="10"/>
+        </g>
+        <g fill="var(--gw-color-primary-500)">
+          <rect x="60" y="108" width="4" height="62" rx="2"/>
+          <rect x="60" y="246" width="4" height="62" rx="2"/>
+          <rect x="60" y="406" width="4" height="62" rx="2"/>
+        </g>
+        <g font-family="Inter, sans-serif" font-size="10.5" font-weight="600" fill="var(--gw-color-neutral-400)" letter-spacing="0.09em">
+          <text x="80" y="130">GATE 1</text>
+          <text x="80" y="268">GATE 2</text>
+          <text x="80" y="428">GATE 3</text>
+        </g>
+        <g font-family="Inter, sans-serif" font-size="13.5" font-weight="600" fill="var(--gw-color-black)">
+          <text x="80" y="152">Brand-defining or high-stakes?</text>
+          <text x="80" y="290">Input shape known in advance?</text>
+          <text x="80" y="450">Durable address, or non-technical maker?</text>
+        </g>
+
+        <g fill="var(--gw-color-white)" stroke="var(--gw-color-neutral-100)" stroke-width="1">
+          <rect x="600" y="112" width="180" height="58" rx="12"/>
+          <rect x="600" y="324" width="180" height="58" rx="12"/>
+          <rect x="600" y="548" width="180" height="58" rx="12"/>
+        </g>
+        <circle cx="620" cy="134" r="5" fill="var(--gw-color-black)"/>
+        <circle cx="620" cy="346" r="5" fill="#28385c"/>
+        <circle cx="620" cy="570" r="5" fill="var(--gw-color-primary-500)"/>
+        <g font-family="Inter, sans-serif" font-size="15" font-weight="600" fill="var(--gw-color-black)">
+          <text x="634" y="139">Desk</text>
+          <text x="634" y="351">Skill</text>
+          <text x="634" y="575">Tool</text>
+        </g>
+        <g font-family="Inter, sans-serif" font-size="11" fill="var(--gw-color-neutral-600)">
+          <text x="620" y="158">design, directly</text>
+          <text x="620" y="370">Claude Code + a template</text>
+          <text x="620" y="594">hosted form, anyone</text>
+        </g>
+
+        <rect x="826" y="324" width="154" height="58" rx="12" fill="var(--gw-color-primary-50)" stroke="var(--gw-color-primary-500)" stroke-width="1.4"/>
+        <text x="903" y="349" font-family="Inter, sans-serif" font-size="14" font-weight="600"
+              fill="var(--gw-color-primary-600)" text-anchor="middle">template library</text>
+        <text x="903" y="367" font-family="Inter, sans-serif" font-size="11"
+              fill="var(--gw-color-primary-600)" text-anchor="middle">a pointer, never a download</text>
+
+        <line x1="60" y1="634" x2="980" y2="634" stroke="var(--gw-color-neutral-50)" stroke-width="1"/>
+        <text x="60" y="656" font-family="Inter, sans-serif" font-size="11.5" fill="var(--gw-color-neutral-400)">
+          No approval gate sits between a lane and its output — review is by sampling, or design is the bottleneck again.
+        </text>
+      </svg></div>
+  <figcaption><strong>Gate 1 is tested first because it overrides the other two.</strong> Everything
+  else falls through in order, and only a request that clears all three can be served by a tool.
+  Without the dashed path the desk only ever grows, and design is the bottleneck again in four months
+  with better tooling.</figcaption></figure>
+</div>
+
+<div class="block">
+  <div class="eyebrow"><i>2</i><h2>How each team interacts with design</h2></div>
+  <p class="lede">Not which lane — <em>when design is involved at all</em>. For four teams the
+  involvement is front-loaded and then stops. For one it never stops, and that is deliberate.</p>
+  <figure><div class="figframe"><svg id="d2" class="flow" viewBox="0 0 1000 636" role="img"
+           aria-label="A matrix of five teams against three phases. AE, CSM, GTM and HR each have a one-time setup phase where design builds their kit, then a steady state where they produce alone, then a rare exception that returns to the desk. The CEO office spans all three phases as permanent desk work. Exceptions flow into the desk, become templates in the library, and feed back into the steady state.">
+        <defs>
+          <marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="var(--gw-color-primary-500)"/>
+          </marker>
+        </defs>
+
+        <!-- intake band -->
+        <rect x="40" y="20" width="918" height="38" rx="10" fill="var(--gw-color-black)"/>
+        <text x="60" y="44" font-family="Inter, sans-serif" font-size="12.5" font-weight="600" fill="var(--gw-color-white)">
+          One intake · the three gates above decide the lane · no team routes itself by preference
+        </text>
+
+        <!-- column headers -->
+        <g font-family="Inter, sans-serif" font-size="10.5" font-weight="600" fill="var(--gw-color-neutral-400)"
+           letter-spacing="0.09em" text-anchor="middle">
+          <text x="319" y="88">ONE-TIME SETUP</text>
+          <text x="577" y="88">STEADY STATE</text>
+          <text x="835" y="88">THE EXCEPTION</text>
+        </g>
+        <g font-family="Inter, sans-serif" font-size="10.5" fill="var(--gw-color-neutral-300)" text-anchor="middle">
+          <text x="319" y="102">design builds it</text>
+          <text x="577" y="102">team produces alone</text>
+          <text x="835" y="102">rare, returns to design</text>
+        </g>
+
+        <!-- team rows -->
+        <g font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="var(--gw-color-black)">
+          <text x="40" y="148">AE</text>
+          <text x="40" y="218">CSM</text>
+          <text x="40" y="288">GTM</text>
+          <text x="40" y="358">CEO office</text>
+          <text x="40" y="428">HR</text>
+        </g>
+
+        <!-- AE / CSM / GTM / HR : setup cells -->
+        <g fill="var(--gw-color-primary-50)" stroke="var(--gw-color-primary-500)" stroke-width="1.2">
+          <rect x="196" y="116" width="246" height="56" rx="10"/>
+          <rect x="196" y="186" width="246" height="56" rx="10"/>
+          <rect x="196" y="256" width="246" height="56" rx="10"/>
+          <rect x="196" y="396" width="246" height="56" rx="10"/>
+        </g>
+        <g font-family="Inter, sans-serif" font-size="11.5" font-weight="600" fill="var(--gw-color-primary-600)">
+          <text x="212" y="140">case study tool · deck skill</text>
+          <text x="212" y="210">review tool · template set</text>
+          <text x="212" y="280">lander tool · lead magnet</text>
+          <text x="212" y="420">template set</text>
+        </g>
+        <g font-family="Inter, sans-serif" font-size="10.5" fill="var(--gw-color-primary-600)" opacity="0.75">
+          <text x="212" y="157">tool is built, skill pending</text>
+          <text x="212" y="227">conditional on structured data</text>
+          <text x="212" y="297">plus variant support</text>
+          <text x="212" y="437">careers page is desk work, once</text>
+        </g>
+
+        <!-- steady-state cells -->
+        <g fill="var(--gw-color-white)" stroke="var(--gw-color-neutral-100)" stroke-width="1">
+          <rect x="454" y="116" width="246" height="56" rx="10"/>
+          <rect x="454" y="186" width="246" height="56" rx="10"/>
+          <rect x="454" y="256" width="246" height="56" rx="10"/>
+          <rect x="454" y="396" width="246" height="56" rx="10"/>
+        </g>
+        <g font-family="Inter, sans-serif" font-size="11.5" font-weight="600" fill="var(--gw-color-black)">
+          <text x="470" y="140">produces alone</text>
+          <text x="470" y="210">produces alone</text>
+          <text x="470" y="280">produces alone</text>
+          <text x="470" y="420">produces alone</text>
+        </g>
+        <g font-family="Inter, sans-serif" font-size="10.5" fill="var(--gw-color-neutral-600)">
+          <text x="470" y="157">design not involved</text>
+          <text x="470" y="227">design not involved</text>
+          <text x="470" y="297">highest volume of any team</text>
+          <text x="470" y="437">design not involved</text>
+        </g>
+
+        <!-- exception cells -->
+        <g fill="var(--gw-color-white)" stroke="var(--gw-color-neutral-200)" stroke-width="1" stroke-dasharray="5 4">
+          <rect x="712" y="116" width="246" height="56" rx="10"/>
+          <rect x="712" y="186" width="246" height="56" rx="10"/>
+          <rect x="712" y="256" width="246" height="56" rx="10"/>
+          <rect x="712" y="396" width="246" height="56" rx="10"/>
+        </g>
+        <g font-family="Inter, sans-serif" font-size="11.5" fill="var(--gw-color-neutral-700)">
+          <text x="728" y="140">a bespoke pitch</text>
+          <text x="728" y="210">an at-risk account</text>
+          <text x="728" y="280">a brand campaign</text>
+          <text x="728" y="420">seldom</text>
+        </g>
+        <g font-family="Inter, sans-serif" font-size="10.5" fill="var(--gw-color-neutral-400)">
+          <text x="728" y="157">for the largest deals only</text>
+          <text x="728" y="227">a rescue, not a routine</text>
+          <text x="728" y="297">not a campaign asset</text>
+          <text x="728" y="437">once the templates exist</text>
+        </g>
+
+        <!-- CEO office: one bar across all three phases -->
+        <rect x="196" y="326" width="762" height="56" rx="10" fill="var(--gw-color-black)"/>
+        <text x="212" y="350" font-family="Inter, sans-serif" font-size="12.5" font-weight="600" fill="var(--gw-color-white)">
+          Desk, permanently — board decks, investor updates, all-hands
+        </text>
+        <text x="212" y="367" font-family="Inter, sans-serif" font-size="10.5" fill="var(--gw-color-neutral-300)">
+          There is no setup that makes this self-serve. Reserve capacity rather than building a path nobody will use
+        </text>
+
+        <!-- the loop: exception → desk → library → steady state -->
+        <g stroke="var(--gw-color-primary-500)" stroke-width="1.8" fill="none" marker-end="url(#a2)" stroke-dasharray="6 4">
+          <line x1="835" y1="458" x2="835" y2="478"/>
+          <line x1="835" y1="524" x2="835" y2="544"/>
+          <polyline points="712,571 577,571 577,458"/>
+        </g>
+
+        <rect x="712" y="478" width="246" height="46" rx="10" fill="var(--gw-color-white)" stroke="var(--gw-color-black)" stroke-width="1.4"/>
+        <circle cx="730" cy="501" r="5" fill="var(--gw-color-black)"/>
+        <text x="744" y="506" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="var(--gw-color-black)">Desk picks it up</text>
+
+        <rect x="712" y="544" width="246" height="46" rx="10" fill="var(--gw-color-primary-50)" stroke="var(--gw-color-primary-500)" stroke-width="1.4"/>
+        <text x="728" y="572" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="var(--gw-color-primary-600)">becomes a template</text>
+
+        <g font-family="Inter, sans-serif" font-size="10.5" fill="var(--gw-color-primary-600)">
+          <text x="845" y="472">an exception</text>
+          <text x="845" y="538">if it is a pattern</text>
+          <text x="600" y="564">feeds every team's steady state</text>
+        </g>
+      </svg></div>
+  <figcaption><strong>Four teams sit mostly in the middle column, and that column is where design is
+  absent.</strong> The setup pass is the investment; steady state is the return. The CEO office row is
+  the deliberate exception — no amount of tooling makes a board deck self-serve, so the honest plan
+  reserves desk capacity for it instead of designing a path it will bypass anyway.</figcaption></figure>
+</div>
+
+<div class="block">
+  <div class="eyebrow"><i>3</i><h2>Where nothing verifies the result</h2></div>
+  <p class="lede">The same system seen from the library&rsquo;s side. <strong>One spine</strong> —
+  everything is measured, drawn on the sheet, and passes your review before it reaches the skill.</p>
+  <figure><div class="figframe"><svg id="d3" class="flow" viewBox="0 0 1000 430" role="img"
+           aria-label="One spine. Figma and work built directly in Claude Code are both measured into exports, which are drawn on the review sheet. Nothing enters the skill until it has been reviewed and passed there. The skill is then built into a stamped artifact, which check-drift.sh reads. Four handoffs are unchecked: Figma to exports, exports to the sheet, the built-here route, and the skill to the built artifact.">
+        <defs>
+          <marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="var(--gw-color-black)"/>
+          </marker>
+        </defs>
+
+        <g font-family="Inter, sans-serif" font-size="10.5" font-weight="600" fill="var(--gw-color-neutral-400)"
+           letter-spacing="0.09em" text-anchor="middle">
+          <text x="87" y="26">ORIGIN</text>
+          <text x="290" y="26">SOURCE OF TRUTH</text>
+          <text x="505" y="26">THE GATE</text>
+          <text x="710" y="26">BUILD INPUT</text>
+          <text x="908" y="26">OUTPUT</text>
+        </g>
+
+        <!-- the spine, as it exists -->
+        <g stroke="var(--gw-color-black)" stroke-width="1.6" fill="none" marker-end="url(#a3)">
+          <line x1="158" y1="143" x2="208" y2="143"/>
+          <line x1="368" y1="143" x2="418" y2="143"/>
+          <line x1="778" y1="143" x2="828" y2="143"/>
+          <line x1="908" y1="178" x2="908" y2="276"/>
+        </g>
+        <!-- RULED 15 Sep 2026 by Utsav: measured and created, then drawn on the review sheet,
+             then into the skill only once reviewed and passed. Built-here work takes the same
+             spine — no side door. Dashed because the rule is ruled, not yet mechanised. -->
+        <g stroke="var(--gw-color-black)" stroke-width="1.6" fill="none" marker-end="url(#a3)" stroke-dasharray="6 4">
+          <line x1="588" y1="143" x2="638" y2="143"/>
+          <polyline points="158,313 290,313 290,182"/>
+        </g>
+
+        <g font-family="Inter, sans-serif" font-size="11" fill="var(--gw-color-neutral-700)" text-anchor="middle">
+          <text x="183" y="202">measure</text>
+          <text x="393" y="202">drawn on the sheet</text>
+          <text x="613" y="202">you review and pass</text>
+          <text x="803" y="202">build</text>
+          <text x="224" y="304">measured the same way</text>
+        </g>
+        <text x="918" y="232" font-family="Inter, sans-serif" font-size="11" fill="var(--gw-color-neutral-700)">carries stamp</text>
+
+        <g stroke="var(--gw-color-neutral-100)" stroke-width="1" fill="var(--gw-color-white)">
+          <rect x="16"  y="110" width="142" height="66" rx="10"/>
+          <rect x="212" y="110" width="156" height="66" rx="10"/>
+          <rect x="422" y="110" width="166" height="66" rx="10"/>
+          <rect x="642" y="110" width="136" height="66" rx="10"/>
+          <rect x="832" y="110" width="152" height="66" rx="10"/>
+          <rect x="16"  y="280" width="142" height="66" rx="10"/>
+          <rect x="832" y="280" width="152" height="66" rx="10"/>
+        </g>
+        <rect x="212" y="110" width="156" height="66" rx="10" fill="none" stroke="var(--gw-color-primary-500)" stroke-width="2"/>
+        <rect x="422" y="110" width="166" height="66" rx="10" fill="none" stroke="var(--gw-color-black)" stroke-width="2"/>
+
+        <g font-family="Inter, sans-serif" text-anchor="middle">
+          <g font-size="13.5" font-weight="600" fill="var(--gw-color-black)">
+            <text x="87"  y="138">Figma</text>
+            <text x="290" y="138">exports/*.md</text>
+            <text x="505" y="138">review-sheet.html</text>
+            <text x="710" y="138">skills/</text>
+            <text x="908" y="138">artifact</text>
+            <text x="87"  y="308">built here</text>
+            <text x="908" y="308">check-drift.sh</text>
+          </g>
+          <g font-size="11" fill="var(--gw-color-neutral-600)">
+            <text x="87"  y="156">where you draw</text>
+            <text x="290" y="156">measured, node-traceable</text>
+            <text x="505" y="156">draws only what is measured</text>
+            <text x="710" y="156">what Claude reads</text>
+            <text x="908" y="156">+ gushwork-build stamp</text>
+            <text x="87"  y="326">straight into Claude Code</text>
+            <text x="908" y="326">the machine check</text>
+          </g>
+        </g>
+
+        <g>
+          <circle cx="183" cy="143" r="12" fill="#ffebed" stroke="#d00416" stroke-width="1.6"/>
+          <circle cx="393" cy="143" r="12" fill="#ffebed" stroke="#d00416" stroke-width="1.6"/>
+          <circle cx="290" cy="242" r="12" fill="#ffebed" stroke="#d00416" stroke-width="1.6"/>
+          <circle cx="803" cy="143" r="12" fill="#ffebed" stroke="#d00416" stroke-width="1.6"/>
+          <g font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#d00416" text-anchor="middle">
+            <text x="183" y="147">1</text>
+            <text x="393" y="147">2</text>
+            <text x="290" y="246">3</text>
+            <text x="803" y="147">4</text>
+          </g>
+        </g>
+
+        <g font-family="Inter, sans-serif" font-size="11" fill="var(--gw-color-neutral-600)">
+          <circle cx="28" cy="382" r="9" fill="#ffebed" stroke="#d00416" stroke-width="1.4"/>
+          <text x="28" y="386" font-size="10" font-weight="700" fill="#d00416" text-anchor="middle">n</text>
+          <text x="46" y="386">unchecked handoff</text>
+          <line x1="19" y1="408" x2="37" y2="408" stroke="var(--gw-color-black)" stroke-width="1.6" stroke-dasharray="6 4"/>
+          <text x="46" y="412">ruled 15 Sep, mechanism not built yet</text>
+        </g>
+      </svg></div>
+  <figcaption>The discipline behind this is already sound — values are read off specific Figma nodes
+  and written with the node id attached, and where a written spec disagrees with a measured node, the
+  measured node wins. What is missing is <strong>closure</strong>: nothing reports the size of the gap,
+  or notices when it grows. <strong>Ruled 15 September:</strong> measured and created, then drawn on
+  the sheet, then into the skill only once you have reviewed and passed it.</figcaption></figure>
+
+  <ol class="gaps">
+    <li><span class="num">1</span><div>
+      <b>Nothing diffs Figma against the measured exports</b>
+      <p>The pull is manual, so a changed value in Figma goes unnoticed until someone re-measures that
+      node. The badge ruling is the live proof: the decision moved light labels to <code>/600</code>,
+      Figma still ships <code>/500</code>, and the system has held both positions for weeks without
+      complaint. <em>Not yet built.</em></p></div></li>
+    <li><span class="num">2</span><div>
+      <b>The gate can only pass what it draws, and it draws part of the library</b>
+      <p>The review sheet now states its own coverage at the top, counted rather than typed —
+      <em>11 of 18 groups rendered, 19 further sets named and not drawn.</em> Under the new routing
+      that is a throughput limit, not a display gap: a set the sheet cannot draw is one you cannot
+      review, and therefore one that cannot enter the skill.</p></div></li>
+    <li><span class="num">3</span><div>
+      <b>Work built here takes the same spine now, but nothing carries it</b>
+      <p><em>Ruled 15 September:</em> anything built directly in Claude Code is measured into
+      <code>exports/*.md</code> like anything else, drawn on the review sheet, and enters the skill only
+      once you have reviewed and passed it. No side door. What the ruling lacks is a mechanism — both
+      steps are manual today, which is why the route is dashed and still numbered.</p></div></li>
+    <li><span class="num">4</span><div>
+      <b>The font rule was absolute in a target that cannot obey it</b>
+      <p><em>Closed.</em> <code>foundation/output-targets.md</code> said never to let a build fall back,
+      and also said to emit a standalone file for mockups — which cannot load a licensed face at all.
+      A rule right half the time gets followed at random. It is now a per-target table, and
+      <code>scripts/check-fonts.sh</code> enforces it row by row.</p></div></li>
+  </ol>
+
+  <div class="note">
+    <b>What runs today</b>
+    <p><code>scripts/_sheet_coverage.py</code> stamps the review sheet&rsquo;s coverage at publish time ·
+    <code>scripts/check-drift.sh --unstamped</code> lists builds carrying no stamp, so absence is the
+    alert · <code>scripts/check-fonts.sh &lt;path&gt; --target &lt;row&gt;</code> enforces the font table.
+    Gaps 1 and 3 remain open.</p>
+  </div>
+</div>
+
+<footer>
+  <span>How design runs</span>
+  <span>Companion to the written operating model</span>
+  <span>Updated 15 September 2026</span>
+</footer>
+</div>
+</body>
+</html>

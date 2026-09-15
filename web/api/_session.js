@@ -127,12 +127,25 @@ export function allowedDomain() {
 
    Turning Google auth on does not switch this off — see authModes(). Set
    SITE_PASSWORD to an empty string to disable the password path entirely. */
-/* Whether the sign-in gate runs at all. OFF since 1 Sep 2026 — see the block in
-   middleware.js for why. It lives here rather than there because two things need the same
-   answer: the middleware, which enforces it, and /api/auth/me, which tells shell.js whether
-   to draw locks. Two switches would eventually disagree, and the visible symptom would be a
-   padlock on a page that opens fine. */
-export const GATE_ENABLED = false;
+/* Whether the sign-in gate runs at all. It lives here rather than in middleware.js because two
+   things need the same answer: the middleware, which enforces it, and /api/auth/me, which tells
+   shell.js whether to draw locks. Two switches would eventually disagree, and the visible symptom
+   would be a padlock on a page that opens fine.
+
+   ON since 15 Sep 2026. It was off from 1 Sep, correctly: every page behind it was already
+   readable in this public repo, so the gate was asking for a password to see files anyone could
+   download from GitHub, and it was breaking the plugin install page for new teammates.
+
+   What changed is that the internal pages stopped being a mirror of the repo. /internal/ now
+   serves two working tools — the employee ID card generator and the email signature creator —
+   which are applications rather than published files, and the ID card tool shipped with its own
+   client-side password removed on the explicit understanding that this would replace it.
+
+   Turning this on requires GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET and SESSION_SECRET to exist on
+   the Vercel project. Without them the middleware fails closed and serves 503 to everyone,
+   including you — that is deliberate, but it means this flag and those variables have to move
+   together. Check with `vercel env ls production` before flipping it back on after any change. */
+export const GATE_ENABLED = true;
 
 export function sitePassword() {
   return process.env.SITE_PASSWORD || '';

@@ -24,6 +24,11 @@
       "permanent": false
     },
     {
+      "source": "/admin/review",
+      "destination": "/admin/review-sheet",
+      "permanent": false
+    },
+    {
       "source": "/preview/review-sheet",
       "destination": "/admin/review-sheet",
       "permanent": false

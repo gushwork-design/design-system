@@ -25,6 +25,7 @@
 #   /internal/changelog      = changelog-sheet  @gushwork.ai
 #   /admin/review-sheet      = review-sheet     ADMIN_EMAILS only
 #   /admin/catalogue         = catalogue        ADMIN_EMAILS only
+#   /admin/workflow          = workflow          ADMIN_EMAILS only
 #
 # THE SHEETS ARE STILL NEVER EDITED. They are generated, and release-log.sh
 # --check compares what is committed against what the generator produces.
@@ -54,6 +55,7 @@ SHEETS=(
   "preview/changelog-sheet.html|internal/changelog.html"
   "preview/review-sheet.html|admin/review-sheet.html"
   "preview/catalogue.html|admin/catalogue.html"
+  "preview/workflow.html|admin/workflow.html"
 )
 
 # Social card images. A page's og:image must be an absolute URL for crawlers
@@ -72,6 +74,16 @@ bash scripts/release-log.sh --check
 # both, so it had not been run — and the live install page advertised 1.39.0 for ten days.
 # This is the gate that catches it.
 bash scripts/version-json.sh --check
+
+# The face a page renders in is decided per output target, and this deploy is the "hosted" row:
+# tokens.css declares the @font-face rules and the faces are copied up below, so there is no
+# excuse for a hosted page to fall back. See the table in foundation/output-targets.md. This is
+# the check that stops "it rendered in Inter" being reported, half-correctly, forever.
+bash scripts/check-fonts.sh preview/ web/ --target hosted >/dev/null || {
+  echo "✘ a page disagrees with the 'hosted' row of the font table. Run:" >&2
+  echo "    bash scripts/check-fonts.sh preview/ web/ --target hosted" >&2
+  exit 1
+}
 
 command -v vercel >/dev/null || { echo "vercel CLI not installed — brew install vercel" >&2; exit 1; }
 if [ "$MODE" != dry ] && ! vercel whoami >/dev/null 2>&1; then
@@ -92,6 +104,7 @@ mkdir -p "$STAGE"
 cp -R web/. "$STAGE/"
 # README-auth.md is documentation for us, not a page. Don't serve it.
 rm -f "$STAGE/README-auth.md"
+rm -f "$STAGE/internal/employee-id-card/README-emailjs.md"
 
 for required in index.html shell.css shell.js middleware.js vercel.json \
                 api/_session.js api/auth/login.js api/auth/callback.js \
@@ -110,6 +123,11 @@ for pair in "${SHEETS[@]}"; do
   cp "$src" "$STAGE/$dst"
 done
 python3 scripts/_add_shell.py $(for p in "${SHEETS[@]}"; do echo "$STAGE/${p##*|}"; done)
+
+# How much of the library the review sheet actually draws, counted at publish time rather than
+# typed. It matters more since the 15 Sep ruling made the sheet a gate: a set it cannot draw is a
+# set nobody can pass. Stamped into the STAGED copy only, so the repo's file stays as authored.
+python3 scripts/_sheet_coverage.py "$STAGE/admin/review-sheet.html"
 
 # install.html's social card still points at the old /preview/install.html.
 # Rewrite it in the staged copy so the unfurl lands on the live page. The old
