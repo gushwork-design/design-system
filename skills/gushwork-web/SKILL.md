@@ -26,7 +26,7 @@ Any commits listed means they are behind: tell them to run
 | For | Read |
 |---|---|
 | Every colour, size, radius, shadow, type style | `foundation/tokens.css` |
-| **Every standing ruling — R0 to R24** | `DECISIONS.md` |
+| **Every standing ruling — R0 to R25** | `DECISIONS.md` |
 | Voice, casing, banned words, CTA copy | `foundation/voice.md` |
 | Badge, Gushwork logo, Phosphor icons | `foundation/shared-components.md` |
 | **Text fields — shared with dashboard, all 14 variants** | `foundation/text-field.md` |

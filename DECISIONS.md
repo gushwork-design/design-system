@@ -754,3 +754,53 @@ real company facts, sample numbers, tokens still in the byline, and it fails the
 **What this does not license.** Sample numbers in anything a prospect sees as a claim — an ad, a
 lander, a deck slide, a proposal. This ruling covers the case-study *page format*, not the
 practice of inventing results.
+
+---
+
+## R25 — access is data, and the tier that grants it is not editable from inside
+
+**Who can open which page is a runtime rule, stored in Edge Config and changed from
+`/admin/access-control` without a deploy. The owner tier is the exception: it lives in the
+environment, it is not editable through that page, and only an owner may change who is an
+admin.** **Ruled 15 Sep 2026 by Utsav.**
+
+**Why.** Until now the gate was two prefixes compiled into `middleware.js` — `/internal/*` for
+anyone at the domain, `/admin/*` for whatever `ADMIN_EMAILS` happened to say. That has no way to
+express the thing actually being asked for: staging belongs to the GTM team, a particular tool
+belongs to two named people, and someone needs to be able to say so on a Tuesday afternoon
+without a redeploy and without asking an engineer. A permission model you cannot change is one
+people route around — by sharing a login, or by asking for the gate to come off entirely.
+
+**Why the owner tier is not in the store.** A self-serve access page that can rewrite who is
+allowed to use it is not a gate. The first admin to open it could promote anyone, demote the
+owner, and lock the building from the inside — not necessarily maliciously; one wrong bulk edit
+does it. Owners come from `OWNER_EMAILS`, default `utsav.singh@gushwork.ai,design@gushwork.ai`,
+and `isAdmin()` treats them as admins whether or not the stored list agrees. Emptying `admins`
+cannot shut the owner out, which is what makes the store safe to hand to a page.
+
+**The clauses.**
+
+1. **The most specific path wins.** A rule on `/internal/staging` overrides the one on
+   `/internal`. Prefixes match on segment boundaries, so `/internal/stagingzzz` is not covered
+   by the staging rule.
+2. **An unreachable store changes nothing.** If Edge Config is missing, unreachable, or returns
+   something that does not validate, `_access.js` falls back to the compiled two-tier behaviour.
+   It does not fail open, and it does not fail closed and strand the owner.
+3. **The decision is live, never the cookie's claim.** The session cookie is signed for twelve
+   hours and carries an `admin` flag from sign-in time. Both `middleware.js` and
+   `/api/auth/me` evaluate against the current rules instead, because a revoked admin holding a
+   valid cookie must lose access now, not at midnight.
+4. **The write token never reaches the browser.** `VERCEL_API_TOKEN` can rewrite the store that
+   decides who is an admin. The page proposes a ruleset to `/api/access`, which verifies the
+   session first and is the only thing that talks to the Vercel API.
+5. **Only an owner changes the admin list.** An admin who submits a changed `admins` array is
+   refused in full — their other edits are not partially applied.
+
+**The enforceable form.** `web/api/_access.js` is the single decision function, imported by both
+the Edge middleware and the Node API routes, so the padlock in the sidebar, the page the edge
+serves, and the answer `/api/auth/me` gives cannot disagree. Its `normalise()` treats everything
+read from the store as untrusted input.
+
+**Still open.** The catalogue and the review sheet are to be merged into one page; Access Control
+is a third, separate page and does not absorb either of them. The Figma rail (683:5282) draws
+three admin rows because it assumed a rename — the rail has four until that merge happens.

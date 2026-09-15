@@ -18,6 +18,7 @@
 
 import { COOKIE, verify, readCookie, sessionSecret, authModes, GATE_ENABLED }
   from './api/_session.js';
+import { loadRules, decide } from './api/_access.js';
 
 export const config = {
   matcher: ['/internal/:path*', '/admin/:path*']
@@ -58,7 +59,7 @@ function forbidden(email) {
     'border:1px solid var(--gw-color-neutral-100);text-align:center">' +
     '<h1 style="margin:0 0 8px;font-size:22px">Admins only</h1>' +
     '<p style="margin:0 0 24px;font-size:14px;color:var(--gw-color-neutral-600)">' +
-    'The review sheet and the catalogue are limited to the design system admins. ' +
+    'This page is limited to the design system admins. ' +
     'You are signed in as ' + String(email || '').replace(/[<>&"]/g, '') + '.</p>' +
     '<a href="/" style="font-size:14px;color:var(--gw-color-primary-500)">' +
     'Back to Gushwork Design</a></div></body>',
@@ -113,9 +114,17 @@ export default async function middleware(request) {
   );
   if (!session) return toSignIn(url);
 
-  if (url.pathname.startsWith('/admin') && !session.admin) {
-    return forbidden(session.email);
-  }
+  /* Evaluated against the rules AS THEY ARE NOW, not against session.admin.
+     The cookie is signed for 12 hours, so trusting its claim would mean a
+     revoked admin kept the keys for the rest of the day and a newly granted
+     one had to sign out and back in to use them — neither is what "live" in
+     /admin/access-control means. The rules come from Edge Config when a store
+     is attached and from the compiled defaults when it is not, so this is the
+     old two-tier behaviour until someone changes something. */
+  const rules = await loadRules();
+  const verdict = decide(url.pathname, session, rules);
+  if (verdict === 'forbid') return forbidden(session.email);
+  if (verdict === 'signin') return toSignIn(url);
 
   /* Returning nothing continues to the next handler, which serves the file. */
   return undefined;

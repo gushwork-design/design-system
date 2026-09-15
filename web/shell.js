@@ -104,12 +104,13 @@
     label: 'Admin',
     tier: 'admin',
     items: [
-      /* Labelled Access Control per the Figma rail, but still pointing at the
-         catalogue: the page that grants and revokes access does not exist yet.
-         Ruled by Utsav 15 Sep 2026 — catalogue and review sheet merge later,
-         and this row takes over the merged page when it lands. */
-      { label: 'Access Control', href: '/admin/catalogue',   icon: 'gear' },
+      /* Access Control is its own page, not a renamed catalogue — ruled by
+         Utsav 15 Sep 2026. The Figma rail draws three rows because it assumed
+         the rename; the catalogue keeps its own row until it and the review
+         sheet are merged, which is a separate piece of work. */
+      { label: 'Access Control', href: '/admin/access-control', icon: 'gear' },
       { label: 'Review Sheet', href: '/admin/review-sheet', icon: 'checks' },
+      { label: 'Catalogue',    href: '/admin/catalogue',    icon: 'squares-four' },
       /* Was 'flow-arrow', which is not in ICON — the row drew an empty <path>.
          683:5282 gives Workflow the same stacked glyph as Change Log. */
       { label: 'Workflow',     href: '/admin/workflow',     icon: 'stack-overflow-logo' }
