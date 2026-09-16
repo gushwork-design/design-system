@@ -6,6 +6,7 @@
 
 import { COOKIE, verify, readCookie, sessionSecret, authModes, GATE_ENABLED }
   from '../_session.js';
+import { loadRules, isAdmin } from '../_access.js';
 
 export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -20,12 +21,20 @@ export default async function handler(req, res) {
                                                 gate: GATE_ENABLED }));
   }
 
+  /* Live, not the cookie's 12-hour-old claim — the same rules middleware.js
+     enforces. Drawing an ADMIN group the edge would then 403 is worse than
+     drawing nothing, and that is exactly what a stale claim produces the
+     moment access-control is used to grant or revoke someone. */
+  const rules = await loadRules();
+
   res.status(200).end(JSON.stringify({
     signedIn: true,
     email: payload.email || null,
     name: payload.name || payload.email,
     picture: payload.picture || null,
-    admin: !!payload.admin,
+    /* No email means the shared-password door, which is admin by design —
+       isAdmin() has no address to look up and would draw an empty rail. */
+    admin: payload.email ? isAdmin(payload.email, rules) : !!payload.admin,
     via: payload.via || 'google',
     modes,
     gate: GATE_ENABLED

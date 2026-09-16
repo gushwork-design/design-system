@@ -6,14 +6,14 @@
     "email": "design@gushwork.ai"
   },
   "metadata": {
-    "description": "Gushwork's internal Claude Code plugins. Design system today; slides, flyers and internal tools as they are added.",
-    "version": "1.45.0"
+    "description": "Gushwork's internal Claude Code plugins. Design system today \u2014 web, dashboard, lead magnets and slide decks; flyers and internal tools as they are added.",
+    "version": "1.46.0"
   },
   "plugins": [
     {
       "name": "gushwork-design",
-      "description": "Gushwork's governed design system. Two surface-scoped skills \u2014 marketing web and product dashboard \u2014 over one shared foundation of tokens, voice, and shared atoms, measured from the Gush Design System v2.0 Figma file.",
-      "version": "1.45.0",
+      "description": "Gushwork's governed design system. Four surface-scoped skills \u2014 marketing web, product dashboard, lead-magnet documents, and slide decks \u2014 over one shared foundation of tokens, voice, and shared atoms, measured from the Gush Design System v2.0 and GW-Slides Figma files.",
+      "version": "1.46.0",
       "author": {
         "name": "Gushwork Design",
         "email": "design@gushwork.ai"
@@ -26,7 +26,9 @@
         "gushwork",
         "figma",
         "marketing-web",
-        "dashboard"
+        "dashboard",
+        "lead-magnet",
+        "slides"
       ]
     }
   ]

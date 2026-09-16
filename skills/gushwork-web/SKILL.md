@@ -8,7 +8,7 @@ description: Builds Gushwork marketing and public-website pages on-brand — lan
 You are building a **public-facing marketing surface** for Gushwork. Spacious,
 white-on-black with a blue accent, numbers leading every claim. This is not the product UI.
 
-Announce at the start: **"Using the Gushwork web skill — v1.45.0, updated 7 Sep 2026."**
+Announce at the start: **"Using the Gushwork web skill — v1.46.0, updated 15 Sep 2026."**
 
 That version and date are stamped into this file, so **a stale copy reports its own stale date**
 rather than claiming to be current. If the user asks whether they are up to date, or the output
@@ -26,7 +26,7 @@ Any commits listed means they are behind: tell them to run
 | For | Read |
 |---|---|
 | Every colour, size, radius, shadow, type style | `foundation/tokens.css` |
-| **Every standing ruling — R0 to R13** | `DECISIONS.md` |
+| **Every standing ruling — R0 to R25** | `DECISIONS.md` |
 | Voice, casing, banned words, CTA copy | `foundation/voice.md` |
 | Badge, Gushwork logo, Phosphor icons | `foundation/shared-components.md` |
 | **Text fields — shared with dashboard, all 14 variants** | `foundation/text-field.md` |
@@ -44,6 +44,7 @@ Any commits listed means they are behind: tell them to run
 | Variant key spacing | keep it irregular — `Outlined/ black`, `Outlined / white`, `Text/ black` are **identifiers**; the spec's tidied forms do not resolve | **R0** |
 | Spec vs Figma | the **measurement** wins, always | **R0** |
 | A raw hex where a token exists | build the **token**, report the binding bug | **R4** |
+| A case study with invented numbers | **permitted** as an internal artefact — but never an invented named person, a borrowed photo, or a real client logo. The byline stays a `{{QUOTE_NAME}}` token, and `check-placeholders.sh` failing is the point | **R24** |
 
 **Never restate a token value or a voice rule here or in your output.** Reference the token.
 
@@ -150,7 +151,19 @@ Full detail in `exports/web/button.md`.
 ## Templates — a measured page beats a composed one
 
 `templates/` holds whole pages already measured off Figma and rendered. When one matches the
-request, **copy it and fill it in** — do not recompose the page from folds. The template
+request, **copy it and fill it in** — do not recompose the page from folds.
+
+**`templates/` and `examples/` are different things, and the difference is load-bearing:**
+
+| | Holds | You |
+|---|---|---|
+| `templates/` | The placeholder page. Every fillable string is a `{{TOKEN}}`. | **Copy** it |
+| `examples/` | Worked, fully-filled instances — real clients, real numbers. | **Read** them |
+
+Copy the template, never an example. An example's numbers and quotes belong to the client
+in it, and a page built by editing someone else's story carries their facts until you
+notice. `bash scripts/check-placeholders.sh` fails on any page still holding `{{TOKEN}}`
+stubs, and runs as a push warning. The template
 carries the geometry, the off-token flags and the build stamp, and re-deriving those by hand
 is how a page ends up plausible but wrong.
 
@@ -159,7 +172,7 @@ is how a page ends up plausible but wrong.
 | `templates/case-study/` | One customer story as a page — hero with outcome numbers, prose column with a sticky rail CTA, closing CTA | Figma `case-study-with-image`, `2PbNu2kGHalHhMUfFyFoeG` / `495:3382`, with the navbar, rail card and footer from the live site |
 
 ```bash
-cp -r skills/gushwork-web/templates/case-study skills/gushwork-web/templates/<client-slug>
+cp -r skills/gushwork-web/templates/case-study skills/gushwork-web/examples/<client-slug>
 ```
 
 Each template's README records what it was measured from, **where the live site disagrees with

@@ -29,7 +29,7 @@ MARKER = "gw-shell-injected"
 # explicitly picks dark via the toggle; that choice is what persists
 # across visits, not the OS setting.
 THEME_SNIPPET = (
-    "<script>try{var t=localStorage.getItem('gw-theme')||'light';"
+    "<script>try{var t=localStorage.getItem('gw-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');"
     "document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>"
 )
 

@@ -1,0 +1,10 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="104" height="104" viewBox="0 0 104 104" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Frame 2147259871">
+<rect x="1" y="1" width="102" height="102" rx="19" fill="#0070FF"/>
+<rect x="1" y="1" width="102" height="102" rx="19" stroke="#338CFF" stroke-width="2"/>
+<g id="Subtract">
+<path d="M75.7957 28.9662C76.3767 27.5344 75.3022 26 73.757 26H31.9429C28.6607 26 26 28.6607 26 31.9429V69.4056C26 72.8117 29.361 75.1939 32.4742 73.8119C52.5521 64.8992 67.846 48.5599 75.7957 28.9662Z" fill="white"/>
+<path d="M47.1355 78C46.4114 78 46.1082 77.0595 46.6868 76.6243C61.6854 65.3422 72.432 49.273 77.1978 31.2339C77.3112 30.8045 78 30.8855 78 31.3297V72.0571C78 75.3393 75.3393 78 72.0571 78H47.1355Z" fill="white"/>
+</g>
+</g>
+</svg>

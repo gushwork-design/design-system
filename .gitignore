@@ -7,3 +7,10 @@ preview/board.html
 
 # Rendered output of templates/*/render.sh — regenerate with ./render.sh
 templates/**/*.pdf
+
+# Slide-deck template build output and deps — regenerate with ./render.sh and
+# `npm install && node build-pptx.mjs`
+templates/**/node_modules/
+templates/**/out/
+templates/**/package-lock.json
+.vercel

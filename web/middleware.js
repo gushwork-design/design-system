@@ -18,26 +18,34 @@
 
 import { COOKIE, verify, readCookie, sessionSecret, authModes, GATE_ENABLED }
   from './api/_session.js';
+import { loadRules, decide } from './api/_access.js';
 
 export const config = {
   matcher: ['/internal/:path*', '/admin/:path*']
 };
 
-/* ── THE GATE IS OFF, 1 Sep 2026 ─────────────────────────────────────────────
-   Ruled by Utsav. Set to true to put it back; nothing else has to change.
+/* ── THE GATE IS ON, 15 Sep 2026 ─────────────────────────────────────────────
+   The switch itself is GATE_ENABLED in api/_session.js, not here — one answer, read by both
+   this file and /api/auth/me, so a padlock in the sidebar can never disagree with what the
+   edge actually does.
 
-   Why turning it off is not the exposure it sounds like: every page behind it
-   — install.html, changelog-sheet.html, review-sheet.html, catalogue.html — is
-   already tracked in this repo, and this repo is PUBLIC. The gate was asking
-   for a password to see files anyone can read on GitHub. What it was actually
-   costing was the install page: /preview/install.html redirects to
-   /internal/claude-plugin, so with no SITE_PASSWORD configured the first page
-   a new teammate opens would have answered 503.
+   It was off from 1 Sep, and that was the right call at the time: every page behind it was
+   already committed to this PUBLIC repo, so the gate was asking for a password to see files
+   anyone could download from GitHub, and it was answering 503 on the install page a new
+   teammate opens first.
 
-   What this does NOT make public is anything that was not already: there is no
-   private data on this deploy. If that ever stops being true — a real customer
-   list, an unreleased campaign — turn this back on BEFORE adding the page, not
-   after.
+   That reasoning expired when /internal/ stopped being a mirror of the repo. It now serves two
+   working applications — the employee ID card generator and the email signature creator — and
+   the ID card tool shipped with its own client-side password REMOVED on the understanding that
+   Google auth would replace it. The old note here said to turn this back on BEFORE adding a
+   genuinely private page. That page arrived, so it is on.
+
+   Still deliberately outside the matcher and still public: the per-surface
+   component-registry.json files under /exports (written without a glob here, because the
+   two characters that spell one would close this comment),
+   which every dashboard the plugin builds fetches on load to check for drift, /version.json,
+   /foundation/tokens.css and /fonts/. Widening the matcher silently breaks drift checks
+   everywhere, and nothing reports it.
    ────────────────────────────────────────────────────────────────────────── */
 
 function forbidden(email) {
@@ -51,7 +59,7 @@ function forbidden(email) {
     'border:1px solid var(--gw-color-neutral-100);text-align:center">' +
     '<h1 style="margin:0 0 8px;font-size:22px">Admins only</h1>' +
     '<p style="margin:0 0 24px;font-size:14px;color:var(--gw-color-neutral-600)">' +
-    'The review sheet and the catalogue are limited to the design system admins. ' +
+    'This page is limited to the design system admins. ' +
     'You are signed in as ' + String(email || '').replace(/[<>&"]/g, '') + '.</p>' +
     '<a href="/" style="font-size:14px;color:var(--gw-color-primary-500)">' +
     'Back to Gushwork Design</a></div></body>',
@@ -106,9 +114,17 @@ export default async function middleware(request) {
   );
   if (!session) return toSignIn(url);
 
-  if (url.pathname.startsWith('/admin') && !session.admin) {
-    return forbidden(session.email);
-  }
+  /* Evaluated against the rules AS THEY ARE NOW, not against session.admin.
+     The cookie is signed for 12 hours, so trusting its claim would mean a
+     revoked admin kept the keys for the rest of the day and a newly granted
+     one had to sign out and back in to use them — neither is what "live" in
+     /admin/access-control means. The rules come from Edge Config when a store
+     is attached and from the compiled defaults when it is not, so this is the
+     old two-tier behaviour until someone changes something. */
+  const rules = await loadRules();
+  const verdict = decide(url.pathname, session, rules);
+  if (verdict === 'forbid') return forbidden(session.email);
+  if (verdict === 'signin') return toSignIn(url);
 
   /* Returning nothing continues to the next handler, which serves the file. */
   return undefined;

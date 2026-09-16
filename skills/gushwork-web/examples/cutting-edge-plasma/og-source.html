@@ -1,0 +1,88 @@
+<!doctype html>
+<!-- OG image SOURCE for the case-study template — renders to a static 1200×630
+     PNG, same pattern as assets/og/_source.html. Rebuilt against a second,
+     simpler Figma reference frame (2PbNu2kGHalHhMUfFyFoeG, node 1684:12373)
+     after the first reference (1607:425 — topbar + hero photo + client-logo
+     overlay) was dropped in favour of this one on Utsav's own call.
+
+     Layout per the frame's own metadata (get_metadata, not eyeballed): a
+     1200×630 frame, black ground, one full-bleed background asset ("Union",
+     1200.625×675.625 — taller than the frame on purpose, clipped by
+     overflow:hidden) and one column centred on both axes (920 wide, at frame
+     x=140/y=143 — (1200-920)/2 and (630-344)/2 confirm true centring) holding
+     logo → headline → button at a flat 60px gap, confirmed from the child
+     nodes' own x/y: logo at 0, headline at 84 (=24 logo height + 60 gap),
+     button at 288 (=84 + 144 headline height + 60 gap).
+
+     The background is the frame's real downloaded vector
+     (assets/og/case-study-grid.svg — an evenodd grid lattice filled with a
+     radial gradient, dark at centre fading to lighter grey at the edges, 40%
+     opacity), not a CSS approximation. A CSS mask attempt on the previous
+     reference frame had the fade direction backwards — caught only by
+     opening the real asset file instead of trusting the bounding-box JSON.
+
+     Headline and button link are this template's own content (the case
+     study's actual h1 and URL), not the reference frame's own sample copy
+     ("John Maye…") — same convention every other generated slot here uses.
+
+     TO GENERATE A NEW CASE STUDY'S OG IMAGE: swap the headline text and the
+     button's href below to that case's own. Then screenshot this file at
+     exactly 1200×630 (no scaling) to produce the static PNG a
+     `<meta property="og:image">` tag needs — OG consumers (Slack, X,
+     iMessage, etc.) fetch a static image URL, they don't render HTML. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>OG image source — Cutting Edge Plasma</title>
+<link rel="stylesheet" href="../../../../foundation/tokens.css">
+<style>
+@font-face{font-family:'Vert Grotesk Display';src:url('../../../../fonts/Vert_Grotesk_Display_VF.ttf') format('truetype-variations');font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:'Inter';src:url('../../../../fonts/Inter-VariableFont_opsz_wght.ttf') format('truetype-variations');font-weight:100 900;font-style:normal;font-display:swap}
+
+*,*::before,*::after{box-sizing:border-box;margin:0}
+html,body{width:1200px;height:630px;overflow:hidden}
+body{
+  position:relative;background:var(--gw-color-black);
+  font-family:var(--gw-font-body);
+}
+
+/* Native size (1200.625×675.625) placed at the frame's own 0,0 — the JSX's
+   left:calc(50%+0.31px)/translateX(-50%) is Figma's own centring math for
+   this exact width, algebraically the same as left:0 at this size. Height
+   overflows the 630 frame on purpose; overflow:hidden on html/body clips it,
+   matching what the reference frame itself does. */
+.og-grid{position:absolute;left:0;top:0;width:1200.625px;height:675.625px;display:block}
+
+.og-content{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:920px;display:flex;flex-direction:column;align-items:center;gap:60px;
+}
+.og-content .og-logo{height:24px;width:auto;display:block}
+.og-content h1{
+  width:100%;text-align:center;
+  font:700 60px/1.2 var(--gw-font-display);color:var(--gw-color-white);
+}
+.og-btn{
+  display:inline-flex;align-items:center;gap:var(--gw-space-8);width:fit-content;
+  padding:16px 16px 16px 20px;
+  background:var(--gw-color-primary-500);color:var(--gw-color-white);
+  text-decoration:none;
+  border-radius:var(--gw-radius-12);
+  font:var(--gw-text-body-16-med);letter-spacing:var(--gw-text-body-16-med-tracking);
+}
+.og-btn svg{width:16px;height:16px;display:block}
+</style>
+</head>
+<body>
+  <img class="og-grid" src="../../../../assets/og/case-study-grid.svg" alt="">
+
+  <div class="og-content">
+    <img class="og-logo" src="../../../../assets/logo/gushwork-logo-white.svg" alt="Gushwork">
+    <h1>From Chasing CNC Buyers To Getting Found On Google</h1>
+    <a class="og-btn" href="https://www.gushwork.ai/case-study/cutting-edge-plasma">
+      See Case Study
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M14.0306 8.53063L9.53063 13.0306C9.38973 13.1715 9.19863 13.2507 8.99938 13.2507C8.80012 13.2507 8.60902 13.1715 8.46813 13.0306C8.32723 12.8897 8.24807 12.6986 8.24807 12.4994C8.24807 12.3001 8.32723 12.109 8.46813 11.9681L11.6875 8.75H2.5C2.30109 8.75 2.11032 8.67098 1.96967 8.53033C1.82902 8.38968 1.75 8.19891 1.75 8C1.75 7.80109 1.82902 7.61032 1.96967 7.46967C2.11032 7.32902 2.30109 7.25 2.5 7.25H11.6875L8.46937 4.03C8.32848 3.8891 8.24932 3.69801 8.24932 3.49875C8.24932 3.29949 8.32848 3.1084 8.46937 2.9675C8.61027 2.8266 8.80137 2.74745 9.00062 2.74745C9.19988 2.74745 9.39098 2.8266 9.53187 2.9675L14.0319 7.4675C14.1018 7.53727 14.1573 7.62017 14.1951 7.71144C14.2329 7.8027 14.2523 7.90054 14.2522 7.99932C14.252 8.09811 14.2324 8.1959 14.1944 8.28707C14.1564 8.37825 14.1007 8.46102 14.0306 8.53063Z" fill="currentColor"/></svg>
+    </a>
+  </div>
+</body>
+</html>

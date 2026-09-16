@@ -1,0 +1,606 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Access Control — Gushwork Design</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="Who can see which page, and who can grant it.">
+<script>try{var t=localStorage.getItem('gw-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20width%3D%2280%22%20height%3D%2280%22%20rx%3D%2220%22%20fill%3D%22%230d0d0d%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="/foundation/tokens.css">
+<link rel="stylesheet" href="/shell.css">
+<script src="/shell.js" defer></script>
+<style>
+/* Page-scoped. Product density per the dashboard rules — 4–32 spacing, 1px
+   neutral borders, S1/S2 only, no blur. Everything colour-bearing is a token
+   or one of shell.css's --s-* semantic pairs, so dark mode needs no second
+   set of rules here. */
+.ac-card {
+  background: var(--s-card-bg);
+  border: 1px solid var(--s-card-border);
+  border-radius: var(--gw-radius-16);
+  overflow: hidden;
+}
+.ac-card__hd {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: var(--gw-space-16);
+  padding: var(--gw-space-20) var(--gw-space-24);
+  border-bottom: 1px solid var(--s-card-border);
+}
+.ac-card__hd h3 {
+  margin: 0 0 var(--gw-space-4);
+  font: var(--gw-text-body-16-sem); color: var(--s-heading);
+}
+.ac-card__hd p { margin: 0; font: var(--gw-text-body-12-reg); color: var(--s-nav-label); }
+.ac-card__body { padding: var(--gw-space-8) var(--gw-space-24) var(--gw-space-20); }
+
+/* Rows, not a <table>: each row carries a select and a token field, and a
+   table's cell widths fight both of them at phone width. */
+.ac-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.1fr) 200px minmax(0, 1.4fr) 44px;
+  gap: var(--gw-space-12);
+  align-items: center;
+  padding: var(--gw-space-12) 0;
+  border-bottom: 1px solid var(--s-card-border);
+}
+.ac-row:last-child { border-bottom: 0; }
+.ac-row__path { font: var(--gw-text-body-14-med); color: var(--s-heading); word-break: break-all; }
+.ac-row__path small { display: block; font: var(--gw-text-body-12-reg); color: var(--s-nav-label); word-break: normal; }
+
+.ac-head {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.1fr) 200px minmax(0, 1.4fr) 44px;
+  gap: var(--gw-space-12);
+  padding: var(--gw-space-8) 0;
+  border-bottom: 1px solid var(--s-card-border);
+  font: var(--gw-text-body-10-sem); letter-spacing: .06em; text-transform: uppercase;
+  color: var(--s-group-label);
+}
+
+.ac-field, .ac-select {
+  width: 100%; box-sizing: border-box; min-height: 40px;
+  padding: 0 var(--gw-space-12);
+  border: 1px solid var(--s-field-border);
+  border-radius: var(--gw-radius-10);
+  background: var(--s-field-bg);
+  color: var(--s-heading);
+  font: var(--gw-text-body-14-reg);
+}
+.ac-select { appearance: none; padding-right: var(--gw-space-32); }
+/* The chevron is a mask painted in currentColor, not a background SVG with the
+   stroke baked in: a hex inside a data URI cannot follow a theme, and would be
+   the one off-token colour on the page. */
+.ac-selwrap { position: relative; }
+.ac-selwrap::after {
+  content: ""; position: absolute; right: 12px; top: 50%;
+  width: 16px; height: 16px; margin-top: -8px; pointer-events: none;
+  background: var(--s-field-icon);
+  -webkit-mask: var(--ac-chevron) center / 16px no-repeat;
+          mask: var(--ac-chevron) center / 16px no-repeat;
+}
+:root {
+  --ac-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 6.5 8 10.5 12 6.5' fill='none' stroke='%23000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+.ac-field::placeholder { color: var(--s-placeholder); }
+.ac-field:focus, .ac-select:focus { outline: var(--gw-focus-ring); outline-offset: var(--gw-focus-offset); }
+.ac-field:disabled, .ac-select:disabled { opacity: .55; cursor: not-allowed; }
+
+/* 44 minimum, per the product hit-target rule — the icon is 16 inside it. */
+.ac-icbtn {
+  width: 44px; height: 44px; display: grid; place-items: center;
+  border: 0; background: none; border-radius: var(--gw-radius-10);
+  color: var(--s-nav-label); cursor: pointer;
+}
+.ac-icbtn:hover { background: var(--s-nav-hover); color: var(--s-danger); }
+.ac-icbtn:disabled { opacity: .35; cursor: not-allowed; }
+.ac-icbtn:disabled:hover { background: none; color: var(--s-nav-label); }
+.ac-icbtn svg { width: 16px; height: 16px; display: block; }
+
+.ac-btn {
+  min-height: 40px; padding: 0 var(--gw-space-16);
+  display: inline-flex; align-items: center; gap: var(--gw-space-8);
+  border-radius: var(--gw-radius-10);
+  border: 1px solid var(--s-field-border);
+  background: var(--s-card-bg); color: var(--s-heading);
+  font: var(--gw-text-button-14); cursor: pointer;
+  transition: background var(--gw-motion-fast);
+}
+.ac-btn:hover { background: var(--s-nav-hover); }
+.ac-btn--primary {
+  background: var(--gw-color-primary-500);
+  border-color: var(--gw-color-primary-600);
+  color: var(--gw-color-white);
+}
+.ac-btn--primary:hover { background: var(--gw-color-primary-600); }
+.ac-btn:disabled { opacity: .5; cursor: not-allowed; }
+.ac-btn svg { width: 16px; height: 16px; }
+
+.ac-people { display: flex; flex-wrap: wrap; gap: var(--gw-space-8); align-items: center; }
+.ac-chip {
+  display: inline-flex; align-items: center; gap: var(--gw-space-8);
+  height: 28px; padding: 0 var(--gw-space-4) 0 var(--gw-space-12);
+  border-radius: var(--gw-radius-full);
+  background: var(--s-lock-bg); color: var(--s-heading);
+  font: var(--gw-text-body-12-med);
+}
+.ac-chip--owner { padding-right: var(--gw-space-12); color: var(--s-nav-label); }
+.ac-chip button {
+  width: 20px; height: 20px; display: grid; place-items: center;
+  border: 0; background: none; border-radius: var(--gw-radius-full);
+  color: var(--s-nav-label); cursor: pointer;
+}
+.ac-chip button:hover { color: var(--s-danger); }
+.ac-chip button svg { width: 12px; height: 12px; display: block; }
+
+.ac-note {
+  display: flex; gap: var(--gw-space-12);
+  padding: var(--gw-space-16) var(--gw-space-20);
+  border: 1px solid var(--s-card-border);
+  border-radius: var(--gw-radius-12);
+  background: var(--s-lock-bg);
+  font: var(--gw-text-body-14-reg); color: var(--s-body);
+}
+.ac-note svg { width: 16px; height: 16px; flex: none; margin-top: 2px; color: var(--s-nav-label); }
+.ac-note--warn { background: var(--s-field-bg); }
+.ac-note code { font-size: .92em; }
+
+/* The save bar only exists once something is pending, so it never sits there
+   inviting a Save on an unchanged page. */
+.ac-bar {
+  position: sticky; bottom: var(--gw-space-20); z-index: 5;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--gw-space-16);
+  margin-top: var(--gw-space-24);
+  padding: var(--gw-space-12) var(--gw-space-12) var(--gw-space-12) var(--gw-space-20);
+  border: 1px solid var(--s-card-border);
+  border-radius: var(--gw-radius-12);
+  background: var(--s-card-bg);
+  box-shadow: var(--gw-shadow-s2);
+  font: var(--gw-text-body-14-med); color: var(--s-heading);
+}
+.ac-bar__actions { display: flex; gap: var(--gw-space-8); }
+.ac-msg { font: var(--gw-text-body-14-reg); }
+.ac-msg--err { color: var(--s-danger); }
+
+@media (max-width: 760px) {
+  .ac-head { display: none; }
+  .ac-row { grid-template-columns: 1fr 44px; grid-template-areas: "path del" "who who" "people people"; row-gap: var(--gw-space-8); }
+  .ac-row__path { grid-area: path; }
+  .ac-row__who { grid-area: who; }
+  .ac-row__people { grid-area: people; }
+  .ac-row__del { grid-area: del; }
+  .ac-bar { flex-direction: column; align-items: stretch; }
+}
+</style>
+</head>
+<body data-gw-page="access-control">
+
+<div class="gw-col">
+  <div class="gw-section gw-stack-40">
+
+    <div class="gw-prose gw-stack-20">
+      <h2>Access control</h2>
+      <p>Who can open which page, and who is allowed to decide that. Changes apply at the
+         edge within seconds — there is no deploy to wait for, and no need for anyone to
+         sign out and back in.</p>
+    </div>
+
+    <div id="ac-state"></div>
+    <div id="ac-app" hidden>
+      <div class="gw-stack-24" id="ac-sections"></div>
+      <div id="ac-barmount"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var ICON = {
+    trash: 'M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z',
+    x: 'M208.49,191.51a12,12,0,0,1-17,17L128,145,64.49,208.49a12,12,0,0,1-17-17L111,128,47.51,64.49a12,12,0,0,1,17-17L128,111l63.51-63.52a12,12,0,0,1,17,17L145,128Z',
+    plus: 'M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z',
+    info: 'M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm16-40a8,8,0,0,1-8,8,16,16,0,0,1-16-16V128a8,8,0,0,1,0-16,16,16,0,0,1,16,16v40A8,8,0,0,1,144,176ZM112,84a12,12,0,1,1,12,12A12,12,0,0,1,112,84Z'
+  };
+  function icon(n) {
+    return '<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="' +
+      (ICON[n] || '') + '"/></svg>';
+  }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function el(html) {
+    var t = document.createElement('template');
+    t.innerHTML = html.trim();
+    return t.content.firstElementChild;
+  }
+
+  var ACCESS = [
+    ['public',   'Everyone'],
+    ['internal', 'Anyone at {domain}'],
+    ['people',   'Specific people & groups'],
+    ['admin',    'Admins only']
+  ];
+
+  var state = null;   /* the server's answer, untouched — the baseline */
+  var draft = null;   /* what the form is showing */
+  var meta  = null;
+
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+  function dirty() { return JSON.stringify(draft) !== JSON.stringify(state); }
+
+  /* -- render ------------------------------------------------------------- */
+
+  function routeRow(r, i) {
+    var opts = ACCESS.map(function (a) {
+      return '<option value="' + a[0] + '"' + (r.access === a[0] ? ' selected' : '') + '>' +
+        esc(a[1].replace('{domain}', meta.domain)) + '</option>';
+    }).join('');
+
+    var people = [].concat(
+      (r.groups || []).map(function (g) { return '@' + g; }),
+      r.people || []
+    ).join(', ');
+
+    return el(
+      '<div class="ac-row" data-i="' + i + '">' +
+        '<div class="ac-row__path">' + esc(r.path) +
+          (r.path === '/admin' ? '<small>Includes this page</small>' : '') + '</div>' +
+        '<div class="ac-row__who ac-selwrap"><select class="ac-select" data-act="access" ' +
+          'aria-label="Who can see ' + esc(r.path) + '">' + opts + '</select></div>' +
+        '<div class="ac-row__people">' +
+          (r.access === 'people'
+            ? '<input class="ac-field" data-act="people" value="' + esc(people) + '" ' +
+              'placeholder="name@' + esc(meta.domain) + ', @group" ' +
+              'aria-label="People and groups for ' + esc(r.path) + '" ' +
+              'data-1p-ignore="true" data-lpignore="true" data-form-type="other">'
+            : '') +
+        '</div>' +
+        '<div class="ac-row__del"><button class="ac-icbtn" type="button" data-act="drop" ' +
+          (r.path === '/admin' ? 'disabled title="The admin area cannot be ungated here"' :
+            'aria-label="Remove the rule for ' + esc(r.path) + '"') +
+          '>' + icon('trash') + '</button></div>' +
+      '</div>'
+    );
+  }
+
+  function pagesCard() {
+    var card = el(
+      '<section class="ac-card">' +
+        '<div class="ac-card__hd">' +
+          '<div><h3>Pages</h3><p>The most specific matching path wins, so a rule on ' +
+            '<code>/internal/staging</code> overrides the one on <code>/internal</code>.</p></div>' +
+        '</div>' +
+        '<div class="ac-card__body">' +
+          '<div class="ac-head"><span>Path</span><span>Who can see it</span>' +
+            '<span>People &amp; groups</span><span></span></div>' +
+          '<div data-rows></div>' +
+          '<div style="padding-top:16px;display:flex;gap:8px;flex-wrap:wrap">' +
+            '<input class="ac-field" data-newpath placeholder="/internal/new-page" ' +
+              'aria-label="Path to add" style="max-width:280px" ' +
+              'data-1p-ignore="true" data-lpignore="true" data-form-type="other">' +
+            '<button class="ac-btn" type="button" data-addpath>' + icon('plus') +
+              '<span>Add a page</span></button>' +
+          '</div>' +
+        '</div>' +
+      '</section>'
+    );
+
+    var rows = card.querySelector('[data-rows]');
+    draft.routes.forEach(function (r, i) { rows.appendChild(routeRow(r, i)); });
+
+    rows.addEventListener('change', function (ev) {
+      var row = ev.target.closest('.ac-row'); if (!row) return;
+      var r = draft.routes[+row.dataset.i];
+      if (ev.target.dataset.act === 'access') { r.access = ev.target.value; render(); }
+      if (ev.target.dataset.act === 'people') {
+        var parts = ev.target.value.split(',').map(function (s) { return s.trim(); })
+          .filter(Boolean);
+        r.groups = parts.filter(function (s) { return s.charAt(0) === '@'; })
+          .map(function (s) { return s.slice(1).toLowerCase(); });
+        r.people = parts.filter(function (s) { return s.charAt(0) !== '@'; })
+          .map(function (s) { return s.toLowerCase(); });
+        paintBar();
+      }
+    });
+    rows.addEventListener('click', function (ev) {
+      var btn = ev.target.closest('[data-act="drop"]'); if (!btn || btn.disabled) return;
+      draft.routes.splice(+btn.closest('.ac-row').dataset.i, 1);
+      render();
+    });
+
+    card.querySelector('[data-addpath]').addEventListener('click', function () {
+      var input = card.querySelector('[data-newpath]');
+      var path = input.value.trim().replace(/\/+$/, '');
+      if (!path) return;
+      if (path.charAt(0) !== '/') { input.value = '/' + path; return; }
+      if (draft.routes.some(function (r) { return r.path === path; })) { input.value = ''; return; }
+      draft.routes.push({ path: path, access: 'internal', groups: [], people: [] });
+      draft.routes.sort(function (a, b) { return a.path.localeCompare(b.path); });
+      render();
+    });
+
+    return card;
+  }
+
+  function groupsCard() {
+    var names = Object.keys(draft.groups || {}).sort();
+    var card = el(
+      '<section class="ac-card">' +
+        '<div class="ac-card__hd">' +
+          '<div><h3>Groups</h3><p>A named list of people, so a page can be handed to a ' +
+            'team rather than to seven addresses. Referred to as ' +
+            '<code>@name</code> above.</p></div>' +
+        '</div>' +
+        '<div class="ac-card__body"><div data-groups></div>' +
+          '<div style="padding-top:16px;display:flex;gap:8px;flex-wrap:wrap">' +
+            '<input class="ac-field" data-newgroup placeholder="gtm" aria-label="Group name" ' +
+              'style="max-width:200px" data-1p-ignore="true" data-lpignore="true" ' +
+              'data-form-type="other">' +
+            '<button class="ac-btn" type="button" data-addgroup>' + icon('plus') +
+              '<span>Add a group</span></button>' +
+          '</div>' +
+        '</div>' +
+      '</section>'
+    );
+
+    var mount = card.querySelector('[data-groups]');
+    if (!names.length) {
+      mount.appendChild(el('<p style="margin:12px 0 0;font:var(--gw-text-body-14-reg);' +
+        'color:var(--s-nav-label)">No groups yet.</p>'));
+    }
+    names.forEach(function (name) {
+      mount.appendChild(el(
+        '<div class="ac-row" style="grid-template-columns:minmax(120px,240px) minmax(0,1fr) 44px">' +
+          '<div class="ac-row__path">@' + esc(name) + '</div>' +
+          '<div><input class="ac-field" data-group="' + esc(name) + '" ' +
+            'value="' + esc(draft.groups[name].join(', ')) + '" ' +
+            'aria-label="Members of ' + esc(name) + '" ' +
+            'placeholder="name@' + esc(meta.domain) + ', name@' + esc(meta.domain) + '" ' +
+            'data-1p-ignore="true" data-lpignore="true" data-form-type="other"></div>' +
+          '<div><button class="ac-icbtn" type="button" data-dropgroup="' + esc(name) + '" ' +
+            'aria-label="Delete the ' + esc(name) + ' group">' + icon('trash') + '</button></div>' +
+        '</div>'
+      ));
+    });
+
+    mount.addEventListener('change', function (ev) {
+      var name = ev.target.dataset.group; if (!name) return;
+      draft.groups[name] = ev.target.value.split(',').map(function (s) {
+        return s.trim().toLowerCase();
+      }).filter(Boolean);
+      paintBar();
+    });
+    mount.addEventListener('click', function (ev) {
+      var btn = ev.target.closest('[data-dropgroup]'); if (!btn) return;
+      var name = btn.dataset.dropgroup;
+      delete draft.groups[name];
+      /* A page pointing at a group that no longer exists would silently stop
+         letting those people in, with nothing on screen saying why. */
+      draft.routes.forEach(function (r) {
+        r.groups = r.groups.filter(function (g) { return g !== name; });
+      });
+      render();
+    });
+
+    card.querySelector('[data-addgroup]').addEventListener('click', function () {
+      var input = card.querySelector('[data-newgroup]');
+      var name = input.value.trim().toLowerCase().replace(/^@/, '');
+      if (!name || draft.groups[name]) { input.value = ''; return; }
+      draft.groups[name] = [];
+      render();
+    });
+
+    return card;
+  }
+
+  function adminsCard() {
+    var owners = (meta.owners || []).map(function (e) { return e.toLowerCase(); });
+    var extra = (draft.admins || []).filter(function (e) { return owners.indexOf(e) === -1; });
+
+    var card = el(
+      '<section class="ac-card">' +
+        '<div class="ac-card__hd">' +
+          '<div><h3>Admins</h3><p>Admins can open every page and change everything on ' +
+            'this one. Owners are set in the environment and cannot be edited here.</p></div>' +
+        '</div>' +
+        '<div class="ac-card__body">' +
+          '<div class="ac-people" style="padding:12px 0" data-admins></div>' +
+          (meta.you.owner
+            ? '<div style="padding-top:8px;display:flex;gap:8px;flex-wrap:wrap">' +
+                '<input class="ac-field" data-newadmin placeholder="name@' + esc(meta.domain) + '" ' +
+                  'type="email" aria-label="Email to make an admin" style="max-width:280px" ' +
+                  'data-1p-ignore="true" data-lpignore="true" data-form-type="other">' +
+                '<button class="ac-btn" type="button" data-addadmin>' + icon('plus') +
+                  '<span>Add an admin</span></button>' +
+              '</div>'
+            : '<div class="ac-note" style="margin-top:8px">' + icon('info') +
+              '<span>Only an owner can add or remove an admin. You can change page ' +
+              'access and groups.</span></div>') +
+        '</div>' +
+      '</section>'
+    );
+
+    var mount = card.querySelector('[data-admins]');
+    owners.forEach(function (e) {
+      mount.appendChild(el('<span class="ac-chip ac-chip--owner">' + esc(e) +
+        ' &middot; owner</span>'));
+    });
+    extra.forEach(function (e) {
+      mount.appendChild(el('<span class="ac-chip">' + esc(e) +
+        (meta.you.owner
+          ? '<button type="button" data-dropadmin="' + esc(e) + '" ' +
+            'aria-label="Remove ' + esc(e) + ' as an admin">' + icon('x') + '</button>'
+          : '') + '</span>'));
+    });
+    if (!extra.length) {
+      mount.appendChild(el('<span style="font:var(--gw-text-body-14-reg);' +
+        'color:var(--s-nav-label)">No admins beyond the owners.</span>'));
+    }
+
+    mount.addEventListener('click', function (ev) {
+      var btn = ev.target.closest('[data-dropadmin]'); if (!btn) return;
+      var e = btn.dataset.dropadmin;
+      draft.admins = draft.admins.filter(function (a) { return a !== e; });
+      render();
+    });
+
+    var add = card.querySelector('[data-addadmin]');
+    if (add) {
+      add.addEventListener('click', function () {
+        var input = card.querySelector('[data-newadmin]');
+        var e = input.value.trim().toLowerCase();
+        if (!e || e.indexOf('@') === -1) return;
+        if (draft.admins.indexOf(e) === -1) draft.admins.push(e);
+        input.value = '';
+        render();
+      });
+    }
+
+    return card;
+  }
+
+  /* -- the save bar ------------------------------------------------------- */
+
+  function paintBar() {
+    var mount = document.getElementById('ac-barmount');
+    mount.innerHTML = '';
+    if (!dirty()) return;
+
+    var bar = el(
+      '<div class="ac-bar">' +
+        '<span data-msg>Unsaved changes.</span>' +
+        '<span class="ac-bar__actions">' +
+          '<button class="ac-btn" type="button" data-discard>Discard</button>' +
+          '<button class="ac-btn ac-btn--primary" type="button" data-save' +
+            (meta.writable ? '' : ' disabled title="No Edge Config store is attached"') +
+            '>Save changes</button>' +
+        '</span>' +
+      '</div>'
+    );
+    bar.querySelector('[data-discard]').addEventListener('click', function () {
+      draft = clone(state); render();
+    });
+    bar.querySelector('[data-save]').addEventListener('click', function () { save(bar); });
+    mount.appendChild(bar);
+  }
+
+  function save(bar) {
+    var msg = bar.querySelector('[data-msg]');
+    var btn = bar.querySelector('[data-save]');
+    btn.disabled = true;
+    msg.className = 'ac-msg';
+    msg.textContent = 'Saving…';
+
+    fetch('/api/access', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify({ rules: draft })
+    })
+      .then(function (r) { return r.json().then(function (b) { return { ok: r.ok, b: b }; }); })
+      .then(function (out) {
+        if (!out.ok) throw new Error(out.b && out.b.error || 'The save was refused.');
+        state = clone(out.b.rules);
+        draft = clone(out.b.rules);
+        render();
+        var done = el('<div class="ac-note" style="margin-top:16px">' + icon('info') +
+          '<span>Saved. The gate is using these rules now.</span></div>');
+        document.getElementById('ac-barmount').appendChild(done);
+        setTimeout(function () { done.remove(); }, 6000);
+      })
+      .catch(function (e) {
+        btn.disabled = false;
+        msg.className = 'ac-msg ac-msg--err';
+        msg.textContent = e.message;
+      });
+  }
+
+  /* Says which piece is missing, not just that something is. "No store
+     attached" was wrong and unhelpful the moment the store existed but the
+     variable had been renamed — which is exactly what happened when Edge
+     Config became Global Config and started writing GLOBAL_CONFIG. */
+  function banner() {
+    var d = meta.diagnostics || { store: false, token: false, read: { state: 'not-tried' } };
+    var why;
+
+    if (!d.store) {
+      why = 'No config store is connected to this project. Create one under ' +
+            'Storage &rarr; Global Config and connect it, which writes ' +
+            '<code>GLOBAL_CONFIG</code> for you.';
+    } else if (d.read.state === 'http-error') {
+      why = 'The store is connected but refused the read (' + esc(d.read.detail) +
+            '). The connection string is probably pointing at a store this ' +
+            'project cannot see.';
+    } else if (d.read.state === 'unreachable') {
+      why = 'The store is connected but could not be reached just now. The gate ' +
+            'is running on the compiled defaults until it answers.';
+    } else if (!d.token) {
+      why = 'The store is connected and readable, but there is no ' +
+            '<code>VERCEL_API_TOKEN</code> on the project, so there is nothing ' +
+            'that can write to it. Add one and redeploy.';
+    } else {
+      why = 'Saving is off.';
+    }
+
+    return '<div class="ac-note ac-note--warn">' + icon('info') +
+      '<span><b>Read-only.</b> ' + why + ' The rules below are exactly what the ' +
+      'gate is enforcing either way.</span></div>';
+  }
+
+  /* -- boot --------------------------------------------------------------- */
+
+  function render() {
+    var mount = document.getElementById('ac-sections');
+    mount.innerHTML = '';
+    if (!meta.writable) mount.appendChild(el(banner()));
+    /* Store attached and readable, but the write token is missing or the store
+       has never been written — worth saying, because the rules on screen are
+       still the compiled defaults and it is not obvious why. */
+    if (meta.writable && meta.diagnostics && meta.diagnostics.read.state === 'empty') {
+      mount.appendChild(el('<div class="ac-note">' + icon('info') +
+        '<span>The store is connected and empty. The rules below are the compiled ' +
+        'defaults; your first save writes them into it.</span></div>'));
+    }
+    mount.appendChild(pagesCard());
+    mount.appendChild(groupsCard());
+    mount.appendChild(adminsCard());
+    paintBar();
+  }
+
+  fetch('/api/access', { credentials: 'same-origin' })
+    .then(function (r) { return r.json().then(function (b) { return { ok: r.ok, b: b }; }); })
+    .then(function (out) {
+      if (!out.ok) throw new Error(out.b && out.b.error || 'Could not load the rules.');
+      meta = out.b;
+      /* Fill in anything the server left off before a single card renders.
+         The page is the last place that should be discovering a rule has no
+         `groups` array — it renders, it does not validate. */
+      var r = out.b.rules || {};
+      r.admins = r.admins || [];
+      r.groups = r.groups || {};
+      r.routes = (r.routes || []).map(function (x) {
+        return { path: x.path, access: x.access,
+                 groups: x.groups || [], people: x.people || [] };
+      });
+      state = clone(r);
+      draft = clone(r);
+      document.getElementById('ac-state').innerHTML = '';
+      document.getElementById('ac-app').hidden = false;
+      render();
+    })
+    .catch(function (e) {
+      document.getElementById('ac-state').innerHTML =
+        '<div class="ac-note ac-note--warn">' + icon('info') + '<span>' + esc(e.message) +
+        '</span></div>';
+    });
+
+  document.getElementById('ac-state').innerHTML =
+    '<p style="font:var(--gw-text-body-14-reg);color:var(--s-nav-label)">Loading the rules…</p>';
+})();
+</script>
+
+</body></html>

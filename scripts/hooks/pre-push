@@ -16,9 +16,34 @@
 # git in this clone can also set the variable. The only thing that genuinely stops an
 # unreviewed push is server-side branch protection requiring a reviewed pull request — see
 # the note in CONTRIBUTING.md.
+#
+# It also WARNS (never blocks) about two things that are invisible until someone else hits
+# them on their own machine:
+#
+#   check-version.sh      plugin surface changed but the version field did not move, so no
+#                         changelog row, no updated announce date, and nothing for the
+#                         SessionStart update check to compare — the change ships silently.
+#   check-placeholders.sh a page still carries {{...}} stubs.
+#
+# Warnings, not blocks, and deliberately so: CONTRIBUTING.md is explicit that a bump is not
+# required for content to reach teammates, and a half-written page is a legitimate thing to
+# push to a branch. Blocking either would train people to pass --no-verify, which would also
+# disable the main-branch guard above. These run BEFORE the GW_PUSH escape hatch, because an
+# authorised push to main is exactly when an unstamped change matters most.
 
 set -uo pipefail
 PROTECTED="main"
+ROOT="$(git rev-parse --show-toplevel)"
+
+# Never let a warning break a push: these are advisory, and a broken check script
+# must not become the reason someone cannot ship.
+if [ -x "$ROOT/scripts/check-version.sh" ]; then
+  "$ROOT/scripts/check-version.sh" 2>&1 | sed 's/^/  /' || true
+fi
+if [ -x "$ROOT/scripts/check-placeholders.sh" ]; then
+  OUT="$("$ROOT/scripts/check-placeholders.sh" 2>&1 || true)"
+  case "$OUT" in *✘*) printf '%s\n' "$OUT" | grep -v '✔' | sed 's/^/  /' ;; esac
+fi
 
 if [ "${GW_PUSH:-}" = "1" ]; then
   exit 0

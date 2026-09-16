@@ -1,0 +1,183 @@
+{
+  "$comment": [
+    "Per-component versions for the slides surface. The plugin version tells someone the PLUGIN is",
+    "stale; this tells them which of the components THEY used actually changed, which is the only",
+    "thing that makes them act. Bump a component's version in the same commit that changes its spec",
+    "— scripts/check-drift.sh reads this file and a build's stamp, and reports the intersection.",
+    "",
+    "version = the plugin version in which that component's spec last changed.",
+    "breaking = true when a build using it will render WRONG until updated, as opposed to merely",
+    "missing an improvement. It is the difference between a red notice and an amber one.",
+    "",
+    "Every entry is seeded at 1.45.0 because this surface is new — there are no earlier slide",
+    "builds for a bump to warn, so there is nothing to over-report.",
+    "",
+    "`source` records where each spec came from, because they are not equally reliable:",
+    "  figma   — read off node properties in GW-Slides. Authoritative (R0).",
+    "  export  — derived from the Google Slides .pptx shape tree, doubled to 1920x1080. Good,",
+    "            but Slides re-fits text, so type is the weak spot.",
+    "  authored — built from tokens because no source has it. A first draft, not a spec.",
+    "An `authored` entry that later gets measured is a BREAKING bump: builds made against the",
+    "draft will be wrong, not merely dated."
+  ],
+  "registryVersion": "1.45.0",
+  "components": {
+    "ground": {
+      "version": "1.45.0",
+      "changed": "2026-09-07",
+      "breaking": false,
+      "source": "figma",
+      "figmaNode": "1137:614",
+      "doc": "deck.md"
+    },
+    "cover": {
+      "version": "1.45.0",
+      "changed": "2026-09-07",
+      "breaking": false,
+      "source": "figma",
+      "figmaNode": "99:5280",
+      "doc": "cover.md"
+    },
+    "title-bar": {
+      "version": "1.45.0",
+      "changed": "2026-09-07",
+      "breaking": false,
+      "source": "export",
+      "doc": "deck.md"
+    },
+    "content-card": {
+      "version": "1.45.0",
+      "changed": "2026-09-07",
+      "breaking": false,
+      "source": "export",
+      "doc": "deck.md"
+    },
+    "media-well": {
+      "version": "1.45.0",
+      "changed": "2026-09-07",
+      "breaking": false,
+      "source": "export",
+      "doc": "elements.md"
+    },
+    "icon-tile": {
+      "version": "1.45.0",
+      "changed": "2026-09-07",
+      "breaking": false,
+      "source": "export",
+      "doc": "elements.md"
+    },
+    "step-card": {
+      "version": "1.45.0",
+      "changed": "2026-09-07",
+      "breaking": false,
+      "source": "export",
+      "doc": "elements.md"
+    },
+    "eyebrow": {
+      "version": "1.45.0",
+      "changed": "2026-09-07",
+      "breaking": false,
+      "source": "export",
+      "doc": "elements.md"
+    },
+    "feature-row": {
+      "version": "1.45.0",
+      "changed": "2026-09-07",
+      "breaking": false,
+      "source": "export",
+      "doc": "elements.md"
+    },
+    "lead-paragraph": {
+      "version": "1.45.0",
+      "changed": "2026-09-07",
+      "breaking": false,
+      "source": "export",
+      "doc": "elements.md"
+    },
+    "rule-label": {
+      "version": "1.45.0",
+      "changed": "2026-09-07",
+      "breaking": false,
+      "source": "export",
+      "doc": "elements.md"
+    },
+    "annotation": {
+      "version": "1.45.0",
+      "changed": "2026-09-07",
+      "breaking": false,
+      "source": "export",
+      "doc": "elements.md"
+    },
+    "layout-split-card": {
+      "version": "1.45.0",
+      "changed": "2026-09-07",
+      "breaking": false,
+      "source": "export",
+      "doc": "layouts.md"
+    },
+    "layout-feature-list": {
+      "version": "1.45.0",
+      "changed": "2026-09-07",
+      "breaking": false,
+      "source": "export",
+      "doc": "layouts.md"
+    },
+    "layout-step-row": {
+      "version": "1.45.0",
+      "changed": "2026-09-07",
+      "breaking": false,
+      "source": "export",
+      "doc": "layouts.md"
+    },
+    "layout-full-bleed": {
+      "version": "1.45.0",
+      "changed": "2026-09-07",
+      "breaking": false,
+      "source": "export",
+      "doc": "layouts.md"
+    },
+    "layout-pricing": {
+      "version": "1.45.0",
+      "changed": "2026-09-07",
+      "breaking": false,
+      "source": "export",
+      "doc": "layouts.md"
+    },
+    "layout-divider": {
+      "version": "1.45.0",
+      "changed": "2026-09-07",
+      "breaking": false,
+      "source": "authored",
+      "doc": "layouts.md"
+    },
+    "layout-big-number": {
+      "version": "1.45.0",
+      "changed": "2026-09-07",
+      "breaking": false,
+      "source": "authored",
+      "doc": "layouts.md"
+    },
+    "layout-testimonial": {
+      "version": "1.45.0",
+      "changed": "2026-09-07",
+      "breaking": false,
+      "source": "authored",
+      "doc": "layouts.md"
+    },
+    "layout-two-up": {
+      "version": "1.45.0",
+      "changed": "2026-09-07",
+      "breaking": false,
+      "source": "authored",
+      "doc": "layouts.md"
+    },
+    "layout-closer": {
+      "version": "1.45.0",
+      "changed": "2026-09-07",
+      "breaking": false,
+      "source": "authored",
+      "doc": "layouts.md",
+      "note": "A real 'Thank You!' slide exists on the Sales Pitch page of GW-Slides but has not been measured. Measuring it is a breaking bump."
+    }
+  }
+}

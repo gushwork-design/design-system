@@ -1,0 +1,1422 @@
+/* ─────────────────────────────────────────────────────────────────
+   Gushwork Email Signature Creator
+   App shell styles. The signature itself uses inline styles so the
+   copy-to-clipboard HTML survives Gmail's sanitiser without depending
+   on an external stylesheet.
+   ───────────────────────────────────────────────────────────────── */
+
+@font-face {
+  font-family: 'Vert Grotesk Display';
+  src: url('/fonts/Vert_Grotesk_Display_VF.ttf') format('truetype-variations'),
+       url('/fonts/Vert_Grotesk_Display_VF.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --bg-page: #efeff1;
+  --card: #ffffff;
+  --line: #e5e7eb;
+  --line-soft: #ececef;
+  --ink: #0d0d0d;
+  --ink-2: #4b5563;
+  --ink-3: #9ca3af;
+  --brand: #0070ff;
+  --brand-hover: #0061e0;
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-pill: 0 2px 14px rgba(15, 17, 22, 0.08), 0 1px 2px rgba(15, 17, 22, 0.05);
+  --radius-card: 16px;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-feature-settings: 'cv11', 'ss01';
+  background: var(--bg-page);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  font-size: 14px;
+  letter-spacing: -0.006em;
+  transition: background-color 200ms;
+}
+
+html[data-theme="dark"] body { background: #1a1d20; }
+html[data-theme="dark"] .preview-col,
+html[data-theme="dark"] .preview-content { color: #e5e7eb; }
+html[data-theme="dark"] .preview-content { background: transparent; }
+
+/* ── overall app grid ───────────────────────────────────────────── */
+.app {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 20px;
+  padding: 20px;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* ── left column (brand card + form card stacked) ───────────────── */
+.left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: sticky;
+  top: 20px;
+  align-self: flex-start;
+  height: calc(100vh - 40px);
+}
+
+.brand-card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: var(--shadow-card);
+  border: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+.brand-card img,
+.brand-card .brand-icon { width: 32px; height: 32px; display: block; flex-shrink: 0; border-radius: 6px; }
+.brand-card h1 {
+  font-family: 'Vert Grotesk Display', 'Inter', system-ui, sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.016em;
+  margin: 0;
+  color: var(--ink);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.beta-tag {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #6b7280;
+  background: #f1f2f4;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  padding: 2px 7px;
+  line-height: 1;
+  margin-left: 4px;
+  white-space: nowrap;
+}
+
+.form-card {
+  background: var(--card);
+  border-radius: var(--radius-card);
+  padding: 0;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-card);
+  border: 1px solid #e5e7eb;
+}
+/* ── Custom scrollbar — matches the soft, neutral UI ────────────── */
+.form-card .form,
+.preview-col {
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: rgba(15, 17, 22, 0.18) transparent;
+}
+.form-card .form::-webkit-scrollbar,
+.preview-col::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.form-card .form::-webkit-scrollbar-track,
+.preview-col::-webkit-scrollbar-track {
+  background: transparent;
+}
+.form-card .form::-webkit-scrollbar-thumb,
+.preview-col::-webkit-scrollbar-thumb {
+  background-color: rgba(15, 17, 22, 0.16);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  min-height: 36px;
+  transition: background-color 160ms ease;
+}
+.form-card:hover .form::-webkit-scrollbar-thumb,
+.preview-col:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(15, 17, 22, 0.22);
+  background-clip: padding-box;
+}
+.form-card .form::-webkit-scrollbar-thumb:hover,
+.preview-col::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(15, 17, 22, 0.32);
+  background-clip: padding-box;
+}
+.form-card .form::-webkit-scrollbar-thumb:active,
+.preview-col::-webkit-scrollbar-thumb:active {
+  background-color: rgba(15, 17, 22, 0.42);
+  background-clip: padding-box;
+}
+.form-card .form::-webkit-scrollbar-corner,
+.preview-col::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+.form-card-subtitle {
+  position: relative;
+  z-index: 10;
+  background: #fafbfc;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 14px 22px;
+  border-bottom: 1px solid #e5e7eb;
+  font-family: 'Vert Grotesk Display', 'Inter', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #4b5563;
+  letter-spacing: -0.012em;
+  border-top-left-radius: var(--radius-card);
+  border-top-right-radius: var(--radius-card);
+  flex: 0 0 auto;
+}
+.form-card-subtitle-icon {
+  color: #6b7280;
+  flex: 0 0 auto;
+}
+
+.form-card .form {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* ── Framer-style property panel ─────────────────────────────────── */
+.prop-section {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.prop-section + .prop-section,
+.prop-section + .prop-collapse > .prop-section,
+.prop-collapse + .prop-section,
+.prop-collapse + .prop-collapse > .prop-section {
+  border-top: 1px solid #ececef;
+}
+
+/* Collapsible wrapper — animates grid-template-rows + opacity */
+.prop-collapse {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 280ms cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 220ms ease;
+  opacity: 1;
+}
+.prop-collapse > * {
+  overflow: hidden;
+  min-height: 0;
+}
+.prop-collapse.closed {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+.prop-section-head h3 {
+  font-family: 'Vert Grotesk Display', 'Inter', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--ink);
+  letter-spacing: 0.004em;
+}
+.prop-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.prop-row {
+  display: grid;
+  grid-template-columns: 84px 1fr;
+  align-items: center;
+  gap: 10px;
+  min-height: 32px;
+}
+.prop-row--start { align-items: start; }
+.prop-row--start .prop-label { padding-top: 6px; }
+.prop-label {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  color: #6b7280;
+}
+.prop-control {
+  display: flex;
+  min-width: 0;
+}
+
+.prop-input {
+  width: 100%;
+  background: #f1f2f4;
+  border: 1.5px solid transparent;
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #2a2d33;
+  outline: none;
+  transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+  letter-spacing: -0.006em;
+  min-width: 0;
+}
+.prop-input:hover { background: #e7e9ee; }
+.prop-input:focus {
+  background: #fff;
+  border-color: #d6d9de;
+  box-shadow: 0 0 0 3px rgba(15, 17, 22, 0.06);
+}
+.prop-input::placeholder { color: #a0a4ab; font-weight: 400; }
+.prop-input.mono {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 12px;
+}
+.prop-input.num {
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+  padding: 6px 9px;
+}
+/* dropdown variant of the same input — used by the banner picker */
+.prop-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #6b7280 50%),
+    linear-gradient(135deg, #6b7280 50%, transparent 50%);
+  background-position:
+    calc(100% - 14px) 50%,
+    calc(100% - 9px) 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 26px;
+  cursor: pointer;
+}
+
+/* ── PropDropdown — hover-to-open custom select ─────────────────── */
+.prop-dropdown { position: relative; width: 100%; }
+.prop-dropdown-trigger {
+  width: 100%;
+  background: #f1f2f4;
+  border: 1.5px solid transparent;
+  border-radius: 8px;
+  padding: 7px 10px 7px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+  transition: background 140ms ease, border-color 140ms ease;
+  min-height: 36px;
+}
+.prop-dropdown-trigger:hover { background: #e7e9ee; }
+.prop-dropdown.open .prop-dropdown-trigger {
+  background: #e7e9ee;
+}
+.prop-dropdown-value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.prop-dropdown-caret {
+  flex-shrink: 0;
+  color: #6b7280;
+  transition: transform 140ms ease;
+}
+.prop-dropdown.open .prop-dropdown-caret { transform: rotate(180deg); }
+.prop-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 6px;
+  box-shadow: 0 10px 30px rgba(13, 17, 23, 0.10), 0 2px 6px rgba(13, 17, 23, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  /* Tiny invisible bridge so moving from trigger to menu doesn't trip mouseleave. */
+}
+.prop-dropdown-menu::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -8px;
+  height: 8px;
+}
+.prop-dropdown-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 9px 10px;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-2);
+  text-align: left;
+  cursor: pointer;
+  transition: background 100ms ease, color 100ms ease;
+}
+.prop-dropdown-item:hover { background: #f4f5f7; color: var(--ink); }
+.prop-dropdown-item.active {
+  background: transparent;
+  color: var(--ink);
+}
+.prop-dropdown-item.active:hover { background: #f4f5f7; }
+.prop-dropdown-item-label {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.prop-dropdown-item-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: currentColor;
+  flex-shrink: 0;
+}
+.prop-dropdown-item-check { flex-shrink: 0; color: var(--ink); }
+
+.prop-segmented {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  background: #f1f2f4;
+  border-radius: 8px;
+  padding: 3px;
+  gap: 2px;
+  width: 100%;
+}
+.prop-segmented button {
+  background: transparent;
+  border: 1.5px solid transparent;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: background 140ms ease, color 140ms ease, border-color 140ms ease;
+}
+.prop-segmented button:hover { color: var(--ink); }
+.prop-segmented button.active {
+  background: #fff;
+  color: var(--ink);
+  border-color: #e5e7eb;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  font-weight: 600;
+}
+
+.prop-slider {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+.prop-slider .prop-input.num {
+  padding: 6px 8px;
+}
+.prop-slider input[type='range'] {
+  -webkit-appearance: none;
+  width: 100%;
+  background: transparent;
+  min-width: 0;
+}
+.prop-slider input[type='range']::-webkit-slider-runnable-track {
+  height: 4px;
+  background: var(--line);
+  border-radius: 999px;
+}
+.prop-slider input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: #0d0d0d;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.08);
+  margin-top: -5px;
+  cursor: pointer;
+}
+
+.prop-tip {
+  margin: 0;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: #6b7280;
+}
+.prop-tip-list {
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.prop-tip-list li::marker { color: #9ca3af; }
+.prop-tip strong { color: #1f2937; font-weight: 600; }
+.prop-tip a,
+.prop-tip-link {
+  color: #0070FF;
+  text-decoration: none;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(0, 112, 255, 0.25);
+  transition: border-color 0.15s ease;
+}
+.prop-tip a:hover,
+.prop-tip-link:hover { border-bottom-color: #0070FF; }
+.prop-tip-note {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: #fff8e6;
+  border: 1px solid #f5e0a3;
+  border-radius: 8px;
+  color: #5b4500;
+}
+.prop-tip-note strong { color: #3d2e00; }
+.prop-tip .kbd { vertical-align: baseline; }
+
+/* dropzone fills the row's right column */
+.prop-row .dropzone { width: 100%; padding: 10px 12px; }
+.prop-row .dropzone .thumb { width: 40px; height: 40px; }
+.prop-row .dropzone .copy .name { font-size: 12.5px; }
+.prop-row .dropzone .copy .hint { font-size: 10.5px; }
+
+/* form sections (Layout, Identity, Photo, Banner) ────────────────── */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.section-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 6px 0 2px;
+}
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field > label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+
+/* ── Floating-label text field ───────────────────────────────────── */
+.float-field {
+  position: relative;
+  background: #f1f2f4;
+  border: 1.5px solid transparent;
+  border-radius: 8px;
+  min-height: 60px;
+  padding: 10px 12px 10px 16px;
+  transition: background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+}
+.float-field:hover { background: #e7e9ee; }
+.float-field input {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 100%;
+  padding: 18px 0 0;
+  letter-spacing: -0.006em;
+}
+.float-field input::placeholder {
+  color: #a0a4ab;
+  font-weight: 400;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+.float-field:focus-within input::placeholder { opacity: 1; }
+
+.float-field label {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6e7480;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  pointer-events: none;
+  transition: top 140ms ease, transform 140ms ease, font-size 140ms ease, color 140ms ease;
+  letter-spacing: -0.006em;
+  background: transparent;
+  white-space: nowrap;
+  max-width: calc(100% - 28px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.float-field.filled label,
+.float-field:focus-within label {
+  top: 10px;
+  transform: translateY(0);
+  font-size: 11px;
+  color: #6e7480;
+}
+.float-field.error {
+  background: #ffffff;
+  border-color: #ef4444;
+}
+.float-field.error label { color: #6e7480; }
+.float-field .error-text {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #ef4444;
+  margin: 8px 0 0 4px;
+}
+
+/* segmented control (Layout) — selected has blue border */
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  background: #f3f4f6;
+  border-radius: 12px;
+  padding: 4px;
+  gap: 4px;
+}
+.segmented button {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-2);
+  background: transparent;
+  border: 1.5px solid transparent;
+  border-radius: 9px;
+  padding: 9px 10px;
+  cursor: pointer;
+  transition: background 120ms, color 120ms, border-color 120ms, box-shadow 120ms;
+}
+.segmented button.active {
+  background: #fff;
+  color: var(--ink);
+  border-color: #e5e7eb;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+/* slider */
+.slider-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+}
+.slider-row input[type='range'] {
+  -webkit-appearance: none;
+  width: 100%;
+  background: transparent;
+}
+.slider-row input[type='range']::-webkit-slider-runnable-track {
+  height: 4px;
+  background: var(--line);
+  border-radius: 999px;
+}
+.slider-row input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: var(--brand);
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.08);
+  margin-top: -6px;
+  cursor: pointer;
+}
+.slider-row .value {
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  color: var(--ink-2);
+  min-width: 36px;
+  text-align: right;
+}
+
+/* photo dropzone */
+.dropzone {
+  position: relative;
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: #fafbfc;
+  transition: background 120ms, border-color 120ms;
+}
+.dropzone:hover { background: #f4f5f7; border-color: #cbd5e0; }
+.dropzone .thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  background: #e5e7eb;
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+}
+.dropzone .thumb.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-3);
+  font-size: 22px;
+  font-weight: 300;
+}
+.dropzone .copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+.dropzone .copy .name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dropzone .copy .hint { font-size: 11px; color: var(--ink-3); line-height: 1.2; }
+.dropzone input[type='file'] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.dropzone .clear {
+  margin-left: auto;
+  font: inherit;
+  font-size: 11px;
+  color: var(--ink-3);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+  z-index: 2;
+}
+.dropzone .clear:hover { color: var(--ink); border-color: var(--ink-3); }
+
+/* toggle row */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 0 4px;
+}
+.toggle {
+  width: 32px;
+  height: 18px;
+  background: var(--line);
+  border-radius: 999px;
+  position: relative;
+  cursor: pointer;
+  transition: background 120ms;
+  flex-shrink: 0;
+  border: none;
+  padding: 0;
+}
+.toggle::after {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 120ms;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+.toggle.on { background: var(--brand); }
+.toggle.on::after { transform: translateX(14px); }
+.toggle-row label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+/* ── preview column ─────────────────────────────────────────────── */
+.preview-col {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 56px 32px 140px;
+  min-width: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 100vh;
+  box-sizing: border-box;
+}
+
+.preview-content {
+  width: 760px;
+  max-width: 100%;
+  padding: 24px 28px;
+  border-radius: 18px;
+  margin-inline: auto;
+  transition: width 220ms ease, background-color 200ms, color 200ms;
+}
+.preview-content[data-viewport="mobile"] {
+  width: 400px;
+}
+.preview-content[data-theme="light"] { background: transparent; color: #111; }
+.preview-content[data-theme="dark"]  { background: #1a1d20; color: #e5e7eb; }
+
+.preview-content .email-body {
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 28px;
+  color: rgba(0, 0, 0, 0.55);
+}
+.preview-content[data-theme="dark"] .email-body {
+  color: rgba(229, 231, 235, 0.55);
+}
+
+/* ── tooltip on the dark-mode (moon) toolbar button ──────────────── */
+.moon-tooltip {
+  position: relative;
+  display: inline-flex;
+}
+.moon-tooltip-tip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 10px);
+  transform: translateX(-50%) translateY(4px);
+  width: max-content;
+  max-width: 220px;
+  padding: 12px 14px;
+  background: #0d0d0d;
+  color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.32);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 12.5px;
+  line-height: 1.5;
+  letter-spacing: -0.002em;
+  text-align: left;
+  white-space: normal;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 140ms ease, transform 140ms ease, visibility 140ms;
+  pointer-events: none;
+  z-index: 40;
+}
+.moon-tooltip-tip::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border: 5px solid transparent;
+  border-top-color: #0d0d0d;
+}
+.moon-tooltip:hover .moon-tooltip-tip,
+.moon-tooltip:focus-within .moon-tooltip-tip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ── classic "-- " signature delimiter shown above the signature ── */
+.preview-content .sig-delimiter {
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.55);
+  margin-bottom: 8px;
+  user-select: none;
+}
+.preview-content[data-theme="dark"] .sig-delimiter {
+  color: rgba(229, 231, 235, 0.55);
+}
+
+/* ── inline tooltip for "Don't know how to add it to Gmail?" ─────── */
+/* Inline text links inside the email body / preview copy. Share this
+   on any anchor that sits inside a sentence so the styling stays
+   consistent (Utsav mention, Gmail help trigger, etc). */
+.email-body .text-link,
+.email-body .gmail-help {
+  color: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.email-body .gmail-help {
+  position: relative;
+  display: inline-block;
+  cursor: help;
+  outline: none;
+}
+.email-body .gmail-help-tip {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 8px);
+  width: 280px;
+  padding: 12px 14px;
+  background: #0d0d0d;
+  color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.32);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 12.5px;
+  line-height: 1.5;
+  letter-spacing: -0.002em;
+  text-align: left;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  transition: opacity 140ms ease, transform 140ms ease, visibility 140ms;
+  z-index: 30;
+  pointer-events: none;
+}
+.email-body .gmail-help:hover .gmail-help-tip,
+.email-body .gmail-help:focus-visible .gmail-help-tip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+.email-body .gmail-help-tip::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+  border-top-color: #0d0d0d;
+  transform: translateX(-50%);
+}
+.email-body .gmail-help-tip-title {
+  display: block;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.65);
+  margin-bottom: 6px;
+}
+.email-body .gmail-help-tip-steps {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  opacity: 1;
+}
+.email-body .gmail-help-tip-steps li { padding: 0; }
+.email-body .gmail-help-tip-steps strong { color: #fff; font-weight: 400; }
+.email-body .gmail-help-tip-steps a {
+  color: #7fb6ff;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(127, 182, 255, 0.4);
+}
+.email-body .gmail-help-tip-steps a:hover { border-bottom-color: #7fb6ff; }
+
+/* ── floating bottom toolbar ────────────────────────────────────── */
+.floating-toolbar {
+  position: fixed;
+  bottom: 24px;
+  /* centered over the right (preview) column: shift by half the left-col + gap */
+  left: calc(50% + 190px);
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 20;
+}
+
+.tb-pill {
+  background: #fff;
+  border-radius: 12px;
+  padding: 4px;
+  display: flex;
+  gap: 2px;
+  box-shadow: var(--shadow-pill);
+  border: 1px solid rgba(15, 17, 22, 0.06);
+}
+
+.tb-pill button {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-2);
+  background: transparent;
+  border: 1.5px solid transparent;
+  border-radius: 8px;
+  padding: 7px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  transition: background 140ms ease, color 140ms ease, border-color 140ms ease;
+}
+.tb-pill button:hover { color: var(--ink); background: #f5f6f7; }
+.tb-pill button.active {
+  background: #f1f2f4;
+  color: var(--ink);
+  font-weight: 600;
+}
+.tb-pill button.icon-only { padding: 7px 10px; }
+
+.tb-pill .btn-primary {
+  background: var(--brand);
+  color: #fff;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-color: transparent;
+}
+.tb-pill .btn-primary:hover {
+  background: var(--brand-hover);
+  color: #fff;
+  border-color: transparent;
+}
+.tb-pill .btn-primary.copied {
+  background: #10b981;
+  border-color: transparent;
+}
+
+/* ── Copied → Gmail settings tooltip ───────────────────────────── */
+.copy-btn-wrap {
+  position: relative;
+  display: inline-flex;
+}
+.copy-tooltip {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #0d0d0d;
+  color: #fff;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 12.5px;
+  line-height: 1.5;
+  letter-spacing: -0.002em;
+  font-weight: 500;
+  text-align: left;
+  border-radius: 10px;
+  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.32);
+  width: max-content;
+  max-width: 240px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(-50%, 6px);
+  transition: opacity 200ms ease, transform 200ms ease, visibility 0s linear 200ms;
+  pointer-events: none;
+  z-index: 50;
+}
+.copy-btn-wrap.show-tooltip .copy-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+  pointer-events: auto;
+  transition: opacity 200ms ease, transform 200ms ease, visibility 0s linear 0s;
+}
+.copy-tooltip svg {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  color: #34d399;
+}
+.copy-tooltip-text { color: rgba(255, 255, 255, 0.92); }
+.copy-tooltip a {
+  color: #7fb6ff;
+  text-decoration: none;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(127, 182, 255, 0.5);
+}
+.copy-tooltip a:hover { border-bottom-color: #7fb6ff; }
+.copy-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #0d0d0d;
+}
+
+.tb-pill .btn-error,
+.tb-pill .btn-primary.btn-error {
+  animation: shake 380ms cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+.tb-pill .btn-primary.btn-error {
+  background: #dc2626;
+  color: #fff;
+  border-color: transparent;
+}
+.tb-pill .btn-primary.btn-error:hover {
+  background: #b91c1c;
+  color: #fff;
+  border-color: transparent;
+}
+.tb-pill > button.btn-error {
+  background: rgba(239, 68, 68, 0.08);
+  color: #dc2626;
+  border-color: rgba(239, 68, 68, 0.3);
+  font-weight: 600;
+}
+@keyframes shake {
+  10%, 90% { transform: translateX(-1px); }
+  20%, 80% { transform: translateX(2px); }
+  30%, 50%, 70% { transform: translateX(-3px); }
+  40%, 60% { transform: translateX(3px); }
+}
+
+/* signature CTA hover (preview only — Gmail strips :hover from copied HTML) */
+[data-cta="primary"] {
+  transition: background-color 140ms ease, transform 140ms ease;
+}
+[data-cta="primary"]:hover {
+  background-color: #0061e0 !important;
+}
+[data-cta="primary"]:active {
+  background-color: #0048a3 !important;
+}
+[data-cta="secondary"] {
+  transition: background-color 140ms ease, border-color 140ms ease;
+}
+[data-cta="secondary"]:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+}
+[data-cta="secondary"]:active {
+  background-color: rgba(255, 255, 255, 0.14) !important;
+}
+
+/* contact-link hover: animated underline sweeping left → right (preview only) */
+[data-contact-link] {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  background-size: 0% 1px;
+  transition: background-size 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  padding-bottom: 1px;
+}
+[data-contact-link]:hover {
+  background-size: 100% 1px;
+}
+
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.split-button {
+  position: relative;
+  display: inline-flex;
+}
+.split-trigger {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-2);
+  background: #fff;
+  border: 1px solid rgba(15, 17, 22, 0.06);
+  border-radius: 12px;
+  padding: 8px 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  box-shadow: var(--shadow-pill);
+  transition: background 140ms ease, color 140ms ease;
+}
+.split-trigger:hover { color: var(--ink); background: #f5f6f7; }
+.split-trigger.btn-primary {
+  background: var(--brand);
+  color: #fff;
+  font-weight: 600;
+  border-color: transparent;
+}
+.split-trigger.btn-primary:hover { background: var(--brand-hover); color: #fff; }
+.split-trigger.btn-primary.copied { background: #10b981; }
+.split-trigger.btn-error {
+  background: rgba(239, 68, 68, 0.08);
+  color: #dc2626;
+  border-color: rgba(239, 68, 68, 0.3);
+  font-weight: 600;
+  animation: shake 380ms cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+.split-menu {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  min-width: 220px;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid rgba(15, 17, 22, 0.08);
+  box-shadow: 0 10px 28px -8px rgba(15, 17, 22, 0.18), 0 2px 6px rgba(15, 17, 22, 0.06);
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  animation: split-menu-in 140ms ease;
+}
+@keyframes split-menu-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.split-menu-item {
+  font: inherit;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 10px;
+  text-align: left;
+  cursor: pointer;
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  transition: background 100ms ease;
+}
+.split-menu-item:hover { background: #f3f4f6; }
+.split-menu-item .item-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.split-menu-item .item-tag {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--brand);
+  background: rgba(0, 112, 255, 0.10);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+.split-menu-item .item-hint {
+  font-size: 11px;
+  color: var(--ink-3);
+  line-height: 1.4;
+}
+
+/* spinner for clipboard "working" state */
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+/* ── Hover-to-upload overlay on the preview photo ──────────────── */
+.sig-wrap {
+  position: relative;
+  display: inline-block;
+}
+.sig-photo-overlay {
+  /* Absolute-positioned over the photo area of the signature.
+     The photo sits below the salutation (13px text + 20px margin = 33px)
+     on both viewports — only the photo size changes. */
+  position: absolute;
+  left: 0;
+  width: 64px;
+  height: 64px;
+  top: 33px;
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  background: rgba(13, 17, 23, 0);
+  transition: background-color 160ms ease, opacity 160ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+.sig-wrap[data-has-salutation="false"] .sig-photo-overlay { top: 0; }
+.sig-wrap[data-viewport="mobile"] .sig-photo-overlay {
+  top: 33px;
+  width: 56px;
+  height: 56px;
+  border-radius: 6px;
+}
+.sig-wrap[data-viewport="mobile"][data-has-salutation="false"] .sig-photo-overlay { top: 0; }
+.sig-photo-overlay input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+.sig-photo-overlay-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border-radius: 999px;
+  /* Glass morphism — translucent surface + backdrop blur. */
+  background: rgba(255, 255, 255, 0.28);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  backdrop-filter: blur(12px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  color: #ffffff;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.16),
+    0 4px 14px rgba(0, 0, 0, 0.20),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  opacity: 0;
+  transform: translateY(3px) scale(0.96);
+  transition: opacity 160ms ease, transform 180ms cubic-bezier(0.2, 0.7, 0.3, 1.2);
+  pointer-events: none;
+}
+.sig-photo-overlay:hover {
+  background: rgba(13, 17, 23, 0.32);
+}
+.sig-photo-overlay:hover .sig-photo-overlay-inner {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* ── Custom banner empty placeholder ────────────────────────────
+   Striped block by default. On hover: dim overlay + glass "Add
+   custom banner" pill appears, matching the photo-overlay pattern. */
+.gw-banner-placeholder {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background:
+    repeating-linear-gradient(135deg, #f4f5f7 0 12px, #eceef2 12px 24px);
+  border: 1px dashed #d6d9de;
+  cursor: pointer;
+  overflow: hidden;
+  transition: background-color 160ms ease;
+}
+.gw-banner-placeholder::after {
+  /* Dim overlay — fades in on hover. */
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(13, 17, 23, 0);
+  transition: background 160ms ease;
+  pointer-events: none;
+}
+.gw-banner-placeholder:hover::after {
+  background: rgba(13, 17, 23, 0.32);
+}
+.gw-banner-placeholder-hint {
+  position: relative;
+  z-index: 1;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 12px;
+  color: #6a7077;
+  letter-spacing: -0.002em;
+  text-align: center;
+  padding: 12px;
+  transition: opacity 140ms ease;
+}
+.gw-banner-placeholder:hover .gw-banner-placeholder-hint {
+  opacity: 0;
+}
+.gw-banner-placeholder-pill {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, calc(-50% + 3px)) scale(0.96);
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.28);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  backdrop-filter: blur(12px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  color: #ffffff;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: -0.004em;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.16),
+    0 4px 14px rgba(0, 0, 0, 0.20),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  opacity: 0;
+  transform: translateY(3px) scale(0.96);
+  transition: opacity 160ms ease, transform 180ms cubic-bezier(0.2, 0.7, 0.3, 1.2);
+  pointer-events: none;
+  white-space: nowrap;
+}
+.gw-banner-placeholder:hover .gw-banner-placeholder-pill {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+.gw-banner-placeholder-input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── tiny utilities ─────────────────────────────────────────────── */
+.muted { color: var(--ink-3); font-size: 12px; }
+.kbd {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  background: #f1f2f5;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 11px;
+  color: var(--ink-2);
+}

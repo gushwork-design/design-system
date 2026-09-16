@@ -1054,11 +1054,20 @@ def main():
         script=SCRIPT,
     ))
 
-    flagged = sum(1 for c in COLUMNS for card in sections[c] if flags(card, c))
+    # Count each flag as itself. This used to total EVERY flag and print the lot as "needing
+    # detail", so the first card to carry `blocked:` was reported as missing a key it had — the
+    # summary contradicting the board it summarises, which is the one thing this file must not do.
+    def count(flag):
+        return sum(1 for c in COLUMNS for card in sections[c] if flag in flags(card, c))
+
+    tail = "".join(
+        ", %d %s" % (n, label)
+        for n, label in ((count("needs detail"), "needing detail"), (count("blocked"), "blocked"))
+        if n
+    )
     sys.stderr.write(
         "Wrote %s — %d waiting, %d open, %d shipped%s\n"
-        % (os.environ.get("OUT", "the board"), len(waiting), open_cards, shipped,
-           (", %d needing detail" % flagged) if flagged else ""))
+        % (os.environ.get("OUT", "the board"), len(waiting), open_cards, shipped, tail))
     return 0
 
 

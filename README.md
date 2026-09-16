@@ -88,23 +88,32 @@ settings, which is what [`ROLLOUT.md`](ROLLOUT.md) recommends.
 Verdicts from a [`notices/`](notices/) review are exactly what feeds step 1. That is the loop
 closing: a deviation someone hit in a real build becomes a measured value everyone gets.
 
-## Two surfaces, two skills
+## Four surfaces, four skills
 
-The system covers two surfaces that look and behave differently, so they are two skills with
+The system covers four surfaces that look and behave differently, so they are four skills with
 disjoint trigger vocabularies. They are deliberately **not** merged.
 
 | Skill | Surface | Fires on |
 |---|---|---|
 | [`gushwork-web`](skills/gushwork-web/SKILL.md) | Public marketing site | landing page, ad lander, hero, fold, CTA section, pricing, comparison table, testimonial, case study, FAQ, navbar, footer |
 | [`gushwork-dashboard`](skills/gushwork-dashboard/SKILL.md) | Logged-in product | dashboard, app screen, KPI card, analytics panel, data table, side nav, filters, tabs, toasts |
+| [`gushwork-lead-magnet`](skills/gushwork-lead-magnet/SKILL.md) | Downloadable PDF | lead magnet, gated asset, PDF checklist, prompt pack, audit worksheet, playbook, buyer guide |
+| [`gushwork-slides`](skills/gushwork-slides/SKILL.md) | Presented deck | sales deck, pitch deck, QBR, investor update, slide, `.pptx`, Google Slides |
 
-Spacious white-and-blue marketing surfaces on one side; dense gray-canvas product surfaces
-with black-and-outline actions on the other. Blue is a primary action on the website and a
-signal-only colour in the product.
+Spacious white-and-blue marketing surfaces; dense gray-canvas product surfaces with
+black-and-outline actions; print-bound documents that invert the convention so the page is the
+wash and the cards are white; and decks that live on a blue blueprint ground with a single white
+content card. Blue is a primary action on the website, a signal-only colour in the product, and
+the ground itself on slides.
+
+Slides is the only surface that emits three formats from one build — HTML, a real `.pptx`, and a
+Google Slides deck — and the only one where **the display face legitimately changes on export**:
+Google Slides cannot load Vert Grotesk Display, so `.pptx` and Slides output render in Plus
+Jakarta Sans by design. That is R21, not a bug.
 
 ## Foundation — referenced, never duplicated
 
-Both skills point at these. Neither restates them, and neither should.
+All four skills point at these. None restates them, and none should.
 
 | File | Holds |
 |---|---|
@@ -131,7 +140,9 @@ gushwork-design/
 │   └── new-component-notice.md
 ├── skills/
 │   ├── gushwork-web/SKILL.md
-│   └── gushwork-dashboard/SKILL.md
+│   ├── gushwork-dashboard/SKILL.md
+│   ├── gushwork-lead-magnet/SKILL.md
+│   └── gushwork-slides/SKILL.md
 ├── notices/          declared elements and deviations, one file per piece of work
 └── exports/
     ├── web/          page-shell · folds · fold-elements · atoms · cards · button · avatar · images

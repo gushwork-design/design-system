@@ -625,3 +625,182 @@ that an unchecked rule is an ignored rule:
 **Unchanged above 1280.** `max-width:100%` costs nothing wherever there is room for the measured
 width, so 442, 480 and 560 still render exactly as drawn at every width the exactness rule in
 `build-rules.md` applies to. This governs only the flow regimes R17 opened.
+
+---
+
+## R21 — Vert Grotesk first, Plus Jakarta Sans as the export fallback
+
+**The slides display face is `Vert Grotesk Display`. `Plus Jakarta Sans` is the sanctioned
+fallback, used only where a custom face cannot load.** `--gw-font-slide-display` names both, in
+that order. **Ruled 7 Sep 2026 by Utsav**, when the slides surface was built.
+
+**Why this needed a ruling.** The evidence pointed both ways, and only one direction is real.
+The `.pptx` export of the manufacturing deck sets its display copy in Plus Jakarta Sans — 318
+runs of it against 125 of Inter — which reads like a deliberate second display face for the
+deck surface. It is not. The Figma cover node (`99:5280`) is set in `Vert Grotesk Display`
+Semibold, and Plus Jakarta Sans appears **nowhere** in the source.
+
+The substitution happens because Google Slides cannot load a custom font. Every deck that has
+been through a Slides or `.pptx` round-trip comes back in Plus Jakarta Sans, which is why so
+many circulating decks look like they were designed that way.
+
+**What this means in practice.**
+
+- Build in Vert Grotesk. It is in `fonts/` and it is what Figma uses.
+- **A deck that came back from an export in Plus Jakarta Sans is not a bug.** Do not "fix" it,
+  do not re-set it, do not file it. The fallback did its job.
+- Say so when handing over a `.pptx` or a Slides deck, or someone will report it.
+- `Plus Jakarta Sans` ships in `fonts/` under OFL for this purpose only. It is **not** a second
+  display face for web, dashboard or lead-magnet surfaces.
+
+**The same round-trip is why R22 exists**, and it also uppercased the cover eyebrow against the
+sentence-case voice rule. Treat an export as a rendering of the design, never as the design.
+
+## R22 — the seven picker greys snap to the nearest token
+
+**The slides export's seven tokenless greys are drift and must be snapped.** **Ruled 7 Sep 2026
+by Utsav.**
+
+| Export | Build | |
+|---|---|---|
+| `#666666` | `--gw-color-neutral-600` | |
+| `#999999` | `--gw-color-neutral-400` | |
+| `#CCCCCC` | `--gw-color-neutral-200` | |
+| `#D9D9D9` | `--gw-color-neutral-200` | same target — never distinguishable |
+| `#434343` | `--gw-color-neutral-850` | |
+| `#EFEFEF` | `--gw-color-neutral-100` | |
+| `#000000` | `--gw-color-black` | **R4** |
+
+**Why.** All seven are swatches from the Google Slides colour picker — someone reached for the
+colour grid instead of the palette. This is the same mechanism as R21: an artefact of working
+downstream of the design, not a decision.
+
+The other nine colours in the export were already exact tokens — `white`, `black`,
+`primary-500`, `primary-600`, `neutral-700`, `neutral-200`, `primary-25`, `neutral-50` and
+`secondary-500`. The palette was mostly being followed; it was the greys that slipped. So this
+is a defect in the source, which is R4's case, not R0's.
+
+**The cost, accepted.** Snapping shifts colours slightly against decks already in circulation.
+Recorded in `exports/slides/deck.md` so the next person can see why their old deck differs.
+
+Also drop the 16 stray `Calibri` runs. A default leaking through is not a typeface choice.
+
+## R23 — the cover's blur is measured; it does not reopen glass anywhere else
+
+**`backdrop-filter: blur(12px)` is correct on the slide cover and nowhere else.** **Ruled 7 Sep
+2026 by Utsav.**
+
+**Why this looks like a contradiction and is not.** The no-glass rule is a *product-surface*
+rule: on a dashboard, blur costs paint time, fails on cheap hardware and hides the layer
+underneath. None of that applies to a static 1920 × 1080 slide with one decorative layer behind
+a text column.
+
+And the value is not a preference. It is bound on the Figma cover node (`99:5280`), alongside a
+4px `neutral-alpha-20-white` border and `--gw-radius-32`. **R0 says the measurement wins.**
+
+**The enforceable form.** Blur is allowed where it is measured on a slide cover node. Reaching
+for `backdrop-filter` on a dashboard, a web fold or a lead-magnet page is still a mistake, and
+"the slide cover does it" is not an argument — that node is the licence, and it only licenses
+itself.
+
+The cover's two other carve-outs are scoped the same way: its **40px** inner inset against the
+content card's 20, and its **25.6px dashed `primary-400`** lattice against the ground's 40px
+solid white one. Neither generalises to another layout.
+
+---
+
+## R24 — a sample-data case study may exist; it may never carry the marks of a real endorsement
+
+**A case-study page built on invented numbers is a legitimate internal artefact — for a vertical
+mockup, a pitch of the format, a layout review. It must never carry an invented named person, a
+real person's photograph, or a real client's logo.** **Ruled 15 Sep 2026 by Utsav.**
+
+**Why.** The line between a mockup and a fabricated testimonial is not the numbers. Numbers with
+no name attached read as illustrative, and everyone treats them that way. What converts a mockup
+into a fabrication is the apparatus of endorsement: a named human, their face, their employer's
+mark. Those say *this person vouched for this*, and if the page escapes — forwarded, screenshotted,
+pasted into a deck — there is no walking it back, because the claim was never about the number.
+It was about the person.
+
+The asymmetry matters. A wrong number is corrected with a better number. An invented quote
+attributed to a named engineer at a real company is a thing you have to apologise for, possibly
+to them.
+
+**The four clauses.**
+
+1. **Sample outcome figures are permitted**, provided the page says so in a comment block at the
+   top of the file *and* in its README. Hero stats, chart values and the numbers inside headline
+   copy all count.
+2. **The byline stays a token.** `{{QUOTE_NAME}}` and `{{QUOTE_TITLE}}` are not filled with a
+   plausible-sounding person. Bracketed placeholders are not a rough edge to tidy — they are the
+   ruling, rendered.
+3. **No real client logo above sample numbers.** A logo reads as participation. The hero logo
+   slot's `onerror` handler hides it, which is the correct behaviour for an unresolved mark;
+   leave it unresolved.
+4. **Never move a real person's photograph onto a quote they did not give.** An empty byline slot
+   is better than a borrowed face. This is the clause most likely to be violated by convenience,
+   because the photo is already sitting in `assets/` from the last case study.
+
+**Scope.** A sample-data page may live in `skills/gushwork-web/examples/`, may be shown
+internally, and may be sent to a client as a format proposal. It may not be published to a public
+URL, embedded in a sales asset, or linked from the site.
+
+**The enforceable form.** `scripts/check-placeholders.sh` is the mechanism, not a reminder. A
+sample-data page keeps its byline tokens, so the check fails, so the page cannot pass a clean
+push — and clearing it requires deliberately replacing a token with a real cleared name. The
+failure is the feature. `skills/gushwork-web/examples/electrocraft/` is the worked instance:
+real company facts, sample numbers, tokens still in the byline, and it fails the check on purpose.
+
+**What this does not license.** Sample numbers in anything a prospect sees as a claim — an ad, a
+lander, a deck slide, a proposal. This ruling covers the case-study *page format*, not the
+practice of inventing results.
+
+---
+
+## R25 — access is data, and the tier that grants it is not editable from inside
+
+**Who can open which page is a runtime rule, stored in Edge Config and changed from
+`/admin/access-control` without a deploy. The owner tier is the exception: it lives in the
+environment, it is not editable through that page, and only an owner may change who is an
+admin.** **Ruled 15 Sep 2026 by Utsav.**
+
+**Why.** Until now the gate was two prefixes compiled into `middleware.js` — `/internal/*` for
+anyone at the domain, `/admin/*` for whatever `ADMIN_EMAILS` happened to say. That has no way to
+express the thing actually being asked for: staging belongs to the GTM team, a particular tool
+belongs to two named people, and someone needs to be able to say so on a Tuesday afternoon
+without a redeploy and without asking an engineer. A permission model you cannot change is one
+people route around — by sharing a login, or by asking for the gate to come off entirely.
+
+**Why the owner tier is not in the store.** A self-serve access page that can rewrite who is
+allowed to use it is not a gate. The first admin to open it could promote anyone, demote the
+owner, and lock the building from the inside — not necessarily maliciously; one wrong bulk edit
+does it. Owners come from `OWNER_EMAILS`, default `utsav.singh@gushwork.ai,design@gushwork.ai`,
+and `isAdmin()` treats them as admins whether or not the stored list agrees. Emptying `admins`
+cannot shut the owner out, which is what makes the store safe to hand to a page.
+
+**The clauses.**
+
+1. **The most specific path wins.** A rule on `/internal/staging` overrides the one on
+   `/internal`. Prefixes match on segment boundaries, so `/internal/stagingzzz` is not covered
+   by the staging rule.
+2. **An unreachable store changes nothing.** If Edge Config is missing, unreachable, or returns
+   something that does not validate, `_access.js` falls back to the compiled two-tier behaviour.
+   It does not fail open, and it does not fail closed and strand the owner.
+3. **The decision is live, never the cookie's claim.** The session cookie is signed for twelve
+   hours and carries an `admin` flag from sign-in time. Both `middleware.js` and
+   `/api/auth/me` evaluate against the current rules instead, because a revoked admin holding a
+   valid cookie must lose access now, not at midnight.
+4. **The write token never reaches the browser.** `VERCEL_API_TOKEN` can rewrite the store that
+   decides who is an admin. The page proposes a ruleset to `/api/access`, which verifies the
+   session first and is the only thing that talks to the Vercel API.
+5. **Only an owner changes the admin list.** An admin who submits a changed `admins` array is
+   refused in full — their other edits are not partially applied.
+
+**The enforceable form.** `web/api/_access.js` is the single decision function, imported by both
+the Edge middleware and the Node API routes, so the padlock in the sidebar, the page the edge
+serves, and the answer `/api/auth/me` gives cannot disagree. Its `normalise()` treats everything
+read from the store as untrusted input.
+
+**Still open.** The catalogue and the review sheet are to be merged into one page; Access Control
+is a third, separate page and does not absorb either of them. The Figma rail (683:5282) draws
+three admin rows because it assumed a rename — the rail has four until that merge happens.
