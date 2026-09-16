@@ -41,6 +41,8 @@
     'x':                   'M208.49,191.51a12,12,0,0,1-17,17L128,145,64.49,208.49a12,12,0,0,1-17-17L111,128,47.51,64.49a12,12,0,0,1,17-17L128,111l63.51-63.52a12,12,0,0,1,17,17L145,128Z',
     'gear':                'M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Zm88-29.84q.06-2.16,0-4.32l14.92-18.64a8,8,0,0,0,1.48-7.06,107.21,107.21,0,0,0-10.88-26.25,8,8,0,0,0-6-3.93l-23.72-2.64q-1.48-1.56-3-3L186,40.54a8,8,0,0,0-3.94-6,107.71,107.71,0,0,0-26.25-10.87,8,8,0,0,0-7.06,1.49L130.16,40Q128,40,125.84,40L107.2,25.11a8,8,0,0,0-7.06-1.48A107.6,107.6,0,0,0,73.89,34.51a8,8,0,0,0-3.93,6L67.32,64.27q-1.56,1.49-3,3L40.54,70a8,8,0,0,0-6,3.94,107.71,107.71,0,0,0-10.87,26.25,8,8,0,0,0,1.49,7.06L40,125.84Q40,128,40,130.16L25.11,148.8a8,8,0,0,0-1.48,7.06,107.21,107.21,0,0,0,10.88,26.25,8,8,0,0,0,6,3.93l23.72,2.64q1.49,1.56,3,3L70,215.46a8,8,0,0,0,3.94,6,107.71,107.71,0,0,0,26.25,10.87,8,8,0,0,0,7.06-1.49L125.84,216q2.16.06,4.32,0l18.64,14.92a8,8,0,0,0,7.06,1.48,107.21,107.21,0,0,0,26.25-10.88,8,8,0,0,0,3.93-6l2.64-23.72q1.56-1.48,3-3L215.46,186a8,8,0,0,0,6-3.94,107.71,107.71,0,0,0,10.87-26.25,8,8,0,0,0-1.49-7.06Zm-16.1-6.5a73.93,73.93,0,0,1,0,8.68,8,8,0,0,0,1.74,5.48l14.19,17.73a91.57,91.57,0,0,1-6.23,15L187,173.11a8,8,0,0,0-5.1,2.64,74.11,74.11,0,0,1-6.14,6.14,8,8,0,0,0-2.64,5.1l-2.51,22.58a91.32,91.32,0,0,1-15,6.23l-17.74-14.19a8,8,0,0,0-5-1.75h-.48a73.93,73.93,0,0,1-8.68,0,8,8,0,0,0-5.48,1.74L100.45,215.8a91.57,91.57,0,0,1-15-6.23L82.89,187a8,8,0,0,0-2.64-5.1,74.11,74.11,0,0,1-6.14-6.14,8,8,0,0,0-5.1-2.64L46.43,170.6a91.32,91.32,0,0,1-6.23-15l14.19-17.74a8,8,0,0,0,1.74-5.48,73.93,73.93,0,0,1,0-8.68,8,8,0,0,0-1.74-5.48L40.2,100.45a91.57,91.57,0,0,1,6.23-15L69,82.89a8,8,0,0,0,5.1-2.64,74.11,74.11,0,0,1,6.14-6.14A8,8,0,0,0,82.89,69L85.4,46.43a91.32,91.32,0,0,1,15-6.23l17.74,14.19a8,8,0,0,0,5.48,1.74,73.93,73.93,0,0,1,8.68,0,8,8,0,0,0,5.48-1.74L155.55,40.2a91.57,91.57,0,0,1,15,6.23L173.11,69a8,8,0,0,0,2.64,5.1,74.11,74.11,0,0,1,6.14,6.14,8,8,0,0,0,5.1,2.64l22.58,2.51a91.32,91.32,0,0,1,6.23,15l-14.19,17.74A8,8,0,0,0,199.87,123.66Z',
     'arrow-right':         'M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z',
+    'desktop':             'M208,40H48A24,24,0,0,0,24,64V176a24,24,0,0,0,24,24h72v16H96a8,8,0,0,0,0,16h64a8,8,0,0,0,0-16H136V200h72a24,24,0,0,0,24-24V64A24,24,0,0,0,208,40ZM48,56H208a8,8,0,0,1,8,8v80H40V64A8,8,0,0,1,48,56ZM208,184H48a8,8,0,0,1-8-8V160H216v16A8,8,0,0,1,208,184Z',
+    'lock-simple-open':    'M208,80H96V56a32,32,0,0,1,32-32c15.37,0,29.2,11,32.16,25.59a8,8,0,0,0,15.68-3.18C171.32,24.15,151.2,8,128,8A48.05,48.05,0,0,0,80,56V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80Zm0,128H48V96H208V208Z',
     'list':                'M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z'
   };
 
@@ -136,6 +138,44 @@
   })();
   var SHORTCUT = IS_MAC ? '\u2318K' : 'Ctrl K';
 
+  /* -- theme ---------------------------------------------------------------
+     Two keys, deliberately. `gw-theme` keeps holding a RESOLVED light|dark, so
+     the no-flash script inlined at the top of every page keeps working exactly
+     as it did and none of them need touching. `gw-theme-pref` holds what the
+     person actually chose, which may be `system` — a value that matches no CSS
+     rule and would paint the light palette on a dark machine if it ever
+     reached data-theme. */
+  var THEMES = [
+    { id: 'light',  label: 'Light',  icon: 'sun-dim' },
+    { id: 'dark',   label: 'Dark',   icon: 'moon' },
+    { id: 'system', label: 'System', icon: 'desktop' }
+  ];
+  var PREF_KEY = 'gw-theme-pref', RESOLVED_KEY = 'gw-theme';
+  var systemQuery = window.matchMedia ? matchMedia('(prefers-color-scheme: dark)') : null;
+
+  function themePref() {
+    try {
+      var v = localStorage.getItem(PREF_KEY);
+      if (v === 'light' || v === 'dark' || v === 'system') return v;
+      /* Upgrading from the two-value world: whatever was last resolved is the
+         preference, so nobody's theme flips on the deploy that adds this. */
+      var old = localStorage.getItem(RESOLVED_KEY);
+      return (old === 'dark' || old === 'light') ? old : 'light';
+    } catch (e) { return 'light'; }
+  }
+  function resolveTheme(pref) {
+    if (pref !== 'system') return pref;
+    return (systemQuery && systemQuery.matches) ? 'dark' : 'light';
+  }
+  function applyTheme(pref) {
+    var resolved = resolveTheme(pref);
+    document.documentElement.setAttribute('data-theme', resolved);
+    try {
+      localStorage.setItem(PREF_KEY, pref);
+      localStorage.setItem(RESOLVED_KEY, resolved);
+    } catch (e) { /* private window — the attribute above still took */ }
+  }
+
   /* -- helpers ----------------------------------------------------------- */
   function el(html) {
     var t = document.createElement('template');
@@ -156,12 +196,21 @@
   }
   function isCurrent(href) { return normalise(location.pathname) === normalise(href); }
 
+  /* Behind the gate? /internal/* and /admin/* are exactly what middleware.js
+     matches, so the two cannot drift. */
+  var INTERNAL_PAGE = /^\/(internal|admin)(\/|$)/.test(normalise(location.pathname));
+
   /* -- markup ------------------------------------------------------------ */
   function topbarHTML() {
     return '' +
       '<header class="gw-topbar">' +
         '<a class="gw-brand" href="/">' +
-          '<span class="gw-brand__chip" style="color:var(--gw-color-white)">' + MARK + '</span>' +
+          /* The component has a second variant, `Internal` (683:5104), whose
+             chip is Neutral/black rather than Primary/500. It is drawn for the
+             pages behind the gate, so the bar itself tells you which side of
+             it you are on without reading the URL. */
+          '<span class="gw-brand__chip' + (INTERNAL_PAGE ? ' gw-brand__chip--internal' : '') +
+               '" style="color:var(--gw-color-white)">' + MARK + '</span>' +
           '<span class="gw-brand__name">Gushwork Design</span>' +
         '</a>' +
         '<div class="gw-topbar__right">' +
@@ -186,12 +235,7 @@
                   'aria-haspopup="dialog" aria-label="Search">' +
             icon('magnifying-glass') +
           '</button>' +
-          '<div class="gw-theme" role="group" aria-label="Colour theme">' +
-            '<button class="gw-theme__btn" data-theme-set="light" type="button" ' +
-                    'aria-label="Light theme">' + icon('sun-dim') + '</button>' +
-            '<button class="gw-theme__btn" data-theme-set="dark" type="button" ' +
-                    'aria-label="Dark theme">' + icon('moon') + '</button>' +
-          '</div>' +
+          themeHTML() +
           /* Phone only, per the navbar's `Collapsed` variant. Hidden by CSS
              above the Phone breakpoint rather than conditionally rendered, so
              a resize never leaves the page without its only nav affordance. */
@@ -202,6 +246,30 @@
       '</header>';
   }
 
+  /* The drawing (683:5116) is a `controls/tab` holding a single 20px glyph.
+     Ruled by Utsav 16 Sep 2026: keep that single trigger, darken it on hover,
+     and open a menu with all three choices rather than lining the options up
+     in the bar. */
+  function themeHTML() {
+    var pref = themePref();
+    var current = THEMES.filter(function (t) { return t.id === pref; })[0] || THEMES[0];
+    return '<div class="gw-theme" data-theme-menu>' +
+        '<button class="gw-theme__btn" type="button" data-theme-trigger ' +
+                'aria-haspopup="menu" aria-expanded="false" ' +
+                'aria-label="Colour theme: ' + esc(current.label) + '">' +
+          icon(current.icon) +
+        '</button>' +
+        '<div class="gw-theme__menu" role="menu" hidden>' +
+          THEMES.map(function (t) {
+            return '<button class="gw-theme__opt" type="button" role="menuitemradio" ' +
+                     'aria-checked="' + (t.id === pref) + '" data-theme-set="' + t.id + '">' +
+                     icon(t.icon) + '<span>' + t.label + '</span>' +
+                   '</button>';
+          }).join('') +
+        '</div>' +
+      '</div>';
+  }
+
   function itemHTML(item, tier) {
     /* No gate, no locks. Drawing a padlock on a page that opens fine is worse than drawing
        nothing: the row becomes a button that pops a sign-in modal instead of a link that
@@ -209,10 +277,20 @@
     var locked = session.gate &&
                  ((tier === 'internal' && !session.signedIn) ||
                   (tier === 'admin'    && !session.admin));
+    /* Behind the gate but open to you: 683:5282 State2 keeps the badge and
+       swaps the glyph for an OPEN padlock, so the rail still says which pages
+       are gated once you are inside. Ruled by Utsav 16 Sep 2026.
+
+       `internal` only: State2 badges the internal and GTM rows and leaves the
+       ADMIN group bare (683:5714-5716 carry no badge div). A row you can only
+       see because you are an admin does not need telling you it is private. */
+    var unlocked = session.gate && !locked && tier === 'internal';
     var cur = isCurrent(item.href) ? ' aria-current="page"' : '';
+    var badge = locked   ? '<span class="gw-lock" title="Sign in to open this">' + icon('lock-simple') + '</span>'
+              : unlocked ? '<span class="gw-lock gw-lock--open" title="Behind the gate, open to you">' + icon('lock-simple-open') + '</span>'
+              : '';
     var inner = icon(item.icon) +
-      '<span class="gw-navitem__text">' + esc(item.label) + '</span>' +
-      (locked ? '<span class="gw-lock">' + icon('lock-simple') + '</span>' : '');
+      '<span class="gw-navitem__text">' + esc(item.label) + '</span>' + badge;
 
     /* A locked row is a button, not a link — it opens the modal instead of
        walking into a redirect. */
@@ -336,45 +414,77 @@
   }
 
   /* -- theme ---------------------------------------------------------------
-     Modelled on the postmortem artifact. The important part is what it does
-     NOT do: with no stored preference it writes no attribute at all, leaving
-     the CSS `prefers-color-scheme` block to decide. Writing data-theme on
-     every load — which this used to do — pins the page to whatever the OS said
-     at first paint and makes it deaf to a live OS change.
+     `system` is now a real choice, so the old "no stored value means follow the
+     OS" trick is gone: the preference is always stored, and following the OS is
+     one of the things it can say. The OS listener therefore fires for `system`
+     specifically rather than for the absence of an answer.
 
-     Every [data-theme-set] is kept in sync, not just the one that was clicked,
-     because the toggle is duplicated for the phone dock: CSS cannot move a
-     node between parents, so there are two of them and both must agree. */
-  var MQ = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+     Controls are duplicated for the phone dock — CSS cannot move a node between
+     parents — so every sync walks all of them rather than the one that was
+     clicked. */
 
-  function storedTheme() {
-    try { return localStorage.getItem('gw-theme'); } catch (e) { return null; }
-  }
-  function effectiveTheme() {
-    return storedTheme() || (MQ && MQ.matches ? 'dark' : 'light');
-  }
-  function syncThemeControls(t) {
-    var c = document.querySelectorAll('[data-theme-set]');
-    for (var i = 0; i < c.length; i++) {
-      var on = c[i].getAttribute('data-theme-set') === t;
-      c[i].classList.toggle('is-on', on);
-      c[i].setAttribute('aria-pressed', on ? 'true' : 'false');
+  function syncThemeControls(pref) {
+    var opts = document.querySelectorAll('[data-theme-set]');
+    for (var i = 0; i < opts.length; i++) {
+      var on = opts[i].getAttribute('data-theme-set') === pref;
+      opts[i].classList.toggle('is-on', on);
+      opts[i].setAttribute('aria-checked', on ? 'true' : 'false');
+    }
+    /* The trigger wears the chosen option's glyph, so the bar shows the answer
+       without the menu being open. */
+    var chosen = THEMES.filter(function (t) { return t.id === pref; })[0] || THEMES[0];
+    var triggers = document.querySelectorAll('[data-theme-trigger]');
+    for (var j = 0; j < triggers.length; j++) {
+      triggers[j].innerHTML = icon(chosen.icon);
+      triggers[j].setAttribute('aria-label', 'Colour theme: ' + chosen.label);
     }
   }
-  function applyTheme(t) {
-    document.documentElement.setAttribute('data-theme', t);
-    try { localStorage.setItem('gw-theme', t); } catch (e) {}
-    syncThemeControls(t);
+
+  function setTheme(pref) {
+    applyTheme(pref);
+    syncThemeControls(pref);
+    closeThemeMenus();
   }
+
+  function closeThemeMenus() {
+    var m = document.querySelectorAll('[data-theme-menu]');
+    for (var i = 0; i < m.length; i++) {
+      m[i].classList.remove('is-open');
+      var menu = m[i].querySelector('.gw-theme__menu');
+      var trig = m[i].querySelector('[data-theme-trigger]');
+      if (menu) menu.hidden = true;
+      if (trig) trig.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  function toggleThemeMenu(trigger) {
+    var wrap = trigger.closest('[data-theme-menu]');
+    var open = wrap.classList.contains('is-open');
+    closeThemeMenus();
+    if (open) return;
+    wrap.classList.add('is-open');
+    wrap.querySelector('.gw-theme__menu').hidden = false;
+    trigger.setAttribute('aria-expanded', 'true');
+  }
+
   function initTheme() {
-    var s = storedTheme();
-    if (s) applyTheme(s); else syncThemeControls(effectiveTheme());
-    /* Follow the OS for as long as the user has expressed no preference. */
-    if (MQ && MQ.addEventListener) {
-      MQ.addEventListener('change', function () {
-        if (!storedTheme()) syncThemeControls(effectiveTheme());
+    var pref = themePref();
+    applyTheme(pref);
+    syncThemeControls(pref);
+    /* Only `system` cares what the OS is doing. A person who picked dark keeps
+       dark when their machine flips at sunset. */
+    if (systemQuery && systemQuery.addEventListener) {
+      systemQuery.addEventListener('change', function () {
+        if (themePref() === 'system') applyTheme('system');
       });
     }
+    /* Belt and braces: a machine that flips at sunset while this tab is in the
+       background may deliver the change event late, or not at all in some
+       embedded webviews. Re-resolving when the tab comes back is cheap and
+       makes the answer right by the time anyone is looking at it. */
+    document.addEventListener('visibilitychange', function () {
+      if (!document.hidden && themePref() === 'system') applyTheme('system');
+    });
   }
 
   /* -- modal -------------------------------------------------------------- */
@@ -646,14 +756,7 @@
        keeps every [data-theme-set] in sync." Hidden above the phone
        breakpoint; the topbar copy is hidden below it. */
     shell.appendChild(el(
-      '<div class="gw-phone-dock">' +
-        '<div class="gw-theme" role="group" aria-label="Colour theme">' +
-          '<button class="gw-theme__btn" data-theme-set="light" type="button" ' +
-                  'aria-label="Light theme">' + icon('sun-dim') + '</button>' +
-          '<button class="gw-theme__btn" data-theme-set="dark" type="button" ' +
-                  'aria-label="Dark theme">' + icon('moon') + '</button>' +
-        '</div>' +
-      '</div>'));
+      '<div class="gw-phone-dock">' + themeHTML() + '</div>'));
     document.body.appendChild(el(modalHTML()));
 
     initTheme();
@@ -662,15 +765,20 @@
     /* One delegated listener for everything the chrome does. */
     document.addEventListener('click', function (ev) {
       var t = ev.target.closest ? ev.target.closest(
-        '[data-theme-set],[data-locked],[data-open-modal],[data-close-modal],[data-signout],' +
+        '[data-theme-set],[data-theme-trigger],[data-locked],[data-open-modal],[data-close-modal],[data-signout],' +
         '[data-nav-toggle],.gw-navitem') : null;
       if (!t) {
         /* click on the backdrop closes */
         if (ev.target.classList && ev.target.classList.contains('gw-modal')) closeModal();
+        /* A menu that survives a click elsewhere on the page is a menu people
+           close by clicking its trigger twice, having first tried everything
+           else. Anything outside it dismisses. */
+        if (!ev.target.closest('[data-theme-menu]')) closeThemeMenus();
         return;
       }
       if (t.hasAttribute('data-nav-toggle')) { toggleNav(); return; }
-      if (t.hasAttribute('data-theme-set')) { applyTheme(t.getAttribute('data-theme-set')); return; }
+      if (t.hasAttribute('data-theme-trigger')) { toggleThemeMenu(t); return; }
+      if (t.hasAttribute('data-theme-set')) { setTheme(t.getAttribute('data-theme-set')); return; }
       if (t.hasAttribute('data-locked'))    { ev.preventDefault(); openModal(t.getAttribute('data-locked')); return; }
       if (t.hasAttribute('data-open-modal')){ ev.preventDefault(); openModal(location.pathname); return; }
       if (t.hasAttribute('data-close-modal')){ closeModal(); return; }
@@ -689,7 +797,7 @@
     });
 
     document.addEventListener('keydown', function (ev) {
-      if (ev.key === 'Escape') { closeModal(); setNav(false); }
+      if (ev.key === 'Escape') { closeModal(); setNav(false); closeThemeMenus(); }
     });
 
     /* ResizeObserver, not just the resize event. The event does not reliably

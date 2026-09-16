@@ -279,7 +279,11 @@
   display: grid; place-items: center;
   border-radius: var(--gw-radius-8);
   background: var(--gw-color-primary-500);
+  box-shadow: inset 0 0 0 1px var(--gw-color-neutral-800);
 }
+/* `Internal` variant of the component: the chip goes Neutral/black on the
+   pages behind the gate, so the bar itself says which side of it you are on. */
+.gw-brand__chip--internal { background: var(--gw-color-black); }
 .gw-brand__chip svg { width: 16px; height: 16px; display: block; }
 /* wordmark 478:14792 — Vert Grotesk Display Semibold 20/100%, ls 0, black.
    No text style is bound in Figma, so this is spelled out rather than
@@ -291,7 +295,7 @@
 }
 
 /* Frame 2147260244 — HUG, gap 16, MAX|CENTER */
-.gw-topbar__right { display: flex; align-items: center; gap: var(--gw-space-16); }
+.gw-topbar__right { display: flex; align-items: center; gap: var(--gw-space-12); }
 
 /* search 478:14794 — 400x36, pad 8/12, gap 8, r12,
    fill Neutral/25, 1px Neutral/200 */
@@ -300,7 +304,7 @@
   display: flex; align-items: center;
   gap: var(--gw-space-8);
   padding: var(--gw-space-8) var(--gw-space-12);
-  border-radius: var(--gw-radius-12);
+  border-radius: var(--gw-radius-8);
   background: var(--s-field-bg);
   border: 1px solid var(--s-field-border);
 }
@@ -325,8 +329,11 @@
    a shortcut nobody uses. Filled by shell.js so it reads ⌘K on a Mac and Ctrl K elsewhere. */
 .gw-search__key {
   flex: none; display: inline-flex; align-items: center; gap: 1px;
-  padding: 0 var(--gw-space-4); height: 20px;
-  border: 1px solid var(--s-field-border); border-radius: var(--gw-radius-4);
+  padding: var(--gw-space-4); gap: var(--gw-space-2);
+  border: 0; border-radius: var(--gw-radius-4);
+  /* Drawn on Neutral/50. --s-lock-bg is Neutral/100 — one step darker, kept
+     because it is the pair that already survives the dark theme, where a
+     Neutral/50 chip would vanish into the bar it sits on. */
   background: var(--s-lock-bg);
   font: var(--gw-text-body-12-med); letter-spacing: 0;
   color: var(--s-field-icon); white-space: nowrap;
@@ -338,7 +345,7 @@
   display: flex; align-items: center;
   gap: var(--gw-space-2);
   padding: var(--gw-space-4);
-  border-radius: var(--gw-radius-12);
+  border-radius: var(--gw-radius-8);
   /* The control has no declared size — 4 + 28 + 2 + 28 + 4 hugs to exactly
      the measured 66x36. Figma centre-aligns strokes, so its 1px does not grow
      the frame; a CSS border would, giving 68x38. An inset shadow draws the
@@ -351,19 +358,51 @@
   width: 28px; height: 28px;
   flex: none;
   display: grid; place-items: center;
-  padding: var(--gw-space-8);
+  padding: var(--gw-space-4);
   border: 0;
-  border-radius: var(--gw-radius-8);
+  border-radius: var(--gw-radius-4);
   background: none;
   color: var(--s-thumb-idle);
   cursor: pointer;
   transition: background var(--gw-motion-fast), color var(--gw-motion-fast);
 }
-.gw-theme__btn svg { width: 12px; height: 12px; display: block; }
-.gw-theme__btn[aria-pressed="true"] {
-  background: var(--s-thumb-bg);
-  color: var(--s-thumb-icon);
+.gw-theme__btn svg { width: 20px; height: 20px; display: block; }
+/* Hover darkens the glyph rather than filling the button — the control is a
+   single icon now, so the fill would read as a selected state it does not
+   have. Ruled by Utsav 16 Sep 2026. */
+.gw-theme__btn:hover { color: var(--s-heading); }
+.gw-theme[data-theme-menu] { position: relative; }
+.gw-theme.is-open .gw-theme__btn { color: var(--s-heading); background: var(--s-nav-hover); }
+
+.gw-theme__menu {
+  position: absolute; top: calc(100% + var(--gw-space-8)); right: 0;
+  z-index: 60;
+  min-width: 160px;
+  display: flex; flex-direction: column; gap: var(--gw-space-2);
+  padding: var(--gw-space-4);
+  border-radius: var(--gw-radius-12);
+  background: var(--s-card-bg);
+  border: 1px solid var(--s-card-border);
+  box-shadow: var(--gw-shadow-s3);
 }
+.gw-theme__menu[hidden] { display: none; }
+.gw-theme__opt {
+  display: flex; align-items: center; gap: var(--gw-space-8);
+  height: 32px; padding: 0 var(--gw-space-8);
+  border: 0; border-radius: var(--gw-radius-8);
+  background: none; color: var(--s-nav-label);
+  font: var(--gw-text-button-14); letter-spacing: 0;
+  cursor: pointer; text-align: left;
+  transition: background var(--gw-motion-fast);
+}
+.gw-theme__opt svg { width: 16px; height: 16px; flex: none; display: block; }
+.gw-theme__opt:hover { background: var(--s-nav-hover); }
+.gw-theme__opt.is-on { background: var(--s-nav-sel); }
+.gw-theme__opt:focus-visible { outline: var(--gw-focus-ring); outline-offset: -2px; }
+
+/* Above the phone breakpoint the dock is hidden; below it the menu would open
+   off the bottom of the screen, so it opens upward from the dock instead. */
+.gw-phone-dock .gw-theme__menu { top: auto; bottom: calc(100% + var(--gw-space-8)); right: auto; left: 0; }
 .gw-theme__btn:focus-visible { outline: var(--gw-focus-ring); outline-offset: var(--gw-focus-offset); }
 
 /* ---------------------------------------------------------------------------
@@ -392,7 +431,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--gw-space-24);
-  padding: var(--gw-space-40) var(--gw-space-20) var(--gw-space-24);
+  padding: var(--gw-space-24) var(--gw-space-20);
 }
 /* list-group 478:14809 — vertical, gap 0 */
 .gw-navgroup { display: flex; flex-direction: column; gap: 0; }
@@ -455,6 +494,9 @@
   color: var(--s-lock-icon);
 }
 .gw-lock svg { width: 12px; height: 12px; display: block; }
+/* Open padlock: the page is behind the gate and you are through it. It has to
+   read as calmer than the closed one or every internal row looks blocked. */
+.gw-lock--open { background: none; color: var(--s-group-label); }
 
 /* End block — admin group + user card, pinned to the bottom by the
    sidebar's space-between. Footer padding 20/20/32 is the dashboard's
@@ -475,7 +517,7 @@
   border-top: 1.5px solid var(--s-chrome-border);
 }
 .gw-user__av {
-  width: 32px; height: 32px; flex: none;
+  width: 40px; height: 40px; flex: none;
   border-radius: var(--gw-radius-full);
   background: var(--gw-color-primary-500);
   color: var(--gw-color-white);
@@ -484,26 +526,26 @@
   overflow: hidden;
 }
 .gw-user__av img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.gw-user__txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.gw-user__txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--gw-space-8); }
 /* name Button/button-12-med, role Button/button-10-med Neutral/400 — the
    dashboard's measured user card (audit §4.15) */
 /* Same descender clipping as the nav label — see the note there. */
 .gw-user__name {
-  font: var(--gw-text-button-12);
-  line-height: 16px;
+  font: var(--gw-text-button-14);
+  /* Neutral/900 like the nav rows around it, not the black used for headings —
+     the name is a list label, and the drawing treats it as one. */
   color: var(--s-nav-label);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .gw-user__role {
-  font: var(--gw-text-button-10);
-  line-height: 15px;
+  font: var(--gw-text-button-12);
   color: var(--s-group-label);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .gw-user__out {
-  width: 28px; height: 28px; flex: none;
+  width: 24px; height: 24px; flex: none;
   display: grid; place-items: center;
-  border: 0; border-radius: var(--gw-radius-8);
+  border: 0; border-radius: var(--gw-radius-4);
   background: none; color: var(--s-body); cursor: pointer;
   transition: background var(--gw-motion-fast);
 }
@@ -515,13 +557,19 @@
 .gw-signin {
   display: flex; align-items: center; justify-content: center;
   gap: var(--gw-space-8);
-  margin: var(--gw-space-20);
-  height: 36px;
-  border-radius: var(--gw-radius-10);
-  border: 1px solid var(--s-field-border);
-  background: var(--s-card-bg);
-  color: var(--s-nav-label);
+  margin: var(--gw-space-20) var(--gw-space-20) var(--gw-space-32);
+  height: 48px;
+  /* Vertical padding is the 48 height; horizontal stays 16 as drawn. The label
+     is nowrap because the drawing's is: 16 mark + 8 gap + 145 label is 169 in
+     a 200 rail button, which wraps to two lines the moment it is allowed to. */
+  padding: 0 var(--gw-space-16);
+  white-space: nowrap;
+  border-radius: var(--gw-radius-12);
+  border: 0.81px solid var(--gw-color-neutral-200);
+  background: var(--gw-color-white);
+  color: var(--gw-color-neutral-900);
   font: var(--gw-text-button-14);
+  box-shadow: var(--gw-shadow-s3);
   cursor: pointer;
   transition: background var(--gw-motion-fast);
 }
@@ -604,9 +652,9 @@
   background: var(--gw-color-neutral-alpha-50-black);
 }
 .gw-modal__box {
-  width: 100%; max-width: 420px;
-  padding: var(--gw-space-32);
-  border-radius: var(--gw-radius-16);
+  width: 100%; max-width: 496px;
+  padding: var(--gw-space-60) var(--gw-space-40);
+  border-radius: var(--gw-radius-24);
   background: var(--s-card-bg);
   border: 1px solid var(--s-card-border);
   box-shadow: var(--gw-shadow-s4);
@@ -623,38 +671,42 @@
 .gw-modal__x svg { width: 14px; height: 14px; display: block; }
 .gw-modal__x:hover { background: var(--s-nav-hover); }
 .gw-modal__chip {
-  width: 48px; height: 48px; margin: 0 auto var(--gw-space-20);
+  width: 60px; height: 60px; margin: 0 auto var(--gw-space-20);
   display: grid; place-items: center;
-  border-radius: var(--gw-radius-12);
+  border-radius: 15px;
   background: var(--gw-color-primary-500);
+  box-shadow: inset 0 0 0 1.875px var(--gw-color-neutral-800);
 }
-.gw-modal__chip svg { width: 24px; height: 24px; display: block; }
+.gw-modal__chip svg { width: 30px; height: 30px; display: block; }
 .gw-modal__title {
-  margin: 0 0 var(--gw-space-8);
-  font: var(--gw-text-h7);
-  letter-spacing: var(--gw-text-h7-tracking);
+  margin: 0 0 10px;
+  font: var(--gw-text-h5);
+  letter-spacing: 0;
   color: var(--s-heading);
 }
 .gw-modal__sub {
-  margin: 0 0 var(--gw-space-24);
-  font: var(--gw-text-body-14-reg);
-  letter-spacing: var(--gw-text-body-14-reg-tracking);
+  margin: 0 0 var(--gw-space-40);
+  font: var(--gw-text-body-16-med);
+  letter-spacing: var(--gw-text-body-16-med-tracking);
   color: var(--s-body);
 }
 .gw-modal__btn {
-  width: 100%; height: 44px;
+  width: 100%; height: 48px;
   display: flex; align-items: center; justify-content: center;
-  gap: var(--gw-space-12);
-  border-radius: var(--gw-radius-10);
-  border: 1px solid var(--s-field-border);
+  gap: var(--gw-space-8);
+  padding: 0 var(--gw-space-16) 0 var(--gw-space-20);
+  border-radius: var(--gw-radius-12);
+  border: 0.81px solid var(--gw-color-neutral-200);
   background: var(--gw-color-white);
-  color: var(--gw-color-black);
+  color: var(--gw-color-neutral-900);
   font: var(--gw-text-button-14);
+  box-shadow: var(--gw-shadow-s3);
   cursor: pointer;
   text-decoration: none;
   transition: box-shadow var(--gw-motion-fast);
 }
-.gw-modal__btn:hover { box-shadow: var(--gw-shadow-s2); }
+.gw-modal__btn > svg { width: 18px; height: 18px; flex: none; display: block; }
+.gw-modal__btn:hover { box-shadow: var(--gw-shadow-s4); }
 /* Trailing arrow on the Google button — 683:4571 sets it right after the
    label, so it rides with the centred group rather than pinning to the edge.
    The G mark is already sized by the rule below; this keeps the arrow to the
