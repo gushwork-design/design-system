@@ -682,7 +682,11 @@
   display: grid; place-items: center;
   border-radius: 15px;
   background: var(--gw-color-primary-500);
-  box-shadow: inset 0 0 0 1.875px var(--gw-color-neutral-800);
+  /* Primary/600, matching the brand chip in the bar. 683:4915 draws this one
+     with Neutral/800 too, but the ruling is that a blue chip takes a blue
+     outline — Utsav 16 Sep 2026 — so both follow it and the Figma component
+     is what needs updating, not this. */
+  box-shadow: inset 0 0 0 1.875px var(--gw-color-primary-600);
 }
 .gw-modal__chip svg { width: 30px; height: 30px; display: block; }
 .gw-modal__title {
