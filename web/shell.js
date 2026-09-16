@@ -89,16 +89,31 @@
       ]
     },
     /* Staging is drawn as its own group in 683:5282 because it is a GTM
-       surface, not a design-system one. Same `internal` tier — the split is
-       about who the page is FOR, not who can open it. */
+       surface, not a design-system one. Same `internal` tier for the item's
+       own lock badge, but the GROUP itself only renders for the `gtm` group
+       (managed at /admin/access-control) or an admin — everyone else does
+       not see the section at all, rather than seeing a link that 403s. */
     {
       label: 'For GTM',
       tier: 'internal',
+      group: 'gtm',
       items: [
         { label: 'Staging',       href: '/internal/staging',       icon: 'stack-overflow-logo' }
       ]
     }
   ];
+
+  /* A nav group with no `group` field is visible to anyone its `tier` already
+     allows. One with a `group` field additionally needs membership in that
+     named group — or admin, since "note everything should be visible for
+     admin" applies to every section, not just the Admin one below. Before
+     /api/auth/me has answered, session.groups is empty and session.admin is
+     false, so a gated group simply does not render yet — same pop-in-once-known
+     behaviour the Admin group already has. */
+  function groupVisible(g) {
+    if (!g.group) return true;
+    return session.admin || (session.groups || []).indexOf(g.group) !== -1;
+  }
 
   /* Pinned to the bottom of the rail, the way the dashboard keeps admin and
      the user card there (audit line 424). Rendered only for admins. */
@@ -123,7 +138,7 @@
      the site runs on a shared password, so the modal has to be able to render
      either form — or both, once Google is configured alongside it. */
   var session = { signedIn: false, admin: false, email: null, name: null,
-                  picture: null, modes: { google: false, password: true },
+                  picture: null, groups: [], modes: { google: false, password: true },
                   gate: false };
 
   /* Mac reads ⌘K, everything else Ctrl K. navigator.platform is deprecated but is still the
@@ -334,7 +349,7 @@
   }
 
   function sidebarHTML() {
-    var groups = GROUPS.map(groupHTML).join('');
+    var groups = GROUPS.filter(groupVisible).map(groupHTML).join('');
     var end = (session.admin ? '<div class="gw-navgroups">' + groupHTML(ADMIN_GROUP) + '</div>' : '') +
               footerHTML();
     return '<aside class="gw-sidebar" id="gw-rail">' +

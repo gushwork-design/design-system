@@ -201,6 +201,22 @@ export function isInternal(email) {
   return !!email && String(email).toLowerCase().endsWith('@' + allowedDomain());
 }
 
+/* Which named groups (from `rules.groups`) this email is a member of. Used to
+   decide nav visibility client-side — the sidebar hides a group-gated section
+   from someone who is signed in but not in the group, rather than drawing a
+   link that only 403s once clicked. Admins are not added here: they see every
+   nav section already, by checking `session.admin` at the call site, not by
+   being enrolled in every group. */
+export function groupsFor(email, rules) {
+  if (!email) return [];
+  const e = String(email).toLowerCase();
+  const out = [];
+  for (const [name, members] of Object.entries(rules.groups || {})) {
+    if ((members || []).includes(e)) out.push(name);
+  }
+  return out;
+}
+
 /** The most specific rule covering a path — longest matching prefix. */
 export function ruleFor(pathname, rules) {
   const p = String(pathname || '/').replace(/\/+$/, '') || '/';
