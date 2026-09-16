@@ -352,10 +352,12 @@
         GOOGLE_G + '<span>Continue with Google</span>' +
         '<span class="gw-modal__btnarrow">' + icon('arrow-right') + '</span></a>';
     }
-    if (m.google && m.password) {
-      body += '<div class="gw-modal__or"><span>or</span></div>';
-    }
-    if (m.password) {
+    /* 683:4911 is Google and nothing else — no divider, no password field, no
+       line under the button. Utsav 16 Sep, revising the 15 Sep call to show
+       both. The fallback is not deleted, only hidden while Google is actually
+       available: it exists for the case where Google is NOT configured, and in
+       that case it is still the only way in and still renders. */
+    if (!m.google && m.password) {
       body += '<form class="gw-modal__form" data-pw-form>' +
         '<label class="gw-modal__label" for="gw-pw">Team password</label>' +
         '<input class="gw-modal__input" id="gw-pw" name="password" type="password" ' +
@@ -367,8 +369,10 @@
       '</form>';
     }
 
+    /* The drawing carries nothing under the button, so the note only appears on
+       the path the drawing does not cover. */
     var note = m.google
-      ? 'You need a @gushwork.ai account.'
+      ? ''
       : 'Google sign-in is not switched on yet, so the team password is the way in ' +
         'for now.';
 
@@ -382,7 +386,7 @@
           '<p class="gw-modal__sub">Log in using your Gushwork email id to get ' +
              'access.</p>' +
           body +
-          '<p class="gw-modal__note">' + note + '</p>' +
+          (note ? '<p class="gw-modal__note">' + note + '</p>' : '') +
         '</div>' +
       '</div>';
   }
