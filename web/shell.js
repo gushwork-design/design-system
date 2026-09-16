@@ -849,23 +849,46 @@
 
     /* Who is signed in? On a local static preview there is no API, so this
        fails and the page stays in its signed-out state, which is correct. */
-    fetch('/api/auth/me', { credentials: 'same-origin' })
-      .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (s) {
-        if (!s) return;
-        session = s;
-        /* Redraw both: the sidebar for the locks and the ADMIN group, the
-           modal because only now do we know which doors are open. */
-        renderSidebar();
-        renderModal();
-      })
-      .catch(function () { /* no API — stay signed out, password form shown */ });
+    /* Arriving on a gated route with no session: the middleware sends you to
+       the Overview with ?signin=required, and this is what pops the modal over
+       it. It runs AFTER /api/auth/me has answered, and that ordering is the
+       whole point — see the note where it is called.
 
-    /* Arriving back from a gated route with ?signin=required pops the modal. */
-    if (/[?&]signin=required/.test(location.search)) {
+       Deliberately not gated on `signedIn`: the only thing that puts this
+       param in the URL is the middleware bouncing a request it would not
+       serve, so if it is here, there is no usable session. */
+    function popSignInIfAsked() {
+      if (!/[?&]signin=required/.test(location.search)) return;
       var params = new URLSearchParams(location.search);
       openModal(params.get('next') || '/');
     }
+
+    fetch('/api/auth/me', { credentials: 'same-origin' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (s) {
+        if (s) {
+          session = s;
+          /* Redraw both: the sidebar for the locks and the ADMIN group, the
+             modal because only now do we know which doors are open. */
+          renderSidebar();
+          renderModal();
+        }
+        popSignInIfAsked();
+      })
+      /* No API — stay signed out. The modal keeps its pre-flight guess, which
+         on a static preview is the only honest answer. */
+      .catch(popSignInIfAsked);
+
+    /* Popped here and not at mount, because renderModal() above REFUSES to
+       rebuild a modal that is already open — it must not wipe a field someone
+       is typing into. Opening synchronously at mount won that race every time:
+       the modal went up built from the pre-flight guess, renderModal() then
+       bailed on it, and the card sat there offering the team-password door on
+       a deployment where Google is the only one that works.
+
+       Every other way in is a human clicking something, by which point /me
+       has long since answered. This is the only path that opens the modal
+       before anyone has had time to act, so it is the only one that raced. */
 
     palWire();
   }

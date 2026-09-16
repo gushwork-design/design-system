@@ -67,14 +67,29 @@ function forbidden(email) {
   );
 }
 
-/* Bounced off a gated URL with no session → the dedicated login page
-   (488:21730), not the index with ?signin=required. There is no page underneath
-   to overlay here: you asked for a URL you cannot have, so the sign-in IS the
-   page. The modal stays exactly as it was and is still what a locked sidebar
-   row opens, and /?signin=required still pops it for anyone holding that link —
-   this only changes where the middleware sends you. */
+/* Bounced off a gated URL with no session → the OVERVIEW page with the modal
+   over it, not the standalone /login screen.
+
+   This was the other way round until 16 Sep 2026, on the reasoning that "you
+   asked for a URL you cannot have, so the sign-in IS the page". That reasoning
+   only holds for someone already inside the site who clicked a locked row. It
+   does not hold for the case that actually happens: a link to a gated page gets
+   shared, and the person opening it has never seen this site. They arrived on a
+   grid with an empty middle and no way to tell what they were being asked to
+   sign in TO.
+
+   Sending them to the Overview answers that question before it is asked — the
+   page behind the modal is the pitch — and closing the modal leaves them
+   somewhere real instead of on a dead end. `next` rides along, and
+   shell.js pops the modal on ?signin=required and hands `next` to whichever
+   door they use, so they still land on the page they asked for.
+
+   /login stays as a page: it is the designed frame (488:21730), it is what a
+   bookmark or a typed URL hits, and it is the one entrance that does not need
+   a shell around it. */
 function toSignIn(url) {
-  const to = new URL('/login', url);
+  const to = new URL('/', url);
+  to.searchParams.set('signin', 'required');
   to.searchParams.set('next', url.pathname + url.search);
   return new Response(null, { status: 302, headers: { Location: to.toString() } });
 }
