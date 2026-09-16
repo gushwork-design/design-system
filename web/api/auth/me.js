@@ -6,7 +6,7 @@
 
 import { COOKIE, verify, readCookie, sessionSecret, authModes, GATE_ENABLED }
   from '../_session.js';
-import { loadRules, isAdmin } from '../_access.js';
+import { loadRules, isAdmin, groupsFor } from '../_access.js';
 
 export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -35,6 +35,10 @@ export default async function handler(req, res) {
     /* No email means the shared-password door, which is admin by design —
        isAdmin() has no address to look up and would draw an empty rail. */
     admin: payload.email ? isAdmin(payload.email, rules) : !!payload.admin,
+    /* Named groups this address belongs to (e.g. "gtm") — shell.js uses this
+       to decide which nav sections to draw, the same rules.groups an admin
+       edits at /admin/access-control. */
+    groups: payload.email ? groupsFor(payload.email, rules) : [],
     via: payload.via || 'google',
     modes,
     gate: GATE_ENABLED
