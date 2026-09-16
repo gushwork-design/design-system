@@ -61,9 +61,7 @@
   --s-kbd-bg:        var(--gw-color-neutral-50);   /* measured 683:5113: ⌘K chip fill */
   --s-lock-icon:     var(--gw-color-neutral-400);  /* measured: LockSimple vector */
 
-  --s-thumb-bg:      var(--gw-color-black);        /* measured: active toggle cell fill */
-  --s-thumb-icon:    var(--gw-color-white);        /* measured: SunDim vector */
-  --s-thumb-idle:    var(--gw-color-neutral-900);  /* measured: Moon vector */
+  --s-thumb-idle:    var(--gw-color-neutral-700);  /* measured 683:4958: Desktop vector */
 
   --s-card-bg:       var(--gw-color-white);        /* measured: audit §5 card fill */
   --s-card-border:   var(--gw-color-neutral-100);  /* measured: audit §5 card border */
@@ -96,8 +94,6 @@
 
     /* measured — audit §9: dark primary button is a white fill with Neutral/900
        text, which is the same inversion the dark tab-active uses */
-    --s-thumb-bg:      var(--gw-color-white);
-    --s-thumb-icon:    var(--gw-color-neutral-900);
     --s-thumb-idle:    var(--gw-color-neutral-300);
     --s-danger:        var(--gw-color-red-300);      /* measured: audit §5 Danger → Red/300 */
 
@@ -137,8 +133,6 @@
 
   /* measured — audit §9: dark primary button is a white fill with Neutral/900
      text, which is the same inversion the dark tab-active uses */
-  --s-thumb-bg:      var(--gw-color-white);
-  --s-thumb-icon:    var(--gw-color-neutral-900);
   --s-thumb-idle:    var(--gw-color-neutral-300);
   --s-danger:        var(--gw-color-red-300);      /* measured: audit §5 Danger → Red/300 */
 
