@@ -24,6 +24,16 @@
       "permanent": false
     },
     {
+      "source": "/internal/changelog-sheet",
+      "destination": "/internal/changelog",
+      "permanent": false
+    },
+    {
+      "source": "/internal/changelog-sheet.html",
+      "destination": "/internal/changelog",
+      "permanent": false
+    },
+    {
       "source": "/internal/mini-tools",
       "destination": "/internal/tools",
       "permanent": false
