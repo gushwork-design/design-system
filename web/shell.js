@@ -160,8 +160,12 @@
       /* Upgrading from the two-value world: whatever was last resolved is the
          preference, so nobody's theme flips on the deploy that adds this. */
       var old = localStorage.getItem(RESOLVED_KEY);
-      return (old === 'dark' || old === 'light') ? old : 'light';
-    } catch (e) { return 'light'; }
+      if (old === 'dark' || old === 'light') return old;
+      /* Nobody has chosen: follow the machine. Ruled by Utsav 16 Sep 2026.
+         The no-flash script inlined in each page resolves the same way, so
+         first paint and this agree. */
+      return 'system';
+    } catch (e) { return 'system'; }
   }
   function resolveTheme(pref) {
     if (pref !== 'system') return pref;
@@ -320,7 +324,8 @@
     return '<div class="gw-user">' +
         '<span class="gw-user__av">' + avatar + '</span>' +
         '<span class="gw-user__txt">' +
-          '<span class="gw-user__name">' + esc(session.name || session.email) + '</span>' +
+          '<span class="gw-user__name" title="' + esc(session.name || session.email) + '">' +
+            esc(session.name || session.email) + '</span>' +
           '<span class="gw-user__role">' + (session.admin ? 'Admin' : 'Gushwork') + '</span>' +
         '</span>' +
         '<button class="gw-user__out" type="button" data-signout aria-label="Sign out">' +

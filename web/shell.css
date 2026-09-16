@@ -58,6 +58,7 @@
   --s-field-icon:    var(--gw-color-neutral-600);  /* measured: MagnifyingGlass vector */
 
   --s-lock-bg:       var(--gw-color-neutral-100);  /* measured: lock badge fill */
+  --s-kbd-bg:        var(--gw-color-neutral-50);   /* measured 683:5113: ⌘K chip fill */
   --s-lock-icon:     var(--gw-color-neutral-400);  /* measured: LockSimple vector */
 
   --s-thumb-bg:      var(--gw-color-black);        /* measured: active toggle cell fill */
@@ -107,6 +108,9 @@
     --s-field-bg:      var(--gw-color-black);
     --s-field-border:  var(--gw-color-neutral-800);
     --s-lock-bg:       var(--gw-color-neutral-800);
+    /* One step up from --s-field-bg (black) so the chip still reads as a chip;
+       the light pair sits one step DOWN from its field for the same reason. */
+    --s-kbd-bg:        var(--gw-color-neutral-800);
     --s-group-label:   var(--gw-color-neutral-400);  /* unchanged; legible on /900 */
     --s-placeholder:   var(--gw-color-neutral-400);
     --s-field-icon:    var(--gw-color-neutral-300);
@@ -244,6 +248,7 @@
   border-radius: var(--gw-radius-2);
 }
 
+.gw-stack-12 { display: flex; flex-direction: column; gap: var(--gw-space-12); }
 .gw-stack-20 { display: flex; flex-direction: column; gap: var(--gw-space-20); }
 .gw-stack-40 { display: flex; flex-direction: column; gap: var(--gw-space-40); }
 
@@ -279,11 +284,15 @@
   display: grid; place-items: center;
   border-radius: var(--gw-radius-8);
   background: var(--gw-color-primary-500);
-  box-shadow: inset 0 0 0 1px var(--gw-color-neutral-800);
+  box-shadow: inset 0 0 0 1px var(--gw-color-primary-600);
 }
 /* `Internal` variant of the component: the chip goes Neutral/black on the
-   pages behind the gate, so the bar itself says which side of it you are on. */
-.gw-brand__chip--internal { background: var(--gw-color-black); }
+   pages behind the gate, so the bar itself says which side of it you are on.
+   Its outline stays Neutral/800 — Primary/600 is the outline for the blue. */
+.gw-brand__chip--internal {
+  background: var(--gw-color-black);
+  box-shadow: inset 0 0 0 1px var(--gw-color-neutral-800);
+}
 .gw-brand__chip svg { width: 16px; height: 16px; display: block; }
 /* wordmark 478:14792 — Vert Grotesk Display Semibold 20/100%, ls 0, black.
    No text style is bound in Figma, so this is spelled out rather than
@@ -331,10 +340,7 @@
   flex: none; display: inline-flex; align-items: center; gap: 1px;
   padding: var(--gw-space-4); gap: var(--gw-space-2);
   border: 0; border-radius: var(--gw-radius-4);
-  /* Drawn on Neutral/50. --s-lock-bg is Neutral/100 — one step darker, kept
-     because it is the pair that already survives the dark theme, where a
-     Neutral/50 chip would vanish into the bar it sits on. */
-  background: var(--s-lock-bg);
+  background: var(--s-kbd-bg);
   font: var(--gw-text-body-12-med); letter-spacing: 0;
   color: var(--s-field-icon); white-space: nowrap;
 }
@@ -513,7 +519,11 @@
   display: flex;
   align-items: center;
   gap: var(--gw-space-8);
-  padding: var(--gw-space-20) var(--gw-space-20) var(--gw-space-32);
+  /* 16 at the sides, not the 20 the rest of the rail uses. At 14px — the size
+     the drawing specifies — a real account name like "Design gushwork" needs
+     119px and the 20-padding slot gives 106, so the name arrived clipped. The
+     drawing never hit this because it is mocked with "Bruce Wayne". */
+  padding: var(--gw-space-20) var(--gw-space-16) var(--gw-space-32);
   border-top: 1.5px solid var(--s-chrome-border);
 }
 .gw-user__av {
@@ -526,7 +536,10 @@
   overflow: hidden;
 }
 .gw-user__av img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.gw-user__txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--gw-space-8); }
+.gw-user__txt {
+  flex: 1 1 auto; min-width: 0;
+  display: flex; flex-direction: column; gap: var(--gw-space-8);
+}
 /* name Button/button-12-med, role Button/button-10-med Neutral/400 — the
    dashboard's measured user card (audit §4.15) */
 /* Same descender clipping as the nav label — see the note there. */
@@ -862,6 +875,9 @@
      the spacing scale. Snapped to the token either side. */
   gap:var(--gw-space-8);justify-content:center;
   border-radius:var(--gw-radius-8);background:var(--s-lock-bg);
+  /* 1px Neutral/200, per the drawing — the fill alone left the pill with no
+     edge against the page. Inset so the 48x26 measurement holds. */
+  box-shadow:inset 0 0 0 1px var(--s-field-border);
   padding-bottom:var(--gw-space-4)}
 .idx[data-collapsed="true"] .idx__col{
   width:12px;height:12px;padding:0;background:none;border:0}
