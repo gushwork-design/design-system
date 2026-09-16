@@ -421,7 +421,13 @@
   justify-content: space-between;
   background: var(--s-chrome-bg);
   border-right: 1.5px solid var(--s-chrome-border);
-  overflow-y: auto;
+  /* The rail itself does not scroll; its nav list does. When the whole rail
+     scrolled, a classic scrollbar — Windows, or macOS set to always show —
+     took ~15px off the rail's content width, and the user card at the bottom
+     paid for it: the 128px name slot became 113 and "Design gushwork" (116.6
+     at Inter Medium 14) clipped. Overlay scrollbars hide the bug, which is why
+     it survived review on a Mac. */
+  overflow: hidden;
 }
 
 /* list-groups 478:14808 — measured pad 24/20, gap 24.
@@ -433,6 +439,10 @@
   gap: var(--gw-space-24);
   padding: var(--gw-space-24) var(--gw-space-20);
 }
+/* Only the top-level list scrolls — the child .gw-navgroups inside .gw-navend
+   holds the ADMIN group and must not become its own scroll area. */
+.gw-sidebar > .gw-navgroups { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+.gw-navend { flex: none; }
 /* list-group 478:14809 — vertical, gap 0 */
 .gw-navgroup { display: flex; flex-direction: column; gap: 0; }
 
