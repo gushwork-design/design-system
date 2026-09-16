@@ -58,12 +58,34 @@ export function defaultRules() {
 }
 
 /* ── reading the store ────────────────────────────────────────────────────
-   EDGE_CONFIG is the connection string Vercel writes when you attach a store
-   to the project: https://edge-config.vercel.com/<id>?token=<read-token>.
-   Appending /items to the path and keeping the token query gives the whole
-   config in one request. */
+   Vercel writes the connection string when you attach the store. The product
+   is now called Global Config and the variable it writes is GLOBAL_CONFIG;
+   it was Edge Config writing EDGE_CONFIG, and older projects still have that.
+   Both are read, new name first, so neither a fresh store nor an existing one
+   needs the code changed.
+
+   Nothing here assumes the host or the id format. The connection string is
+   whatever Vercel says it is; /items is appended to its path and the token
+   query is preserved, which is the read shape for the whole config in one
+   request. A rename that changes the host does not reach this code. */
+export function connectionString() {
+  return process.env.GLOBAL_CONFIG || process.env.EDGE_CONFIG || null;
+}
+
+/* The store id is the first path segment — NOT matched against an `ecfg_`
+   prefix. The prefix is Vercel's to change, and hard-coding it would turn a
+   rename into a silent "no store attached". */
+export function storeId() {
+  const conn = connectionString();
+  if (!conn) return null;
+  try {
+    const seg = new URL(conn).pathname.split('/').filter(Boolean);
+    return seg[0] || null;
+  } catch { return null; }
+}
+
 function itemsURL() {
-  const conn = process.env.EDGE_CONFIG;
+  const conn = connectionString();
   if (!conn) return null;
   try {
     const u = new URL(conn);
@@ -73,6 +95,12 @@ function itemsURL() {
     return u.toString();
   } catch { return null; }
 }
+
+/* What happened the last time the store was read. The page shows this, so a
+   misconfiguration says which misconfiguration instead of silently looking
+   like "no store attached". Never carries the URL or the token. */
+let lastRead = { state: 'not-tried', detail: null };
+export function readStatus() { return lastRead; }
 
 /* One fetch per request would be correct and slow: middleware runs on every
    gated page load. Edge Config is already edge-cached, so this is a small
@@ -88,18 +116,26 @@ export async function loadRules() {
   if (cache.rules && now - cache.at < TTL_MS) return cache.rules;
 
   const url = itemsURL();
-  if (!url) return defaultRules();
+  if (!url) { lastRead = { state: 'no-store', detail: null }; return defaultRules(); }
 
   let rules = null;
   try {
     const res = await fetch(url, { headers: { accept: 'application/json' } });
-    if (res.ok) {
+    if (!res.ok) {
+      lastRead = { state: 'http-error', detail: String(res.status) };
+    } else {
       const items = await res.json();
       rules = normalise(items && items.access);
+      lastRead = rules
+        ? { state: 'ok', detail: null }
+        /* A brand-new store has no `access` key yet. That is not an error —
+           it is the state between attaching the store and the first Save. */
+        : { state: 'empty', detail: null };
     }
-  } catch {
+  } catch (e) {
     /* Network trouble reading the store is not a reason to change who can see
        what. Fall through to the compiled defaults. */
+    lastRead = { state: 'unreachable', detail: null };
   }
 
   const out = rules || defaultRules();

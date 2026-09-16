@@ -519,17 +519,51 @@
       });
   }
 
+  /* Says which piece is missing, not just that something is. "No store
+     attached" was wrong and unhelpful the moment the store existed but the
+     variable had been renamed — which is exactly what happened when Edge
+     Config became Global Config and started writing GLOBAL_CONFIG. */
+  function banner() {
+    var d = meta.diagnostics || { store: false, token: false, read: { state: 'not-tried' } };
+    var why;
+
+    if (!d.store) {
+      why = 'No config store is connected to this project. Create one under ' +
+            'Storage &rarr; Global Config and connect it, which writes ' +
+            '<code>GLOBAL_CONFIG</code> for you.';
+    } else if (d.read.state === 'http-error') {
+      why = 'The store is connected but refused the read (' + esc(d.read.detail) +
+            '). The connection string is probably pointing at a store this ' +
+            'project cannot see.';
+    } else if (d.read.state === 'unreachable') {
+      why = 'The store is connected but could not be reached just now. The gate ' +
+            'is running on the compiled defaults until it answers.';
+    } else if (!d.token) {
+      why = 'The store is connected and readable, but there is no ' +
+            '<code>VERCEL_API_TOKEN</code> on the project, so there is nothing ' +
+            'that can write to it. Add one and redeploy.';
+    } else {
+      why = 'Saving is off.';
+    }
+
+    return '<div class="ac-note ac-note--warn">' + icon('info') +
+      '<span><b>Read-only.</b> ' + why + ' The rules below are exactly what the ' +
+      'gate is enforcing either way.</span></div>';
+  }
+
   /* -- boot --------------------------------------------------------------- */
 
   function render() {
     var mount = document.getElementById('ac-sections');
     mount.innerHTML = '';
-    if (!meta.writable) {
-      mount.appendChild(el('<div class="ac-note ac-note--warn">' + icon('info') +
-        '<span><b>Read-only.</b> No Edge Config store is attached to this project yet, so ' +
-        'these are the compiled defaults and Save is off. Attach a store and set ' +
-        '<code>VERCEL_API_TOKEN</code> to turn the controls on — the rules below are ' +
-        'exactly what the gate is enforcing either way.</span></div>'));
+    if (!meta.writable) mount.appendChild(el(banner()));
+    /* Store attached and readable, but the write token is missing or the store
+       has never been written — worth saying, because the rules on screen are
+       still the compiled defaults and it is not obvious why. */
+    if (meta.writable && meta.diagnostics && meta.diagnostics.read.state === 'empty') {
+      mount.appendChild(el('<div class="ac-note">' + icon('info') +
+        '<span>The store is connected and empty. The rules below are the compiled ' +
+        'defaults; your first save writes them into it.</span></div>'));
     }
     mount.appendChild(pagesCard());
     mount.appendChild(groupsCard());

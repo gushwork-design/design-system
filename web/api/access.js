@@ -12,19 +12,8 @@
    ========================================================================= */
 
 import { COOKIE, verify, readCookie, sessionSecret } from './_session.js';
-import { loadRules, normalise, defaultRules, ownerEmails, isOwner, isAdmin,
-         invalidate, allowedDomain } from './_access.js';
-
-/* The store id lives in the connection string Vercel writes for the project,
-   so it does not need its own variable and cannot drift from the one being
-   read. https://edge-config.vercel.com/ecfg_xxx?token=... */
-function edgeConfigId() {
-  try {
-    const u = new URL(process.env.EDGE_CONFIG || '');
-    const id = u.pathname.split('/').filter(Boolean)[0];
-    return id && id.startsWith('ecfg_') ? id : null;
-  } catch { return null; }
-}
+import { loadRules, normalise, ownerEmails, isOwner, isAdmin,
+         invalidate, allowedDomain, storeId, readStatus } from './_access.js';
 
 function json(res, status, body) {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -57,7 +46,7 @@ export default async function handler(req, res) {
   }
 
   const owner = isOwner(email);
-  const configured = !!edgeConfigId() && !!process.env.VERCEL_API_TOKEN;
+  const configured = !!storeId() && !!process.env.VERCEL_API_TOKEN;
 
   if (req.method === 'GET') {
     return json(res, 200, {
@@ -69,7 +58,15 @@ export default async function handler(req, res) {
          shows the real rules read-only rather than offering a Save that
          cannot work. */
       writable: configured,
-      source: process.env.EDGE_CONFIG ? 'edge-config' : 'compiled-defaults'
+      /* Why the page is in whatever state it is in. `store` says whether a
+         connection string exists, `read` is what the last read of it actually
+         did, and `token` says whether writes are possible. Between them the
+         banner can name the missing piece instead of saying "no store". */
+      diagnostics: {
+        store: !!storeId(),
+        token: !!process.env.VERCEL_API_TOKEN,
+        read: readStatus()
+      }
     });
   }
 
@@ -106,7 +103,7 @@ export default async function handler(req, res) {
     admins: [...new Set([...ownerEmails(), ...next.admins])]
   };
 
-  const id = edgeConfigId();
+  const id = storeId();
   const team = process.env.VERCEL_TEAM_ID;
   const url = 'https://api.vercel.com/v1/edge-config/' + id + '/items' +
               (team ? '?teamId=' + encodeURIComponent(team) : '');
