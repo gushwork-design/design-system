@@ -100,6 +100,16 @@
 .sg-logo[data-bg="white"]{background:var(--gw-color-white)}
 .sg-logo[data-bg="dark"]{background:var(--gw-color-black)}
 .sg-logo[data-bg="blue"]{background:var(--gw-color-primary-500)}
+.sg-logo[data-bg="concept"]{background:var(--gw-color-neutral-100)}
+/* 478:15084. The MARK is what is centred, not the artwork: its 136-wide frame
+   sits at x=312 of the 760 panel, dead centre, and the curve sweeps out past
+   it to the left and through the panel's clip. Centring the bounding box
+   instead would push the mark 35px right of where it belongs. Drawn at natural
+   size — the construction guides are hairlines and scaling greys them out. */
+.sg-logo--concept img{
+  position:absolute;top:50%;left:50%;
+  width:296.78px;height:225.78px;
+  transform:translate(calc(-50% - 35.32px),-50%)}
 
 /* -- do / don't grid: GRID gap 8, cards 248x158 r16 ----------------------- */
 .sg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gw-space-8)}
@@ -493,8 +503,10 @@
              exponential curve, a direct reminder &amp; leading indicator of this message.
              The upward curve transitioning from thick to thin represents our core
              mission, maximizing ARR per FTE.</p>
-          <div class="sg-card sg-logo" data-bg="blue">
-            <img src="/assets/logo/gushwork-logo-white.svg" alt="The Gushwork logo">
+          <div class="sg-card sg-logo sg-logo--concept" data-bg="concept">
+            <img src="/assets/logo/gushwork-logo-construction.svg"
+                 alt="The Gushwork mark with its construction guides: a 136 square
+                      crossed by the exponential curve, running thick to thin.">
           </div>
           <p>We free businesses from bloated teams at a time where even one-person
              unicorns can thrive and Gushwork is the gush behind that transformation.
