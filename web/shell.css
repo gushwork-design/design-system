@@ -59,13 +59,20 @@
 
   --s-lock-bg:       var(--gw-color-neutral-100);  /* measured: lock badge fill */
   --s-kbd-bg:        var(--gw-color-neutral-50);   /* measured 683:5113: ⌘K chip fill */
-  --s-lock-icon:     var(--gw-color-neutral-400);  /* measured: LockSimple vector */
+  --s-lock-icon:     var(--gw-color-neutral-400);  /* measured: Lock / LockOpen vector */
 
   --s-thumb-idle:    var(--gw-color-neutral-700);  /* measured 683:4958: Desktop vector */
 
   --s-card-bg:       var(--gw-color-white);        /* measured: audit §5 card fill */
   --s-card-border:   var(--gw-color-neutral-100);  /* measured: audit §5 card border */
   --s-danger:        var(--gw-color-red-400);      /* measured: audit §5 Danger */
+
+  /* A command you are meant to run, measured off 716:8656. Blue, not a grey
+     card: on a page that is mostly prose the tint is what makes the runnable
+     lines findable without reading them. */
+  --s-code-bg:       var(--gw-color-primary-50);   /* measured 716:8656: fill */
+  --s-code-border:   var(--gw-color-primary-200);  /* measured 716:8656: 1px stroke */
+  --s-code-fg:       var(--gw-color-primary-600);  /* measured 716:8661: mono fill */
 }
 
 /* System dark. The artifact's theme system has FOUR blocks, not two: bare
@@ -101,6 +108,11 @@
        no lock badge, so these follow the mappings above rather than a source.
        Flagged to Utsav; replace with measured values when the dark screen
        grows a search field. */
+    /* Same distance in from the dark end of the ramp as the light triple is
+       from the light end. There is no dark command card drawn. */
+    --s-code-bg:       var(--gw-color-primary-900);
+    --s-code-border:   var(--gw-color-primary-800);
+    --s-code-fg:       var(--gw-color-primary-200);
     --s-field-bg:      var(--gw-color-black);
     --s-field-border:  var(--gw-color-neutral-800);
     --s-lock-bg:       var(--gw-color-neutral-800);
@@ -140,6 +152,9 @@
      no lock badge, so these follow the mappings above rather than a source.
      Flagged to Utsav; replace with measured values when the dark screen
      grows a search field. */
+  --s-code-bg:       var(--gw-color-primary-900);
+  --s-code-border:   var(--gw-color-primary-800);
+  --s-code-fg:       var(--gw-color-primary-200);
   --s-field-bg:      var(--gw-color-black);
   --s-field-border:  var(--gw-color-neutral-800);
   --s-lock-bg:       var(--gw-color-neutral-800);
@@ -493,20 +508,21 @@
 .gw-navitem[aria-current="page"] { background: var(--s-nav-sel); }
 .gw-navitem:focus-visible { outline: var(--gw-focus-ring); outline-offset: -2px; }
 
-/* lock badge 478:14814 — 20x20, pad 4, r4, fill Neutral/100,
-   LockSimple Bold 12 in Neutral/400 */
+/* lock badge 683:5282 — 24x24, pad 4, r4, Lock / LockOpen Regular 16 in
+   Neutral/400. The tinted chip is gone: at 16px the glyph carries itself, and
+   a filled square on every gated row read as a second selection state
+   competing with the real one.
+
+   Both states get the same treatment now — only the glyph differs, closed vs
+   open. That is the whole signal, and it is the one the drawing uses. */
 .gw-lock {
-  width: 20px; height: 20px;
+  width: 24px; height: 24px;
   flex: none;
   display: grid; place-items: center;
   border-radius: var(--gw-radius-4);
-  background: var(--s-lock-bg);
   color: var(--s-lock-icon);
 }
-.gw-lock svg { width: 12px; height: 12px; display: block; }
-/* Open padlock: the page is behind the gate and you are through it. It has to
-   read as calmer than the closed one or every internal row looks blocked. */
-.gw-lock--open { background: none; color: var(--s-group-label); }
+.gw-lock svg { width: 16px; height: 16px; display: block; }
 
 /* End block — admin group + user card, pinned to the bottom by the
    sidebar's space-between. Footer padding 20/20/32 is the dashboard's
@@ -530,13 +546,19 @@
   padding: var(--gw-space-20) var(--gw-space-16) var(--gw-space-32);
   border-top: 1.5px solid var(--s-chrome-border);
 }
+/* 683:5721 — a 40px squircle at r12, not a circle. Primary/200 ground with the
+   initials in Primary/600: the same pairing the eyebrow chips use, and quiet
+   enough that a photo dropping in over it is not a jump in weight. The hairline
+   is what keeps it off the rail's own Neutral/50 in light. */
 .gw-user__av {
   width: 40px; height: 40px; flex: none;
-  border-radius: var(--gw-radius-full);
-  background: var(--gw-color-primary-500);
-  color: var(--gw-color-white);
+  border-radius: var(--gw-radius-12);
+  border: 1px solid var(--s-card-border);
+  background: var(--gw-color-primary-200);
+  color: var(--gw-color-primary-600);
   display: grid; place-items: center;
-  font: var(--gw-text-button-12);
+  font: var(--gw-text-body-14-sem);
+  letter-spacing: var(--gw-text-body-14-sem-tracking);
   overflow: hidden;
 }
 .gw-user__av img { width: 100%; height: 100%; object-fit: cover; display: block; }

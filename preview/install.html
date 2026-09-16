@@ -1,29 +1,33 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Install the Gushwork design system</title>
-<meta name="description" content="A Claude Code plugin. Install it once, and Claude builds Gushwork screens using the real components and tokens instead of guessing at them.">
+<title>Gushwork Design Plugin</title>
+<meta name="description" content="A Claude Code plugin. Install it once and Claude builds Gushwork pages, screens, decks and lead magnets from the real tokens and components instead of guessing at them.">
 <!-- Social card. og:image must be absolute — crawlers do not resolve relative paths.
      The asset is staged by scripts/publish-sheets.sh; it is not picked up by the
      ../assets/ grep there, because og:image uses `content`, not href/src. -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://gushwork-design.vercel.app/preview/install.html">
-<meta property="og:title" content="Install the Gushwork design system">
-<meta property="og:description" content="A Claude Code plugin. Install it once, and Claude builds Gushwork screens using the real components and tokens instead of guessing at them.">
+<meta property="og:title" content="Gushwork Design Plugin">
+<meta property="og:description" content="A Claude Code plugin. Install it once and Claude builds Gushwork pages, screens, decks and lead magnets from the real tokens and components instead of guessing at them.">
 <meta property="og:image" content="https://gushwork-design.vercel.app/assets/og/install.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="The Gushwork mark on a dark grid.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Install the Gushwork design system">
-<meta name="twitter:description" content="A Claude Code plugin. Install it once, and Claude builds Gushwork screens using the real components and tokens instead of guessing at them.">
+<meta name="twitter:title" content="Gushwork Design Plugin">
+<meta name="twitter:description" content="A Claude Code plugin. Install it once and Claude builds Gushwork pages, screens, decks and lead magnets from the real tokens and components instead of guessing at them.">
 <meta name="twitter:image" content="https://gushwork-design.vercel.app/assets/og/install.png">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20width%3D%2280%22%20height%3D%2280%22%20rx%3D%2220%22%20fill%3D%22%230d0d0d%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
 <link rel="stylesheet" href="../foundation/tokens.css">
 <style>
   /* ==========================================================================
-     Install page — hosted at /internal/claude-plugin (and /preview/install.html,
-     which redirects there).
+     Claude plugin page — hosted at /internal/claude-plugin (and
+     /preview/install.html, which redirects there). Drawn at 691:6692.
+
+     THREE SECTIONS, IN THE ORDER SOMEONE ARRIVES IN: how to install, how to
+     use it, what it can do. Install comes first because nothing else on the
+     page is actionable until it is done.
 
      LAYOUT IS THE STYLE GUIDE'S. Measured off web/style-guide.html so the two
      pages read as one document rather than two products: 1200 outer, the rail's
@@ -41,7 +45,7 @@
 
      NEW ELEMENTS, pending library review — notices/2026-08-13-install-page.md:
        .code   a copyable command block with a copy control
-       .or     an either/or divider between two routes to the same outcome
+       .chip   the version pill beside the title (eyebrow, 710:8320)
      ========================================================================== */
   *,*::before,*::after{box-sizing:border-box}
 
@@ -63,10 +67,11 @@
   .sg__main{min-width:0;display:flex;flex-direction:column;gap:var(--gw-space-32)}
 
   /* The dotted rule is a 2px radial repeated every 4.1px — a real hairline at
-     any zoom, where a 1px border rounds away. Straight from the guide. */
+     any zoom, where a 1px border rounds away. 691:6698 draws it as a 2px line
+     with dasharray 0.1 4 and a round cap, which is the same thing. */
   .sg__hd{
     padding:0 var(--gw-space-40) var(--gw-space-32);
-    display:flex;flex-direction:column;gap:var(--gw-space-12);
+    display:flex;flex-direction:column;gap:var(--gw-space-20);
     /* --s-rule is defined page-locally in style-guide.html, so it does NOT reach here even
        with the shell — falling straight to a light neutral put a bright hairline on a black
        page. --s-card-border is in shell.css and themes (neutral-100 / neutral-800). */
@@ -75,28 +80,52 @@
     background-size:4.1px 2px;background-position:bottom left;
     background-repeat:repeat-x;
   }
+  .sg__titlerow{display:flex;align-items:center;gap:var(--gw-space-12);flex-wrap:wrap}
   .sg__title{
     margin:0;font:600 44px/1.2 var(--gw-font-display);letter-spacing:0;
     color:var(--s-heading, var(--gw-color-black));
   }
+  /* Version pill, 710:8320 — the eyebrow component at its bare minimum: label
+     only, no icon. It sits ON the title line because the version is part of
+     what you are looking at, not a footnote about it. */
+  .chip{
+    display:inline-flex;align-items:center;gap:var(--gw-space-4);
+    height:24px;padding:var(--gw-space-4) var(--gw-space-8);
+    border-radius:var(--gw-radius-full);
+    background:var(--s-card-bg, var(--gw-color-white));
+    border:.5px solid var(--s-card-border, var(--gw-color-neutral-100));
+    font:var(--gw-text-button-12);line-height:16px;
+    color:var(--s-nav-label, var(--gw-color-neutral-900));
+    white-space:nowrap;
+  }
+  /* `.meta` and nothing else: scripts/stamp-release.sh rewrites the date in the
+     element below by matching its opening tag and leading words literally, and
+     raises if it cannot find them. The version moved to `.chip` in the same
+     release; the script matches that separately. Adding a second class to either
+     element breaks the release, silently until you cut one — and do not repeat
+     either literal anywhere else in this file, including in a comment, or the
+     stamp will happily rewrite the prose too. */
+  .meta{
+    margin:0;font:var(--gw-text-body-14-med);
+    letter-spacing:var(--gw-text-body-14-med-tracking);
+    color:var(--gw-color-neutral-500);
+  }
+  /* 691:6697 underlines the link in the run-on colour rather than tinting it —
+     the stamp is furniture, and a blue word in it pulls harder than it earns. */
+  .meta a{color:inherit;text-decoration:underline}
+  .meta a:hover{color:var(--gw-color-primary-500)}
+
+  .sg__body{display:flex;flex-direction:column;gap:var(--gw-space-60)}
+  /* The standfirst is below the rule, not in the header — it belongs to the
+     page's content, and the rule separates the stamp from all of it. */
   .sg__sub{
-    margin:0;max-width:60ch;
+    margin:0;padding-left:var(--gw-space-40);max-width:68ch;
     font:var(--gw-text-body-18-med);
     letter-spacing:var(--gw-text-body-18-med-tracking);
     color:var(--s-body, var(--gw-color-neutral-600));
   }
-  /* `.meta` and nothing else: scripts/stamp-release.sh rewrites the version here by
-     matching `<p class="meta"><strong>v` literally, and raises if it cannot find it.
-     Adding a second class to this element breaks the release, silently until you cut one. */
-  .meta{
-    margin:0;font:var(--gw-text-body-14-med);
-    letter-spacing:var(--gw-text-body-14-med-tracking);
-    color:var(--gw-color-neutral-400);
-  }
-  .meta a{color:var(--gw-color-primary-500);text-decoration:none}
-  .meta a:hover{text-decoration:underline}
-
-  .sg__body{display:flex;flex-direction:column;gap:var(--gw-space-60)}
+  /* A section's own standfirst is already inside the section's 40 inset. */
+  .sg-sec > .sg__sub{padding-left:0}
   .sg-sec{
     padding-left:var(--gw-space-40);
     display:flex;flex-direction:column;gap:var(--gw-space-40);
@@ -114,72 +143,73 @@
     letter-spacing:var(--gw-text-body-18-sem-tracking);
     color:var(--s-heading, var(--gw-color-black));
   }
-  .sg-block > h3 .n{
-    color:var(--gw-color-neutral-400);
-    font-variant-numeric:tabular-nums;
-  }
   .sg-block > p{
     margin:0;max-width:68ch;
     font:var(--gw-text-body-18-med);
     letter-spacing:var(--gw-text-body-18-med-tracking);
     color:var(--s-body, var(--gw-color-neutral-600));
   }
+  .sg-block > p strong{
+    font-weight:700;color:var(--s-heading, var(--gw-color-black));
+  }
+  .sg-block a{color:var(--s-heading, var(--gw-color-black));text-decoration:underline}
+  .sg-block a:hover{color:var(--gw-color-primary-500)}
   .sg-block code{
     font:var(--gw-text-body-14-reg);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
     background:var(--s-lock-bg, var(--gw-color-neutral-100));
     border-radius:var(--gw-radius-4);padding:2px 6px;
     color:var(--s-heading, var(--gw-color-black));
   }
+  /* The tighter run inside one step: heading to prose is 12, not 20. 716:8664 */
+  .sg-block--tight{gap:var(--gw-space-12)}
 
-  /* -- command block ------------------------------------------------------- */
+  /* -- command block, 716:8656 ---------------------------------------------
+     Blue, not a grey card. On a page that is mostly prose, the tint is what
+     makes the four runnable lines findable without reading them.
+     The type is the drawing's Azeret Mono 16/24 at the system mono stack —
+     Azeret is not in foundation/tokens.css and no page loads it, and adding a
+     webfont for four lines is a bigger decision than this page gets to make.
+     --------------------------------------------------------------------- */
   .code{
     position:relative;
-    background:var(--s-card-bg, var(--gw-color-white));
-    border:1px solid var(--s-card-border, var(--gw-color-neutral-100));
-    border-radius:var(--gw-radius-12);
-    padding:var(--gw-space-16) var(--gw-space-16);
+    display:flex;align-items:flex-start;gap:var(--gw-space-32);
+    background:var(--s-code-bg, var(--gw-color-primary-50));
+    border:1px solid var(--s-code-border, var(--gw-color-primary-200));
+    border-radius:var(--gw-radius-16);
+    padding:var(--gw-space-20);
   }
   .code pre{
-    margin:0;padding-right:96px;overflow-x:auto;
-    font:var(--gw-text-body-14-reg);
+    margin:0;flex:1 1 auto;min-width:0;overflow-x:auto;
+    font:var(--gw-text-body-16-med);
     font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
-    line-height:22px;white-space:pre-wrap;word-break:break-word;
-    color:var(--s-heading, var(--gw-color-black));
+    letter-spacing:var(--gw-text-body-16-med-tracking);
+    line-height:24px;white-space:pre-wrap;word-break:break-word;
+    color:var(--s-code-fg, var(--gw-color-primary-600));
   }
-  /* Output, not input: nothing to copy, so it loses the button and the padding
-     that reserved room for one. Tinted so a reader can tell at a glance which
-     blocks they act on and which they only compare against. */
-  /* Page-bg, not chrome-bg: in dark, --s-chrome-bg and --s-card-bg are BOTH neutral-900, so
-     the output block became indistinguishable from the command blocks and the whole
-     run-this / compare-against-this distinction disappeared. --s-page-bg sits one step back
-     from the card in both themes — neutral-25 against white, black against neutral-900. */
-  .code--out{background:var(--s-page-bg, var(--gw-color-neutral-25))}
-  .code--out pre{padding-right:0;color:var(--s-body, var(--gw-color-neutral-600))}
+  /* Output, not input: nothing to copy, so it loses the button. It keeps the
+     tint — 721:8847 draws the announce line on the same card as the commands,
+     because it is the same kind of thing: a literal you compare against. */
+  .code--out pre{padding-right:0}
 
+  /* 721:8727 — icon only, 20px in a 4px pad. No border, no fill, no label:
+     the card it sits on is already the affordance. */
   .code__btn{
-    position:absolute;top:var(--gw-space-12);right:var(--gw-space-12);
+    flex:none;
     display:inline-flex;align-items:center;gap:var(--gw-space-4);
-    min-width:76px;justify-content:center;
-    height:28px;padding:0 var(--gw-space-8);
-    border-radius:var(--gw-radius-8);
-    border:1px solid var(--s-card-border, var(--gw-color-neutral-100));
-    background:var(--s-page-bg, var(--gw-color-neutral-25));
-    color:var(--s-body, var(--gw-color-neutral-600));
+    padding:var(--gw-space-4);
+    border:0;border-radius:var(--gw-radius-4);
+    background:none;
+    color:var(--s-code-fg, var(--gw-color-primary-600));
     font:var(--gw-text-button-12);line-height:16px;cursor:pointer;
-    transition:color var(--gw-motion-fast),border-color var(--gw-motion-fast);
+    transition:opacity var(--gw-motion-fast);
   }
-  .code__btn svg{width:14px;height:14px;display:block}
-  .code__btn:hover{color:var(--gw-color-primary-500);border-color:var(--gw-color-primary-300)}
-  .code__btn[data-state="done"]{color:var(--gw-color-primary-500);border-color:var(--gw-color-primary-300)}
+  .code__btn svg{width:20px;height:20px;display:block}
+  .code__btn:hover{opacity:.7}
+  /* The label is the confirmation, so it only exists once there is something to
+     confirm. Tier 3 of the copy ladder ("⌘C") needs it visible too — same state. */
+  .code__btn span{display:none}
+  .code__btn[data-state="done"] span{display:inline}
   .code__btn:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
-
-  /* -- either/or ----------------------------------------------------------- */
-  .or{display:flex;align-items:center;gap:var(--gw-space-16);color:var(--gw-color-neutral-400)}
-  .or::before,.or::after{
-    content:"";flex:1;height:1px;
-    background:var(--s-card-border, var(--gw-color-neutral-100));
-  }
-  .or span{font:var(--gw-text-button-12);line-height:16px;letter-spacing:.04em}
 
   /* -- "On this page" rail -------------------------------------------------
      Measured off the styleguide TOC (478:15070 -> Frame 2147260252): 260 wide,
@@ -236,7 +266,7 @@
     .idx{display:none}
     .sg{grid-template-columns:minmax(0,1fr);padding:var(--gw-space-32) var(--gw-space-20) var(--gw-space-60)}
     .sg__hd{padding-left:0;padding-right:0}
-    .sg-sec{padding-left:0}
+    .sg__sub,.sg-sec{padding-left:0}
     .sg__title{font-size:32px}
     .sg-sec > h2{font-size:24px}
   }
@@ -251,114 +281,103 @@
   <div class="sg__main">
 
     <header class="sg__hd">
-      <h1 class="sg__title">Gushwork design system</h1>
-      <p class="sg__sub">A Claude Code plugin. Install it once, and Claude builds Gushwork
-         screens using the real components and tokens instead of guessing at them.</p>
-      <p class="meta"><strong>v1.46.0</strong> · last updated 15 Sep 2026, 23:46 ·
-         <a href="changelog-sheet.html" target="_blank" rel="noopener noreferrer">changelog</a></p>
+      <div class="sg__titlerow">
+        <h1 class="sg__title">Gushwork Design Plugin</h1>
+        <span class="chip">v1.46.0</span>
+      </div>
+      <p class="meta">Last updated 15 Sep 2026, 23:46 ·
+         <a href="changelog-sheet.html" target="_blank" rel="noopener noreferrer">Change log</a></p>
     </header>
 
     <div class="sg__body">
 
+      <p class="sg__sub">A Claude Code plugin. Install it once and Claude builds Gushwork pages,
+         screens, decks and lead magnets from the real tokens and components instead of guessing
+         at them.</p>
+
       <section class="sg-sec" id="install">
-        <h2>Install</h2>
+        <h2>How to install?</h2>
+        <p class="sg__sub">One command and a restart. You do this once —
+           after that it keeps itself up to date.</p>
 
         <div class="sg-block">
-          <h3><span class="n">1</span> · Install it</h3>
-          <p>One line, in any terminal. It adds the marketplace, installs the plugin, and turns
-             on auto-update — and it is safe to re-run, so it is also the fix if you are not
-             sure what state you are in.</p>
+          <h3>Step 1: Copy the command and paste it in Claude Code, or run it in a terminal</h3>
+          <p>It adds the marketplace, installs the plugin and turns on auto-update. Safe to
+             re-run — so it is also the fix when you are not sure what state you are in.</p>
           <div class="code">
 <pre>curl -fsSL https://raw.githubusercontent.com/gushwork-design/design-system/main/scripts/install.sh | bash</pre>
-            <button class="code__btn" type="button"><svg><use href="#i-copy"/></svg><span>Copy</span></button>
-          </div>
-          <p>Needs Claude Code on your PATH and git able to reach the repo. It checks both up
-             front and tells you which one is missing rather than failing three steps later.</p>
-
-          <div class="or"><span>OR</span></div>
-
-          <p>Don't want to use a terminal? Paste this into Claude Code instead and approve what
-             it runs. Same result.</p>
-          <div class="code">
-<pre>Set up the Gushwork Design System plugin for me:
-
-1. Run: claude plugin marketplace add gushwork-design/design-system
-2. Run: claude plugin install gushwork-design@gushwork
-
-Then tell me to restart Claude Code.</pre>
-            <button class="code__btn" type="button"><svg><use href="#i-copy"/></svg><span>Copy</span></button>
+            <button class="code__btn" type="button" aria-label="Copy the install command"><svg><use href="#i-copy"/></svg><span>Copy</span></button>
           </div>
         </div>
 
-        <div class="sg-block">
-          <h3><span class="n">2</span> · Restart Claude Code</h3>
-          <p>The plugin does not take effect in the session you installed it from. Quit and
-             start it again — this is the step people miss.</p>
+        <div class="sg-block sg-block--tight">
+          <h3>Step 2: Restart Claude</h3>
+          <p>The plugin does not take effect in the session you installed it from. This is the
+             step people miss.</p>
         </div>
-      </section>
-
-      <section class="sg-sec" id="verify">
-        <h2>Verify</h2>
 
         <div class="sg-block">
-          <h3><span class="n">1</span> · Check it's installed</h3>
-          <p>You should see <code>gushwork-design</code> in the list.</p>
+          <div class="sg-block sg-block--tight">
+            <h3>Step 3: Confirm it installed</h3>
+            <p>Copy and paste this in Claude Code. You should see <code>gushwork-design</code>
+               in the list.</p>
+          </div>
           <div class="code">
             <pre>claude plugin list</pre>
-            <button class="code__btn" type="button"><svg><use href="#i-copy"/></svg><span>Copy</span></button>
+            <button class="code__btn" type="button" aria-label="Copy the list command"><svg><use href="#i-copy"/></svg><span>Copy</span></button>
           </div>
         </div>
 
         <div class="sg-block">
-          <h3><span class="n">2</span> · Check it fires</h3>
-          <p>Ask Claude to build something with the Gushwork design system — a dashboard, a
-             landing page, whatever you're working on. You don't have to name the skill; it
-             triggers on the work.</p>
-          <p>The reply must open with one of these, depending on what you asked for:</p>
-          <div class="code code--out">
-<pre>Using the Gushwork dashboard skill — v1.46.0, updated 15 Sep 2026.
-Using the Gushwork web skill — v1.46.0, updated 15 Sep 2026.
-Using the Gushwork lead-magnet skill — v1.46.0, updated 15 Sep 2026.</pre>
-          </div>
-          <p>If that line is missing it didn't fire — restart again, or ask for the skill by
-             name. The version in it is also how you catch a stale install: if
-             it reads anything below <strong>v1.46.0</strong>, you're behind and it's emitting
-             old values. It will ask two or three questions before building. That's
-             deliberate.</p>
+          <p>That's it. Auto-update is on, so a session that has fallen behind says so at the
+             start — naming what changed and what breaks. Silence means you are current.</p>
         </div>
       </section>
 
-      <section class="sg-sec" id="staying-current">
-        <h2>Staying current</h2>
+      <section class="sg-sec" id="use">
+        <h2>How to use it?</h2>
 
         <div class="sg-block">
-          <h3><span class="n">1</span> · Your session tells you when you're behind</h3>
-          <p>You no longer have to check. At the start of a session the plugin compares the copy
-             you are running against the published one, and speaks up only if it has moved —
-             naming the components that changed and which of them break a screen built on the
-             old ones.</p>
+          <p>Ask for the work, not the skill. Claude reads the request and loads the right one.</p>
+          <p>"Build an ad page for Meta", "add a KPI row to the dashboard", "a discovery deck for
+             this prospect" — you never name a skill, and you don't need to know which one covers
+             what. See what it covers below.</p>
+          <p>You know it fired when the reply opens with a line like:</p>
           <div class="code code--out">
-<pre>Gushwork design system v&lt;latest&gt; is out — this session is on v&lt;yours&gt;.
-1 breaking: badge · 4 changed. Auto-update was off on this machine —
-it is on now, so the next start picks this up.</pre>
+<pre>Using the Gushwork web skill — v1.46.0, updated 15 Sep 2026.</pre>
           </div>
-          <p>Silence means you're current. The check is time-boxed and fails quietly, so a
-             flaky network costs you nothing.</p>
+          <p>That version is also your stale-install check. Anything below the current release and
+             you are getting old values.</p>
+          <p>Expect two or three questions before it builds. What surface, who it is for, what the
+             page has to do. That is deliberate — the answers are what keep it from guessing, and
+             guessing is what the plugin exists to stop.</p>
         </div>
+      </section>
+
+      <section class="sg-sec" id="can">
+        <h2>What can it do?</h2>
 
         <div class="sg-block">
-          <h3><span class="n">2</span> · Auto-update turns itself on</h3>
-          <p>Keeping it on used to be a manual edit to a config file, which is exactly why it
-             got skipped — and a skipped flag means emitting last month's colours and spacing
-             with full confidence. No error, no warning. The same session check sets it for
-             you, once.</p>
-          <p>An update lands in the background and takes effect at your <em>next</em> start,
-             never the current one. To take one immediately:</p>
-          <div class="code">
-            <pre>claude plugin update gushwork-design@gushwork</pre>
-            <button class="code__btn" type="button"><svg><use href="#i-copy"/></svg><span>Copy</span></button>
-          </div>
-          <p>Restart afterwards either way.</p>
+          <p>Four surfaces today, all built from the same tokens, components and voice rules this
+             site documents.</p>
+          <p><strong>Marketing pages:</strong> landing pages and ad landers, heroes, pricing pages,
+             comparison tables, testimonials, case studies, FAQs, navbars, footers, forms.</p>
+          <p><strong>Product screens:</strong> dashboards, app screens, KPI cards, analytics
+             panels, data tables, side navigation, filters, tabs, toasts, account chrome.</p>
+          <p><strong>Slide decks:</strong> sales, pitch, prospect and client decks, QBRs, investor
+             updates, all-hands. Emits static HTML, a real .pptx, or a Google Slides deck.</p>
+          <p><strong>Lead magnets:</strong> the downloadable PDF behind an ad lander — checklists,
+             prompt packs, audit worksheets, playbooks, teardowns, buyer guides.</p>
+          <p>That is what ships today, and it is the difference between Claude approximating the
+             brand and reading it.</p>
+          <p>More is on the way. A longer list of skills lands over the next few weeks, covering
+             surfaces this does not reach yet.</p>
+          <p>You do not have to watch for them. Auto-update brings each one down on its own, and
+             Claude tells you at the start of a session when the system has moved, naming what
+             changed and what breaks a screen built on the old version. Nothing to check, nothing
+             to subscribe to. The
+             <a href="changelog-sheet.html" target="_blank" rel="noopener noreferrer">Change Log</a>
+             has the full history whenever you want the detail.</p>
         </div>
       </section>
 
@@ -375,9 +394,9 @@ it is on now, so the next start picks this up.</pre>
       <span>On this page</span>
     </div>
     <div class="idx__list" id="pg-toc">
-      <a href="#install">Install</a>
-      <a href="#verify">Verify</a>
-      <a href="#staying-current">Staying current</a>
+      <a href="#install">How to install?</a>
+      <a href="#use">How to use it?</a>
+      <a href="#can">What can it do?</a>
     </div>
   </nav>
 </div>

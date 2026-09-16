@@ -61,18 +61,20 @@ for name in ("gushwork-web", "gushwork-dashboard", "gushwork-lead-magnet", "gush
     p.write_text(t2)
     print(f"  {name:<20} -> v{v}, {d}")
 
-# The install page is hand-written and carries the version in four places. It is the FIRST thing
+# The install page is hand-written and carries the version in three places. It is the FIRST thing
 # a new teammate reads, so a stale version there tells them to expect output the plugin no longer
 # produces. It drifted two releases before anyone noticed; stamping it removes the chance.
 p = root / "preview" / "install.html"
 t = p.read_text()
 subs = [
-    (re.compile(r'(<p class="meta"><strong>v)[0-9.]+(</strong> · last updated )[^·<]+'),
-     lambda x: f"{x.group(1)}{v}{x.group(2)}{d}, {tm} "),
+    # The version is a pill on the title line (710:8320); the date is the stamp
+    # under it. They were one sentence until the 691:6692 redesign split them.
+    (re.compile(r'(<span class="chip">v)[0-9.]+(</span>)'),
+     lambda x: f"{x.group(1)}{v}{x.group(2)}"),
+    (re.compile(r'(<p class="meta">Last updated )[^·<]+'),
+     lambda x: f"{x.group(1)}{d}, {tm} "),
     (re.compile(r'(Using the Gushwork [\w-]+ skill — v)[0-9.]+(, updated )[^.\n]+'),
      lambda x: f"{x.group(1)}{v}{x.group(2)}{d}"),
-    (re.compile(r'(it reads anything below <strong>v)[0-9.]+(</strong>)'),
-     lambda x: f"{x.group(1)}{v}{x.group(2)}"),
 ]
 total = 0
 for pat_i, repl in subs:
