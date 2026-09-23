@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>title-bar — Gushwork</title>
+<meta name="robots" content="noindex">
+<script>try{var t=localStorage.getItem('gw-theme');if(t!=='dark')t='light';
+document.documentElement.setAttribute('data-theme',t)}catch(e){
+document.documentElement.setAttribute('data-theme','light')}</script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20width%3D%2280%22%20height%3D%2280%22%20rx%3D%2220%22%20fill%3D%22%230d0d0d%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="../../../foundation/tokens.css">
+<link rel="stylesheet" href="../../../shell.css">
+<style>
+.cl{--cl-gap:var(--gw-space-40)}
+.cl h2{font:var(--gw-text-h5);color:var(--s-heading);margin:0}
+.cl h3{font:var(--gw-text-h7);color:var(--s-heading);margin:0}
+.cl h4{font:var(--gw-text-body-16-sem);color:var(--s-heading);margin:0}
+.cl p{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+      color:var(--s-body);margin:0;max-width:78ch}
+.cl code,.cl .mono{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px}
+
+/* --- page head ------------------------------------------------------------ */
+.cl-head{display:flex;flex-direction:column;gap:var(--gw-space-16)}
+.cl-head h1{font:var(--gw-text-h4);color:var(--s-heading);margin:0}
+.cl-lede{font:var(--gw-text-body-18-reg);letter-spacing:var(--gw-text-body-18-reg-tracking);
+         color:var(--s-body);margin:0;max-width:72ch}
+
+/* --- the tally ------------------------------------------------------------ */
+.cl-tally{display:flex;flex-wrap:wrap;gap:var(--gw-space-12)}
+.cl-stat{flex:1 1 150px;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-16) var(--gw-space-20);
+         display:flex;flex-direction:column;gap:var(--gw-space-4)}
+.cl-stat b{font:var(--gw-text-h6);color:var(--s-heading);font-feature-settings:"tnum" 1}
+.cl-stat span{font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-400);
+              text-transform:uppercase;letter-spacing:.06em}
+
+/* --- review queue --------------------------------------------------------- */
+.cl-queue{background:var(--s-card-bg);border:1px solid var(--gw-color-yellow-300);
+          border-left:3px solid var(--gw-color-yellow-400);border-radius:var(--gw-radius-12);
+          padding:var(--gw-space-20) var(--gw-space-24);display:flex;flex-direction:column;
+          gap:var(--gw-space-12)}
+.cl-queue h2{font:var(--gw-text-h7)}
+.cl-queue ul{margin:0;padding-left:var(--gw-space-20);display:flex;flex-direction:column;
+             gap:var(--gw-space-4)}
+.cl-queue li{font:var(--gw-text-body-14-reg);color:var(--s-body)}
+.cl-queue a{color:var(--gw-color-primary-600);text-decoration:none}
+.cl-queue a:hover{text-decoration:underline}
+.cl-pass{background:var(--s-card-bg);border:1px solid var(--gw-color-green-300);
+         border-left:3px solid var(--gw-color-green-400)}
+
+/* --- controls ------------------------------------------------------------- */
+.cl-bar{position:sticky;top:0;z-index:5;background:var(--s-page-bg);
+        padding:var(--gw-space-12) 0;display:flex;flex-wrap:wrap;gap:var(--gw-space-8);
+        align-items:center;border-bottom:1px solid var(--s-chrome-border)}
+.cl-find{flex:1 1 220px;min-width:180px;background:var(--s-field-bg);
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         padding:var(--gw-space-8) var(--gw-space-12);font:var(--gw-text-body-14-reg);
+         color:var(--s-heading)}
+.cl-find::placeholder{color:var(--s-placeholder)}
+.cl-find:focus{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.cl-filter{display:flex;gap:var(--gw-space-4);flex-wrap:wrap}
+.cl-f{font:var(--gw-text-body-12-med);color:var(--s-body);background:transparent;
+      border:1px solid var(--s-field-border);border-radius:var(--gw-radius-full);
+      padding:6px var(--gw-space-12);cursor:pointer}
+.cl-f:hover{border-color:var(--gw-color-primary-500)}
+.cl-f[aria-pressed="true"]{background:var(--gw-color-black);color:var(--gw-color-white);
+                           border-color:var(--gw-color-black)}
+.cl-f:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.cl-count{font:var(--gw-text-body-12-reg);color:var(--gw-color-neutral-400);margin-left:auto}
+
+/* --- sections ------------------------------------------------------------- */
+.cl-sec{display:flex;flex-direction:column;gap:var(--gw-space-20);
+        scroll-margin-top:var(--gw-space-80)}
+.cl-sec[hidden]{display:none}
+.cl-sechead{display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--gw-space-12)}
+.cl-note{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+         color:var(--s-body);background:var(--gw-color-neutral-25);
+         border:1px solid var(--s-card-border);border-left:3px solid var(--gw-color-neutral-300);
+         border-radius:var(--gw-radius-8);padding:var(--gw-space-12) var(--gw-space-16);
+         white-space:pre-wrap;max-width:88ch}
+:root[data-theme="dark"] .cl-note{background:var(--gw-color-neutral-900)}
+.cl-sub{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.cl-sub[hidden]{display:none}
+
+/* --- chips ---------------------------------------------------------------- */
+.cl-chip{display:inline-flex;align-items:center;gap:6px;font:var(--gw-text-body-12-med);
+         border-radius:var(--gw-radius-full);padding:3px var(--gw-space-8);white-space:nowrap}
+.cl-chip--measured{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.cl-chip--transcribed{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.cl-chip--ruled{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+.cl-chip--passed{background:var(--gw-color-green-500);color:var(--gw-color-white)}
+.cl-chip--pending{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+.cl-chip--rejected{background:var(--gw-color-red-500);color:var(--gw-color-white)}
+.cl-chip--gap{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+:root[data-theme="dark"] .cl-chip--measured{background:var(--gw-color-green-900);
+                                            color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .cl-chip--transcribed{background:var(--gw-color-yellow-900);
+                                               color:var(--gw-color-yellow-100)}
+:root[data-theme="dark"] .cl-chip--ruled{background:var(--gw-color-primary-900);
+                                         color:var(--gw-color-primary-200)}
+:root[data-theme="dark"] .cl-chip--pending{background:var(--gw-color-neutral-800);
+                                           color:var(--gw-color-neutral-300)}
+:root[data-theme="dark"] .cl-chip--gap{background:var(--gw-color-red-900);
+                                       color:var(--gw-color-red-200)}
+
+/* --- colour --------------------------------------------------------------- */
+.cl-ramp{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));
+         gap:var(--gw-space-8)}
+.cl-sw{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+       border-radius:var(--gw-radius-10);overflow:hidden;display:flex;flex-direction:column}
+.cl-sw[hidden]{display:none}
+.cl-sw__chip{height:64px;border-bottom:1px solid var(--s-card-border);
+             background-image:linear-gradient(45deg,var(--gw-color-neutral-100) 25%,transparent 25%),
+                              linear-gradient(-45deg,var(--gw-color-neutral-100) 25%,transparent 25%),
+                              linear-gradient(45deg,transparent 75%,var(--gw-color-neutral-100) 75%),
+                              linear-gradient(-45deg,transparent 75%,var(--gw-color-neutral-100) 75%);
+             background-size:12px 12px;
+             background-position:0 0,0 6px,6px -6px,-6px 0}
+.cl-sw__fill{width:100%;height:100%}
+.cl-sw__body{padding:var(--gw-space-8) var(--gw-space-12);display:flex;
+             flex-direction:column;gap:3px}
+.cl-sw__name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;
+             color:var(--s-heading);word-break:break-all;line-height:1.35}
+.cl-sw__hex{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;
+            color:var(--gw-color-neutral-400);text-transform:uppercase}
+.cl-sw__ac{display:flex;gap:4px;margin-top:2px}
+.cl-ac{font-size:9.5px;font-weight:600;letter-spacing:.04em;border-radius:var(--gw-radius-4);
+       padding:1px 4px;line-height:1.5}
+.cl-ac--ok{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.cl-ac--no{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+:root[data-theme="dark"] .cl-ac--ok{background:var(--gw-color-green-900);color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .cl-ac--no{background:var(--gw-color-red-900);color:var(--gw-color-red-200)}
+
+/* --- type ----------------------------------------------------------------- */
+.cl-types{display:flex;flex-direction:column;gap:2px}
+.cl-t{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:var(--gw-space-20);
+      align-items:start;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+      border-radius:var(--gw-radius-10);padding:var(--gw-space-16) var(--gw-space-20)}
+.cl-t[hidden]{display:none}
+.cl-t__spec{color:var(--s-heading);min-width:0;overflow-wrap:anywhere}
+.cl-t__meta{display:flex;flex-direction:column;gap:2px;text-align:right}
+.cl-t__name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+            color:var(--gw-color-primary-600)}
+.cl-t__val{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10.5px;
+           color:var(--gw-color-neutral-400);line-height:1.5}
+@media (max-width:860px){.cl-t{grid-template-columns:1fr}.cl-t__meta{text-align:left}}
+
+/* --- faces ---------------------------------------------------------------- */
+.cl-faces{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+          gap:var(--gw-space-16)}
+.cl-face{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-24);
+         display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.cl-face__aa{font-size:52px;line-height:1.05;color:var(--s-heading)}
+.cl-face__wt{display:flex;flex-direction:column;gap:2px}
+.cl-face__wt span{color:var(--s-heading);font-size:19px;line-height:1.45}
+
+/* --- space / radius / shadow ---------------------------------------------- */
+.cl-rows{display:flex;flex-direction:column;gap:6px}
+.cl-row{display:grid;grid-template-columns:132px minmax(0,1fr) 60px;gap:var(--gw-space-16);
+        align-items:center;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-radius:var(--gw-radius-8);padding:var(--gw-space-8) var(--gw-space-16)}
+.cl-row[hidden]{display:none}
+.cl-row__n{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+           color:var(--gw-color-primary-600);word-break:break-all}
+.cl-row__v{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+           color:var(--gw-color-neutral-400);text-align:right}
+.cl-bararea{min-height:18px;display:flex;align-items:center}
+.cl-barfill{height:16px;background:var(--gw-color-primary-500);border-radius:var(--gw-radius-2);
+            max-width:100%}
+.cl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));
+         gap:var(--gw-space-12)}
+.cl-tile{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-10);padding:var(--gw-space-16);display:flex;
+         flex-direction:column;align-items:center;gap:var(--gw-space-8)}
+.cl-tile[hidden]{display:none}
+.cl-tile__demo{width:72px;height:72px;background:var(--gw-color-primary-100);
+               border:1.5px solid var(--gw-color-primary-500)}
+.cl-tile__sh{width:100%;height:64px;background:var(--gw-color-white);
+             border-radius:var(--gw-radius-8)}
+:root[data-theme="dark"] .cl-tile__sh{background:var(--gw-color-neutral-800)}
+/* The alpha checker is drawn in neutral-100, which is near-white and shouts on a
+   black ground. Same job, quieter, in dark. */
+:root[data-theme="dark"] .cl-sw__chip{
+  background-image:linear-gradient(45deg,var(--gw-color-neutral-800) 25%,transparent 25%),
+                   linear-gradient(-45deg,var(--gw-color-neutral-800) 25%,transparent 25%),
+                   linear-gradient(45deg,transparent 75%,var(--gw-color-neutral-800) 75%),
+                   linear-gradient(-45deg,transparent 75%,var(--gw-color-neutral-800) 75%)}
+
+/* --- tables --------------------------------------------------------------- */
+.cl-tbl{width:100%;border-collapse:collapse;background:var(--s-card-bg);
+        border:1px solid var(--s-card-border);border-radius:var(--gw-radius-10);
+        overflow:hidden;font:var(--gw-text-body-14-reg)}
+.cl-tblwrap{overflow-x:auto}
+.cl-tbl th{text-align:left;font:var(--gw-text-body-12-med);text-transform:uppercase;
+           letter-spacing:.06em;color:var(--gw-color-neutral-400);
+           padding:var(--gw-space-8) var(--gw-space-16);
+           border-bottom:1px solid var(--s-card-border);white-space:nowrap}
+.cl-tbl td{padding:var(--gw-space-8) var(--gw-space-16);color:var(--s-body);
+           border-bottom:1px solid var(--s-card-border);vertical-align:top}
+.cl-tbl tr:last-child td{border-bottom:none}
+.cl-tbl tr[hidden]{display:none}
+.cl-tbl .mono{color:var(--gw-color-primary-600)}
+.cl-tbl .num{font-feature-settings:"tnum" 1;white-space:nowrap}
+
+/* --- gaps ----------------------------------------------------------------- */
+.cl-gaps{display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.cl-gap{display:grid;grid-template-columns:28px minmax(0,1fr);gap:var(--gw-space-12);
+        background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-left:3px solid var(--gw-color-red-400);border-radius:var(--gw-radius-8);
+        padding:var(--gw-space-12) var(--gw-space-16)}
+.cl-gap__n{font:var(--gw-text-body-14-sem);color:var(--gw-color-red-500);
+           font-feature-settings:"tnum" 1}
+.cl-gap__t{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+           color:var(--s-body);white-space:pre-wrap;margin:0}
+
+/* --- use-case cards ------------------------------------------------------- */
+.cl-cases{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+          gap:var(--gw-space-12)}
+.cl-case{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-20);
+         display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.cl-case__n{display:flex;align-items:baseline;justify-content:space-between;gap:var(--gw-space-8)}
+.cl-case__list{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:4px}
+.cl-case__list li{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10.5px;
+                  color:var(--gw-color-neutral-600);background:var(--gw-color-neutral-25);
+                  border:1px solid var(--s-card-border);border-radius:var(--gw-radius-4);
+                  padding:1px 5px}
+:root[data-theme="dark"] .cl-case__list li{background:var(--gw-color-neutral-900)}
+
+/* --- misc ----------------------------------------------------------------- */
+.cl-src{display:flex;flex-wrap:wrap;gap:var(--gw-space-8)}
+.cl-src code{background:var(--s-code-bg);border:1px solid var(--s-code-border);
+             color:var(--s-code-fg);border-radius:var(--gw-radius-4);padding:2px 7px}
+.cl-empty{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-400);
+          border:1px dashed var(--s-field-border);border-radius:var(--gw-radius-10);
+          padding:var(--gw-space-24);text-align:center}
+.cl-jump{display:flex;flex-wrap:wrap;gap:6px}
+.cl-jump a{font:var(--gw-text-body-12-med);color:var(--s-body);text-decoration:none;
+           border:1px solid var(--s-field-border);border-radius:var(--gw-radius-full);
+           padding:5px var(--gw-space-12)}
+.cl-jump a:hover{border-color:var(--gw-color-primary-500);color:var(--gw-color-primary-600)}
+@media print{.cl-bar,.cl-jump{display:none}}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--s-page-bg);font-family:var(--gw-font-body);
+     color:var(--s-body);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
+
+/* ---- topbar ------------------------------------------------------------- */
+.lb-top{position:sticky;top:0;z-index:20;height:60px;display:flex;align-items:center;
+        gap:var(--gw-space-16);padding:0 var(--gw-space-24);
+        background:var(--s-chrome-bg);border-bottom:1px solid var(--s-chrome-border)}
+.lb-brand{display:flex;align-items:center;gap:var(--gw-space-12);text-decoration:none;
+          flex:none}
+.lb-brand__chip{width:32px;height:32px;border-radius:var(--gw-radius-8);
+                background:var(--gw-color-black);color:var(--gw-color-white);
+                display:grid;place-items:center;flex:none}
+.lb-brand__chip svg{width:16px;height:16px;display:block}
+.lb-brand__n{font:var(--gw-text-h7);color:var(--s-heading)}
+.lb-crumb{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-400);
+          white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-crumb a{color:var(--gw-color-primary-600);text-decoration:none}
+.lb-top__r{display:flex;align-items:center;gap:var(--gw-space-12);margin-left:auto}
+.lb-find{width:300px;height:36px;background:var(--s-field-bg);
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         padding:0 var(--gw-space-12);font:var(--gw-text-body-14-reg);color:var(--s-heading)}
+.lb-find::placeholder{color:var(--s-placeholder)}
+.lb-find:focus{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.lb-tbtn{width:36px;height:36px;display:grid;place-items:center;background:transparent;
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         color:var(--s-body);cursor:pointer;flex:none}
+.lb-tbtn svg{width:18px;height:18px;display:block}
+.lb-tbtn:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+@media (max-width:820px){.lb-find{display:none}}
+
+/* ---- three columns ------------------------------------------------------- */
+.lb-3{display:grid;grid-template-columns:240px minmax(0,1fr) 212px;align-items:start;
+      max-width:1600px;margin:0 auto}
+.lb-rail{position:sticky;top:60px;max-height:calc(100vh - 60px);overflow-y:auto;
+         border-right:1px solid var(--s-chrome-border);padding:var(--gw-space-24) 0}
+.lb-rail__t{font:var(--gw-text-body-12-med);text-transform:uppercase;letter-spacing:.06em;
+            color:var(--gw-color-neutral-400);padding:0 var(--gw-space-20) var(--gw-space-8)}
+.lb-rail a{display:flex;justify-content:space-between;gap:var(--gw-space-8);
+           font:var(--gw-text-body-14-reg);color:var(--s-body);text-decoration:none;
+           padding:6px var(--gw-space-20)}
+.lb-rail a:hover{background:var(--s-nav-hover);color:var(--s-heading)}
+.lb-rail a.on{background:var(--s-nav-sel);color:var(--s-heading);
+              font:var(--gw-text-body-14-sem)}
+.lb-rail a span{color:var(--gw-color-neutral-400);font:var(--gw-text-body-12-reg);flex:none}
+.lb-rail a.on span{color:var(--s-heading)}
+.lb-rail__sep{margin:var(--gw-space-12) var(--gw-space-20) var(--gw-space-8);
+              border-top:1px solid var(--s-chrome-border)}
+
+.lb-mid{grid-column:2;padding:var(--gw-space-32) var(--gw-space-40) var(--gw-space-80);
+        min-width:0;display:flex;flex-direction:column;gap:var(--gw-space-24)}
+.lb-toc{grid-column:3;position:sticky;top:60px;max-height:calc(100vh - 60px);overflow-y:auto;
+        padding:var(--gw-space-32) var(--gw-space-20);display:flex;flex-direction:column;
+        gap:5px}
+.lb-toc b{font:var(--gw-text-body-12-med);text-transform:uppercase;letter-spacing:.06em;
+          color:var(--gw-color-neutral-400);margin-bottom:3px}
+.lb-toc a{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-600);
+          text-decoration:none;line-height:1.35}
+.lb-toc a:hover{color:var(--gw-color-primary-600)}
+.lb-toc a.l3{padding-left:var(--gw-space-12)}
+@media (max-width:1180px){.lb-3{grid-template-columns:220px minmax(0,1fr)}
+                          .lb-toc{display:none}}
+@media (max-width:820px){.lb-3{grid-template-columns:1fr}
+                         .lb-rail{position:static;max-height:none;border-right:0;
+                                  border-bottom:1px solid var(--s-chrome-border)}
+                         .lb-mid{padding:var(--gw-space-24) var(--gw-space-20)}}
+
+/* ---- page head ----------------------------------------------------------- */
+.lb-h{display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.lb-h h1{font:var(--gw-text-h4);margin:0}
+.lb-h .lede{font:var(--gw-text-body-16-reg);color:var(--s-body);margin:0;max-width:74ch}
+.lb-row{display:flex;flex-wrap:wrap;gap:var(--gw-space-8);align-items:center}
+.lb-meta{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+         color:var(--gw-color-neutral-400)}
+
+.chip{display:inline-flex;align-items:center;gap:5px;font:var(--gw-text-body-12-med);
+      border-radius:var(--gw-radius-full);padding:3px var(--gw-space-8);white-space:nowrap}
+.chip--measured{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.chip--transcribed{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.chip--ruled{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+.chip--structure{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.chip--built-here{background:var(--gw-color-orange-50);color:var(--gw-color-orange-700)}
+.chip--passed{background:var(--gw-color-green-500);color:var(--gw-color-white)}
+.chip--pending{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+.chip--rejected{background:var(--gw-color-red-500);color:var(--gw-color-white)}
+.chip--gap{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+.chip--web{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+:root[data-theme="dark"] .chip--measured{background:var(--gw-color-green-900);color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .chip--transcribed,
+:root[data-theme="dark"] .chip--structure{background:var(--gw-color-yellow-900);color:var(--gw-color-yellow-100)}
+:root[data-theme="dark"] .chip--ruled,
+:root[data-theme="dark"] .chip--web{background:var(--gw-color-primary-900);color:var(--gw-color-primary-200)}
+:root[data-theme="dark"] .chip--pending{background:var(--gw-color-neutral-800);color:var(--gw-color-neutral-300)}
+:root[data-theme="dark"] .chip--built-here{background:var(--gw-color-orange-900);color:var(--gw-color-orange-100)}
+:root[data-theme="dark"] .chip--gap{background:var(--gw-color-red-900);color:var(--gw-color-red-200)}
+
+/* ---- markdown ------------------------------------------------------------ */
+.md{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.md h2{font:var(--gw-text-h6);margin:var(--gw-space-20) 0 0;scroll-margin-top:80px}
+.md h3{font:var(--gw-text-h7);margin:var(--gw-space-16) 0 0;scroll-margin-top:80px}
+.md h4,.md h5,.md h6{font:var(--gw-text-body-16-sem);margin:var(--gw-space-12) 0 0}
+.md p{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+      color:var(--s-body);margin:0;max-width:80ch}
+.md ul,.md ol{margin:0;padding-left:var(--gw-space-20);display:flex;
+              flex-direction:column;gap:5px}
+.md li{font:var(--gw-text-body-14-reg);color:var(--s-body);max-width:78ch}
+.md code{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px;
+         background:var(--s-code-bg);border:1px solid var(--s-code-border);
+         color:var(--s-code-fg);border-radius:var(--gw-radius-4);padding:1px 5px}
+.md a{color:var(--gw-color-primary-600)}
+.md-pre{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-radius:var(--gw-radius-8);padding:var(--gw-space-16);overflow-x:auto;margin:0}
+.md-pre code{background:none;border:0;padding:0;color:var(--s-body);font-size:12px}
+.md-q{margin:0;border-left:3px solid var(--gw-color-neutral-300);
+      padding:var(--gw-space-8) var(--gw-space-16);font:var(--gw-text-body-14-reg);
+      color:var(--s-body)}
+.md-hr{border:0;border-top:1px solid var(--s-card-border);margin:var(--gw-space-12) 0}
+.md-tblwrap{overflow-x:auto}
+.md-tbl{width:100%;border-collapse:collapse;background:var(--s-card-bg);
+        border:1px solid var(--s-card-border);border-radius:var(--gw-radius-8);
+        overflow:hidden;font:var(--gw-text-body-14-reg)}
+.md-tbl th{text-align:left;font:var(--gw-text-body-12-med);text-transform:uppercase;
+           letter-spacing:.06em;color:var(--gw-color-neutral-400);
+           padding:var(--gw-space-8) var(--gw-space-12);
+           border-bottom:1px solid var(--s-card-border);white-space:nowrap}
+.md-tbl td{padding:var(--gw-space-8) var(--gw-space-12);color:var(--s-body);
+           border-bottom:1px solid var(--s-card-border);vertical-align:top}
+.md-tbl tr:last-child td{border-bottom:none}
+.md-tbl code{white-space:nowrap}
+
+.note{font:var(--gw-text-body-14-reg);color:var(--s-body);
+      background:var(--gw-color-neutral-25);border:1px solid var(--s-card-border);
+      border-left:3px solid var(--gw-color-neutral-300);border-radius:var(--gw-radius-8);
+      padding:var(--gw-space-12) var(--gw-space-16);white-space:pre-wrap;max-width:88ch}
+:root[data-theme="dark"] .note{background:var(--gw-color-neutral-900)}
+.note--find{border-left-color:var(--gw-color-yellow-400);white-space:normal}
+.empty{border:1px dashed var(--s-field-border);border-radius:var(--gw-radius-10);
+       padding:var(--gw-space-24);text-align:center;font:var(--gw-text-body-14-reg);
+       color:var(--gw-color-neutral-400)}
+.sec{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.sec h2{font:var(--gw-text-h6);margin:0;scroll-margin-top:80px}
+</style>
+</head>
+<body>
+<header class="lb-top">
+  <a class="lb-brand" href="../../../library/index.html">
+    <span class="lb-brand__chip"><svg viewBox="0 0 80 80" fill="none" aria-hidden="true"><path d="M76.6088 4.56344C77.5025 2.36058 75.8495 0 73.4723 0H9.14286C4.0934 0 0 4.0934 0 9.14286V66.7778C0 72.018 5.17081 75.6829 9.9603 73.5568C40.8494 59.8449 64.3785 34.7075 76.6088 4.56344Z" fill="currentColor"/><path d="M32.5161 80C31.4022 80 30.9357 78.5531 31.8259 77.8835C54.9007 60.5265 71.4338 35.8047 78.7658 8.0522C78.9403 7.39154 80 7.51618 80 8.19951V70.8571C80 75.9066 75.9066 80 70.8571 80H32.5161Z" fill="currentColor"/></svg></span>
+    <span class="lb-brand__n">Component Library</span></a>
+  <span class="lb-crumb"><a href="../../index.html">Library</a> / <a href="index.html">Slides</a></span>
+  <div class="lb-top__r"><input class="lb-find" id="lb-find" type="search" placeholder="Filter this library">
+    <button class="lb-tbtn" id="lb-theme" type="button" aria-label="Switch theme">
+      <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M116,36V32a12,12,0,0,1,24,0v4a12,12,0,0,1-24,0Zm80,92a68,68,0,1,1-68-68A68.07,68.07,0,0,1,196,128Zm-24,0a44,44,0,1,0-44,44A44.05,44.05,0,0,0,172,128ZM51.51,68.49a12,12,0,1,0,17-17l-4-4a12,12,0,0,0-17,17Zm0,119-4,4a12,12,0,0,0,17,17l4-4a12,12,0,1,0-17-17ZM196,72a12,12,0,0,0,8.49-3.51l4-4a12,12,0,0,0-17-17l-4,4A12,12,0,0,0,196,72Zm8.49,115.51a12,12,0,0,0-17,17l4,4a12,12,0,0,0,17-17ZM48,128a12,12,0,0,0-12-12H32a12,12,0,0,0,0,24h4A12,12,0,0,0,48,128Zm80,80a12,12,0,0,0-12,12v4a12,12,0,0,0,24,0v-4A12,12,0,0,0,128,208Zm96-92h-4a12,12,0,0,0,0,24h4a12,12,0,0,0,0-24Z"/></svg></button></div>
+</header>
+<div class="lb-3"><nav class="lb-rail"><div class="lb-rail__t">Slides · 22</div><a href="index.html" data-q="overview 22">Overview<span>22</span></a><div class="lb-rail__sep"></div><a href="annotation.html" data-q="annotation ">annotation</a><a href="content-card.html" data-q="content-card ">content-card</a><a href="cover.html" data-q="cover ">cover</a><a href="eyebrow.html" data-q="eyebrow ">eyebrow</a><a href="feature-row.html" data-q="feature-row ">feature-row</a><a href="ground.html" data-q="ground ">ground</a><a href="icon-tile.html" data-q="icon-tile ">icon-tile</a><a href="layout-big-number.html" data-q="layout-big-number ">layout-big-number</a><a href="layout-closer.html" data-q="layout-closer ">layout-closer</a><a href="layout-divider.html" data-q="layout-divider ">layout-divider</a><a href="layout-feature-list.html" data-q="layout-feature-list ">layout-feature-list</a><a href="layout-full-bleed.html" data-q="layout-full-bleed ">layout-full-bleed</a><a href="layout-pricing.html" data-q="layout-pricing ">layout-pricing</a><a href="layout-split-card.html" data-q="layout-split-card ">layout-split-card</a><a href="layout-step-row.html" data-q="layout-step-row ">layout-step-row</a><a href="layout-testimonial.html" data-q="layout-testimonial ">layout-testimonial</a><a href="layout-two-up.html" data-q="layout-two-up ">layout-two-up</a><a href="lead-paragraph.html" data-q="lead-paragraph ">lead-paragraph</a><a href="media-well.html" data-q="media-well ">media-well</a><a href="rule-label.html" data-q="rule-label ">rule-label</a><a href="step-card.html" data-q="step-card ">step-card</a><a href="title-bar.html" data-q="title-bar " class="on">title-bar</a></nav><main class="lb-mid"><div class="lb-h"><h1>title-bar</h1><p class="lede">Slides · deck.md</p><div class="lb-row"><span class="chip chip--measured" title="Read off the bound Figma variables. Safe to build from.">measured</span><span class="chip chip--pending" title="Has not been through a review pass">not reviewed</span><span class="pill">v1.45.0</span></div><div class="lb-meta">review: bash scripts/review-pass.sh slides title-bar</div></div><div class="md"><h2 id="where-these-numbers-come-from-and-how-much-to-trust-them">Slides — the deck shell</h2>
+<p>Every slide is the same four things stacked: the <b>ground</b>, the <b>title bar</b>, the <b>logo mark</b>, and the <b>content card</b>. Layouts differ only in what goes inside the card. Get the shell right and a new layout is half an hour; get it wrong and every slide is wrong at once.</p>
+<p><b>Slide is 1920 × 1080.</b> Do not change it unless asked.</p>
+<hr class="md-hr">
+<h3 id="the-ground">Where these numbers come from, and how much to trust them</h3>
+<p>Three tiers. They are not equally reliable and the spec says which is which, because a transcribed number presented as a measured one is how the dashboard surface shipped a dozen wrong values.</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Tier</th><th>Source</th><th>Trust</th></tr></thead><tbody><tr><td><b>Figma-measured</b></td><td>Read off node properties in <code>GW-Slides</code> (<code>R9JgCTytCKSgyBL4efP7hz</code>)</td><td>Authoritative. R0 — Figma outranks everything</td></tr><tr><td><b>Export-derived</b></td><td>Read off the shape tree of the Manufacturing deck's Google Slides <code>.pptx</code> export at 960 × 540, then doubled</td><td>Good. The export IS that Figma file two conversions downstream, and where both exist they agree — but Slides re-fits text, so type is the weak spot</td></tr><tr><td><b>Authored</b></td><td>Built from tokens because neither source has it</td><td>A first draft. Marked <code>AUTHORED</code> wherever it appears</td></tr></tbody></table></div>
+<p>The one place the two known sources disagree is type, and it disagrees for a knowable reason — see <i>Why your export looks wrong</i> below.</p>
+<hr class="md-hr">
+<h3 id="the-title-bar">The ground</h3>
+<p><code>assets/slides/slide-ground.svg</code> — Figma node <code>1137:614</code>, <b>Figma-measured</b>.</p>
+<p>Three layers:</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Layer</th><th>Value</th></tr></thead><tbody><tr><td>Base</td><td><code>--gw-color-primary-500</code>, full frame</td></tr><tr><td>Lattice</td><td>40px pitch, 1px line, drawn on half-pixel offsets so it stays crisp; <code>opacity: 0.3</code></td></tr><tr><td>Lattice fill</td><td>Radial gradient, <code>--gw-color-primary-500</code> at centre → <code>white</code> at edge. Centre <code>(922.746, 540)</code>, elliptical radii <code>1951.42 × 1881.56</code></td></tr></tbody></table></div>
+<p><b>The gradient is on the grid, not behind it.</b> So the lines are <code>primary-500</code> on <code>primary-500</code> mid-frame — invisible — and ramp toward white as they approach the corners. The grid appears to emerge from the edges. At the far corner the gradient is ~55% of the way to white, giving the lines an effective alpha of ~0.17.</p>
+<p>Rebuild it in CSS from <code>--gw-slide-grid-*</code>; a masked grid is exact here:</p>
+<pre class="md-pre"><code>.slide-ground { background: var(--gw-color-primary-500); position: relative; }
+.slide-ground::before {
+  content: &quot;&quot;; position: absolute; inset: 0;
+  background-image:
+    linear-gradient(to right,  #fff var(--gw-slide-grid-line), transparent var(--gw-slide-grid-line)),
+    linear-gradient(to bottom, #fff var(--gw-slide-grid-line), transparent var(--gw-slide-grid-line));
+  background-size: var(--gw-slide-grid-pitch) var(--gw-slide-grid-pitch);
+  background-position: -0.5px -0.5px;
+  opacity: var(--gw-slide-grid-opacity);
+  mask-image: radial-gradient(
+    var(--gw-slide-grid-radius-x) var(--gw-slide-grid-radius-y)
+    at var(--gw-slide-grid-origin-x) var(--gw-slide-grid-origin-y),
+    transparent 0%, #000 100%);
+}</code></pre>
+<p>The SVG exists for the <code>.pptx</code> path, which has no CSS. <b>Keep the two in step</b> — if you change the pitch or the gradient, change both, or a deck and its export stop matching.</p>
+<p>The radial centre is <code>922.746</code>, not <code>960</code>. It is off-centre by 37px in the source and that is deliberate; do not tidy it to centre.</p>
+<hr class="md-hr">
+<h3 id="the-logo-mark">The title bar</h3>
+<p><b>Export-derived.</b> The title sits directly on the ground, outside the card.</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th></th><th>1 line</th><th>2 lines</th></tr></thead><tbody><tr><td>x</td><td>40</td><td>40</td></tr><tr><td>y</td><td>38.2</td><td>38.2</td></tr><tr><td>w</td><td>1723.2</td><td>1523.2</td></tr><tr><td>h</td><td>86</td><td>205.4</td></tr></tbody></table></div>
+<p>Type: <code>--gw-text-slide-title</code> — 72px/1.2, weight 700, white. Left-aligned, always.</p>
+<p><b>A two-line title pushes the card down</b>, it does not overlap it. See the card table below. There is no three-line case in either source; if a title needs three lines the title is too long.</p>
+<hr class="md-hr">
+<h3 id="the-content-card">The logo mark</h3>
+<p><b>Export-derived.</b> <code>assets/logo/gushwork-symbol-white.svg</code>, 38.7 × 38.7 at <code>x=1815.6 y=61.8</code>.</p>
+<p>That leaves a 65.7px right margin, which does <b>not</b> match the 40px the title uses. Both sources agree on it, so it is intentional, not drift — the mark is optically aligned to the title's cap height rather than to the title's box.</p>
+<p>The mark appears on every slide <b>except the cover</b>, where the wordmark is used instead.</p>
+<hr class="md-hr">
+<h3 id="radii-all-five-map-onto-existing-tokens">The content card</h3>
+<p><b>Export-derived.</b> A white <code>roundRect</code> on the ground. This is where all content lives.</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Variant</th><th>x</th><th>y</th><th>w</th><th>h</th><th>Radius</th></tr></thead><tbody><tr><td>Standard</td><td>20</td><td>178.2</td><td>1880</td><td>884</td><td><code>--gw-radius-36</code></td></tr><tr><td>Below a 2-line title</td><td>20</td><td>282.8</td><td>1880</td><td>777.3</td><td><code>--gw-radius-36</code></td></tr><tr><td>Case study (full-bleed inner image)</td><td>20</td><td>176</td><td>1880</td><td>884</td><td><code>--gw-radius-32</code></td></tr></tbody></table></div>
+<p>Fill <code>--gw-color-white</code>. Border <code>--gw-slide-card-border</code> (1.3px) <code>--gw-color-neutral-200</code>.</p>
+<p>Every variant insets <b>20px from the left, right and bottom slide edges</b> — the y and h are what move. The 1.3px border is measured, not a rounding artefact of a 1px stroke; keep it.</p>
+<p>The case-study variant's <code>--gw-radius-32</code> against the standard <code>--gw-radius-36</code> is a 4px difference nobody will see, and it is in the source. Use 36 unless you are reproducing that slide specifically.</p>
+<h4>Radii — all five map onto existing tokens</h4>
+<p>Google Slides stores a roundRect radius as a proportion of the shorter side, so these arrive as opaque <code>adj</code> values. Resolved:</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Element</th><th><code>adj</code></th><th>Resolves to</th><th>Token</th></tr></thead><tbody><tr><td>Content card</td><td>4035</td><td>35.7px</td><td><code>--gw-radius-36</code></td></tr><tr><td>Case-study card</td><td>3511</td><td>31.0px</td><td><code>--gw-radius-32</code></td></tr><tr><td>Media well</td><td>3456</td><td>26.9px</td><td><code>--gw-radius-28</code></td></tr><tr><td>Step card</td><td>9314</td><td>41.2px</td><td><code>--gw-radius-40</code></td></tr><tr><td>Icon tile</td><td>16667</td><td>14.3px</td><td><code>--gw-radius-16</code></td></tr></tbody></table></div>
+<p><b>Nothing here needed a new radius token.</b> The deck was on-system all along; the values were just wearing an export's clothing. Use the token, never the resolved decimal.</p>
+<hr class="md-hr">
+<h3 id="the-20px-grid">The 20px grid</h3>
+<p>Every inset and gap in the deck is 20, or 16 where it is vertical and inside another box:</p>
+<ul><li>Card inset from slide edge: <b>20</b> on all four sides</li><li>Media well inset from card edge: <b>20</b> horizontal, <b>16</b> vertical</li><li>Gap between step cards: <b>19.4</b> → use <code>--gw-slide-gap</code> (20)</li><li>Cover inner frame inset: <b>40</b> (Figma-measured, and genuinely different — see <code>cover.md</code>)</li></ul>
+<p>Build to the tokens, not the decimals.</p>
+<hr class="md-hr">
+<h3 id="type-the-ramp-and-the-one-gap-in-it">Type — the ramp, and the one gap in it</h3>
+<p>Google Slides works in points at 960 × 540. At 1920 the conversion is <code>1pt = 2.667px</code>. Doubling that way lands most steps exactly on the shared ramp:</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Deck</th><th>→ px</th><th>Token</th></tr></thead><tbody><tr><td>8.25pt</td><td>22</td><td><code>--gw-text-body-22-*</code> — exact</td></tr><tr><td>12pt</td><td>32</td><td><code>--gw-text-h5</code> — exact</td></tr><tr><td>8pt</td><td>21.33</td><td><code>--gw-text-body-22-*</code>, off by 0.67</td></tr><tr><td>10pt</td><td>26.67</td><td><code>--gw-text-h6</code>, off by 0.67</td></tr><tr><td>16pt</td><td>42.67</td><td><code>--gw-text-h3</code>, off by 1.3</td></tr><tr><td>11pt</td><td>29.33</td><td><b>no token</b> — nearest is <code>h5</code> (32), off by 2.7</td></tr><tr><td>9pt</td><td>24</td><td><b>no token</b> — nearest is <code>h6</code> (26), off by 2</td></tr><tr><td>27pt</td><td>72</td><td><code>--gw-text-slide-title</code> — added for this surface</td></tr><tr><td>32pt</td><td>85.33</td><td>superseded — Figma measures the cover at <b>90px</b></td></tr></tbody></table></div>
+<p><b>Snap to the token.</b> The sub-pixel differences are Slides' rounding, not design intent.</p>
+<p>The two real gaps — 11pt and 9pt — are <b>findings, not licences to hardcode</b>. Both sit between existing steps. Until they are measured in Figma, use <code>--gw-text-h5</code> for the 11pt row heading and <code>--gw-text-h6</code> for the 9pt footnote, and say in one line that you snapped.</p>
+<p><code>--gw-text-slide-title</code> at 72px is <b>export-derived and still owes a Figma measurement</b> — it is the one number in the shell that has not been read off a node. The cover, which has been, came back 90px against the export's 85.33px, so expect 72 to move too.</p>
+<hr class="md-hr">
+<h3 id="why-your-export-looks-wrong-it-isn-t">Why your export looks wrong (it isn't)</h3>
+<p>A deck built here renders in <b>Vert Grotesk Display</b>. Push it through <code>.pptx</code> or Google Slides and it renders in <b>Plus Jakarta Sans</b>.</p>
+<p>That is correct behaviour. Vert Grotesk is a custom face; Google Slides cannot load one, so the export substitutes. <code>--gw-font-slide-display</code> names both in that order for exactly this reason.</p>
+<p><b>Do not &quot;fix&quot; a deck that came back in Plus Jakarta Sans.</b> It is the fallback doing its job. The Figma cover node proves the direction of travel: it is set in <code>Vert Grotesk Display</code> Semibold, and Plus Jakarta Sans appears nowhere in the source — only downstream of an export.</p>
+<p>The same round-trip is what introduced the grey drift below, and it flipped the cover eyebrow to uppercase against the voice rule. Treat the export as a rendering of the design, never as the design.</p>
+<hr class="md-hr">
+<h3 id="the-grey-drift-snap-all-seven">The grey drift — snap all seven</h3>
+<p>The export carries seven colours with no token. All seven are swatches from the Google Slides colour picker: someone reached for the colour grid instead of the palette.</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Export</th><th>Build instead</th><th>Note</th></tr></thead><tbody><tr><td><code>#666666</code></td><td><code>--gw-color-neutral-600</code></td><td></td></tr><tr><td><code>#999999</code></td><td><code>--gw-color-neutral-400</code></td><td></td></tr><tr><td><code>#CCCCCC</code></td><td><code>--gw-color-neutral-200</code></td><td></td></tr><tr><td><code>#D9D9D9</code></td><td><code>--gw-color-neutral-200</code></td><td>Same target as <code>#CCCCCC</code> — they were never distinguishable</td></tr><tr><td><code>#434343</code></td><td><code>--gw-color-neutral-850</code></td><td></td></tr><tr><td><code>#EFEFEF</code></td><td><code>--gw-color-neutral-100</code></td><td></td></tr><tr><td><code>#000000</code></td><td><code>--gw-color-black</code></td><td><b>R4</b> — never raw black</td></tr></tbody></table></div>
+<p>Ruled by Utsav, 7 Sep 2026. Snapping shifts colours slightly against decks already in circulation; that is accepted, and the drift is recorded here so the next person can see why their old deck differs.</p>
+<p>The other nine colours in the export were already exact tokens — <code>white</code>, <code>black</code>, <code>primary-500</code>, <code>primary-600</code>, <code>neutral-700</code>, <code>neutral-200</code>, <code>primary-25</code>, <code>neutral-50</code>, and <code>secondary-500</code>. The palette was mostly being followed. It was the greys that slipped.</p>
+<p>Also drop the 16 stray <code>Calibri</code> runs. They are a default leaking through, not a typeface choice.</p></div></main><div class="lb-toc"><b>On this page</b><a href="#where-these-numbers-come-from-and-how-much-to-trust-them" class="l3">Where these numbers come from, and how much to trust them</a><a href="#the-ground" class="l3">The ground</a><a href="#the-title-bar" class="l3">The title bar</a><a href="#the-logo-mark" class="l3">The logo mark</a><a href="#the-content-card" class="l3">The content card</a><a href="#radii-all-five-map-onto-existing-tokens" class="l3">Radii — all five map onto existing tokens</a><a href="#the-20px-grid" class="l3">The 20px grid</a><a href="#type-the-ramp-and-the-one-gap-in-it" class="l3">Type — the ramp, and the one gap in it</a><a href="#why-your-export-looks-wrong-it-isn-t" class="l3">Why your export looks wrong (it isn't)</a><a href="#the-grey-drift-snap-all-seven" class="l3">The grey drift — snap all seven</a></div></div>
+<script>
+(function(){
+  /* Theme: the same two localStorage keys the main site uses, so a choice made there
+     carries here and back. 'system' can still arrive from an older stored value and
+     resolves to light, matching shell.js. */
+  var PREF='gw-theme-pref', RES='gw-theme';
+  function pref(){try{var v=localStorage.getItem(PREF);
+    if(v==='light'||v==='dark')return v;
+    if(v==='system')return 'light';
+    var o=localStorage.getItem(RES);
+    return (o==='dark'||o==='light')?o:'light';}catch(e){return 'light'}}
+  function apply(p){var r=p==='dark'?'dark':'light';
+    document.documentElement.setAttribute('data-theme',r);
+    try{localStorage.setItem(PREF,p);localStorage.setItem(RES,r)}catch(e){}
+    var b=document.getElementById('lb-theme');
+    if(b)b.setAttribute('aria-label',r==='dark'?'Switch to light':'Switch to dark');}
+  var btn=document.getElementById('lb-theme');
+  if(btn)btn.addEventListener('click',function(){
+    apply(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
+  apply(pref());
+
+  /* Rail filter. Narrows the inventory in place — it does not navigate, because the
+     rail is a list of siblings and losing your place to search them is worse than
+     scrolling. */
+  var f=document.getElementById('lb-find');
+  if(f){
+    var rows=[].slice.call(document.querySelectorAll('.lb-rail a'));
+    f.addEventListener('input',function(){
+      var t=f.value.trim().toLowerCase();
+      rows.forEach(function(a){
+        a.hidden=!!t&&a.getAttribute('data-q').indexOf(t)===-1});
+    });
+  }
+
+  /* Mark the on-this-page entry for whatever heading is currently at the top. */
+  var toc=[].slice.call(document.querySelectorAll('.lb-toc a'));
+  if(toc.length){
+    var heads=toc.map(function(a){return document.getElementById(a.hash.slice(1))})
+                 .filter(Boolean);
+    var tick=function(){
+      var best=0;
+      heads.forEach(function(h,i){if(h.getBoundingClientRect().top<=90)best=i});
+      toc.forEach(function(a,i){a.style.color=i===best?'var(--gw-color-primary-600)':''});
+    };
+    document.addEventListener('scroll',tick,{passive:true});tick();
+  }
+})();
+</script>
+</body></html>

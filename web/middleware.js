@@ -7,7 +7,13 @@
 
    Two tiers:
      /internal/*  any verified @gushwork.ai account
+     /library/*   the component library — same tier, its own surface
      /admin/*     only the ADMIN_EMAILS allowlist
+
+   /library/review is admin, by being the longer prefix in _access.js. The bare
+   /library is matched as well as /library/:path* — a one-segment path does not
+   match the :path* form, and without it the index of the whole library is the
+   one page in it that is public.
 
    The matcher below is deliberately narrow. Everything else — the Overview
    page, /foundation/tokens.css, the fonts, and critically
@@ -21,7 +27,7 @@ import { COOKIE, verify, readCookie, sessionSecret, authModes, GATE_ENABLED }
 import { loadRules, decide } from './api/_access.js';
 
 export const config = {
-  matcher: ['/internal/:path*', '/admin/:path*']
+  matcher: ['/internal/:path*', '/admin/:path*', '/library', '/library/:path*']
 };
 
 /* ── THE GATE IS ON, 15 Sep 2026 ─────────────────────────────────────────────
@@ -67,16 +73,51 @@ function forbidden(email) {
   );
 }
 
-/* Bounced off a gated URL with no session → the dedicated login page
-   (488:21730), not the index with ?signin=required. There is no page underneath
-   to overlay here: you asked for a URL you cannot have, so the sign-in IS the
-   page. The modal stays exactly as it was and is still what a locked sidebar
-   row opens, and /?signin=required still pops it for anyone holding that link —
-   this only changes where the middleware sends you. */
+/* Bounced off a gated URL with no session → the OVERVIEW page with the modal
+   over it, not the standalone /login screen.
+
+   This was the other way round until 16 Sep 2026, on the reasoning that "you
+   asked for a URL you cannot have, so the sign-in IS the page". That reasoning
+   only holds for someone already inside the site who clicked a locked row. It
+   does not hold for the case that actually happens: a link to a gated page gets
+   shared, and the person opening it has never seen this site. They arrived on a
+   grid with an empty middle and no way to tell what they were being asked to
+   sign in TO.
+
+   Sending them to the Overview answers that question before it is asked — the
+   page behind the modal is the pitch — and closing the modal leaves them
+   somewhere real instead of on a dead end. `next` rides along, and
+   shell.js pops the modal on ?signin=required and hands `next` to whichever
+   door they use, so they still land on the page they asked for.
+
+   /login stays as a page: it is the designed frame (488:21730), it is what a
+   bookmark or a typed URL hits, and it is the one entrance that does not need
+   a shell around it. */
 function toSignIn(url) {
-  const to = new URL('/login', url);
+  const to = new URL('/', url);
+  to.searchParams.set('signin', 'required');
   to.searchParams.set('next', url.pathname + url.search);
   return new Response(null, { status: 302, headers: { Location: to.toString() } });
+}
+
+/* ── ad landers are public, and this has to be stated HERE ──────────────────
+   An ad page exists to be pasted into Slack, sent to a client and run as paid
+   media. A social card cannot render from behind the gate: the scraper has no
+   cookie, gets the sign-in bounce, and the link shows a grey box.
+
+   There is an `access: 'public'` tier in _access.js and a compiled route for
+   this path, but a compiled route only fills a GENUINE hole — withFallbacks()
+   treats a stored /internal rule as covering everything beneath it, so once an
+   Edge Config store exists the sub-route is never added and the page stays
+   gated. Saying it in the middleware is the only version that holds either way.
+
+   Consequence worth knowing: this bypasses decide(), so /admin/access-control
+   cannot re-gate these paths. Removing a page from public means removing it
+   from this list. Ruled by Utsav 22 Sep 2026. */
+const PUBLIC_PATHS = ['/internal/staging/ai-crm-lander'];
+
+function isPublic(pathname) {
+  return PUBLIC_PATHS.some(p => pathname === p || pathname.startsWith(p + '/'));
 }
 
 export default async function middleware(request) {
@@ -84,6 +125,7 @@ export default async function middleware(request) {
   if (!GATE_ENABLED) return undefined;
 
   const url = new URL(request.url);
+  if (isPublic(url.pathname)) return undefined;
   const modes = authModes();
 
   /* Fail closed if there is no way in at all — an unconfigured gate must not

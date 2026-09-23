@@ -129,6 +129,11 @@
       { label: 'Access Control', href: '/admin/access-control', icon: 'gear' },
       { label: 'Review Sheet', href: '/admin/review-sheet', icon: 'checks' },
       { label: 'Catalogue',    href: '/admin/catalogue',    icon: 'squares-four' },
+      /* Its own surface at /library, not a page under /admin — it renders its own
+         chrome, because its left column is the library's inventory rather than this
+         rail. Listed here anyway so there is one place you look for it. The review
+         queue inside it is admin; the libraries are open to any @gushwork.ai. */
+      { label: 'Component Library', href: '/library', icon: 'swatches' },
       /* Was 'flow-arrow', which is not in ICON — the row drew an empty <path>.
          683:5282 gives Workflow the same stacked glyph as Change Log. */
       { label: 'Workflow',     href: '/admin/workflow',     icon: 'stack-overflow-logo' }
@@ -161,31 +166,36 @@
      person actually chose, which may be `system` — a value that matches no CSS
      rule and would paint the light palette on a dark machine if it ever
      reached data-theme. */
+  /* System was dropped 18 Sep 2026 — the site defaults to Light and only ever
+     follows an explicit choice. The resolver still understands 'system' so an
+     existing stored preference does not break; it just resolves to light and is
+     rewritten on the next apply. */
   var THEMES = [
     { id: 'light',  label: 'Light',  icon: 'sun-dim' },
-    { id: 'dark',   label: 'Dark',   icon: 'moon' },
-    { id: 'system', label: 'System', icon: 'desktop' }
+    { id: 'dark',   label: 'Dark',   icon: 'moon' }
   ];
   var PREF_KEY = 'gw-theme-pref', RESOLVED_KEY = 'gw-theme';
-  var systemQuery = window.matchMedia ? matchMedia('(prefers-color-scheme: dark)') : null;
 
   function themePref() {
     try {
       var v = localStorage.getItem(PREF_KEY);
-      if (v === 'light' || v === 'dark' || v === 'system') return v;
+      /* 'system' is no longer offered: anyone holding it lands on light. */
+      if (v === 'light' || v === 'dark') return v;
+      if (v === 'system') return 'light';
       /* Upgrading from the two-value world: whatever was last resolved is the
          preference, so nobody's theme flips on the deploy that adds this. */
       var old = localStorage.getItem(RESOLVED_KEY);
       if (old === 'dark' || old === 'light') return old;
-      /* Nobody has chosen: follow the machine. Ruled by Utsav 16 Sep 2026.
-         The no-flash script inlined in each page resolves the same way, so
-         first paint and this agree. */
-      return 'system';
-    } catch (e) { return 'system'; }
+      /* Nobody has chosen: Light. This supersedes the 16 Sep "follow the
+         machine" rule. The no-flash script inlined in each page resolves the
+         same way, so first paint and this agree. */
+      return 'light';
+    } catch (e) { return 'light'; }
   }
   function resolveTheme(pref) {
-    if (pref !== 'system') return pref;
-    return (systemQuery && systemQuery.matches) ? 'dark' : 'light';
+    /* 'system' can still arrive from an old stored value; it resolves to light
+       rather than to the machine, which is the point of the change. */
+    return pref === 'dark' ? 'dark' : 'light';
   }
   function applyTheme(pref) {
     var resolved = resolveTheme(pref);
@@ -394,11 +404,19 @@
 
     return '<div class="gw-modal" hidden role="dialog" aria-modal="true" ' +
                 'aria-labelledby="gw-modal-title">' +
+        '<div class="gw-login__grid" aria-hidden="true">' +
+          '<span class="gw-login__cell" style="left:400px;top:80px"></span>' +
+          '<span class="gw-login__cell" style="left:440px;top:120px"></span>' +
+          '<span class="gw-login__cell" style="left:800px;top:240px"></span>' +
+          '<span class="gw-login__cell" style="right:120px;bottom:200px"></span>' +
+          '<span class="gw-login__cell" style="right:280px;bottom:80px"></span>' +
+        '</div>' +
         '<div class="gw-modal__box">' +
           '<button class="gw-modal__x" type="button" data-close-modal aria-label="Close">' +
             icon('x') + '</button>' +
           '<span class="gw-modal__chip" style="color:var(--gw-color-white)">' + MARK + '</span>' +
           '<h2 class="gw-modal__title" id="gw-modal-title">You&rsquo;ll need to log in</h2>' +
+          '<p class="gw-modal__dest" hidden></p>' +
           '<p class="gw-modal__sub">Log in using your Gushwork email id to get ' +
              'access.</p>' +
           body +
@@ -496,28 +514,58 @@
     var pref = themePref();
     applyTheme(pref);
     syncThemeControls(pref);
-    /* Only `system` cares what the OS is doing. A person who picked dark keeps
-       dark when their machine flips at sunset. */
-    if (systemQuery && systemQuery.addEventListener) {
-      systemQuery.addEventListener('change', function () {
-        if (themePref() === 'system') applyTheme('system');
-      });
-    }
-    /* Belt and braces: a machine that flips at sunset while this tab is in the
-       background may deliver the change event late, or not at all in some
-       embedded webviews. Re-resolving when the tab comes back is cheap and
-       makes the answer right by the time anyone is looking at it. */
-    document.addEventListener('visibilitychange', function () {
-      if (!document.hidden && themePref() === 'system') applyTheme('system');
-    });
+    /* The OS-change and visibility listeners that lived here are gone with the
+       System option: both only acted when the preference was 'system', which
+       themePref() can no longer return. The theme now only ever changes because
+       someone picked it. */
   }
 
   /* -- modal -------------------------------------------------------------- */
+
+  /* Figma 763:2222 names the page you were trying to reach, under the title and
+     in Primary/500 — "You'll need to log in to see / AI CRM Lander". Resolve it
+     from the nav first (those labels are already the human names), then fall
+     back to prettifying the slug so a new staging page needs no registry edit.
+     ACRONYMS is what turns "ai-crm-lander" into "AI CRM Lander" rather than
+     "Ai Crm Lander". */
+  var ACRONYMS = { ai:'AI', crm:'CRM', gtm:'GTM', seo:'SEO', pdf:'PDF', ui:'UI', ux:'UX',
+                   api:'API', og:'OG', faq:'FAQ', cta:'CTA', b2b:'B2B', b2c:'B2C' };
+  function destName(path) {
+    if (!path) return '';
+    var clean = String(path).split('?')[0].replace(/\/+$/, '');
+    if (!clean || clean === '/') return '';
+    var hit = '';
+    GROUPS.forEach(function (g) {
+      (g.items || []).forEach(function (it) {
+        if (it.href && it.href.replace(/\/+$/, '') === clean) hit = it.label;
+      });
+    });
+    if (hit) return hit;
+    var slug = clean.split('/').pop();
+    if (!slug) return '';
+    return slug.split('-').map(function (w) {
+      return ACRONYMS[w.toLowerCase()] || (w.charAt(0).toUpperCase() + w.slice(1));
+    }).join(' ');
+  }
+
   var lastFocus = null;
-  function openModal(next) {
+  function openModal(next, solo) {
     var m = document.querySelector('.gw-modal');
     if (!m) return;
+    m.classList.toggle('gw-modal--solo', !!solo);
     pendingNext = next || location.pathname;
+
+    /* Name the destination when we know it. The drawing hides the standing
+       subtitle in that case (763:2602 is hidden="true"), so it only shows on
+       the path the drawing does not cover — a locked row clicked from inside. */
+    var dest = destName(next);
+    var titleEl = m.querySelector('.gw-modal__title');
+    var destEl = m.querySelector('.gw-modal__dest');
+    var subEl = m.querySelector('.gw-modal__sub');
+    if (titleEl) titleEl.textContent = dest ? 'You\u2019ll need to log in to see' : 'You\u2019ll need to log in';
+    if (destEl) { destEl.textContent = dest; destEl.hidden = !dest; }
+    if (subEl) subEl.hidden = !!dest;
+
     var btn = m.querySelector('[data-google-btn]');
     if (btn) {
       btn.setAttribute('href', '/api/auth/login?next=' + encodeURIComponent(pendingNext));
@@ -849,23 +897,50 @@
 
     /* Who is signed in? On a local static preview there is no API, so this
        fails and the page stays in its signed-out state, which is correct. */
+    /* Arriving on a gated route with no session: the middleware sends you to
+       the Overview with ?signin=required, and this is what pops the modal over
+       it. It runs AFTER /api/auth/me has answered, and that ordering is the
+       whole point — see the note where it is called.
+
+       Deliberately not gated on `signedIn`: the only thing that puts this
+       param in the URL is the middleware bouncing a request it would not
+       serve, so if it is here, there is no usable session. */
+    function popSignInIfAsked() {
+      if (!/[?&]signin=required/.test(location.search)) return;
+      var params = new URLSearchParams(location.search);
+      /* A direct-link bounce gets the grid backdrop of 763:2222 ("direct-link-login")
+         rather than the Overview showing through: someone who followed a shared link
+         has no business reading half a page they cannot use. Closing the modal still
+         reveals the Overview, which is what the 16 Sep routing call was protecting. */
+      openModal(params.get('next') || '/', true);
+    }
+
     fetch('/api/auth/me', { credentials: 'same-origin' })
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (s) {
-        if (!s) return;
-        session = s;
-        /* Redraw both: the sidebar for the locks and the ADMIN group, the
-           modal because only now do we know which doors are open. */
-        renderSidebar();
-        renderModal();
+        if (s) {
+          session = s;
+          /* Redraw both: the sidebar for the locks and the ADMIN group, the
+             modal because only now do we know which doors are open. */
+          renderSidebar();
+          renderModal();
+        }
+        popSignInIfAsked();
       })
-      .catch(function () { /* no API — stay signed out, password form shown */ });
+      /* No API — stay signed out. The modal keeps its pre-flight guess, which
+         on a static preview is the only honest answer. */
+      .catch(popSignInIfAsked);
 
-    /* Arriving back from a gated route with ?signin=required pops the modal. */
-    if (/[?&]signin=required/.test(location.search)) {
-      var params = new URLSearchParams(location.search);
-      openModal(params.get('next') || '/');
-    }
+    /* Popped here and not at mount, because renderModal() above REFUSES to
+       rebuild a modal that is already open — it must not wipe a field someone
+       is typing into. Opening synchronously at mount won that race every time:
+       the modal went up built from the pre-flight guess, renderModal() then
+       bailed on it, and the card sat there offering the team-password door on
+       a deployment where Google is the only one that works.
+
+       Every other way in is a human clicking something, by which point /me
+       has long since answered. This is the only path that opens the modal
+       before anyone has had time to act, so it is the only one that raced. */
 
     palWire();
   }

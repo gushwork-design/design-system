@@ -714,7 +714,11 @@
   display: grid; place-items: center;
   border-radius: 15px;
   background: var(--gw-color-primary-500);
-  box-shadow: inset 0 0 0 1.875px var(--gw-color-neutral-800);
+  /* Primary/600, not Neutral/800 — Utsav 15 Sep, and this chip is the example
+     he gave. Every blue brand chip outlines in the next step of its own ramp;
+     only the black `--internal` topbar variant keeps a neutral edge, because
+     there the ground is neutral too. */
+  box-shadow: inset 0 0 0 1.875px var(--gw-color-primary-600);
 }
 .gw-modal__chip svg { width: 30px; height: 30px; display: block; }
 .gw-modal__title {
@@ -1099,6 +1103,10 @@
   border-radius: 15px;
   background: var(--gw-color-primary-500);
   color: var(--gw-color-white);
+  /* Matches .gw-modal__chip. These are the same mark at the same size in the
+     same moment, reached two ways, and login.html's own comments say the two
+     entrances must not disagree about what they show. */
+  box-shadow: inset 0 0 0 1.875px var(--gw-color-primary-600);
 }
 .gw-login__chip svg { width: 30px; height: 30px; display: block; }
 

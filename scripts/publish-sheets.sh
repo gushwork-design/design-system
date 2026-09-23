@@ -68,6 +68,11 @@ SOCIAL=(
 # The changelog sheet is generated, so a publish must not ship a stale one.
 bash scripts/release-log.sh --check
 
+# The component library is generated from tokens.css, the registries and the measured
+# Figma. Publishing a stale one would show a reviewer values the system no longer holds,
+# which is worse than not publishing it at all.
+bash scripts/library-site.sh --check
+
 # And the version fields must agree before anything goes out, because version.json below
 # becomes the number every machine compares itself against. v1.40.0 shipped with
 # plugin.json at 1.40.0 and marketplace.json still at 1.39.0 — stamp-release.sh writes
@@ -123,6 +128,19 @@ for pair in "${SHEETS[@]}"; do
   cp "$src" "$STAGE/$dst"
 done
 python3 scripts/_add_shell.py $(for p in "${SHEETS[@]}"; do echo "$STAGE/${p##*|}"; done)
+
+# ---------------------------------------------------------------------------
+# 2b. The component library — a TREE, not a sheet, and it does NOT get the site
+#     shell. It renders its own topbar and uses the left column for the library's
+#     own inventory, so injecting shell.js would put two navigations on one page.
+#     Gated by web/api/_access.js: /library internal, /library/review admin.
+# ---------------------------------------------------------------------------
+if [ -d preview/library ]; then
+  cp -R preview/library "$STAGE/library"
+  echo "  library -> $(find preview/library -name '*.html' | wc -l | tr -d ' ') pages"
+else
+  echo "  MISSING preview/library — run: bash scripts/library-site.sh" >&2; exit 1
+fi
 
 # How much of the library the review sheet actually draws, counted at publish time rather than
 # typed. It matters more since the 15 Sep ruling made the sheet a gate: a set it cannot draw is a
@@ -210,6 +228,36 @@ python3 scripts/_search_index.py "$STAGE" > "$STAGE/search-index.json"
 
 cp foundation/tokens.css "$STAGE/foundation/"
 cp fonts/*.ttf "$STAGE/fonts/"
+
+# The /downloads page hands over files the grep below CANNOT see. It builds its
+# format-menu hrefs in JavaScript — `/assets/logo/png/gushwork-<slug>-1000.png`
+# is assembled at runtime from a data-slug, so it never appears in the HTML as a
+# literal href= and the reference sweep further down walks straight past it. The
+# page would deploy looking perfect with every menu row 404ing.
+#
+# So they are listed. A missing one stops the publish: a downloads page that
+# hands out dead links is worse than one that is a day late.
+echo "Staging downloadable assets:"
+for d in assets/logo assets/logo/png assets/logo/jpg assets/color; do
+  [ -d "$d" ] || { echo "  MISSING asset directory: $d" >&2; exit 1; }
+  mkdir -p "$STAGE/$d"
+  cp "$d"/*.* "$STAGE/$d/" 2>/dev/null || true
+done
+# Count what actually landed, rather than trusting the copy above.
+for pair in "assets/logo/png|10" "assets/logo/jpg|5" "assets/color|4"; do
+  dir="${pair%%|*}"; want="${pair##*|}"
+  got=$(ls -1 "$STAGE/$dir" 2>/dev/null | wc -l | tr -d ' ')
+  [ "$got" -ge "$want" ] || { echo "  $dir staged $got files, expected $want" >&2; exit 1; }
+  echo "  $dir -> $got files"
+done
+
+# The other token formats /downloads offers. tokens.css is copied above; these
+# three are generated from it and are linked the same runtime-built way.
+for f in foundation/tokens.json foundation/tokens.scss foundation/tailwind-theme.js; do
+  [ -f "$f" ] || { echo "  MISSING token format: $f — regenerate it" >&2; exit 1; }
+  cp "$f" "$STAGE/foundation/"
+  echo "  $f"
+done
 
 for a in "${SOCIAL[@]}"; do
   [ -f "$a" ] || { echo "  MISSING social image: $a" >&2; exit 1; }

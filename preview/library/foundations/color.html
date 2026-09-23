@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Color — Gushwork</title>
+<meta name="robots" content="noindex">
+<script>try{var t=localStorage.getItem('gw-theme');if(t!=='dark')t='light';
+document.documentElement.setAttribute('data-theme',t)}catch(e){
+document.documentElement.setAttribute('data-theme','light')}</script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20width%3D%2280%22%20height%3D%2280%22%20rx%3D%2220%22%20fill%3D%22%230d0d0d%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="../../foundation/tokens.css">
+<link rel="stylesheet" href="../../shell.css">
+<style>
+.cl{--cl-gap:var(--gw-space-40)}
+.cl h2{font:var(--gw-text-h5);color:var(--s-heading);margin:0}
+.cl h3{font:var(--gw-text-h7);color:var(--s-heading);margin:0}
+.cl h4{font:var(--gw-text-body-16-sem);color:var(--s-heading);margin:0}
+.cl p{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+      color:var(--s-body);margin:0;max-width:78ch}
+.cl code,.cl .mono{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px}
+
+/* --- page head ------------------------------------------------------------ */
+.cl-head{display:flex;flex-direction:column;gap:var(--gw-space-16)}
+.cl-head h1{font:var(--gw-text-h4);color:var(--s-heading);margin:0}
+.cl-lede{font:var(--gw-text-body-18-reg);letter-spacing:var(--gw-text-body-18-reg-tracking);
+         color:var(--s-body);margin:0;max-width:72ch}
+
+/* --- the tally ------------------------------------------------------------ */
+.cl-tally{display:flex;flex-wrap:wrap;gap:var(--gw-space-12)}
+.cl-stat{flex:1 1 150px;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-16) var(--gw-space-20);
+         display:flex;flex-direction:column;gap:var(--gw-space-4)}
+.cl-stat b{font:var(--gw-text-h6);color:var(--s-heading);font-feature-settings:"tnum" 1}
+.cl-stat span{font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-400);
+              text-transform:uppercase;letter-spacing:.06em}
+
+/* --- review queue --------------------------------------------------------- */
+.cl-queue{background:var(--s-card-bg);border:1px solid var(--gw-color-yellow-300);
+          border-left:3px solid var(--gw-color-yellow-400);border-radius:var(--gw-radius-12);
+          padding:var(--gw-space-20) var(--gw-space-24);display:flex;flex-direction:column;
+          gap:var(--gw-space-12)}
+.cl-queue h2{font:var(--gw-text-h7)}
+.cl-queue ul{margin:0;padding-left:var(--gw-space-20);display:flex;flex-direction:column;
+             gap:var(--gw-space-4)}
+.cl-queue li{font:var(--gw-text-body-14-reg);color:var(--s-body)}
+.cl-queue a{color:var(--gw-color-primary-600);text-decoration:none}
+.cl-queue a:hover{text-decoration:underline}
+.cl-pass{background:var(--s-card-bg);border:1px solid var(--gw-color-green-300);
+         border-left:3px solid var(--gw-color-green-400)}
+
+/* --- controls ------------------------------------------------------------- */
+.cl-bar{position:sticky;top:0;z-index:5;background:var(--s-page-bg);
+        padding:var(--gw-space-12) 0;display:flex;flex-wrap:wrap;gap:var(--gw-space-8);
+        align-items:center;border-bottom:1px solid var(--s-chrome-border)}
+.cl-find{flex:1 1 220px;min-width:180px;background:var(--s-field-bg);
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         padding:var(--gw-space-8) var(--gw-space-12);font:var(--gw-text-body-14-reg);
+         color:var(--s-heading)}
+.cl-find::placeholder{color:var(--s-placeholder)}
+.cl-find:focus{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.cl-filter{display:flex;gap:var(--gw-space-4);flex-wrap:wrap}
+.cl-f{font:var(--gw-text-body-12-med);color:var(--s-body);background:transparent;
+      border:1px solid var(--s-field-border);border-radius:var(--gw-radius-full);
+      padding:6px var(--gw-space-12);cursor:pointer}
+.cl-f:hover{border-color:var(--gw-color-primary-500)}
+.cl-f[aria-pressed="true"]{background:var(--gw-color-black);color:var(--gw-color-white);
+                           border-color:var(--gw-color-black)}
+.cl-f:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.cl-count{font:var(--gw-text-body-12-reg);color:var(--gw-color-neutral-400);margin-left:auto}
+
+/* --- sections ------------------------------------------------------------- */
+.cl-sec{display:flex;flex-direction:column;gap:var(--gw-space-20);
+        scroll-margin-top:var(--gw-space-80)}
+.cl-sec[hidden]{display:none}
+.cl-sechead{display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--gw-space-12)}
+.cl-note{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+         color:var(--s-body);background:var(--gw-color-neutral-25);
+         border:1px solid var(--s-card-border);border-left:3px solid var(--gw-color-neutral-300);
+         border-radius:var(--gw-radius-8);padding:var(--gw-space-12) var(--gw-space-16);
+         white-space:pre-wrap;max-width:88ch}
+:root[data-theme="dark"] .cl-note{background:var(--gw-color-neutral-900)}
+.cl-sub{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.cl-sub[hidden]{display:none}
+
+/* --- chips ---------------------------------------------------------------- */
+.cl-chip{display:inline-flex;align-items:center;gap:6px;font:var(--gw-text-body-12-med);
+         border-radius:var(--gw-radius-full);padding:3px var(--gw-space-8);white-space:nowrap}
+.cl-chip--measured{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.cl-chip--transcribed{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.cl-chip--ruled{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+.cl-chip--passed{background:var(--gw-color-green-500);color:var(--gw-color-white)}
+.cl-chip--pending{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+.cl-chip--rejected{background:var(--gw-color-red-500);color:var(--gw-color-white)}
+.cl-chip--gap{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+:root[data-theme="dark"] .cl-chip--measured{background:var(--gw-color-green-900);
+                                            color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .cl-chip--transcribed{background:var(--gw-color-yellow-900);
+                                               color:var(--gw-color-yellow-100)}
+:root[data-theme="dark"] .cl-chip--ruled{background:var(--gw-color-primary-900);
+                                         color:var(--gw-color-primary-200)}
+:root[data-theme="dark"] .cl-chip--pending{background:var(--gw-color-neutral-800);
+                                           color:var(--gw-color-neutral-300)}
+:root[data-theme="dark"] .cl-chip--gap{background:var(--gw-color-red-900);
+                                       color:var(--gw-color-red-200)}
+
+/* --- colour --------------------------------------------------------------- */
+.cl-ramp{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));
+         gap:var(--gw-space-8)}
+.cl-sw{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+       border-radius:var(--gw-radius-10);overflow:hidden;display:flex;flex-direction:column}
+.cl-sw[hidden]{display:none}
+.cl-sw__chip{height:64px;border-bottom:1px solid var(--s-card-border);
+             background-image:linear-gradient(45deg,var(--gw-color-neutral-100) 25%,transparent 25%),
+                              linear-gradient(-45deg,var(--gw-color-neutral-100) 25%,transparent 25%),
+                              linear-gradient(45deg,transparent 75%,var(--gw-color-neutral-100) 75%),
+                              linear-gradient(-45deg,transparent 75%,var(--gw-color-neutral-100) 75%);
+             background-size:12px 12px;
+             background-position:0 0,0 6px,6px -6px,-6px 0}
+.cl-sw__fill{width:100%;height:100%}
+.cl-sw__body{padding:var(--gw-space-8) var(--gw-space-12);display:flex;
+             flex-direction:column;gap:3px}
+.cl-sw__name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;
+             color:var(--s-heading);word-break:break-all;line-height:1.35}
+.cl-sw__hex{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;
+            color:var(--gw-color-neutral-400);text-transform:uppercase}
+.cl-sw__ac{display:flex;gap:4px;margin-top:2px}
+.cl-ac{font-size:9.5px;font-weight:600;letter-spacing:.04em;border-radius:var(--gw-radius-4);
+       padding:1px 4px;line-height:1.5}
+.cl-ac--ok{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.cl-ac--no{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+:root[data-theme="dark"] .cl-ac--ok{background:var(--gw-color-green-900);color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .cl-ac--no{background:var(--gw-color-red-900);color:var(--gw-color-red-200)}
+
+/* --- type ----------------------------------------------------------------- */
+.cl-types{display:flex;flex-direction:column;gap:2px}
+.cl-t{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:var(--gw-space-20);
+      align-items:start;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+      border-radius:var(--gw-radius-10);padding:var(--gw-space-16) var(--gw-space-20)}
+.cl-t[hidden]{display:none}
+.cl-t__spec{color:var(--s-heading);min-width:0;overflow-wrap:anywhere}
+.cl-t__meta{display:flex;flex-direction:column;gap:2px;text-align:right}
+.cl-t__name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+            color:var(--gw-color-primary-600)}
+.cl-t__val{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10.5px;
+           color:var(--gw-color-neutral-400);line-height:1.5}
+@media (max-width:860px){.cl-t{grid-template-columns:1fr}.cl-t__meta{text-align:left}}
+
+/* --- faces ---------------------------------------------------------------- */
+.cl-faces{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+          gap:var(--gw-space-16)}
+.cl-face{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-24);
+         display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.cl-face__aa{font-size:52px;line-height:1.05;color:var(--s-heading)}
+.cl-face__wt{display:flex;flex-direction:column;gap:2px}
+.cl-face__wt span{color:var(--s-heading);font-size:19px;line-height:1.45}
+
+/* --- space / radius / shadow ---------------------------------------------- */
+.cl-rows{display:flex;flex-direction:column;gap:6px}
+.cl-row{display:grid;grid-template-columns:132px minmax(0,1fr) 60px;gap:var(--gw-space-16);
+        align-items:center;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-radius:var(--gw-radius-8);padding:var(--gw-space-8) var(--gw-space-16)}
+.cl-row[hidden]{display:none}
+.cl-row__n{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+           color:var(--gw-color-primary-600);word-break:break-all}
+.cl-row__v{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+           color:var(--gw-color-neutral-400);text-align:right}
+.cl-bararea{min-height:18px;display:flex;align-items:center}
+.cl-barfill{height:16px;background:var(--gw-color-primary-500);border-radius:var(--gw-radius-2);
+            max-width:100%}
+.cl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));
+         gap:var(--gw-space-12)}
+.cl-tile{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-10);padding:var(--gw-space-16);display:flex;
+         flex-direction:column;align-items:center;gap:var(--gw-space-8)}
+.cl-tile[hidden]{display:none}
+.cl-tile__demo{width:72px;height:72px;background:var(--gw-color-primary-100);
+               border:1.5px solid var(--gw-color-primary-500)}
+.cl-tile__sh{width:100%;height:64px;background:var(--gw-color-white);
+             border-radius:var(--gw-radius-8)}
+:root[data-theme="dark"] .cl-tile__sh{background:var(--gw-color-neutral-800)}
+/* The alpha checker is drawn in neutral-100, which is near-white and shouts on a
+   black ground. Same job, quieter, in dark. */
+:root[data-theme="dark"] .cl-sw__chip{
+  background-image:linear-gradient(45deg,var(--gw-color-neutral-800) 25%,transparent 25%),
+                   linear-gradient(-45deg,var(--gw-color-neutral-800) 25%,transparent 25%),
+                   linear-gradient(45deg,transparent 75%,var(--gw-color-neutral-800) 75%),
+                   linear-gradient(-45deg,transparent 75%,var(--gw-color-neutral-800) 75%)}
+
+/* --- tables --------------------------------------------------------------- */
+.cl-tbl{width:100%;border-collapse:collapse;background:var(--s-card-bg);
+        border:1px solid var(--s-card-border);border-radius:var(--gw-radius-10);
+        overflow:hidden;font:var(--gw-text-body-14-reg)}
+.cl-tblwrap{overflow-x:auto}
+.cl-tbl th{text-align:left;font:var(--gw-text-body-12-med);text-transform:uppercase;
+           letter-spacing:.06em;color:var(--gw-color-neutral-400);
+           padding:var(--gw-space-8) var(--gw-space-16);
+           border-bottom:1px solid var(--s-card-border);white-space:nowrap}
+.cl-tbl td{padding:var(--gw-space-8) var(--gw-space-16);color:var(--s-body);
+           border-bottom:1px solid var(--s-card-border);vertical-align:top}
+.cl-tbl tr:last-child td{border-bottom:none}
+.cl-tbl tr[hidden]{display:none}
+.cl-tbl .mono{color:var(--gw-color-primary-600)}
+.cl-tbl .num{font-feature-settings:"tnum" 1;white-space:nowrap}
+
+/* --- gaps ----------------------------------------------------------------- */
+.cl-gaps{display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.cl-gap{display:grid;grid-template-columns:28px minmax(0,1fr);gap:var(--gw-space-12);
+        background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-left:3px solid var(--gw-color-red-400);border-radius:var(--gw-radius-8);
+        padding:var(--gw-space-12) var(--gw-space-16)}
+.cl-gap__n{font:var(--gw-text-body-14-sem);color:var(--gw-color-red-500);
+           font-feature-settings:"tnum" 1}
+.cl-gap__t{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+           color:var(--s-body);white-space:pre-wrap;margin:0}
+
+/* --- use-case cards ------------------------------------------------------- */
+.cl-cases{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+          gap:var(--gw-space-12)}
+.cl-case{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-20);
+         display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.cl-case__n{display:flex;align-items:baseline;justify-content:space-between;gap:var(--gw-space-8)}
+.cl-case__list{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:4px}
+.cl-case__list li{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10.5px;
+                  color:var(--gw-color-neutral-600);background:var(--gw-color-neutral-25);
+                  border:1px solid var(--s-card-border);border-radius:var(--gw-radius-4);
+                  padding:1px 5px}
+:root[data-theme="dark"] .cl-case__list li{background:var(--gw-color-neutral-900)}
+
+/* --- misc ----------------------------------------------------------------- */
+.cl-src{display:flex;flex-wrap:wrap;gap:var(--gw-space-8)}
+.cl-src code{background:var(--s-code-bg);border:1px solid var(--s-code-border);
+             color:var(--s-code-fg);border-radius:var(--gw-radius-4);padding:2px 7px}
+.cl-empty{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-400);
+          border:1px dashed var(--s-field-border);border-radius:var(--gw-radius-10);
+          padding:var(--gw-space-24);text-align:center}
+.cl-jump{display:flex;flex-wrap:wrap;gap:6px}
+.cl-jump a{font:var(--gw-text-body-12-med);color:var(--s-body);text-decoration:none;
+           border:1px solid var(--s-field-border);border-radius:var(--gw-radius-full);
+           padding:5px var(--gw-space-12)}
+.cl-jump a:hover{border-color:var(--gw-color-primary-500);color:var(--gw-color-primary-600)}
+@media print{.cl-bar,.cl-jump{display:none}}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--s-page-bg);font-family:var(--gw-font-body);
+     color:var(--s-body);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
+
+/* ---- topbar ------------------------------------------------------------- */
+.lb-top{position:sticky;top:0;z-index:20;height:60px;display:flex;align-items:center;
+        gap:var(--gw-space-16);padding:0 var(--gw-space-24);
+        background:var(--s-chrome-bg);border-bottom:1px solid var(--s-chrome-border)}
+.lb-brand{display:flex;align-items:center;gap:var(--gw-space-12);text-decoration:none;
+          flex:none}
+.lb-brand__chip{width:32px;height:32px;border-radius:var(--gw-radius-8);
+                background:var(--gw-color-black);color:var(--gw-color-white);
+                display:grid;place-items:center;flex:none}
+.lb-brand__chip svg{width:16px;height:16px;display:block}
+.lb-brand__n{font:var(--gw-text-h7);color:var(--s-heading)}
+.lb-crumb{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-400);
+          white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-crumb a{color:var(--gw-color-primary-600);text-decoration:none}
+.lb-top__r{display:flex;align-items:center;gap:var(--gw-space-12);margin-left:auto}
+.lb-find{width:300px;height:36px;background:var(--s-field-bg);
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         padding:0 var(--gw-space-12);font:var(--gw-text-body-14-reg);color:var(--s-heading)}
+.lb-find::placeholder{color:var(--s-placeholder)}
+.lb-find:focus{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.lb-tbtn{width:36px;height:36px;display:grid;place-items:center;background:transparent;
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         color:var(--s-body);cursor:pointer;flex:none}
+.lb-tbtn svg{width:18px;height:18px;display:block}
+.lb-tbtn:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+@media (max-width:820px){.lb-find{display:none}}
+
+/* ---- three columns ------------------------------------------------------- */
+.lb-3{display:grid;grid-template-columns:240px minmax(0,1fr) 212px;align-items:start;
+      max-width:1600px;margin:0 auto}
+.lb-rail{position:sticky;top:60px;max-height:calc(100vh - 60px);overflow-y:auto;
+         border-right:1px solid var(--s-chrome-border);padding:var(--gw-space-24) 0}
+.lb-rail__t{font:var(--gw-text-body-12-med);text-transform:uppercase;letter-spacing:.06em;
+            color:var(--gw-color-neutral-400);padding:0 var(--gw-space-20) var(--gw-space-8)}
+.lb-rail a{display:flex;justify-content:space-between;gap:var(--gw-space-8);
+           font:var(--gw-text-body-14-reg);color:var(--s-body);text-decoration:none;
+           padding:6px var(--gw-space-20)}
+.lb-rail a:hover{background:var(--s-nav-hover);color:var(--s-heading)}
+.lb-rail a.on{background:var(--s-nav-sel);color:var(--s-heading);
+              font:var(--gw-text-body-14-sem)}
+.lb-rail a span{color:var(--gw-color-neutral-400);font:var(--gw-text-body-12-reg);flex:none}
+.lb-rail a.on span{color:var(--s-heading)}
+.lb-rail__sep{margin:var(--gw-space-12) var(--gw-space-20) var(--gw-space-8);
+              border-top:1px solid var(--s-chrome-border)}
+
+.lb-mid{grid-column:2;padding:var(--gw-space-32) var(--gw-space-40) var(--gw-space-80);
+        min-width:0;display:flex;flex-direction:column;gap:var(--gw-space-24)}
+.lb-toc{grid-column:3;position:sticky;top:60px;max-height:calc(100vh - 60px);overflow-y:auto;
+        padding:var(--gw-space-32) var(--gw-space-20);display:flex;flex-direction:column;
+        gap:5px}
+.lb-toc b{font:var(--gw-text-body-12-med);text-transform:uppercase;letter-spacing:.06em;
+          color:var(--gw-color-neutral-400);margin-bottom:3px}
+.lb-toc a{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-600);
+          text-decoration:none;line-height:1.35}
+.lb-toc a:hover{color:var(--gw-color-primary-600)}
+.lb-toc a.l3{padding-left:var(--gw-space-12)}
+@media (max-width:1180px){.lb-3{grid-template-columns:220px minmax(0,1fr)}
+                          .lb-toc{display:none}}
+@media (max-width:820px){.lb-3{grid-template-columns:1fr}
+                         .lb-rail{position:static;max-height:none;border-right:0;
+                                  border-bottom:1px solid var(--s-chrome-border)}
+                         .lb-mid{padding:var(--gw-space-24) var(--gw-space-20)}}
+
+/* ---- page head ----------------------------------------------------------- */
+.lb-h{display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.lb-h h1{font:var(--gw-text-h4);margin:0}
+.lb-h .lede{font:var(--gw-text-body-16-reg);color:var(--s-body);margin:0;max-width:74ch}
+.lb-row{display:flex;flex-wrap:wrap;gap:var(--gw-space-8);align-items:center}
+.lb-meta{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+         color:var(--gw-color-neutral-400)}
+
+.chip{display:inline-flex;align-items:center;gap:5px;font:var(--gw-text-body-12-med);
+      border-radius:var(--gw-radius-full);padding:3px var(--gw-space-8);white-space:nowrap}
+.chip--measured{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.chip--transcribed{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.chip--ruled{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+.chip--structure{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.chip--built-here{background:var(--gw-color-orange-50);color:var(--gw-color-orange-700)}
+.chip--passed{background:var(--gw-color-green-500);color:var(--gw-color-white)}
+.chip--pending{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+.chip--rejected{background:var(--gw-color-red-500);color:var(--gw-color-white)}
+.chip--gap{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+.chip--web{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+:root[data-theme="dark"] .chip--measured{background:var(--gw-color-green-900);color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .chip--transcribed,
+:root[data-theme="dark"] .chip--structure{background:var(--gw-color-yellow-900);color:var(--gw-color-yellow-100)}
+:root[data-theme="dark"] .chip--ruled,
+:root[data-theme="dark"] .chip--web{background:var(--gw-color-primary-900);color:var(--gw-color-primary-200)}
+:root[data-theme="dark"] .chip--pending{background:var(--gw-color-neutral-800);color:var(--gw-color-neutral-300)}
+:root[data-theme="dark"] .chip--built-here{background:var(--gw-color-orange-900);color:var(--gw-color-orange-100)}
+:root[data-theme="dark"] .chip--gap{background:var(--gw-color-red-900);color:var(--gw-color-red-200)}
+
+/* ---- markdown ------------------------------------------------------------ */
+.md{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.md h2{font:var(--gw-text-h6);margin:var(--gw-space-20) 0 0;scroll-margin-top:80px}
+.md h3{font:var(--gw-text-h7);margin:var(--gw-space-16) 0 0;scroll-margin-top:80px}
+.md h4,.md h5,.md h6{font:var(--gw-text-body-16-sem);margin:var(--gw-space-12) 0 0}
+.md p{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+      color:var(--s-body);margin:0;max-width:80ch}
+.md ul,.md ol{margin:0;padding-left:var(--gw-space-20);display:flex;
+              flex-direction:column;gap:5px}
+.md li{font:var(--gw-text-body-14-reg);color:var(--s-body);max-width:78ch}
+.md code{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px;
+         background:var(--s-code-bg);border:1px solid var(--s-code-border);
+         color:var(--s-code-fg);border-radius:var(--gw-radius-4);padding:1px 5px}
+.md a{color:var(--gw-color-primary-600)}
+.md-pre{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-radius:var(--gw-radius-8);padding:var(--gw-space-16);overflow-x:auto;margin:0}
+.md-pre code{background:none;border:0;padding:0;color:var(--s-body);font-size:12px}
+.md-q{margin:0;border-left:3px solid var(--gw-color-neutral-300);
+      padding:var(--gw-space-8) var(--gw-space-16);font:var(--gw-text-body-14-reg);
+      color:var(--s-body)}
+.md-hr{border:0;border-top:1px solid var(--s-card-border);margin:var(--gw-space-12) 0}
+.md-tblwrap{overflow-x:auto}
+.md-tbl{width:100%;border-collapse:collapse;background:var(--s-card-bg);
+        border:1px solid var(--s-card-border);border-radius:var(--gw-radius-8);
+        overflow:hidden;font:var(--gw-text-body-14-reg)}
+.md-tbl th{text-align:left;font:var(--gw-text-body-12-med);text-transform:uppercase;
+           letter-spacing:.06em;color:var(--gw-color-neutral-400);
+           padding:var(--gw-space-8) var(--gw-space-12);
+           border-bottom:1px solid var(--s-card-border);white-space:nowrap}
+.md-tbl td{padding:var(--gw-space-8) var(--gw-space-12);color:var(--s-body);
+           border-bottom:1px solid var(--s-card-border);vertical-align:top}
+.md-tbl tr:last-child td{border-bottom:none}
+.md-tbl code{white-space:nowrap}
+
+.note{font:var(--gw-text-body-14-reg);color:var(--s-body);
+      background:var(--gw-color-neutral-25);border:1px solid var(--s-card-border);
+      border-left:3px solid var(--gw-color-neutral-300);border-radius:var(--gw-radius-8);
+      padding:var(--gw-space-12) var(--gw-space-16);white-space:pre-wrap;max-width:88ch}
+:root[data-theme="dark"] .note{background:var(--gw-color-neutral-900)}
+.note--find{border-left-color:var(--gw-color-yellow-400);white-space:normal}
+.empty{border:1px dashed var(--s-field-border);border-radius:var(--gw-radius-10);
+       padding:var(--gw-space-24);text-align:center;font:var(--gw-text-body-14-reg);
+       color:var(--gw-color-neutral-400)}
+.sec{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.sec h2{font:var(--gw-text-h6);margin:0;scroll-margin-top:80px}
+</style>
+</head>
+<body>
+<header class="lb-top">
+  <a class="lb-brand" href="../../library/index.html">
+    <span class="lb-brand__chip"><svg viewBox="0 0 80 80" fill="none" aria-hidden="true"><path d="M76.6088 4.56344C77.5025 2.36058 75.8495 0 73.4723 0H9.14286C4.0934 0 0 4.0934 0 9.14286V66.7778C0 72.018 5.17081 75.6829 9.9603 73.5568C40.8494 59.8449 64.3785 34.7075 76.6088 4.56344Z" fill="currentColor"/><path d="M32.5161 80C31.4022 80 30.9357 78.5531 31.8259 77.8835C54.9007 60.5265 71.4338 35.8047 78.7658 8.0522C78.9403 7.39154 80 7.51618 80 8.19951V70.8571C80 75.9066 75.9066 80 70.8571 80H32.5161Z" fill="currentColor"/></svg></span>
+    <span class="lb-brand__n">Component Library</span></a>
+  <span class="lb-crumb"><a href="../index.html">Library</a> / Foundations</span>
+  <div class="lb-top__r"><input class="lb-find" id="lb-find" type="search" placeholder="Filter this library">
+    <button class="lb-tbtn" id="lb-theme" type="button" aria-label="Switch theme">
+      <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M116,36V32a12,12,0,0,1,24,0v4a12,12,0,0,1-24,0Zm80,92a68,68,0,1,1-68-68A68.07,68.07,0,0,1,196,128Zm-24,0a44,44,0,1,0-44,44A44.05,44.05,0,0,0,172,128ZM51.51,68.49a12,12,0,1,0,17-17l-4-4a12,12,0,0,0-17,17Zm0,119-4,4a12,12,0,0,0,17,17l4-4a12,12,0,1,0-17-17ZM196,72a12,12,0,0,0,8.49-3.51l4-4a12,12,0,0,0-17-17l-4,4A12,12,0,0,0,196,72Zm8.49,115.51a12,12,0,0,0-17,17l4,4a12,12,0,0,0,17-17ZM48,128a12,12,0,0,0-12-12H32a12,12,0,0,0,0,24h4A12,12,0,0,0,48,128Zm80,80a12,12,0,0,0-12,12v4a12,12,0,0,0,24,0v-4A12,12,0,0,0,128,208Zm96-92h-4a12,12,0,0,0,0,24h4a12,12,0,0,0,0-24Z"/></svg></button></div>
+</header>
+<div class="lb-3"><nav class="lb-rail"><div class="lb-rail__t">Foundations · 11</div><a href="typefaces.html" data-q="typefaces ">Typefaces</a><a href="color.html" data-q="color 92" class="on">Color<span>92</span></a><a href="spacing.html" data-q="spacing 16">Spacing<span>16</span></a><a href="radius.html" data-q="radius 9">Radius<span>9</span></a><a href="elevation.html" data-q="elevation 6">Elevation<span>6</span></a><a href="type.html" data-q="type 69">Type<span>69</span></a><a href="breakpoint.html" data-q="breakpoints 66">Breakpoints<span>66</span></a><a href="content-width.html" data-q="content column 4">Content column<span>4</span></a><a href="type-links.html" data-q="type 35">Type<span>35</span></a><a href="ruled.html" data-q="ruled 4">Ruled<span>4</span></a><a href="slides.html" data-q="slides 23">Slides<span>23</span></a></nav><main class="lb-mid"><div class="lb-h"><h1>Color</h1><p class="lede">92 tokens · shared by every surface</p><div class="lb-row"><span class="chip chip--measured" title="Read off the bound Figma variables. Safe to build from.">measured</span><span class="chip chip--pending" title="Has not been through a review pass">not reviewed</span></div><div class="lb-meta">review: bash scripts/review-pass.sh foundation color</div></div><div class="note">Figma collection: Colors</div><section class="sec" id="primary-brand-blue"><div class="cl-sub"><h3>Primary (brand blue)</h3><div class="cl-note">Figma path Colors/Primary/*. Note the 500 step is named `500-main` in
+Figma — the only ramp step in the file with a suffix.</div><div class="cl-ramp"><div class="cl-sw" data-q="--gw-color-primary-25 #f2f8ff "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#f2f8ff"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-primary-25</span><span class="cl-sw__hex">#F2F8FF</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.1:1 on white</span><span class="cl-ac cl-ac--ok">18.2:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-primary-50 #e5f1ff "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#e5f1ff"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-primary-50</span><span class="cl-sw__hex">#E5F1FF</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.1:1 on white</span><span class="cl-ac cl-ac--ok">17.0:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-primary-100 #cce2ff "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#cce2ff"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-primary-100</span><span class="cl-sw__hex">#CCE2FF</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.3:1 on white</span><span class="cl-ac cl-ac--ok">14.7:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-primary-200 #99c6ff "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#99c6ff"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-primary-200</span><span class="cl-sw__hex">#99C6FF</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.8:1 on white</span><span class="cl-ac cl-ac--ok">11.0:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-primary-300 #66a9ff "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#66a9ff"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-primary-300</span><span class="cl-sw__hex">#66A9FF</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">2.4:1 on white</span><span class="cl-ac cl-ac--ok">8.0:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-primary-400 #338cff "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#338cff"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-primary-400</span><span class="cl-sw__hex">#338CFF</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">3.3:1 on white</span><span class="cl-ac cl-ac--ok">5.9:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-primary-500 #0070ff colors/primary/500-main — the brand blue"><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#0070ff"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-primary-500</span><span class="cl-sw__hex">#0070FF</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">4.4:1 on white</span><span class="cl-ac cl-ac--no">4.4:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-primary-600 #0061e0 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#0061e0"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-primary-600</span><span class="cl-sw__hex">#0061E0</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--ok">5.5:1 on white</span><span class="cl-ac cl-ac--no">3.5:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-primary-700 #004ebf "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#004ebf"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-primary-700</span><span class="cl-sw__hex">#004EBF</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--ok">7.4:1 on white</span><span class="cl-ac cl-ac--no">2.6:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-primary-800 #003a8c "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#003a8c"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-primary-800</span><span class="cl-sw__hex">#003A8C</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--ok">10.6:1 on white</span><span class="cl-ac cl-ac--no">1.8:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-primary-900 #002559 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#002559"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-primary-900</span><span class="cl-sw__hex">#002559</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--ok">14.9:1 on white</span><span class="cl-ac cl-ac--no">1.3:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-primary-alpha-10 #0070ff1a "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#0070ff1a"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-primary-alpha-10</span><span class="cl-sw__hex">#0070FF1A</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.2:1 on white</span><span class="cl-ac cl-ac--no">1.1:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-primary-alpha-40 #0070ff66 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#0070ff66"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-primary-alpha-40</span><span class="cl-sw__hex">#0070FF66</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.8:1 on white</span><span class="cl-ac cl-ac--no">1.6:1 on black</span></span></div></div></div></div></section><section class="sec" id="secondary"><div class="cl-sub"><h3>Secondary</h3><div class="cl-note">Figma path Colors/Secondary/500-main. A single step, no ramp. Used as the
+dark surface on page-build, navbar, footer and the comparison table.</div><div class="cl-ramp"><div class="cl-sw" data-q="--gw-color-secondary-500 #111827 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#111827"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-secondary-500</span><span class="cl-sw__hex">#111827</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--ok">17.7:1 on white</span><span class="cl-ac cl-ac--no">1.1:1 on black</span></span></div></div></div></div></section><section class="sec" id="neutral"><div class="cl-sub"><h3>Neutral</h3><div class="cl-note">Figma path Colors/Neutral/*. Cool-tinted, not pure gray. The 35/250/850
+steps are real variables but have no swatch on the canvas.</div><div class="cl-ramp"><div class="cl-sw" data-q="--gw-color-neutral-25 #f7f8f9 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#f7f8f9"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-neutral-25</span><span class="cl-sw__hex">#F7F8F9</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.1:1 on white</span><span class="cl-ac cl-ac--ok">18.3:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-neutral-35 #f5f5f5 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#f5f5f5"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-neutral-35</span><span class="cl-sw__hex">#F5F5F5</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.1:1 on white</span><span class="cl-ac cl-ac--ok">17.8:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-neutral-50 #f1f2f3 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#f1f2f3"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-neutral-50</span><span class="cl-sw__hex">#F1F2F3</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.1:1 on white</span><span class="cl-ac cl-ac--ok">17.3:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-neutral-100 #e7e8e9 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#e7e8e9"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-neutral-100</span><span class="cl-sw__hex">#E7E8E9</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.2:1 on white</span><span class="cl-ac cl-ac--ok">15.8:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-neutral-200 #cfd1d4 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#cfd1d4"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-neutral-200</span><span class="cl-sw__hex">#CFD1D4</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.5:1 on white</span><span class="cl-ac cl-ac--ok">12.7:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-neutral-250 #bcbec2 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#bcbec2"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-neutral-250</span><span class="cl-sw__hex">#BCBEC2</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.9:1 on white</span><span class="cl-ac cl-ac--ok">10.4:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-neutral-300 #bbbec4 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#bbbec4"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-neutral-300</span><span class="cl-sw__hex">#BBBEC4</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.9:1 on white</span><span class="cl-ac cl-ac--ok">10.4:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-neutral-400 #959ba4 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#959ba4"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-neutral-400</span><span class="cl-sw__hex">#959BA4</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">2.8:1 on white</span><span class="cl-ac cl-ac--ok">6.9:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-neutral-500 #878b94 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#878b94"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-neutral-500</span><span class="cl-sw__hex">#878B94</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">3.4:1 on white</span><span class="cl-ac cl-ac--ok">5.7:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-neutral-600 #6a7077 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#6a7077"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-neutral-600</span><span class="cl-sw__hex">#6A7077</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--ok">5.0:1 on white</span><span class="cl-ac cl-ac--no">3.9:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-neutral-700 #535a61 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#535a61"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-neutral-700</span><span class="cl-sw__hex">#535A61</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--ok">7.0:1 on white</span><span class="cl-ac cl-ac--no">2.8:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-neutral-800 #4d545c "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#4d545c"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-neutral-800</span><span class="cl-sw__hex">#4D545C</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--ok">7.7:1 on white</span><span class="cl-ac cl-ac--no">2.5:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-neutral-850 #333333 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#333333"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-neutral-850</span><span class="cl-sw__hex">#333333</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--ok">12.6:1 on white</span><span class="cl-ac cl-ac--no">1.5:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-neutral-900 #262a2e "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#262a2e"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-neutral-900</span><span class="cl-sw__hex">#262A2E</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--ok">14.5:1 on white</span><span class="cl-ac cl-ac--no">1.3:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-white #ffffff "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#ffffff"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-white</span><span class="cl-sw__hex">#FFFFFF</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.0:1 on white</span><span class="cl-ac cl-ac--ok">19.4:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-black #0d0d0d "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#0d0d0d"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-black</span><span class="cl-sw__hex">#0D0D0D</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--ok">19.4:1 on white</span><span class="cl-ac cl-ac--no">1.0:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-neutral-alpha-10-white #ffffff1a "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#ffffff1a"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-neutral-alpha-10-white</span><span class="cl-sw__hex">#FFFFFF1A</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.0:1 on white</span><span class="cl-ac cl-ac--no">1.3:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-neutral-alpha-20-white #ffffff33 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#ffffff33"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-neutral-alpha-20-white</span><span class="cl-sw__hex">#FFFFFF33</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.0:1 on white</span><span class="cl-ac cl-ac--no">1.8:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-neutral-alpha-30-white #ffffff4d "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#ffffff4d"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-neutral-alpha-30-white</span><span class="cl-sw__hex">#FFFFFF4D</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.0:1 on white</span><span class="cl-ac cl-ac--no">2.6:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-neutral-alpha-50-white #ffffff80 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#ffffff80"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-neutral-alpha-50-white</span><span class="cl-sw__hex">#FFFFFF80</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.0:1 on white</span><span class="cl-ac cl-ac--ok">5.3:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-neutral-alpha-60-white #ffffff99 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#ffffff99"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-neutral-alpha-60-white</span><span class="cl-sw__hex">#FFFFFF99</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.0:1 on white</span><span class="cl-ac cl-ac--ok">7.3:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-neutral-alpha-80-white #ffffffcc "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#ffffffcc"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-neutral-alpha-80-white</span><span class="cl-sw__hex">#FFFFFFCC</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.0:1 on white</span><span class="cl-ac cl-ac--ok">12.5:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-neutral-alpha-10-black #0101091a "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#0101091a"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-neutral-alpha-10-black</span><span class="cl-sw__hex">#0101091A</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.3:1 on white</span><span class="cl-ac cl-ac--no">1.0:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-neutral-alpha-20-black #01010933 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#01010933"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-neutral-alpha-20-black</span><span class="cl-sw__hex">#01010933</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.6:1 on white</span><span class="cl-ac cl-ac--no">1.0:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-neutral-alpha-50-black #01010980 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#01010980"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-neutral-alpha-50-black</span><span class="cl-sw__hex">#01010980</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">3.9:1 on white</span><span class="cl-ac cl-ac--no">1.0:1 on black</span></span></div></div></div></div></section><section class="sec" id="categorical-chart-series-ruled-decisions-md-r11"><div class="cl-sub"><h3>Categorical chart series — RULED, DECISIONS.md R11</h3><div class="cl-note">`Graph Type=Grouped Bar` (2143:683) binds three raw hexes. Two sit within a few
+units of an existing ramp step across 765 — differences nobody can see — and are
+treated as those tokens, unbound:
+#a1cdfe -&gt; --gw-color-primary-200      #fed14a -&gt; --gw-color-yellow-200
+The third is a violet and the system has NO violet ramp, so it is added here as a
+single named colour rather than nine steps nobody drew.
+THREE SERIES IS THE CEILING. A fourth category is a finding to report, not a
+colour to pick. Single-series charts (`Bar`, `Line`) use --gw-color-primary-500
+and do not touch this palette.
+Not a Figma variable — added by ruling, 8 Aug 2026.</div><div class="cl-ramp"><div class="cl-sw" data-q="--gw-color-chart-violet #9784ff "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#9784ff"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-chart-violet</span><span class="cl-sw__hex">#9784FF</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">3.0:1 on white</span><span class="cl-ac cl-ac--ok">6.5:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-chart-1 #99c6ff "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:var(--gw-color-primary-200)"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-chart-1</span><span class="cl-sw__hex">#99C6FF</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.8:1 on white</span><span class="cl-ac cl-ac--ok">11.0:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-chart-2 #9784ff "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:var(--gw-color-chart-violet)"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-chart-2</span><span class="cl-sw__hex">#9784FF</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">3.0:1 on white</span><span class="cl-ac cl-ac--ok">6.5:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-chart-3 #fcd34d "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:var(--gw-color-yellow-200)"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-chart-3</span><span class="cl-sw__hex">#FCD34D</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.4:1 on white</span><span class="cl-ac cl-ac--ok">13.5:1 on black</span></span></div></div></div></div></section><section class="sec" id="red-negative-error"><div class="cl-sub"><h3>Red (negative / error)</h3><div class="cl-ramp"><div class="cl-sw" data-q="--gw-color-red-25 #fff1f2 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#fff1f2"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-red-25</span><span class="cl-sw__hex">#FFF1F2</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.1:1 on white</span><span class="cl-ac cl-ac--ok">17.7:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-red-50 #ffe4e6 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#ffe4e6"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-red-50</span><span class="cl-sw__hex">#FFE4E6</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.2:1 on white</span><span class="cl-ac cl-ac--ok">16.2:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-red-100 #fecdd3 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#fecdd3"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-red-100</span><span class="cl-sw__hex">#FECDD3</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.4:1 on white</span><span class="cl-ac cl-ac--ok">13.8:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-red-200 #fda4af "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#fda4af"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-red-200</span><span class="cl-sw__hex">#FDA4AF</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.9:1 on white</span><span class="cl-ac cl-ac--ok">10.3:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-red-300 #fb7185 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#fb7185"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-red-300</span><span class="cl-sw__hex">#FB7185</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">2.7:1 on white</span><span class="cl-ac cl-ac--ok">7.2:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-red-400 #f43f5e "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#f43f5e"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-red-400</span><span class="cl-sw__hex">#F43F5E</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">3.7:1 on white</span><span class="cl-ac cl-ac--ok">5.3:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-red-500 #e11d48 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#e11d48"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-red-500</span><span class="cl-sw__hex">#E11D48</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--ok">4.7:1 on white</span><span class="cl-ac cl-ac--no">4.1:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-red-600 #be123c "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#be123c"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-red-600</span><span class="cl-sw__hex">#BE123C</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--ok">6.3:1 on white</span><span class="cl-ac cl-ac--no">3.1:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-red-700 #9f1239 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#9f1239"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-red-700</span><span class="cl-sw__hex">#9F1239</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--ok">8.0:1 on white</span><span class="cl-ac cl-ac--no">2.4:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-red-800 #881337 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#881337"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-red-800</span><span class="cl-sw__hex">#881337</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--ok">9.6:1 on white</span><span class="cl-ac cl-ac--no">2.0:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-red-900 #4c0519 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#4c0519"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-red-900</span><span class="cl-sw__hex">#4C0519</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--ok">15.6:1 on white</span><span class="cl-ac cl-ac--no">1.2:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-red-alpha-10 #f43f5e1a "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#f43f5e1a"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-red-alpha-10</span><span class="cl-sw__hex">#F43F5E1A</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.1:1 on white</span><span class="cl-ac cl-ac--no">1.1:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-red-alpha-20 #f43f5e33 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#f43f5e33"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-red-alpha-20</span><span class="cl-sw__hex">#F43F5E33</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.3:1 on white</span><span class="cl-ac cl-ac--no">1.2:1 on black</span></span></div></div></div></div></section><section class="sec" id="yellow-warning-in-between"><div class="cl-sub"><h3>Yellow (warning / in-between)</h3><div class="cl-ramp"><div class="cl-sw" data-q="--gw-color-yellow-25 #fffbeb "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#fffbeb"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-yellow-25</span><span class="cl-sw__hex">#FFFBEB</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.0:1 on white</span><span class="cl-ac cl-ac--ok">18.7:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-yellow-50 #fef3c7 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#fef3c7"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-yellow-50</span><span class="cl-sw__hex">#FEF3C7</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.1:1 on white</span><span class="cl-ac cl-ac--ok">17.5:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-yellow-100 #fde68a "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#fde68a"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-yellow-100</span><span class="cl-sw__hex">#FDE68A</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.2:1 on white</span><span class="cl-ac cl-ac--ok">15.6:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-yellow-200 #fcd34d "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#fcd34d"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-yellow-200</span><span class="cl-sw__hex">#FCD34D</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.4:1 on white</span><span class="cl-ac cl-ac--ok">13.5:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-yellow-300 #fbbf24 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#fbbf24"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-yellow-300</span><span class="cl-sw__hex">#FBBF24</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.7:1 on white</span><span class="cl-ac cl-ac--ok">11.6:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-yellow-400 #f59e0b "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#f59e0b"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-yellow-400</span><span class="cl-sw__hex">#F59E0B</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">2.1:1 on white</span><span class="cl-ac cl-ac--ok">9.0:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-yellow-500 #d97706 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#d97706"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-yellow-500</span><span class="cl-sw__hex">#D97706</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">3.2:1 on white</span><span class="cl-ac cl-ac--ok">6.1:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-yellow-600 #b45309 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#b45309"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-yellow-600</span><span class="cl-sw__hex">#B45309</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--ok">5.0:1 on white</span><span class="cl-ac cl-ac--no">3.9:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-yellow-700 #92400e "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#92400e"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-yellow-700</span><span class="cl-sw__hex">#92400E</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--ok">7.1:1 on white</span><span class="cl-ac cl-ac--no">2.7:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-yellow-800 #78350f "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#78350f"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-yellow-800</span><span class="cl-sw__hex">#78350F</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--ok">9.1:1 on white</span><span class="cl-ac cl-ac--no">2.1:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-yellow-900 #451a03 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#451a03"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-yellow-900</span><span class="cl-sw__hex">#451A03</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--ok">15.0:1 on white</span><span class="cl-ac cl-ac--no">1.3:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-yellow-alpha-10 #f59e0b1a "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#f59e0b1a"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-yellow-alpha-10</span><span class="cl-sw__hex">#F59E0B1A</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.1:1 on white</span><span class="cl-ac cl-ac--no">1.2:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-yellow-alpha-20 #f59e0b33 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#f59e0b33"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-yellow-alpha-20</span><span class="cl-sw__hex">#F59E0B33</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.2:1 on white</span><span class="cl-ac cl-ac--no">1.4:1 on black</span></span></div></div></div></div></section><section class="sec" id="orange"><div class="cl-sub"><h3>Orange</h3><div class="cl-note">The color rule text calls this group &quot;Accent&quot;. The Figma group and the
+variable collection both name it Orange. Orange has no alpha steps.</div><div class="cl-ramp"><div class="cl-sw" data-q="--gw-color-orange-25 #fff7ed "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#fff7ed"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-orange-25</span><span class="cl-sw__hex">#FFF7ED</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.1:1 on white</span><span class="cl-ac cl-ac--ok">18.3:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-orange-50 #ffedd5 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#ffedd5"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-orange-50</span><span class="cl-sw__hex">#FFEDD5</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.1:1 on white</span><span class="cl-ac cl-ac--ok">17.0:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-orange-100 #fed7aa "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#fed7aa"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-orange-100</span><span class="cl-sw__hex">#FED7AA</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.4:1 on white</span><span class="cl-ac cl-ac--ok">14.4:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-orange-200 #fdba74 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#fdba74"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-orange-200</span><span class="cl-sw__hex">#FDBA74</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.7:1 on white</span><span class="cl-ac cl-ac--ok">11.5:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-orange-300 #fb923c "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#fb923c"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-orange-300</span><span class="cl-sw__hex">#FB923C</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">2.3:1 on white</span><span class="cl-ac cl-ac--ok">8.6:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-orange-400 #f97316 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#f97316"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-orange-400</span><span class="cl-sw__hex">#F97316</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">2.8:1 on white</span><span class="cl-ac cl-ac--ok">6.9:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-orange-500 #ea580c "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#ea580c"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-orange-500</span><span class="cl-sw__hex">#EA580C</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">3.6:1 on white</span><span class="cl-ac cl-ac--ok">5.5:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-orange-600 #c2410c "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#c2410c"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-orange-600</span><span class="cl-sw__hex">#C2410C</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--ok">5.2:1 on white</span><span class="cl-ac cl-ac--no">3.8:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-orange-700 #9a3412 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#9a3412"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-orange-700</span><span class="cl-sw__hex">#9A3412</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--ok">7.3:1 on white</span><span class="cl-ac cl-ac--no">2.7:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-orange-800 #7c2d12 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#7c2d12"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-orange-800</span><span class="cl-sw__hex">#7C2D12</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--ok">9.4:1 on white</span><span class="cl-ac cl-ac--no">2.1:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-orange-900 #431407 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#431407"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-orange-900</span><span class="cl-sw__hex">#431407</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--ok">15.7:1 on white</span><span class="cl-ac cl-ac--no">1.2:1 on black</span></span></div></div></div></div></section><section class="sec" id="green-positive-success"><div class="cl-sub"><h3>Green (positive / success)</h3><div class="cl-ramp"><div class="cl-sw" data-q="--gw-color-green-25 #f0fdf4 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#f0fdf4"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-green-25</span><span class="cl-sw__hex">#F0FDF4</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.0:1 on white</span><span class="cl-ac cl-ac--ok">18.6:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-green-50 #dcfce7 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#dcfce7"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-green-50</span><span class="cl-sw__hex">#DCFCE7</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.1:1 on white</span><span class="cl-ac cl-ac--ok">17.7:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-green-100 #bbf7d0 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#bbf7d0"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-green-100</span><span class="cl-sw__hex">#BBF7D0</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.2:1 on white</span><span class="cl-ac cl-ac--ok">16.0:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-green-200 #86efac "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#86efac"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-green-200</span><span class="cl-sw__hex">#86EFAC</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.4:1 on white</span><span class="cl-ac cl-ac--ok">13.8:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-green-300 #4ade80 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#4ade80"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-green-300</span><span class="cl-sw__hex">#4ADE80</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.7:1 on white</span><span class="cl-ac cl-ac--ok">11.2:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-green-400 #22c55e "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#22c55e"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-green-400</span><span class="cl-sw__hex">#22C55E</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">2.3:1 on white</span><span class="cl-ac cl-ac--ok">8.5:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-green-500 #16a34a "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#16a34a"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-green-500</span><span class="cl-sw__hex">#16A34A</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">3.3:1 on white</span><span class="cl-ac cl-ac--ok">5.9:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-green-600 #15803d "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#15803d"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-green-600</span><span class="cl-sw__hex">#15803D</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--ok">5.0:1 on white</span><span class="cl-ac cl-ac--no">3.9:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-green-700 #166534 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#166534"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-green-700</span><span class="cl-sw__hex">#166534</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--ok">7.1:1 on white</span><span class="cl-ac cl-ac--no">2.7:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-green-800 #14532d "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#14532d"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-green-800</span><span class="cl-sw__hex">#14532D</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--ok">9.1:1 on white</span><span class="cl-ac cl-ac--no">2.1:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-green-900 #052e16 "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#052e16"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-green-900</span><span class="cl-sw__hex">#052E16</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--ok">14.9:1 on white</span><span class="cl-ac cl-ac--no">1.3:1 on black</span></span></div></div><div class="cl-sw" data-q="--gw-color-green-alpha-10 #22c55e1a "><div class="cl-sw__chip"><div class="cl-sw__fill" style="background:#22c55e1a"></div></div><div class="cl-sw__body"><span class="cl-sw__name">--gw-color-green-alpha-10</span><span class="cl-sw__hex">#22C55E1A</span><span class="cl-sw__ac"><span class="cl-ac cl-ac--no">1.1:1 on white</span><span class="cl-ac cl-ac--no">1.1:1 on black</span></span></div></div></div></div></section></main><div class="lb-toc"><b>On this page</b><a href="#primary-brand-blue" class="l2">Primary (brand blue)</a><a href="#secondary" class="l2">Secondary</a><a href="#neutral" class="l2">Neutral</a><a href="#categorical-chart-series-ruled-decisions-md-r11" class="l2">Categorical chart series — RULED, DECISIONS.md R11</a><a href="#red-negative-error" class="l2">Red (negative / error)</a><a href="#yellow-warning-in-between" class="l2">Yellow (warning / in-between)</a><a href="#orange" class="l2">Orange</a><a href="#green-positive-success" class="l2">Green (positive / success)</a></div></div>
+<script>
+(function(){
+  /* Theme: the same two localStorage keys the main site uses, so a choice made there
+     carries here and back. 'system' can still arrive from an older stored value and
+     resolves to light, matching shell.js. */
+  var PREF='gw-theme-pref', RES='gw-theme';
+  function pref(){try{var v=localStorage.getItem(PREF);
+    if(v==='light'||v==='dark')return v;
+    if(v==='system')return 'light';
+    var o=localStorage.getItem(RES);
+    return (o==='dark'||o==='light')?o:'light';}catch(e){return 'light'}}
+  function apply(p){var r=p==='dark'?'dark':'light';
+    document.documentElement.setAttribute('data-theme',r);
+    try{localStorage.setItem(PREF,p);localStorage.setItem(RES,r)}catch(e){}
+    var b=document.getElementById('lb-theme');
+    if(b)b.setAttribute('aria-label',r==='dark'?'Switch to light':'Switch to dark');}
+  var btn=document.getElementById('lb-theme');
+  if(btn)btn.addEventListener('click',function(){
+    apply(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
+  apply(pref());
+
+  /* Rail filter. Narrows the inventory in place — it does not navigate, because the
+     rail is a list of siblings and losing your place to search them is worse than
+     scrolling. */
+  var f=document.getElementById('lb-find');
+  if(f){
+    var rows=[].slice.call(document.querySelectorAll('.lb-rail a'));
+    f.addEventListener('input',function(){
+      var t=f.value.trim().toLowerCase();
+      rows.forEach(function(a){
+        a.hidden=!!t&&a.getAttribute('data-q').indexOf(t)===-1});
+    });
+  }
+
+  /* Mark the on-this-page entry for whatever heading is currently at the top. */
+  var toc=[].slice.call(document.querySelectorAll('.lb-toc a'));
+  if(toc.length){
+    var heads=toc.map(function(a){return document.getElementById(a.hash.slice(1))})
+                 .filter(Boolean);
+    var tick=function(){
+      var best=0;
+      heads.forEach(function(h,i){if(h.getBoundingClientRect().top<=90)best=i});
+      toc.forEach(function(a,i){a.style.color=i===best?'var(--gw-color-primary-600)':''});
+    };
+    document.addEventListener('scroll',tick,{passive:true});tick();
+  }
+})();
+</script>
+</body></html>

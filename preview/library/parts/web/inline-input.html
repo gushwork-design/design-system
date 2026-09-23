@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>inline-input — Gushwork</title>
+<meta name="robots" content="noindex">
+<script>try{var t=localStorage.getItem('gw-theme');if(t!=='dark')t='light';
+document.documentElement.setAttribute('data-theme',t)}catch(e){
+document.documentElement.setAttribute('data-theme','light')}</script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20width%3D%2280%22%20height%3D%2280%22%20rx%3D%2220%22%20fill%3D%22%230d0d0d%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="../../../foundation/tokens.css">
+<link rel="stylesheet" href="../../../shell.css">
+<style>
+.cl{--cl-gap:var(--gw-space-40)}
+.cl h2{font:var(--gw-text-h5);color:var(--s-heading);margin:0}
+.cl h3{font:var(--gw-text-h7);color:var(--s-heading);margin:0}
+.cl h4{font:var(--gw-text-body-16-sem);color:var(--s-heading);margin:0}
+.cl p{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+      color:var(--s-body);margin:0;max-width:78ch}
+.cl code,.cl .mono{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px}
+
+/* --- page head ------------------------------------------------------------ */
+.cl-head{display:flex;flex-direction:column;gap:var(--gw-space-16)}
+.cl-head h1{font:var(--gw-text-h4);color:var(--s-heading);margin:0}
+.cl-lede{font:var(--gw-text-body-18-reg);letter-spacing:var(--gw-text-body-18-reg-tracking);
+         color:var(--s-body);margin:0;max-width:72ch}
+
+/* --- the tally ------------------------------------------------------------ */
+.cl-tally{display:flex;flex-wrap:wrap;gap:var(--gw-space-12)}
+.cl-stat{flex:1 1 150px;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-16) var(--gw-space-20);
+         display:flex;flex-direction:column;gap:var(--gw-space-4)}
+.cl-stat b{font:var(--gw-text-h6);color:var(--s-heading);font-feature-settings:"tnum" 1}
+.cl-stat span{font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-400);
+              text-transform:uppercase;letter-spacing:.06em}
+
+/* --- review queue --------------------------------------------------------- */
+.cl-queue{background:var(--s-card-bg);border:1px solid var(--gw-color-yellow-300);
+          border-left:3px solid var(--gw-color-yellow-400);border-radius:var(--gw-radius-12);
+          padding:var(--gw-space-20) var(--gw-space-24);display:flex;flex-direction:column;
+          gap:var(--gw-space-12)}
+.cl-queue h2{font:var(--gw-text-h7)}
+.cl-queue ul{margin:0;padding-left:var(--gw-space-20);display:flex;flex-direction:column;
+             gap:var(--gw-space-4)}
+.cl-queue li{font:var(--gw-text-body-14-reg);color:var(--s-body)}
+.cl-queue a{color:var(--gw-color-primary-600);text-decoration:none}
+.cl-queue a:hover{text-decoration:underline}
+.cl-pass{background:var(--s-card-bg);border:1px solid var(--gw-color-green-300);
+         border-left:3px solid var(--gw-color-green-400)}
+
+/* --- controls ------------------------------------------------------------- */
+.cl-bar{position:sticky;top:0;z-index:5;background:var(--s-page-bg);
+        padding:var(--gw-space-12) 0;display:flex;flex-wrap:wrap;gap:var(--gw-space-8);
+        align-items:center;border-bottom:1px solid var(--s-chrome-border)}
+.cl-find{flex:1 1 220px;min-width:180px;background:var(--s-field-bg);
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         padding:var(--gw-space-8) var(--gw-space-12);font:var(--gw-text-body-14-reg);
+         color:var(--s-heading)}
+.cl-find::placeholder{color:var(--s-placeholder)}
+.cl-find:focus{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.cl-filter{display:flex;gap:var(--gw-space-4);flex-wrap:wrap}
+.cl-f{font:var(--gw-text-body-12-med);color:var(--s-body);background:transparent;
+      border:1px solid var(--s-field-border);border-radius:var(--gw-radius-full);
+      padding:6px var(--gw-space-12);cursor:pointer}
+.cl-f:hover{border-color:var(--gw-color-primary-500)}
+.cl-f[aria-pressed="true"]{background:var(--gw-color-black);color:var(--gw-color-white);
+                           border-color:var(--gw-color-black)}
+.cl-f:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.cl-count{font:var(--gw-text-body-12-reg);color:var(--gw-color-neutral-400);margin-left:auto}
+
+/* --- sections ------------------------------------------------------------- */
+.cl-sec{display:flex;flex-direction:column;gap:var(--gw-space-20);
+        scroll-margin-top:var(--gw-space-80)}
+.cl-sec[hidden]{display:none}
+.cl-sechead{display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--gw-space-12)}
+.cl-note{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+         color:var(--s-body);background:var(--gw-color-neutral-25);
+         border:1px solid var(--s-card-border);border-left:3px solid var(--gw-color-neutral-300);
+         border-radius:var(--gw-radius-8);padding:var(--gw-space-12) var(--gw-space-16);
+         white-space:pre-wrap;max-width:88ch}
+:root[data-theme="dark"] .cl-note{background:var(--gw-color-neutral-900)}
+.cl-sub{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.cl-sub[hidden]{display:none}
+
+/* --- chips ---------------------------------------------------------------- */
+.cl-chip{display:inline-flex;align-items:center;gap:6px;font:var(--gw-text-body-12-med);
+         border-radius:var(--gw-radius-full);padding:3px var(--gw-space-8);white-space:nowrap}
+.cl-chip--measured{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.cl-chip--transcribed{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.cl-chip--ruled{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+.cl-chip--passed{background:var(--gw-color-green-500);color:var(--gw-color-white)}
+.cl-chip--pending{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+.cl-chip--rejected{background:var(--gw-color-red-500);color:var(--gw-color-white)}
+.cl-chip--gap{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+:root[data-theme="dark"] .cl-chip--measured{background:var(--gw-color-green-900);
+                                            color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .cl-chip--transcribed{background:var(--gw-color-yellow-900);
+                                               color:var(--gw-color-yellow-100)}
+:root[data-theme="dark"] .cl-chip--ruled{background:var(--gw-color-primary-900);
+                                         color:var(--gw-color-primary-200)}
+:root[data-theme="dark"] .cl-chip--pending{background:var(--gw-color-neutral-800);
+                                           color:var(--gw-color-neutral-300)}
+:root[data-theme="dark"] .cl-chip--gap{background:var(--gw-color-red-900);
+                                       color:var(--gw-color-red-200)}
+
+/* --- colour --------------------------------------------------------------- */
+.cl-ramp{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));
+         gap:var(--gw-space-8)}
+.cl-sw{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+       border-radius:var(--gw-radius-10);overflow:hidden;display:flex;flex-direction:column}
+.cl-sw[hidden]{display:none}
+.cl-sw__chip{height:64px;border-bottom:1px solid var(--s-card-border);
+             background-image:linear-gradient(45deg,var(--gw-color-neutral-100) 25%,transparent 25%),
+                              linear-gradient(-45deg,var(--gw-color-neutral-100) 25%,transparent 25%),
+                              linear-gradient(45deg,transparent 75%,var(--gw-color-neutral-100) 75%),
+                              linear-gradient(-45deg,transparent 75%,var(--gw-color-neutral-100) 75%);
+             background-size:12px 12px;
+             background-position:0 0,0 6px,6px -6px,-6px 0}
+.cl-sw__fill{width:100%;height:100%}
+.cl-sw__body{padding:var(--gw-space-8) var(--gw-space-12);display:flex;
+             flex-direction:column;gap:3px}
+.cl-sw__name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;
+             color:var(--s-heading);word-break:break-all;line-height:1.35}
+.cl-sw__hex{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;
+            color:var(--gw-color-neutral-400);text-transform:uppercase}
+.cl-sw__ac{display:flex;gap:4px;margin-top:2px}
+.cl-ac{font-size:9.5px;font-weight:600;letter-spacing:.04em;border-radius:var(--gw-radius-4);
+       padding:1px 4px;line-height:1.5}
+.cl-ac--ok{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.cl-ac--no{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+:root[data-theme="dark"] .cl-ac--ok{background:var(--gw-color-green-900);color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .cl-ac--no{background:var(--gw-color-red-900);color:var(--gw-color-red-200)}
+
+/* --- type ----------------------------------------------------------------- */
+.cl-types{display:flex;flex-direction:column;gap:2px}
+.cl-t{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:var(--gw-space-20);
+      align-items:start;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+      border-radius:var(--gw-radius-10);padding:var(--gw-space-16) var(--gw-space-20)}
+.cl-t[hidden]{display:none}
+.cl-t__spec{color:var(--s-heading);min-width:0;overflow-wrap:anywhere}
+.cl-t__meta{display:flex;flex-direction:column;gap:2px;text-align:right}
+.cl-t__name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+            color:var(--gw-color-primary-600)}
+.cl-t__val{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10.5px;
+           color:var(--gw-color-neutral-400);line-height:1.5}
+@media (max-width:860px){.cl-t{grid-template-columns:1fr}.cl-t__meta{text-align:left}}
+
+/* --- faces ---------------------------------------------------------------- */
+.cl-faces{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+          gap:var(--gw-space-16)}
+.cl-face{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-24);
+         display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.cl-face__aa{font-size:52px;line-height:1.05;color:var(--s-heading)}
+.cl-face__wt{display:flex;flex-direction:column;gap:2px}
+.cl-face__wt span{color:var(--s-heading);font-size:19px;line-height:1.45}
+
+/* --- space / radius / shadow ---------------------------------------------- */
+.cl-rows{display:flex;flex-direction:column;gap:6px}
+.cl-row{display:grid;grid-template-columns:132px minmax(0,1fr) 60px;gap:var(--gw-space-16);
+        align-items:center;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-radius:var(--gw-radius-8);padding:var(--gw-space-8) var(--gw-space-16)}
+.cl-row[hidden]{display:none}
+.cl-row__n{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+           color:var(--gw-color-primary-600);word-break:break-all}
+.cl-row__v{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+           color:var(--gw-color-neutral-400);text-align:right}
+.cl-bararea{min-height:18px;display:flex;align-items:center}
+.cl-barfill{height:16px;background:var(--gw-color-primary-500);border-radius:var(--gw-radius-2);
+            max-width:100%}
+.cl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));
+         gap:var(--gw-space-12)}
+.cl-tile{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-10);padding:var(--gw-space-16);display:flex;
+         flex-direction:column;align-items:center;gap:var(--gw-space-8)}
+.cl-tile[hidden]{display:none}
+.cl-tile__demo{width:72px;height:72px;background:var(--gw-color-primary-100);
+               border:1.5px solid var(--gw-color-primary-500)}
+.cl-tile__sh{width:100%;height:64px;background:var(--gw-color-white);
+             border-radius:var(--gw-radius-8)}
+:root[data-theme="dark"] .cl-tile__sh{background:var(--gw-color-neutral-800)}
+/* The alpha checker is drawn in neutral-100, which is near-white and shouts on a
+   black ground. Same job, quieter, in dark. */
+:root[data-theme="dark"] .cl-sw__chip{
+  background-image:linear-gradient(45deg,var(--gw-color-neutral-800) 25%,transparent 25%),
+                   linear-gradient(-45deg,var(--gw-color-neutral-800) 25%,transparent 25%),
+                   linear-gradient(45deg,transparent 75%,var(--gw-color-neutral-800) 75%),
+                   linear-gradient(-45deg,transparent 75%,var(--gw-color-neutral-800) 75%)}
+
+/* --- tables --------------------------------------------------------------- */
+.cl-tbl{width:100%;border-collapse:collapse;background:var(--s-card-bg);
+        border:1px solid var(--s-card-border);border-radius:var(--gw-radius-10);
+        overflow:hidden;font:var(--gw-text-body-14-reg)}
+.cl-tblwrap{overflow-x:auto}
+.cl-tbl th{text-align:left;font:var(--gw-text-body-12-med);text-transform:uppercase;
+           letter-spacing:.06em;color:var(--gw-color-neutral-400);
+           padding:var(--gw-space-8) var(--gw-space-16);
+           border-bottom:1px solid var(--s-card-border);white-space:nowrap}
+.cl-tbl td{padding:var(--gw-space-8) var(--gw-space-16);color:var(--s-body);
+           border-bottom:1px solid var(--s-card-border);vertical-align:top}
+.cl-tbl tr:last-child td{border-bottom:none}
+.cl-tbl tr[hidden]{display:none}
+.cl-tbl .mono{color:var(--gw-color-primary-600)}
+.cl-tbl .num{font-feature-settings:"tnum" 1;white-space:nowrap}
+
+/* --- gaps ----------------------------------------------------------------- */
+.cl-gaps{display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.cl-gap{display:grid;grid-template-columns:28px minmax(0,1fr);gap:var(--gw-space-12);
+        background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-left:3px solid var(--gw-color-red-400);border-radius:var(--gw-radius-8);
+        padding:var(--gw-space-12) var(--gw-space-16)}
+.cl-gap__n{font:var(--gw-text-body-14-sem);color:var(--gw-color-red-500);
+           font-feature-settings:"tnum" 1}
+.cl-gap__t{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+           color:var(--s-body);white-space:pre-wrap;margin:0}
+
+/* --- use-case cards ------------------------------------------------------- */
+.cl-cases{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+          gap:var(--gw-space-12)}
+.cl-case{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-20);
+         display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.cl-case__n{display:flex;align-items:baseline;justify-content:space-between;gap:var(--gw-space-8)}
+.cl-case__list{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:4px}
+.cl-case__list li{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10.5px;
+                  color:var(--gw-color-neutral-600);background:var(--gw-color-neutral-25);
+                  border:1px solid var(--s-card-border);border-radius:var(--gw-radius-4);
+                  padding:1px 5px}
+:root[data-theme="dark"] .cl-case__list li{background:var(--gw-color-neutral-900)}
+
+/* --- misc ----------------------------------------------------------------- */
+.cl-src{display:flex;flex-wrap:wrap;gap:var(--gw-space-8)}
+.cl-src code{background:var(--s-code-bg);border:1px solid var(--s-code-border);
+             color:var(--s-code-fg);border-radius:var(--gw-radius-4);padding:2px 7px}
+.cl-empty{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-400);
+          border:1px dashed var(--s-field-border);border-radius:var(--gw-radius-10);
+          padding:var(--gw-space-24);text-align:center}
+.cl-jump{display:flex;flex-wrap:wrap;gap:6px}
+.cl-jump a{font:var(--gw-text-body-12-med);color:var(--s-body);text-decoration:none;
+           border:1px solid var(--s-field-border);border-radius:var(--gw-radius-full);
+           padding:5px var(--gw-space-12)}
+.cl-jump a:hover{border-color:var(--gw-color-primary-500);color:var(--gw-color-primary-600)}
+@media print{.cl-bar,.cl-jump{display:none}}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--s-page-bg);font-family:var(--gw-font-body);
+     color:var(--s-body);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
+
+/* ---- topbar ------------------------------------------------------------- */
+.lb-top{position:sticky;top:0;z-index:20;height:60px;display:flex;align-items:center;
+        gap:var(--gw-space-16);padding:0 var(--gw-space-24);
+        background:var(--s-chrome-bg);border-bottom:1px solid var(--s-chrome-border)}
+.lb-brand{display:flex;align-items:center;gap:var(--gw-space-12);text-decoration:none;
+          flex:none}
+.lb-brand__chip{width:32px;height:32px;border-radius:var(--gw-radius-8);
+                background:var(--gw-color-black);color:var(--gw-color-white);
+                display:grid;place-items:center;flex:none}
+.lb-brand__chip svg{width:16px;height:16px;display:block}
+.lb-brand__n{font:var(--gw-text-h7);color:var(--s-heading)}
+.lb-crumb{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-400);
+          white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-crumb a{color:var(--gw-color-primary-600);text-decoration:none}
+.lb-top__r{display:flex;align-items:center;gap:var(--gw-space-12);margin-left:auto}
+.lb-find{width:300px;height:36px;background:var(--s-field-bg);
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         padding:0 var(--gw-space-12);font:var(--gw-text-body-14-reg);color:var(--s-heading)}
+.lb-find::placeholder{color:var(--s-placeholder)}
+.lb-find:focus{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.lb-tbtn{width:36px;height:36px;display:grid;place-items:center;background:transparent;
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         color:var(--s-body);cursor:pointer;flex:none}
+.lb-tbtn svg{width:18px;height:18px;display:block}
+.lb-tbtn:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+@media (max-width:820px){.lb-find{display:none}}
+
+/* ---- three columns ------------------------------------------------------- */
+.lb-3{display:grid;grid-template-columns:240px minmax(0,1fr) 212px;align-items:start;
+      max-width:1600px;margin:0 auto}
+.lb-rail{position:sticky;top:60px;max-height:calc(100vh - 60px);overflow-y:auto;
+         border-right:1px solid var(--s-chrome-border);padding:var(--gw-space-24) 0}
+.lb-rail__t{font:var(--gw-text-body-12-med);text-transform:uppercase;letter-spacing:.06em;
+            color:var(--gw-color-neutral-400);padding:0 var(--gw-space-20) var(--gw-space-8)}
+.lb-rail a{display:flex;justify-content:space-between;gap:var(--gw-space-8);
+           font:var(--gw-text-body-14-reg);color:var(--s-body);text-decoration:none;
+           padding:6px var(--gw-space-20)}
+.lb-rail a:hover{background:var(--s-nav-hover);color:var(--s-heading)}
+.lb-rail a.on{background:var(--s-nav-sel);color:var(--s-heading);
+              font:var(--gw-text-body-14-sem)}
+.lb-rail a span{color:var(--gw-color-neutral-400);font:var(--gw-text-body-12-reg);flex:none}
+.lb-rail a.on span{color:var(--s-heading)}
+.lb-rail__sep{margin:var(--gw-space-12) var(--gw-space-20) var(--gw-space-8);
+              border-top:1px solid var(--s-chrome-border)}
+
+.lb-mid{grid-column:2;padding:var(--gw-space-32) var(--gw-space-40) var(--gw-space-80);
+        min-width:0;display:flex;flex-direction:column;gap:var(--gw-space-24)}
+.lb-toc{grid-column:3;position:sticky;top:60px;max-height:calc(100vh - 60px);overflow-y:auto;
+        padding:var(--gw-space-32) var(--gw-space-20);display:flex;flex-direction:column;
+        gap:5px}
+.lb-toc b{font:var(--gw-text-body-12-med);text-transform:uppercase;letter-spacing:.06em;
+          color:var(--gw-color-neutral-400);margin-bottom:3px}
+.lb-toc a{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-600);
+          text-decoration:none;line-height:1.35}
+.lb-toc a:hover{color:var(--gw-color-primary-600)}
+.lb-toc a.l3{padding-left:var(--gw-space-12)}
+@media (max-width:1180px){.lb-3{grid-template-columns:220px minmax(0,1fr)}
+                          .lb-toc{display:none}}
+@media (max-width:820px){.lb-3{grid-template-columns:1fr}
+                         .lb-rail{position:static;max-height:none;border-right:0;
+                                  border-bottom:1px solid var(--s-chrome-border)}
+                         .lb-mid{padding:var(--gw-space-24) var(--gw-space-20)}}
+
+/* ---- page head ----------------------------------------------------------- */
+.lb-h{display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.lb-h h1{font:var(--gw-text-h4);margin:0}
+.lb-h .lede{font:var(--gw-text-body-16-reg);color:var(--s-body);margin:0;max-width:74ch}
+.lb-row{display:flex;flex-wrap:wrap;gap:var(--gw-space-8);align-items:center}
+.lb-meta{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+         color:var(--gw-color-neutral-400)}
+
+.chip{display:inline-flex;align-items:center;gap:5px;font:var(--gw-text-body-12-med);
+      border-radius:var(--gw-radius-full);padding:3px var(--gw-space-8);white-space:nowrap}
+.chip--measured{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.chip--transcribed{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.chip--ruled{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+.chip--structure{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.chip--built-here{background:var(--gw-color-orange-50);color:var(--gw-color-orange-700)}
+.chip--passed{background:var(--gw-color-green-500);color:var(--gw-color-white)}
+.chip--pending{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+.chip--rejected{background:var(--gw-color-red-500);color:var(--gw-color-white)}
+.chip--gap{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+.chip--web{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+:root[data-theme="dark"] .chip--measured{background:var(--gw-color-green-900);color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .chip--transcribed,
+:root[data-theme="dark"] .chip--structure{background:var(--gw-color-yellow-900);color:var(--gw-color-yellow-100)}
+:root[data-theme="dark"] .chip--ruled,
+:root[data-theme="dark"] .chip--web{background:var(--gw-color-primary-900);color:var(--gw-color-primary-200)}
+:root[data-theme="dark"] .chip--pending{background:var(--gw-color-neutral-800);color:var(--gw-color-neutral-300)}
+:root[data-theme="dark"] .chip--built-here{background:var(--gw-color-orange-900);color:var(--gw-color-orange-100)}
+:root[data-theme="dark"] .chip--gap{background:var(--gw-color-red-900);color:var(--gw-color-red-200)}
+
+/* ---- markdown ------------------------------------------------------------ */
+.md{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.md h2{font:var(--gw-text-h6);margin:var(--gw-space-20) 0 0;scroll-margin-top:80px}
+.md h3{font:var(--gw-text-h7);margin:var(--gw-space-16) 0 0;scroll-margin-top:80px}
+.md h4,.md h5,.md h6{font:var(--gw-text-body-16-sem);margin:var(--gw-space-12) 0 0}
+.md p{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+      color:var(--s-body);margin:0;max-width:80ch}
+.md ul,.md ol{margin:0;padding-left:var(--gw-space-20);display:flex;
+              flex-direction:column;gap:5px}
+.md li{font:var(--gw-text-body-14-reg);color:var(--s-body);max-width:78ch}
+.md code{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px;
+         background:var(--s-code-bg);border:1px solid var(--s-code-border);
+         color:var(--s-code-fg);border-radius:var(--gw-radius-4);padding:1px 5px}
+.md a{color:var(--gw-color-primary-600)}
+.md-pre{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-radius:var(--gw-radius-8);padding:var(--gw-space-16);overflow-x:auto;margin:0}
+.md-pre code{background:none;border:0;padding:0;color:var(--s-body);font-size:12px}
+.md-q{margin:0;border-left:3px solid var(--gw-color-neutral-300);
+      padding:var(--gw-space-8) var(--gw-space-16);font:var(--gw-text-body-14-reg);
+      color:var(--s-body)}
+.md-hr{border:0;border-top:1px solid var(--s-card-border);margin:var(--gw-space-12) 0}
+.md-tblwrap{overflow-x:auto}
+.md-tbl{width:100%;border-collapse:collapse;background:var(--s-card-bg);
+        border:1px solid var(--s-card-border);border-radius:var(--gw-radius-8);
+        overflow:hidden;font:var(--gw-text-body-14-reg)}
+.md-tbl th{text-align:left;font:var(--gw-text-body-12-med);text-transform:uppercase;
+           letter-spacing:.06em;color:var(--gw-color-neutral-400);
+           padding:var(--gw-space-8) var(--gw-space-12);
+           border-bottom:1px solid var(--s-card-border);white-space:nowrap}
+.md-tbl td{padding:var(--gw-space-8) var(--gw-space-12);color:var(--s-body);
+           border-bottom:1px solid var(--s-card-border);vertical-align:top}
+.md-tbl tr:last-child td{border-bottom:none}
+.md-tbl code{white-space:nowrap}
+
+.note{font:var(--gw-text-body-14-reg);color:var(--s-body);
+      background:var(--gw-color-neutral-25);border:1px solid var(--s-card-border);
+      border-left:3px solid var(--gw-color-neutral-300);border-radius:var(--gw-radius-8);
+      padding:var(--gw-space-12) var(--gw-space-16);white-space:pre-wrap;max-width:88ch}
+:root[data-theme="dark"] .note{background:var(--gw-color-neutral-900)}
+.note--find{border-left-color:var(--gw-color-yellow-400);white-space:normal}
+.empty{border:1px dashed var(--s-field-border);border-radius:var(--gw-radius-10);
+       padding:var(--gw-space-24);text-align:center;font:var(--gw-text-body-14-reg);
+       color:var(--gw-color-neutral-400)}
+.sec{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.sec h2{font:var(--gw-text-h6);margin:0;scroll-margin-top:80px}
+</style>
+</head>
+<body>
+<header class="lb-top">
+  <a class="lb-brand" href="../../../library/index.html">
+    <span class="lb-brand__chip"><svg viewBox="0 0 80 80" fill="none" aria-hidden="true"><path d="M76.6088 4.56344C77.5025 2.36058 75.8495 0 73.4723 0H9.14286C4.0934 0 0 4.0934 0 9.14286V66.7778C0 72.018 5.17081 75.6829 9.9603 73.5568C40.8494 59.8449 64.3785 34.7075 76.6088 4.56344Z" fill="currentColor"/><path d="M32.5161 80C31.4022 80 30.9357 78.5531 31.8259 77.8835C54.9007 60.5265 71.4338 35.8047 78.7658 8.0522C78.9403 7.39154 80 7.51618 80 8.19951V70.8571C80 75.9066 75.9066 80 70.8571 80H32.5161Z" fill="currentColor"/></svg></span>
+    <span class="lb-brand__n">Component Library</span></a>
+  <span class="lb-crumb"><a href="../../index.html">Library</a> / <a href="index.html">Web</a></span>
+  <div class="lb-top__r"><input class="lb-find" id="lb-find" type="search" placeholder="Filter this library">
+    <button class="lb-tbtn" id="lb-theme" type="button" aria-label="Switch theme">
+      <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M116,36V32a12,12,0,0,1,24,0v4a12,12,0,0,1-24,0Zm80,92a68,68,0,1,1-68-68A68.07,68.07,0,0,1,196,128Zm-24,0a44,44,0,1,0-44,44A44.05,44.05,0,0,0,172,128ZM51.51,68.49a12,12,0,1,0,17-17l-4-4a12,12,0,0,0-17,17Zm0,119-4,4a12,12,0,0,0,17,17l4-4a12,12,0,1,0-17-17ZM196,72a12,12,0,0,0,8.49-3.51l4-4a12,12,0,0,0-17-17l-4,4A12,12,0,0,0,196,72Zm8.49,115.51a12,12,0,0,0-17,17l4,4a12,12,0,0,0,17-17ZM48,128a12,12,0,0,0-12-12H32a12,12,0,0,0,0,24h4A12,12,0,0,0,48,128Zm80,80a12,12,0,0,0-12,12v4a12,12,0,0,0,24,0v-4A12,12,0,0,0,128,208Zm96-92h-4a12,12,0,0,0,0,24h4a12,12,0,0,0,0-24Z"/></svg></button></div>
+</header>
+<div class="lb-3"><nav class="lb-rail"><div class="lb-rail__t">Web · 28</div><a href="index.html" data-q="overview 28">Overview<span>28</span></a><div class="lb-rail__sep"></div><a href="ai-agents.html" data-q="ai-agents ">ai-agents</a><a href="button.html" data-q="button ">button</a><a href="card-case-study.html" data-q="card-case-study ">card-case-study</a><a href="card-information.html" data-q="card-information ">card-information</a><a href="card-review.html" data-q="card-review ">card-review</a><a href="card-testimonial.html" data-q="card-testimonial ">card-testimonial</a><a href="cards-grid.html" data-q="cards-grid ">cards-grid</a><a href="cards-grid-small.html" data-q="cards-grid-small ">cards-grid-small</a><a href="case-study-page.html" data-q="case-study-page ">case-study-page</a><a href="client-avatar.html" data-q="client-avatar ">client-avatar</a><a href="client-logos.html" data-q="client-logos ">client-logos</a><a href="comparison-table.html" data-q="comparison-table ">comparison-table</a><a href="cta.html" data-q="cta ">cta</a><a href="eyebrow.html" data-q="eyebrow ">eyebrow</a><a href="faqs.html" data-q="faqs ">faqs</a><a href="fold-other.html" data-q="fold-other ">fold-other</a><a href="footer.html" data-q="footer ">footer</a><a href="form.html" data-q="form ">form</a><a href="hero.html" data-q="hero ">hero</a><a href="image.html" data-q="image ">image</a><a href="inline-input.html" data-q="inline-input " class="on">inline-input</a><a href="input-fields.html" data-q="input-fields ">input-fields</a><a href="navbar.html" data-q="navbar ">navbar</a><a href="page-build.html" data-q="page-build ">page-build</a><a href="testimonial.html" data-q="testimonial ">testimonial</a><a href="timeline.html" data-q="timeline ">timeline</a><a href="video.html" data-q="video ">video</a><a href="with-image.html" data-q="with-image ">with-image</a></nav><main class="lb-mid"><div class="lb-h"><h1>inline-input</h1><p class="lede">Web · atoms.md</p><div class="lb-row"><span class="chip chip--measured" title="Read off the bound Figma variables. Safe to build from.">measured</span><span class="chip chip--pending" title="Has not been through a review pass">not reviewed</span><span class="pill">v1.1.0</span></div><div class="lb-meta">review: bash scripts/review-pass.sh web inline-input</div></div><div class="md"><h2 id="eyebrow">Web atoms</h2>
+<p>Figma: <code>↳ web/ component-library</code> (<code>112:414</code>).</p>
+<p>The smallest tier of the web ladder. Atoms compose into fold-elements, which compose into Folds, which stack into Page Build. Never place an atom directly on a page — put it inside a fold-element or a Fold.</p>
+<p>Covered elsewhere: <b>Button</b> → <code>button.md</code> · <b>client/avatar</b> → <code>avatar.md</code> · <b>Cards</b> → <code>cards.md</code> · <b>image</b> → <code>images.md</code> · <b>Badge</b> and <b>Logo</b> → <code>foundation/shared-components.md</code>.</p>
+<hr class="md-hr">
+<h3 id="appearance-from-design-context-1516-410"><code>eyebrow</code></h3>
+<p>Group <code>1530:2190</code> · set <code>1516:410</code> · <b>6 variants</b> (2 × 2 × 2), complete.</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Property</th><th>Values</th></tr></thead><tbody><tr><td><code>Type</code></td><td><code>Default</code>, <code>Trustpilot</code></td></tr><tr><td><code>Color</code></td><td><code>Default</code>, <code>Blue</code></td></tr><tr><td><code>State</code></td><td><code>Default</code>, <code>Hover</code></td></tr></tbody></table></div>
+<p>A small pill label that sits above a heading.</p>
+<p><b><code>Type</code>:</b></p>
+<ul><li><code>Default</code> — the standard eyebrow. e.g. &quot;What's happening?&quot;, &quot;Referred by Jacob&quot;. Used</li></ul>
+<p>widely.</p>
+<ul><li><code>Trustpilot</code> — the rating variant. e.g. &quot;Rated 4.5 on Trustpilot&quot;. For social-proof and</li></ul>
+<p>rating callouts.</p>
+<p><b><code>Color</code></b> (Default type only):</p>
+<ul><li><code>Default</code> (black) — <b>the default.</b> Use widely.</li><li><code>Blue</code> — <b>only when asked.</b></li></ul>
+<h4>Appearance — from design context (<code>1516:410</code>)</h4>
+<p><b>There are five props, not three.</b> The variant matrix is <code>Type</code> × <code>Color</code> × <code>State</code>, plus two booleans the annotation never mentions:</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Prop</th><th>Type</th><th>Default</th></tr></thead><tbody><tr><td><code>icon</code></td><td>BOOLEAN</td><td><b><code>true</code></b> — the leading glyph is on by default</td></tr><tr><td><code>clickable</code></td><td>BOOLEAN</td><td><code>false</code> — adds a trailing caret chip</td></tr></tbody></table></div>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Part</th><th><code>Color=Default</code></th><th><code>Color=Blue</code></th></tr></thead><tbody><tr><td>pill</td><td><code>--gw-color-white</code></td><td><b><code>--gw-color-primary-25</code></b></td></tr><tr><td>stroke</td><td><code>--gw-color-neutral-100</code> at <b>0.5px</b></td><td><b>none</b></td></tr><tr><td>label</td><td><code>--gw-text-body-12-med</code> · <b><code>--gw-color-neutral-900</code></b></td><td><code>--gw-text-body-12-med</code> · <code>--gw-color-primary-500</code></td></tr><tr><td>leading icon</td><td><b><code>SealQuestion</code></b> (<code>112:648</code>)</td><td><b><code>Handshake</code></b> (<code>112:3301</code>)</td></tr></tbody></table></div>
+<p>Shared: height <b>24 fixed</b>, <code>--gw-radius-full</code> (100px), <code>padding: 4px 8px</code>, gap <code>--gw-space-4</code>. <b>Icons are 14×14</b> — not the 12 or 16 the master spec claims.</p>
+<p><code>State=Hover</code> widens the gap from <code>--gw-space-4</code> to <code>--gw-space-8</code>. Nothing else changes.</p>
+<p><b><code>clickable=true</code></b> appends a chip: <code>padding: --gw-space-4</code>, <b><code>--gw-radius-60</code></b>, holding <code>CaretRight</code> (<code>112:4326</code>) at <b>10px</b>. Chip fill is <code>--gw-color-neutral-50</code> at rest and <code>--gw-color-neutral-900</code> on hover.</p>
+<p><b><code>Type=Trustpilot</code></b> is a different composition: white pill, 0.5px stroke, asymmetric <code>padding: 4px 4px 4px 8px</code>, label <code>Rated 4.5 on</code> + the Trustpilot mark (14.848 × 14) + the word <code>Trustpilot</code>, and the caret chip is always present.</p>
+<p>All three glyphs are in the library: <code>assets/icons/regular/seal-question.svg</code>, <code>handshake.svg</code>, <code>caret-right.svg</code>.</p>
+<h4>Corrections this measurement forced</h4>
+<ol><li><b>The eyebrow has a real leading icon, on by default.</b> Earlier passes rendered a plain</li></ol>
+<p>CSS circle. It is <code>SealQuestion</code> on Default and <code>Handshake</code> on Blue.</p>
+<ol><li><b><code>Color=Default</code> labels are <code>neutral-900</code>, not <code>neutral-700</code>.</b> The master spec says</li></ol>
+<p><code>#535A61</code>; the component says <code>#262a2e</code>. The spec is wrong.</p>
+<ol><li><b>The Blue pill is <code>primary-25</code>, not <code>primary-50</code></b> — and it carries <b>no stroke</b>, unlike</li></ol>
+<p>Default.</p>
+<ol><li><b>Icons are 14px.</b> Not a token step, and not what the spec says.</li><li><b>Two boolean props exist</b> — <code>icon</code> and <code>clickable</code> — neither of which was documented.</li><li>The 0.5px stroke is what makes the white pill read on a white fold, not a shadow. An</li></ol>
+<p>even earlier pass guessed <code>--gw-shadow-s2</code>; also wrong.</p>
+<p><b>There is no on-blue or on-black eyebrow.</b> All 6 variants are <code>Type</code> × <code>Color</code> × <code>State</code>. For a label on a full-bleed coloured fold, report the gap; don't improvise a translucent-white pill.</p>
+<p>The Trustpilot type keeps its own rating style; the black/blue rule does not apply to it.</p>
+<p><b>Leading icon</b> is optional on default eyebrows — turn it on or off as the design needs.</p>
+<p><b>Clickable:</b> the <code>Default</code> type can be made clickable (toggle). When on, an arrow-with-background appears at the end. <code>Trustpilot</code> is non-clickable by default; add the clickable appearance only when asked.</p>
+<p><b>Where a clickable eyebrow links is subjective — ask for the destination.</b> Do not assume one.</p>
+<p>Use an eyebrow, never a coloured dot, for a label above a heading.</p>
+<hr class="md-hr">
+<h3 id="corrections-this-measurement-forced"><code>tooltip</code></h3>
+<p>Group <code>1530:2709</code> · set <code>1554:348</code> · <b>9 variants</b> (3 × 3), complete.</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Property</th><th>Values</th></tr></thead><tbody><tr><td><code>Color</code></td><td><code>Neutral</code>, <code>Dark</code>, <code>Blue</code></td></tr><tr><td><code>Position</code></td><td><code>Left</code>, <code>Right</code>, <code>Center</code></td></tr></tbody></table></div>
+<p><b><code>Color</code> — pick by contrast with the background:</b></p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Color</th><th>Use on</th></tr></thead><tbody><tr><td><code>Neutral</code> (light pill)</td><td>Dark backgrounds</td></tr><tr><td><code>Dark</code> (dark pill)</td><td>Light backgrounds</td></tr><tr><td><code>Blue</code></td><td>When you need to highlight or draw attention to a tooltip</td></tr></tbody></table></div>
+<p><b><code>Position</code></b> controls where the arrow/tail sits below the text box. <b>Pick by the tooltip's placement so content never clips</b> — a tooltip near the left edge uses <code>Left</code> so the box doesn't cut off. <b>There is no default</b>; position is decided by placement.</p>
+<p>The rule calls this property <b>&quot;Arrow position&quot;</b>; the actual key is <b><code>Position</code></b>.</p>
+<p><b>Leading icon</b> can be turned on or off, and swapped to suit the context (default is the info icon).</p>
+<hr class="md-hr">
+<h3 id="tooltip"><code>input-fields</code></h3>
+<p>Group <code>1485:14897</code>. Six sets plus five standalone status components.</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Component</th><th>Node</th><th>Properties</th><th>Variants</th></tr></thead><tbody><tr><td><code>input/text-field</code></td><td><code>1562:705</code></td><td><code>State</code> [<code>Default</code>, <code>Hover</code>, <code>Selected</code>, <code>Filled</code>, <code>Loading</code>, <code>Verified</code>] × <code>Feedback</code> [<code>None</code>, <code>Red Warning</code>, <code>Yellow Warning</code>]</td><td>14 of 18</td></tr><tr><td><code>input/phone-field</code></td><td><code>1562:5506</code></td><td>same as text-field</td><td>14 of 18</td></tr><tr><td><code>input/dropdown</code></td><td><code>1562:5769</code></td><td><code>State</code> [<code>Default</code>, <code>Hover</code>, <code>Filled</code>, <code>Open</code>]</td><td>4</td></tr><tr><td><code>input/card</code></td><td><code>1562:5807</code></td><td><code>State</code> [<code>Default</code>, <code>Hover</code>, <code>Selected</code>] × <code>Feedback</code> [<code>None</code>]</td><td>3</td></tr><tr><td><code>input/ dropdown-options</code></td><td><code>1490:3488</code></td><td><code>Type</code> [<code>Basic</code>, <code>With Recent/ Suggestions</code>, <code>With Add Other Item</code>, <code>With Description</code>] × <code>State</code> [<code>none</code>, <code>Default</code>, <code>Typing</code>]</td><td>5</td></tr><tr><td><code>input/checkbox</code></td><td><code>1977:4776</code></td><td><code>State</code> [<code>Default</code>, <code>Hover</code>, <code>Selected</code>]</td><td>3</td></tr></tbody></table></div>
+<p>Note <code>input/ dropdown-options</code> has a <b>space after the slash</b>, unlike its five siblings. <code>input/card</code> carries a single-value <code>Feedback [None]</code> property — dead weight that must still be supplied.</p>
+<h4>Definitions</h4>
+<ul><li><b>Single-select</b> — the user picks exactly one option.</li><li><b>Multi-select</b> — the user can pick more than one.</li><li><b>Required by default</b> — every field is required unless its label ends with</li></ul>
+<p><code>&quot; (Optional)&quot;</code>.</p>
+<h4>Pick the component by input type</h4>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Input</th><th>Component</th></tr></thead><tbody><tr><td>Single-line text — email, first name, last name, company name, job title, URL</td><td><code>input/text-field</code></td></tr><tr><td>Phone number</td><td><code>input/phone-field</code></td></tr><tr><td>Single-select, few options, all visible</td><td><code>input/card</code></td></tr><tr><td>Single-select, long list or tight space</td><td><code>input/dropdown</code></td></tr><tr><td>Multi-select</td><td><code>input/checkbox</code></td></tr></tbody></table></div>
+<p><b>Single-select is only ever a Card or a Dropdown — never hand-roll a radio button.</b> Cards when the choices are few and worth showing up front (B2B / B2C / Mixed); Dropdown when the list is long, unknown, or space is tight.</p>
+<h4>Dropdown list types</h4>
+<p>The rule names these <code>Plain</code> / <code>Suggested</code> / <code>Recent</code> / <code>Type-and-add</code> / <code>With descriptions</code>. <b>None of those is a real key.</b> The actual <code>Type</code> values on <code>1490:3488</code>, and what the rule means by each:</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Actual key</th><th>Rule calls it</th><th>Use for</th></tr></thead><tbody><tr><td><code>Basic</code></td><td>&quot;Plain&quot;</td><td>Fixed, short list</td></tr><tr><td><code>With Recent/ Suggestions</code></td><td>&quot;Suggested / Recent&quot;</td><td>Frequent or repeated picks surfaced at the top</td></tr><tr><td><code>With Add Other Item</code></td><td>&quot;Type-and-add&quot;</td><td>The list can't be exhaustive; user can type a new value</td></tr><tr><td><code>With Description</code></td><td>&quot;With descriptions&quot;</td><td>Options need a line of explanation to choose between</td></tr></tbody></table></div>
+<p>Use the left column. Following the prose emits four invalid keys.</p>
+<h4>Field states — when each fires, the copy, whether it blocks</h4>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>State</th><th>Fires when</th><th>Copy</th><th>Blocks?</th></tr></thead><tbody><tr><td><code>Default</code></td><td>Untouched or valid</td><td>none</td><td>no</td></tr><tr><td>Error (red) — <code>Feedback=Red Warning</code></td><td>Hard validation fail: wrong format, missing required</td><td><code>&quot;Oops! That does not look right. Do you wanna try again?&quot;</code></td><td><b>yes</b></td></tr><tr><td>Warning (yellow) — <code>Feedback=Yellow Warning</code></td><td>Value allowed but looks off</td><td><code>&quot;Heads up! Please double-check this field.&quot;</code></td><td>no</td></tr><tr><td><code>Verified</code></td><td>Passed a check, e.g. verified email</td><td>none — show the check</td><td>no</td></tr><tr><td><code>Loading</code></td><td>Async validation in progress</td><td>none — spinner</td><td>no</td></tr></tbody></table></div>
+<p>The rule calls the success state <b>&quot;Success (green check)&quot;</b>; the actual value is <b><code>Verified</code></b>. There is no <code>Success</code> key.</p>
+<p>The rule also flattens a two-axis model into one list. States live on <code>State</code> (<code>Default</code>, <code>Hover</code>, <code>Selected</code>, <code>Filled</code>, <code>Loading</code>, <code>Verified</code>) and validation lives on <code>Feedback</code> (<code>None</code>, <code>Red Warning</code>, <code>Yellow Warning</code>). <code>Hover</code>, <code>Selected</code>, and <code>Filled</code> are undocumented in the prose.</p>
+<p>The two error/warning strings above are the exception to the no-exclamation-marks rule in <code>foundation/voice.md</code> — they are the component's shipped copy. Do not write new copy with exclamation marks.</p>
+<h4>Label and placeholder behaviour</h4>
+<p>At rest (empty, unfocused) the <b>label sits inside the field</b>. On focus or fill (the <code>Selected</code> variant) the label <b>shrinks and floats to the top</b>, and the example placeholder appears below it. <b>Both stay visible — the placeholder never replaces the label.</b></p>
+<p>The placeholder is a <b>lowercase example</b> of the expected value, hinting at format, not repeating the field name:</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Field</th><th>Placeholder</th></tr></thead><tbody><tr><td>Email</td><td><code>name@company.com</code></td></tr><tr><td>Company name</td><td><code>your company name</code></td></tr><tr><td>First name</td><td><code>first name</code></td></tr><tr><td>Last name</td><td><code>last name</code></td></tr></tbody></table></div>
+<h4>Optional fields</h4>
+<p>Fields are required by default. When a field is optional, <b>append <code>&quot; (Optional)&quot;</code> to its label</b>. <b>Never mark required fields</b> — required is the silent default.</p>
+<h4>Status / processing icons</h4>
+<p>Five standalone slash-named components, not a variant set: <code>Processing/None</code> (<code>1497:213</code>), <code>Processing/Loading</code> (<code>1497:214</code>), <code>Processing/Verified</code> (<code>1497:216</code>), <code>Processing/Red Warning</code> (<code>1523:307</code>), <code>Processing/Yellow Warning</code> (<code>1523:310</code>).</p>
+<p>Inconsistent with every other multi-state element in the file, which uses variant properties. Reach for them through the field's <code>State</code> / <code>Feedback</code>, not directly.</p>
+<hr class="md-hr">
+<h3 id="input-fields"><code>inline-input</code></h3>
+<p>Group <code>1584:1059</code> · set <code>1584:1579</code> · <b>24 variants</b> (4 × 3 × 2), complete.</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Property</th><th>Values</th></tr></thead><tbody><tr><td><code>State</code></td><td><code>Default</code>, <code>Hover</code>, <code>Selected</code>, <code>Filled</code></td></tr><tr><td><code>Feedback</code></td><td><code>None</code>, <code>Red Warning</code>, <code>Yellow Warning</code></td></tr><tr><td><code>Button Style</code></td><td><code>Primary</code>, <code>Dark</code></td></tr></tbody></table></div>
+<p>One field plus an inline CTA in a single row.</p>
+<p><b>When to use: only when a single piece of input moves the user forward</b> — capturing a work email before a demo. One field, one CTA, one step. <b>For anything longer, build a full form from the standard input fields.</b></p>
+<h4>Copy conventions</h4>
+<ul><li><b>Label is phrased as a question</b>, not a noun — &quot;What's your work email?&quot; (Standard</li></ul>
+<p>input-field labels stay noun-style, &quot;Work email&quot;; inline-input labels ask.)</p>
+<ul><li><b>Placeholder</b> is a lowercase example of the value — <code>name@company.com</code>.</li><li><b>Button text is the primary CTA</b> — <code>Book a Demo</code>. See <code>foundation/voice.md</code>; the</li></ul>
+<p>rule text here says &quot;Book a call&quot; and is one of the two outliers.</p>
+<h4>CTA colour</h4>
+<p><b>Black CTA is the default primary.</b> Use the <b>Blue</b> CTA when the inline-input sits on a black background, so the CTA keeps emphasis. Same rule as buttons: blue is primary on black surfaces.</p>
+<h4>States</h4>
+<p>Inline-input carries the same states as the standard input fields — see the field-states table above. Do not redefine them.</p>
+<h4>Phone breakpoint</h4>
+<p>Field and CTA <b>stack vertically</b> — field on top, CTA full-width below, <b>12px gap</b>.</p>
+<p><code>inline-input</code> is the only group in the web library with no <code>Wrapper Frame</code> — an extractor keyed on that frame name will skip it.</p>
+<hr class="md-hr">
+<h3 id="definitions"><code>ai-agents</code> / <code>agent-icon</code></h3>
+<p>Group <code>1584:2041</code> · set <code>1606:581</code> · <b>20 variants</b> (10 × 2), complete.</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Property</th><th>Values</th></tr></thead><tbody><tr><td><code>ai agent</code></td><td><code>research</code>, <code>refresh</code>, <code>authority</code>, <code>paid_boost</code>, <code>strategy</code>, <code>content</code>, <code>follow_up</code>, <code>memory</code>, <code>design_&amp;_development</code>, <code>other</code></td></tr><tr><td><code>add emphasis</code></td><td><code>false</code>, <code>true</code></td></tr></tbody></table></div>
+<p>Both property names are <b>lowercase with spaces</b> — <code>ai agent</code>, <code>add emphasis</code> — unlike the Title-Case convention everywhere else. Copy as written.</p>
+<p><b>Where to use:</b> in cards, or wherever an agent needs to be represented visually.</p>
+<p><b>The agent set is fixed.</b> Each name maps to its own icon. Use snake_case for multi-word names. The rule lists nine; <b>the component ships ten — <code>other</code> is undocumented</b> and is the slot for an agent not in the set.</p>
+<p><b>Construction:</b> each icon is a 4×4 grid of rounded-corner squares. <b>Don't hand-draw new patterns</b> — use the ones in the set. <b>Each agent's pattern is fixed; don't swap an agent's glyph.</b></p>
+<p><b>Emphasis:</b> <code>add emphasis=false</code> (lighter blue) is the resting state. <code>add emphasis=true</code> (brighter blue) is used on hover, and to statically spotlight an agent when you want to draw attention to it.</p>
+<p>The rule names these states &quot;Default&quot; and &quot;Emphasis&quot; — neither is a resolvable key. Use <code>false</code> / <code>true</code>.</p>
+<hr class="md-hr">
+<h3 id="pick-the-component-by-input-type">Source notes</h3>
+<ul><li><b><code>Label: Dropdown</code> is stale copy-paste on six of these groups</b> — <code>1584:1578</code> and</li></ul>
+<p><code>1979:5345</code> (inline-input), <code>1584:2112</code> (eyebrow), <code>1607:4014</code> (ai-agents), <code>1584:2135</code> (badge), <code>1584:2124</code> (tooltip), <code>1977:4775</code> (checkbox). Ignore it.</p>
+<ul><li><b>Four descriptions share one generated template</b> (&quot;…providing a flexible and</li></ul>
+<p>consistent … across the interface&quot;): button <code>1674:37760</code>, badge <code>1553:14916</code>, tooltip <code>1530:2714</code>, input-fields <code>1485:14902</code>. Two make false claims — the badge description promises &quot;counts&quot; (no such variant) and input-fields claims &quot;inline CTAs&quot; (a separate group).</p>
+<ul><li>The eyebrow and tooltip rules describe icon on/off toggles and a clickable toggle that</li></ul>
+<p>do not appear in variant names. They are most likely boolean or instance-swap component properties, which the metadata API does not expose. Treat them as real but verify against the component before relying on exact prop names.</p>
+<ul><li><b>21 stray hidden <code>Frame 2147223955</code> nodes</b> sit at the root of this page, each holding</li></ul>
+<p>two text nodes named <code>Text</code>. Page garbage; ignore.</p></div></main><div class="lb-toc"><b>On this page</b><a href="#eyebrow" class="l3">eyebrow</a><a href="#appearance-from-design-context-1516-410" class="l3">Appearance — from design context (1516:410)</a><a href="#corrections-this-measurement-forced" class="l3">Corrections this measurement forced</a><a href="#tooltip" class="l3">tooltip</a><a href="#input-fields" class="l3">input-fields</a><a href="#definitions" class="l3">Definitions</a><a href="#pick-the-component-by-input-type" class="l3">Pick the component by input type</a><a href="#dropdown-list-types" class="l3">Dropdown list types</a><a href="#field-states-when-each-fires-the-copy-whether-it-blocks" class="l3">Field states — when each fires, the copy, whether it blocks</a><a href="#label-and-placeholder-behaviour" class="l3">Label and placeholder behaviour</a><a href="#optional-fields" class="l3">Optional fields</a><a href="#status-processing-icons" class="l3">Status / processing icons</a><a href="#inline-input" class="l3">inline-input</a><a href="#copy-conventions" class="l3">Copy conventions</a><a href="#cta-colour" class="l3">CTA colour</a><a href="#states" class="l3">States</a><a href="#phone-breakpoint" class="l3">Phone breakpoint</a><a href="#ai-agents-agent-icon" class="l3">ai-agents / agent-icon</a><a href="#source-notes" class="l3">Source notes</a></div></div>
+<script>
+(function(){
+  /* Theme: the same two localStorage keys the main site uses, so a choice made there
+     carries here and back. 'system' can still arrive from an older stored value and
+     resolves to light, matching shell.js. */
+  var PREF='gw-theme-pref', RES='gw-theme';
+  function pref(){try{var v=localStorage.getItem(PREF);
+    if(v==='light'||v==='dark')return v;
+    if(v==='system')return 'light';
+    var o=localStorage.getItem(RES);
+    return (o==='dark'||o==='light')?o:'light';}catch(e){return 'light'}}
+  function apply(p){var r=p==='dark'?'dark':'light';
+    document.documentElement.setAttribute('data-theme',r);
+    try{localStorage.setItem(PREF,p);localStorage.setItem(RES,r)}catch(e){}
+    var b=document.getElementById('lb-theme');
+    if(b)b.setAttribute('aria-label',r==='dark'?'Switch to light':'Switch to dark');}
+  var btn=document.getElementById('lb-theme');
+  if(btn)btn.addEventListener('click',function(){
+    apply(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
+  apply(pref());
+
+  /* Rail filter. Narrows the inventory in place — it does not navigate, because the
+     rail is a list of siblings and losing your place to search them is worse than
+     scrolling. */
+  var f=document.getElementById('lb-find');
+  if(f){
+    var rows=[].slice.call(document.querySelectorAll('.lb-rail a'));
+    f.addEventListener('input',function(){
+      var t=f.value.trim().toLowerCase();
+      rows.forEach(function(a){
+        a.hidden=!!t&&a.getAttribute('data-q').indexOf(t)===-1});
+    });
+  }
+
+  /* Mark the on-this-page entry for whatever heading is currently at the top. */
+  var toc=[].slice.call(document.querySelectorAll('.lb-toc a'));
+  if(toc.length){
+    var heads=toc.map(function(a){return document.getElementById(a.hash.slice(1))})
+                 .filter(Boolean);
+    var tick=function(){
+      var best=0;
+      heads.forEach(function(h,i){if(h.getBoundingClientRect().top<=90)best=i});
+      toc.forEach(function(a,i){a.style.color=i===best?'var(--gw-color-primary-600)':''});
+    };
+    document.addEventListener('scroll',tick,{passive:true});tick();
+  }
+})();
+</script>
+</body></html>

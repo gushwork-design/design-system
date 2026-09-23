@@ -1,0 +1,267 @@
+{
+  "$comment": [
+    "The ad-page fold set, measured off GW-Ads-Library on 2026-09-22.",
+    "",
+    "WHAT IS MEASURED HERE. Node ids, frame names, the Desktop/Phone variant split and",
+    "every width and height came back from the Figma metadata API and are node-traceable.",
+    "TOKEN BINDINGS are measured too, and live in the sibling variables.json — read with",
+    "the variable API, so they say what each node is ATTACHED to rather than what a",
+    "generated stylesheet happened to emit. What is still not measured is the LAYOUT",
+    "that arranges those tokens, which is why a fold is shown as its Figma render",
+    "rather than rebuilt.",
+    "THIS IS A SECOND ADS FILE. Memory and DECISIONS record the ads Figma as",
+    "O6g05YAT980r85VaDQha4h. This is t9rRxJODIVZ4N6CnrGdMhC, GW-Ads-Library, and it is the",
+    "one Utsav pointed at. Which of the two is authoritative is an open question, not",
+    "something this file should answer by picking one silently.",
+    "",
+    "`order` is the composition of the page that actually shipped —",
+    "web/internal/staging/ai-crm-lander — read off its own section comments, not decided",
+    "here. Two folds in that order have no component in this library and come from the main",
+    "web set instead; they carry \"library\": \"web\" and are the finding, not an omission."
+  ],
+  "source": {
+    "fileKey": "t9rRxJODIVZ4N6CnrGdMhC",
+    "fileName": "GW-Ads-Library",
+    "section": "43:34411",
+    "sectionName": "ready-for-claude",
+    "sectionSize": [
+      6897,
+      9126
+    ],
+    "measured": "2026-09-22",
+    "method": "figma get_metadata (structure) + get_variable_defs (bindings)"
+  },
+  "reference": {
+    "page": "web/internal/staging/ai-crm-lander/index.html",
+    "pins": "page-build Type=Ads",
+    "navbar": "logo + blue Book a Demo only — no nav links, no hamburger",
+    "footer": "copyright line only",
+    "note": "Still in flight. Not listed on web/internal/staging.html."
+  },
+  "components": [
+    {
+      "key": "eyebrow-ad-page",
+      "name": "Atoms / Eyebrow / Ad Page",
+      "kind": "atom",
+      "set": "25:7450",
+      "desktop": {
+        "node": "20:6361",
+        "w": 146,
+        "h": 32,
+        "img": "eyebrow-desktop.png"
+      },
+      "phone": {
+        "node": "25:7443",
+        "w": 146,
+        "h": 32
+      },
+      "note": "An ads-specific eyebrow. The main web set has six eyebrow variants (Type x Color x State) and none of them is this one."
+    },
+    {
+      "key": "hero-primary",
+      "name": "Folds / Hero / Primary",
+      "kind": "fold",
+      "set": "25:7453",
+      "desktop": {
+        "node": "25:7451",
+        "w": 1440,
+        "h": 833,
+        "img": "hero-primary-desktop.png"
+      },
+      "phone": {
+        "node": "25:7452",
+        "w": 375,
+        "h": 1124,
+        "img": "hero-primary-phone.png"
+      },
+      "note": "Full-bleed at 1440 — the hero is page-width, not content-width."
+    },
+    {
+      "key": "hero-alternate",
+      "name": "Folds / Hero / Alternate",
+      "kind": "fold",
+      "set": "43:30476",
+      "desktop": {
+        "node": "43:32414",
+        "w": 1440,
+        "h": 1261,
+        "img": "hero-alternate-desktop.png"
+      },
+      "phone": {
+        "node": "43:30477",
+        "w": 375,
+        "h": 1476
+      },
+      "note": "Taller than Primary by 428px — it carries the client-logo strip and a testimonial quote under the fold. Not used by the AI CRM lander."
+    },
+    {
+      "key": "video",
+      "name": "Folds / Video",
+      "kind": "fold",
+      "set": "25:7459",
+      "desktop": {
+        "node": "25:7457",
+        "w": 1240,
+        "h": 776,
+        "img": "video-desktop.png"
+      },
+      "phone": {
+        "node": "25:7458",
+        "w": 375,
+        "h": 736
+      },
+      "note": "The lander builds this as fold/ other rather than instancing a video fold."
+    },
+    {
+      "key": "features",
+      "name": "Folds / Features",
+      "kind": "fold",
+      "set": "25:7462",
+      "desktop": {
+        "node": "25:7460",
+        "w": 1240,
+        "h": 2527,
+        "img": "features-desktop.png"
+      },
+      "phone": {
+        "node": "25:7461",
+        "w": 375,
+        "h": 3616,
+        "img": "features-phone.png"
+      },
+      "note": "Four alternating text/image rows. The tallest fold in the set at both breakpoints."
+    },
+    {
+      "key": "timeline",
+      "name": "Folds / Timeline / CRM Setup",
+      "kind": "fold",
+      "set": "25:7468",
+      "desktop": {
+        "node": "25:7466",
+        "w": 1240,
+        "h": 520,
+        "img": "timeline-desktop.png"
+      },
+      "phone": {
+        "node": "25:7467",
+        "w": 375,
+        "h": 1156,
+        "img": "timeline-phone.png"
+      },
+      "note": "Four steps in a row on desktop, stacked on phone — 520 to 1156, the biggest reflow in the set."
+    },
+    {
+      "key": "faqs",
+      "name": "Folds / FAQs",
+      "kind": "fold",
+      "set": "25:7477",
+      "desktop": {
+        "node": "25:7475",
+        "w": 1240,
+        "h": 472,
+        "img": "faqs-desktop.png"
+      },
+      "phone": {
+        "node": "25:7476",
+        "w": 375,
+        "h": 874
+      }
+    },
+    {
+      "key": "footer-with-cta",
+      "name": "Footers / With CTA",
+      "kind": "footer",
+      "set": "25:7495",
+      "desktop": {
+        "node": "25:7493",
+        "w": 1440,
+        "h": 504,
+        "img": "footer-cta-desktop.png"
+      },
+      "phone": {
+        "node": "25:7494",
+        "w": 375,
+        "h": 948
+      },
+      "note": "Blue CTA panel plus the legal line. Page-width at 1440."
+    },
+    {
+      "key": "footer-minimal",
+      "name": "Footers / Minimal",
+      "kind": "footer",
+      "set": "25:7498",
+      "desktop": {
+        "node": "25:7496",
+        "w": 1440,
+        "h": 44,
+        "img": "footer-minimal-desktop.png"
+      },
+      "phone": {
+        "node": "25:7497",
+        "w": 375,
+        "h": 44
+      },
+      "note": "44px at both breakpoints — the only component in the set that does not reflow."
+    }
+  ],
+  "order": [
+    {
+      "step": 1,
+      "as": "navbar",
+      "key": null,
+      "library": "web",
+      "built": "Type=Ads navbar — logo + blue Book a Demo"
+    },
+    {
+      "step": 2,
+      "as": "fold/ Hero, Layout=Form",
+      "key": "hero-primary",
+      "library": "ad-page"
+    },
+    {
+      "step": 3,
+      "as": "fold/ other",
+      "key": "video",
+      "library": "ad-page",
+      "built": "MESS → AI CRM"
+    },
+    {
+      "step": 4,
+      "as": "fold/ With image × 4",
+      "key": "features",
+      "library": "ad-page"
+    },
+    {
+      "step": 5,
+      "as": "fold/AI Agents",
+      "key": "ai-agents",
+      "library": "ad-page",
+      "built": "fold/AI Agents"
+    },
+    {
+      "step": 6,
+      "as": "fold/Timeline",
+      "key": "timeline",
+      "library": "ad-page"
+    },
+    {
+      "step": 7,
+      "as": "fold/Comparison Table",
+      "key": "comparison-table",
+      "library": "ad-page",
+      "built": "fold/Comparison Table"
+    },
+    {
+      "step": 8,
+      "as": "fold/ FAQs",
+      "key": "faqs",
+      "library": "ad-page"
+    },
+    {
+      "step": 9,
+      "as": "fold/ CTA, Color=Blue + footer",
+      "key": "footer-with-cta",
+      "library": "ad-page"
+    }
+  ]
+}

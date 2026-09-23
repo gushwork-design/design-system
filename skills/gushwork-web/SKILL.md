@@ -8,7 +8,7 @@ description: Builds Gushwork marketing and public-website pages on-brand — lan
 You are building a **public-facing marketing surface** for Gushwork. Spacious,
 white-on-black with a blue accent, numbers leading every claim. This is not the product UI.
 
-Announce at the start: **"Using the Gushwork web skill — v1.46.0, updated 15 Sep 2026."**
+Announce at the start: **"Using the Gushwork web skill — v1.47.0, updated 23 Sep 2026."**
 
 That version and date are stamped into this file, so **a stale copy reports its own stale date**
 rather than claiming to be current. If the user asks whether they are up to date, or the output
@@ -117,6 +117,70 @@ blue primary on a Brand page means you set the wrong page type.
 
 Full detail in `exports/web/button.md`.
 
+## Ad landing pages — prefer the ad-page fold set
+
+An ad lander is still this surface: same `page-build`, same navbar and footer, same Button.
+What changes is **which folds you reach for**. There is a measured ad-page set harvested from
+the landers built over the last four to five months, and it beats composing the same shapes
+out of the general folds.
+
+**`Type=Ads` still governs everything above.** Navbar drops to logo + blue CTA, footer to a
+copyright line, primary button goes Blue. Set it once at the page level. Nothing below changes
+that or restates it.
+
+| Need | Use | Node |
+|---|---|---|
+| Opening fold with a form | `Folds / Hero / Primary` | `25:7451` |
+| Opening fold with client logos and a quote beneath | `Folds / Hero / Alternate` | `43:32414` |
+| A media well — video or product shot | `Folds / Video` | `25:7457` |
+| Alternating text/image feature rows | `Folds / Features` | `25:7460` |
+| Step- or week-based setup sequence | `Folds / Timeline / CRM Setup` | `25:7466` |
+| Question list | `Folds / FAQs` | `25:7475` |
+| Closing CTA plus the legal line | `Footers / With CTA` | `25:7493` |
+| The legal line alone | `Footers / Minimal` | `25:7496` |
+| The label above an ad-page heading | `Atoms / Eyebrow / Ad Page` | `20:6361` |
+
+Measured in `exports/ad-page/` — structure in `folds.json`, token bindings in `variables.json`.
+**178 of 181 bindings resolve to a `--gw-*` token and agree with `tokens.css`.** The three that
+do not are the bare legacy `White` variable on both heroes and the CTA footer; build
+`--gw-color-white`, per gap 9 below.
+
+### The order that shipped
+
+`navbar → Hero/Primary → Video → Features → AI Agents → Timeline → Comparison Table → FAQs →
+Footers/With CTA`. That is the AI CRM lander's own composition — a worked example, not a
+template to follow blindly.
+
+### Two folds are built-here and carry known off-system values
+
+`AI Agents` and `Comparison Table` have **no Figma component**. They exist only in
+`web/internal/staging/ai-crm-lander`, and were measured off the rendered page. Building either
+means reproducing values the system has no token for. Read `exports/ad-page/built-here.json`
+before you do:
+
+- **AI Agents** — card title is `700 18px/25.2px` display. The display ramp has no 18px step,
+  and only h1-h4 are 700. Off the ramp twice over, on all 54 cards.
+- **Comparison Table** — `#efefef` (in no ramp, between neutral-35 and neutral-50);
+  `700 16px/24px` Inter on 17 cells (the 16px body ramp is 400/500/600, there is no 700); and
+  `1px 6px` padding (the scale has neither, and must not be interpolated).
+
+Each is a ruling waiting to be made — either the token should exist, or the page should change.
+Until one is made, **report the value rather than reproducing it silently.**
+
+### What the ad-page set does not have
+
+No navbar of its own — use this surface's `navbar` under `Type=Ads`. No Button, no Badge, no
+card types, no client-logo row; those come from the web set and the shared atoms. The ad-page
+set is nine folds, one eyebrow and two built-here sections, and nothing else.
+
+### Review state
+
+**None of these eleven has been through a review pass yet** — `bash scripts/review-pass.sh
+--check` is the live answer, and it is the honest caveat on everything above. The measurements
+are node-traceable and the binding check re-runs on every build, so the numbers are real; what
+has not happened is the design owner reading them and saying yes. Treat the fold set as a good
+first draft and say so, the same way this file already asks you to for the unmeasured web folds.
+
 ## Which component? — the decision table
 
 | Need | Use | Read |
@@ -220,6 +284,71 @@ dashboard-only and invalid here. Never merge, alias, or substitute the two sets.
 
 **Badge is genuinely shared** — same component, both surfaces. See
 `foundation/shared-components.md`.
+
+## Every ad page ships a title and a description
+
+A `<title>` and `<meta name="description">` are part of the deliverable, not SEO
+housekeeping — they are the two lines that show up in Slack's unfurl, in a Google result,
+and in the browser tab a prospect leaves open. A page shipped without them is shipped
+unfinished.
+
+**If the brief supplies them, use them verbatim.** If it doesn't, derive them:
+
+| | Derive from | Aim for | Shape |
+|---|---|---|---|
+| `<title>` | the page's H1, plus ` \| Gushwork` | under 60 chars | sentence case, no trailing full stop |
+| `<meta name="description">` | the hero subtext, cut to the claim that matters | 120–155 chars | full sentences, ordinary punctuation |
+| `og:title` | the H1 **without** the ` \| Gushwork` suffix | under 60 chars | `og:site_name` already says Gushwork |
+| `og:description` | the same string as the meta description | — | keep the two identical; two versions drift |
+
+**Derived copy is a proposal, not a decision — put it to whoever asked for the page
+before it goes to staging.** A title and description are the page's first line of sales
+copy, and guessing them from body text produces something plausible and slightly wrong
+more often than not. Ruled by Utsav, 22 Sep 2026.
+
+Voice applies here as everywhere: sentence case, no em-dash-heavy constructions, and the
+heading rule about full stops applies to the title, not to the description, which is
+ordinary prose.
+
+## Every ad page ships a favicon and a social card
+
+**Not optional, and not a finishing touch — a `Type=Ads` page is pasted into Slack, sent
+to a client, and run as a paid ad. A page with no card is a grey box with a URL in it.**
+
+Artwork lives in **GW Ads Library `t9rRxJODIVZ4N6CnrGdMhC`**, page `↳ web/ads/og-image`:
+
+| | Node | Spec |
+|---|---|---|
+| Favicon | `5:46605` | 80 × 80 · `--gw-color-primary-500` ground · 2px `--gw-color-primary-600` rim · `--gw-radius-20` · white symbol 40 × 40 centred |
+| Social card | `5:36` | 1200 × 630 · `--gw-color-primary-500` ground · the lattice · white `gushwork-logo` (`Type=White`, `Size=40 px`) over the headline · headline Vert Grotesk Display **Bold 64/1.2**, white, centred, 840 wide · logo → headline gap 40 |
+
+Three rules:
+
+1. **The card carries the page's own H1, never the template's placeholder.** `5:36` ships
+   `Lorem ipsum dolor sit amet…`. Exporting the node as-is publishes lorem to LinkedIn.
+   Render the card from the page's real headline and regenerate it when the headline
+   changes.
+2. **`og:url` and `og:image` must be absolute.** Scrapers do not honour `<base href>`.
+   A relative `og:image` silently yields no preview.
+3. **Ship the set, not just one file** — `favicon.svg`, a 32px PNG fallback,
+   `apple-touch-icon.png` at 180, `og.png` at 1200 × 630, plus `theme-color`,
+   `og:type`/`og:site_name`/`og:title`/`og:description`/`og:image:width`/`:height`/`:alt`,
+   and the four `twitter:` tags with `summary_large_image`.
+
+**Don't rebuild any of this per page — copy it.** `assets/ads/` holds the three icon
+files ready to ship and `og-template.html`, which inlines the display face and renders
+the card from one substitution:
+
+```bash
+sed 's/HEADLINE/Your page H1 here/' assets/ads/og-template.html > /tmp/og.html
+chrome --headless --window-size=1200,630 --screenshot=og.png "file:///tmp/og.html"
+```
+
+See `assets/ads/README.md`.
+
+**A page behind the `/internal/*` gate cannot be previewed by a scraper** — the card 404s
+for anyone not signed in. That is expected on staging; check the card on the public URL
+once the page moves, not before.
 
 ## Surface defaults
 

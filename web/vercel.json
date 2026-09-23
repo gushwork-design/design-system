@@ -4,6 +4,16 @@
   "trailingSlash": false,
   "redirects": [
     {
+      "source": "/admin/ad-page-sheet",
+      "destination": "/library/recipes/ad-landing-page",
+      "permanent": false
+    },
+    {
+      "source": "/admin/component-library",
+      "destination": "/library",
+      "permanent": false
+    },
+    {
       "source": "/preview/install",
       "destination": "/internal/claude-plugin",
       "permanent": false

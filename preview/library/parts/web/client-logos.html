@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>client-logos — Gushwork</title>
+<meta name="robots" content="noindex">
+<script>try{var t=localStorage.getItem('gw-theme');if(t!=='dark')t='light';
+document.documentElement.setAttribute('data-theme',t)}catch(e){
+document.documentElement.setAttribute('data-theme','light')}</script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20width%3D%2280%22%20height%3D%2280%22%20rx%3D%2220%22%20fill%3D%22%230d0d0d%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="../../../foundation/tokens.css">
+<link rel="stylesheet" href="../../../shell.css">
+<style>
+.cl{--cl-gap:var(--gw-space-40)}
+.cl h2{font:var(--gw-text-h5);color:var(--s-heading);margin:0}
+.cl h3{font:var(--gw-text-h7);color:var(--s-heading);margin:0}
+.cl h4{font:var(--gw-text-body-16-sem);color:var(--s-heading);margin:0}
+.cl p{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+      color:var(--s-body);margin:0;max-width:78ch}
+.cl code,.cl .mono{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px}
+
+/* --- page head ------------------------------------------------------------ */
+.cl-head{display:flex;flex-direction:column;gap:var(--gw-space-16)}
+.cl-head h1{font:var(--gw-text-h4);color:var(--s-heading);margin:0}
+.cl-lede{font:var(--gw-text-body-18-reg);letter-spacing:var(--gw-text-body-18-reg-tracking);
+         color:var(--s-body);margin:0;max-width:72ch}
+
+/* --- the tally ------------------------------------------------------------ */
+.cl-tally{display:flex;flex-wrap:wrap;gap:var(--gw-space-12)}
+.cl-stat{flex:1 1 150px;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-16) var(--gw-space-20);
+         display:flex;flex-direction:column;gap:var(--gw-space-4)}
+.cl-stat b{font:var(--gw-text-h6);color:var(--s-heading);font-feature-settings:"tnum" 1}
+.cl-stat span{font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-400);
+              text-transform:uppercase;letter-spacing:.06em}
+
+/* --- review queue --------------------------------------------------------- */
+.cl-queue{background:var(--s-card-bg);border:1px solid var(--gw-color-yellow-300);
+          border-left:3px solid var(--gw-color-yellow-400);border-radius:var(--gw-radius-12);
+          padding:var(--gw-space-20) var(--gw-space-24);display:flex;flex-direction:column;
+          gap:var(--gw-space-12)}
+.cl-queue h2{font:var(--gw-text-h7)}
+.cl-queue ul{margin:0;padding-left:var(--gw-space-20);display:flex;flex-direction:column;
+             gap:var(--gw-space-4)}
+.cl-queue li{font:var(--gw-text-body-14-reg);color:var(--s-body)}
+.cl-queue a{color:var(--gw-color-primary-600);text-decoration:none}
+.cl-queue a:hover{text-decoration:underline}
+.cl-pass{background:var(--s-card-bg);border:1px solid var(--gw-color-green-300);
+         border-left:3px solid var(--gw-color-green-400)}
+
+/* --- controls ------------------------------------------------------------- */
+.cl-bar{position:sticky;top:0;z-index:5;background:var(--s-page-bg);
+        padding:var(--gw-space-12) 0;display:flex;flex-wrap:wrap;gap:var(--gw-space-8);
+        align-items:center;border-bottom:1px solid var(--s-chrome-border)}
+.cl-find{flex:1 1 220px;min-width:180px;background:var(--s-field-bg);
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         padding:var(--gw-space-8) var(--gw-space-12);font:var(--gw-text-body-14-reg);
+         color:var(--s-heading)}
+.cl-find::placeholder{color:var(--s-placeholder)}
+.cl-find:focus{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.cl-filter{display:flex;gap:var(--gw-space-4);flex-wrap:wrap}
+.cl-f{font:var(--gw-text-body-12-med);color:var(--s-body);background:transparent;
+      border:1px solid var(--s-field-border);border-radius:var(--gw-radius-full);
+      padding:6px var(--gw-space-12);cursor:pointer}
+.cl-f:hover{border-color:var(--gw-color-primary-500)}
+.cl-f[aria-pressed="true"]{background:var(--gw-color-black);color:var(--gw-color-white);
+                           border-color:var(--gw-color-black)}
+.cl-f:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.cl-count{font:var(--gw-text-body-12-reg);color:var(--gw-color-neutral-400);margin-left:auto}
+
+/* --- sections ------------------------------------------------------------- */
+.cl-sec{display:flex;flex-direction:column;gap:var(--gw-space-20);
+        scroll-margin-top:var(--gw-space-80)}
+.cl-sec[hidden]{display:none}
+.cl-sechead{display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--gw-space-12)}
+.cl-note{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+         color:var(--s-body);background:var(--gw-color-neutral-25);
+         border:1px solid var(--s-card-border);border-left:3px solid var(--gw-color-neutral-300);
+         border-radius:var(--gw-radius-8);padding:var(--gw-space-12) var(--gw-space-16);
+         white-space:pre-wrap;max-width:88ch}
+:root[data-theme="dark"] .cl-note{background:var(--gw-color-neutral-900)}
+.cl-sub{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.cl-sub[hidden]{display:none}
+
+/* --- chips ---------------------------------------------------------------- */
+.cl-chip{display:inline-flex;align-items:center;gap:6px;font:var(--gw-text-body-12-med);
+         border-radius:var(--gw-radius-full);padding:3px var(--gw-space-8);white-space:nowrap}
+.cl-chip--measured{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.cl-chip--transcribed{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.cl-chip--ruled{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+.cl-chip--passed{background:var(--gw-color-green-500);color:var(--gw-color-white)}
+.cl-chip--pending{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+.cl-chip--rejected{background:var(--gw-color-red-500);color:var(--gw-color-white)}
+.cl-chip--gap{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+:root[data-theme="dark"] .cl-chip--measured{background:var(--gw-color-green-900);
+                                            color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .cl-chip--transcribed{background:var(--gw-color-yellow-900);
+                                               color:var(--gw-color-yellow-100)}
+:root[data-theme="dark"] .cl-chip--ruled{background:var(--gw-color-primary-900);
+                                         color:var(--gw-color-primary-200)}
+:root[data-theme="dark"] .cl-chip--pending{background:var(--gw-color-neutral-800);
+                                           color:var(--gw-color-neutral-300)}
+:root[data-theme="dark"] .cl-chip--gap{background:var(--gw-color-red-900);
+                                       color:var(--gw-color-red-200)}
+
+/* --- colour --------------------------------------------------------------- */
+.cl-ramp{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));
+         gap:var(--gw-space-8)}
+.cl-sw{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+       border-radius:var(--gw-radius-10);overflow:hidden;display:flex;flex-direction:column}
+.cl-sw[hidden]{display:none}
+.cl-sw__chip{height:64px;border-bottom:1px solid var(--s-card-border);
+             background-image:linear-gradient(45deg,var(--gw-color-neutral-100) 25%,transparent 25%),
+                              linear-gradient(-45deg,var(--gw-color-neutral-100) 25%,transparent 25%),
+                              linear-gradient(45deg,transparent 75%,var(--gw-color-neutral-100) 75%),
+                              linear-gradient(-45deg,transparent 75%,var(--gw-color-neutral-100) 75%);
+             background-size:12px 12px;
+             background-position:0 0,0 6px,6px -6px,-6px 0}
+.cl-sw__fill{width:100%;height:100%}
+.cl-sw__body{padding:var(--gw-space-8) var(--gw-space-12);display:flex;
+             flex-direction:column;gap:3px}
+.cl-sw__name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;
+             color:var(--s-heading);word-break:break-all;line-height:1.35}
+.cl-sw__hex{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;
+            color:var(--gw-color-neutral-400);text-transform:uppercase}
+.cl-sw__ac{display:flex;gap:4px;margin-top:2px}
+.cl-ac{font-size:9.5px;font-weight:600;letter-spacing:.04em;border-radius:var(--gw-radius-4);
+       padding:1px 4px;line-height:1.5}
+.cl-ac--ok{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.cl-ac--no{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+:root[data-theme="dark"] .cl-ac--ok{background:var(--gw-color-green-900);color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .cl-ac--no{background:var(--gw-color-red-900);color:var(--gw-color-red-200)}
+
+/* --- type ----------------------------------------------------------------- */
+.cl-types{display:flex;flex-direction:column;gap:2px}
+.cl-t{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:var(--gw-space-20);
+      align-items:start;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+      border-radius:var(--gw-radius-10);padding:var(--gw-space-16) var(--gw-space-20)}
+.cl-t[hidden]{display:none}
+.cl-t__spec{color:var(--s-heading);min-width:0;overflow-wrap:anywhere}
+.cl-t__meta{display:flex;flex-direction:column;gap:2px;text-align:right}
+.cl-t__name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+            color:var(--gw-color-primary-600)}
+.cl-t__val{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10.5px;
+           color:var(--gw-color-neutral-400);line-height:1.5}
+@media (max-width:860px){.cl-t{grid-template-columns:1fr}.cl-t__meta{text-align:left}}
+
+/* --- faces ---------------------------------------------------------------- */
+.cl-faces{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+          gap:var(--gw-space-16)}
+.cl-face{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-24);
+         display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.cl-face__aa{font-size:52px;line-height:1.05;color:var(--s-heading)}
+.cl-face__wt{display:flex;flex-direction:column;gap:2px}
+.cl-face__wt span{color:var(--s-heading);font-size:19px;line-height:1.45}
+
+/* --- space / radius / shadow ---------------------------------------------- */
+.cl-rows{display:flex;flex-direction:column;gap:6px}
+.cl-row{display:grid;grid-template-columns:132px minmax(0,1fr) 60px;gap:var(--gw-space-16);
+        align-items:center;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-radius:var(--gw-radius-8);padding:var(--gw-space-8) var(--gw-space-16)}
+.cl-row[hidden]{display:none}
+.cl-row__n{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+           color:var(--gw-color-primary-600);word-break:break-all}
+.cl-row__v{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+           color:var(--gw-color-neutral-400);text-align:right}
+.cl-bararea{min-height:18px;display:flex;align-items:center}
+.cl-barfill{height:16px;background:var(--gw-color-primary-500);border-radius:var(--gw-radius-2);
+            max-width:100%}
+.cl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));
+         gap:var(--gw-space-12)}
+.cl-tile{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-10);padding:var(--gw-space-16);display:flex;
+         flex-direction:column;align-items:center;gap:var(--gw-space-8)}
+.cl-tile[hidden]{display:none}
+.cl-tile__demo{width:72px;height:72px;background:var(--gw-color-primary-100);
+               border:1.5px solid var(--gw-color-primary-500)}
+.cl-tile__sh{width:100%;height:64px;background:var(--gw-color-white);
+             border-radius:var(--gw-radius-8)}
+:root[data-theme="dark"] .cl-tile__sh{background:var(--gw-color-neutral-800)}
+/* The alpha checker is drawn in neutral-100, which is near-white and shouts on a
+   black ground. Same job, quieter, in dark. */
+:root[data-theme="dark"] .cl-sw__chip{
+  background-image:linear-gradient(45deg,var(--gw-color-neutral-800) 25%,transparent 25%),
+                   linear-gradient(-45deg,var(--gw-color-neutral-800) 25%,transparent 25%),
+                   linear-gradient(45deg,transparent 75%,var(--gw-color-neutral-800) 75%),
+                   linear-gradient(-45deg,transparent 75%,var(--gw-color-neutral-800) 75%)}
+
+/* --- tables --------------------------------------------------------------- */
+.cl-tbl{width:100%;border-collapse:collapse;background:var(--s-card-bg);
+        border:1px solid var(--s-card-border);border-radius:var(--gw-radius-10);
+        overflow:hidden;font:var(--gw-text-body-14-reg)}
+.cl-tblwrap{overflow-x:auto}
+.cl-tbl th{text-align:left;font:var(--gw-text-body-12-med);text-transform:uppercase;
+           letter-spacing:.06em;color:var(--gw-color-neutral-400);
+           padding:var(--gw-space-8) var(--gw-space-16);
+           border-bottom:1px solid var(--s-card-border);white-space:nowrap}
+.cl-tbl td{padding:var(--gw-space-8) var(--gw-space-16);color:var(--s-body);
+           border-bottom:1px solid var(--s-card-border);vertical-align:top}
+.cl-tbl tr:last-child td{border-bottom:none}
+.cl-tbl tr[hidden]{display:none}
+.cl-tbl .mono{color:var(--gw-color-primary-600)}
+.cl-tbl .num{font-feature-settings:"tnum" 1;white-space:nowrap}
+
+/* --- gaps ----------------------------------------------------------------- */
+.cl-gaps{display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.cl-gap{display:grid;grid-template-columns:28px minmax(0,1fr);gap:var(--gw-space-12);
+        background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-left:3px solid var(--gw-color-red-400);border-radius:var(--gw-radius-8);
+        padding:var(--gw-space-12) var(--gw-space-16)}
+.cl-gap__n{font:var(--gw-text-body-14-sem);color:var(--gw-color-red-500);
+           font-feature-settings:"tnum" 1}
+.cl-gap__t{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+           color:var(--s-body);white-space:pre-wrap;margin:0}
+
+/* --- use-case cards ------------------------------------------------------- */
+.cl-cases{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+          gap:var(--gw-space-12)}
+.cl-case{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-20);
+         display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.cl-case__n{display:flex;align-items:baseline;justify-content:space-between;gap:var(--gw-space-8)}
+.cl-case__list{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:4px}
+.cl-case__list li{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10.5px;
+                  color:var(--gw-color-neutral-600);background:var(--gw-color-neutral-25);
+                  border:1px solid var(--s-card-border);border-radius:var(--gw-radius-4);
+                  padding:1px 5px}
+:root[data-theme="dark"] .cl-case__list li{background:var(--gw-color-neutral-900)}
+
+/* --- misc ----------------------------------------------------------------- */
+.cl-src{display:flex;flex-wrap:wrap;gap:var(--gw-space-8)}
+.cl-src code{background:var(--s-code-bg);border:1px solid var(--s-code-border);
+             color:var(--s-code-fg);border-radius:var(--gw-radius-4);padding:2px 7px}
+.cl-empty{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-400);
+          border:1px dashed var(--s-field-border);border-radius:var(--gw-radius-10);
+          padding:var(--gw-space-24);text-align:center}
+.cl-jump{display:flex;flex-wrap:wrap;gap:6px}
+.cl-jump a{font:var(--gw-text-body-12-med);color:var(--s-body);text-decoration:none;
+           border:1px solid var(--s-field-border);border-radius:var(--gw-radius-full);
+           padding:5px var(--gw-space-12)}
+.cl-jump a:hover{border-color:var(--gw-color-primary-500);color:var(--gw-color-primary-600)}
+@media print{.cl-bar,.cl-jump{display:none}}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--s-page-bg);font-family:var(--gw-font-body);
+     color:var(--s-body);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
+
+/* ---- topbar ------------------------------------------------------------- */
+.lb-top{position:sticky;top:0;z-index:20;height:60px;display:flex;align-items:center;
+        gap:var(--gw-space-16);padding:0 var(--gw-space-24);
+        background:var(--s-chrome-bg);border-bottom:1px solid var(--s-chrome-border)}
+.lb-brand{display:flex;align-items:center;gap:var(--gw-space-12);text-decoration:none;
+          flex:none}
+.lb-brand__chip{width:32px;height:32px;border-radius:var(--gw-radius-8);
+                background:var(--gw-color-black);color:var(--gw-color-white);
+                display:grid;place-items:center;flex:none}
+.lb-brand__chip svg{width:16px;height:16px;display:block}
+.lb-brand__n{font:var(--gw-text-h7);color:var(--s-heading)}
+.lb-crumb{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-400);
+          white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-crumb a{color:var(--gw-color-primary-600);text-decoration:none}
+.lb-top__r{display:flex;align-items:center;gap:var(--gw-space-12);margin-left:auto}
+.lb-find{width:300px;height:36px;background:var(--s-field-bg);
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         padding:0 var(--gw-space-12);font:var(--gw-text-body-14-reg);color:var(--s-heading)}
+.lb-find::placeholder{color:var(--s-placeholder)}
+.lb-find:focus{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.lb-tbtn{width:36px;height:36px;display:grid;place-items:center;background:transparent;
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         color:var(--s-body);cursor:pointer;flex:none}
+.lb-tbtn svg{width:18px;height:18px;display:block}
+.lb-tbtn:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+@media (max-width:820px){.lb-find{display:none}}
+
+/* ---- three columns ------------------------------------------------------- */
+.lb-3{display:grid;grid-template-columns:240px minmax(0,1fr) 212px;align-items:start;
+      max-width:1600px;margin:0 auto}
+.lb-rail{position:sticky;top:60px;max-height:calc(100vh - 60px);overflow-y:auto;
+         border-right:1px solid var(--s-chrome-border);padding:var(--gw-space-24) 0}
+.lb-rail__t{font:var(--gw-text-body-12-med);text-transform:uppercase;letter-spacing:.06em;
+            color:var(--gw-color-neutral-400);padding:0 var(--gw-space-20) var(--gw-space-8)}
+.lb-rail a{display:flex;justify-content:space-between;gap:var(--gw-space-8);
+           font:var(--gw-text-body-14-reg);color:var(--s-body);text-decoration:none;
+           padding:6px var(--gw-space-20)}
+.lb-rail a:hover{background:var(--s-nav-hover);color:var(--s-heading)}
+.lb-rail a.on{background:var(--s-nav-sel);color:var(--s-heading);
+              font:var(--gw-text-body-14-sem)}
+.lb-rail a span{color:var(--gw-color-neutral-400);font:var(--gw-text-body-12-reg);flex:none}
+.lb-rail a.on span{color:var(--s-heading)}
+.lb-rail__sep{margin:var(--gw-space-12) var(--gw-space-20) var(--gw-space-8);
+              border-top:1px solid var(--s-chrome-border)}
+
+.lb-mid{grid-column:2;padding:var(--gw-space-32) var(--gw-space-40) var(--gw-space-80);
+        min-width:0;display:flex;flex-direction:column;gap:var(--gw-space-24)}
+.lb-toc{grid-column:3;position:sticky;top:60px;max-height:calc(100vh - 60px);overflow-y:auto;
+        padding:var(--gw-space-32) var(--gw-space-20);display:flex;flex-direction:column;
+        gap:5px}
+.lb-toc b{font:var(--gw-text-body-12-med);text-transform:uppercase;letter-spacing:.06em;
+          color:var(--gw-color-neutral-400);margin-bottom:3px}
+.lb-toc a{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-600);
+          text-decoration:none;line-height:1.35}
+.lb-toc a:hover{color:var(--gw-color-primary-600)}
+.lb-toc a.l3{padding-left:var(--gw-space-12)}
+@media (max-width:1180px){.lb-3{grid-template-columns:220px minmax(0,1fr)}
+                          .lb-toc{display:none}}
+@media (max-width:820px){.lb-3{grid-template-columns:1fr}
+                         .lb-rail{position:static;max-height:none;border-right:0;
+                                  border-bottom:1px solid var(--s-chrome-border)}
+                         .lb-mid{padding:var(--gw-space-24) var(--gw-space-20)}}
+
+/* ---- page head ----------------------------------------------------------- */
+.lb-h{display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.lb-h h1{font:var(--gw-text-h4);margin:0}
+.lb-h .lede{font:var(--gw-text-body-16-reg);color:var(--s-body);margin:0;max-width:74ch}
+.lb-row{display:flex;flex-wrap:wrap;gap:var(--gw-space-8);align-items:center}
+.lb-meta{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+         color:var(--gw-color-neutral-400)}
+
+.chip{display:inline-flex;align-items:center;gap:5px;font:var(--gw-text-body-12-med);
+      border-radius:var(--gw-radius-full);padding:3px var(--gw-space-8);white-space:nowrap}
+.chip--measured{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.chip--transcribed{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.chip--ruled{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+.chip--structure{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.chip--built-here{background:var(--gw-color-orange-50);color:var(--gw-color-orange-700)}
+.chip--passed{background:var(--gw-color-green-500);color:var(--gw-color-white)}
+.chip--pending{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+.chip--rejected{background:var(--gw-color-red-500);color:var(--gw-color-white)}
+.chip--gap{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+.chip--web{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+:root[data-theme="dark"] .chip--measured{background:var(--gw-color-green-900);color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .chip--transcribed,
+:root[data-theme="dark"] .chip--structure{background:var(--gw-color-yellow-900);color:var(--gw-color-yellow-100)}
+:root[data-theme="dark"] .chip--ruled,
+:root[data-theme="dark"] .chip--web{background:var(--gw-color-primary-900);color:var(--gw-color-primary-200)}
+:root[data-theme="dark"] .chip--pending{background:var(--gw-color-neutral-800);color:var(--gw-color-neutral-300)}
+:root[data-theme="dark"] .chip--built-here{background:var(--gw-color-orange-900);color:var(--gw-color-orange-100)}
+:root[data-theme="dark"] .chip--gap{background:var(--gw-color-red-900);color:var(--gw-color-red-200)}
+
+/* ---- markdown ------------------------------------------------------------ */
+.md{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.md h2{font:var(--gw-text-h6);margin:var(--gw-space-20) 0 0;scroll-margin-top:80px}
+.md h3{font:var(--gw-text-h7);margin:var(--gw-space-16) 0 0;scroll-margin-top:80px}
+.md h4,.md h5,.md h6{font:var(--gw-text-body-16-sem);margin:var(--gw-space-12) 0 0}
+.md p{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+      color:var(--s-body);margin:0;max-width:80ch}
+.md ul,.md ol{margin:0;padding-left:var(--gw-space-20);display:flex;
+              flex-direction:column;gap:5px}
+.md li{font:var(--gw-text-body-14-reg);color:var(--s-body);max-width:78ch}
+.md code{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px;
+         background:var(--s-code-bg);border:1px solid var(--s-code-border);
+         color:var(--s-code-fg);border-radius:var(--gw-radius-4);padding:1px 5px}
+.md a{color:var(--gw-color-primary-600)}
+.md-pre{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-radius:var(--gw-radius-8);padding:var(--gw-space-16);overflow-x:auto;margin:0}
+.md-pre code{background:none;border:0;padding:0;color:var(--s-body);font-size:12px}
+.md-q{margin:0;border-left:3px solid var(--gw-color-neutral-300);
+      padding:var(--gw-space-8) var(--gw-space-16);font:var(--gw-text-body-14-reg);
+      color:var(--s-body)}
+.md-hr{border:0;border-top:1px solid var(--s-card-border);margin:var(--gw-space-12) 0}
+.md-tblwrap{overflow-x:auto}
+.md-tbl{width:100%;border-collapse:collapse;background:var(--s-card-bg);
+        border:1px solid var(--s-card-border);border-radius:var(--gw-radius-8);
+        overflow:hidden;font:var(--gw-text-body-14-reg)}
+.md-tbl th{text-align:left;font:var(--gw-text-body-12-med);text-transform:uppercase;
+           letter-spacing:.06em;color:var(--gw-color-neutral-400);
+           padding:var(--gw-space-8) var(--gw-space-12);
+           border-bottom:1px solid var(--s-card-border);white-space:nowrap}
+.md-tbl td{padding:var(--gw-space-8) var(--gw-space-12);color:var(--s-body);
+           border-bottom:1px solid var(--s-card-border);vertical-align:top}
+.md-tbl tr:last-child td{border-bottom:none}
+.md-tbl code{white-space:nowrap}
+
+.note{font:var(--gw-text-body-14-reg);color:var(--s-body);
+      background:var(--gw-color-neutral-25);border:1px solid var(--s-card-border);
+      border-left:3px solid var(--gw-color-neutral-300);border-radius:var(--gw-radius-8);
+      padding:var(--gw-space-12) var(--gw-space-16);white-space:pre-wrap;max-width:88ch}
+:root[data-theme="dark"] .note{background:var(--gw-color-neutral-900)}
+.note--find{border-left-color:var(--gw-color-yellow-400);white-space:normal}
+.empty{border:1px dashed var(--s-field-border);border-radius:var(--gw-radius-10);
+       padding:var(--gw-space-24);text-align:center;font:var(--gw-text-body-14-reg);
+       color:var(--gw-color-neutral-400)}
+.sec{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.sec h2{font:var(--gw-text-h6);margin:0;scroll-margin-top:80px}
+</style>
+</head>
+<body>
+<header class="lb-top">
+  <a class="lb-brand" href="../../../library/index.html">
+    <span class="lb-brand__chip"><svg viewBox="0 0 80 80" fill="none" aria-hidden="true"><path d="M76.6088 4.56344C77.5025 2.36058 75.8495 0 73.4723 0H9.14286C4.0934 0 0 4.0934 0 9.14286V66.7778C0 72.018 5.17081 75.6829 9.9603 73.5568C40.8494 59.8449 64.3785 34.7075 76.6088 4.56344Z" fill="currentColor"/><path d="M32.5161 80C31.4022 80 30.9357 78.5531 31.8259 77.8835C54.9007 60.5265 71.4338 35.8047 78.7658 8.0522C78.9403 7.39154 80 7.51618 80 8.19951V70.8571C80 75.9066 75.9066 80 70.8571 80H32.5161Z" fill="currentColor"/></svg></span>
+    <span class="lb-brand__n">Component Library</span></a>
+  <span class="lb-crumb"><a href="../../index.html">Library</a> / <a href="index.html">Web</a></span>
+  <div class="lb-top__r"><input class="lb-find" id="lb-find" type="search" placeholder="Filter this library">
+    <button class="lb-tbtn" id="lb-theme" type="button" aria-label="Switch theme">
+      <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M116,36V32a12,12,0,0,1,24,0v4a12,12,0,0,1-24,0Zm80,92a68,68,0,1,1-68-68A68.07,68.07,0,0,1,196,128Zm-24,0a44,44,0,1,0-44,44A44.05,44.05,0,0,0,172,128ZM51.51,68.49a12,12,0,1,0,17-17l-4-4a12,12,0,0,0-17,17Zm0,119-4,4a12,12,0,0,0,17,17l4-4a12,12,0,1,0-17-17ZM196,72a12,12,0,0,0,8.49-3.51l4-4a12,12,0,0,0-17-17l-4,4A12,12,0,0,0,196,72Zm8.49,115.51a12,12,0,0,0-17,17l4,4a12,12,0,0,0,17-17ZM48,128a12,12,0,0,0-12-12H32a12,12,0,0,0,0,24h4A12,12,0,0,0,48,128Zm80,80a12,12,0,0,0-12,12v4a12,12,0,0,0,24,0v-4A12,12,0,0,0,128,208Zm96-92h-4a12,12,0,0,0,0,24h4a12,12,0,0,0,0-24Z"/></svg></button></div>
+</header>
+<div class="lb-3"><nav class="lb-rail"><div class="lb-rail__t">Web · 28</div><a href="index.html" data-q="overview 28">Overview<span>28</span></a><div class="lb-rail__sep"></div><a href="ai-agents.html" data-q="ai-agents ">ai-agents</a><a href="button.html" data-q="button ">button</a><a href="card-case-study.html" data-q="card-case-study ">card-case-study</a><a href="card-information.html" data-q="card-information ">card-information</a><a href="card-review.html" data-q="card-review ">card-review</a><a href="card-testimonial.html" data-q="card-testimonial ">card-testimonial</a><a href="cards-grid.html" data-q="cards-grid ">cards-grid</a><a href="cards-grid-small.html" data-q="cards-grid-small ">cards-grid-small</a><a href="case-study-page.html" data-q="case-study-page ">case-study-page</a><a href="client-avatar.html" data-q="client-avatar ">client-avatar</a><a href="client-logos.html" data-q="client-logos " class="on">client-logos</a><a href="comparison-table.html" data-q="comparison-table ">comparison-table</a><a href="cta.html" data-q="cta ">cta</a><a href="eyebrow.html" data-q="eyebrow ">eyebrow</a><a href="faqs.html" data-q="faqs ">faqs</a><a href="fold-other.html" data-q="fold-other ">fold-other</a><a href="footer.html" data-q="footer ">footer</a><a href="form.html" data-q="form ">form</a><a href="hero.html" data-q="hero ">hero</a><a href="image.html" data-q="image ">image</a><a href="inline-input.html" data-q="inline-input ">inline-input</a><a href="input-fields.html" data-q="input-fields ">input-fields</a><a href="navbar.html" data-q="navbar ">navbar</a><a href="page-build.html" data-q="page-build ">page-build</a><a href="testimonial.html" data-q="testimonial ">testimonial</a><a href="timeline.html" data-q="timeline ">timeline</a><a href="video.html" data-q="video ">video</a><a href="with-image.html" data-q="with-image ">with-image</a></nav><main class="lb-mid"><div class="lb-h"><h1>client-logos</h1><p class="lede">Web · fold-elements.md</p><div class="lb-row"><span class="chip chip--measured" title="Read off the bound Figma variables. Safe to build from.">measured</span><span class="chip chip--pending" title="Has not been through a review pass">not reviewed</span><span class="pill">v1.1.0</span></div><div class="lb-meta">review: bash scripts/review-pass.sh web client-logos</div></div><div class="md"><h2 id="inventory-13-sets">Fold elements</h2>
+<p>Figma: section <code>fold-elements</code> (<code>2089:23401</code>) on <code>↳ web/ pattern-library</code>.</p>
+<p>The reusable sub-components Folds are built from. The web analog of dashboard section-elements: the small parts a Fold assembles, rather than Folds themselves.</p>
+<p><b>These are building blocks, not standalone sections.</b> Reach for them through the Fold that contains them. Never place one directly in a Page Build slot.</p>
+<h3 id="fold-fold-element-heading">Inventory — 13 sets</h3>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Name</th><th>Node</th><th>Type</th><th>Properties</th><th>Variants</th></tr></thead><tbody><tr><td><code>fold/fold-element/heading</code></td><td><code>1732:3751</code></td><td>SET</td><td><code>Breakpoint</code> [<code>Desktop</code>, <code>Phone</code>] × <code>Length</code> [<code>Large</code>, <code>Small</code>, <code>Default</code>] · bools <code>Show subtext</code> (true), <code>Show badge</code> (true)</td><td>4</td></tr><tr><td><code>fold/fold-element/form</code></td><td><code>1836:7735</code></td><td>SET</td><td><code>Type</code> [<code>Check Lead Potential</code>, <code>Lead Form</code>] × <code>Size</code> [<code>Small</code>, <code>Large</code>] × <code>Breakpoint</code> [<code>Desktop</code>, <code>Phone</code>]</td><td>5</td></tr><tr><td><code>fold/fold-element/accordion</code></td><td><code>1775:5866</code></td><td>SET</td><td><code>Breakpoint</code> [<code>Desktop</code>, <code>Phone</code>] × <code>State</code> [<code>default</code>, <code>hover</code>, <code>open</code>] · text props <code>Question</code>, <code>Answer</code></td><td>6</td></tr><tr><td><code>fold/fold-element/table-row</code></td><td><code>1824:6638</code></td><td>SET</td><td><code>State</code> [<code>Default</code>, <code>Hover</code>]</td><td>2</td></tr><tr><td><code>fold/fold-element/table-header</code></td><td><code>1824:6639</code></td><td>COMPONENT</td><td>none</td><td>1</td></tr><tr><td><code>fold/fold-element/table-toggle</code></td><td><code>1809:97472</code></td><td>SET</td><td><code>Switch</code> [<code>no</code>, <code>yes</code>]</td><td>2</td></tr><tr><td><code>fold/fold-element/table-phone-card</code></td><td><code>1824:6658</code></td><td>COMPONENT</td><td>none</td><td>1</td></tr><tr><td><code>fold/fold-element/timeline-tab</code></td><td><code>1808:20888</code></td><td>SET</td><td><code>State</code> [<code>default</code>, <code>Hover</code>]</td><td>2</td></tr><tr><td><code>fold/fold-element/progress-bar</code></td><td><code>1678:1707</code></td><td>SET</td><td><code>Height</code> [<code>4 px</code>, <code>8 px</code>, <code>12 px</code>]</td><td>3</td></tr><tr><td><code>fold/fold-element/client-logo-card</code></td><td><code>1833:107612</code></td><td>SET</td><td><b><code>Property 1</code></b> [<code>hover</code>, <code>default</code>] · bool <code>Show Arrow</code> (true) · slot <code>Slot</code></td><td>2</td></tr><tr><td><code>Client Logos</code></td><td><code>1860:7959</code></td><td>SET</td><td><code>Color</code> [<code>Dark</code>, <code>Light</code>] × <code>Logo</code> (24 client names)</td><td>48</td></tr><tr><td><code>talking-guy</code></td><td><code>1658:24852</code></td><td>SET</td><td><b><code>Property 1</code></b> [<code>Frame 2147259587</code>, <code>Frame 2147259588</code>]</td><td>2</td></tr><tr><td><code>Agent Card</code></td><td><code>1921:1132</code></td><td>SET</td><td><code>Breakpoint</code> [<code>Desktop</code>, <code>Phone</code>] × <code>State</code> [<code>Default</code>, <code>Hover</code>] × <code>Agent</code> (9 agents)</td><td>27</td></tr></tbody></table></div>
+<p><b>Three sets break the <code>fold/fold-element/*</code> namespace</b> — <code>Client Logos</code>, <code>talking-guy</code>, <code>Agent Card</code>. They live in the fold-elements section but carry no prefix.</p>
+<p><b><code>Agent Card</code> has no Info Frame at all</b> — no title, no description, no rules.</p>
+<hr class="md-hr">
+<h3 id="fold-fold-element-form"><code>fold/fold-element/heading</code></h3>
+<p>The fold heading block. Used by nearly every Fold.</p>
+<p><code>Length</code> [<code>Large</code>, <code>Small</code>, <code>Default</code>] sizes the heading. Only 4 variants exist: Desktop × all three lengths, plus Phone at <code>Default</code> only. <b>There is no Phone/Large or Phone/Small</b> — on phone the heading is always <code>Default</code>.</p>
+<p><code>Show subtext</code> (default <b>true</b>) toggles the supporting line. <code>Show badge</code> (default <b>true</b>) toggles a Badge. <b>This is the only route by which Badge enters a Fold</b> — Cards do not use it. Badge rules live in <code>foundation/shared-components.md</code>.</p>
+<p>Observed sizes: 580×266 and 580×310 in a split fold; 620×213 and 620×106 centred in a 1240 container.</p>
+<h3 id="fold-fold-element-accordion"><code>fold/fold-element/form</code></h3>
+<p><code>Type</code> picks the form's purpose: <code>Check Lead Potential</code> (the shorter qualifier) or <code>Lead Form</code> (the full capture). <code>Size</code> [<code>Small</code>, <code>Large</code>].</p>
+<p><b>5 variants — <code>Size=Large</code> exists only at <code>Desktop</code> + <code>Lead Form</code>.</b> Every other combination is <code>Small</code>.</p>
+<p>CTAs observed inside it: <code>Check my lead potential</code>, <code>Pick a time</code>, and <code>Get a 20-min demo with our team</code>. These are action-specific and stay as written — do not normalise them to <code>Book a Demo</code>. See <code>foundation/voice.md</code>.</p>
+<p>The heading text node <code>1833:104960</code> contains a raw U+2028 LINE SEPARATOR where a line break belongs (<code>Get a 20-min demo⁠with our team</code>). Render it as a break.</p>
+<p>Fields inside come from <code>input-fields</code> — see <code>atoms.md</code>.</p>
+<h3 id="measured-19-sep-2026"><code>fold/fold-element/accordion</code></h3>
+<p><code>State</code> [<code>default</code>, <code>hover</code>, <code>open</code>] — all lowercase. Interaction states, not a choice.</p>
+<p>Text properties <code>Question</code> and <code>Answer</code> carry the content. Used by <code>fold/ FAQs</code>.</p>
+<h4>Measured — 19 Sep 2026</h4>
+<p>Measured off <b>GW Ads Library <code>t9rRxJODIVZ4N6CnrGdMhC</code></b>, <code>43:29915</code> (collapsed) and <code>43:30008</code> (open). This is the current treatment; see the disagreement note below.</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th></th><th>Value</th></tr></thead><tbody><tr><td>Rim</td><td>1px <code>--gw-color-neutral-50</code></td></tr><tr><td>Radius</td><td><code>--gw-radius-12</code></td></tr><tr><td>Padding</td><td><code>--gw-space-12</code>, all sides</td></tr><tr><td>Header → answer gap</td><td><code>--gw-space-12</code></td></tr><tr><td>Question</td><td><code>--gw-text-body-18-sem</code>, <code>--gw-color-neutral-800</code></td></tr><tr><td>Answer</td><td><code>--gw-text-body-16-med</code>, <code>--gw-color-neutral-600</code></td></tr><tr><td>Caret tile</td><td>32 × 32, <code>--gw-color-neutral-50</code>, <code>--gw-radius-8</code>, CaretDown at 16</td></tr><tr><td>Collapsed height</td><td><b>58</b> (12 + 32 + 12 + 2 rim)</td></tr><tr><td>Row pitch in a list</td><td>66 — i.e. rows stack on an <code>--gw-space-8</code> gap</td></tr></tbody></table></div>
+<p>Header is <code>space-between</code>, full width: question left (flexes), caret tile right. The answer is <code>overflow: clip</code>-ed rather than removed, so the collapsed row keeps its height.</p>
+<p><b>The two ads files disagree, and this one is newer.</b> <code>O6g05YAT980r85VaDQha4h/1890:42758</code> draws the same component with <b>no rim</b> and a 56 collapsed height. The Ads Library rim is the later of the two. If you are building against a page composed in the older file, match the page you were given and note it, rather than silently mixing the two.</p>
+<h4>Ask-anything rows</h4>
+<p>The ask-anything pattern lets a visitor add their own question to the list. It has three states, all measured off <code>t9rRxJODIVZ4N6CnrGdMhC</code>: <code>43:30376</code> (composer), <code>43:35127</code> (thinking), <code>43:30008</code> (answered).</p>
+<p><b>The composer</b> is an accordion row whose question slot is an input placeheld <code>Ask anything else...</code>, keeping the caret tile in place.</p>
+<p><b>A visitor's row</b> is an ordinary accordion row with two differences:</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th></th><th>Value</th></tr></thead><tbody><tr><td>Rim</td><td>1px <code>--gw-color-neutral-100</code> — a step stronger than the <code>neutral-50</code> of authored rows</td></tr><tr><td>Marker</td><td><code>Sparkle</code> 14 × 14 in <code>--gw-color-primary-500</code>, before the question</td></tr><tr><td>Gap, marker → question</td><td><code>--gw-space-8</code></td></tr><tr><td>Question</td><td><code>--gw-text-body-18-sem</code>, <code>--gw-color-neutral-800</code>, capped at 480</td></tr></tbody></table></div>
+<p>An earlier revision used a <code>Your Question</code> badge in <code>--gw-color-primary-alpha-10</code> instead of the Sparkle. <b>Superseded 19 Sep 2026</b> — the Sparkle replaced it; don't build the badge.</p>
+<p><b>The thinking state</b> (<code>65:1265</code>) replaces the answer while the row waits:</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th></th><th>Value</th></tr></thead><tbody><tr><td>Bars</td><td>3, stacked, <code>--gw-space-8</code> apart</td></tr><tr><td>Bar</td><td>12 tall, <code>--gw-radius-full</code>, <code>--gw-color-neutral-100</code> at <b>45% opacity</b></td></tr><tr><td>Widths</td><td>420 / 520 / 360 on a 634 content column — i.e. 66% / 82% / 57%</td></tr><tr><td>Row height</td><td>122 while thinking</td></tr></tbody></table></div>
+<p>Figma shows it static. Whether the bars pulse is a build decision, not a spec.</p>
+<h3 id="ask-anything-rows">Table elements</h3>
+<p>Four components make up <code>fold/Comparison Table</code>:</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Element</th><th>Role</th></tr></thead><tbody><tr><td><code>table-header</code></td><td>The header row. No variants.</td></tr><tr><td><code>table-row</code></td><td>A comparison row. <code>State</code> [<code>Default</code>, <code>Hover</code>].</td></tr><tr><td><code>table-toggle</code></td><td>The row-expand control. <code>Switch</code> [<code>no</code>, <code>yes</code>].</td></tr><tr><td><code>table-phone-card</code></td><td>The phone-breakpoint replacement for a table row. No variants.</td></tr></tbody></table></div>
+<p>On phone, the comparison table becomes a stack of <code>table-phone-card</code>s rather than a scrolling grid.</p>
+<p><b>These are the marketing comparison table, not a data grid.</b> For browsable product data use the dashboard's <code>section/table</code> — see <code>exports/dashboard/sections.md</code>.</p>
+<h3 id="table-elements"><code>fold/fold-element/timeline-tab</code></h3>
+<p><code>State</code> [<code>default</code>, <code>Hover</code>] — note the <b>mixed casing</b>, lowercase <code>default</code> and capitalised <code>Hover</code>. Both are literal keys.</p>
+<p>Used by <code>fold/Timeline</code> for the week-based step tabs.</p>
+<h3 id="fold-fold-element-timeline-tab"><code>fold/fold-element/progress-bar</code></h3>
+<p><code>Height</code> [<code>4 px</code>, <code>8 px</code>, <code>12 px</code>] — <b>note the space before <code>px</code></b>, same convention as the logo's <code>Size</code>.</p>
+<p>Used inside <code>Card / Testimonial</code> (at <code>4 px</code>, 492 wide) as the auto-advance indicator.</p>
+<p><b>This is the one documented violation of the composition ladder</b>: an atom (<code>Card / Testimonial</code>) instances a fold-element. The fold rule says atoms compose into fold-elements, not the reverse. It is how the file is built — don't replicate the pattern in new work.</p>
+<h3 id="fold-fold-element-progress-bar"><code>fold/fold-element/client-logo-card</code></h3>
+<p><code>Property 1</code> [<code>hover</code>, <code>default</code>] — the property name is Figma's auto-generated default and is the literal key. Boolean <code>Show Arrow</code> (default true). Slot <code>Slot</code>.</p>
+<p>Its documenting group is named <b><code>component-7</code></b> (<code>1948:8212</code>) with the placeholder description <i>&quot;Miscellaneous component variant.&quot;</i>, while its title reads &quot;Client Logo Card&quot;. The fold Component Structure blob also lists <code>component-7</code> as though it were a real fold element. It is not — it is this component's group.</p>
+<h3 id="fold-fold-element-client-logo-card"><code>Client Logos</code></h3>
+<p><code>Color</code> [<code>Dark</code>, <code>Light</code>] × <code>Logo</code> (24 client names) = <b>48 variants</b>.</p>
+<p>Pick <code>Color</code> by the surface: <code>Light</code> logos on dark backgrounds, <code>Dark</code> on light.</p>
+<p><b>Never fabricate a client logo.</b> If a client isn't in the set of 24, that is a finding — see the fallback in the skill.</p>
+<h3 id="client-logos"><code>talking-guy</code></h3>
+<p>A decorative illustration set. <code>Property 1</code> [<code>Frame 2147259587</code>, <code>Frame 2147259588</code>] — both the property name <b>and</b> its values are Figma auto-generated. Unusable as semantic keys; pick by looking at the two variants.</p>
+<p><b>Its description is copied from a different component entirely</b> (<code>1658:24827</code>):</p>
+<blockquote class="md-q">&quot;The Checkbox component supports multiple styles, states, sizes, and label configurations, providing a flexible and consistent selection element across the interface.&quot;</blockquote>
+<p>That is the Checkbox description on a decorative illustration. Ignore it. There is no real rule for this component.</p>
+<h3 id="talking-guy"><code>Agent Card</code></h3>
+<p><code>Breakpoint</code> [<code>Desktop</code>, <code>Phone</code>] × <code>State</code> [<code>Default</code>, <code>Hover</code>] × <code>Agent</code> (9 agents) = <b>27 variants</b> — Phone exists at <code>Default</code> only.</p>
+<p>The 9 agents match <code>agent-icon</code>'s fixed set minus <code>other</code>. Used by <code>fold/AI Agents</code> as the marquee tiles. Agent naming and glyph rules live in <code>atoms.md</code> under <code>ai-agents</code>.</p>
+<p>No Info Frame, so no written rules exist for this component.</p>
+<hr class="md-hr">
+<h3 id="agent-card">Coverage gap in the source</h3>
+<p><b>No fold-element has its own Rules of Usage.</b> Each has a one-line generic description only — &quot;Accordion expand/collapse element variants&quot;, &quot;Progress bar indicator element variants&quot;, and so on. The guidance above is derived from the shared fold rules (<code>2089:23406</code>), the fold Component Structure blob (<code>2089:23403</code>), and how the Folds and Cards actually instance these elements.</p>
+<p>Where a decision isn't covered here, it isn't covered in Figma either. Ask rather than invent.</p>
+<h3 id="coverage-gap-in-the-source">Property-naming inconsistencies across these elements</h3>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Concept</th><th>Keys in use</th></tr></thead><tbody><tr><td>Interaction state</td><td>`default\</td><td>hover\</td><td>open<code> · </code>default\</td><td>Hover<code> · </code>Default\</td><td>Hover`</td></tr><tr><td>Boolean</td><td>`no\</td><td>yes<code> (</code>Switch<code>) · </code>false\</td><td>true` (booleans)</td></tr><tr><td>Unnamed property</td><td><code>Property 1</code> on <code>client-logo-card</code> and <code>talking-guy</code></td></tr><tr><td>Size with unit</td><td><code>4 px</code> / <code>8 px</code> / <code>12 px</code> — space before unit</td></tr></tbody></table></div></div></main><div class="lb-toc"><b>On this page</b><a href="#inventory-13-sets" class="l3">Inventory — 13 sets</a><a href="#fold-fold-element-heading" class="l3">fold/fold-element/heading</a><a href="#fold-fold-element-form" class="l3">fold/fold-element/form</a><a href="#fold-fold-element-accordion" class="l3">fold/fold-element/accordion</a><a href="#measured-19-sep-2026" class="l3">Measured — 19 Sep 2026</a><a href="#ask-anything-rows" class="l3">Ask-anything rows</a><a href="#table-elements" class="l3">Table elements</a><a href="#fold-fold-element-timeline-tab" class="l3">fold/fold-element/timeline-tab</a><a href="#fold-fold-element-progress-bar" class="l3">fold/fold-element/progress-bar</a><a href="#fold-fold-element-client-logo-card" class="l3">fold/fold-element/client-logo-card</a><a href="#client-logos" class="l3">Client Logos</a><a href="#talking-guy" class="l3">talking-guy</a><a href="#agent-card" class="l3">Agent Card</a><a href="#coverage-gap-in-the-source" class="l3">Coverage gap in the source</a><a href="#property-naming-inconsistencies-across-these-elements" class="l3">Property-naming inconsistencies across these elements</a></div></div>
+<script>
+(function(){
+  /* Theme: the same two localStorage keys the main site uses, so a choice made there
+     carries here and back. 'system' can still arrive from an older stored value and
+     resolves to light, matching shell.js. */
+  var PREF='gw-theme-pref', RES='gw-theme';
+  function pref(){try{var v=localStorage.getItem(PREF);
+    if(v==='light'||v==='dark')return v;
+    if(v==='system')return 'light';
+    var o=localStorage.getItem(RES);
+    return (o==='dark'||o==='light')?o:'light';}catch(e){return 'light'}}
+  function apply(p){var r=p==='dark'?'dark':'light';
+    document.documentElement.setAttribute('data-theme',r);
+    try{localStorage.setItem(PREF,p);localStorage.setItem(RES,r)}catch(e){}
+    var b=document.getElementById('lb-theme');
+    if(b)b.setAttribute('aria-label',r==='dark'?'Switch to light':'Switch to dark');}
+  var btn=document.getElementById('lb-theme');
+  if(btn)btn.addEventListener('click',function(){
+    apply(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
+  apply(pref());
+
+  /* Rail filter. Narrows the inventory in place — it does not navigate, because the
+     rail is a list of siblings and losing your place to search them is worse than
+     scrolling. */
+  var f=document.getElementById('lb-find');
+  if(f){
+    var rows=[].slice.call(document.querySelectorAll('.lb-rail a'));
+    f.addEventListener('input',function(){
+      var t=f.value.trim().toLowerCase();
+      rows.forEach(function(a){
+        a.hidden=!!t&&a.getAttribute('data-q').indexOf(t)===-1});
+    });
+  }
+
+  /* Mark the on-this-page entry for whatever heading is currently at the top. */
+  var toc=[].slice.call(document.querySelectorAll('.lb-toc a'));
+  if(toc.length){
+    var heads=toc.map(function(a){return document.getElementById(a.hash.slice(1))})
+                 .filter(Boolean);
+    var tick=function(){
+      var best=0;
+      heads.forEach(function(h,i){if(h.getBoundingClientRect().top<=90)best=i});
+      toc.forEach(function(a,i){a.style.color=i===best?'var(--gw-color-primary-600)':''});
+    };
+    document.addEventListener('scroll',tick,{passive:true});tick();
+  }
+})();
+</script>
+</body></html>
