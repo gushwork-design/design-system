@@ -124,6 +124,12 @@ What changes is **which folds you reach for**. There is a measured ad-page set h
 the landers built over the last four to five months, and it beats composing the same shapes
 out of the general folds.
 
+**Before you reach for the fold set at all, check `templates/ad-page/`.** It is the whole
+page already assembled from these folds and measured against
+`O6g05YAT980r85VaDQha4h` — copy it and fill the tokens rather than rebuilding the
+composition. The fold set below is what you reach for when a lander genuinely needs a
+shape the template does not carry.
+
 **`Type=Ads` still governs everything above.** Navbar drops to logo + blue CTA, footer to a
 copyright line, primary button goes Blue. Set it once at the page level. Nothing below changes
 that or restates it.
@@ -175,11 +181,14 @@ set is nine folds, one eyebrow and two built-here sections, and nothing else.
 
 ### Review state
 
-**None of these eleven has been through a review pass yet** — `bash scripts/review-pass.sh
---check` is the live answer, and it is the honest caveat on everything above. The measurements
-are node-traceable and the binding check re-runs on every build, so the numbers are real; what
-has not happened is the design owner reading them and saying yes. Treat the fold set as a good
-first draft and say so, the same way this file already asks you to for the unmeasured web folds.
+**All eleven were passed by Utsav on 23 Sep 2026.** Recorded in
+`exports/ad-page/component-registry.json`; `bash scripts/review-pass.sh --check` is the live
+answer and the one to trust, because a pass expires by itself when the source moves.
+
+Passing `ai-agents` and `comparison-table` ruled on the four off-system values above: they
+stand as-is for now. That is a decision about those two folds, **not** a licence to use those
+values elsewhere — `700 18px` display and `700 16px` Inter are still not in the ramps, and
+`#efefef` is still in no palette. Reproducing them outside these two folds is off-system.
 
 ## Which component? — the decision table
 
@@ -188,6 +197,7 @@ first draft and say so, the same way this file already asks you to for the unmea
 | Any marketing page | `page-build` | `page-shell.md` |
 | An empty page to compose freely | `page-build` with `Blank=yes` | `page-shell.md` |
 | A customer case study | **`templates/case-study/`** — a measured page, not a fold | `templates/case-study/README.md` |
+| A paid-ad landing page | **`templates/ad-page/`** — a measured page, not a stack of folds | `templates/ad-page/README.md` |
 | Top nav | `navbar/navbar` — `Type` inherits from the page | `page-shell.md` |
 | Bottom of page | `footer/footer` — `Type` inherits | `page-shell.md` |
 | The opening fold | `fold/ Hero` — `Layout` = `Home` / `Centered` / `Split` / `Form` | `folds.md` |
@@ -234,9 +244,11 @@ is how a page ends up plausible but wrong.
 | Template | For | Base |
 |---|---|---|
 | `templates/case-study/` | One customer story as a page — hero with outcome numbers, prose column with a sticky rail CTA, closing CTA | Figma `case-study-with-image`, `2PbNu2kGHalHhMUfFyFoeG` / `495:3382`, with the navbar, rail card and footer from the live site |
+| `templates/ad-page/` | A paid-ad landing page — form-first hero, proof ticks, logo ticker, media fold, feature rows, agent marquee, timeline, comparison table, FAQs with an ask-anything row, closing CTA | Figma **GW Meta/Google Ads** `O6g05YAT980r85VaDQha4h` — desktop `1890:42045`, phone `1890:43786` |
 
 ```bash
 cp -r skills/gushwork-web/templates/case-study skills/gushwork-web/examples/<client-slug>
+cp -r skills/gushwork-web/templates/ad-page    skills/gushwork-web/examples/<campaign-slug>
 ```
 
 Each template's README records what it was measured from, **where the live site disagrees with
