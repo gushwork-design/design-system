@@ -72,6 +72,63 @@ Fields inside come from `input-fields` — see `atoms.md`.
 
 Text properties `Question` and `Answer` carry the content. Used by `fold/ FAQs`.
 
+### Measured — 19 Sep 2026
+
+Measured off **GW Ads Library `t9rRxJODIVZ4N6CnrGdMhC`**, `43:29915` (collapsed) and
+`43:30008` (open). This is the current treatment; see the disagreement note below.
+
+| | Value |
+|---|---|
+| Rim | 1px `--gw-color-neutral-50` |
+| Radius | `--gw-radius-12` |
+| Padding | `--gw-space-12`, all sides |
+| Header → answer gap | `--gw-space-12` |
+| Question | `--gw-text-body-18-sem`, `--gw-color-neutral-800` |
+| Answer | `--gw-text-body-16-med`, `--gw-color-neutral-600` |
+| Caret tile | 32 × 32, `--gw-color-neutral-50`, `--gw-radius-8`, CaretDown at 16 |
+| Collapsed height | **58** (12 + 32 + 12 + 2 rim) |
+| Row pitch in a list | 66 — i.e. rows stack on an `--gw-space-8` gap |
+
+Header is `space-between`, full width: question left (flexes), caret tile right. The
+answer is `overflow: clip`-ed rather than removed, so the collapsed row keeps its height.
+
+**The two ads files disagree, and this one is newer.** `O6g05YAT980r85VaDQha4h/1890:42758`
+draws the same component with **no rim** and a 56 collapsed height. The Ads Library rim is
+the later of the two. If you are building against a page composed in the older file, match
+the page you were given and note it, rather than silently mixing the two.
+
+### Ask-anything rows
+
+The ask-anything pattern lets a visitor add their own question to the list. It has three
+states, all measured off `t9rRxJODIVZ4N6CnrGdMhC`: `43:30376` (composer), `43:35127`
+(thinking), `43:30008` (answered).
+
+**The composer** is an accordion row whose question slot is an input placeheld
+`Ask anything else...`, keeping the caret tile in place.
+
+**A visitor's row** is an ordinary accordion row with two differences:
+
+| | Value |
+|---|---|
+| Rim | 1px `--gw-color-neutral-100` — a step stronger than the `neutral-50` of authored rows |
+| Marker | `Sparkle` 14 × 14 in `--gw-color-primary-500`, before the question |
+| Gap, marker → question | `--gw-space-8` |
+| Question | `--gw-text-body-18-sem`, `--gw-color-neutral-800`, capped at 480 |
+
+An earlier revision used a `Your Question` badge in `--gw-color-primary-alpha-10` instead
+of the Sparkle. **Superseded 19 Sep 2026** — the Sparkle replaced it; don't build the badge.
+
+**The thinking state** (`65:1265`) replaces the answer while the row waits:
+
+| | Value |
+|---|---|
+| Bars | 3, stacked, `--gw-space-8` apart |
+| Bar | 12 tall, `--gw-radius-full`, `--gw-color-neutral-100` at **45% opacity** |
+| Widths | 420 / 520 / 360 on a 634 content column — i.e. 66% / 82% / 57% |
+| Row height | 122 while thinking |
+
+Figma shows it static. Whether the bars pulse is a build decision, not a spec.
+
 ## Table elements
 
 Four components make up `fold/Comparison Table`:
