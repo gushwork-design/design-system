@@ -1,6 +1,6 @@
 {
   "name": "gushwork-design",
-  "version": "1.47.0",
+  "version": "1.48.0",
   "description": "Gushwork's governed design system. Four surface-scoped skills \u2014 marketing web, product dashboard, lead-magnet documents, and slide decks \u2014 over one shared foundation of tokens, voice, and shared atoms, generated from the Gush Design System v2.0 and GW-Slides Figma files.",
   "author": {
     "name": "Gushwork Design",

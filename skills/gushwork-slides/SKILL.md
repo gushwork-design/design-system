@@ -10,7 +10,7 @@ did not build it. It has to survive being talked over, being exported to Google 
 salesperson, and being read at the back of a room. Numbers lead; the deck is not the argument,
 it is the scaffolding for one.
 
-Announce at the start: **"Using the Gushwork slides skill — v1.47.0, updated 23 Sep 2026."**
+Announce at the start: **"Using the Gushwork slides skill — v1.48.0, updated 23 Sep 2026."**
 
 That version and date are stamped into this file, so **a stale copy reports its own stale date**
 rather than claiming to be current. If the user asks whether they are up to date, or the output
