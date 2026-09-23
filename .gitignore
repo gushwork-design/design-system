@@ -14,3 +14,8 @@ templates/**/node_modules/
 templates/**/out/
 templates/**/package-lock.json
 .vercel
+
+# Rendered ad-page video. 7MB, and a fresh copy lands on every re-render — the source
+# is the HyperFrames project at videos/ai-crm-flow/, and publish-sheets.sh ships the
+# working tree, so deploys do not need it in git.
+web/internal/staging/**/ai-crm-flow.mp4
