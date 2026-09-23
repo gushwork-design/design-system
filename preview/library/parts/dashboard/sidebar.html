@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sidebar — Gushwork</title>
+<meta name="robots" content="noindex">
+<script>try{var t=localStorage.getItem('gw-theme');if(t!=='dark')t='light';
+document.documentElement.setAttribute('data-theme',t)}catch(e){
+document.documentElement.setAttribute('data-theme','light')}</script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20width%3D%2280%22%20height%3D%2280%22%20rx%3D%2220%22%20fill%3D%22%230d0d0d%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="../../../foundation/tokens.css">
+<link rel="stylesheet" href="../../../shell.css">
+<style>
+.cl{--cl-gap:var(--gw-space-40)}
+.cl h2{font:var(--gw-text-h5);color:var(--s-heading);margin:0}
+.cl h3{font:var(--gw-text-h7);color:var(--s-heading);margin:0}
+.cl h4{font:var(--gw-text-body-16-sem);color:var(--s-heading);margin:0}
+.cl p{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+      color:var(--s-body);margin:0;max-width:78ch}
+.cl code,.cl .mono{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px}
+
+/* --- page head ------------------------------------------------------------ */
+.cl-head{display:flex;flex-direction:column;gap:var(--gw-space-16)}
+.cl-head h1{font:var(--gw-text-h4);color:var(--s-heading);margin:0}
+.cl-lede{font:var(--gw-text-body-18-reg);letter-spacing:var(--gw-text-body-18-reg-tracking);
+         color:var(--s-body);margin:0;max-width:72ch}
+
+/* --- the tally ------------------------------------------------------------ */
+.cl-tally{display:flex;flex-wrap:wrap;gap:var(--gw-space-12)}
+.cl-stat{flex:1 1 150px;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-16) var(--gw-space-20);
+         display:flex;flex-direction:column;gap:var(--gw-space-4)}
+.cl-stat b{font:var(--gw-text-h6);color:var(--s-heading);font-feature-settings:"tnum" 1}
+.cl-stat span{font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-400);
+              text-transform:uppercase;letter-spacing:.06em}
+
+/* --- review queue --------------------------------------------------------- */
+.cl-queue{background:var(--s-card-bg);border:1px solid var(--gw-color-yellow-300);
+          border-left:3px solid var(--gw-color-yellow-400);border-radius:var(--gw-radius-12);
+          padding:var(--gw-space-20) var(--gw-space-24);display:flex;flex-direction:column;
+          gap:var(--gw-space-12)}
+.cl-queue h2{font:var(--gw-text-h7)}
+.cl-queue ul{margin:0;padding-left:var(--gw-space-20);display:flex;flex-direction:column;
+             gap:var(--gw-space-4)}
+.cl-queue li{font:var(--gw-text-body-14-reg);color:var(--s-body)}
+.cl-queue a{color:var(--gw-color-primary-600);text-decoration:none}
+.cl-queue a:hover{text-decoration:underline}
+.cl-pass{background:var(--s-card-bg);border:1px solid var(--gw-color-green-300);
+         border-left:3px solid var(--gw-color-green-400)}
+
+/* --- controls ------------------------------------------------------------- */
+.cl-bar{position:sticky;top:0;z-index:5;background:var(--s-page-bg);
+        padding:var(--gw-space-12) 0;display:flex;flex-wrap:wrap;gap:var(--gw-space-8);
+        align-items:center;border-bottom:1px solid var(--s-chrome-border)}
+.cl-find{flex:1 1 220px;min-width:180px;background:var(--s-field-bg);
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         padding:var(--gw-space-8) var(--gw-space-12);font:var(--gw-text-body-14-reg);
+         color:var(--s-heading)}
+.cl-find::placeholder{color:var(--s-placeholder)}
+.cl-find:focus{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.cl-filter{display:flex;gap:var(--gw-space-4);flex-wrap:wrap}
+.cl-f{font:var(--gw-text-body-12-med);color:var(--s-body);background:transparent;
+      border:1px solid var(--s-field-border);border-radius:var(--gw-radius-full);
+      padding:6px var(--gw-space-12);cursor:pointer}
+.cl-f:hover{border-color:var(--gw-color-primary-500)}
+.cl-f[aria-pressed="true"]{background:var(--gw-color-black);color:var(--gw-color-white);
+                           border-color:var(--gw-color-black)}
+.cl-f:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.cl-count{font:var(--gw-text-body-12-reg);color:var(--gw-color-neutral-400);margin-left:auto}
+
+/* --- sections ------------------------------------------------------------- */
+.cl-sec{display:flex;flex-direction:column;gap:var(--gw-space-20);
+        scroll-margin-top:var(--gw-space-80)}
+.cl-sec[hidden]{display:none}
+.cl-sechead{display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--gw-space-12)}
+.cl-note{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+         color:var(--s-body);background:var(--gw-color-neutral-25);
+         border:1px solid var(--s-card-border);border-left:3px solid var(--gw-color-neutral-300);
+         border-radius:var(--gw-radius-8);padding:var(--gw-space-12) var(--gw-space-16);
+         white-space:pre-wrap;max-width:88ch}
+:root[data-theme="dark"] .cl-note{background:var(--gw-color-neutral-900)}
+.cl-sub{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.cl-sub[hidden]{display:none}
+
+/* --- chips ---------------------------------------------------------------- */
+.cl-chip{display:inline-flex;align-items:center;gap:6px;font:var(--gw-text-body-12-med);
+         border-radius:var(--gw-radius-full);padding:3px var(--gw-space-8);white-space:nowrap}
+.cl-chip--measured{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.cl-chip--transcribed{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.cl-chip--ruled{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+.cl-chip--passed{background:var(--gw-color-green-500);color:var(--gw-color-white)}
+.cl-chip--pending{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+.cl-chip--rejected{background:var(--gw-color-red-500);color:var(--gw-color-white)}
+.cl-chip--gap{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+:root[data-theme="dark"] .cl-chip--measured{background:var(--gw-color-green-900);
+                                            color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .cl-chip--transcribed{background:var(--gw-color-yellow-900);
+                                               color:var(--gw-color-yellow-100)}
+:root[data-theme="dark"] .cl-chip--ruled{background:var(--gw-color-primary-900);
+                                         color:var(--gw-color-primary-200)}
+:root[data-theme="dark"] .cl-chip--pending{background:var(--gw-color-neutral-800);
+                                           color:var(--gw-color-neutral-300)}
+:root[data-theme="dark"] .cl-chip--gap{background:var(--gw-color-red-900);
+                                       color:var(--gw-color-red-200)}
+
+/* --- colour --------------------------------------------------------------- */
+.cl-ramp{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));
+         gap:var(--gw-space-8)}
+.cl-sw{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+       border-radius:var(--gw-radius-10);overflow:hidden;display:flex;flex-direction:column}
+.cl-sw[hidden]{display:none}
+.cl-sw__chip{height:64px;border-bottom:1px solid var(--s-card-border);
+             background-image:linear-gradient(45deg,var(--gw-color-neutral-100) 25%,transparent 25%),
+                              linear-gradient(-45deg,var(--gw-color-neutral-100) 25%,transparent 25%),
+                              linear-gradient(45deg,transparent 75%,var(--gw-color-neutral-100) 75%),
+                              linear-gradient(-45deg,transparent 75%,var(--gw-color-neutral-100) 75%);
+             background-size:12px 12px;
+             background-position:0 0,0 6px,6px -6px,-6px 0}
+.cl-sw__fill{width:100%;height:100%}
+.cl-sw__body{padding:var(--gw-space-8) var(--gw-space-12);display:flex;
+             flex-direction:column;gap:3px}
+.cl-sw__name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;
+             color:var(--s-heading);word-break:break-all;line-height:1.35}
+.cl-sw__hex{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;
+            color:var(--gw-color-neutral-400);text-transform:uppercase}
+.cl-sw__ac{display:flex;gap:4px;margin-top:2px}
+.cl-ac{font-size:9.5px;font-weight:600;letter-spacing:.04em;border-radius:var(--gw-radius-4);
+       padding:1px 4px;line-height:1.5}
+.cl-ac--ok{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.cl-ac--no{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+:root[data-theme="dark"] .cl-ac--ok{background:var(--gw-color-green-900);color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .cl-ac--no{background:var(--gw-color-red-900);color:var(--gw-color-red-200)}
+
+/* --- type ----------------------------------------------------------------- */
+.cl-types{display:flex;flex-direction:column;gap:2px}
+.cl-t{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:var(--gw-space-20);
+      align-items:start;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+      border-radius:var(--gw-radius-10);padding:var(--gw-space-16) var(--gw-space-20)}
+.cl-t[hidden]{display:none}
+.cl-t__spec{color:var(--s-heading);min-width:0;overflow-wrap:anywhere}
+.cl-t__meta{display:flex;flex-direction:column;gap:2px;text-align:right}
+.cl-t__name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+            color:var(--gw-color-primary-600)}
+.cl-t__val{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10.5px;
+           color:var(--gw-color-neutral-400);line-height:1.5}
+@media (max-width:860px){.cl-t{grid-template-columns:1fr}.cl-t__meta{text-align:left}}
+
+/* --- faces ---------------------------------------------------------------- */
+.cl-faces{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+          gap:var(--gw-space-16)}
+.cl-face{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-24);
+         display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.cl-face__aa{font-size:52px;line-height:1.05;color:var(--s-heading)}
+.cl-face__wt{display:flex;flex-direction:column;gap:2px}
+.cl-face__wt span{color:var(--s-heading);font-size:19px;line-height:1.45}
+
+/* --- space / radius / shadow ---------------------------------------------- */
+.cl-rows{display:flex;flex-direction:column;gap:6px}
+.cl-row{display:grid;grid-template-columns:132px minmax(0,1fr) 60px;gap:var(--gw-space-16);
+        align-items:center;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-radius:var(--gw-radius-8);padding:var(--gw-space-8) var(--gw-space-16)}
+.cl-row[hidden]{display:none}
+.cl-row__n{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+           color:var(--gw-color-primary-600);word-break:break-all}
+.cl-row__v{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+           color:var(--gw-color-neutral-400);text-align:right}
+.cl-bararea{min-height:18px;display:flex;align-items:center}
+.cl-barfill{height:16px;background:var(--gw-color-primary-500);border-radius:var(--gw-radius-2);
+            max-width:100%}
+.cl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));
+         gap:var(--gw-space-12)}
+.cl-tile{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-10);padding:var(--gw-space-16);display:flex;
+         flex-direction:column;align-items:center;gap:var(--gw-space-8)}
+.cl-tile[hidden]{display:none}
+.cl-tile__demo{width:72px;height:72px;background:var(--gw-color-primary-100);
+               border:1.5px solid var(--gw-color-primary-500)}
+.cl-tile__sh{width:100%;height:64px;background:var(--gw-color-white);
+             border-radius:var(--gw-radius-8)}
+:root[data-theme="dark"] .cl-tile__sh{background:var(--gw-color-neutral-800)}
+/* The alpha checker is drawn in neutral-100, which is near-white and shouts on a
+   black ground. Same job, quieter, in dark. */
+:root[data-theme="dark"] .cl-sw__chip{
+  background-image:linear-gradient(45deg,var(--gw-color-neutral-800) 25%,transparent 25%),
+                   linear-gradient(-45deg,var(--gw-color-neutral-800) 25%,transparent 25%),
+                   linear-gradient(45deg,transparent 75%,var(--gw-color-neutral-800) 75%),
+                   linear-gradient(-45deg,transparent 75%,var(--gw-color-neutral-800) 75%)}
+
+/* --- tables --------------------------------------------------------------- */
+.cl-tbl{width:100%;border-collapse:collapse;background:var(--s-card-bg);
+        border:1px solid var(--s-card-border);border-radius:var(--gw-radius-10);
+        overflow:hidden;font:var(--gw-text-body-14-reg)}
+.cl-tblwrap{overflow-x:auto}
+.cl-tbl th{text-align:left;font:var(--gw-text-body-12-med);text-transform:uppercase;
+           letter-spacing:.06em;color:var(--gw-color-neutral-400);
+           padding:var(--gw-space-8) var(--gw-space-16);
+           border-bottom:1px solid var(--s-card-border);white-space:nowrap}
+.cl-tbl td{padding:var(--gw-space-8) var(--gw-space-16);color:var(--s-body);
+           border-bottom:1px solid var(--s-card-border);vertical-align:top}
+.cl-tbl tr:last-child td{border-bottom:none}
+.cl-tbl tr[hidden]{display:none}
+.cl-tbl .mono{color:var(--gw-color-primary-600)}
+.cl-tbl .num{font-feature-settings:"tnum" 1;white-space:nowrap}
+
+/* --- gaps ----------------------------------------------------------------- */
+.cl-gaps{display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.cl-gap{display:grid;grid-template-columns:28px minmax(0,1fr);gap:var(--gw-space-12);
+        background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-left:3px solid var(--gw-color-red-400);border-radius:var(--gw-radius-8);
+        padding:var(--gw-space-12) var(--gw-space-16)}
+.cl-gap__n{font:var(--gw-text-body-14-sem);color:var(--gw-color-red-500);
+           font-feature-settings:"tnum" 1}
+.cl-gap__t{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+           color:var(--s-body);white-space:pre-wrap;margin:0}
+
+/* --- use-case cards ------------------------------------------------------- */
+.cl-cases{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+          gap:var(--gw-space-12)}
+.cl-case{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-20);
+         display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.cl-case__n{display:flex;align-items:baseline;justify-content:space-between;gap:var(--gw-space-8)}
+.cl-case__list{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:4px}
+.cl-case__list li{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10.5px;
+                  color:var(--gw-color-neutral-600);background:var(--gw-color-neutral-25);
+                  border:1px solid var(--s-card-border);border-radius:var(--gw-radius-4);
+                  padding:1px 5px}
+:root[data-theme="dark"] .cl-case__list li{background:var(--gw-color-neutral-900)}
+
+/* --- misc ----------------------------------------------------------------- */
+.cl-src{display:flex;flex-wrap:wrap;gap:var(--gw-space-8)}
+.cl-src code{background:var(--s-code-bg);border:1px solid var(--s-code-border);
+             color:var(--s-code-fg);border-radius:var(--gw-radius-4);padding:2px 7px}
+.cl-empty{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-400);
+          border:1px dashed var(--s-field-border);border-radius:var(--gw-radius-10);
+          padding:var(--gw-space-24);text-align:center}
+.cl-jump{display:flex;flex-wrap:wrap;gap:6px}
+.cl-jump a{font:var(--gw-text-body-12-med);color:var(--s-body);text-decoration:none;
+           border:1px solid var(--s-field-border);border-radius:var(--gw-radius-full);
+           padding:5px var(--gw-space-12)}
+.cl-jump a:hover{border-color:var(--gw-color-primary-500);color:var(--gw-color-primary-600)}
+@media print{.cl-bar,.cl-jump{display:none}}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--s-page-bg);font-family:var(--gw-font-body);
+     color:var(--s-body);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
+
+/* ---- topbar ------------------------------------------------------------- */
+.lb-top{position:sticky;top:0;z-index:20;height:60px;display:flex;align-items:center;
+        gap:var(--gw-space-16);padding:0 var(--gw-space-24);
+        background:var(--s-chrome-bg);border-bottom:1px solid var(--s-chrome-border)}
+.lb-brand{display:flex;align-items:center;gap:var(--gw-space-12);text-decoration:none;
+          flex:none}
+.lb-brand__chip{width:32px;height:32px;border-radius:var(--gw-radius-8);
+                background:var(--gw-color-black);color:var(--gw-color-white);
+                display:grid;place-items:center;flex:none}
+.lb-brand__chip svg{width:16px;height:16px;display:block}
+.lb-brand__n{font:var(--gw-text-h7);color:var(--s-heading)}
+.lb-crumb{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-400);
+          white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-crumb a{color:var(--gw-color-primary-600);text-decoration:none}
+.lb-top__r{display:flex;align-items:center;gap:var(--gw-space-12);margin-left:auto}
+.lb-find{width:300px;height:36px;background:var(--s-field-bg);
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         padding:0 var(--gw-space-12);font:var(--gw-text-body-14-reg);color:var(--s-heading)}
+.lb-find::placeholder{color:var(--s-placeholder)}
+.lb-find:focus{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.lb-tbtn{width:36px;height:36px;display:grid;place-items:center;background:transparent;
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         color:var(--s-body);cursor:pointer;flex:none}
+.lb-tbtn svg{width:18px;height:18px;display:block}
+.lb-tbtn:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+@media (max-width:820px){.lb-find{display:none}}
+
+/* ---- three columns ------------------------------------------------------- */
+.lb-3{display:grid;grid-template-columns:240px minmax(0,1fr) 212px;align-items:start;
+      max-width:1600px;margin:0 auto}
+.lb-rail{position:sticky;top:60px;max-height:calc(100vh - 60px);overflow-y:auto;
+         border-right:1px solid var(--s-chrome-border);padding:var(--gw-space-24) 0}
+.lb-rail__t{font:var(--gw-text-body-12-med);text-transform:uppercase;letter-spacing:.06em;
+            color:var(--gw-color-neutral-400);padding:0 var(--gw-space-20) var(--gw-space-8)}
+.lb-rail a{display:flex;justify-content:space-between;gap:var(--gw-space-8);
+           font:var(--gw-text-body-14-reg);color:var(--s-body);text-decoration:none;
+           padding:6px var(--gw-space-20)}
+.lb-rail a:hover{background:var(--s-nav-hover);color:var(--s-heading)}
+.lb-rail a.on{background:var(--s-nav-sel);color:var(--s-heading);
+              font:var(--gw-text-body-14-sem)}
+.lb-rail a span{color:var(--gw-color-neutral-400);font:var(--gw-text-body-12-reg);flex:none}
+.lb-rail a.on span{color:var(--s-heading)}
+.lb-rail__sep{margin:var(--gw-space-12) var(--gw-space-20) var(--gw-space-8);
+              border-top:1px solid var(--s-chrome-border)}
+
+.lb-mid{grid-column:2;padding:var(--gw-space-32) var(--gw-space-40) var(--gw-space-80);
+        min-width:0;display:flex;flex-direction:column;gap:var(--gw-space-24)}
+.lb-toc{grid-column:3;position:sticky;top:60px;max-height:calc(100vh - 60px);overflow-y:auto;
+        padding:var(--gw-space-32) var(--gw-space-20);display:flex;flex-direction:column;
+        gap:5px}
+.lb-toc b{font:var(--gw-text-body-12-med);text-transform:uppercase;letter-spacing:.06em;
+          color:var(--gw-color-neutral-400);margin-bottom:3px}
+.lb-toc a{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-600);
+          text-decoration:none;line-height:1.35}
+.lb-toc a:hover{color:var(--gw-color-primary-600)}
+.lb-toc a.l3{padding-left:var(--gw-space-12)}
+@media (max-width:1180px){.lb-3{grid-template-columns:220px minmax(0,1fr)}
+                          .lb-toc{display:none}}
+@media (max-width:820px){.lb-3{grid-template-columns:1fr}
+                         .lb-rail{position:static;max-height:none;border-right:0;
+                                  border-bottom:1px solid var(--s-chrome-border)}
+                         .lb-mid{padding:var(--gw-space-24) var(--gw-space-20)}}
+
+/* ---- page head ----------------------------------------------------------- */
+.lb-h{display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.lb-h h1{font:var(--gw-text-h4);margin:0}
+.lb-h .lede{font:var(--gw-text-body-16-reg);color:var(--s-body);margin:0;max-width:74ch}
+.lb-row{display:flex;flex-wrap:wrap;gap:var(--gw-space-8);align-items:center}
+.lb-meta{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+         color:var(--gw-color-neutral-400)}
+
+.chip{display:inline-flex;align-items:center;gap:5px;font:var(--gw-text-body-12-med);
+      border-radius:var(--gw-radius-full);padding:3px var(--gw-space-8);white-space:nowrap}
+.chip--measured{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.chip--transcribed{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.chip--ruled{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+.chip--structure{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.chip--built-here{background:var(--gw-color-orange-50);color:var(--gw-color-orange-700)}
+.chip--passed{background:var(--gw-color-green-500);color:var(--gw-color-white)}
+.chip--pending{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+.chip--rejected{background:var(--gw-color-red-500);color:var(--gw-color-white)}
+.chip--gap{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+.chip--web{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+:root[data-theme="dark"] .chip--measured{background:var(--gw-color-green-900);color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .chip--transcribed,
+:root[data-theme="dark"] .chip--structure{background:var(--gw-color-yellow-900);color:var(--gw-color-yellow-100)}
+:root[data-theme="dark"] .chip--ruled,
+:root[data-theme="dark"] .chip--web{background:var(--gw-color-primary-900);color:var(--gw-color-primary-200)}
+:root[data-theme="dark"] .chip--pending{background:var(--gw-color-neutral-800);color:var(--gw-color-neutral-300)}
+:root[data-theme="dark"] .chip--built-here{background:var(--gw-color-orange-900);color:var(--gw-color-orange-100)}
+:root[data-theme="dark"] .chip--gap{background:var(--gw-color-red-900);color:var(--gw-color-red-200)}
+
+/* ---- markdown ------------------------------------------------------------ */
+.md{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.md h2{font:var(--gw-text-h6);margin:var(--gw-space-20) 0 0;scroll-margin-top:80px}
+.md h3{font:var(--gw-text-h7);margin:var(--gw-space-16) 0 0;scroll-margin-top:80px}
+.md h4,.md h5,.md h6{font:var(--gw-text-body-16-sem);margin:var(--gw-space-12) 0 0}
+.md p{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+      color:var(--s-body);margin:0;max-width:80ch}
+.md ul,.md ol{margin:0;padding-left:var(--gw-space-20);display:flex;
+              flex-direction:column;gap:5px}
+.md li{font:var(--gw-text-body-14-reg);color:var(--s-body);max-width:78ch}
+.md code{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px;
+         background:var(--s-code-bg);border:1px solid var(--s-code-border);
+         color:var(--s-code-fg);border-radius:var(--gw-radius-4);padding:1px 5px}
+.md a{color:var(--gw-color-primary-600)}
+.md-pre{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-radius:var(--gw-radius-8);padding:var(--gw-space-16);overflow-x:auto;margin:0}
+.md-pre code{background:none;border:0;padding:0;color:var(--s-body);font-size:12px}
+.md-q{margin:0;border-left:3px solid var(--gw-color-neutral-300);
+      padding:var(--gw-space-8) var(--gw-space-16);font:var(--gw-text-body-14-reg);
+      color:var(--s-body)}
+.md-hr{border:0;border-top:1px solid var(--s-card-border);margin:var(--gw-space-12) 0}
+.md-tblwrap{overflow-x:auto}
+.md-tbl{width:100%;border-collapse:collapse;background:var(--s-card-bg);
+        border:1px solid var(--s-card-border);border-radius:var(--gw-radius-8);
+        overflow:hidden;font:var(--gw-text-body-14-reg)}
+.md-tbl th{text-align:left;font:var(--gw-text-body-12-med);text-transform:uppercase;
+           letter-spacing:.06em;color:var(--gw-color-neutral-400);
+           padding:var(--gw-space-8) var(--gw-space-12);
+           border-bottom:1px solid var(--s-card-border);white-space:nowrap}
+.md-tbl td{padding:var(--gw-space-8) var(--gw-space-12);color:var(--s-body);
+           border-bottom:1px solid var(--s-card-border);vertical-align:top}
+.md-tbl tr:last-child td{border-bottom:none}
+.md-tbl code{white-space:nowrap}
+
+.note{font:var(--gw-text-body-14-reg);color:var(--s-body);
+      background:var(--gw-color-neutral-25);border:1px solid var(--s-card-border);
+      border-left:3px solid var(--gw-color-neutral-300);border-radius:var(--gw-radius-8);
+      padding:var(--gw-space-12) var(--gw-space-16);white-space:pre-wrap;max-width:88ch}
+:root[data-theme="dark"] .note{background:var(--gw-color-neutral-900)}
+.note--find{border-left-color:var(--gw-color-yellow-400);white-space:normal}
+.empty{border:1px dashed var(--s-field-border);border-radius:var(--gw-radius-10);
+       padding:var(--gw-space-24);text-align:center;font:var(--gw-text-body-14-reg);
+       color:var(--gw-color-neutral-400)}
+.sec{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.sec h2{font:var(--gw-text-h6);margin:0;scroll-margin-top:80px}
+</style>
+</head>
+<body>
+<header class="lb-top">
+  <a class="lb-brand" href="../../../library/index.html">
+    <span class="lb-brand__chip"><svg viewBox="0 0 80 80" fill="none" aria-hidden="true"><path d="M76.6088 4.56344C77.5025 2.36058 75.8495 0 73.4723 0H9.14286C4.0934 0 0 4.0934 0 9.14286V66.7778C0 72.018 5.17081 75.6829 9.9603 73.5568C40.8494 59.8449 64.3785 34.7075 76.6088 4.56344Z" fill="currentColor"/><path d="M32.5161 80C31.4022 80 30.9357 78.5531 31.8259 77.8835C54.9007 60.5265 71.4338 35.8047 78.7658 8.0522C78.9403 7.39154 80 7.51618 80 8.19951V70.8571C80 75.9066 75.9066 80 70.8571 80H32.5161Z" fill="currentColor"/></svg></span>
+    <span class="lb-brand__n">Component Library</span></a>
+  <span class="lb-crumb"><a href="../../index.html">Library</a> / <a href="index.html">Dashboard</a></span>
+  <div class="lb-top__r"><input class="lb-find" id="lb-find" type="search" placeholder="Filter this library">
+    <button class="lb-tbtn" id="lb-theme" type="button" aria-label="Switch theme">
+      <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M116,36V32a12,12,0,0,1,24,0v4a12,12,0,0,1-24,0Zm80,92a68,68,0,1,1-68-68A68.07,68.07,0,0,1,196,128Zm-24,0a44,44,0,1,0-44,44A44.05,44.05,0,0,0,172,128ZM51.51,68.49a12,12,0,1,0,17-17l-4-4a12,12,0,0,0-17,17Zm0,119-4,4a12,12,0,0,0,17,17l4-4a12,12,0,1,0-17-17ZM196,72a12,12,0,0,0,8.49-3.51l4-4a12,12,0,0,0-17-17l-4,4A12,12,0,0,0,196,72Zm8.49,115.51a12,12,0,0,0-17,17l4,4a12,12,0,0,0,17-17ZM48,128a12,12,0,0,0-12-12H32a12,12,0,0,0,0,24h4A12,12,0,0,0,48,128Zm80,80a12,12,0,0,0-12,12v4a12,12,0,0,0,24,0v-4A12,12,0,0,0,128,208Zm96-92h-4a12,12,0,0,0,0,24h4a12,12,0,0,0,0-24Z"/></svg></button></div>
+</header>
+<div class="lb-3"><nav class="lb-rail"><div class="lb-rail__t">Dashboard · 29</div><a href="index.html" data-q="overview 29">Overview<span>29</span></a><div class="lb-rail__sep"></div><a href="card-shell.html" data-q="card-shell ">card-shell</a><a href="checkbox.html" data-q="checkbox ">checkbox</a><a href="control.html" data-q="control ">control</a><a href="dashboard-switcher.html" data-q="dashboard-switcher ">dashboard-switcher</a><a href="date-range-picker.html" data-q="date-range-picker ">date-range-picker</a><a href="divider.html" data-q="divider ">divider</a><a href="empty-state.html" data-q="empty-state ">empty-state</a><a href="icon-button.html" data-q="icon-button ">icon-button</a><a href="icon-toggle-group.html" data-q="icon-toggle-group ">icon-toggle-group</a><a href="input.html" data-q="input ">input</a><a href="legend.html" data-q="legend ">legend</a><a href="metric-card.html" data-q="metric-card ">metric-card</a><a href="modal.html" data-q="modal ">modal</a><a href="page-header.html" data-q="page-header ">page-header</a><a href="pagination.html" data-q="pagination ">pagination</a><a href="progress-bar.html" data-q="progress-bar ">progress-bar</a><a href="ring.html" data-q="ring ">ring</a><a href="section-header.html" data-q="section-header ">section-header</a><a href="sidebar.html" data-q="sidebar " class="on">sidebar</a><a href="skeleton.html" data-q="skeleton ">skeleton</a><a href="stat-card.html" data-q="stat-card ">stat-card</a><a href="status-dot.html" data-q="status-dot ">status-dot</a><a href="tab-group.html" data-q="tab-group ">tab-group</a><a href="tab-item.html" data-q="tab-item ">tab-item</a><a href="table-cell.html" data-q="table-cell ">table-cell</a><a href="table-row.html" data-q="table-row ">table-row</a><a href="toast.html" data-q="toast ">toast</a><a href="tooltip.html" data-q="tooltip ">tooltip</a><a href="topbar.html" data-q="topbar ">topbar</a></nav><main class="lb-mid"><div class="lb-h"><h1>sidebar</h1><p class="lede">Dashboard · v2/cards-and-chrome.md</p><div class="lb-row"><span class="chip chip--measured" title="Read off the bound Figma variables. Safe to build from.">measured</span><span class="chip chip--pending" title="Has not been through a review pass">not reviewed</span><span class="pill">v1.40.0</span></div><div class="lb-meta">review: bash scripts/review-pass.sh dashboard sidebar</div></div><div class="md"><h2 id="stat-card">Cards and chrome — stat, metric, shell, topbar, sidebar, headers</h2>
+<p>Page <code>Dashboard Components</code> (<code>257:371</code>) in <b><code>Q9L6q38dEj3Qu1JkjiT13y</code></b> — the product file, not the library. See <code>README.md</code> in this folder.</p>
+<p><b>Scope: dashboard / product.</b></p>
+<hr class="md-hr">
+<h3 id="metric-card"><code>stat-card</code></h3>
+<p>Set <code>275:533</code> · <b>2 variants</b> (<code>Theme</code> = <code>light</code> · <code>dark</code>). <b>218 × 132</b> (source 217.6).</p>
+<p><code>radius/12</code>, padding <code>spacing/12</code>, gap <code>spacing/16</code>. Inner <code>body</code> frame padding <code>spacing/4</code>, gap <code>spacing/16</code>.</p>
+<p>Structure:</p>
+<ul><li><code>label-row</code> — gap <code>spacing/8</code>, label <b>grows</b>, then a <code>status-dot</code> 8px</li><li><code>value-block</code> — gap <code>spacing/8</code></li><li><code>value-row</code> — <code>SPACE_BETWEEN</code>, cross-align <b>MAX</b> (baselines sit on the bottom)</li><li><code>value</code> column, gap <code>spacing/4</code>: the number, then a <code>of N</code> sub-line</li><li>the percentage, right-aligned</li><li><code>progress-bar Size=md</code> (4px), <b>FILL</b></li></ul>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Part</th><th>Type</th><th>Light</th><th>Dark</th></tr></thead><tbody><tr><td>Surface</td><td>—</td><td><code>neutral/white</code> + 1px <code>neutral/100</code></td><td><code>neutral/900</code> + 1px <code>neutral/800</code></td></tr><tr><td>Label</td><td><code>body-12-med</code></td><td><code>neutral/700</code></td><td><b><code>neutral/400</code></b></td></tr><tr><td>Value</td><td><code>Dashboard/display-28-med</code> ⚠ no token</td><td><code>neutral/black</code></td><td><code>neutral/white</code></td></tr><tr><td>Sub-line</td><td><code>body-12-med</code></td><td><code>neutral/500</code></td><td><code>neutral/500</code> — <b>unchanged</b></td></tr><tr><td>Percentage</td><td><code>body-12-med</code></td><td><code>neutral/500</code></td><td><code>neutral/500</code> — <b>unchanged</b></td></tr><tr><td>Progress track</td><td>—</td><td><code>neutral/200</code></td><td><code>neutral/600</code></td></tr><tr><td>Progress fill</td><td>—</td><td><code>green/400</code></td><td><code>green/300</code></td></tr><tr><td>Status dot</td><td>—</td><td><code>green/400</code></td><td><code>green/400</code> — <b>unchanged</b></td></tr></tbody></table></div>
+<p>Every dark value measured off the dark screen. <b>The sub-line and percentage do not change</b> — a sensible guess steps them down and is wrong.</p>
+<p><b>Component properties:</b> <code>Label</code> · <code>Value</code> · <code>Sub</code> · <code>Percent</code> (TEXT).</p>
+<p>⚠ Supersedes <code>kpi-card</code> and <code>analytics-card</code> in <code>section-elements.md</code>, whose <code>Mode</code> names are <b>inverted</b> (<code>Mode=light</code> renders a dark card). This component has no such defect — <code>Theme=light</code> is light.</p>
+<hr class="md-hr">
+<h3 id="card-shell"><code>metric-card</code></h3>
+<p>Set <code>275:546</code> · <b>2 variants</b> (<code>Theme</code>). <b>274 × 124</b> — the run-rate card.</p>
+<p><code>radius/12</code>, padding <b><code>spacing/16</code></b> — <i>not</i> <code>spacing/12</code> like <code>stat-card</code> — gap <code>spacing/16</code>, <code>SPACE_BETWEEN</code> horizontal.</p>
+<p><code>body</code> column, gap <code>spacing/16</code>: label <code>body-12-med</code>, then a value block at gap <code>spacing/4</code> — <code>Dashboard/display-28-med</code> over a <code>body-12-med</code> <code>neutral/500</code> sub-line.</p>
+<p><b>No progress bar.</b> Same light/dark token mapping as <code>stat-card</code>.</p>
+<p><b>Component properties:</b> <code>Label</code> · <code>Value</code> · <code>Sub</code> (TEXT).</p>
+<p>⚠ The padding difference between the two cards is measured, not an error. <code>stat-card</code> is 12, <code>metric-card</code> is 16.</p>
+<p>⚠ <b><code>metric-card</code> does not fit <code>card-layout</code>'s analytics slot.</b> That slot's measured grid height is <b>196</b> — two rows of the v1 <code>analytics-card</code> 94 floor plus the 8 gap. <code>metric-card</code>'s content (a <code>body-12-med</code> label, a <code>Dashboard/display-28-med</code> value and a sub-line) bottoms out around <b>104</b> at <code>p-12</code>, so two rows come to ~214 and the stretched lead <code>stat-card</code> is dragged ~16px past its own 198 ceiling. Measured 17 Aug 2026.</p>
+<p>The 196 was measured with <code>analytics-card</code>, whose value is smaller. There is no combination of v2 cards that reproduces it. Either the slot's height is no longer 196 in a v2 build, or the analytics slot needs a card that is not <code>metric-card</code>. <b>Unresolved</b> — flag it in the build rather than shrinking the type to force the old number.</p>
+<hr class="md-hr">
+<h3 id="topbar"><code>card-shell</code></h3>
+<p>Set <code>276:521</code> · <b>6 variants</b> (3 × 2). Default <b>1120 × 200</b>, <code>content</code> slot fills.</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Size</th><th>Radius</th><th>Padding</th><th>Where</th></tr></thead><tbody><tr><td><code>lg</code></td><td><b><code>radius/16</code></b></td><td><code>spacing/12</code></td><td>hero card, table card</td></tr><tr><td><code>md</code></td><td><code>radius/12</code></td><td><code>spacing/12</code></td><td>stat and run-rate cards</td></tr><tr><td><code>sm</code></td><td><code>radius/8</code></td><td>0</td><td>inner surfaces — table grid wrapper, inset panels</td></tr></tbody></table></div>
+<p>Light <code>neutral/white</code> + 1px <code>neutral/100</code>; dark <code>neutral/900</code> + 1px <code>neutral/800</code>.</p>
+<p><b>Two radius tiers are deliberate</b> — outer containers 16, nested cards 12, inner surfaces 8. Ruled 13 Aug 2026. <code>--gw-radius-16</code> already existed; the screens were using a <b>raw 16</b>, which is why it looked like a missing token.</p>
+<hr class="md-hr">
+<h3 id="sidebar"><code>topbar</code></h3>
+<p>Set <code>279:629</code> · <b>2 variants</b> (<code>Theme</code>). <b>1440 × 60</b>.</p>
+<p>Padding <code>px-40</code> (<code>spacing/40</code>), <code>SPACE_BETWEEN</code>, vertically centred. Bottom border 1px only.</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Part</th><th>Light</th><th>Dark</th></tr></thead><tbody><tr><td>Fill</td><td><code>neutral/50</code></td><td><code>neutral/900</code></td></tr><tr><td>Bottom border</td><td>1px <code>neutral/100</code></td><td>1px <code>neutral/800</code></td></tr><tr><td>Title</td><td><code>neutral/black</code></td><td><code>neutral/white</code></td></tr><tr><td>Caret icon</td><td><code>neutral/600</code></td><td><code>neutral/300</code></td></tr></tbody></table></div>
+<p><code>dashboard-title</code> — gap <code>spacing/8</code>: <code>gushwork-logo-(internal-use)</code> <b>32 × 32</b>, the dashboard name in <b><code>Dashboard/display-20-sem</code></b> ⚠ no token, then a <code>CaretDown</code> 16 in a 24 × 24 <code>radius/4</code> tile.</p>
+<p><code>actions</code> — gap <code>spacing/8</code>: a <code>control Kind=button, Style=outlined, Size=36</code> (<code>Sync Now</code>) and <code>icon-toggle-group</code>.</p>
+<p>⚠ <b>The source uses a raw 14px vertical padding.</b> Replaced with vertical centring on a fixed 60h — identical result, and on-token. Noted 13 Aug 2026.</p>
+<p>⚠ The rail title is <b>the dashboard's name, not the company's</b> — v1 ruling, still holds.</p>
+<hr class="md-hr">
+<h3 id="page-header"><code>sidebar</code></h3>
+<p>Set <code>280:1032</code> · <b>4 variants</b> (<code>State</code> × <code>Theme</code>).</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>State</th><th>Width</th><th>Height</th></tr></thead><tbody><tr><td><code>expanded</code></td><td><b>240</b></td><td>828</td></tr><tr><td><code>collapsed</code></td><td><b>64</b></td><td>828</td></tr></tbody></table></div>
+<p>Fill <code>neutral/50</code> / <code>neutral/900</code>; <b>right</b> border 1px <code>neutral/100</code> / <code>neutral/800</code>. <code>SPACE_BETWEEN</code> vertical — nav at the top, footer pinned at the bottom.</p>
+<ul><li><code>collapse-row</code> — padding <code>spacing/4</code>, an <code>icon-button Size=20</code>. Chevron is <code>CaretDoubleLeft</code></li></ul>
+<p>when expanded, <b><code>CaretDoubleRight</code></b> when collapsed. Right-aligned expanded, centred collapsed.</p>
+<ul><li><code>list-groups</code> — padding <code>spacing/20</code> (collapsed: <code>spacing/8</code>), gap <code>spacing/24</code></li><li><code>group-label</code> — padding <code>py-4 px-8</code>, <b><code>body-10-sem</code></b> on <code>neutral/400</code></li><li>nav rows — <code>control Kind=nav</code>, <code>FILL</code> width</li><li><code>footer</code> — padding <code>spacing/20</code> sides and top, <b><code>spacing/32</code></b> bottom; a <code>control Kind=user</code></li></ul>
+<p><b><code>body-10-sem</code> is an existing library style</b> — Inter Semi Bold 10/15, an exact match for the group label. Nothing new was created for it; the screens simply had it unbound.</p>
+<p>⚠ <b><code>collapsed</code> is NEW — it was never designed.</b> The collapse chevron existed in the screens but no collapsed state did. 64 wide with 32 × 32 icon cells at <code>radius/8</code>; labels and group headers hidden; footer shows the avatar only. Declared 13 Aug 2026. The width is a judgement call.</p>
+<p>⚠ The v1 rail is <b>260</b> wide (<code>dashboard-build.md</code>); this sidebar is <b>240</b>, measured from the screens. If you are building the v1 <code>dashboard-build</code> shell, its 260 still applies — 8 + 260 + 1164 + 8 = 1440. These are two different shells; do not mix the numbers.</p>
+<hr class="md-hr">
+<h3 id="section-header"><code>page-header</code></h3>
+<p>Set <code>278:567</code> · <b>2 variants</b> (<code>Theme</code>). <b>1120 × 113</b> — exactly the source.</p>
+<p>Vertical, gap <code>spacing/24</code>, no fill.</p>
+<ul><li>Title — <b><code>Dashboard/display-44-sem</code></b> ⚠ no token — <code>neutral/black</code> / <code>neutral/white</code></li><li><code>controls-row</code> — <code>SPACE_BETWEEN</code>, gap <code>spacing/16</code>, centred</li><li><code>filters</code> — gap <code>spacing/16</code>: a <code>tab-group</code>, then <code>period-meta</code> (<code>Day 18 of 30</code>,</li></ul>
+<p><code>button-10-med</code>, <code>neutral/600</code> / <code>neutral/300</code>)</p>
+<ul><li><code>action</code> — a <code>control Kind=button, Style=outlined, Size=36</code> (<code>Compare</code>)</li></ul>
+<p>⚠ Distinct from <code>section-header</code> below, and from the v1 <code>section/header</code> (1164 × 146, a 32px <code>h5</code> title). Three different headers now exist; pick by tier — page title, section title, or the v1 sticky section header.</p>
+<hr class="md-hr">
+<h3 id="legend"><code>section-header</code></h3>
+<p>Set <code>276:560</code> · <b>2 variants</b> (<code>Theme</code>). <b>1120 × 24</b>.</p>
+<p>Padding <code>px-8</code> (<code>spacing/8</code>), <code>SPACE_BETWEEN</code>, gap <code>spacing/8</code>, no fill.</p>
+<ul><li><code>title-group</code> — gap <code>spacing/8</code>: title <code>body-16-sem</code> <code>neutral/black</code> / <code>neutral/white</code>, then a</li></ul>
+<p>qualifier <code>body-16-reg</code> <code>neutral/500</code> / <code>neutral/300</code> (<code>for last month</code>, <code>per biz day</code>)</p>
+<ul><li>a <code>legend</code> instance on the right, optional</li></ul>
+<p>The qualifier is part of the pattern, not decoration — it states the period the section covers.</p>
+<hr class="md-hr">
+<h3><code>legend</code></h3>
+<p>Component <code>276:522</code> (not a set). <b>236 × 16</b> — exactly the source.</p>
+<p>Gap <b><code>spacing/32</code></b> between items; within an item, gap <code>spacing/4</code>. Each item is a <code>status-dot</code> 8px plus a <code>body-12-med</code> label on <code>neutral/700</code>.</p>
+<p>Ships <code>On track</code> · <code>Pending</code> · <code>Behind</code> — matching the three <code>status-dot</code> states.</p>
+<p><b>Dark override:</b> label → <code>neutral/300</code>. The dots stay at <code>/400</code>.</p></div></main><div class="lb-toc"><b>On this page</b><a href="#stat-card" class="l3">stat-card</a><a href="#metric-card" class="l3">metric-card</a><a href="#card-shell" class="l3">card-shell</a><a href="#topbar" class="l3">topbar</a><a href="#sidebar" class="l3">sidebar</a><a href="#page-header" class="l3">page-header</a><a href="#section-header" class="l3">section-header</a><a href="#legend" class="l3">legend</a></div></div>
+<script>
+(function(){
+  /* Theme: the same two localStorage keys the main site uses, so a choice made there
+     carries here and back. 'system' can still arrive from an older stored value and
+     resolves to light, matching shell.js. */
+  var PREF='gw-theme-pref', RES='gw-theme';
+  function pref(){try{var v=localStorage.getItem(PREF);
+    if(v==='light'||v==='dark')return v;
+    if(v==='system')return 'light';
+    var o=localStorage.getItem(RES);
+    return (o==='dark'||o==='light')?o:'light';}catch(e){return 'light'}}
+  function apply(p){var r=p==='dark'?'dark':'light';
+    document.documentElement.setAttribute('data-theme',r);
+    try{localStorage.setItem(PREF,p);localStorage.setItem(RES,r)}catch(e){}
+    var b=document.getElementById('lb-theme');
+    if(b)b.setAttribute('aria-label',r==='dark'?'Switch to light':'Switch to dark');}
+  var btn=document.getElementById('lb-theme');
+  if(btn)btn.addEventListener('click',function(){
+    apply(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
+  apply(pref());
+
+  /* Rail filter. Narrows the inventory in place — it does not navigate, because the
+     rail is a list of siblings and losing your place to search them is worse than
+     scrolling. */
+  var f=document.getElementById('lb-find');
+  if(f){
+    var rows=[].slice.call(document.querySelectorAll('.lb-rail a'));
+    f.addEventListener('input',function(){
+      var t=f.value.trim().toLowerCase();
+      rows.forEach(function(a){
+        a.hidden=!!t&&a.getAttribute('data-q').indexOf(t)===-1});
+    });
+  }
+
+  /* Mark the on-this-page entry for whatever heading is currently at the top. */
+  var toc=[].slice.call(document.querySelectorAll('.lb-toc a'));
+  if(toc.length){
+    var heads=toc.map(function(a){return document.getElementById(a.hash.slice(1))})
+                 .filter(Boolean);
+    var tick=function(){
+      var best=0;
+      heads.forEach(function(h,i){if(h.getBoundingClientRect().top<=90)best=i});
+      toc.forEach(function(a,i){a.style.color=i===best?'var(--gw-color-primary-600)':''});
+    };
+    document.addEventListener('scroll',tick,{passive:true});tick();
+  }
+})();
+</script>
+</body></html>

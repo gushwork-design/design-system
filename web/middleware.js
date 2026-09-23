@@ -7,7 +7,13 @@
 
    Two tiers:
      /internal/*  any verified @gushwork.ai account
+     /library/*   the component library — same tier, its own surface
      /admin/*     only the ADMIN_EMAILS allowlist
+
+   /library/review is admin, by being the longer prefix in _access.js. The bare
+   /library is matched as well as /library/:path* — a one-segment path does not
+   match the :path* form, and without it the index of the whole library is the
+   one page in it that is public.
 
    The matcher below is deliberately narrow. Everything else — the Overview
    page, /foundation/tokens.css, the fonts, and critically
@@ -21,7 +27,7 @@ import { COOKIE, verify, readCookie, sessionSecret, authModes, GATE_ENABLED }
 import { loadRules, decide } from './api/_access.js';
 
 export const config = {
-  matcher: ['/internal/:path*', '/admin/:path*']
+  matcher: ['/internal/:path*', '/admin/:path*', '/library', '/library/:path*']
 };
 
 /* ── THE GATE IS ON, 15 Sep 2026 ─────────────────────────────────────────────
@@ -94,11 +100,32 @@ function toSignIn(url) {
   return new Response(null, { status: 302, headers: { Location: to.toString() } });
 }
 
+/* ── ad landers are public, and this has to be stated HERE ──────────────────
+   An ad page exists to be pasted into Slack, sent to a client and run as paid
+   media. A social card cannot render from behind the gate: the scraper has no
+   cookie, gets the sign-in bounce, and the link shows a grey box.
+
+   There is an `access: 'public'` tier in _access.js and a compiled route for
+   this path, but a compiled route only fills a GENUINE hole — withFallbacks()
+   treats a stored /internal rule as covering everything beneath it, so once an
+   Edge Config store exists the sub-route is never added and the page stays
+   gated. Saying it in the middleware is the only version that holds either way.
+
+   Consequence worth knowing: this bypasses decide(), so /admin/access-control
+   cannot re-gate these paths. Removing a page from public means removing it
+   from this list. Ruled by Utsav 22 Sep 2026. */
+const PUBLIC_PATHS = ['/internal/staging/ai-crm-lander'];
+
+function isPublic(pathname) {
+  return PUBLIC_PATHS.some(p => pathname === p || pathname.startsWith(p + '/'));
+}
+
 export default async function middleware(request) {
   /* Returning undefined continues to the next handler, which serves the file. */
   if (!GATE_ENABLED) return undefined;
 
   const url = new URL(request.url);
+  if (isPublic(url.pathname)) return undefined;
   const modes = authModes();
 
   /* Fail closed if there is no way in at all — an unconfigured gate must not

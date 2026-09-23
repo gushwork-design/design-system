@@ -52,9 +52,44 @@ export function defaultRules() {
        one, which is what every project sees before a store is attached. */
     routes: [
       { path: '/admin',    access: 'admin',    groups: [], people: [] },
-      { path: '/internal', access: 'internal', groups: [], people: [] }
+      { path: '/internal', access: 'internal', groups: [], people: [] },
+      /* The component library. Its own surface rather than a page under
+         /internal, because it renders its own chrome instead of the site shell
+         — but the same tier: any verified @gushwork.ai. The review sheet under
+         it is admin, and wins here by being the longer prefix. */
+      { path: '/library',  access: 'internal', groups: [], people: [] },
+      { path: '/library/review', access: 'admin', groups: [], people: [] },
+      /* Ad landers are public on purpose. An ad page's whole job is to be
+         pasted into Slack, sent to a client and run as paid media, and a
+         social card cannot render from behind the gate: the scraper fetching
+         the URL has no cookie, gets the sign-in bounce, and shows a grey box.
+         Longest prefix wins, so this opens exactly this page — everything
+         else under /internal stays internal. Ruled by Utsav 22 Sep 2026.
+         NOTE: the page calls /api/faq, which spends API credit per question.
+         That endpoint is rate-limited because of this line. */
+      { path: '/internal/staging/ai-crm-lander', access: 'public', groups: [], people: [] }
     ]
   };
+}
+
+/* ── why a stored ruleset cannot silently un-gate a new page ────────────────
+   A store that returns routes REPLACES the compiled ones outright. That is
+   correct for the paths it knows about and dangerous for the ones it does not:
+   ship a new gated prefix in code, and a store written before that prefix
+   existed has no rule covering it, ruleFor() returns null, and decide()
+   answers 'allow'. The matcher runs, the gate says yes, and the page is public.
+   Nothing reports it — it looks exactly like a page that was meant to be open.
+
+   So a compiled route survives unless the store actually covers it. The store
+   still wins wherever it has an opinion: a stored /library rule, or any stored
+   ancestor of it, takes precedence as before. This only fills genuine holes. */
+export function withFallbacks(rules) {
+  const covered = path => rules.routes.some(
+    r => path === r.path || path.startsWith(r.path + '/')
+  );
+  const missing = defaultRules().routes.filter(r => !covered(r.path));
+  if (!missing.length) return rules;
+  return { ...rules, routes: rules.routes.concat(missing) };
 }
 
 /* ── reading the store ────────────────────────────────────────────────────
@@ -126,6 +161,7 @@ export async function loadRules() {
     } else {
       const items = await res.json();
       rules = normalise(items && items.access);
+      if (rules) rules = withFallbacks(rules);
       lastRead = rules
         ? { state: 'ok', detail: null }
         /* A brand-new store has no `access` key yet. That is not an error —

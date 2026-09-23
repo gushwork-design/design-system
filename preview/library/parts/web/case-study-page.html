@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>case-study-page — Gushwork</title>
+<meta name="robots" content="noindex">
+<script>try{var t=localStorage.getItem('gw-theme');if(t!=='dark')t='light';
+document.documentElement.setAttribute('data-theme',t)}catch(e){
+document.documentElement.setAttribute('data-theme','light')}</script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20width%3D%2280%22%20height%3D%2280%22%20rx%3D%2220%22%20fill%3D%22%230d0d0d%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="../../../foundation/tokens.css">
+<link rel="stylesheet" href="../../../shell.css">
+<style>
+.cl{--cl-gap:var(--gw-space-40)}
+.cl h2{font:var(--gw-text-h5);color:var(--s-heading);margin:0}
+.cl h3{font:var(--gw-text-h7);color:var(--s-heading);margin:0}
+.cl h4{font:var(--gw-text-body-16-sem);color:var(--s-heading);margin:0}
+.cl p{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+      color:var(--s-body);margin:0;max-width:78ch}
+.cl code,.cl .mono{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px}
+
+/* --- page head ------------------------------------------------------------ */
+.cl-head{display:flex;flex-direction:column;gap:var(--gw-space-16)}
+.cl-head h1{font:var(--gw-text-h4);color:var(--s-heading);margin:0}
+.cl-lede{font:var(--gw-text-body-18-reg);letter-spacing:var(--gw-text-body-18-reg-tracking);
+         color:var(--s-body);margin:0;max-width:72ch}
+
+/* --- the tally ------------------------------------------------------------ */
+.cl-tally{display:flex;flex-wrap:wrap;gap:var(--gw-space-12)}
+.cl-stat{flex:1 1 150px;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-16) var(--gw-space-20);
+         display:flex;flex-direction:column;gap:var(--gw-space-4)}
+.cl-stat b{font:var(--gw-text-h6);color:var(--s-heading);font-feature-settings:"tnum" 1}
+.cl-stat span{font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-400);
+              text-transform:uppercase;letter-spacing:.06em}
+
+/* --- review queue --------------------------------------------------------- */
+.cl-queue{background:var(--s-card-bg);border:1px solid var(--gw-color-yellow-300);
+          border-left:3px solid var(--gw-color-yellow-400);border-radius:var(--gw-radius-12);
+          padding:var(--gw-space-20) var(--gw-space-24);display:flex;flex-direction:column;
+          gap:var(--gw-space-12)}
+.cl-queue h2{font:var(--gw-text-h7)}
+.cl-queue ul{margin:0;padding-left:var(--gw-space-20);display:flex;flex-direction:column;
+             gap:var(--gw-space-4)}
+.cl-queue li{font:var(--gw-text-body-14-reg);color:var(--s-body)}
+.cl-queue a{color:var(--gw-color-primary-600);text-decoration:none}
+.cl-queue a:hover{text-decoration:underline}
+.cl-pass{background:var(--s-card-bg);border:1px solid var(--gw-color-green-300);
+         border-left:3px solid var(--gw-color-green-400)}
+
+/* --- controls ------------------------------------------------------------- */
+.cl-bar{position:sticky;top:0;z-index:5;background:var(--s-page-bg);
+        padding:var(--gw-space-12) 0;display:flex;flex-wrap:wrap;gap:var(--gw-space-8);
+        align-items:center;border-bottom:1px solid var(--s-chrome-border)}
+.cl-find{flex:1 1 220px;min-width:180px;background:var(--s-field-bg);
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         padding:var(--gw-space-8) var(--gw-space-12);font:var(--gw-text-body-14-reg);
+         color:var(--s-heading)}
+.cl-find::placeholder{color:var(--s-placeholder)}
+.cl-find:focus{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.cl-filter{display:flex;gap:var(--gw-space-4);flex-wrap:wrap}
+.cl-f{font:var(--gw-text-body-12-med);color:var(--s-body);background:transparent;
+      border:1px solid var(--s-field-border);border-radius:var(--gw-radius-full);
+      padding:6px var(--gw-space-12);cursor:pointer}
+.cl-f:hover{border-color:var(--gw-color-primary-500)}
+.cl-f[aria-pressed="true"]{background:var(--gw-color-black);color:var(--gw-color-white);
+                           border-color:var(--gw-color-black)}
+.cl-f:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.cl-count{font:var(--gw-text-body-12-reg);color:var(--gw-color-neutral-400);margin-left:auto}
+
+/* --- sections ------------------------------------------------------------- */
+.cl-sec{display:flex;flex-direction:column;gap:var(--gw-space-20);
+        scroll-margin-top:var(--gw-space-80)}
+.cl-sec[hidden]{display:none}
+.cl-sechead{display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--gw-space-12)}
+.cl-note{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+         color:var(--s-body);background:var(--gw-color-neutral-25);
+         border:1px solid var(--s-card-border);border-left:3px solid var(--gw-color-neutral-300);
+         border-radius:var(--gw-radius-8);padding:var(--gw-space-12) var(--gw-space-16);
+         white-space:pre-wrap;max-width:88ch}
+:root[data-theme="dark"] .cl-note{background:var(--gw-color-neutral-900)}
+.cl-sub{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.cl-sub[hidden]{display:none}
+
+/* --- chips ---------------------------------------------------------------- */
+.cl-chip{display:inline-flex;align-items:center;gap:6px;font:var(--gw-text-body-12-med);
+         border-radius:var(--gw-radius-full);padding:3px var(--gw-space-8);white-space:nowrap}
+.cl-chip--measured{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.cl-chip--transcribed{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.cl-chip--ruled{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+.cl-chip--passed{background:var(--gw-color-green-500);color:var(--gw-color-white)}
+.cl-chip--pending{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+.cl-chip--rejected{background:var(--gw-color-red-500);color:var(--gw-color-white)}
+.cl-chip--gap{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+:root[data-theme="dark"] .cl-chip--measured{background:var(--gw-color-green-900);
+                                            color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .cl-chip--transcribed{background:var(--gw-color-yellow-900);
+                                               color:var(--gw-color-yellow-100)}
+:root[data-theme="dark"] .cl-chip--ruled{background:var(--gw-color-primary-900);
+                                         color:var(--gw-color-primary-200)}
+:root[data-theme="dark"] .cl-chip--pending{background:var(--gw-color-neutral-800);
+                                           color:var(--gw-color-neutral-300)}
+:root[data-theme="dark"] .cl-chip--gap{background:var(--gw-color-red-900);
+                                       color:var(--gw-color-red-200)}
+
+/* --- colour --------------------------------------------------------------- */
+.cl-ramp{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));
+         gap:var(--gw-space-8)}
+.cl-sw{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+       border-radius:var(--gw-radius-10);overflow:hidden;display:flex;flex-direction:column}
+.cl-sw[hidden]{display:none}
+.cl-sw__chip{height:64px;border-bottom:1px solid var(--s-card-border);
+             background-image:linear-gradient(45deg,var(--gw-color-neutral-100) 25%,transparent 25%),
+                              linear-gradient(-45deg,var(--gw-color-neutral-100) 25%,transparent 25%),
+                              linear-gradient(45deg,transparent 75%,var(--gw-color-neutral-100) 75%),
+                              linear-gradient(-45deg,transparent 75%,var(--gw-color-neutral-100) 75%);
+             background-size:12px 12px;
+             background-position:0 0,0 6px,6px -6px,-6px 0}
+.cl-sw__fill{width:100%;height:100%}
+.cl-sw__body{padding:var(--gw-space-8) var(--gw-space-12);display:flex;
+             flex-direction:column;gap:3px}
+.cl-sw__name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;
+             color:var(--s-heading);word-break:break-all;line-height:1.35}
+.cl-sw__hex{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;
+            color:var(--gw-color-neutral-400);text-transform:uppercase}
+.cl-sw__ac{display:flex;gap:4px;margin-top:2px}
+.cl-ac{font-size:9.5px;font-weight:600;letter-spacing:.04em;border-radius:var(--gw-radius-4);
+       padding:1px 4px;line-height:1.5}
+.cl-ac--ok{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.cl-ac--no{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+:root[data-theme="dark"] .cl-ac--ok{background:var(--gw-color-green-900);color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .cl-ac--no{background:var(--gw-color-red-900);color:var(--gw-color-red-200)}
+
+/* --- type ----------------------------------------------------------------- */
+.cl-types{display:flex;flex-direction:column;gap:2px}
+.cl-t{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:var(--gw-space-20);
+      align-items:start;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+      border-radius:var(--gw-radius-10);padding:var(--gw-space-16) var(--gw-space-20)}
+.cl-t[hidden]{display:none}
+.cl-t__spec{color:var(--s-heading);min-width:0;overflow-wrap:anywhere}
+.cl-t__meta{display:flex;flex-direction:column;gap:2px;text-align:right}
+.cl-t__name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+            color:var(--gw-color-primary-600)}
+.cl-t__val{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10.5px;
+           color:var(--gw-color-neutral-400);line-height:1.5}
+@media (max-width:860px){.cl-t{grid-template-columns:1fr}.cl-t__meta{text-align:left}}
+
+/* --- faces ---------------------------------------------------------------- */
+.cl-faces{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+          gap:var(--gw-space-16)}
+.cl-face{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-24);
+         display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.cl-face__aa{font-size:52px;line-height:1.05;color:var(--s-heading)}
+.cl-face__wt{display:flex;flex-direction:column;gap:2px}
+.cl-face__wt span{color:var(--s-heading);font-size:19px;line-height:1.45}
+
+/* --- space / radius / shadow ---------------------------------------------- */
+.cl-rows{display:flex;flex-direction:column;gap:6px}
+.cl-row{display:grid;grid-template-columns:132px minmax(0,1fr) 60px;gap:var(--gw-space-16);
+        align-items:center;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-radius:var(--gw-radius-8);padding:var(--gw-space-8) var(--gw-space-16)}
+.cl-row[hidden]{display:none}
+.cl-row__n{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+           color:var(--gw-color-primary-600);word-break:break-all}
+.cl-row__v{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+           color:var(--gw-color-neutral-400);text-align:right}
+.cl-bararea{min-height:18px;display:flex;align-items:center}
+.cl-barfill{height:16px;background:var(--gw-color-primary-500);border-radius:var(--gw-radius-2);
+            max-width:100%}
+.cl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));
+         gap:var(--gw-space-12)}
+.cl-tile{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-10);padding:var(--gw-space-16);display:flex;
+         flex-direction:column;align-items:center;gap:var(--gw-space-8)}
+.cl-tile[hidden]{display:none}
+.cl-tile__demo{width:72px;height:72px;background:var(--gw-color-primary-100);
+               border:1.5px solid var(--gw-color-primary-500)}
+.cl-tile__sh{width:100%;height:64px;background:var(--gw-color-white);
+             border-radius:var(--gw-radius-8)}
+:root[data-theme="dark"] .cl-tile__sh{background:var(--gw-color-neutral-800)}
+/* The alpha checker is drawn in neutral-100, which is near-white and shouts on a
+   black ground. Same job, quieter, in dark. */
+:root[data-theme="dark"] .cl-sw__chip{
+  background-image:linear-gradient(45deg,var(--gw-color-neutral-800) 25%,transparent 25%),
+                   linear-gradient(-45deg,var(--gw-color-neutral-800) 25%,transparent 25%),
+                   linear-gradient(45deg,transparent 75%,var(--gw-color-neutral-800) 75%),
+                   linear-gradient(-45deg,transparent 75%,var(--gw-color-neutral-800) 75%)}
+
+/* --- tables --------------------------------------------------------------- */
+.cl-tbl{width:100%;border-collapse:collapse;background:var(--s-card-bg);
+        border:1px solid var(--s-card-border);border-radius:var(--gw-radius-10);
+        overflow:hidden;font:var(--gw-text-body-14-reg)}
+.cl-tblwrap{overflow-x:auto}
+.cl-tbl th{text-align:left;font:var(--gw-text-body-12-med);text-transform:uppercase;
+           letter-spacing:.06em;color:var(--gw-color-neutral-400);
+           padding:var(--gw-space-8) var(--gw-space-16);
+           border-bottom:1px solid var(--s-card-border);white-space:nowrap}
+.cl-tbl td{padding:var(--gw-space-8) var(--gw-space-16);color:var(--s-body);
+           border-bottom:1px solid var(--s-card-border);vertical-align:top}
+.cl-tbl tr:last-child td{border-bottom:none}
+.cl-tbl tr[hidden]{display:none}
+.cl-tbl .mono{color:var(--gw-color-primary-600)}
+.cl-tbl .num{font-feature-settings:"tnum" 1;white-space:nowrap}
+
+/* --- gaps ----------------------------------------------------------------- */
+.cl-gaps{display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.cl-gap{display:grid;grid-template-columns:28px minmax(0,1fr);gap:var(--gw-space-12);
+        background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-left:3px solid var(--gw-color-red-400);border-radius:var(--gw-radius-8);
+        padding:var(--gw-space-12) var(--gw-space-16)}
+.cl-gap__n{font:var(--gw-text-body-14-sem);color:var(--gw-color-red-500);
+           font-feature-settings:"tnum" 1}
+.cl-gap__t{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+           color:var(--s-body);white-space:pre-wrap;margin:0}
+
+/* --- use-case cards ------------------------------------------------------- */
+.cl-cases{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+          gap:var(--gw-space-12)}
+.cl-case{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-20);
+         display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.cl-case__n{display:flex;align-items:baseline;justify-content:space-between;gap:var(--gw-space-8)}
+.cl-case__list{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:4px}
+.cl-case__list li{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10.5px;
+                  color:var(--gw-color-neutral-600);background:var(--gw-color-neutral-25);
+                  border:1px solid var(--s-card-border);border-radius:var(--gw-radius-4);
+                  padding:1px 5px}
+:root[data-theme="dark"] .cl-case__list li{background:var(--gw-color-neutral-900)}
+
+/* --- misc ----------------------------------------------------------------- */
+.cl-src{display:flex;flex-wrap:wrap;gap:var(--gw-space-8)}
+.cl-src code{background:var(--s-code-bg);border:1px solid var(--s-code-border);
+             color:var(--s-code-fg);border-radius:var(--gw-radius-4);padding:2px 7px}
+.cl-empty{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-400);
+          border:1px dashed var(--s-field-border);border-radius:var(--gw-radius-10);
+          padding:var(--gw-space-24);text-align:center}
+.cl-jump{display:flex;flex-wrap:wrap;gap:6px}
+.cl-jump a{font:var(--gw-text-body-12-med);color:var(--s-body);text-decoration:none;
+           border:1px solid var(--s-field-border);border-radius:var(--gw-radius-full);
+           padding:5px var(--gw-space-12)}
+.cl-jump a:hover{border-color:var(--gw-color-primary-500);color:var(--gw-color-primary-600)}
+@media print{.cl-bar,.cl-jump{display:none}}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--s-page-bg);font-family:var(--gw-font-body);
+     color:var(--s-body);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
+
+/* ---- topbar ------------------------------------------------------------- */
+.lb-top{position:sticky;top:0;z-index:20;height:60px;display:flex;align-items:center;
+        gap:var(--gw-space-16);padding:0 var(--gw-space-24);
+        background:var(--s-chrome-bg);border-bottom:1px solid var(--s-chrome-border)}
+.lb-brand{display:flex;align-items:center;gap:var(--gw-space-12);text-decoration:none;
+          flex:none}
+.lb-brand__chip{width:32px;height:32px;border-radius:var(--gw-radius-8);
+                background:var(--gw-color-black);color:var(--gw-color-white);
+                display:grid;place-items:center;flex:none}
+.lb-brand__chip svg{width:16px;height:16px;display:block}
+.lb-brand__n{font:var(--gw-text-h7);color:var(--s-heading)}
+.lb-crumb{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-400);
+          white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-crumb a{color:var(--gw-color-primary-600);text-decoration:none}
+.lb-top__r{display:flex;align-items:center;gap:var(--gw-space-12);margin-left:auto}
+.lb-find{width:300px;height:36px;background:var(--s-field-bg);
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         padding:0 var(--gw-space-12);font:var(--gw-text-body-14-reg);color:var(--s-heading)}
+.lb-find::placeholder{color:var(--s-placeholder)}
+.lb-find:focus{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.lb-tbtn{width:36px;height:36px;display:grid;place-items:center;background:transparent;
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         color:var(--s-body);cursor:pointer;flex:none}
+.lb-tbtn svg{width:18px;height:18px;display:block}
+.lb-tbtn:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+@media (max-width:820px){.lb-find{display:none}}
+
+/* ---- three columns ------------------------------------------------------- */
+.lb-3{display:grid;grid-template-columns:240px minmax(0,1fr) 212px;align-items:start;
+      max-width:1600px;margin:0 auto}
+.lb-rail{position:sticky;top:60px;max-height:calc(100vh - 60px);overflow-y:auto;
+         border-right:1px solid var(--s-chrome-border);padding:var(--gw-space-24) 0}
+.lb-rail__t{font:var(--gw-text-body-12-med);text-transform:uppercase;letter-spacing:.06em;
+            color:var(--gw-color-neutral-400);padding:0 var(--gw-space-20) var(--gw-space-8)}
+.lb-rail a{display:flex;justify-content:space-between;gap:var(--gw-space-8);
+           font:var(--gw-text-body-14-reg);color:var(--s-body);text-decoration:none;
+           padding:6px var(--gw-space-20)}
+.lb-rail a:hover{background:var(--s-nav-hover);color:var(--s-heading)}
+.lb-rail a.on{background:var(--s-nav-sel);color:var(--s-heading);
+              font:var(--gw-text-body-14-sem)}
+.lb-rail a span{color:var(--gw-color-neutral-400);font:var(--gw-text-body-12-reg);flex:none}
+.lb-rail a.on span{color:var(--s-heading)}
+.lb-rail__sep{margin:var(--gw-space-12) var(--gw-space-20) var(--gw-space-8);
+              border-top:1px solid var(--s-chrome-border)}
+
+.lb-mid{grid-column:2;padding:var(--gw-space-32) var(--gw-space-40) var(--gw-space-80);
+        min-width:0;display:flex;flex-direction:column;gap:var(--gw-space-24)}
+.lb-toc{grid-column:3;position:sticky;top:60px;max-height:calc(100vh - 60px);overflow-y:auto;
+        padding:var(--gw-space-32) var(--gw-space-20);display:flex;flex-direction:column;
+        gap:5px}
+.lb-toc b{font:var(--gw-text-body-12-med);text-transform:uppercase;letter-spacing:.06em;
+          color:var(--gw-color-neutral-400);margin-bottom:3px}
+.lb-toc a{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-600);
+          text-decoration:none;line-height:1.35}
+.lb-toc a:hover{color:var(--gw-color-primary-600)}
+.lb-toc a.l3{padding-left:var(--gw-space-12)}
+@media (max-width:1180px){.lb-3{grid-template-columns:220px minmax(0,1fr)}
+                          .lb-toc{display:none}}
+@media (max-width:820px){.lb-3{grid-template-columns:1fr}
+                         .lb-rail{position:static;max-height:none;border-right:0;
+                                  border-bottom:1px solid var(--s-chrome-border)}
+                         .lb-mid{padding:var(--gw-space-24) var(--gw-space-20)}}
+
+/* ---- page head ----------------------------------------------------------- */
+.lb-h{display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.lb-h h1{font:var(--gw-text-h4);margin:0}
+.lb-h .lede{font:var(--gw-text-body-16-reg);color:var(--s-body);margin:0;max-width:74ch}
+.lb-row{display:flex;flex-wrap:wrap;gap:var(--gw-space-8);align-items:center}
+.lb-meta{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+         color:var(--gw-color-neutral-400)}
+
+.chip{display:inline-flex;align-items:center;gap:5px;font:var(--gw-text-body-12-med);
+      border-radius:var(--gw-radius-full);padding:3px var(--gw-space-8);white-space:nowrap}
+.chip--measured{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.chip--transcribed{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.chip--ruled{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+.chip--structure{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.chip--built-here{background:var(--gw-color-orange-50);color:var(--gw-color-orange-700)}
+.chip--passed{background:var(--gw-color-green-500);color:var(--gw-color-white)}
+.chip--pending{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+.chip--rejected{background:var(--gw-color-red-500);color:var(--gw-color-white)}
+.chip--gap{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+.chip--web{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+:root[data-theme="dark"] .chip--measured{background:var(--gw-color-green-900);color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .chip--transcribed,
+:root[data-theme="dark"] .chip--structure{background:var(--gw-color-yellow-900);color:var(--gw-color-yellow-100)}
+:root[data-theme="dark"] .chip--ruled,
+:root[data-theme="dark"] .chip--web{background:var(--gw-color-primary-900);color:var(--gw-color-primary-200)}
+:root[data-theme="dark"] .chip--pending{background:var(--gw-color-neutral-800);color:var(--gw-color-neutral-300)}
+:root[data-theme="dark"] .chip--built-here{background:var(--gw-color-orange-900);color:var(--gw-color-orange-100)}
+:root[data-theme="dark"] .chip--gap{background:var(--gw-color-red-900);color:var(--gw-color-red-200)}
+
+/* ---- markdown ------------------------------------------------------------ */
+.md{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.md h2{font:var(--gw-text-h6);margin:var(--gw-space-20) 0 0;scroll-margin-top:80px}
+.md h3{font:var(--gw-text-h7);margin:var(--gw-space-16) 0 0;scroll-margin-top:80px}
+.md h4,.md h5,.md h6{font:var(--gw-text-body-16-sem);margin:var(--gw-space-12) 0 0}
+.md p{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+      color:var(--s-body);margin:0;max-width:80ch}
+.md ul,.md ol{margin:0;padding-left:var(--gw-space-20);display:flex;
+              flex-direction:column;gap:5px}
+.md li{font:var(--gw-text-body-14-reg);color:var(--s-body);max-width:78ch}
+.md code{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px;
+         background:var(--s-code-bg);border:1px solid var(--s-code-border);
+         color:var(--s-code-fg);border-radius:var(--gw-radius-4);padding:1px 5px}
+.md a{color:var(--gw-color-primary-600)}
+.md-pre{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-radius:var(--gw-radius-8);padding:var(--gw-space-16);overflow-x:auto;margin:0}
+.md-pre code{background:none;border:0;padding:0;color:var(--s-body);font-size:12px}
+.md-q{margin:0;border-left:3px solid var(--gw-color-neutral-300);
+      padding:var(--gw-space-8) var(--gw-space-16);font:var(--gw-text-body-14-reg);
+      color:var(--s-body)}
+.md-hr{border:0;border-top:1px solid var(--s-card-border);margin:var(--gw-space-12) 0}
+.md-tblwrap{overflow-x:auto}
+.md-tbl{width:100%;border-collapse:collapse;background:var(--s-card-bg);
+        border:1px solid var(--s-card-border);border-radius:var(--gw-radius-8);
+        overflow:hidden;font:var(--gw-text-body-14-reg)}
+.md-tbl th{text-align:left;font:var(--gw-text-body-12-med);text-transform:uppercase;
+           letter-spacing:.06em;color:var(--gw-color-neutral-400);
+           padding:var(--gw-space-8) var(--gw-space-12);
+           border-bottom:1px solid var(--s-card-border);white-space:nowrap}
+.md-tbl td{padding:var(--gw-space-8) var(--gw-space-12);color:var(--s-body);
+           border-bottom:1px solid var(--s-card-border);vertical-align:top}
+.md-tbl tr:last-child td{border-bottom:none}
+.md-tbl code{white-space:nowrap}
+
+.note{font:var(--gw-text-body-14-reg);color:var(--s-body);
+      background:var(--gw-color-neutral-25);border:1px solid var(--s-card-border);
+      border-left:3px solid var(--gw-color-neutral-300);border-radius:var(--gw-radius-8);
+      padding:var(--gw-space-12) var(--gw-space-16);white-space:pre-wrap;max-width:88ch}
+:root[data-theme="dark"] .note{background:var(--gw-color-neutral-900)}
+.note--find{border-left-color:var(--gw-color-yellow-400);white-space:normal}
+.empty{border:1px dashed var(--s-field-border);border-radius:var(--gw-radius-10);
+       padding:var(--gw-space-24);text-align:center;font:var(--gw-text-body-14-reg);
+       color:var(--gw-color-neutral-400)}
+.sec{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.sec h2{font:var(--gw-text-h6);margin:0;scroll-margin-top:80px}
+</style>
+</head>
+<body>
+<header class="lb-top">
+  <a class="lb-brand" href="../../../library/index.html">
+    <span class="lb-brand__chip"><svg viewBox="0 0 80 80" fill="none" aria-hidden="true"><path d="M76.6088 4.56344C77.5025 2.36058 75.8495 0 73.4723 0H9.14286C4.0934 0 0 4.0934 0 9.14286V66.7778C0 72.018 5.17081 75.6829 9.9603 73.5568C40.8494 59.8449 64.3785 34.7075 76.6088 4.56344Z" fill="currentColor"/><path d="M32.5161 80C31.4022 80 30.9357 78.5531 31.8259 77.8835C54.9007 60.5265 71.4338 35.8047 78.7658 8.0522C78.9403 7.39154 80 7.51618 80 8.19951V70.8571C80 75.9066 75.9066 80 70.8571 80H32.5161Z" fill="currentColor"/></svg></span>
+    <span class="lb-brand__n">Component Library</span></a>
+  <span class="lb-crumb"><a href="../../index.html">Library</a> / <a href="index.html">Web</a></span>
+  <div class="lb-top__r"><input class="lb-find" id="lb-find" type="search" placeholder="Filter this library">
+    <button class="lb-tbtn" id="lb-theme" type="button" aria-label="Switch theme">
+      <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M116,36V32a12,12,0,0,1,24,0v4a12,12,0,0,1-24,0Zm80,92a68,68,0,1,1-68-68A68.07,68.07,0,0,1,196,128Zm-24,0a44,44,0,1,0-44,44A44.05,44.05,0,0,0,172,128ZM51.51,68.49a12,12,0,1,0,17-17l-4-4a12,12,0,0,0-17,17Zm0,119-4,4a12,12,0,0,0,17,17l4-4a12,12,0,1,0-17-17ZM196,72a12,12,0,0,0,8.49-3.51l4-4a12,12,0,0,0-17-17l-4,4A12,12,0,0,0,196,72Zm8.49,115.51a12,12,0,0,0-17,17l4,4a12,12,0,0,0,17-17ZM48,128a12,12,0,0,0-12-12H32a12,12,0,0,0,0,24h4A12,12,0,0,0,48,128Zm80,80a12,12,0,0,0-12,12v4a12,12,0,0,0,24,0v-4A12,12,0,0,0,128,208Zm96-92h-4a12,12,0,0,0,0,24h4a12,12,0,0,0,0-24Z"/></svg></button></div>
+</header>
+<div class="lb-3"><nav class="lb-rail"><div class="lb-rail__t">Web · 28</div><a href="index.html" data-q="overview 28">Overview<span>28</span></a><div class="lb-rail__sep"></div><a href="ai-agents.html" data-q="ai-agents ">ai-agents</a><a href="button.html" data-q="button ">button</a><a href="card-case-study.html" data-q="card-case-study ">card-case-study</a><a href="card-information.html" data-q="card-information ">card-information</a><a href="card-review.html" data-q="card-review ">card-review</a><a href="card-testimonial.html" data-q="card-testimonial ">card-testimonial</a><a href="cards-grid.html" data-q="cards-grid ">cards-grid</a><a href="cards-grid-small.html" data-q="cards-grid-small ">cards-grid-small</a><a href="case-study-page.html" data-q="case-study-page " class="on">case-study-page</a><a href="client-avatar.html" data-q="client-avatar ">client-avatar</a><a href="client-logos.html" data-q="client-logos ">client-logos</a><a href="comparison-table.html" data-q="comparison-table ">comparison-table</a><a href="cta.html" data-q="cta ">cta</a><a href="eyebrow.html" data-q="eyebrow ">eyebrow</a><a href="faqs.html" data-q="faqs ">faqs</a><a href="fold-other.html" data-q="fold-other ">fold-other</a><a href="footer.html" data-q="footer ">footer</a><a href="form.html" data-q="form ">form</a><a href="hero.html" data-q="hero ">hero</a><a href="image.html" data-q="image ">image</a><a href="inline-input.html" data-q="inline-input ">inline-input</a><a href="input-fields.html" data-q="input-fields ">input-fields</a><a href="navbar.html" data-q="navbar ">navbar</a><a href="page-build.html" data-q="page-build ">page-build</a><a href="testimonial.html" data-q="testimonial ">testimonial</a><a href="timeline.html" data-q="timeline ">timeline</a><a href="video.html" data-q="video ">video</a><a href="with-image.html" data-q="with-image ">with-image</a></nav><main class="lb-mid"><div class="lb-h"><h1>case-study-page</h1><p class="lede">Web · ../../skills/gushwork-web/templates/case-study/README.md</p><div class="lb-row"><span class="chip chip--measured" title="Read off the bound Figma variables. Safe to build from.">measured</span><span class="chip chip--pending" title="Has not been through a review pass">not reviewed</span><span class="pill">v1.44.0</span></div><div class="lb-meta">review: bash scripts/review-pass.sh web case-study-page</div></div><div class="md"><h2 id="source-of-truth-read-this-before-changing-a-number">Case-study page template</h2>
+<p><b>This is the placeholder template. Copy it — do not read it for worked copy.</b> Every fillable string is a <code>{{TOKEN}}</code>; <code>bash scripts/check-placeholders.sh &lt;file&gt;</code> fails while any remain, and the pre-push hook warns about them.</p>
+<p>A worked, fully-filled instance lives at <code>skills/gushwork-web/examples/cutting-edge-plasma/</code> — read that to see what &quot;filled in&quot; looks like. Copying an example instead of this template is the mistake this split exists to prevent: you inherit that client's numbers and quote, and they look like copy you wrote until someone checks.</p>
+<p>One customer story, told as a page. Hero with the outcome numbers, a prose column with a sticky rail CTA, and the closing CTA fold.</p>
+<pre class="md-pre"><code>cp -r skills/gushwork-web/templates/case-study skills/gushwork-web/examples/&lt;client-slug&gt;</code></pre>
+<p>Open <code>case-study.html</code> in a browser. Nothing to build, no dependencies — tokens, fonts and brand assets all resolve out of the repo by relative path, so the template owns no copies.</p>
+<h3 id="structure">Source of truth — read this before changing a number</h3>
+<p>Three sources, and which one wins is a <b>ruling</b>, not a preference:</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Part</th><th>Measured from</th></tr></thead><tbody><tr><td>Hero, article, stats, prose, TL;DR geometry</td><td>Figma <code>case-study-with-image</code> — <code>2PbNu2kGHalHhMUfFyFoeG</code> / <code>495:3382</code></td></tr><tr><td>Pull quote</td><td>Figma <code>testimonial-card-web</code> — <code>1060:7647</code></td></tr><tr><td>CTA fold and its glass testimonial</td><td>Figma — <code>495:3478</code> / <code>495:3516</code> / <code>495:3534</code></td></tr><tr><td>Navbar behaviour, rail CTA card, footer</td><td><b>The live site</b> — <code>gushwork.link/case-study/doug-machines</code></td></tr></tbody></table></div>
+<p><b>Ruled 7 Sep 2026: Figma wins where Figma and the live site disagree</b> — except for the three parts named above, which Utsav asked to take from live, and the TL;DR block. Do not generalise those exceptions to anything else.</p>
+<p>Where Figma and live disagree and Figma won:</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th></th><th>Figma — built</th><th>Live — not built</th></tr></thead><tbody><tr><td>Hero title</td><td><code>--gw-text-h3</code> 44/1.2, <code>neutral/black</code></td><td>38/1.2, <code>secondary-500</code>, max-w 858</td></tr><tr><td>Hero split</td><td>text fills + media 580, gap 64</td><td>608 + 608, gap 64</td></tr><tr><td>Hero media</td><td>four slots, <code>--gw-radius-12</code>, one 80px corner</td><td>one image, radius 0</td></tr><tr><td>Stat number</td><td><code>--gw-text-h5</code> 32/1.2</td><td>22/1.6</td></tr><tr><td>Stat label</td><td><code>--gw-text-body-16-med</code></td><td>14/1.6</td></tr><tr><td>Stats rule</td><td>1px, gap 224</td><td>2.5px, gap 100</td></tr><tr><td>Stats position</td><td>inside the hero</td><td>its own block below it</td></tr><tr><td>Meta row</td><td>Inter Medium 18/1.6</td><td>16px</td></tr></tbody></table></div>
+<h3 id="the-rules-that-came-with-this-template">Structure</h3>
+<pre class="md-pre"><code>navbar          navbar/navbar · Type=Brand · FIXED, transparent, white-80% once scrolled
+hero            fold/ Hero · Layout=Split · neutral-50 FULL-BLEED, bottom corners 20, min-height 920
+  ├ breadcrumb  Customers &gt; Client name (a third level is built and hidden in Figma)
+  ├ title       h3, no full stop — ever
+  ├ meta        Industry · Country
+  ├ media       four image slots; the 80px corner belongs on the bottom-right one
+  └ stats       three numbers, 1px rule above
+article         fold/ other · prose 720 + rail 280, gap 40, in a 1040 column
+  ├ blocks      h4 + 18/1.6 body
+  ├ TL;DR       OPTIONAL — Problem / Challenge / Solution
+  ├ figure      720 × 374, radius 16
+  ├ quote       testimonial-card-web, inline
+  └ rail        one sticky CTA card, flush with the prose top
+cta             fold/ CTA · neutral-50 ground FULL-BLEED · card 1400 × 600 on primary-500
+footer          measured off the live site · neutral/black FULL-BLEED</code></pre>
+<p><b>Every section ground is full-bleed; only the content column is capped.</b> The Figma frame is 1440, but a fixed 1440 shell leaves white gutters on a wider display. <code>.cs-shell</code> has no max-width; <code>.cs-inner</code> caps the content at <code>--cs-content-w</code> (1280) and centres it.</p>
+<h3 id="filling-it-in">The rules that came with this template</h3>
+<p><b>Do not add a related-stories carousel.</b> It was removed on 7 Sep 2026 and does not come back until Utsav asks. When it is asked for, it has to <b>actually function and use real stories</b> — real thumbnails, real titles, real industries, working prev/next. A row of placeholder cards behind a scroll shim is not the deliverable.</p>
+<p><b>The navbar is fixed.</b> Transparent over the hero; it takes <code>--gw-color-neutral-alpha-80-white</code> once scrolled past <code>--cs-nav-solid-at</code> (32px, chosen — the live site flips somewhere between 20 and 40), transitioning <code>background-color</code> over 0.4s. No blur, no shadow, no border — the live site has none of those. The logo does not swap; the light/white logo pair exists for dark heroes, and this page has a light one.</p>
+<p><b>The rail is one card, not two.</b> The proof-list and capture-form cards from the Figma frame were replaced with the live site's rail CTA on Utsav's call. It sits flush with the prose top — no leading offset — and sticks at <code>--cs-sticky-top</code> (80px, chosen: navbar 60 + space-20).</p>
+<h3 id="breakpoints">Filling it in</h3>
+<p><b><code>&lt;title&gt;</code> and <code>&lt;meta name=&quot;description&quot;&gt;</code> are placeholders too — the same rule applies to them as everything else on this list, and they're easy to forget because nothing on the rendered page shows they're wrong.</b> Update both for every case study:</p>
+<ul><li><b>Title</b>: <code>&lt;Client&gt; Case Study | Gushwork</code>. Not <code>&lt;Client&gt; Case Study | Gushwork | Gushwork</code></li></ul>
+<p>— that double is a live-site quirk, not a pattern to copy.</p>
+<ul><li><b>Description</b>: client + industry + the single strongest hero stat, ≤160 characters so</li></ul>
+<p>Google doesn't truncate it. Pull the stat from the same three numbers already going into the hero — don't invent a fourth.</p>
+<p><b>Replace every placeholder.</b> <code>Client name</code>, <code>Industry</code>, <code>Country</code>, <code>Role, Company, Country</code> and the slot labels are all stubs. Copy guidance is in <code>foundation/voice.md</code>; the two that catch people here:</p>
+<ul><li><b>Lead with the outcome and the number.</b> &quot;Client name gets 25 qualified leads in the first</li></ul>
+<p>30 days of AI search&quot; — not &quot;A case study in digital transformation&quot;.</p>
+<ul><li><b>No full stops in headings.</b> Not trailing, and not internal either — rework a staccato</li></ul>
+<p>heading with a comma or an em-dash.</p>
+<p>Three strings are deliberately title case because they ship that way: <b>&quot;See How This Works for Your Business&quot;</b>, <b>&quot;Have Questions?&quot;</b> and <b>&quot;Ask Anything here.&quot;</b> Leave them. The primary CTA is exactly <code>Book a Demo</code> — the live rail button reads <code>Book a demo</code>, and <code>foundation/voice.md</code> rules the capitalised form, so the template uses <code>Book a Demo</code>.</p>
+<p>The footer legal strings are the other way round: the live site ships <code>All Rights Reserved</code>, <code>Privacy Policy</code> and <code>Terms Of Use</code>, and <code>exports/web/page-shell.md</code> finding 3 says write them corrected. The template does.</p>
+<p>The rail card title — &quot;Discover AI agents that help businesses get more qualified leads.&quot; — keeps its <b>full stop</b>. Gushwork headings normally carry none, but this is shipped live copy reproduced verbatim on Utsav's instruction, and the rule governs what you write, not what already ships. Do not &quot;fix&quot; it.</p>
+<p><b>Images.</b> Every grey panel is a slot with its target size in the label. Drop real photography in; never fabricate a client logo, photo, or quote.</p>
+<p><b>The hero takes a photograph.</b> Client-supplied first — that is a <b>brief field</b>, not a search; their plant is the only image that is actually theirs. If it has not arrived, use free-licensed stock per the note below.</p>
+<p>The duotone-icon hero was <b>withdrawn 15 Sep 2026</b> and its CSS removed from the template. Do not reinstate it. A pre-cleared stock library was also considered and rejected — Gushwork's clients run from CNC equipment to medical to home services, so a fixed set is either too shallow to ever match or a curation job that goes stale. If no photograph can be found for a case, that is a blocker to raise, not something to route around with an illustration.</p>
+<p><b>Sourcing the hero photo — no API key needed.</b> Search unsplash.com directly on the client's industry or the physical thing they make or do (&quot;CNC milling&quot;, not &quot;B2B software&quot; — concrete beats abstract). Filter to free results: skip anything marked <b>Unsplash+</b>, a separate paid tier that's watermarked and won't actually download. Download the largest size offered, then downscale before committing it — 1100px wide covers this template's 580×400 slot at retina density, so <code>sips -Z 1100 photo.jpg</code> rather than shipping a multi-megabyte original. Save it as <code>assets/case-study/sample/&lt;client-slug&gt;-&lt;subject&gt;.jpg</code>, next to the other sample assets, and point <code>.cs-slot</code>'s <code>&lt;img&gt;</code> at it. If a reasonable search turns up nothing relevant, say so and ask for client photography — do not settle for a generic stock image that has no relationship to the client.</p>
+<p>Two slots stand in for assets that exist on the live site but not in this repo, and a maintainer should add them:</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Slot</th><th>Live asset</th></tr></thead><tbody><tr><td>Rail card avatar pair (70 × 40)</td><td><code>cta-peopl.webp</code></td></tr><tr><td>Footer wordmark band (full width)</td><td><code>updated-footer-bg.webp</code></td></tr></tbody></table></div>
+<p>The client byline photo is <code>client/avatar</code> — a real photo, desaturated by CSS. Do not reach for <code>assets/avatar/*.svg</code>; that is the dashboard <code>Avatar</code> character, a different component on a different surface.</p>
+<p><b>The TL;DR block is optional.</b> Delete <code>.cs-tldr</code> and its markup if the story does not need a Problem / Challenge / Solution summary. It is the one layout element taken from the live page rather than the Figma frame.</p>
+<p><b>The four hero slots are optional too.</b> Keep one and delete the rest for a single hero image, but keep the 80px corner on whichever slot ends up bottom-right — that corner is the Gushwork tell.</p>
+<h3 id="off-token-values-all-flagged-inline-all-in-the-notice">Breakpoints</h3>
+<p>Desktop and phone, one file, <code>max-width: 767px</code>. There is no tablet — <code>Breakpoint</code> is <code>Desktop | Phone</code>.</p>
+<p>Phone <b>geometry</b> is measured off <code>case-study-page/ mobile</code> (<code>495:3559</code>): 375 wide, padding 120 / 16 / 60 / 16, stack gap 40, media 343 × 237, nav collapses to logo + menu button. Phone <b>type steps</b> are the documented breakpoint rules, not measured — that Figma frame only covers the hero, so the article, quote, CTA and footer had no phone reference to read.</p>
+<h3 id="three-things-worth-knowing-before-you-edit">Off-token values — all flagged inline, all in the notice</h3>
+<p>Every colour, type step, radius, shadow and space in this file is a <code>--gw-*</code> token except these, collected in <code>:root</code> under an <code>OFF-TOKEN</code> comment. None is an invention; each is a value the component uses that has no variable behind it.</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Value</th><th>Where</th><th>Nearest token</th></tr></thead><tbody><tr><td><code>#e1e3e8</code></td><td>hero stats rule</td><td><code>neutral-100</code> <code>#e7e8e9</code> — visibly lighter</td></tr><tr><td>radius 32, 2</td><td>quote card corners</td><td>ramp stops at 20, then 60</td></tr><tr><td>radius 80</td><td>the asymmetric &quot;tell&quot; corner</td><td>—</td></tr><tr><td>radius 120</td><td>TL;DR Solution card</td><td>—</td></tr><tr><td>radius 40</td><td>CTA glass card</td><td>—</td></tr><tr><td>radius 8.879</td><td>CTA inline button</td><td><code>radius-8</code></td></tr><tr><td>radius 6</td><td>navbar CTA</td><td><code>radius-4</code> / <code>radius-8</code></td></tr><tr><td>52px display 700</td><td>CTA heading</td><td>h2 56 / h3 44 — nothing between</td></tr><tr><td>32px display <b>500</b></td><td>CTA glass quote</td><td>h5 is 32 at weight <b>600</b></td></tr><tr><td>20px display 600/28</td><td>rail card title</td><td>h7 is 22/1.4</td></tr></tbody></table></div>
+<h3 id="before-you-call-an-edit-done">Three things worth knowing before you edit</h3>
+<p><b>The blue <code>&quot;</code> glyph in the pull quote is <code>visible: false</code> in the Figma node.</b> It ships built but hidden, so the design is recoverable — drop the <code>is-hidden</code> class to bring it back. It is hidden with a <b>class, not the <code>hidden</code> attribute</b>: the HTML <code>hidden</code> attribute does not hide an SVG element. That was verified in the browser, not assumed.</p>
+<p><b>The glass card uses <code>backdrop-filter</code> and <code>mix-blend-mode: luminosity</code>.</b> Both are measured off the node (<code>backdrop-blur-[10px]</code>, white@10% at luminosity). The general Gushwork guidance is no glass and no blur; that guidance governs <b>product surfaces</b>, and this is a measured marketing component, so it stands. Do not copy the treatment onto anything else.</p>
+<p><b>The navbar and footer are hand-built from measured specs.</b> The skill says never hand-build page chrome, and for React that stands — but there is no component to instance in a static HTML file, and <code>foundation/output-targets.md</code> is explicit that no React set ships in this repo. The footer copyright and legal links are <code>neutral-400</code>, per <b>R9</b>: the live site ships <code>neutral-700</code> there, ~2.3:1 on black, which fails the 4.5:1 floor, and the ruling overrides the measured value.</p>
+<h3>Before you call an edit done</h3>
+<pre class="md-pre"><code>bash scripts/check-drift.sh skills/gushwork-web/templates/case-study/case-study.html</code></pre>
+<p>The <code>gushwork-build:</code> stamp at the top of the file carries the surface and the component list. Update <code>createdBy</code> and <code>createdAt</code> when you copy the folder for a real page — the stamp is how its owner finds out the design moved.</p>
+<p>Verify at <b>1440 and 1920</b> as well as 375: the full-bleed grounds are the thing most likely to regress, and a 1440-only check will not catch a re-introduced width cap.</p></div></main><div class="lb-toc"><b>On this page</b><a href="#source-of-truth-read-this-before-changing-a-number" class="l3">Source of truth — read this before changing a number</a><a href="#structure" class="l3">Structure</a><a href="#the-rules-that-came-with-this-template" class="l3">The rules that came with this template</a><a href="#filling-it-in" class="l3">Filling it in</a><a href="#breakpoints" class="l3">Breakpoints</a><a href="#off-token-values-all-flagged-inline-all-in-the-notice" class="l3">Off-token values — all flagged inline, all in the notice</a><a href="#three-things-worth-knowing-before-you-edit" class="l3">Three things worth knowing before you edit</a><a href="#before-you-call-an-edit-done" class="l3">Before you call an edit done</a></div></div>
+<script>
+(function(){
+  /* Theme: the same two localStorage keys the main site uses, so a choice made there
+     carries here and back. 'system' can still arrive from an older stored value and
+     resolves to light, matching shell.js. */
+  var PREF='gw-theme-pref', RES='gw-theme';
+  function pref(){try{var v=localStorage.getItem(PREF);
+    if(v==='light'||v==='dark')return v;
+    if(v==='system')return 'light';
+    var o=localStorage.getItem(RES);
+    return (o==='dark'||o==='light')?o:'light';}catch(e){return 'light'}}
+  function apply(p){var r=p==='dark'?'dark':'light';
+    document.documentElement.setAttribute('data-theme',r);
+    try{localStorage.setItem(PREF,p);localStorage.setItem(RES,r)}catch(e){}
+    var b=document.getElementById('lb-theme');
+    if(b)b.setAttribute('aria-label',r==='dark'?'Switch to light':'Switch to dark');}
+  var btn=document.getElementById('lb-theme');
+  if(btn)btn.addEventListener('click',function(){
+    apply(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
+  apply(pref());
+
+  /* Rail filter. Narrows the inventory in place — it does not navigate, because the
+     rail is a list of siblings and losing your place to search them is worse than
+     scrolling. */
+  var f=document.getElementById('lb-find');
+  if(f){
+    var rows=[].slice.call(document.querySelectorAll('.lb-rail a'));
+    f.addEventListener('input',function(){
+      var t=f.value.trim().toLowerCase();
+      rows.forEach(function(a){
+        a.hidden=!!t&&a.getAttribute('data-q').indexOf(t)===-1});
+    });
+  }
+
+  /* Mark the on-this-page entry for whatever heading is currently at the top. */
+  var toc=[].slice.call(document.querySelectorAll('.lb-toc a'));
+  if(toc.length){
+    var heads=toc.map(function(a){return document.getElementById(a.hash.slice(1))})
+                 .filter(Boolean);
+    var tick=function(){
+      var best=0;
+      heads.forEach(function(h,i){if(h.getBoundingClientRect().top<=90)best=i});
+      toc.forEach(function(a,i){a.style.color=i===best?'var(--gw-color-primary-600)':''});
+    };
+    document.addEventListener('scroll',tick,{passive:true});tick();
+  }
+})();
+</script>
+</body></html>

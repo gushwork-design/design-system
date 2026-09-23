@@ -1,0 +1,72 @@
+{
+  "$comment": [
+    "The two ad-page folds with NO Figma component. They exist only as built HTML in",
+    "web/internal/staging/ai-crm-lander, so the shipped page is their source of truth and",
+    "their provenance is BUILT-HERE, not measured-from-Figma. This is the case the 15 Sep",
+    "ruling is actually about: work created here, which has to be measured and passed",
+    "before it can enter skills/.",
+    "",
+    "HOW THESE WERE MEASURED. The page was rendered and computed styles were harvested off",
+    "the two sections, located by the page's own section comments rather than by a class",
+    "name — so the boundary is the page's, not one I chose. Distinct values were then",
+    "checked against foundation/tokens.css. A count is how many elements resolved to that",
+    "value, not how many times someone typed it.",
+    "",
+    "A FINDING HERE IS NOT A BUG IN THE PAGE. It is a value the page uses that the system",
+    "has no token for. Either the token should exist, or the page should change. Both are",
+    "rulings, and neither is made here."
+  ],
+  "measured": "2026-09-22",
+  "method": "rendered page, computed styles, checked against tokens.css",
+  "source": "web/internal/staging/ai-crm-lander/index.html",
+  "components": [
+    {
+      "key": "ai-agents",
+      "name": "AI Agents",
+      "kind": "fold",
+      "provenance": "built-here",
+      "builtAs": "fold/AI Agents",
+      "step": 5,
+      "height": 653,
+      "onToken": 564,
+      "findings": [
+        {
+          "kind": "type",
+          "value": "700 18px/25.2px Vert Grotesk Display",
+          "uses": 54,
+          "why": "The display ramp is 60/56/44/38/32/26/22 — there is no 18px step. It is also Bold, and only h1-h4 are 700 (h5/h6 are 600, h7 is 500). So an 18px Bold display style is off the ramp twice over. 54 uses is every agent card title."
+        }
+      ]
+    },
+    {
+      "key": "comparison-table",
+      "name": "Comparison Table",
+      "kind": "fold",
+      "provenance": "built-here",
+      "builtAs": "fold/Comparison Table",
+      "step": 7,
+      "height": 551,
+      "onToken": 159,
+      "findings": [
+        {
+          "kind": "color",
+          "value": "#efefef",
+          "uses": 2,
+          "why": "Not in any ramp. The nearest steps are neutral-35 (#f5f5f5) and neutral-50 (#f1f2f3); it sits between them and matches neither."
+        },
+        {
+          "kind": "type",
+          "value": "700 16px/24px Inter",
+          "uses": 17,
+          "why": "The body ramp at 16px is reg 400, med 500, sem 600. There is no 700. 17 uses — the whole first column of the table."
+        },
+        {
+          "kind": "spacing",
+          "value": "1px 6px padding",
+          "uses": 2,
+          "why": "The spacing scale has neither 1 nor 6. tokens.css is explicit that the scale is irregular and must not be interpolated."
+        }
+      ]
+    }
+  ]
+}

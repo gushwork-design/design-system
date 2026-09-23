@@ -1,0 +1,117 @@
+{
+  "$comment": [
+    "Per-component versions for the ad-page surface — the fold set harvested from the ad",
+    "landers built over roughly the last four to five months and drawn up in GW-Ads-Library.",
+    "That provenance is the point: these are not proposals, they are the folds that kept",
+    "getting used, which is why they earn their own library rather than being variants",
+    "filed under web.",
+    "",
+    "version = the plugin version in which that component's spec last changed.",
+    "breaking = true when a build using it renders WRONG until updated.",
+    "",
+    "STRUCTURE ONLY so far. Node ids, the Desktop/Phone split and every width and height",
+    "are node-traceable; no fill, radius, type style or token binding has been read off",
+    "these nodes yet. Everything here is therefore seeded at the version that first shipped",
+    "the measurement, not backdated to a release that predates the library.",
+    "",
+    "Review state lives in the sibling `review` block, written by scripts/review-pass.sh.",
+    "check-drift.sh reads only [\"components\"], so that block is inert to it.",
+    "",
+    "TWO ENTRIES ARE BUILT-HERE: ai-agents and comparison-table exist only as HTML in the",
+    "shipped lander, with no Figma component behind them. They carry provenance:'built-here'",
+    "and their measurement is in built-here.json rather than folds.json."
+  ],
+  "registryVersion": "1.45.0",
+  "components": {
+    "eyebrow-ad-page": {
+      "version": "1.45.0",
+      "changed": "2026-09-22",
+      "breaking": false,
+      "doc": "folds.json",
+      "node": "25:7450",
+      "kind": "atom"
+    },
+    "hero-primary": {
+      "version": "1.45.0",
+      "changed": "2026-09-22",
+      "breaking": false,
+      "doc": "folds.json",
+      "node": "25:7453",
+      "kind": "fold"
+    },
+    "hero-alternate": {
+      "version": "1.45.0",
+      "changed": "2026-09-22",
+      "breaking": false,
+      "doc": "folds.json",
+      "node": "43:30476",
+      "kind": "fold"
+    },
+    "video": {
+      "version": "1.45.0",
+      "changed": "2026-09-22",
+      "breaking": false,
+      "doc": "folds.json",
+      "node": "25:7459",
+      "kind": "fold"
+    },
+    "features": {
+      "version": "1.45.0",
+      "changed": "2026-09-22",
+      "breaking": false,
+      "doc": "folds.json",
+      "node": "25:7462",
+      "kind": "fold"
+    },
+    "timeline": {
+      "version": "1.45.0",
+      "changed": "2026-09-22",
+      "breaking": false,
+      "doc": "folds.json",
+      "node": "25:7468",
+      "kind": "fold"
+    },
+    "faqs": {
+      "version": "1.45.0",
+      "changed": "2026-09-22",
+      "breaking": false,
+      "doc": "folds.json",
+      "node": "25:7477",
+      "kind": "fold"
+    },
+    "footer-with-cta": {
+      "version": "1.45.0",
+      "changed": "2026-09-22",
+      "breaking": false,
+      "doc": "folds.json",
+      "node": "25:7495",
+      "kind": "footer"
+    },
+    "footer-minimal": {
+      "version": "1.45.0",
+      "changed": "2026-09-22",
+      "breaking": false,
+      "doc": "folds.json",
+      "node": "25:7498",
+      "kind": "footer"
+    },
+    "ai-agents": {
+      "version": "1.45.0",
+      "changed": "2026-09-22",
+      "breaking": false,
+      "doc": "built-here.json",
+      "kind": "fold",
+      "provenance": "built-here",
+      "note": "No Figma component. Measured off web/internal/staging/ai-crm-lander/index.html."
+    },
+    "comparison-table": {
+      "version": "1.45.0",
+      "changed": "2026-09-22",
+      "breaking": false,
+      "doc": "built-here.json",
+      "kind": "fold",
+      "provenance": "built-here",
+      "note": "No Figma component. Measured off web/internal/staging/ai-crm-lander/index.html."
+    }
+  }
+}

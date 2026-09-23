@@ -24,6 +24,17 @@
 #                         changelog row, no updated announce date, and nothing for the
 #                         SessionStart update check to compare — the change ships silently.
 #   check-placeholders.sh a page still carries {{...}} stubs.
+#   check-skill-drift.sh  a skill names a token, path, node or component the repo does not
+#                         hold. Skills are prose, and prose restates facts; check-drift.sh
+#                         compares a BUILT PAGE against the registry and nothing compared
+#                         the skills themselves. A wrong claim here is every future build
+#                         being told something this repo contradicts.
+#   review-pass.sh        something in skills/ has not been through a review pass, or a pass
+#                         has expired because its source moved since. The 15 Sep ruling says
+#                         measured -> drawn -> PASSED -> skills/; this is the step that
+#                         reports the gap. A WARN for the same reason as the other two: the
+#                         library is mid-migration and most of it has never been passed, so
+#                         blocking would just train everyone to use --no-verify.
 #
 # Warnings, not blocks, and deliberately so: CONTRIBUTING.md is explicit that a bump is not
 # required for content to reach teammates, and a half-written page is a legitimate thing to
@@ -43,6 +54,18 @@ fi
 if [ -x "$ROOT/scripts/check-placeholders.sh" ]; then
   OUT="$("$ROOT/scripts/check-placeholders.sh" 2>&1 || true)"
   case "$OUT" in *✘*) printf '%s\n' "$OUT" | grep -v '✔' | sed 's/^/  /' ;; esac
+fi
+if [ -x "$ROOT/scripts/check-skill-drift.sh" ]; then
+  OUT="$("$ROOT/scripts/check-skill-drift.sh" 2>&1 || true)"
+  # Only the wrong claims and the tally. The unverifiable list is long by nature — a node
+  # id living only in Figma is normal — and printing it every push would bury the ✘ lines.
+  printf '%s\n' "$OUT" | grep -E '✘|wrong ·' | sed 's/^/  /' || true
+fi
+if [ -x "$ROOT/scripts/review-pass.sh" ]; then
+  OUT="$("$ROOT/scripts/review-pass.sh" --check 2>&1 || true)"
+  # Only the summary line and the expired rows. The full pending list is long by design
+  # while the library migrates, and a wall of output on every push is output nobody reads.
+  printf '%s\n' "$OUT" | grep -E '^~|expired by a source change' | sed 's/^/  /' || true
 fi
 
 if [ "${GW_PUSH:-}" = "1" ]; then

@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>cards-grid — Gushwork</title>
+<meta name="robots" content="noindex">
+<script>try{var t=localStorage.getItem('gw-theme');if(t!=='dark')t='light';
+document.documentElement.setAttribute('data-theme',t)}catch(e){
+document.documentElement.setAttribute('data-theme','light')}</script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20width%3D%2280%22%20height%3D%2280%22%20rx%3D%2220%22%20fill%3D%22%230d0d0d%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="../../../foundation/tokens.css">
+<link rel="stylesheet" href="../../../shell.css">
+<style>
+.cl{--cl-gap:var(--gw-space-40)}
+.cl h2{font:var(--gw-text-h5);color:var(--s-heading);margin:0}
+.cl h3{font:var(--gw-text-h7);color:var(--s-heading);margin:0}
+.cl h4{font:var(--gw-text-body-16-sem);color:var(--s-heading);margin:0}
+.cl p{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+      color:var(--s-body);margin:0;max-width:78ch}
+.cl code,.cl .mono{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px}
+
+/* --- page head ------------------------------------------------------------ */
+.cl-head{display:flex;flex-direction:column;gap:var(--gw-space-16)}
+.cl-head h1{font:var(--gw-text-h4);color:var(--s-heading);margin:0}
+.cl-lede{font:var(--gw-text-body-18-reg);letter-spacing:var(--gw-text-body-18-reg-tracking);
+         color:var(--s-body);margin:0;max-width:72ch}
+
+/* --- the tally ------------------------------------------------------------ */
+.cl-tally{display:flex;flex-wrap:wrap;gap:var(--gw-space-12)}
+.cl-stat{flex:1 1 150px;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-16) var(--gw-space-20);
+         display:flex;flex-direction:column;gap:var(--gw-space-4)}
+.cl-stat b{font:var(--gw-text-h6);color:var(--s-heading);font-feature-settings:"tnum" 1}
+.cl-stat span{font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-400);
+              text-transform:uppercase;letter-spacing:.06em}
+
+/* --- review queue --------------------------------------------------------- */
+.cl-queue{background:var(--s-card-bg);border:1px solid var(--gw-color-yellow-300);
+          border-left:3px solid var(--gw-color-yellow-400);border-radius:var(--gw-radius-12);
+          padding:var(--gw-space-20) var(--gw-space-24);display:flex;flex-direction:column;
+          gap:var(--gw-space-12)}
+.cl-queue h2{font:var(--gw-text-h7)}
+.cl-queue ul{margin:0;padding-left:var(--gw-space-20);display:flex;flex-direction:column;
+             gap:var(--gw-space-4)}
+.cl-queue li{font:var(--gw-text-body-14-reg);color:var(--s-body)}
+.cl-queue a{color:var(--gw-color-primary-600);text-decoration:none}
+.cl-queue a:hover{text-decoration:underline}
+.cl-pass{background:var(--s-card-bg);border:1px solid var(--gw-color-green-300);
+         border-left:3px solid var(--gw-color-green-400)}
+
+/* --- controls ------------------------------------------------------------- */
+.cl-bar{position:sticky;top:0;z-index:5;background:var(--s-page-bg);
+        padding:var(--gw-space-12) 0;display:flex;flex-wrap:wrap;gap:var(--gw-space-8);
+        align-items:center;border-bottom:1px solid var(--s-chrome-border)}
+.cl-find{flex:1 1 220px;min-width:180px;background:var(--s-field-bg);
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         padding:var(--gw-space-8) var(--gw-space-12);font:var(--gw-text-body-14-reg);
+         color:var(--s-heading)}
+.cl-find::placeholder{color:var(--s-placeholder)}
+.cl-find:focus{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.cl-filter{display:flex;gap:var(--gw-space-4);flex-wrap:wrap}
+.cl-f{font:var(--gw-text-body-12-med);color:var(--s-body);background:transparent;
+      border:1px solid var(--s-field-border);border-radius:var(--gw-radius-full);
+      padding:6px var(--gw-space-12);cursor:pointer}
+.cl-f:hover{border-color:var(--gw-color-primary-500)}
+.cl-f[aria-pressed="true"]{background:var(--gw-color-black);color:var(--gw-color-white);
+                           border-color:var(--gw-color-black)}
+.cl-f:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.cl-count{font:var(--gw-text-body-12-reg);color:var(--gw-color-neutral-400);margin-left:auto}
+
+/* --- sections ------------------------------------------------------------- */
+.cl-sec{display:flex;flex-direction:column;gap:var(--gw-space-20);
+        scroll-margin-top:var(--gw-space-80)}
+.cl-sec[hidden]{display:none}
+.cl-sechead{display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--gw-space-12)}
+.cl-note{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+         color:var(--s-body);background:var(--gw-color-neutral-25);
+         border:1px solid var(--s-card-border);border-left:3px solid var(--gw-color-neutral-300);
+         border-radius:var(--gw-radius-8);padding:var(--gw-space-12) var(--gw-space-16);
+         white-space:pre-wrap;max-width:88ch}
+:root[data-theme="dark"] .cl-note{background:var(--gw-color-neutral-900)}
+.cl-sub{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.cl-sub[hidden]{display:none}
+
+/* --- chips ---------------------------------------------------------------- */
+.cl-chip{display:inline-flex;align-items:center;gap:6px;font:var(--gw-text-body-12-med);
+         border-radius:var(--gw-radius-full);padding:3px var(--gw-space-8);white-space:nowrap}
+.cl-chip--measured{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.cl-chip--transcribed{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.cl-chip--ruled{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+.cl-chip--passed{background:var(--gw-color-green-500);color:var(--gw-color-white)}
+.cl-chip--pending{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+.cl-chip--rejected{background:var(--gw-color-red-500);color:var(--gw-color-white)}
+.cl-chip--gap{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+:root[data-theme="dark"] .cl-chip--measured{background:var(--gw-color-green-900);
+                                            color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .cl-chip--transcribed{background:var(--gw-color-yellow-900);
+                                               color:var(--gw-color-yellow-100)}
+:root[data-theme="dark"] .cl-chip--ruled{background:var(--gw-color-primary-900);
+                                         color:var(--gw-color-primary-200)}
+:root[data-theme="dark"] .cl-chip--pending{background:var(--gw-color-neutral-800);
+                                           color:var(--gw-color-neutral-300)}
+:root[data-theme="dark"] .cl-chip--gap{background:var(--gw-color-red-900);
+                                       color:var(--gw-color-red-200)}
+
+/* --- colour --------------------------------------------------------------- */
+.cl-ramp{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));
+         gap:var(--gw-space-8)}
+.cl-sw{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+       border-radius:var(--gw-radius-10);overflow:hidden;display:flex;flex-direction:column}
+.cl-sw[hidden]{display:none}
+.cl-sw__chip{height:64px;border-bottom:1px solid var(--s-card-border);
+             background-image:linear-gradient(45deg,var(--gw-color-neutral-100) 25%,transparent 25%),
+                              linear-gradient(-45deg,var(--gw-color-neutral-100) 25%,transparent 25%),
+                              linear-gradient(45deg,transparent 75%,var(--gw-color-neutral-100) 75%),
+                              linear-gradient(-45deg,transparent 75%,var(--gw-color-neutral-100) 75%);
+             background-size:12px 12px;
+             background-position:0 0,0 6px,6px -6px,-6px 0}
+.cl-sw__fill{width:100%;height:100%}
+.cl-sw__body{padding:var(--gw-space-8) var(--gw-space-12);display:flex;
+             flex-direction:column;gap:3px}
+.cl-sw__name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;
+             color:var(--s-heading);word-break:break-all;line-height:1.35}
+.cl-sw__hex{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;
+            color:var(--gw-color-neutral-400);text-transform:uppercase}
+.cl-sw__ac{display:flex;gap:4px;margin-top:2px}
+.cl-ac{font-size:9.5px;font-weight:600;letter-spacing:.04em;border-radius:var(--gw-radius-4);
+       padding:1px 4px;line-height:1.5}
+.cl-ac--ok{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.cl-ac--no{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+:root[data-theme="dark"] .cl-ac--ok{background:var(--gw-color-green-900);color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .cl-ac--no{background:var(--gw-color-red-900);color:var(--gw-color-red-200)}
+
+/* --- type ----------------------------------------------------------------- */
+.cl-types{display:flex;flex-direction:column;gap:2px}
+.cl-t{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:var(--gw-space-20);
+      align-items:start;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+      border-radius:var(--gw-radius-10);padding:var(--gw-space-16) var(--gw-space-20)}
+.cl-t[hidden]{display:none}
+.cl-t__spec{color:var(--s-heading);min-width:0;overflow-wrap:anywhere}
+.cl-t__meta{display:flex;flex-direction:column;gap:2px;text-align:right}
+.cl-t__name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+            color:var(--gw-color-primary-600)}
+.cl-t__val{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10.5px;
+           color:var(--gw-color-neutral-400);line-height:1.5}
+@media (max-width:860px){.cl-t{grid-template-columns:1fr}.cl-t__meta{text-align:left}}
+
+/* --- faces ---------------------------------------------------------------- */
+.cl-faces{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+          gap:var(--gw-space-16)}
+.cl-face{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-24);
+         display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.cl-face__aa{font-size:52px;line-height:1.05;color:var(--s-heading)}
+.cl-face__wt{display:flex;flex-direction:column;gap:2px}
+.cl-face__wt span{color:var(--s-heading);font-size:19px;line-height:1.45}
+
+/* --- space / radius / shadow ---------------------------------------------- */
+.cl-rows{display:flex;flex-direction:column;gap:6px}
+.cl-row{display:grid;grid-template-columns:132px minmax(0,1fr) 60px;gap:var(--gw-space-16);
+        align-items:center;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-radius:var(--gw-radius-8);padding:var(--gw-space-8) var(--gw-space-16)}
+.cl-row[hidden]{display:none}
+.cl-row__n{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+           color:var(--gw-color-primary-600);word-break:break-all}
+.cl-row__v{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+           color:var(--gw-color-neutral-400);text-align:right}
+.cl-bararea{min-height:18px;display:flex;align-items:center}
+.cl-barfill{height:16px;background:var(--gw-color-primary-500);border-radius:var(--gw-radius-2);
+            max-width:100%}
+.cl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));
+         gap:var(--gw-space-12)}
+.cl-tile{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-10);padding:var(--gw-space-16);display:flex;
+         flex-direction:column;align-items:center;gap:var(--gw-space-8)}
+.cl-tile[hidden]{display:none}
+.cl-tile__demo{width:72px;height:72px;background:var(--gw-color-primary-100);
+               border:1.5px solid var(--gw-color-primary-500)}
+.cl-tile__sh{width:100%;height:64px;background:var(--gw-color-white);
+             border-radius:var(--gw-radius-8)}
+:root[data-theme="dark"] .cl-tile__sh{background:var(--gw-color-neutral-800)}
+/* The alpha checker is drawn in neutral-100, which is near-white and shouts on a
+   black ground. Same job, quieter, in dark. */
+:root[data-theme="dark"] .cl-sw__chip{
+  background-image:linear-gradient(45deg,var(--gw-color-neutral-800) 25%,transparent 25%),
+                   linear-gradient(-45deg,var(--gw-color-neutral-800) 25%,transparent 25%),
+                   linear-gradient(45deg,transparent 75%,var(--gw-color-neutral-800) 75%),
+                   linear-gradient(-45deg,transparent 75%,var(--gw-color-neutral-800) 75%)}
+
+/* --- tables --------------------------------------------------------------- */
+.cl-tbl{width:100%;border-collapse:collapse;background:var(--s-card-bg);
+        border:1px solid var(--s-card-border);border-radius:var(--gw-radius-10);
+        overflow:hidden;font:var(--gw-text-body-14-reg)}
+.cl-tblwrap{overflow-x:auto}
+.cl-tbl th{text-align:left;font:var(--gw-text-body-12-med);text-transform:uppercase;
+           letter-spacing:.06em;color:var(--gw-color-neutral-400);
+           padding:var(--gw-space-8) var(--gw-space-16);
+           border-bottom:1px solid var(--s-card-border);white-space:nowrap}
+.cl-tbl td{padding:var(--gw-space-8) var(--gw-space-16);color:var(--s-body);
+           border-bottom:1px solid var(--s-card-border);vertical-align:top}
+.cl-tbl tr:last-child td{border-bottom:none}
+.cl-tbl tr[hidden]{display:none}
+.cl-tbl .mono{color:var(--gw-color-primary-600)}
+.cl-tbl .num{font-feature-settings:"tnum" 1;white-space:nowrap}
+
+/* --- gaps ----------------------------------------------------------------- */
+.cl-gaps{display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.cl-gap{display:grid;grid-template-columns:28px minmax(0,1fr);gap:var(--gw-space-12);
+        background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-left:3px solid var(--gw-color-red-400);border-radius:var(--gw-radius-8);
+        padding:var(--gw-space-12) var(--gw-space-16)}
+.cl-gap__n{font:var(--gw-text-body-14-sem);color:var(--gw-color-red-500);
+           font-feature-settings:"tnum" 1}
+.cl-gap__t{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+           color:var(--s-body);white-space:pre-wrap;margin:0}
+
+/* --- use-case cards ------------------------------------------------------- */
+.cl-cases{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+          gap:var(--gw-space-12)}
+.cl-case{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-20);
+         display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.cl-case__n{display:flex;align-items:baseline;justify-content:space-between;gap:var(--gw-space-8)}
+.cl-case__list{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:4px}
+.cl-case__list li{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10.5px;
+                  color:var(--gw-color-neutral-600);background:var(--gw-color-neutral-25);
+                  border:1px solid var(--s-card-border);border-radius:var(--gw-radius-4);
+                  padding:1px 5px}
+:root[data-theme="dark"] .cl-case__list li{background:var(--gw-color-neutral-900)}
+
+/* --- misc ----------------------------------------------------------------- */
+.cl-src{display:flex;flex-wrap:wrap;gap:var(--gw-space-8)}
+.cl-src code{background:var(--s-code-bg);border:1px solid var(--s-code-border);
+             color:var(--s-code-fg);border-radius:var(--gw-radius-4);padding:2px 7px}
+.cl-empty{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-400);
+          border:1px dashed var(--s-field-border);border-radius:var(--gw-radius-10);
+          padding:var(--gw-space-24);text-align:center}
+.cl-jump{display:flex;flex-wrap:wrap;gap:6px}
+.cl-jump a{font:var(--gw-text-body-12-med);color:var(--s-body);text-decoration:none;
+           border:1px solid var(--s-field-border);border-radius:var(--gw-radius-full);
+           padding:5px var(--gw-space-12)}
+.cl-jump a:hover{border-color:var(--gw-color-primary-500);color:var(--gw-color-primary-600)}
+@media print{.cl-bar,.cl-jump{display:none}}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--s-page-bg);font-family:var(--gw-font-body);
+     color:var(--s-body);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
+
+/* ---- topbar ------------------------------------------------------------- */
+.lb-top{position:sticky;top:0;z-index:20;height:60px;display:flex;align-items:center;
+        gap:var(--gw-space-16);padding:0 var(--gw-space-24);
+        background:var(--s-chrome-bg);border-bottom:1px solid var(--s-chrome-border)}
+.lb-brand{display:flex;align-items:center;gap:var(--gw-space-12);text-decoration:none;
+          flex:none}
+.lb-brand__chip{width:32px;height:32px;border-radius:var(--gw-radius-8);
+                background:var(--gw-color-black);color:var(--gw-color-white);
+                display:grid;place-items:center;flex:none}
+.lb-brand__chip svg{width:16px;height:16px;display:block}
+.lb-brand__n{font:var(--gw-text-h7);color:var(--s-heading)}
+.lb-crumb{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-400);
+          white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-crumb a{color:var(--gw-color-primary-600);text-decoration:none}
+.lb-top__r{display:flex;align-items:center;gap:var(--gw-space-12);margin-left:auto}
+.lb-find{width:300px;height:36px;background:var(--s-field-bg);
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         padding:0 var(--gw-space-12);font:var(--gw-text-body-14-reg);color:var(--s-heading)}
+.lb-find::placeholder{color:var(--s-placeholder)}
+.lb-find:focus{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.lb-tbtn{width:36px;height:36px;display:grid;place-items:center;background:transparent;
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         color:var(--s-body);cursor:pointer;flex:none}
+.lb-tbtn svg{width:18px;height:18px;display:block}
+.lb-tbtn:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+@media (max-width:820px){.lb-find{display:none}}
+
+/* ---- three columns ------------------------------------------------------- */
+.lb-3{display:grid;grid-template-columns:240px minmax(0,1fr) 212px;align-items:start;
+      max-width:1600px;margin:0 auto}
+.lb-rail{position:sticky;top:60px;max-height:calc(100vh - 60px);overflow-y:auto;
+         border-right:1px solid var(--s-chrome-border);padding:var(--gw-space-24) 0}
+.lb-rail__t{font:var(--gw-text-body-12-med);text-transform:uppercase;letter-spacing:.06em;
+            color:var(--gw-color-neutral-400);padding:0 var(--gw-space-20) var(--gw-space-8)}
+.lb-rail a{display:flex;justify-content:space-between;gap:var(--gw-space-8);
+           font:var(--gw-text-body-14-reg);color:var(--s-body);text-decoration:none;
+           padding:6px var(--gw-space-20)}
+.lb-rail a:hover{background:var(--s-nav-hover);color:var(--s-heading)}
+.lb-rail a.on{background:var(--s-nav-sel);color:var(--s-heading);
+              font:var(--gw-text-body-14-sem)}
+.lb-rail a span{color:var(--gw-color-neutral-400);font:var(--gw-text-body-12-reg);flex:none}
+.lb-rail a.on span{color:var(--s-heading)}
+.lb-rail__sep{margin:var(--gw-space-12) var(--gw-space-20) var(--gw-space-8);
+              border-top:1px solid var(--s-chrome-border)}
+
+.lb-mid{grid-column:2;padding:var(--gw-space-32) var(--gw-space-40) var(--gw-space-80);
+        min-width:0;display:flex;flex-direction:column;gap:var(--gw-space-24)}
+.lb-toc{grid-column:3;position:sticky;top:60px;max-height:calc(100vh - 60px);overflow-y:auto;
+        padding:var(--gw-space-32) var(--gw-space-20);display:flex;flex-direction:column;
+        gap:5px}
+.lb-toc b{font:var(--gw-text-body-12-med);text-transform:uppercase;letter-spacing:.06em;
+          color:var(--gw-color-neutral-400);margin-bottom:3px}
+.lb-toc a{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-600);
+          text-decoration:none;line-height:1.35}
+.lb-toc a:hover{color:var(--gw-color-primary-600)}
+.lb-toc a.l3{padding-left:var(--gw-space-12)}
+@media (max-width:1180px){.lb-3{grid-template-columns:220px minmax(0,1fr)}
+                          .lb-toc{display:none}}
+@media (max-width:820px){.lb-3{grid-template-columns:1fr}
+                         .lb-rail{position:static;max-height:none;border-right:0;
+                                  border-bottom:1px solid var(--s-chrome-border)}
+                         .lb-mid{padding:var(--gw-space-24) var(--gw-space-20)}}
+
+/* ---- page head ----------------------------------------------------------- */
+.lb-h{display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.lb-h h1{font:var(--gw-text-h4);margin:0}
+.lb-h .lede{font:var(--gw-text-body-16-reg);color:var(--s-body);margin:0;max-width:74ch}
+.lb-row{display:flex;flex-wrap:wrap;gap:var(--gw-space-8);align-items:center}
+.lb-meta{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+         color:var(--gw-color-neutral-400)}
+
+.chip{display:inline-flex;align-items:center;gap:5px;font:var(--gw-text-body-12-med);
+      border-radius:var(--gw-radius-full);padding:3px var(--gw-space-8);white-space:nowrap}
+.chip--measured{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.chip--transcribed{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.chip--ruled{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+.chip--structure{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.chip--built-here{background:var(--gw-color-orange-50);color:var(--gw-color-orange-700)}
+.chip--passed{background:var(--gw-color-green-500);color:var(--gw-color-white)}
+.chip--pending{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+.chip--rejected{background:var(--gw-color-red-500);color:var(--gw-color-white)}
+.chip--gap{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+.chip--web{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+:root[data-theme="dark"] .chip--measured{background:var(--gw-color-green-900);color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .chip--transcribed,
+:root[data-theme="dark"] .chip--structure{background:var(--gw-color-yellow-900);color:var(--gw-color-yellow-100)}
+:root[data-theme="dark"] .chip--ruled,
+:root[data-theme="dark"] .chip--web{background:var(--gw-color-primary-900);color:var(--gw-color-primary-200)}
+:root[data-theme="dark"] .chip--pending{background:var(--gw-color-neutral-800);color:var(--gw-color-neutral-300)}
+:root[data-theme="dark"] .chip--built-here{background:var(--gw-color-orange-900);color:var(--gw-color-orange-100)}
+:root[data-theme="dark"] .chip--gap{background:var(--gw-color-red-900);color:var(--gw-color-red-200)}
+
+/* ---- markdown ------------------------------------------------------------ */
+.md{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.md h2{font:var(--gw-text-h6);margin:var(--gw-space-20) 0 0;scroll-margin-top:80px}
+.md h3{font:var(--gw-text-h7);margin:var(--gw-space-16) 0 0;scroll-margin-top:80px}
+.md h4,.md h5,.md h6{font:var(--gw-text-body-16-sem);margin:var(--gw-space-12) 0 0}
+.md p{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+      color:var(--s-body);margin:0;max-width:80ch}
+.md ul,.md ol{margin:0;padding-left:var(--gw-space-20);display:flex;
+              flex-direction:column;gap:5px}
+.md li{font:var(--gw-text-body-14-reg);color:var(--s-body);max-width:78ch}
+.md code{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px;
+         background:var(--s-code-bg);border:1px solid var(--s-code-border);
+         color:var(--s-code-fg);border-radius:var(--gw-radius-4);padding:1px 5px}
+.md a{color:var(--gw-color-primary-600)}
+.md-pre{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-radius:var(--gw-radius-8);padding:var(--gw-space-16);overflow-x:auto;margin:0}
+.md-pre code{background:none;border:0;padding:0;color:var(--s-body);font-size:12px}
+.md-q{margin:0;border-left:3px solid var(--gw-color-neutral-300);
+      padding:var(--gw-space-8) var(--gw-space-16);font:var(--gw-text-body-14-reg);
+      color:var(--s-body)}
+.md-hr{border:0;border-top:1px solid var(--s-card-border);margin:var(--gw-space-12) 0}
+.md-tblwrap{overflow-x:auto}
+.md-tbl{width:100%;border-collapse:collapse;background:var(--s-card-bg);
+        border:1px solid var(--s-card-border);border-radius:var(--gw-radius-8);
+        overflow:hidden;font:var(--gw-text-body-14-reg)}
+.md-tbl th{text-align:left;font:var(--gw-text-body-12-med);text-transform:uppercase;
+           letter-spacing:.06em;color:var(--gw-color-neutral-400);
+           padding:var(--gw-space-8) var(--gw-space-12);
+           border-bottom:1px solid var(--s-card-border);white-space:nowrap}
+.md-tbl td{padding:var(--gw-space-8) var(--gw-space-12);color:var(--s-body);
+           border-bottom:1px solid var(--s-card-border);vertical-align:top}
+.md-tbl tr:last-child td{border-bottom:none}
+.md-tbl code{white-space:nowrap}
+
+.note{font:var(--gw-text-body-14-reg);color:var(--s-body);
+      background:var(--gw-color-neutral-25);border:1px solid var(--s-card-border);
+      border-left:3px solid var(--gw-color-neutral-300);border-radius:var(--gw-radius-8);
+      padding:var(--gw-space-12) var(--gw-space-16);white-space:pre-wrap;max-width:88ch}
+:root[data-theme="dark"] .note{background:var(--gw-color-neutral-900)}
+.note--find{border-left-color:var(--gw-color-yellow-400);white-space:normal}
+.empty{border:1px dashed var(--s-field-border);border-radius:var(--gw-radius-10);
+       padding:var(--gw-space-24);text-align:center;font:var(--gw-text-body-14-reg);
+       color:var(--gw-color-neutral-400)}
+.sec{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.sec h2{font:var(--gw-text-h6);margin:0;scroll-margin-top:80px}
+</style>
+</head>
+<body>
+<header class="lb-top">
+  <a class="lb-brand" href="../../../library/index.html">
+    <span class="lb-brand__chip"><svg viewBox="0 0 80 80" fill="none" aria-hidden="true"><path d="M76.6088 4.56344C77.5025 2.36058 75.8495 0 73.4723 0H9.14286C4.0934 0 0 4.0934 0 9.14286V66.7778C0 72.018 5.17081 75.6829 9.9603 73.5568C40.8494 59.8449 64.3785 34.7075 76.6088 4.56344Z" fill="currentColor"/><path d="M32.5161 80C31.4022 80 30.9357 78.5531 31.8259 77.8835C54.9007 60.5265 71.4338 35.8047 78.7658 8.0522C78.9403 7.39154 80 7.51618 80 8.19951V70.8571C80 75.9066 75.9066 80 70.8571 80H32.5161Z" fill="currentColor"/></svg></span>
+    <span class="lb-brand__n">Component Library</span></a>
+  <span class="lb-crumb"><a href="../../index.html">Library</a> / <a href="index.html">Web</a></span>
+  <div class="lb-top__r"><input class="lb-find" id="lb-find" type="search" placeholder="Filter this library">
+    <button class="lb-tbtn" id="lb-theme" type="button" aria-label="Switch theme">
+      <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M116,36V32a12,12,0,0,1,24,0v4a12,12,0,0,1-24,0Zm80,92a68,68,0,1,1-68-68A68.07,68.07,0,0,1,196,128Zm-24,0a44,44,0,1,0-44,44A44.05,44.05,0,0,0,172,128ZM51.51,68.49a12,12,0,1,0,17-17l-4-4a12,12,0,0,0-17,17Zm0,119-4,4a12,12,0,0,0,17,17l4-4a12,12,0,1,0-17-17ZM196,72a12,12,0,0,0,8.49-3.51l4-4a12,12,0,0,0-17-17l-4,4A12,12,0,0,0,196,72Zm8.49,115.51a12,12,0,0,0-17,17l4,4a12,12,0,0,0,17-17ZM48,128a12,12,0,0,0-12-12H32a12,12,0,0,0,0,24h4A12,12,0,0,0,48,128Zm80,80a12,12,0,0,0-12,12v4a12,12,0,0,0,24,0v-4A12,12,0,0,0,128,208Zm96-92h-4a12,12,0,0,0,0,24h4a12,12,0,0,0,0-24Z"/></svg></button></div>
+</header>
+<div class="lb-3"><nav class="lb-rail"><div class="lb-rail__t">Web · 28</div><a href="index.html" data-q="overview 28">Overview<span>28</span></a><div class="lb-rail__sep"></div><a href="ai-agents.html" data-q="ai-agents ">ai-agents</a><a href="button.html" data-q="button ">button</a><a href="card-case-study.html" data-q="card-case-study ">card-case-study</a><a href="card-information.html" data-q="card-information ">card-information</a><a href="card-review.html" data-q="card-review ">card-review</a><a href="card-testimonial.html" data-q="card-testimonial ">card-testimonial</a><a href="cards-grid.html" data-q="cards-grid " class="on">cards-grid</a><a href="cards-grid-small.html" data-q="cards-grid-small ">cards-grid-small</a><a href="case-study-page.html" data-q="case-study-page ">case-study-page</a><a href="client-avatar.html" data-q="client-avatar ">client-avatar</a><a href="client-logos.html" data-q="client-logos ">client-logos</a><a href="comparison-table.html" data-q="comparison-table ">comparison-table</a><a href="cta.html" data-q="cta ">cta</a><a href="eyebrow.html" data-q="eyebrow ">eyebrow</a><a href="faqs.html" data-q="faqs ">faqs</a><a href="fold-other.html" data-q="fold-other ">fold-other</a><a href="footer.html" data-q="footer ">footer</a><a href="form.html" data-q="form ">form</a><a href="hero.html" data-q="hero ">hero</a><a href="image.html" data-q="image ">image</a><a href="inline-input.html" data-q="inline-input ">inline-input</a><a href="input-fields.html" data-q="input-fields ">input-fields</a><a href="navbar.html" data-q="navbar ">navbar</a><a href="page-build.html" data-q="page-build ">page-build</a><a href="testimonial.html" data-q="testimonial ">testimonial</a><a href="timeline.html" data-q="timeline ">timeline</a><a href="video.html" data-q="video ">video</a><a href="with-image.html" data-q="with-image ">with-image</a></nav><main class="lb-mid"><div class="lb-h"><h1>cards-grid</h1><p class="lede">Web · folds.md</p><div class="lb-row"><span class="chip chip--measured" title="Read off the bound Figma variables. Safe to build from.">measured</span><span class="chip chip--pending" title="Has not been through a review pass">not reviewed</span><span class="pill">v1.10.0</span></div><div class="lb-meta">review: bash scripts/review-pass.sh web cards-grid</div></div><div class="md"><h2 id="composition-hierarchy-don-t-rebuild-across-levels">Folds — the full-width page sections</h2>
+<p>Figma: frame <code>fold</code> (<code>1948:8108</code>) on <code>↳ web/ pattern-library</code>.</p>
+<p>The full-width sections a marketing page is built from. Each is a responsive section that composes atoms (heading, buttons, cards, eyebrows) into a repeatable block. <b>Folds are the middle layer: atoms build folds; Page Build stacks folds into a page.</b></p>
+<p>There is <b>one</b> Info Frame for all 12 folds — no fold has its own description or rules. Everything below comes from the shared rules (<code>2089:23406</code>), the shared structure blob (<code>2089:23403</code>), and the component sets themselves.</p>
+<h3 id="pick-the-fold-by-content-and-intent">Composition hierarchy — don't rebuild across levels</h3>
+<ul><li>Atoms (<code>Button</code>, <code>Card / Information</code>, <code>eyebrow</code>, <code>Agent Card</code>…) build a fold.</li><li>Folds stack into a full page via <b>Page Build</b>.</li><li><b>A fold reuses atoms by instance.</b> A Cards Grid fold is a heading + <code>Card / Information</code></li></ul>
+<p>cards + <code>Button</code>. <b>Don't hand-build a card inside a fold.</b></p>
+<h3 id="shared-toggles-most-folds-inherit-these">Pick the fold by content and intent</h3>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Fold</th><th>Use for</th><th>Node</th><th>Variants</th></tr></thead><tbody><tr><td><code>fold/ Hero</code></td><td>The opening fold</td><td><code>1731:55983</code></td><td>10</td></tr><tr><td><code>fold/ Testimonial</code></td><td>Client proof</td><td><code>1790:6285</code></td><td>4</td></tr><tr><td><code>fold/ Cards Grid</code></td><td>Feature / benefit grid, up to 6 cards</td><td><code>1790:7329</code></td><td>24</td></tr><tr><td><code>fold/ Cards Grid (small)</code></td><td>A single row of cards</td><td><code>2085:21418</code></td><td>2</td></tr><tr><td><code>fold/ FAQs</code></td><td>Accordion list</td><td><code>1790:7851</code></td><td>2</td></tr><tr><td><code>fold/ With image</code></td><td>Split layout — text one side, image the other</td><td><code>1793:6561</code></td><td>2</td></tr><tr><td><code>fold/Timeline</code></td><td>Week-based steps</td><td><code>1809:21318</code></td><td>2</td></tr><tr><td><code>fold/Comparison Table</code></td><td>4-column comparison — feature + 3 competitors</td><td><code>1824:6836</code></td><td>2</td></tr><tr><td><code>fold/ Video</code></td><td>Video player fold</td><td><code>2085:17304</code></td><td>2</td></tr><tr><td><code>fold/AI Agents</code></td><td>Marquee grid of Agent Cards</td><td><code>2085:18017</code></td><td>2</td></tr><tr><td><code>fold/ CTA</code></td><td>Wraps the footer CTA component</td><td><code>2085:20750</code></td><td>2</td></tr><tr><td><code>fold/ other</code></td><td>Generic fold for custom content</td><td><code>1790:6807</code></td><td>2</td></tr></tbody></table></div>
+<p><b>Note the prefix inconsistency.</b> Nine folds use <code>fold/ </code> with a space after the slash; three do not — <code>fold/AI Agents</code>, <code>fold/Timeline</code>, <code>fold/Comparison Table</code>. These are literal names.</p>
+<p><code>fold/ other</code> is undocumented everywhere else in the file and doesn't surface in component search. It exists and it works.</p>
+<h3 id="per-fold-detail">Shared toggles — most folds inherit these</h3>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Property</th><th>Type</th><th>Default</th></tr></thead><tbody><tr><td><code>Breakpoint</code></td><td>VARIANT</td><td><code>Desktop</code> — <code>Desktop</code> / <code>Phone</code> (or <code>Mobile</code>)</td></tr><tr><td><code>container</code></td><td>SLOT</td><td>— swappable content container</td></tr><tr><td><code>Expand</code></td><td>BOOLEAN</td><td><code>true</code></td></tr><tr><td><code>Show CTA</code></td><td>BOOLEAN</td><td><code>true</code></td></tr><tr><td><code>Show Card 3</code> – <code>Show Card 6</code></td><td>BOOLEAN</td><td><code>true</code></td></tr></tbody></table></div>
+<p><b>Use <code>Show Card 3</code>–<code>6</code> to add or drop cards rather than deleting instances manually.</b></p>
+<blockquote class="md-q"><b>Measured correction.</b> The <code>Show Card</code> toggles live on <b><code>fold/ Cards Grid (small)</code></b> only, and they are <b><code>Show Card 4</code> and <code>Show Card 5</code></b> — two, both default <code>false</code>, so it renders three cards and tops out at five. <code>fold/ Cards Grid</code> has none; its axes are <code>Card Style</code>, <code>Card Image</code> and <code>Card Layout</code>. See <i>Measured appearance</i> below before relying on this table.</blockquote>
+<p><b>&quot;Most folds&quot; is doing real work in that sentence — 4 of 12 inherit nothing.</b> <code>fold/AI Agents</code>, <code>fold/ CTA</code>, <code>fold/Timeline</code>, and <code>fold/Comparison Table</code> have only <code>Breakpoint</code>.</p>
+<h3 id="fold-hero-1731-55983-10-variants">Per-fold detail</h3>
+<h4><code>fold/ Hero</code> — <code>1731:55983</code> · 10 variants</h4>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Property</th><th>Values</th></tr></thead><tbody><tr><td><code>Breakpoint</code></td><td><code>Desktop</code>, <code>Phone</code></td></tr><tr><td><code>Layout</code></td><td><code>Home</code>, <code>Centered</code>, <code>+ Create New</code>, <code>Split</code>, <code>Form</code></td></tr></tbody></table></div>
+<p>Slot: <code>image</code> (<code>1735:26</code>).</p>
+<p><b>Does not use the shared <code>fold/fold-element/heading</code></b> — it has its own heading structure.</p>
+<p><code>+ Create New</code> is Figma's UI affordance leaked into the data as a real variant value — it is the custom-layout slot, not a preset. The rule lists the layouts as <code>Home, Centered, Split, Form, + Create New</code>; the page-build rule refers to them by different names in an unresolved bracket (see <code>page-shell.md</code>).</p>
+<p><code>Layout=Form</code> embeds <code>fold/fold-element/form</code>. <code>Layout=Home</code> includes the client-logo strip.</p>
+<h4><code>fold/ Testimonial</code> — <code>1790:6285</code> · 4 variants</h4>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Property</th><th>Values</th></tr></thead><tbody><tr><td><code>Breakpoint</code></td><td><code>Desktop</code>, <code>Phone</code></td></tr><tr><td><code>Style</code></td><td><code>Video</code>, <code>Single</code></td></tr></tbody></table></div>
+<p><b>Pick <code>Style</code> by the proof format:</b> <code>Video</code> for a video testimonial, <code>Single</code> for a quote with the client's photo and signature.</p>
+<p>Carries <b>both</b> an <code>Expand</code> and an <code>Extend</code> boolean (<code>1748:0</code> and <code>1801:0</code>) — every other fold has only <code>Expand</code>. Their difference is undocumented.</p>
+<p>The structure blob claims <code>Breakpoint</code> has <code>(+ Breakpoint3, Breakpoint4)</code>. <b>Those do not exist.</b></p>
+<h4><code>fold/ Cards Grid</code> — <code>1790:7329</code> · 24 variants</h4>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Property</th><th>Values</th></tr></thead><tbody><tr><td><code>Breakpoint</code></td><td><code>Desktop</code>, <code>Phone</code></td></tr><tr><td><code>Card Style</code></td><td><code>3</code>, <code>1</code>, <code>2</code>, <code>4</code> — note the option order; <code>3</code> is listed first</td></tr><tr><td><code>Card Image</code></td><td><code>With</code>, <code>Without</code></td></tr><tr><td><code>Card Layout</code></td><td><code>Grid</code>, <code>Single</code>, <code>Stacked</code></td></tr></tbody></table></div>
+<p>The largest fold set. Up to 6 cards via <code>Show Card 3</code>–<code>6</code>. Cards come from <code>Card / Information</code> — see <code>cards.md</code>.</p>
+<h4><code>fold/ Cards Grid (small)</code> — <code>2085:21418</code> · 2 variants</h4>
+<p><code>Breakpoint</code> only. A single row, 3–5 cards, no style/image/layout choice.</p>
+<p><b>The documented default is wrong.</b> Both the rule and the structure blob say 3 cards show by default. The actual defaults are <code>Show Card 3</code>=<b>true</b>, <code>Show Card 4</code>=false, <code>Show Card 5</code>=false, <code>Show Card 6</code>=<b>true</b> — so <b>4 cards render.</b> Set the toggles explicitly rather than trusting the default.</p>
+<h4><code>fold/ FAQs</code> — <code>1790:7851</code> · 2 variants</h4>
+<p><code>Breakpoint</code> only, plus booleans <code>Question 6</code> through <code>Question 10</code> (all default <code>false</code>).</p>
+<p><b>5 questions by default, up to 10</b> via the toggles. Uses <code>fold/fold-element/accordion</code>.</p>
+<h4><code>fold/ With image</code> — <code>1793:6561</code> · 2 variants</h4>
+<p><code>Breakpoint</code>, plus slots <code>container</code> (<code>1735:21</code>) and <code>Slot</code> (<code>1793:0</code>) for the image/media area, plus the shared <code>Expand</code> / <code>Show CTA</code> / <code>Show Card 3</code>–<code>6</code> booleans.</p>
+<p>Split layout: text one side, image the other. Observed at 1240 wide with a 580/580 split and a 660 offset. Its in-fold <code>Button</code> is hidden by default in the worked page examples — the CTA is opt-in via <code>Show CTA</code>.</p>
+<h4><code>fold/Timeline</code> — <code>1809:21318</code> · 2 variants</h4>
+<p><code>Breakpoint</code> [<code>Desktop</code>, <code>Phone</code>] only.</p>
+<p><b>Dark theme.</b> Horizontal on desktop, vertical on phone. Uses <code>fold/fold-element/timeline-tab</code> and <code>fold/fold-element/progress-bar</code>.</p>
+<p>The structure blob says this fold has <code>Property 1: Default (⚠️ has errors — both variants share same name)</code>. <b>That note is stale</b> — the set has a proper <code>Breakpoint</code> property with two correctly-named variants and no errors.</p>
+<h4><code>fold/Comparison Table</code> — <code>1824:6836</code> · 2 variants</h4>
+<p><code>Breakpoint</code> only. A <b>4-column comparison</b> — feature name + 3 competitors.</p>
+<p>Desktop uses <code>fold/fold-element/table-header</code> + <code>table-row</code>. <b>Phone replaces the table entirely</b> with <code>table-phone-card</code> + <code>table-toggle</code>.</p>
+<p><b>Distinct from the dashboard's <code>section/table</code></b> — this is a fixed marketing feature-comparison, not a live data grid.</p>
+<h4><code>fold/ Video</code> — <code>2085:17304</code> · 2 variants</h4>
+<p><code>Breakpoint</code>, plus slot <code>container</code> and the shared booleans. A video player fold with a <code>Play</code> control.</p>
+<h4><code>fold/AI Agents</code> — <code>2085:18017</code> · 2 variants</h4>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Property</th><th>Values</th></tr></thead><tbody><tr><td><code>Breakpoint</code></td><td><b><code>Phone</code>, <code>Desktop</code></b> — the only fold whose options are ordered Phone-first</td></tr></tbody></table></div>
+<p>A marquee grid of <code>Agent Card</code>s — 4 rows × 9.</p>
+<p><b>The structure blob claims this fold &quot;Uses <code>Mobile</code> not <code>Phone</code>&quot;.</b> It is wrong and inverted: the actual values are <code>Phone</code> and <code>Desktop</code>. <code>Mobile</code> appears on Cards, under the <code>Device</code> property — not here.</p>
+<h4><code>fold/ CTA</code> — <code>2085:20750</code> · 2 variants</h4>
+<p><code>Breakpoint</code> only. <b>Wraps <code>footer/footer-elements/cta</code></b> — the same CTA component used in the footer.</p>
+<p><b>It carries its own Blue/Black and CTA-copy rules — don't restyle it.</b> See <code>page-shell.md</code> for the footer CTA's colour behaviour and copy.</p>
+<h4><code>fold/ other</code> — <code>1790:6807</code> · 2 variants</h4>
+<p><code>Breakpoint</code>, plus slot <code>container</code> and the shared booleans. <b>Use when nothing above fits.</b> The web equivalent of the dashboard's <code>section/Container</code>.</p>
+<h3 id="fold-testimonial-1790-6285-4-variants">Cross-references — reuse, don't redefine</h3>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Fold</th><th>Instances</th><th>Rules in</th></tr></thead><tbody><tr><td><code>fold/ CTA</code></td><td><code>footer/footer-elements/cta</code></td><td><code>page-shell.md</code></td></tr><tr><td><code>fold/AI Agents</code></td><td><code>Agent Card</code> / <code>agent-icon</code></td><td><code>fold-elements.md</code>, <code>atoms.md</code></td></tr><tr><td><code>fold/ Testimonial</code>, <code>fold/ Cards Grid</code></td><td><code>Card / Information</code></td><td><code>cards.md</code></td></tr><tr><td>All headings</td><td><code>eyebrow</code> via <code>fold/fold-element/heading</code></td><td><code>atoms.md</code>, <code>fold-elements.md</code></td></tr><tr><td>Buttons</td><td><code>Button</code></td><td><code>button.md</code></td></tr></tbody></table></div>
+<h3 id="fold-cards-grid-1790-7329-24-variants">CTA copy</h3>
+<p>Any fold CTA is <b><code>Book a Demo</code></b> — a fixed string, capitalised.</p>
+<p>The fold rule says <code>Book a demo</code>, and <b>the canvas disagrees with even that for six folds</b>: the inline CTA buttons in <code>fold/ With image</code>, <code>fold/ Video</code>, <code>fold/ Testimonial</code>, <code>fold/ Cards Grid</code> (32 nodes), <code>fold/ Cards Grid (small)</code>, and <code>fold/ other</code> all render <b>&quot;Book a call&quot;</b> — 42 nodes in total. <code>fold/ Hero</code> and <code>fold/ CTA</code> render &quot;Book a demo&quot;.</p>
+<p><b>Write <code>Book a Demo</code> regardless of what the fold ships.</b> See <code>foundation/voice.md</code> for the full ruling.</p>
+<h3 id="fold-cards-grid-small-2085-21418-2-variants">Breakpoints</h3>
+<p><b>Every fold ships Desktop + Phone.</b> On phone: multi-column grids collapse to one column, side-by-side internals stack, buttons go full-width, and a primary + secondary pair stacks vertically with a 12px gap.</p>
+<p>The <code>Breakpoint</code> default is stated as <code>Desktop</code> in the fold shared-properties table but as <code>Phone</code> in the footer structure blob. Set it explicitly.</p>
+<h3 id="fold-faqs-1790-7851-2-variants">Ladder violation to know about</h3>
+<p>The fold rule says atoms build fold-elements build folds. <b><code>Card / Testimonial</code> — an atom — instances <code>fold/fold-element/progress-bar</code>,</b> which inverts the ladder. That is how the file is built. Don't replicate the pattern in new work.</p>
+<h3 id="fold-with-image-1793-6561-2-variants">Never</h3>
+<ul><li>Hand-build a card, button, eyebrow, or heading inside a fold. Instance them.</li><li>Delete card instances to reduce a grid — use <code>Show Card 3</code>–<code>6</code>.</li><li>Restyle <code>fold/ CTA</code> — it inherits the footer CTA's rules.</li><li>Ship a fold without its Phone variant considered.</li></ul>
+<hr class="md-hr">
+<h2 id="fold-timeline-1809-21318-2-variants">Measured appearance</h2>
+<p>Everything above this line was transcribed from the page's annotations. Everything below was <b>measured off the rendered components</b> on 7 Aug 2026, and where the two disagree the measured figure wins.</p>
+<p><b>Figma is right. Build what it says.</b> Where a measured value looks like a slip — an odd width, two gaps that should match — it is recorded as measured and <b>reported</b>, never quietly corrected here. An export that tidies a value is worse than an odd number: the build then disagrees with the file everyone designs in, and nobody can tell which one is authoritative. Deviations are the build's decision to declare in a notice, not this file's to pre-empt.</p>
+<p><b>All 12 folds are measured</b> — frame geometry, variant matrices, and internals. What remains unmeasured is only the <b>Phone</b> side of each fold and Hero's other four layouts, both of which have geometry recorded below.</p>
+<h3 id="fold-comparison-table-1824-6836-2-variants">Fold width is 1240 — except three</h3>
+<p>Measured on every fold. The container is <b>1240 desktop / 343 phone</b>, and the exceptions are deliberate or defects:</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Fold</th><th>Desktop</th><th>Phone</th><th></th></tr></thead><tbody><tr><td>Most folds</td><td>1240</td><td>343</td><td>the norm</td></tr><tr><td><code>fold/ Hero</code></td><td><b>1440</b></td><td><b>375</b></td><td>full-bleed — the symbol includes the page margin</td></tr><tr><td><code>fold/AI Agents</code></td><td><b>1440</b></td><td><b>375</b></td><td>full-bleed — the marquee runs edge to edge</td></tr><tr><td><code>fold/Comparison Table</code></td><td><b>1242</b></td><td><b>337</b></td><td>1240 of rows <b>+ its 1px border each side</b></td></tr></tbody></table></div>
+<p><b>Comparison Table's 1242 is not an anomaly</b> — measuring its internals explains it. The rows are 1240 wide and the Table Body wraps them in a 1px <code>neutral/100</code> border, so the frame is 1240 + 1 + 1 = 1242. Build the rows at 1240 and let the border add the rest. The 337 on phone is 6 short of 343 and does <b>not</b> have the same explanation; use it as measured.</p>
+<h3 id="fold-video-2085-17304-2-variants">Measured frame heights</h3>
+<p>Heights are content-driven, so treat these as the drawn state rather than a constraint.</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Fold</th><th>Desktop</th><th>Phone</th></tr></thead><tbody><tr><td><code>fold/ Hero</code></td><td>540–1234 by layout</td><td>460–1003</td></tr><tr><td><code>fold/ Testimonial</code> <code>Style=Video</code></td><td>1067</td><td>1975</td></tr><tr><td><code>fold/ Testimonial</code> <code>Style=Single</code></td><td>347</td><td>430</td></tr><tr><td><code>fold/ Cards Grid</code></td><td>639–841 without image · <b>1549 with</b></td><td>632–1067</td></tr><tr><td><code>fold/ Cards Grid (small)</code></td><td>597</td><td>1171</td></tr><tr><td><code>fold/ FAQs</code></td><td>—</td><td>—</td></tr><tr><td><code>fold/ Video</code></td><td>850</td><td>548</td></tr><tr><td><code>fold/Timeline</code></td><td>656</td><td>649</td></tr><tr><td><code>fold/Comparison Table</code></td><td>511</td><td>1071</td></tr><tr><td><code>fold/AI Agents</code></td><td>696</td><td>660</td></tr><tr><td><code>fold/ other</code></td><td>712</td><td>788</td></tr></tbody></table></div>
+<p><b><code>Card Image=With</code> roughly doubles a Cards Grid</b> — 1549 against 639–841. Worth knowing before you put one above the fold.</p>
+<h3 id="fold-ai-agents-2085-18017-2-variants">The container is 1240 desktop / 343 phone</h3>
+<p>Confirmed identically on <code>With image</code> and <code>FAQs</code>: <code>max-w-[1240px] w-[1240px]</code> desktop, <code>max-w-[343px] w-[343px]</code> phone. That is the fold's own width, inside <code>page-build</code>'s margins.</p>
+<h3 id="fold-cta-2085-20750-2-variants">Headings are <code>neutral/black</code> <code>#0d0d0d</code> — not <code>neutral-900</code></h3>
+<p>Every fold heading measured binds <code>colors/neutral/black</code> (<code>#0d0d0d</code>), and body copy binds <code>colors/neutral/600</code> (<code>#6a7077</code>). <code>neutral-900</code> (<code>#262a2e</code>) is the <b>dashboard</b> text colour. Using it on a marketing page is a surface mix-up, and it is subtle enough to pass review.</p>
+<h3 id="fold-other-1790-6807-2-variants"><code>fold/ With image</code> — <code>1793:6561</code></h3>
+<p>Props: <code>breakpoint</code> · <code>showCta</code> (default <code>true</code>) · <code>slot</code>.</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th></th><th>Desktop</th><th>Phone</th></tr></thead><tbody><tr><td>Fold width</td><td>1240</td><td>343</td></tr><tr><td>Column gap</td><td><code>spacing/80</code> — 80</td><td><code>spacing/40</code> — 40, stacked</td></tr><tr><td>Text block padding</td><td><code>py-80</code></td><td>—</td></tr><tr><td>Heading</td><td>h3 · Vert Grotesk Bold 44/1.2</td><td>h4 · 38/1.2</td></tr><tr><td>Body</td><td><code>body-18-med</code> 18/1.6, max-w 680</td><td><code>body-16-med</code> 16/24</td></tr><tr><td>Heading→body gap</td><td>20</td><td>20</td></tr><tr><td>Image slot</td><td>fills, <code>radius/20</code>, <code>neutral/50</code> on <code>neutral/100</code> border</td><td>400 tall, <code>radius/16</code></td></tr><tr><td>Button</td><td>44 tall, <code>px-20 py-16</code>, radius 8, gap 8, 18px trailing icon</td><td>same, full-width</td></tr></tbody></table></div>
+<p><b>The slot has a real placeholder</b> — <code>neutral/50</code> fill, 1px <code>neutral/100</code> border, <code>radius/20</code>. That is the empty state, not a missing image.</p>
+<p><b>On phone the image comes first</b>, above the text. Desktop is text-left / image-right.</p>
+<h3 id="cross-references-reuse-don-t-redefine"><code>fold/ FAQs</code> — <code>1790:7851</code></h3>
+<p>Props: <code>breakpoint</code> · <code>question6</code>–<code>question10</code>, all <b>boolean, default <code>false</code></b>. Five accordions are hard-built; 6–10 are the toggles. The &quot;5 by default, up to 10&quot; rule is correct.</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th></th><th>Desktop</th><th>Phone</th></tr></thead><tbody><tr><td>Layout</td><td>two columns, gap <code>spacing/100</code> — 100</td><td>stacked, gap 40</td></tr><tr><td>Heading column</td><td>480 wide (max-w 800)</td><td>full width</td></tr><tr><td>Accordion column</td><td>660 wide</td><td>full width</td></tr><tr><td>Accordion gap</td><td><code>spacing/8</code> — 8</td><td>8</td></tr><tr><td>Accordion</td><td><code>p-12</code>, radius 12, <code>overflow-clip</code></td><td>same</td></tr><tr><td>Question</td><td><code>body-18-sem</code> 18/1.6 · <code>neutral/800</code></td><td>same</td></tr><tr><td>Answer</td><td><code>body-16-med</code> 16/24 · <code>neutral/600</code></td><td>same</td></tr><tr><td>Caret</td><td>32 box, <code>neutral/50</code>, <code>radius/8</code>, 16px <code>CaretDown</code></td><td>same</td></tr></tbody></table></div>
+<p><b>Collapsed answers are <code>opacity-0</code> at <code>size-px</code>, absolutely positioned</b> — present in the DOM, not removed. Match that if you want the measured markup.</p>
+<p>The subhead carries an inline link — <i>&quot;Talk to us&quot;</i>, underlined, <code>decoration-dotted</code>, at a <b>raw <code>#0070ff</code></b> rather than the <code>primary/500-main</code> token. Cosmetically identical, but it is a hardcoded hex in the source.</p>
+<h3 id="cta-copy"><code>fold/ CTA</code> — <code>2085:20750</code> · Desktop measured</h3>
+<p>Props: <code>breakpoint</code> only.</p>
+<p><b>It is a full-width blue panel, not a centred block.</b> An earlier revision of this file described it from aggregate token counts rather than its structure and got it wrong — the 600 is the image block, and the <code>radius/40</code> 56×40 shapes are avatars nested <i>inside</i> <code>cta-image</code>, not part of the fold's own layout.</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Part</th><th>Measured</th></tr></thead><tbody><tr><td>Root</td><td>1240, <code>radius/20</code>, <code>gap-60</code>, <b><code>drop-shadow(0 16px 16px rgba(88,92,95,.1))</code></b></td></tr><tr><td>Panel</td><td>full width, <b>440 tall</b>, <code>primary/500-main</code> fill, <code>radius/16</code>, <code>overflow-clip</code></td></tr><tr><td>Inner row</td><td><code>justify-between</code>, full height, max-w <b>1400</b></td></tr><tr><td>Left column</td><td><code>flex-1</code>, <b><code>pl-60</code></b>, <code>gap-40</code></td></tr><tr><td>Heading</td><td><code>h3</code> 44/1.2 Vert Grotesk Bold, <b>white</b> — <i>&quot;Let Gushwork run your marketing team in the background.&quot;</i></td></tr><tr><td>Body</td><td>16/24 Inter Medium on <b><code>neutral/alpha/80-white</code></b></td></tr><tr><td>Primary button</td><td><b>white fill</b>, <code>radius/10</code>, <b><code>pl-16 pr-12 py-12</code></b>, 14/20 on <code>secondary/500-main</code>, 16px icon — <i>&quot;Book a demo&quot;</i></td></tr><tr><td>Secondary button</td><td>1px <b><code>neutral/alpha/30-white</code></b> border, no fill, <code>px-16 py-12</code>, <code>radius/10</code>, white 14/20 — <i>&quot;Calculate ROI with Gushwork&quot;</i></td></tr><tr><td>Right</td><td><code>footer/footer-elements/cta-image</code>, <b>600 × 440</b>, <code>overflow-clip</code></td></tr></tbody></table></div>
+<h4><code>footer/footer-elements/cta-image</code> — <code>1712:2684</code> · 24 variants</h4>
+<p><b><code>Image</code> × <code>Breakpoint</code> × <code>Color</code> = 6 × 2 × 2.</b> Desktop is <b>600 × 440</b>, Phone <b>343 × 393</b>.</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th><code>Image</code></th><th>Overlay</th></tr></thead><tbody><tr><td><code>Testimonial</code></td><td>a <code>Card / Testimonial</code> — <b>measured</b></td></tr><tr><td><code>AI Search Engines</code></td><td>six 60px logo tiles — <b>measured</b></td></tr><tr><td><code>AI Agents</code></td><td>not read yet</td></tr><tr><td><code>Lead Notification</code></td><td>not read yet</td></tr><tr><td><code>Get Mentioned By AI</code></td><td>not read yet</td></tr><tr><td><code>+ Create New</code></td><td>a slot for custom content</td></tr></tbody></table></div>
+<p><b>Every variant shares the same square pattern</b>, and it is <b>drawn geometry, not a bitmap</b> — so there is no image asset to export and nothing that can fail to load. On <code>Testimonial / Desktop / Blue</code>: <b>143 squares, 40 × 40</b>, <code>primary/400</code> (<code>#338cff</code>) borders on a <code>primary/500-main</code> ground, on a 40px grid — x <code>0…560</code>, y <code>0…400</code>. That is a <b>15 × 11 lattice of 165 slots with 22 left empty</b>, and <b>three squares are filled</b> rather than outlined, at <code>(480,80)</code>, <code>(440,120)</code> and <code>(240,360)</code>. The holes and the three fills are what stop it reading as a flat mesh.</p>
+<p><b><code>Image=Testimonial</code> overlay</b> — a <code>Card / Testimonial</code> centred on the block:</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Part</th><th>Measured</th></tr></thead><tbody><tr><td>Card</td><td><b>360</b> wide, <code>neutral/25</code> on <code>neutral/100</code>, <code>p-20</code>, <code>gap-40</code></td></tr><tr><td>Radius</td><td><b><code>20 20 20 2</code></b> — the bottom-left corner is 2px, a speech-bubble tail</td></tr><tr><td>Shadow</td><td><code>0 2px 2px rgba(27,28,29,.04)</code> — <code>Shadows/S2</code></td></tr><tr><td>Quote</td><td><code>body-16-med</code> on <code>neutral/700</code></td></tr><tr><td>Avatar</td><td><code>client/avatar</code> <code>Source Equipment</code>, 56 × 40, radius 40</td></tr><tr><td>Name / role</td><td><code>body-14-sem</code> on <code>neutral/900</code> · <code>body-12-med</code> on <code>neutral/500</code></td></tr></tbody></table></div>
+<p><b><code>Image=AI Search Engines</code> overlay</b> — six <b>60 × 60</b> tiles at measured positions:</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Position</th><th>Treatment</th></tr></thead><tbody><tr><td><code>(170, 50)</code> · <code>(370, 170)</code> · <code>(450, 370)</code> · <code>(490, 49)</code></td><td>bare SVG, no fill</td></tr><tr><td><code>(170, 290)</code> gemini · <code>(570, 250)</code> copilot</td><td><code>primary/400</code> fill, <code>radius/8</code></td></tr></tbody></table></div>
+<p>Note <code>(570, 250)</code> starts 570 across a 600-wide block, so it is <b>deliberately half-clipped</b> by the parent's <code>overflow-clip</code>. The copilot glyph inside is 34.375 × 32, not square.</p>
+<p><b>These six glyphs are the only real image assets in the component</b>, and they are remote Figma URLs that expire in about seven days — they need harvesting into <code>assets/</code> before this variant can be built.</p>
+<p><b>This is the one fold whose buttons use <code>radius/10</code> and 14px labels</b> — everything else uses radius 8 with 16px. It also confirms the CTA copy split: this fold ships <b>&quot;Book a demo&quot;</b>.</p>
+<p><b>Binds <code>colors/secondary/500-main</code> (<code>#111827</code>)</b> for the primary button's label — see the token findings below.</p>
+<p>Because the right-hand 600 is <code>cta-image</code>, the fold cannot be restyled independently; changing it means changing the footer element.</p>
+<h3 id="breakpoints"><code>fold/ Cards Grid</code> — <code>1790:7329</code> · the annotations are wrong about this one</h3>
+<p><b>Real props: <code>breakpoint</code> · <code>cardStyle</code> · <code>cardImage</code> · <code>cardLayout</code> · <code>showCta</code>.</b></p>
+<p>Three axes the rules never mention, and they are what the 24 variants actually are:</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Property</th><th>Values</th><th>Rule</th></tr></thead><tbody><tr><td><code>Card Style</code></td><td><code>1</code> <code>2</code> <code>3</code> <code>4</code></td><td>which <code>Card / Information</code> style fills the grid</td></tr><tr><td><code>Card Image</code></td><td><code>With</code> <code>Without</code></td><td><code>With</code> roughly doubles the fold's height</td></tr><tr><td><code>Card Layout</code></td><td><code>Grid</code> <code>Single</code> <code>Stacked</code></td><td><b><code>Grid</code> is Desktop-only; <code>Single</code> and <code>Stacked</code> are Phone-only</b></td></tr></tbody></table></div>
+<p>That last row is the one to internalise: 8 Desktop variants are all <code>Grid</code>, and the 16 Phone variants split into <code>Single</code> and <code>Stacked</code>. Asking for <code>Card Layout=Grid</code> on Phone resolves to nothing.</p>
+<p><b>There are no <code>Show Card</code> properties on this fold.</b> It hard-builds <b>six</b> cards in two rows of three, and <code>showCta</code> is its only content toggle. The shared-toggles rule about <code>Show Card 3</code>–<code>6</code> describes <b><code>fold/ Cards Grid (small)</code></b>, which carries <code>Show Card 4</code> and <code>Show Card 5</code> — two booleans, not four. See below.</p>
+<h4>Measured — <code>Breakpoint=Desktop, Card Style=1, Card Image=Without, Card Layout=Grid</code></h4>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Part</th><th>Measured</th></tr></thead><tbody><tr><td>Root</td><td>1240 wide, 785 tall, <code>gap-60</code>, centre-aligned column</td></tr><tr><td>Heading block</td><td><b>620</b> wide, <code>gap-20</code>, centred</td></tr><tr><td>eyebrow</td><td><code>neutral/white</code> fill, <b>0.5px</b> <code>neutral/100</code> border, 24 tall, radius <b>100</b>, <code>gap-4</code>, 14px icon, <code>button-12-med</code> on <code>neutral/900</code></td></tr><tr><td>Heading</td><td>h3 · 44/1.2 Vert Grotesk Bold · <code>neutral/black</code> · centred</td></tr><tr><td>Body</td><td><code>body-18-med</code> 18/1.6 · max-w <b>580</b> · <code>neutral/600</code> · centred</td></tr><tr><td>Card</td><td><code>flex-1</code> from an intrinsic <b>336</b>, <code>neutral/25</code> on 1px <code>neutral/100</code>, radius 16</td></tr><tr><td>Card inner</td><td><code>p-16</code>, <code>gap-12</code>; 24px icon; title <code>body-18-sem</code> on <code>neutral/black</code>; subtext <code>body-16-reg</code> on <code>neutral/800</code></td></tr><tr><td>CTA</td><td>blue <code>primary/500-main</code>, 44 tall, <code>px-20 py-16</code>, radius 8</td></tr></tbody></table></div>
+<p><b>The two card rows use different gaps — row 1 is <code>gap-8</code>, row 2 is <code>gap-10</code>.</b> Build both as measured. Because cards are <code>flex-1</code>, row 1's cards come out 2px wider than row 2's; that is what the component does. Flagged as a possible slip for review, but not corrected here — a &quot;tidied&quot; export that silently disagrees with Figma is worse than an odd number, because the next person cannot tell which is authoritative.</p>
+<p><code>Card / Information</code> carries its own <code>subtext</code> boolean, so a card can drop its body copy without a different style.</p>
+<h3 id="ladder-violation-to-know-about"><code>fold/ Cards Grid (small)</code> — <code>2085:21418</code> · Desktop measured</h3>
+<p>Props: <code>breakpoint</code> · <code>showCard4</code> · <code>showCard5</code> · <code>showCta</code>.</p>
+<p><b>This is the fold the <code>Show Card</code> rule belongs to</b> — and it is <code>Show Card 4</code> and <code>Show Card 5</code>, both defaulting to <b><code>false</code></b>. So the fold renders <b>three cards by default, five at most.</b> The shared-toggles table's &quot;3–6&quot; is wrong on both the range and the fold.</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Part</th><th>Measured</th></tr></thead><tbody><tr><td>Root</td><td>1240, <code>gap-60</code>, centred</td></tr><tr><td>Heading</td><td>the shared <code>fold/fold-element/heading</code> at its full <b>800</b> width</td></tr><tr><td>Card row</td><td>single row, <code>gap-8</code></td></tr><tr><td>Card</td><td><code>Card / Information</code> <code>Style=4</code> — <code>neutral/25</code> on <code>neutral/100</code>, <code>radius/16</code>, <code>gap-12</code></td></tr><tr><td>Card inner</td><td><code>p-16</code>, <code>gap-24</code></td></tr><tr><td>Icon container</td><td><b>40 box, <code>neutral/black</code> fill, <code>radius/8</code>, <code>p-8</code>, 20px glyph</b></td></tr><tr><td>Title</td><td><code>body-18-sem</code> · <code>neutral/black</code></td></tr><tr><td>Subtext</td><td><code>body-16-reg</code> · <code>neutral/600</code></td></tr><tr><td>CTA</td><td>blue <code>primary/500-main</code>, 44 tall, radius 8</td></tr></tbody></table></div>
+<p><b><code>Style=4</code> puts the icon in a filled black 40px tile</b>, where <code>Style=1</code> (used by the big Cards Grid) sets a bare 24px glyph on the card background. That is the visible difference between the two card styles.</p>
+<p>Note the subtext colour differs between the two folds — <code>neutral/600</code> here, <code>neutral/800</code> on <code>Cards Grid</code> <code>Style=1</code>. Both as measured.</p>
+<h3 id="never"><code>fold/fold-element/heading</code> — <code>1732:3742</code> · the shared heading</h3>
+<p>Props: <code>breakpoint</code> · <code>length</code> · <code>showBadge</code> · <code>showSubtext</code>.</p>
+<p>Intrinsically <b>800 wide</b>, <code>gap-20</code>, centred: eyebrow → <code>h3</code> 44 on <code>neutral/black</code> → <code>body-18-med</code> at max-w <b>680</b> on <code>neutral/600</code>.</p>
+<p><b><code>fold/ Cards Grid</code> overrides it to 620 wide</b>; <code>Cards Grid (small)</code> and <code>Video</code> use the full</p>
+<ol><li>Both toggles are real — <code>Video</code> switches badge and subtext <b>off</b> and ships heading-only.</li></ol>
+<h3 id="fold-width-is-1240-except-three"><code>fold/ Video</code> — <code>2085:17304</code> · Desktop measured</h3>
+<p>Props: <code>breakpoint</code> · <code>showCta</code>.</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Part</th><th>Measured</th></tr></thead><tbody><tr><td>Root</td><td>1240, <code>gap-60</code>, centred</td></tr><tr><td>Heading</td><td>shared heading with <code>showBadge=false</code>, <code>showSubtext=false</code> — the h3 alone</td></tr><tr><td>Video well</td><td>full width, <b><code>aspect-[1240/580]</code></b>, <code>neutral/400</code> fill, <code>neutral/100</code> border, <code>radius/20</code></td></tr><tr><td>Play button</td><td>centred, 56 tall, <code>pl-24 pr-20 py-16</code>, radius 12</td></tr><tr><td>— its fill</td><td><code>neutral/alpha/10-black</code> with <b><code>backdrop-blur-[2px]</code></b></td></tr><tr><td>— its border</td><td><b>2px</b> <code>neutral/alpha/10-white</code></td></tr><tr><td>— its label</td><td><code>button-18-med</code> · <code>neutral/white</code> · 18px <code>Play</code> glyph, <code>gap-8</code></td></tr><tr><td>CTA</td><td>blue <code>primary/500-main</code>, 44 tall, radius 8</td></tr></tbody></table></div>
+<p><b>The play button is glassmorphic</b> — a translucent black fill over a 2px translucent white border with a 2px backdrop blur. Nothing in the annotations says so, and it does not survive being rebuilt as a plain button. The asymmetric padding (24 left, 20 right) optically centres the label against the leading icon.</p>
+<p>Props: <code>breakpoint</code> · <code>style</code> (<code>Video</code> / <code>Single</code>). No CTA, no slot.</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Part</th><th>Measured</th></tr></thead><tbody><tr><td>Root</td><td>1240, centred, <code>py-40</code>, <code>gap-60</code></td></tr><tr><td>Quote</td><td><b>Vert Grotesk Display Semibold 44</b>/1.2 · <code>neutral/900</code> · centred · <b>fixed 1011 wide</b></td></tr><tr><td>Attribution row</td><td><code>gap-12</code>, centred</td></tr><tr><td>Avatar</td><td><code>client/avatar</code> <code>size=large</code> — 64 × 48, <b>radius 100</b></td></tr><tr><td>Name</td><td><code>body-14-sem</code> 14/21 · <code>neutral/900</code></td></tr><tr><td>Role</td><td><code>body-12-med</code> 12/16 · <code>neutral/500</code></td></tr></tbody></table></div>
+<p><b>Build all three as measured.</b> Two are worth <i>reporting</i> because they point at gaps in the token set, not because the fold is wrong:</p>
+<ol><li><b>The quote is Vert Grotesk Semibold 44, and no token covers it.</b> <code>h3</code> is 44 <b>Bold</b>; the</li></ol>
+<p>display ramp has no 44 Semibold. Set it explicitly and report the missing ramp step — the fold is not wrong, the ramp is short.</p>
+<ol><li><b>It colours the quote <code>neutral/900</code>, where other fold headings use <code>neutral/black</code>.</b> Both</li></ol>
+<p>are real tokens. Use <code>neutral/900</code> here because that is what this component binds.</p>
+<ol><li><b>The quote box is a fixed 1011 wide</b> inside the 1240 container. Not a round number, but it</li></ol>
+<p>is the measured value — use it.</p>
+<p>The avatar measurements confirm <code>avatar.md</code> exactly — 64 × 48, radius 100, a 72 × 48 photo inside a 64-wide clip. That file was already right.</p>
+<h3 id="measured-frame-heights"><code>fold/Timeline</code> — <code>1809:21318</code> · Desktop measured</h3>
+<p><b>Not a dark full-bleed fold — a dark rounded card.</b> <code>neutral/black</code> fill, <b>radius 20</b>, <code>p-60</code>, <code>gap-60</code>, 1240 wide.</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Part</th><th>Measured</th></tr></thead><tbody><tr><td>Heading</td><td><code>h5-bold</code> — Vert Grotesk Bold <b>32</b>/1.2 · <code>neutral/white</code> · 740 wide</td></tr><tr><td>Subhead</td><td><code>body-16-med</code> · <code>neutral/400</code></td></tr><tr><td>Corner icon</td><td><code>Lightning</code>, 40</td></tr><tr><td>Columns</td><td>5, each 380 tall, <code>flex-1</code>, <b>dashed left+right border</b> in <code>neutral/700</code></td></tr><tr><td><code>timeline-tab</code></td><td><b>222</b> wide, <code>p-12</code>, <code>radius/12</code>, <code>neutral/100</code> fill, <code>body-16-sem</code> on <code>neutral/black</code></td></tr><tr><td>Active tab</td><td><code>primary/500-main</code> fill, <code>neutral/white</code> text — the one blue fill on the fold</td></tr><tr><td>Week label</td><td><code>body-14-med</code> · <code>neutral/400</code> · <code>py-4</code>, bottom-aligned</td></tr><tr><td>Callout</td><td>320 wide, <code>neutral/900</code> on <code>neutral/800</code> border, <code>radius/12</code>, <code>p-16</code>, <code>gap-12</code>, <code>Shadows/S3</code></td></tr></tbody></table></div>
+<p><b>The tabs are a staircase in 56px steps</b> — <code>top</code> 0, 56, 112, 168, 224 across the five columns. That is the whole visual idea of the fold; even spacing would flatten it.</p>
+<p>The callout's eyebrow (<code>WEEKS 3-4</code>) is Inter Medium 14 with <code>leading-none</code>, which is the <code>button-14-med</code> token doing duty as a label. Uppercase is applied in the copy, not by CSS.</p>
+<h3 id="the-container-is-1240-desktop-343-phone"><code>fold/Comparison Table</code> — <code>1824:6836</code> · Desktop measured</h3>
+<p>Props: <code>breakpoint</code> only. Root has <b>no fixed width</b> — it sizes from the table.</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Part</th><th>Measured</th></tr></thead><tbody><tr><td>Root</td><td><code>gap-60</code>, centred</td></tr><tr><td>Heading</td><td><b>620</b> wide, <code>h3</code> 44 on <code>neutral/black</code>, <b>no eyebrow and no subtext</b></td></tr><tr><td>Table Body</td><td><b>1px</b> <code>neutral/100</code> border, <code>radius/20</code>, <code>overflow-clip</code></td></tr><tr><td>Every cell border</td><td><b>1.5px</b> <code>neutral/100</code></td></tr><tr><td>Header row</td><td>1240 wide, cells <b>60</b> tall, <code>neutral/white</code> fill</td></tr><tr><td>Header type</td><td>Inter <b>Bold</b> 16/24 on <code>secondary/500-main</code></td></tr><tr><td>Gushwork header cell</td><td><b>the logo SVG at 105.24 × 20</b>, not text</td></tr><tr><td>Feature column</td><td><code>flex-1</code>, <code>p-12</code>, fill <code>#f7f8f9</code>, <code>body-16-med</code> on <code>secondary/500-main</code></td></tr><tr><td>Gushwork column</td><td><b>280</b> fixed, fill <code>#f2f8ff</code>, <code>body-14-sem</code> on <b><code>primary/500-main</code></b></td></tr><tr><td>Competitor columns</td><td><b>280</b> each, <code>bg-white</code>, <code>body-14-med</code> on <code>secondary/500-main</code></td></tr><tr><td>Rows</td><td>7</td></tr></tbody></table></div>
+<p><b>The Gushwork column is the only place blue is used</b> — a tinted <code>#f2f8ff</code> cell with blue semibold text against plain white competitor cells. That contrast is the fold's whole argument; losing it makes the table decorative.</p>
+<p><b>Three colours here are raw hex where a token exists</b> — <code>#f7f8f9</code> is <code>neutral/25</code>, <code>#f2f8ff</code> is <code>primary/25</code>, and the competitor cells use bare <code>bg-white</code>. Recorded as measured; reported as a binding gap, since a palette change would not reach them.</p>
+<p>This fold is also where the <b><code>secondary/500-main</code></b> collection is used most heavily — every text colour in the table binds it rather than <code>neutral/*</code>.</p>
+<p><b>Type conflict worth reporting:</b> this fold reports <code>Body/body-16-reg</code> with <code>letterSpacing -0.6</code>, while <code>Cards Grid</code> and <code>Cards Grid (small)</code> report the same named style at <code>-0.2</code>. One name, two values, depending on where you read it.</p>
+<h3><code>fold/ other</code> — <code>1790:6807</code> · Desktop measured</h3>
+<p>Props: <code>breakpoint</code> · <code>showCta</code>. The generic fold, and it is deliberately almost empty:</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Part</th><th>Measured</th></tr></thead><tbody><tr><td>Root</td><td>1240, <code>gap-60</code>, centred</td></tr><tr><td>Heading</td><td>the shared heading at full <b>800</b>, badge and subtext both on</td></tr><tr><td><code>container</code></td><td><b>an empty div, full width, 320 tall</b> — no fill, no border, no radius</td></tr><tr><td>CTA</td><td>blue <code>primary/500-main</code>, 44 tall, radius 8</td></tr></tbody></table></div>
+<p><b>The container is 320 tall with no styling at all</b> — unlike <code>With image</code>'s slot, which ships a <code>neutral/50</code> placeholder. So <code>fold/ other</code> gives you a bare 320px band between a heading and a CTA. Anything you put in it is yours to style, and 320 is a starting height, not a constraint.</p>
+<h3><code>fold/AI Agents</code> — <code>2085:18017</code> · Desktop measured</h3>
+<p>Props: <code>breakpoint</code> only. Full-bleed <b>1440</b>, <code>gap-60</code>, <code>pb-40</code>, <code>overflow-clip</code>.</p>
+<p><b>Four rows of nine <code>Agent Card</code>s, offset to fake a marquee:</b></p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Row</th><th>Offset</th></tr></thead><tbody><tr><td>1</td><td>none</td></tr><tr><td>2</td><td><code>pl-80</code></td></tr><tr><td>3</td><td><code>pr-120</code></td></tr><tr><td>4</td><td><code>pl-80</code></td></tr></tbody></table></div>
+<p>Row gap and card gap are both <code>spacing/12</code>. The agents are <b>shuffled per row</b>, not repeated in order. The stagger plus <code>overflow-clip</code> on a 1440 frame is the entire effect — evenly aligned rows read as a plain grid.</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Part</th><th>Measured</th></tr></thead><tbody><tr><td>Heading</td><td>800 wide, <code>h3</code> 44 on <code>neutral/black</code>, <b>hard two-line break</b></td></tr><tr><td>Subhead</td><td><code>body-18-med</code> max-w 680 on <code>neutral/600</code></td></tr><tr><td><code>Agent Card</code></td><td><b>min-w 270</b>, <code>pl-16 pr-20 py-16</code>, <code>radius/16</code>, <code>neutral/white</code> on <code>neutral/100</code></td></tr><tr><td>— shadow</td><td><code>0 2px 2px rgba(27,28,29,0.04)</code> — <code>Shadows/S2</code></td></tr><tr><td>— title</td><td><code>body-18-sem</code> · <code>neutral/black</code></td></tr><tr><td>— subtitle</td><td>Inter Medium <b>12</b>, <code>leading-none</code>, <code>neutral/500</code></td></tr></tbody></table></div>
+<p><b><code>agent-icon</code> is a 60px tile drawn from 8px squares.</b> Each of the nine agents is a different dot pattern — <code>primary/300</code> (<code>#66a9ff</code>) squares at <code>radius/2</code>, placed on an 11 / 21 / 31 / 41 px grid inside the tile. It is a generated glyph, not an icon font, so it cannot be swapped for a Phosphor icon.</p>
+<p>Nine agents in use here: <code>research</code> · <code>refresh</code> · <code>authority</code> · <code>paid_boost</code> · <code>strategy</code> · <code>content</code> · <code>follow_up</code> · <code>memory</code> · <code>design_&amp;_development</code>. The card's asymmetric padding (16 left, 20 right) is as measured.</p>
+<h3><code>fold/ Hero</code> — <code>1731:55983</code> · <code>Layout=Centered</code> measured</h3>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Part</th><th>Measured</th></tr></thead><tbody><tr><td>Root</td><td><b>1440</b> wide, <b><code>neutral/25</code> fill</b> — the hero is tinted, not white</td></tr><tr><td>Rhythm</td><td><code>py-120</code>, <code>gap-160</code> — the largest spacing values in the system</td></tr><tr><td>Container</td><td>1240</td></tr><tr><td>Text block</td><td><b>872</b> wide, <code>gap-20</code>, centred</td></tr><tr><td>eyebrow</td><td>24 tall, <code>px-8 py-4</code>, radius 100, <code>neutral/white</code> on <b>0.5px</b> <code>neutral/100</code></td></tr><tr><td>Heading</td><td><b><code>h1</code> 60</b>/1.2 Vert Grotesk Bold · <code>neutral/black</code></td></tr><tr><td>Subhead</td><td><code>body-18-med</code> · <b><code>neutral/700</code></b> — darker than the <code>neutral/600</code> other folds use</td></tr><tr><td>Button row</td><td><code>gap-12</code></td></tr><tr><td>Primary</td><td><b><code>neutral/black</code> fill</b>, 44 tall, <code>px-20 py-16</code>, radius 8, <code>neutral/white</code> label</td></tr><tr><td>Secondary</td><td><b>2px</b> <code>neutral/100</code> border, no fill, <code>button-16-med</code> on <code>neutral/black</code></td></tr></tbody></table></div>
+<p><b>The Hero primary is <code>neutral/black</code> (<code>#0d0d0d</code>), not <code>neutral/900</code></b> — same distinction as the headings. And <b>it is the black button, not the blue one</b>, on this Brand variant; the blue primary belongs to <code>Type=Ads</code>.</p>
+<p><b>Hero says <code>Book a demo</code>.</b> Confirms the split recorded above — Hero and CTA ship &quot;Book a demo&quot;, the six content folds ship &quot;Book a call&quot;. Write <code>Book a Demo</code> regardless, per <code>voice.md</code>.</p>
+<h4>The other four layouts — frame geometry</h4>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Layout</th><th>Desktop</th><th>Phone</th></tr></thead><tbody><tr><td><code>Home</code></td><td>1440 × 1234</td><td>375 × 620</td></tr><tr><td><code>Centered</code></td><td>1440 × 590</td><td>375 × 656</td></tr><tr><td><code>Form</code></td><td>1440 × 729</td><td>375 × 1003</td></tr><tr><td><code>Split</code></td><td>1440 × 928</td><td>375 × 764</td></tr><tr><td><code>+ Create New</code></td><td>1440 × 540</td><td>375 × 460</td></tr></tbody></table></div>
+<p>Note these are <b>1440/375 frame widths</b>, not the 1240/343 content width — the hero symbol includes the page margin. <code>Home</code> is by far the tallest because it carries the client-logo strip. Per-layout internals still need measuring, one symbol at a time.</p>
+<h3>Token findings from this pass</h3>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Finding</th><th>Detail</th></tr></thead><tbody><tr><td><b>Letter-spacing was wrong system-wide</b></td><td>Figma's magnitude is a <b>percent</b>, not px. <code>body-18-med</code> reports <code>-0.2</code> and renders <code>-0.036px</code> at 18px. <code>tokens.css</code> emitted <code>-0.2px</code> — 5–6× too wide on every style. Now emitted in <code>em</code>; <b>fixed</b>.</td></tr><tr><td><b><code>Body/body-18-med</code> does exist</b></td><td>The known-issues list said it was the one ramp step missing its Medium. Figma returns it: Inter Medium 18/1.6, letterSpacing −0.2. That entry was wrong.</td></tr><tr><td><b><code>colors/neutral/white</code> has no token</b></td><td>Used by <code>fold/ CTA</code>. Minor, but it is a real bound variable with nothing in <code>tokens.css</code>.</td></tr><tr><td><b><code>colors/secondary/500-main</code> <code>#111827</code></b></td><td>A whole <b>Secondary</b> collection that <code>tokens.css</code> documents only as a stray legacy <code>gray/900</code>. It is bound by a shipping fold, so it is current, not legacy. Needs pulling properly.</td></tr></tbody></table></div></div></main><div class="lb-toc"><b>On this page</b><a href="#composition-hierarchy-don-t-rebuild-across-levels" class="l3">Composition hierarchy — don't rebuild across levels</a><a href="#pick-the-fold-by-content-and-intent" class="l3">Pick the fold by content and intent</a><a href="#shared-toggles-most-folds-inherit-these" class="l3">Shared toggles — most folds inherit these</a><a href="#per-fold-detail" class="l3">Per-fold detail</a><a href="#fold-hero-1731-55983-10-variants" class="l3">fold/ Hero — 1731:55983 · 10 variants</a><a href="#fold-testimonial-1790-6285-4-variants" class="l3">fold/ Testimonial — 1790:6285 · 4 variants</a><a href="#fold-cards-grid-1790-7329-24-variants" class="l3">fold/ Cards Grid — 1790:7329 · 24 variants</a><a href="#fold-cards-grid-small-2085-21418-2-variants" class="l3">fold/ Cards Grid (small) — 2085:21418 · 2 variants</a><a href="#fold-faqs-1790-7851-2-variants" class="l3">fold/ FAQs — 1790:7851 · 2 variants</a><a href="#fold-with-image-1793-6561-2-variants" class="l3">fold/ With image — 1793:6561 · 2 variants</a><a href="#fold-timeline-1809-21318-2-variants" class="l3">fold/Timeline — 1809:21318 · 2 variants</a><a href="#fold-comparison-table-1824-6836-2-variants" class="l3">fold/Comparison Table — 1824:6836 · 2 variants</a><a href="#fold-video-2085-17304-2-variants" class="l3">fold/ Video — 2085:17304 · 2 variants</a><a href="#fold-ai-agents-2085-18017-2-variants" class="l3">fold/AI Agents — 2085:18017 · 2 variants</a><a href="#fold-cta-2085-20750-2-variants" class="l3">fold/ CTA — 2085:20750 · 2 variants</a><a href="#fold-other-1790-6807-2-variants" class="l3">fold/ other — 1790:6807 · 2 variants</a><a href="#cross-references-reuse-don-t-redefine" class="l3">Cross-references — reuse, don't redefine</a><a href="#cta-copy" class="l3">CTA copy</a><a href="#breakpoints" class="l3">Breakpoints</a><a href="#ladder-violation-to-know-about" class="l3">Ladder violation to know about</a><a href="#never" class="l3">Never</a><a href="#fold-width-is-1240-except-three" class="l3">Fold width is 1240 — except three</a><a href="#measured-frame-heights" class="l3">Measured frame heights</a><a href="#the-container-is-1240-desktop-343-phone" class="l3">The container is 1240 desktop / 343 phone</a></div></div>
+<script>
+(function(){
+  /* Theme: the same two localStorage keys the main site uses, so a choice made there
+     carries here and back. 'system' can still arrive from an older stored value and
+     resolves to light, matching shell.js. */
+  var PREF='gw-theme-pref', RES='gw-theme';
+  function pref(){try{var v=localStorage.getItem(PREF);
+    if(v==='light'||v==='dark')return v;
+    if(v==='system')return 'light';
+    var o=localStorage.getItem(RES);
+    return (o==='dark'||o==='light')?o:'light';}catch(e){return 'light'}}
+  function apply(p){var r=p==='dark'?'dark':'light';
+    document.documentElement.setAttribute('data-theme',r);
+    try{localStorage.setItem(PREF,p);localStorage.setItem(RES,r)}catch(e){}
+    var b=document.getElementById('lb-theme');
+    if(b)b.setAttribute('aria-label',r==='dark'?'Switch to light':'Switch to dark');}
+  var btn=document.getElementById('lb-theme');
+  if(btn)btn.addEventListener('click',function(){
+    apply(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
+  apply(pref());
+
+  /* Rail filter. Narrows the inventory in place — it does not navigate, because the
+     rail is a list of siblings and losing your place to search them is worse than
+     scrolling. */
+  var f=document.getElementById('lb-find');
+  if(f){
+    var rows=[].slice.call(document.querySelectorAll('.lb-rail a'));
+    f.addEventListener('input',function(){
+      var t=f.value.trim().toLowerCase();
+      rows.forEach(function(a){
+        a.hidden=!!t&&a.getAttribute('data-q').indexOf(t)===-1});
+    });
+  }
+
+  /* Mark the on-this-page entry for whatever heading is currently at the top. */
+  var toc=[].slice.call(document.querySelectorAll('.lb-toc a'));
+  if(toc.length){
+    var heads=toc.map(function(a){return document.getElementById(a.hash.slice(1))})
+                 .filter(Boolean);
+    var tick=function(){
+      var best=0;
+      heads.forEach(function(h,i){if(h.getBoundingClientRect().top<=90)best=i});
+      toc.forEach(function(a,i){a.style.color=i===best?'var(--gw-color-primary-600)':''});
+    };
+    document.addEventListener('scroll',tick,{passive:true});tick();
+  }
+})();
+</script>
+</body></html>
