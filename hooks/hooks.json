@@ -3,10 +3,17 @@
     "Claude Code hooks for the Gushwork design system. NOT the same thing as scripts/hooks/,",
     "which holds this repo's git hooks — those guard pushing, these run on a teammate's machine.",
     "",
-    "One hook, and it exists because two documented gaps had no code behind them: autoUpdate is",
+    "check-update.sh exists because two documented gaps had no code behind them: autoUpdate is",
     "per-machine and unsettable from repo settings, so it got skipped; and auto-update takes",
     "effect only on the NEXT start, so the session that could warn you is the one that does not",
     "know yet. See the header of scripts/check-update.sh.",
+    "",
+    "check-approvals.sh is the last leg of REVIEW-LOOP.md — a ✅ reaction in Slack queues an",
+    "approval, and this is where it re-enters a session so the pass can be recorded. It is a",
+    "SEPARATE hook on purpose: one hook emits one JSON envelope, so two notices need two",
+    "scripts, and a broken approvals endpoint must not be able to silence the stale-version",
+    "warning, which matters more. It is inert without GUSHWORK_NOTICE_TOKEN, so it does nothing",
+    "for anyone who is not the reviewer.",
     "",
     "startup|resume only. clear and compact re-fire inside a session someone is already working",
     "in, and a second copy of the same notice reads as a bug. The script caches the network call",
@@ -23,6 +30,11 @@
           {
             "type": "command",
             "command": "\"${CLAUDE_PLUGIN_ROOT}\"/scripts/check-update.sh",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/scripts/check-approvals.sh",
             "timeout": 10
           }
         ]

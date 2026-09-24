@@ -564,7 +564,7 @@
 .gw-user__av img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .gw-user__txt {
   flex: 1 1 auto; min-width: 0;
-  display: flex; flex-direction: column; gap: var(--gw-space-8);
+  display: flex; flex-direction: column; gap: var(--gw-space-4);
 }
 /* name Button/button-12-med, role Button/button-10-med Neutral/400 — the
    dashboard's measured user card (audit §4.15) */
@@ -574,7 +574,18 @@
   /* Neutral/900 like the nav rows around it, not the black used for headings —
      the name is a list label, and the drawing treats it as one. */
   color: var(--s-nav-label);
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  /* Wraps to two lines rather than ellipsing on one.
+     Measured on the live rail: the text slot is 127px and "Design gushwork"
+     renders at 127px — dead even, so it clipped on any rounding. The 16-padding
+     fix above was computed against a 240 rail, but the rail carries a 1.5px
+     right border, so the real inner width is 238.5 and the slot 126.5. It
+     missed by half a pixel.
+     Tuning the padding again would only move the threshold to the next name
+     that is one character longer, so the name is allowed a second line instead
+     and clamped there. The full string stays in the title attribute either way. */
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+  overflow: hidden; overflow-wrap: anywhere;
+  line-height: 1.25;
 }
 .gw-user__role {
   font: var(--gw-text-button-12);
@@ -680,8 +691,10 @@
 
 /* ---------------------------------------------------------------------------
    6. Login modal
-      No design exists in Figma yet — Utsav is sending one. Built from tokens
-      so restyling it is a matter of swapping values, not rebuilding markup.
+      Design: Figma Q9L6q38dEj3Qu1JkjiT13y / 763:2222 "direct-link-login".
+      Card 498x369, padding 62/42, 60px mark, title over the destination name in
+      Primary/500, button 414x48. The standing subtitle (763:2602) is
+      hidden="true" there, so it only shows when there is no destination.
    ------------------------------------------------------------------------ */
 .gw-modal[hidden] { display: none; }
 .gw-modal {
@@ -690,6 +703,24 @@
   padding: var(--gw-space-20);
   background: var(--gw-color-neutral-alpha-50-black);
 }
+/* Direct-link bounce: the drawing (763:2222) has the modal on the login grid,
+   not over a page you cannot read. The scrim becomes the opaque page ground and
+   carries the same grid the /login screen uses, so the two entry points match.
+   The in-site case — a locked row clicked from the sidebar — keeps the scrim. */
+.gw-modal--solo { background: var(--s-page-bg, var(--gw-color-neutral-25)); }
+.gw-modal .gw-login__grid { display: none; }
+.gw-modal--solo .gw-login__grid { display: block; }
+/* Matched to 763:2222. ONE layer, not two: the lines and the filled cells live
+   in the same SVG, drawn on the same 48.977px lattice the exported cells sit on
+   (origin x=0.906 y=0.679 inside the asset). Tiling CSS lines separately put the
+   grid on its own origin while the centred cells kept theirs, and the two
+   lattices read as a second grid. The /login screen keeps its own 40px pattern. */
+.gw-modal--solo .gw-login__grid {
+  background: url('/assets/login-backdrop.svg') center center / 1765px 1226px no-repeat;
+}
+:root[data-theme="dark"] .gw-modal--solo .gw-login__grid { opacity: .3; }
+/* The hand-placed cells are redundant once the asset carries them. */
+.gw-modal--solo .gw-login__cell { display: none; }
 .gw-modal__box {
   width: 100%; max-width: 496px;
   padding: var(--gw-space-60) var(--gw-space-40);
@@ -713,26 +744,31 @@
   width: 60px; height: 60px; margin: 0 auto var(--gw-space-20);
   display: grid; place-items: center;
   border-radius: 15px;
-  background: var(--gw-color-primary-500);
-  /* Primary/600, not Neutral/800 — Utsav 15 Sep, and this chip is the example
-     he gave. Every blue brand chip outlines in the next step of its own ramp;
-     only the black `--internal` topbar variant keeps a neutral edge, because
-     there the ground is neutral too. */
-  box-shadow: inset 0 0 0 1.875px var(--gw-color-primary-600);
+  /* Black, per 763:2599 — this supersedes the 15 Sep Primary/500 + Primary/600
+     chip, which was chosen before any drawing existed for this modal. */
+  background: var(--gw-color-black);
 }
 .gw-modal__chip svg { width: 30px; height: 30px; display: block; }
 .gw-modal__title {
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   font: var(--gw-text-h5);
   letter-spacing: 0;
   color: var(--s-heading);
 }
+.gw-modal__dest {
+  margin: 0 0 var(--gw-space-40);
+  font: var(--gw-text-h5);
+  letter-spacing: 0;
+  color: var(--gw-color-primary-500);
+}
+.gw-modal__dest[hidden] { display: none; }
 .gw-modal__sub {
   margin: 0 0 var(--gw-space-40);
   font: var(--gw-text-body-16-med);
   letter-spacing: var(--gw-text-body-16-med-tracking);
   color: var(--s-body);
 }
+.gw-modal__sub[hidden] { display: none; }
 .gw-modal__btn {
   width: 100%; height: 48px;
   display: flex; align-items: center; justify-content: center;

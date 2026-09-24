@@ -74,6 +74,43 @@ except Exception: pass
 " 2>/dev/null)"
 [ -n "$LOCAL_VERSION" ] || exit 0
 
+# ── usage ping ─────────────────────────────────────────────────────────────────────────────
+# One row per session in a private Sheet, answering the question ROLLOUT.md admits it cannot:
+# "you cannot tell who ran it". Identity, version, timestamp — nothing about the work itself.
+# See the header of web/api/log-usage.js for what is and is not collected, and why it goes to
+# a Sheet rather than into this public repo.
+#
+# Three properties it must keep, all for the same reason the update check has them — a hook
+# that costs anything is a hook someone rips out:
+#   · DETACHED. nohup + & so the session never waits on it, capped at 3s regardless.
+#   · SILENT. No output on any path, success or failure. Nothing here is worth a line.
+#   · OPT-OUT. GW_NO_USAGE_PING=1 turns it off completely, no questions asked.
+# The endpoint itself answers 204 and does nothing until it is configured, so this is inert
+# for anyone who has not set up the Sheet.
+USAGE_URL="${GW_USAGE_URL:-https://gushwork-design.vercel.app/api/log-usage}"
+if [ -z "${GW_NO_USAGE_PING:-}" ]; then
+  # git's own identity: the same value that attributes every commit in this repo. Built with
+  # python3 rather than string-concatenation so a stray quote cannot produce invalid JSON.
+  USAGE_BODY="$(GW_EMAIL="$(git config --get user.email 2>/dev/null || true)" \
+    GW_VER="$LOCAL_VERSION" python3 -c '
+import json, os
+print(json.dumps({
+    "email": os.environ.get("GW_EMAIL", "")[:160],
+    "version": os.environ.get("GW_VER", "")[:32],
+    "event": "session-start",
+}))' 2>/dev/null)"
+  if [ -n "$USAGE_BODY" ]; then
+    ( nohup curl -fsS --max-time 3 -X POST \
+        -H 'content-type: application/json' \
+        --data "$USAGE_BODY" "$USAGE_URL" >/dev/null 2>&1 & ) >/dev/null 2>&1
+  fi
+fi
+
+# Pending ✅ approvals are a SEPARATE hook — scripts/check-approvals.sh. One hook emits one
+# JSON envelope, and two `print(json.dumps(...))` from the same script would concatenate into
+# a malformed document. Registering them separately in hooks/hooks.json means each speaks for
+# itself and one failing cannot silence the other.
+
 # ── is the cache still warm? ───────────────────────────────────────────────────────────────
 # The CHECK is cached, not the notice. Someone who is behind is told at every session start
 # until they update; we just do not re-hit the network for it.

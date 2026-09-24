@@ -216,12 +216,6 @@ CSS = """
      ~760px height forced that row open, shoving the body down to y=972.
      `span 2` spans both rows for real, so its height is satisfied across them. */
   .idx{grid-column:2;grid-row:1 / span 2;align-self:start}
-  /* The badge sits BESIDE the title, not pushed to the far edge — it reads as part of the
-     title line, naming which system this changelog belongs to. No `justify-content`: the
-     gap holds them together, and flex-start lets the pair sit as one unit. h1 drops its
-     margin so the two align on their centres rather than around the heading's spacing. */
-  .hd__top{display:flex;align-items:center;gap:var(--gw-space-20);
-           flex-wrap:wrap}
   /* Styleguide page title, measured: Vert Grotesk Display Semibold 44/120%,
      ls 0, Neutral/black. No text style is bound in Figma, and --gw-text-h3 is
      the wrong weight (700), so the ramp is spelled out. */
@@ -232,20 +226,6 @@ CSS = """
   .hd__meta{margin:0;font:var(--gw-text-body-14-med);
             letter-spacing:var(--gw-text-body-14-med-tracking);
             color:var(--gw-color-neutral-400)}
-  /* This is the library `badge`, not a lookalike: set 1582:628 at
-     Theme=Light, Color=Blue, Icon=no, Size=Small. Every value is from the measured table in
-     exports/web/component-library.md — height 24 and the 8px horizontal padding are its
-     recorded geometry, `Radius/8` runs throughout the set, and Light theme pairs
-     {Color}/Alpha/10 fill with {Color}/500 text. `Blue` is a real value of the Color axis
-     that the written rule never documented.
-     The type ramp is body-12-med → body-14-sem → body-18-sem, so SMALL IS MEDIUM WEIGHT —
-     the weight changes with the size, it is not one style at three sizes. Hand-rolling this
-     badge first got the radius and the weight wrong; read the set. */
-  .brand{display:inline-flex;align-items:center;flex:none;
-         height:24px;padding:0 var(--gw-space-8);border-radius:var(--gw-radius-8);
-         font:var(--gw-text-body-12-med);
-         letter-spacing:var(--gw-text-body-12-med-tracking);white-space:nowrap;
-         background:var(--gw-color-primary-alpha-10);color:var(--gw-color-primary-500)}
   /* One sentence saying what this is, then the housekeeping as separate lines. They were
      one dense paragraph and nobody reads a description that also explains its own
      derivation. */
@@ -255,6 +235,11 @@ CSS = """
             font:var(--gw-text-body-14-med);
             letter-spacing:var(--gw-text-body-14-med-tracking);
             color:var(--s-body, var(--gw-color-neutral-600))}
+
+  /* The page's one-sentence description. It sits BELOW the header rule, in the slot
+     the styleguide and downloads pages put their intro prose in — the header itself is
+     just title, date and rule on every page now. */
+  .intro{padding:0 var(--gw-space-40) var(--gw-space-32)}
 
   /* ── release list ── */
   .rel{display:grid;grid-template-columns:152px minmax(0,1fr);gap:var(--gw-space-40);
@@ -538,10 +523,7 @@ def main():
     w(SPRITE.strip())
     w('<div class="page">')
     w('  <header class="hd">')
-    w('    <div class="hd__top">')
-    w("      <h1>Changelog</h1>")
-    w('      <span class="brand">Gushwork Design Plugin</span>')
-    w("    </div>")
+    w("    <h1>Changelog</h1>")
     # One paragraph: what the page is and where it comes from — they are the same thought,
     # and splitting them made the header a list of one-line paragraphs. The Claude Code changelog has a
     # third — "run claude --version to check your installed version" — and we dropped ours.
@@ -549,14 +531,7 @@ def main():
     # hook tells you when you are behind and names what changed, so a manual check is not the
     # reader's job any more. Verifying an install is the install page's subject, and it covers
     # it properly there; the `claude plugin list` caveat is in README.md.
-    w('    <p class="lede">Release notes for the Gushwork design system, including new')
-    # Only the FILENAME is the link. "CHANGELOG.md on GitHub" as one anchor is a 234px
-    # unbreakable unit — it cannot split at the line end, so it was pushed onto a line of its
-    # own every time, which is the separate line folding it in was meant to remove.
-    w("       components, corrected measurements, and rulings by version. This page is")
-    w('       generated from <a class="lnk" href="%s/blob/main/CHANGELOG.md"%s>CHANGELOG.md</a>'
-      % (REPO, NEWTAB))
-    w("       on GitHub.</p>")
+
     # "Last updated" sits LAST, above the rule — the install page's order: title, then the
     # prose, then the small print. On the styleguide it follows the title directly, but that
     # header is only a title and a date; here it would interrupt three lines that read as one.
@@ -564,6 +539,15 @@ def main():
       % (html.escape(current), html.escape(last_stamp)))
     w("  </header>")
     w("  <main>")
+    w('    <section class="intro"><p class="lede">Release notes for the Gushwork design system, including new')
+    # Only the FILENAME is the link. "CHANGELOG.md on GitHub" as one anchor is a 234px
+    # unbreakable unit — it cannot split at the line end, so it was pushed onto a line of its
+    # own every time, which is the separate line folding it in was meant to remove.
+    w("       components, corrected measurements, and rulings by version. This page is")
+    w('       generated from <a class="lnk" href="%s/blob/main/CHANGELOG.md"%s>CHANGELOG.md</a>'
+      % (REPO, NEWTAB))
+    w("       on GitHub.</p></section>")
+
 
     for i, r in enumerate(rows):
         bs = blocks(r["body"])

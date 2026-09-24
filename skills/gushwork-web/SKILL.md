@@ -452,22 +452,52 @@ A fold that needs a stat strip, a pill group, a small callout — something the 
 cover. **Build it, then declare it.** Refusing a whole page over one missing chip is worse
 than building the chip and saying so.
 
-Three conditions, all required:
+Four conditions, all required — the first is new, and it exists specifically to stop three
+sessions independently inventing three slightly-different versions of the same missing
+thing before anyone reviews any of them:
 
-1. **Compose from what exists first.** Most "missing" things are `fold/ other` with the
+1. **Check for a matching proposal before inventing one.** Read the relevant surface's
+   `exports/<surface>/component-registry.json` `components` block — **regardless of its
+   `review` status** — for an entry that already covers this gap. If one exists, reuse its
+   exact spec; do not build a second, slightly different version. Say so in your notice:
+   *"reusing the pending proposal from `notices/<date>-<slug>.md`, not a new one."* This is
+   the one case where reading an unreviewed entry is required, not just permitted — see the
+   citability rule below for why that's not a contradiction.
+2. **Compose from what exists first.** Most "missing" things are `fold/ other` with the
    right contents, or a fold you have not considered. Check `folds.md` and `atoms.md`.
-2. **Tokens only.** A new element may combine existing values in a new shape; it may never
+3. **Tokens only.** A new element may combine existing values in a new shape; it may never
    introduce a new colour, type style, radius, shadow or spacing value. If it needs one,
    that is a finding to report.
-3. **Mark it in the code** — a comment saying it is new, what it was for, and that it is
-   pending library review.
+4. **Add it to the registry yourself, `review` omitted or `"pending"`** — same
+   `components` block as everything else, same file. Don't invent a separate location for
+   unreviewed entries; the registry already has one, and `check-drift.sh`/`review-pass.sh`
+   already know how to read it. Also mark it in the page's own code — a comment saying it
+   is new, what it was for, and that it is pending library review.
+
+### The citability rule — read is not the same as use
+
+**An entry whose `review.status` is not `"passed"` may be *read* (for the dedup check
+above, or by a human via `/library/review`) but never *cited or composed from as if it were
+settled.*** Every build that uses one still has to disclose that, every single time, until
+it passes — same obligation `ai-agents` and `comparison-table` already carry in
+`exports/ad-page/built-here.json` ("report the value rather than reproducing it silently"),
+just stated once here instead of per-fold. Promotion to citable-without-disclosure is
+**`bash scripts/review-pass.sh <surface> <key>`** — already built, nothing to invent.
 
 ### Then notify — every time
 
-**If you created or modified any element, say so before you finish** — as **one message block
-the user copies straight into Slack**, not a summary plus a message. Write the full record to
-`notices/YYYY-MM-DD-<slug>.md`, commit and push it so the link resolves, then give the
-four-line block. Format: `foundation/new-component-notice.md`.
+**If you created or modified any element, say so before you finish.** Two forms, depending
+on who's asking:
+
+- **The person you're talking to already has final review authority** (you'd know — they
+  approve component passes, decide architecture, etc.) — skip building a message for them
+  to relay to themselves. Just say directly what was built, that it's new/unreviewed, and
+  where the notice file is.
+- **Otherwise** — **one message block they copy straight into Slack**, not a summary plus a
+  message. Write the full record to `notices/YYYY-MM-DD-<slug>.md`, commit and push it so
+  the link resolves, then give the four-line block. Format: `foundation/new-component-notice.md`,
+  which also covers the `GUSHWORK_SLACK_WEBHOOK` direct-post path when one is configured —
+  ask once per session before using it, never assume standing permission.
 
 **Never let a created element pass silently.** An undeclared component is worse than a
 refusal, because it looks official.
