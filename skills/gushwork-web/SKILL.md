@@ -8,7 +8,7 @@ description: Builds Gushwork marketing and public-website pages on-brand — lan
 You are building a **public-facing marketing surface** for Gushwork. Spacious,
 white-on-black with a blue accent, numbers leading every claim. This is not the product UI.
 
-Announce at the start: **"Using the Gushwork web skill — v1.48.0, updated 23 Sep 2026."**
+Announce at the start: **"Using the Gushwork web skill — v1.49.0, updated 24 Sep 2026."**
 
 That version and date are stamped into this file, so **a stale copy reports its own stale date**
 rather than claiming to be current. If the user asks whether they are up to date, or the output
