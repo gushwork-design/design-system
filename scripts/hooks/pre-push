@@ -61,6 +61,16 @@ if [ -x "$ROOT/scripts/check-skill-drift.sh" ]; then
   # id living only in Figma is normal — and printing it every push would bury the ✘ lines.
   printf '%s\n' "$OUT" | grep -E '✘|wrong ·' | sed 's/^/  /' || true
 fi
+if [ -x "$ROOT/scripts/library-site.sh" ]; then
+  # /library is GENERATED but COMMITTED, and regenerating it is a hand-run step. That
+  # combination is exactly how the rendered library drifts from foundation/ + exports/ —
+  # the site then shows a human one thing while the skills read another, and nothing says
+  # so. --check regenerates into a temp dir and diffs; a mismatch means someone changed a
+  # source file (or the HTML itself) without rebuilding. WARN, not block, for the same
+  # reason as everything else here: a half-finished branch is a legitimate thing to push.
+  "$ROOT/scripts/library-site.sh" --check >/dev/null 2>&1 \
+    || echo "  ~ preview/library is out of date — run: bash scripts/library-site.sh"
+fi
 if [ -x "$ROOT/scripts/review-pass.sh" ]; then
   OUT="$("$ROOT/scripts/review-pass.sh" --check 2>&1 || true)"
   # Only the summary line and the expired rows. The full pending list is long by design

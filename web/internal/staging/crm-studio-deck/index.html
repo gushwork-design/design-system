@@ -98,24 +98,10 @@ html, body { margin: 0; padding: 0; height: 100%; background: #0B0B0C; overflow:
 .cover-grid { position: absolute; left: 60px; top: -14px; width: 3879px; height: 1108px;
   pointer-events: none; }
 .surface-blue  { background: var(--primary-500) url("assets/bg-blue.png") center/cover no-repeat; color: #fff; }
-.surface-light { background: linear-gradient(to bottom, #edeef0 0%, #f2f3f4 46%, var(--neutral-25) 100%); }
-/* 54px grid, matching the Figma pitch, masked so it reads strongest under the question
-   and dissolves before the footer — the grid itself is the gradient, not just the ground. */
-.surface-light::before {
-  content: ""; position: absolute; inset: 0; pointer-events: none;
-  background-image:
-    linear-gradient(to right, rgba(13,13,13,.045) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(13,13,13,.045) 1px, transparent 1px);
-  background-size: 54px 54px;
-  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,.9) 0%, rgba(0,0,0,.55) 42%, transparent 86%);
-  mask-image: linear-gradient(to bottom, rgba(0,0,0,.9) 0%, rgba(0,0,0,.55) 42%, transparent 86%);
-}
-/* a soft centre lift so the option column sits on clean ground, as it does in Figma */
-.surface-light::after {
-  content: ""; position: absolute; inset: 0; pointer-events: none;
-  background: radial-gradient(60% 44% at 50% 38%, rgba(255,255,255,.72), transparent 72%);
-}
-.surface-light > * { position: relative; z-index: 1; }
+.surface-light { background: var(--neutral-50); }
+/* 1242:9909 — grid vector, 1953.995 x 1357.562, centred, top -15.28 */
+.q-grid { position: absolute; left: 50%; top: -15.28px; width: 1953.995px; height: 1357.562px;
+  transform: translateX(-50%); pointer-events: none; }
 
 /* ── type scale ────────────────────────────────────────────────── */
 .h-cover { font-family: var(--font-display); font-weight: 700; font-size: 84px; line-height: 1.2;
@@ -368,86 +354,120 @@ html, body { margin: 0; padding: 0; height: 100%; background: #0B0B0C; overflow:
 .crm-tr .acts > i { display: block; width: 16.5px; height: 16.5px; border-radius: 5.5px; background: var(--ph-lo); }
 
 
-/* ── question slide ────────────────────────────────────────────── */
-.q-wrap { position: absolute; left: 0; right: 0; top: 199px; display: flex;
-  flex-direction: column; align-items: center; }
-.pill {
-  display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 10px;
-  border-radius: 100px; background: #fff; color: var(--black);
-  box-shadow: 0 0 0 1px var(--neutral-100), 0 16px 32px -12px rgba(88,92,95,.1);
-  font-size: 18px; font-weight: 500; letter-spacing: -.002em; white-space: nowrap;
-}
-.pill i { font-size: 16px; line-height: 1; }
-.pill .sep { width: 1px; height: 16px; background: var(--neutral-100); margin: 0 2px; }
-.pill .count { color: var(--neutral-400); font-variant-numeric: tabular-nums; }
+/* ── question slide — node 1242:9908 ──────────────────────────────────────
+   Split layout: the question on the left, and a flow panel on the right that
+   fills in as the AE ticks — so the answers finally have somewhere to land. */
 
-.q-head { margin-top: 18px; text-align: center; }
-.q-sub { margin-top: 12px; font-size: 16px; font-weight: 500; color: var(--neutral-400);
-  letter-spacing: -.002em; }
+/* 1242:9910 — 1060 wide, pl 100 / pr 120, centred on (530, 477.5) */
+.q-wrap { position: absolute; left: 0; top: 477.5px; transform: translateY(-50%);
+  width: 1060px; padding: 0 120px 0 100px;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 40px; }
+.q-head-block { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; width: 100%; }
 
-.q-options { margin-top: 26px; display: flex; flex-direction: column; gap: 22px; width: 566px; }
+/* 1242:9913 — eyebrow */
+.pill { display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 32px; padding: 6px 10px; border-radius: 133.333px;
+  background: var(--neutral-25); border: .667px solid var(--neutral-100);
+  font-size: 16px; font-weight: 500; line-height: 1; color: var(--black); white-space: nowrap; }
+.pill i { font-size: 18.667px; }
+.pill .sep { color: var(--neutral-200); }
+.pill .count { color: var(--neutral-600); }
+
+/* 1242:9924 — options, gap 20, min-height 320 */
+.q-options { display: flex; flex-direction: column; gap: 20px; width: 100%; min-height: 320px; }
+/* 1242:9925 — row: neutral-50, 2px neutral-100, r20, p16, gap 10 */
 .opt {
-  display: flex; align-items: center; gap: 15px; min-height: 62px; padding: 8px 20px; width: 100%;
-  border-radius: 14px; background: var(--white); border: 1px solid var(--neutral-100);
-  font-size: 20px; font-weight: 500; letter-spacing: -.006em; color: var(--neutral-800);
+  display: flex; align-items: center; gap: 10px; width: 100%; padding: 16px;
+  border-radius: 20px; background: var(--neutral-50); border: 2px solid var(--neutral-100);
+  font-size: 20px; font-weight: 500; line-height: 1; color: var(--neutral-800);
   cursor: pointer; user-select: none; text-align: left;
   transition: border-color .12s, background .12s, color .12s;
 }
-.opt:hover { border-color: var(--neutral-300); }
-.opt .box {
-  flex: 0 0 auto; width: 26px; height: 26px; border-radius: 8px;
-  border: 2px solid var(--neutral-200); background: var(--neutral-25);
-  display: grid; place-items: center; color: transparent; font-size: 15px;
-  transition: all .12s;
-}
-.opt .key {
-  margin-left: auto; flex: 0 0 auto; font-size: 13px; font-weight: 600; color: var(--neutral-300);
-  border: 1px solid var(--neutral-100); border-radius: 6px; padding: 2px 7px;
-  font-variant-numeric: tabular-nums;
-}
-.opt.is-on { background: var(--primary-25); border-color: var(--primary-500); color: var(--black); }
-.opt-other { display: flex; align-items: center; gap: 15px; min-height: 62px; padding: 8px 20px;
-  width: 100%; border-radius: 14px; background: var(--white); border: 1px dashed var(--neutral-200); }
-.opt-other.is-on { border-style: solid; border-color: var(--primary-500); background: var(--primary-25); }
-.opt-other input {
-  flex: 1; min-width: 0; border: none; background: transparent; outline: none;
-  font-family: var(--font-body); font-size: 20px; font-weight: 500; letter-spacing: -.006em;
-  color: var(--black);
-}
-.opt-other input::placeholder { color: var(--neutral-300); font-weight: 400; }
-.opt.is-on .box { background: var(--primary-500); border-color: var(--primary-500); color: #fff; }
-.opt-other .box { flex: 0 0 auto; width: 26px; height: 26px; border-radius: 8px;
-  border: 2px dashed var(--neutral-200); background: var(--neutral-25);
-  display: grid; place-items: center; color: var(--neutral-300); font-size: 14px; }
-.opt-other.is-on .box { border-style: solid; background: var(--primary-500);
-  border-color: var(--primary-500); color: #fff; }
-.opt.is-on .key { color: var(--primary-500); border-color: var(--primary-100); }
+.opt:hover { border-color: var(--neutral-200); }
+/* 1242:9926 — 28px circle; selected fills black (1242:9932) */
+.opt .box { flex: 0 0 auto; width: 28px; height: 28px; border-radius: 40px;
+  background: var(--neutral-100); border: 1px solid var(--neutral-200);
+  display: grid; place-items: center; color: transparent; font-size: 16px; transition: all .12s; }
+.opt .key { margin-left: auto; flex: 0 0 auto; font-size: 13px; font-weight: 600;
+  color: var(--neutral-300); border: 1px solid var(--neutral-100); border-radius: 6px;
+  padding: 2px 7px; font-variant-numeric: tabular-nums; }
+.opt.is-on { background: #fff; border-color: var(--neutral-200); color: var(--neutral-900); }
+.opt.is-on .box { background: var(--black); border-color: var(--black); color: #fff; }
+.opt.is-on .key { color: var(--neutral-400); }
 
-.q-nav { margin-top: 30px; display: flex; align-items: center; gap: 12px; width: 566px; }
-.btn {
-  display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 18px;
-  border-radius: var(--r10); border: none; cursor: pointer;
-  font-family: var(--font-body); font-size: 16px; font-weight: 600; letter-spacing: -.004em;
-  transition: background .12s, color .12s, border-color .12s;
-}
-.btn i { font-size: 15px; }
+.opt-other { display: flex; align-items: center; gap: 10px; width: 100%; padding: 16px;
+  border-radius: 20px; background: var(--neutral-50); border: 2px dashed var(--neutral-100); }
+.opt-other .box { flex: 0 0 auto; width: 28px; height: 28px; border-radius: 40px;
+  background: var(--neutral-100); border: 1px dashed var(--neutral-200);
+  display: grid; place-items: center; color: var(--neutral-400); font-size: 14px; }
+.opt-other.is-on { border-style: solid; background: #fff; border-color: var(--neutral-200); }
+.opt-other.is-on .box { background: var(--black); border-color: var(--black); color: #fff; }
+.opt-other input { flex: 1; min-width: 0; border: none; background: transparent; outline: none;
+  font-family: var(--font-body); font-size: 20px; font-weight: 500; line-height: 1;
+  color: var(--neutral-900); }
+.opt-other input::placeholder { color: var(--neutral-400); font-weight: 500; }
+
+/* 1242:9938 — nav, gap 8, right-aligned by the column's items-end */
+.q-nav { display: flex; align-items: center; gap: 8px; }
+.q-nav .hint { margin-right: auto; font-size: 14px; color: var(--neutral-400); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 36px; padding: 8px 12px; border-radius: 8px; border: none; cursor: pointer;
+  font-family: var(--font-body); font-size: 14px; font-weight: 500; line-height: 1;
+  transition: background .12s, color .12s, border-color .12s; }
+.btn i { font-size: 16px; }
 .btn-blue { background: var(--primary-500); color: #fff; }
 .btn-blue:hover { background: var(--primary-600); }
-.btn-ghost { background: #fff; color: var(--neutral-700); box-shadow: inset 0 0 0 1px var(--neutral-100); }
-.btn-ghost:hover { color: var(--black); box-shadow: inset 0 0 0 1px var(--neutral-300); }
-.btn-icon { width: 40px; padding: 0; justify-content: center; }
-.q-nav .spacer { flex: 1; }
-.q-nav .hint { font-size: 15px; color: var(--neutral-400); letter-spacing: -.002em; }
+.btn-ghost { background: transparent; color: var(--neutral-600);
+  box-shadow: inset 0 0 0 1.5px var(--neutral-100); }
+.btn-ghost:hover { color: var(--black); box-shadow: inset 0 0 0 1.5px var(--neutral-200); }
+.btn-icon { width: 36px; height: 36px; padding: 8px; }
 
-.q-foot {
-  position: absolute; left: 0; right: 0; bottom: 0; height: 84px;
-  display: flex; align-items: center; gap: 16px; padding: 0 44px;
-  background: #fff; border-top: 1px solid var(--neutral-100);
-  font-size: 26px; font-weight: 600; letter-spacing: -.008em; color: var(--black);
+/* ── 1242:9996 — the flow panel: 840 x 960 at right 20, centred on y 500 ── */
+.flow {
+  position: absolute; right: 20px; top: 20px; width: 840px; height: 960px;
+  background: var(--neutral-25); border: 2px solid var(--neutral-100); border-radius: 20px;
+  overflow: hidden;
 }
-.q-foot .mark { width: 34px; height: 34px; border-radius: 9px; background: var(--primary-500);
-  display: grid; place-items: center; }
-.q-foot .mark img { width: 18px; height: 18px; display: block; }
+/* 1246:10205 — Vert Grotesk Display Medium 28 / 1.4 */
+.flow h2 { position: absolute; left: 58px; top: 58px; margin: 0;
+  font-family: var(--font-display); font-weight: 500; font-size: 28px; line-height: 1.4;
+  letter-spacing: -.01em; color: var(--neutral-900); }
+/* 1246:10202 — stage column at (58, 157), 640 wide */
+.flow-stages { position: absolute; left: 58px; top: 157px; width: 640px; bottom: 58px;
+  display: flex; flex-direction: column; justify-content: space-between; gap: 24px; }
+/* 1246:10207 — the rule the stages hang off */
+.flow-stages::before { content: ""; position: absolute; left: 20px; top: 18px; bottom: 18px;
+  width: 0; border-left: 1px dashed var(--neutral-200); }
+.flow-stage { display: flex; flex-direction: column; align-items: flex-start; gap: 16px;
+  width: 100%; position: relative; transition: opacity .18s; }
+.flow-stage.is-todo { opacity: .38; }
+/* 1242:10120 — header: 40px avatar, gap 16 */
+.flow-head { display: flex; align-items: center; gap: 16px; height: 40px; }
+.flow-ico { flex: 0 0 auto; width: 40px; height: 40px; border-radius: var(--r8);
+  border: .281px solid; display: grid; place-items: center; overflow: hidden; }
+.flow-ico img { width: 24px; height: 24px; display: block; }
+.flow-name { font-family: var(--font-display); font-weight: 600; font-size: 22px;
+  line-height: 1.4; color: var(--neutral-900); white-space: nowrap; }
+.flow-stage.is-now .flow-name { color: var(--black); }
+/* 1246:10146 — chips indent past the avatar, gap 12 */
+.flow-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+  padding: 0 0 0 56px; width: 100%; }
+/* 1242:10136 — chip: white, 1px neutral-100, r40, px16 py12, Inter Medium 16 */
+.chip { display: inline-flex; align-items: center; padding: 12px 16px; border-radius: 40px;
+  background: #fff; border: 1px solid var(--neutral-100);
+  font-size: 16px; font-weight: 500; line-height: 1; color: var(--neutral-800); }
+.chip.is-empty { border-style: dashed; background: transparent; color: var(--neutral-300);
+  min-width: 96px; justify-content: center; }
+
+/* 1246:10211 — footer strip, 80 tall, px 60 */
+.q-foot {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 80px;
+  display: flex; align-items: center; gap: 16px; padding: 20px 60px;
+  background: #fff; border-top: 1px solid var(--neutral-100);
+  font-family: var(--font-display); font-weight: 500; font-size: 24px; line-height: 1.4;
+  color: var(--neutral-900);
+}
+.q-foot .mark { width: 24px; height: 24px; display: block; flex: none; }
 .q-foot .steps { margin-left: auto; display: flex; gap: 8px; }
 .q-foot .steps b { width: 34px; height: 4px; border-radius: 2px; background: var(--neutral-100); }
 .q-foot .steps b.done, .q-foot .steps b.here { background: var(--neutral-800); }
@@ -855,6 +875,9 @@ const BENEFITS = [
 ];
 
 const WORKFLOW_TITLE = 'Walk us through how the work actually flows';
+/* The panel is the running answer, so it gets its own title rather than
+   repeating the footer's line. */
+const FLOW_TITLE = 'Your flow so far';
 
 /* ═══════════════════════════════════════════════════════════════
    State — answers persist so an AE can reopen mid-call
@@ -928,6 +951,37 @@ function coverSlide() {
   </section>`;
 }
 
+/* What the AE has ticked for a stage, in the client's own words. */
+const picksFor = key => {
+  const list = (state.answers[key] || []).slice();
+  if (state.other[key]) list.push(state.other[key]);
+  return list;
+};
+
+/* 1242:9996 — the panel fills in as the call goes: answered stages show their chips,
+   the stage being asked is highlighted, stages still ahead sit dimmed. */
+function flowPanel(currentIdx) {
+  const stages = STAGES.map((st, i) => {
+    const picks = picksFor(st.key);
+    const mode = i === currentIdx ? 'is-now' : (picks.length ? 'is-done' : 'is-todo');
+    const chips = picks.length
+      ? picks.map(o => `<span class="chip">${esc(o)}</span>`).join('')
+      : `<span class="chip is-empty">—</span>`;
+    return `<div class="flow-stage ${mode}">
+      <div class="flow-head">
+        <span class="flow-ico" style="background:${st.tint};border-color:${st.edge}">
+          <img src="assets/stack/${st.art}" alt=""></span>
+        <span class="flow-name">${esc(st.name)}</span>
+      </div>
+      <div class="flow-chips">${chips}</div>
+    </div>`;
+  }).join('');
+  return `<div class="flow">
+    <h2>${esc(FLOW_TITLE)}</h2>
+    <div class="flow-stages">${stages}</div>
+  </div>`;
+}
+
 function questionSlide(stage, idx) {
   const picked = state.answers[stage.key];
   const opts = stage.options.map((o, n) => `
@@ -945,23 +999,25 @@ function questionSlide(stage, idx) {
   const steps = STAGES.map((s, n) =>
     `<b class="${n === idx ? 'here' : (n < idx ? 'done' : '')}"></b>`).join('');
   return `<section class="slide surface-light" data-kind="question" data-stage="${stage.key}">
+    <img class="q-grid" src="assets/flow/grid.svg" alt="">
     <div class="q-wrap">
-      <span class="pill">
-        ${ph(stage.icon)}${esc(stage.name)}
-        <span class="sep"></span><span class="count">${idx + 1}/5</span>
-      </span>
-      <h1 class="h-q q-head">${esc(stage.question)}</h1>
-      <div class="q-sub">Pick everything that applies — most businesses do two or three</div>
+      <div class="q-head-block">
+        <span class="pill">
+          ${ph(stage.icon)}${esc(stage.name)}
+          <span class="sep">|</span><span class="count">${idx + 1}/5</span>
+        </span>
+        <h1 class="h-q">${esc(stage.question)}</h1>
+      </div>
       <div class="q-options">${opts}</div>
       <div class="q-nav">
-        <button class="btn btn-ghost btn-icon" data-nav="prev">${ph('arrow-left','bold')}</button>
         <span class="hint" data-role="tally"></span>
-        <span class="spacer"></span>
+        <button class="btn btn-ghost btn-icon" data-nav="prev">${ph('arrow-left','bold')}</button>
         <button class="btn btn-blue" data-nav="next">Next${ph('arrow-right','bold')}</button>
       </div>
     </div>
+    ${flowPanel(idx)}
     <div class="q-foot">
-      <span class="mark"><img src="${gmark}" alt=""></span>
+      <img class="mark" src="assets/flow/mark.svg" alt="">
       ${esc(WORKFLOW_TITLE)}
       <span class="steps">${steps}</span>
     </div>

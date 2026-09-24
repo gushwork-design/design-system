@@ -2,35 +2,642 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Downloads — Gushwork Design</title>
-<meta name="description" content="Official Gushwork assets — the logo in its approved treatments, and the fonts.">
-<script>try{var t=localStorage.getItem('gw-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<meta name="description" content="The official Gushwork assets — the logo in its approved treatments, the color sheet, the fonts, and the tokens.">
+<script>try{var t=localStorage.getItem('gw-theme');if(t!=='dark')t='light';document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20width%3D%2280%22%20height%3D%2280%22%20rx%3D%2220%22%20fill%3D%22%230d0d0d%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
 <link rel="stylesheet" href="/foundation/tokens.css">
 <link rel="stylesheet" href="/shell.css">
 <script src="/shell.js" defer></script>
+<style>
+/* ============================================================================
+   Downloads — built from Figma `Q9L6q38dEj3Qu1JkjiT13y` → frame `downloads`
+   (683:7506), reconciled with the v3 wireframe signed off 16 Sep 2026.
+
+   Measured off the node tree, not the screenshot:
+     frame          1440 · top-bar 60 · side-panel 240 · content 1200
+     column split   main 800 (text 760) · rail 260 at x=900 — same `.sg`
+                    grid the Style Guide and Change Log already use
+     header         title 53 tall · meta at y=73 · rule at y=125
+     asset table    header row 48 · body rows 80 · width 760
+                    cols: preview 132 · type 140 · usage 240 · action 107
+     action button  107 x 32
+     format menu    148 x 102 (683:7506 → 736:9440 `dropdown-options`)
+
+   Reuses the shell wholesale: `.sg` page grid, `.idx` on-this-page rail, the
+   topbar/sidebar from shell.js. Only the asset table, the format menu and the
+   font specimens are new here.
+   ========================================================================= */
+
+/* -- local surface tokens -------------------------------------------------
+   The TABLE is chrome — it follows the theme. The PREVIEW TILES are specimens
+   and keep a light ground in both themes, for the same reason the Style Guide
+   pins its logo stage: the Original treatment goes dark-on-dark and reads as
+   blank. Same rule, applied to the one element that shows the artwork. */
+:root,:root[data-theme="light"]{
+  --d-card:var(--gw-color-white);
+  --d-card-border:var(--gw-color-neutral-100);
+  --d-row-border:var(--gw-color-neutral-100);
+  --d-head-bg:var(--gw-color-neutral-25);
+  --d-rule:var(--gw-color-neutral-200);
+  --d-menu-bg:var(--gw-color-white);
+  --d-menu-hover:var(--gw-color-neutral-25);
+  --d-muted:var(--gw-color-neutral-600);
+}
+:root[data-theme="dark"]{
+  --d-card:var(--gw-color-neutral-900);
+  --d-card-border:var(--gw-color-neutral-800);
+  --d-row-border:var(--gw-color-neutral-800);
+  --d-head-bg:var(--gw-color-neutral-800);
+  --d-rule:var(--gw-color-neutral-800);
+  --d-menu-bg:var(--gw-color-neutral-900);
+  --d-menu-hover:var(--gw-color-neutral-800);
+  --d-muted:var(--gw-color-neutral-300);
+}
+
+/* -- page frame: identical split to the Style Guide ----------------------- */
+.dl{max-width:1200px;margin:0 auto;
+    padding:var(--gw-space-60) var(--gw-space-40) var(--gw-space-120);
+    display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--gw-space-60)}
+.dl__main{min-width:0;display:flex;flex-direction:column;gap:var(--gw-space-32)}
+
+/* -- header: same dotted rule as the Style Guide (2px, round cap, [0.1,4]) - */
+.dl__hd{padding:0 var(--gw-space-40) var(--gw-space-32);
+        background-image:radial-gradient(circle closest-side,
+                         var(--d-rule) 100%, transparent 100%);
+        background-size:4.1px 2px;background-position:left bottom;
+        background-repeat:repeat-x;
+        display:flex;flex-direction:column;gap:var(--gw-space-20)}
+.dl__title{margin:0;font:600 44px/1.2 var(--gw-font-display);color:var(--s-heading)}
+.dl__meta{margin:0;font:var(--gw-text-body-14-med);
+          letter-spacing:var(--gw-text-body-14-med-tracking);
+          color:var(--gw-color-neutral-400)}
+
+/* -- sections ------------------------------------------------------------- */
+.dl__body{display:flex;flex-direction:column;gap:var(--gw-space-60)}
+.dl-sec{padding-left:var(--gw-space-40);display:flex;flex-direction:column;
+        gap:var(--gw-space-20);scroll-margin-top:calc(60px + var(--gw-space-24))}
+.dl-sec :where(h2){margin:0;font:600 28px/1.2 var(--gw-font-display);color:var(--s-heading)}
+.dl-sec :where(p){margin:0;font:var(--gw-text-body-18-med);
+          letter-spacing:var(--gw-text-body-18-med-tracking);color:var(--s-body)}
+/* Links carry no colour of their own — weight and the underline do the work,
+   so a paragraph reads as one piece of text rather than as prose with blue
+   holes punched through it. */
+.dl-sec :where(p) a{color:inherit;font-weight:600;text-decoration:underline;
+          text-underline-offset:3px;text-decoration-thickness:1px;
+          text-decoration-color:var(--gw-color-neutral-300)}
+.dl-sec :where(p) a:hover{color:var(--s-heading);
+          text-decoration-color:currentColor}
+.dl-sec :where(p) a:focus-visible{outline:var(--gw-focus-ring);
+          outline-offset:var(--gw-focus-offset);border-radius:var(--gw-radius-2)}
+/* The lock is the same glyph the sidebar puts on a gated row, so the note and
+   the rows it describes read as one statement. */
+.dl-note--lock{display:flex;align-items:flex-start;gap:var(--gw-space-8)}
+.dl-note--lock svg{width:14px;height:14px;flex:none;display:block;margin-top:3px}
+.dl-note{margin:0;font:var(--gw-text-body-14-med);
+         letter-spacing:var(--gw-text-body-14-med-tracking);
+         color:var(--gw-color-neutral-400)}
+
+/* -- asset table ----------------------------------------------------------
+   Rendered as a real <table> so the header reads as a header to a screen
+   reader and the rows stay associated with their columns. Row heights are the
+   measured 48 / 80; the widths below are the measured 132/140/240/107 plus
+   the 16 gutters, which is what makes them add to 760. */
+.dl-table{width:100%;border-collapse:separate;border-spacing:0;
+          background:var(--d-card);border:1px solid var(--d-card-border);
+          border-radius:var(--gw-radius-20);overflow:visible}
+.dl-table th{height:48px;padding:0 var(--gw-space-16);text-align:left;
+             background:var(--d-head-bg);
+             border-bottom:1px solid var(--d-row-border);
+             font:var(--gw-text-body-14-sem);
+             letter-spacing:var(--gw-text-body-14-sem-tracking);
+             color:var(--d-muted)}
+.dl-table th:first-child{border-top-left-radius:var(--gw-radius-20)}
+.dl-table th:last-child{border-top-right-radius:var(--gw-radius-20)}
+.dl-table td{height:80px;padding:0 var(--gw-space-16);vertical-align:middle;
+             border-bottom:1px solid var(--d-row-border);
+             font:var(--gw-text-body-14-med);
+             letter-spacing:var(--gw-text-body-14-med-tracking);
+             color:var(--s-heading)}
+.dl-table tr:last-child td{border-bottom:0}
+.dl-table td.u{color:var(--s-body)}
+.dl-table .c-prev{width:164px}
+.dl-table .c-type{width:156px}
+.dl-table .c-use{width:272px}
+.dl-table .c-act{width:139px;text-align:right}
+
+/* preview tile — 132x48, keeps a light ground in both themes (see above) */
+.dl-pv{width:132px;height:48px;border-radius:var(--gw-radius-10);
+       display:grid;place-items:center;background:var(--gw-color-neutral-25);
+       border:1px solid var(--gw-color-neutral-100)}
+.dl-pv[data-bg="blue"]{background:var(--gw-color-primary-500);
+       border-color:var(--gw-color-primary-500)}
+.dl-pv[data-bg="dark"]{background:var(--gw-color-black);
+       border-color:var(--gw-color-black)}
+.dl-pv img{display:block;width:84px;height:auto}
+.dl-pv[data-art="symbol"] img{width:16px}
+.dl-pv[data-art="sheet"] svg{width:20px;height:20px;display:block;
+       color:var(--gw-color-neutral-400)}
+/* The swatch row shows the palette itself — more use than any icon of it. */
+.dl-pv[data-art="chips"]{display:flex;gap:var(--gw-space-4);
+       align-items:center;justify-content:center}
+.dl-pv[data-art="chips"] i{width:16px;height:16px;border-radius:var(--gw-radius-4);
+       display:block;box-shadow:inset 0 0 0 1px rgba(13,13,13,.06)}
+
+/* -- action button + format menu ------------------------------------------ */
+.dl-act{position:relative;display:inline-block}
+.dl-btn{width:107px;height:32px;display:inline-flex;align-items:center;
+        text-decoration:none;
+        justify-content:center;gap:var(--gw-space-8);
+        border:1px solid var(--s-field-border);border-radius:var(--gw-radius-8);
+        background:var(--d-card);color:var(--s-heading);cursor:pointer;
+        font:var(--gw-text-button-14);line-height:16px;
+        box-shadow:var(--gw-shadow-s2);
+        transition:background var(--gw-motion-fast),border-color var(--gw-motion-fast)}
+.dl-btn:hover{background:var(--d-menu-hover)}
+.dl-btn:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.dl-btn svg{width:14px;height:14px;flex:none;display:block}
+.dl-btn .cv{width:10px;height:10px;transition:transform var(--gw-motion-fast)}
+.dl-btn[aria-expanded="true"] .cv{transform:rotate(180deg)}
+
+.dl-menu{position:absolute;right:0;top:calc(100% + var(--gw-space-8));
+         min-width:190px;padding:var(--gw-space-4);z-index:20;
+         background:var(--d-menu-bg);border:1px solid var(--d-card-border);
+         border-radius:var(--gw-radius-12);box-shadow:var(--gw-shadow-card);
+         display:flex;flex-direction:column;text-align:left}
+.dl-menu[hidden]{display:none}
+.dl-mi{display:flex;align-items:baseline;justify-content:space-between;
+       gap:var(--gw-space-16);padding:var(--gw-space-8) var(--gw-space-12);
+       border:0;background:none;cursor:pointer;border-radius:var(--gw-radius-8);
+       color:var(--s-heading);text-decoration:none;
+       font:var(--gw-text-body-14-med);
+       letter-spacing:var(--gw-text-body-14-med-tracking)}
+.dl-mi:hover{background:var(--d-menu-hover)}
+.dl-mi:focus-visible{outline:var(--gw-focus-ring);outline-offset:-2px}
+.dl-mi .r{font:var(--gw-text-button-12);line-height:16px;color:var(--gw-color-neutral-400);
+          flex:none;white-space:nowrap}
+
+/* -- font specimen --------------------------------------------------------- */
+.dl-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--gw-space-16)}
+.dl-spec{background:var(--d-card);border:1px solid var(--d-card-border);
+         border-radius:var(--gw-radius-20);padding:var(--gw-space-24);
+         display:flex;flex-direction:column;gap:var(--gw-space-16)}
+.dl-spec__name{font:var(--gw-text-body-14-sem);
+               letter-spacing:var(--gw-text-body-14-sem-tracking);color:var(--s-heading)}
+.dl-spec__art{margin:0;font:600 44px/1.1 var(--gw-font-display);color:var(--s-heading)}
+.dl-spec__art small{display:block;margin-top:var(--gw-space-8);
+                    font:var(--gw-text-body-14-med);
+                    letter-spacing:var(--gw-text-body-14-med-tracking);
+                    color:var(--s-body)}
+.dl-spec--body .dl-spec__art{font:600 44px/1.1 var(--gw-font-body)}
+.dl-chips{display:flex;flex-wrap:wrap;gap:var(--gw-space-8)}
+.dl-chip{padding:var(--gw-space-4) var(--gw-space-8);border-radius:var(--gw-radius-8);
+         background:var(--gw-color-neutral-25);color:var(--d-muted);
+         font:var(--gw-text-button-12);line-height:16px}
+:root[data-theme="dark"] .dl-chip{background:var(--gw-color-neutral-800)}
+.dl-spec__foot{display:flex;align-items:center;justify-content:space-between;
+               gap:var(--gw-space-16);margin-top:var(--gw-space-4);
+               padding-top:var(--gw-space-16);
+               border-top:1px solid var(--d-card-border)}
+
+/* -- tokens block ---------------------------------------------------------- */
+.dl-code{background:var(--d-card);border:1px solid var(--d-card-border);
+         border-radius:var(--gw-radius-20);padding:var(--gw-space-24);
+         display:flex;flex-direction:column;gap:var(--gw-space-20)}
+.dl-code pre{margin:0;overflow-x:auto;
+             font:500 13px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;
+             color:var(--s-body)}
+.dl-code .k{color:var(--gw-color-primary-500)}
+.dl-acts{display:flex;flex-wrap:wrap;gap:var(--gw-space-12)}
+.dl-btn--auto{width:auto;padding:0 var(--gw-space-16)}
+
+/* -- closing links ---------------------------------------------------------- */
+.dl-outs{display:flex;flex-wrap:wrap;gap:var(--gw-space-12)}
+.dl-out{display:inline-flex;align-items:center;gap:var(--gw-space-8);height:40px;
+        padding:0 var(--gw-space-16);border-radius:var(--gw-radius-10);
+        border:1px solid var(--s-field-border);background:var(--d-card);
+        color:var(--s-heading);text-decoration:none;
+        font:var(--gw-text-button-14);line-height:16px}
+.dl-out:hover{background:var(--d-menu-hover)}
+.dl-out:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.dl-out svg{width:16px;height:16px;flex:none;display:block;color:currentColor}
+
+/* screen-reader-only, same recipe the Style Guide uses */
+.gw-sr{position:absolute;width:1px;height:1px;margin:0;overflow:hidden;
+       clip-path:inset(50%);white-space:nowrap}
+.dl-sec code{font:500 15px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;
+             background:var(--gw-color-neutral-100);color:var(--s-heading);
+             padding:1px 6px;border-radius:var(--gw-radius-4)}
+:root[data-theme="dark"] .dl-sec code{background:var(--gw-color-neutral-800)}
+
+/* -- phone ----------------------------------------------------------------- */
+@media (max-width:900px){
+  .dl{grid-template-columns:minmax(0,1fr);padding:var(--gw-space-32) var(--gw-space-20) var(--gw-space-60)}
+  .dl__hd,.dl-sec{padding-left:0}
+  .dl__hd{padding-right:0}
+  .dl__title{font-size:32px}
+  .dl-cards{grid-template-columns:minmax(0,1fr)}
+  /* The table stops being a grid and becomes stacked cards — 760 of columns
+     will not survive 390, and a horizontally scrolling table is a table
+     nobody scrolls. */
+  .dl-table,.dl-table tbody,.dl-table tr,.dl-table td{display:block;width:auto}
+  .dl-table thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+  .dl-table tr{padding:var(--gw-space-16);border-bottom:1px solid var(--d-row-border)}
+  .dl-table tr:last-child{border-bottom:0}
+  .dl-table td{height:auto;padding:0 0 var(--gw-space-8);border-bottom:0}
+  .dl-table td.c-act{text-align:left;padding-bottom:0}
+  .dl-menu{right:auto;left:0}
+}
+</style>
 </head>
 <body data-gw-page="downloads">
 
-<div class="gw-col">
-  <div class="gw-section gw-stack-40">
-    <div class="gw-prose gw-stack-20">
-      <h2>Downloads</h2>
-      <p>The official assets. Use these rather than redrawing or re-exporting —
-         a mark rebuilt by hand is a mark that drifts.</p>
-    </div>
+<div class="dl">
+  <div class="dl__main">
 
-    <div class="gw-soon">
-      <h2>Being built from the Figma</h2>
-      <p>Two asset cards are designed — the logo on Brandeis Blue and on a light
-         surface, each with an Original / White / Dark switcher. They get built in the
-         next pass, alongside download links for:</p>
-      <ul>
-        <li>The mark and the full lockup, in all three treatments, as SVG</li>
-        <li>Vert Grotesk Display and Inter</li>
-        <li><code>tokens.css</code>, if you are building outside the plugin</li>
-      </ul>
+    <!-- HEADER — 683:7562 -->
+    <header class="dl__hd">
+      <h1 class="dl__title">Download Gushwork Assets</h1>
+      <p class="dl__meta">Last updated 16th Sep, 2026</p>
+    </header>
+
+    <div class="dl__body">
+
+      <!-- INTRO — 683:7568, verbatim from the Figma text node -->
+      <section class="dl-sec">
+        <p>The official Gushwork assets — the logo, the two typefaces, and the tokens.
+           Use these rather than redrawing or re-exporting: a mark rebuilt by hand is a
+           mark that drifts.</p>
+        <p>How to use them is the Style Guide&rsquo;s job. This page just hands you the files.
+           <a href="/style-guide">Explore the Style Guide</a></p>
+      </section>
+
+      <!-- 01 · OUR LOGO — 683:7569 -->
+      <section class="dl-sec" id="logo">
+        <h2>Our logo</h2>
+        <p>Three treatments, two lockups. Pick by background, not by preference. Clear space,
+           the construction grid and what not to do are in the
+           <a href="/style-guide#logo">Style Guide</a></p>
+
+        <table class="dl-table">
+          <thead>
+            <tr>
+              <th class="c-prev" scope="col">Preview</th>
+              <th class="c-type" scope="col">Type</th>
+              <th class="c-use" scope="col">Usage</th>
+              <th class="c-act" scope="col"><span class="gw-sr">Download</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="c-prev"><span class="dl-pv"><img src="/assets/logo/gushwork-logo-original.svg" alt=""></span></td>
+              <td class="c-type">Original Full Logo</td>
+              <td class="c-use u">White and light surfaces</td>
+              <td class="c-act" data-asset="Original Full Logo" data-slug="logo-original"></td>
+            </tr>
+            <tr>
+              <td class="c-prev"><span class="dl-pv" data-bg="blue"><img src="/assets/logo/gushwork-logo-white.svg" alt=""></span></td>
+              <td class="c-type">White Full Logo</td>
+              <td class="c-use u">Blue and dark surfaces or images</td>
+              <td class="c-act" data-asset="White Full Logo" data-slug="logo-white"></td>
+            </tr>
+            <tr>
+              <td class="c-prev"><span class="dl-pv"><img src="/assets/logo/gushwork-logo-dark.svg" alt=""></span></td>
+              <td class="c-type">Dark Full Logo</td>
+              <td class="c-use u">Monochrome and no-color print</td>
+              <td class="c-act" data-asset="Dark Full Logo" data-slug="logo-dark"></td>
+            </tr>
+            <tr>
+              <td class="c-prev"><span class="dl-pv" data-art="symbol"><img src="/assets/logo/gushwork-symbol-original.svg" alt=""></span></td>
+              <td class="c-type">Original Symbol</td>
+              <td class="c-use u">Favicons, avatars, app icons</td>
+              <td class="c-act" data-asset="Original Symbol" data-slug="symbol-original"></td>
+            </tr>
+            <tr>
+              <td class="c-prev"><span class="dl-pv" data-bg="blue" data-art="symbol"><img src="/assets/logo/gushwork-symbol-white.svg" alt=""></span></td>
+              <td class="c-type">White Symbol</td>
+              <td class="c-use u">Blue and dark surfaces</td>
+              <td class="c-act" data-asset="White Symbol" data-slug="symbol-white"></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- 02 · COLOR SHEET -->
+      <section class="dl-sec" id="color-sheet">
+        <h2>Color sheet</h2>
+        <p>The full palette, in the formats the tools actually read. These are the same values the
+           Style Guide documents — this page just hands them over.</p>
+
+        <table class="dl-table">
+          <thead>
+            <tr>
+              <th class="c-prev" scope="col">Preview</th>
+              <th class="c-type" scope="col">Type</th>
+              <th class="c-use" scope="col">Usage</th>
+              <th class="c-act" scope="col"><span class="gw-sr">Download</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="c-prev"><span class="dl-pv" data-art="sheet">
+                <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM160,51.31,188.69,80H160ZM200,216H56V40h88V88a8,8,0,0,0,8,8h48V216Zm-40-72a8,8,0,0,1-8,8H104a8,8,0,0,1,0-16h48A8,8,0,0,1,160,144Zm0,32a8,8,0,0,1-8,8H104a8,8,0,0,1,0-16h48A8,8,0,0,1,160,176Z"/></svg>
+              </span></td>
+              <td class="c-type">Color reference sheet</td>
+              <td class="c-use u">Print, handoff, anyone without the tokens</td>
+              <td class="c-act" data-asset="Color reference sheet" data-formats="sheet"></td>
+            </tr>
+            <tr>
+              <td class="c-prev"><span class="dl-pv" data-art="chips">
+                <i style="background:var(--gw-color-primary-500)"></i>
+                <i style="background:var(--gw-color-black)"></i>
+                <i style="background:var(--gw-color-neutral-400)"></i>
+                <i style="background:var(--gw-color-neutral-100)"></i>
+              </span></td>
+              <td class="c-type">Swatch library</td>
+              <td class="c-use u">Illustrator, Photoshop, Sketch</td>
+              <td class="c-act" data-asset="Swatch library" data-formats="swatch"></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- 03 · FONTS -->
+      <section class="dl-sec" id="fonts">
+        <h2>Fonts</h2>
+        <p>Vert Grotesk Display sets every heading. Inter carries body copy and UI.
+           Two faces, and no third.</p>
+
+        <div class="dl-cards">
+          <div class="dl-spec">
+            <span class="dl-spec__name">Vert Grotesk Display</span>
+            <p class="dl-spec__art">Aa<small>Rank, publish, compound</small></p>
+            <div class="dl-chips">
+              <span class="dl-chip">Display &amp; headings</span>
+              <span class="dl-chip">Variable</span>
+              <span class="dl-chip">57 KB</span>
+            </div>
+            <div class="dl-spec__foot">
+              <span class="dl-note">400&ndash;700 &middot; no italics</span>
+              <a class="dl-btn dl-btn--auto" href="/fonts/Vert_Grotesk_Display_VF.ttf" download>
+                <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M74.34,133.66a8,8,0,0,1,11.32-11.32L120,156.69V40a8,8,0,0,1,16,0V156.69l34.34-34.35a8,8,0,0,1,11.32,11.32l-48,48a8,8,0,0,1-11.32,0ZM216,144a8,8,0,0,0-8,8v56H48V152a8,8,0,0,0-16,0v56a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V152A8,8,0,0,0,216,144Z"/></svg>
+                <span>Download</span><span class="gw-sr"> Vert Grotesk Display, TTF</span></a>
+            </div>
+          </div>
+
+          <div class="dl-spec dl-spec--body">
+            <span class="dl-spec__name">Inter</span>
+            <p class="dl-spec__art">Aa<small>Body copy, tables, interface</small></p>
+            <div class="dl-chips">
+              <span class="dl-chip">Body &amp; UI</span>
+              <span class="dl-chip">Variable + italic</span>
+              <span class="dl-chip">854 / 883 KB</span>
+            </div>
+            <div class="dl-spec__foot">
+              <span class="dl-note">100&ndash;900 &middot; roman and italic</span>
+              <a class="dl-btn dl-btn--auto" href="/fonts/Inter-VariableFont_opsz_wght.ttf" download>
+                <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M74.34,133.66a8,8,0,0,1,11.32-11.32L120,156.69V40a8,8,0,0,1,16,0V156.69l34.34-34.35a8,8,0,0,1,11.32,11.32l-48,48a8,8,0,0,1-11.32,0ZM216,144a8,8,0,0,0-8,8v56H48V152a8,8,0,0,0-16,0v56a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V152A8,8,0,0,0,216,144Z"/></svg>
+                <span>Download</span><span class="gw-sr"> Inter, TTF</span></a>
+            </div>
+          </div>
+        </div>
+
+        <p>Decks exported to Google Slides or <code>.pptx</code> come back in Plus Jakarta Sans —
+           Slides cannot load a custom face. That substitution is expected, not drift.
+           <a href="/fonts/PlusJakartaSans-VariableFont_wght.ttf" download>Download Plus Jakarta Sans</a></p>
+      </section>
+
+      <!-- 04 · TOKENS -->
+      <section class="dl-sec" id="tokens">
+        <h2>Tokens</h2>
+        <p>Every color, type step, space and radius as a CSS custom property. Inside Claude Code
+           the plugin already serves these — this is for everything else.</p>
+
+        <div class="dl-code">
+<pre>:root {
+  <span class="k">--gw-color-primary-500</span>: #0070ff;
+  <span class="k">--gw-text-display-40-semi</span>: 600 40px/1.2 …;
+  <span class="k">--gw-space-40</span>: 40px;
+  <span class="k">--gw-radius-8</span>: 8px;
+}</pre>
+          <div class="dl-acts">
+            <span class="c-act" data-asset="Tokens" data-formats="tokens"></span>
+            <button class="dl-btn dl-btn--auto" type="button" data-copy="/foundation/tokens.css">
+              <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M216,32H88a8,8,0,0,0-8,8V80H40a8,8,0,0,0-8,8V216a8,8,0,0,0,8,8H168a8,8,0,0,0,8-8V176h40a8,8,0,0,0,8-8V40A8,8,0,0,0,216,32ZM160,208H48V96H160Zm48-48H176V88a8,8,0,0,0-8-8H96V48H208Z"/></svg>
+              <span data-copy-label>Copy raw URL</span>
+            </button>
+          </div>
+        </div>
+        <p class="dl-note">tokens.css &middot; 32 KB</p>
+      </section>
+
+      <!-- 05 · WHAT ISN'T HERE -->
+      <section class="dl-sec" id="not-here">
+        <h2>What isn&rsquo;t here</h2>
+        <p>Deck templates, the lead-magnet shell and the dashboard kit ship with the Claude plugin
+           rather than as loose files — a template that gets downloaded is a template that goes
+           stale. Icons come from Phosphor over CDN, so there is nothing to take there either.</p>
+        <div class="dl-outs">
+          <a class="dl-out" href="/internal/claude-plugin">Claude Plugin
+            <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M224.49,136.49l-72,72a12,12,0,0,1-17-17L187,140H40a12,12,0,0,1,0-24H187L135.51,64.48a12,12,0,0,1,17-17l72,72A12,12,0,0,1,224.49,136.49Z"/></svg></a>
+          <a class="dl-out" href="/internal/tools">Tools &amp; Templates
+            <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M224.49,136.49l-72,72a12,12,0,0,1-17-17L187,140H40a12,12,0,0,1,0-24H187L135.51,64.48a12,12,0,0,1,17-17l72,72A12,12,0,0,1,224.49,136.49Z"/></svg></a>
+        </div>
+        <p class="dl-note dl-note--lock">
+           <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z"/></svg>
+           <span>Both are for Gushwork internal use and need a Google sign-in —
+           signed out, they show as locked.</span></p>
+      </section>
+
     </div>
   </div>
+
+  <!-- On this page — same `.idx` rail the Style Guide uses -->
+  <nav class="idx" aria-label="On this page" data-collapsed="false">
+    <div class="idx__t">
+      <button class="idx__col" type="button" data-idx-collapse aria-expanded="true"
+              aria-controls="dl-toc" aria-label="Collapse the section list">
+        <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M184.49,136.49l-80,80a12,12,0,0,1-17-17L159,128,87.51,56.49a12,12,0,1,1,17-17l80,80A12,12,0,0,1,184.49,136.49Z"/></svg>
+      </button>
+      <svg class="idx__ico" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z"/></svg>
+      <span>On this page</span>
+    </div>
+    <div class="idx__list" id="dl-toc">
+      <a href="#logo">Our logo</a>
+      <a href="#color-sheet">Color sheet</a>
+      <a href="#fonts">Fonts</a>
+      <a href="#tokens">Tokens</a>
+      <a href="#not-here">What isn&rsquo;t here</a>
+    </div>
+  </nav>
 </div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* -- format sets ----------------------------------------------------------
+     Every entry below points at a file that exists in the repo. The rasters are
+     generated from the SVGs, so the SVG stays the source of truth and nothing
+     here is hand-exported. */
+  var CARET = '<svg class="cv" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">' +
+    '<path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg>';
+
+  /* JPEG cannot hold transparency, so each treatment is flattened onto the
+     ground it is FOR — the white marks onto Brandeis Blue, the rest onto white. */
+  function logoSet(slug) {
+    return [
+      { label: '.svg', note: 'vector',   href: '/assets/logo/gushwork-' + slug + '.svg' },
+      { label: '.png', note: '1000 px',  href: '/assets/logo/png/gushwork-' + slug + '-1000.png' },
+      { label: '.png', note: '2000 px',  href: '/assets/logo/png/gushwork-' + slug + '-2000.png' },
+      { label: '.jpg', note: '2000 px',  href: '/assets/logo/jpg/gushwork-' + slug + '-2000.jpg' }
+    ];
+  }
+  var SETS = {
+    sheet:  [ { label: '.pdf', note: 'A4 · 2 pages', href: '/assets/color/gushwork-colors.pdf' },
+              { label: '.pdf', note: 'one page',    href: '/assets/color/gushwork-colors-1page.pdf' } ],
+    swatch: [ { label: '.ase', note: 'Adobe', href: '/assets/color/gushwork-colors.ase' },
+              { label: '.clr', note: 'macOS', href: '/assets/color/gushwork-colors.clr' } ],
+    tokens: [ { label: '.css',  note: '32 KB',  href: '/foundation/tokens.css' },
+              { label: '.json', note: '290 tokens', href: '/foundation/tokens.json' },
+              { label: '.scss', note: 'variables',  href: '/foundation/tokens.scss' },
+              { label: 'Tailwind theme', note: '.js', href: '/foundation/tailwind-theme.js' } ]
+  };
+
+  /* -- build every action cell --------------------------------------------- */
+  var seq = 0;
+  [].forEach.call(document.querySelectorAll('.c-act[data-asset]'), function (cell) {
+    var kind = cell.getAttribute('data-formats');
+    var items = kind && SETS[kind] ? SETS[kind] : logoSet(cell.getAttribute('data-slug'));
+
+    var id = 'dlm-' + (++seq);
+    var asset = cell.getAttribute('data-asset');
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'dl-btn';
+    btn.setAttribute('aria-haspopup', 'true');
+    btn.setAttribute('aria-expanded', 'false');
+    btn.setAttribute('aria-controls', id);
+    btn.innerHTML = '<span>Download</span>' + CARET +
+      '<span class="gw-sr"> ' + asset + '</span>';
+
+    var menu = document.createElement('div');
+    menu.className = 'dl-menu';
+    menu.id = id;
+    menu.hidden = true;
+    menu.setAttribute('role', 'menu');
+    menu.setAttribute('aria-label', 'Download ' + asset + ' as');
+
+    items.forEach(function (it) {
+      var row = document.createElement('a');
+      row.href = it.href;
+      row.setAttribute('download', '');
+      row.className = 'dl-mi';
+      row.setAttribute('role', 'menuitem');
+      row.tabIndex = -1;
+      row.innerHTML = '<span>' + it.label + '</span>' +
+                      '<span class="r">' + it.note + '</span>';
+      menu.appendChild(row);
+    });
+
+    var wrap = document.createElement('span');
+    wrap.className = 'dl-act';
+    wrap.appendChild(btn);
+    wrap.appendChild(menu);
+    cell.appendChild(wrap);
+  });
+
+  /* -- one open menu at a time --------------------------------------------- */
+  function closeAll(except) {
+    [].forEach.call(document.querySelectorAll('.dl-menu'), function (m) {
+      if (m === except) return;
+      m.hidden = true;
+      var b = document.getElementById(m.id) && document.querySelector('[aria-controls="' + m.id + '"]');
+      if (b) b.setAttribute('aria-expanded', 'false');
+    });
+  }
+
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest ? e.target.closest('.dl-btn[aria-controls]') : null;
+
+    if (btn) {
+      var menu = document.getElementById(btn.getAttribute('aria-controls'));
+      var open = menu.hidden;
+      closeAll(open ? menu : null);
+      menu.hidden = !open;
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (open) { var f = menu.querySelector('.dl-mi'); if (f) f.focus(); }
+      return;
+    }
+
+    if (!(e.target.closest && e.target.closest('.dl-menu'))) closeAll(null);
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      var open = document.querySelector('.dl-menu:not([hidden])');
+      if (!open) return;
+      var b = document.querySelector('[aria-controls="' + open.id + '"]');
+      closeAll(null);
+      if (b) b.focus();
+      return;
+    }
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+    var menu = e.target.closest && e.target.closest('.dl-menu');
+    if (!menu) return;
+    e.preventDefault();
+    var rows = [].slice.call(menu.querySelectorAll('.dl-mi'));
+    var i = rows.indexOf(document.activeElement);
+    var next = e.key === 'ArrowDown' ? i + 1 : i - 1;
+    if (next < 0) next = rows.length - 1;
+    if (next >= rows.length) next = 0;
+    rows[next].focus();
+  });
+
+  /* -- copy the raw token URL ------------------------------------------------ */
+  var copy = document.querySelector('[data-copy]');
+  if (copy) {
+    copy.addEventListener('click', function () {
+      var url = location.origin + copy.getAttribute('data-copy');
+      var label = copy.querySelector('[data-copy-label]');
+      function done(ok) {
+        label.textContent = ok ? 'Copied' : 'Press ⌘C';
+        setTimeout(function () { label.textContent = 'Copy raw URL'; }, 1600);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(function () { done(true); },
+                                                function () { done(false); });
+      } else { done(false); }
+    });
+  }
+
+  /* -- TOC: collapse + scroll spy (same behaviour as the Style Guide) -------- */
+  var idx = document.querySelector('.idx');
+  var col = document.querySelector('[data-idx-collapse]');
+  if (col && idx) {
+    col.addEventListener('click', function () {
+      var next = idx.getAttribute('data-collapsed') !== 'true';
+      idx.setAttribute('data-collapsed', next ? 'true' : 'false');
+      col.setAttribute('aria-expanded', next ? 'false' : 'true');
+      col.setAttribute('aria-label', next ? 'Expand the section list' : 'Collapse the section list');
+    });
+  }
+  var links = [].slice.call(document.querySelectorAll('.idx__list a'));
+  var secs = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+  function spy() {
+    var best = 0;
+    for (var i = 0; i < secs.length; i++) {
+      if (secs[i] && secs[i].getBoundingClientRect().top <= 140) best = i;
+    }
+    links.forEach(function (a, i) { a.classList.toggle('now', i === best); });
+  }
+  var t = false;
+  addEventListener('scroll', function () {
+    if (t) return; t = true;
+    requestAnimationFrame(function () { t = false; spy(); });
+  }, { passive: true });
+  spy();
+})();
+</script>
 
 </body></html>
