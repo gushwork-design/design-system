@@ -112,6 +112,101 @@
       "kind": "fold",
       "provenance": "built-here",
       "note": "No Figma component. Measured off web/internal/staging/ai-crm-lander/index.html."
+    },
+    "stat-strip": {
+      "version": "1.47.0",
+      "changed": "2026-09-24",
+      "breaking": false,
+      "doc": "built-here.json",
+      "kind": "fold-element",
+      "provenance": "built-here",
+      "note": "Three-stat row under the hero's proof ticks. No Figma component and no equivalent in the ad-page hero, which carries ticks but no numbers. Built for the AI-services lander because the brief specifies one. Tokens only: --gw-text-h6 for the figure, --gw-text-body-12-med for the label. See notices/2026-09-24-ai-services-lander.md."
+    },
+    "slot-icon": {
+      "version": "1.47.0",
+      "changed": "2026-09-24",
+      "breaking": false,
+      "doc": "built-here.json",
+      "kind": "fold-element",
+      "provenance": "built-here",
+      "note": "A simplified .slot for the features fold: one large reused Phosphor icon on the same neutral-50 card, in place of the reference lander's animated product mockups. Exists because those mockups are CRM-specific and have no equivalent for other service lines without inventing product detail. Tokens only. See notices/2026-09-24-ai-services-lander.md."
+    },
+    "form-microcopy": {
+      "version": "1.47.0",
+      "changed": "2026-09-24",
+      "breaking": false,
+      "doc": "built-here.json",
+      "kind": "fold-element",
+      "provenance": "built-here",
+      "note": "Privacy line (.form-legal) and secondary text CTA (.form-alt) under the hero form's submit. The measured ad-page form carries neither; briefs keep asking for both. Tokens only. See notices/2026-09-24-ai-services-lander.md."
+    }
+  },
+  "review": {
+    "eyebrow-ad-page": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-09-23",
+      "fingerprint": "fcd5a7caaabe5137"
+    },
+    "hero-primary": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-09-23",
+      "fingerprint": "ad7ce6d84fcf1593"
+    },
+    "hero-alternate": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-09-23",
+      "fingerprint": "95a30623feac5283"
+    },
+    "video": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-09-23",
+      "fingerprint": "18ef5965c91a8967"
+    },
+    "features": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-09-23",
+      "fingerprint": "88d5e945ba6c85cc"
+    },
+    "timeline": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-09-23",
+      "fingerprint": "9b05a5de733ba6dc"
+    },
+    "faqs": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-09-23",
+      "fingerprint": "6f2d345582ae5b96"
+    },
+    "footer-with-cta": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-09-23",
+      "fingerprint": "4de7279c8e49bdf8"
+    },
+    "footer-minimal": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-09-23",
+      "fingerprint": "ce82b606097a134b"
+    },
+    "ai-agents": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-09-23",
+      "fingerprint": "54983f18fe335372"
+    },
+    "comparison-table": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-09-23",
+      "fingerprint": "177e1db101ac0493"
     }
   }
 }

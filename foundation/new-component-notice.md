@@ -60,6 +60,25 @@ which turns a list into a review.
 Commit and push the file **before** you give the message — the link must resolve. An
 uncommitted path is a dead link.
 
+## 0. Check before you build, not just before you notify
+
+Before treating something as missing, read the surface's `component-registry.json`
+`components` block for an entry that already covers the same gap — **regardless of its
+review status.** A `pending` entry there means someone already proposed this; reuse its
+spec instead of inventing a second, slightly different one, and say so in your notice
+("reusing the pending proposal from `notices/<date>-<slug>.md`"). This is the one case
+where reading an unreviewed entry is required — it's still never citable as *settled* until
+`bash scripts/review-pass.sh <surface> <key>` says so, but that's a different question from
+whether you're allowed to look at it before building.
+
+## 1a. Skip this whole section if the person you're talking to is the reviewer
+
+The four-line block below exists to bridge *requester ≠ reviewer* — someone building a page
+who cannot themselves render an Add/Promote/Replace/Revert verdict. If the person you're
+talking to already has that authority (they approve component passes, decide what ships),
+relaying a message to themselves is pure ceremony. Say directly what was built, that it's
+new/unreviewed, and where the notice file is — done.
+
 ## 2. Give exactly this, and nothing more
 
 One short lead-in line, one fenced block, one link:
@@ -87,7 +106,17 @@ people to ignore the real ones.
 
 ## Getting it to Slack
 
-**Works today, no setup:** the block copies in one action and
+**Preferred when it is configured:** `bash scripts/notify-slack.sh "<the four lines>"` posts
+the notice straight to the design-review channel via `GUSHWORK_SLACK_WEBHOOK`, so nobody
+relays anything by hand. It is a silent no-op when that variable is unset, so it is always
+safe to reach for — if it did nothing, fall back to the copy-and-paste block below.
+
+**Ask once per session before the first send, every session.** Posting a message on
+someone's behalf is not something to assume standing permission for, and one yes earlier
+today is not a yes tomorrow. After they agree once, use it for the rest of that session
+without asking again.
+
+**Works with no setup at all:** the block copies in one action and
 `https://gushwork.slack.com/team/U06UAR183TR` opens the DM.
 
 **Be straight about the limit.** Slack has no URL parameter that pre-fills DM text —
