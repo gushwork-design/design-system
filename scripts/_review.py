@@ -126,7 +126,7 @@ def record(scope, key, state, note=""):
     where = save(scope, data)
     print(f"✔ {scope}/{key} → {state} ({rec['reviewedBy']}, {rec['reviewedOn']})")
     print(f"  written to {where}")
-    print("  regenerate the page:  bash scripts/component-library.sh")
+    print("  regenerate the page:  bash scripts/library-site.sh")
 
 
 def report(strict=False):

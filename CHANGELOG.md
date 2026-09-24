@@ -24,6 +24,7 @@ reports its own stale date.**
 
 | Version | Date | What changed | Commit | Session |
 |---|---|---|---|---|
+| **v1.49.0** | 24 Sep 2026 20:17 | Withdraw the three ad-page elements, and R26 — pages are built from templates, not from other pages | [`f06d59f`](https://github.com/gushwork-design/design-system/commit/f06d59ffb9ad8de3e11ab445e629832d96b14861) | [AEO ad lander](claude://resume/4bd963f4-cb45-46af-a030-5141ddb9025a) |
 | **v1.48.0** | 23 Sep 2026 11:59 | The ad-page template, the measured FAQ accordion, and the OG and favicon rule for ad pages | [`1a5587f`](https://github.com/gushwork-design/design-system/commit/1a5587fbaca0a5bc0b2cfa00fe5a65d3f5572fe2) | [AI-CRM ad lander](claude://resume/cda8dcc2-e096-4513-a2e2-c42f8d692009) |
 | **v1.47.0** | 23 Sep 2026 11:00 | Component library as a site at /library, the ad-page fold set, and the review-pass gate | [`7dcbbae`](https://github.com/gushwork-design/design-system/commit/7dcbbaea5683dfea7dadd55b6cc87deefd4e85cb) | — |
 | **v1.46.0** | 15 Sep 2026 23:46 | Slides skill, rulings R14-R24, and the site rebuilt from Figma | [`9f87a61`](https://github.com/gushwork-design/design-system/commit/9f87a6106404e481e5596f584d64c73c55343d58) | [Update design.gushwork.ai from Figma](claude://resume/74d271f4-ac22-41c7-9653-fd55db09c839) |
