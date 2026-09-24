@@ -115,5 +115,23 @@
         }
       ]
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/log-usage",
+      "destination": "/api/gw?action=log-usage"
+    },
+    {
+      "source": "/api/post-notice",
+      "destination": "/api/gw?action=post-notice"
+    },
+    {
+      "source": "/api/slack-events",
+      "destination": "/api/gw?action=slack-events"
+    },
+    {
+      "source": "/api/approvals",
+      "destination": "/api/gw?action=approvals"
+    }
   ]
 }
