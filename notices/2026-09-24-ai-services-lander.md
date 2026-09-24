@@ -1,5 +1,14 @@
 # AI services ad lander — new elements and deviations
 
+> **WITHDRAWN 24 Sep 2026.** `stat-strip`, `slot-icon` and `form-microcopy` have been removed
+> from `exports/ad-page/component-registry.json` and `built-here.json`, and their pages are
+> gone from the generated library. Ruled by Utsav: the skill should not be offering these.
+> All three were invented for this lander and measured off a rendered page rather than
+> derived from Figma, and a review pass made them look like library components. The promote
+> commands below no longer apply. This notice is kept as the historical record of how they
+> got there. The CSS still lives inline in this lander's own file; nothing about this page
+> changed.
+
 Built 23–24 Sep 2026. Files: `web/internal/staging/ai-services-lander/index.html`
 (+ `favicon.svg`, `favicon-32.png`, `apple-touch-icon.png`, `og.png`)
 

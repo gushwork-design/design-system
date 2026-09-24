@@ -112,33 +112,6 @@
       "kind": "fold",
       "provenance": "built-here",
       "note": "No Figma component. Measured off web/internal/staging/ai-crm-lander/index.html."
-    },
-    "stat-strip": {
-      "version": "1.47.0",
-      "changed": "2026-09-24",
-      "breaking": false,
-      "doc": "built-here.json",
-      "kind": "fold-element",
-      "provenance": "built-here",
-      "note": "Three-stat row under the hero's proof ticks. No Figma component and no equivalent in the ad-page hero, which carries ticks but no numbers. Built for the AI-services lander because the brief specifies one. Tokens only: --gw-text-h6 for the figure, --gw-text-body-12-med for the label. See notices/2026-09-24-ai-services-lander.md."
-    },
-    "slot-icon": {
-      "version": "1.47.0",
-      "changed": "2026-09-24",
-      "breaking": false,
-      "doc": "built-here.json",
-      "kind": "fold-element",
-      "provenance": "built-here",
-      "note": "A simplified .slot for the features fold: one large reused Phosphor icon on the same neutral-50 card, in place of the reference lander's animated product mockups. Exists because those mockups are CRM-specific and have no equivalent for other service lines without inventing product detail. Tokens only. See notices/2026-09-24-ai-services-lander.md."
-    },
-    "form-microcopy": {
-      "version": "1.47.0",
-      "changed": "2026-09-24",
-      "breaking": false,
-      "doc": "built-here.json",
-      "kind": "fold-element",
-      "provenance": "built-here",
-      "note": "Privacy line (.form-legal) and secondary text CTA (.form-alt) under the hero form's submit. The measured ad-page form carries neither; briefs keep asking for both. Tokens only. See notices/2026-09-24-ai-services-lander.md."
     }
   },
   "review": {
@@ -199,32 +172,14 @@
     "ai-agents": {
       "reviewed": "passed",
       "reviewedBy": "utsav-gushwork",
-      "reviewedOn": "2026-09-23",
-      "fingerprint": "54983f18fe335372"
+      "reviewedOn": "2026-09-24",
+      "fingerprint": "3e6cc593af555197"
     },
     "comparison-table": {
       "reviewed": "passed",
       "reviewedBy": "utsav-gushwork",
-      "reviewedOn": "2026-09-23",
-      "fingerprint": "177e1db101ac0493"
-    },
-    "stat-strip": {
-      "reviewed": "passed",
-      "reviewedBy": "utsav-gushwork",
       "reviewedOn": "2026-09-24",
-      "fingerprint": "aa9d444b208114f1"
-    },
-    "form-microcopy": {
-      "reviewed": "passed",
-      "reviewedBy": "utsav-gushwork",
-      "reviewedOn": "2026-09-24",
-      "fingerprint": "7b0dd41eed19d49c"
-    },
-    "slot-icon": {
-      "reviewed": "passed",
-      "reviewedBy": "utsav-gushwork",
-      "reviewedOn": "2026-09-24",
-      "fingerprint": "3651fa1ee8037e19"
+      "fingerprint": "b3c8426a405d1c76"
     }
   }
 }

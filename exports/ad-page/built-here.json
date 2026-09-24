@@ -8,7 +8,7 @@
     "",
     "HOW THESE WERE MEASURED. The page was rendered and computed styles were harvested off",
     "the two sections, located by the page's own section comments rather than by a class",
-    "name — so the boundary is the page's, not one I chose. Distinct values were then",
+    "name \u2014 so the boundary is the page's, not one I chose. Distinct values were then",
     "checked against foundation/tokens.css. A count is how many elements resolved to that",
     "value, not how many times someone typed it.",
     "",
@@ -34,7 +34,7 @@
           "kind": "type",
           "value": "700 18px/25.2px Vert Grotesk Display",
           "uses": 54,
-          "why": "The display ramp is 60/56/44/38/32/26/22 — there is no 18px step. It is also Bold, and only h1-h4 are 700 (h5/h6 are 600, h7 is 500). So an 18px Bold display style is off the ramp twice over. 54 uses is every agent card title."
+          "why": "The display ramp is 60/56/44/38/32/26/22 \u2014 there is no 18px step. It is also Bold, and only h1-h4 are 700 (h5/h6 are 600, h7 is 500). So an 18px Bold display style is off the ramp twice over. 54 uses is every agent card title."
         }
       ]
     },
@@ -58,7 +58,7 @@
           "kind": "type",
           "value": "700 16px/24px Inter",
           "uses": 17,
-          "why": "The body ramp at 16px is reg 400, med 500, sem 600. There is no 700. 17 uses — the whole first column of the table."
+          "why": "The body ramp at 16px is reg 400, med 500, sem 600. There is no 700. 17 uses \u2014 the whole first column of the table."
         },
         {
           "kind": "spacing",

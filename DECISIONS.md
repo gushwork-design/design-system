@@ -804,3 +804,74 @@ read from the store as untrusted input.
 **Still open.** The catalogue and the review sheet are to be merged into one page; Access Control
 is a third, separate page and does not absorb either of them. The Figma rail (683:5282) draws
 three admin rows because it assumed a rename — the rail has four until that merge happens.
+
+---
+
+## R26 — build from `templates/`, never from another built page
+
+**Every Gushwork page starts as a `cp -r` of the matching folder in `templates/`. Never copy,
+open, or take structure from a page that has already shipped — not a sibling lander, not a
+worked example, however close a match it looks.** **Ruled 24 Sep 2026 by Utsav.**
+
+| Deliverable | Template |
+|---|---|
+| Ad landing page | `skills/gushwork-web/templates/ad-page/` |
+| Case study | `skills/gushwork-web/templates/case-study/` |
+| Lead magnet PDF | `templates/lead-magnet/` |
+| Slide deck | `templates/slide-deck/` |
+
+**Why.** A shipped page carries the previous campaign's real client content — named customers,
+their photographs, their quotes — and none of it announces itself. It reads as copy you wrote
+until somebody checks. Building the AEO lander from `ai-crm-lander/` on 24 Sep 2026 meant
+hand-stripping a real testimonial, and its avatar came within one step of shipping under a
+different company's byline: exactly the failure R24 clause 4 names, arrived at from a different
+direction. R24 forbids the outcome. R26 removes the opportunity.
+
+The second reason is drift. Copying the nearest lander means each page inherits the last one's
+divergences as well as its structure, and the template stops being the thing anyone builds from.
+A template nobody copies is documentation, not a template.
+
+**The tax, and why it is not an argument against this rule.**
+
+`templates/ad-page/` tokenises its **campaign layer only** — 23 tokens covering the meta block,
+the hero, the form, both testimonials and the closing CTA. Everything between them is literal
+AI CRM copy that ships as written: the problem fold's heading, the four feature rows, the eight
+agents, the four onboarding steps, the comparison table's two competitor columns, and the six
+FAQs. Its README calls this "product truth — correct as written," which is true **for another
+campaign against the CRM offer** and false for any other product.
+
+So a non-CRM lander rewrites those folds. The AEO page rewrote three of them and dropped the
+other three. **That cost is expected and is not grounds for going back to copying a lander** —
+copying one costs the same rewrite *plus* the client-content hazard. Budget for it.
+
+The real conclusion is that a **product-agnostic ad template**, one that tokenises the body
+folds too, does not exist and should. Until it does, expect the body rewrite on every lander
+that is not selling the CRM.
+
+**The carve-out: cleared content, never structure.** Testimonials for an ad lander are taken
+from `web/internal/staging/ai-crm-lander` and stay the same unless Utsav asks otherwise —
+Stephanie Snyder (hero) and Ryan Cimo (closing CTA), each with the avatar that belongs to that
+byline. Utsav cleared that content on 24 Sep 2026. Taking cleared *content* from a shipped page
+is permitted; taking its structure or layout as reference is not. R24 clause 4 still governs:
+never move a photograph onto a quote its subject did not give.
+
+**Scope.** `skills/gushwork-web/examples/` exists to be **read**, not copied — that split is the
+whole point of it. `check-placeholders.sh` checks `examples/` and skips `templates/`, which is
+how a half-filled copy is caught before it ships.
+
+**On discoverability, and a correction.** This ruling was first drafted claiming the skill file
+did not document `templates/ad-page/`. That was wrong. `skills/gushwork-web/SKILL.md` names it
+in the decision table, in the templates table, in the copy command, and tells you outright:
+*"Before you reach for the fold set at all, check `templates/ad-page/`."* All of it landed in
+`fd458cb`, alongside the template itself. The session that drafted this was reading a **stale
+v1.47.0 plugin cache**, cut before that commit, and mistook its own staleness for a hole in the
+system.
+
+Two things follow. **Check the plugin version before reporting a gap in the system** — a missing
+row is far more often a stale cache than a real omission, and `claude plugin update` is cheaper
+than a wrong ruling. And **the repo is the source; the cache is a copy** — when they disagree,
+read the repo.
+
+One real gap does remain: `scripts/_search_index.py` points at a non-existent
+`internal/mini-tools.html`, so the Tools & Templates page is absent from the site's search index
+and no template name is findable in it.
