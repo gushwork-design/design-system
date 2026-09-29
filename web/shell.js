@@ -83,6 +83,10 @@
     {
       label: 'For internal use',
       tier: 'internal',
+      /* The ONLY group that draws a padlock. Ruled by Utsav 29 Sep 2026 — the
+         badge is a display decision, not an access one, so it is flagged here
+         rather than inferred from `tier`, which the GTM group shares. */
+      lock: true,
       items: [
         { label: 'Claude Plugin', href: '/internal/claude-plugin', icon: 'sparkle' },
         { label: 'Tools & Templates', href: '/internal/tools',     icon: 'toolbox' },
@@ -91,7 +95,8 @@
     },
     /* Staging is drawn as its own group in 683:5282 because it is a GTM
        surface, not a design-system one. Same `internal` tier for the item's
-       own lock badge, but the GROUP itself only renders for the `gtm` group
+       own access rule, but it draws NO padlock (no `lock` flag) — ruled 29 Sep
+       2026. The GROUP itself only renders for the `gtm` group
        (managed at /admin/access-control) or an admin — everyone else does
        not see the section at all, rather than seeing a link that 403s. */
     {
@@ -143,7 +148,7 @@
   /* `modes` says which doors are open. Until the Google OAuth client exists
      the site runs on a shared password, so the modal has to be able to render
      either form — or both, once Google is configured alongside it. */
-  var session = { signedIn: false, admin: false, email: null, name: null,
+  var session = { signedIn: false, admin: false, owner: false, email: null, name: null,
                   picture: null, groups: [], modes: { google: false, password: true },
                   gate: false };
 
@@ -287,7 +292,10 @@
         '<button class="gw-theme__btn" type="button" data-theme-trigger ' +
                 'aria-haspopup="menu" aria-expanded="false" ' +
                 'aria-label="Colour theme: ' + esc(current.label) + '">' +
-          icon(current.icon) +
+          /* A constant display glyph, per Figma 791:2637 — the trigger says
+             "theme lives here", it does not mirror the current state. The menu
+             below is what shows which one is active. */
+          icon('desktop') +
         '</button>' +
         '<div class="gw-theme__menu" role="menu" hidden>' +
           THEMES.map(function (t) {
@@ -307,18 +315,16 @@
     var locked = session.gate &&
                  ((tier === 'internal' && !session.signedIn) ||
                   (tier === 'admin'    && !session.admin));
-    /* Behind the gate but open to you: 683:5282 State2 keeps the badge and
-       swaps the glyph for an OPEN padlock, so the rail still says which pages
-       are gated once you are inside. Ruled by Utsav 16 Sep 2026.
-
-       `internal` only: State2 badges the internal and GTM rows and leaves the
-       ADMIN group bare (683:5714-5716 carry no badge div). A row you can only
-       see because you are an admin does not need telling you it is private. */
-    var unlocked = session.gate && !locked && tier === 'internal';
+    /* SUPERSEDES the 16 Sep 2026 ruling, which kept the badge after sign-in and
+       swapped it for an open padlock. Ruled again by Utsav 29 Sep 2026: the lock
+       is a closed door, so once you are through it there is nothing to say. It
+       now shows only while signed out, and only on the group that sets `lock`.
+       The open-padlock state is gone; `lock-open` stays in the icon set because
+       the access-control table still uses it. */
+    /* No per-row badge any more — the group label carries the one lock. `locked`
+       still decides whether the row is a button that opens the modal. */
+    var badge = '';
     var cur = isCurrent(item.href) ? ' aria-current="page"' : '';
-    var badge = locked   ? '<span class="gw-lock" title="Sign in to open this">' + icon('lock') + '</span>'
-              : unlocked ? '<span class="gw-lock gw-lock--open" title="Behind the gate, open to you">' + icon('lock-open') + '</span>'
-              : '';
     var inner = icon(item.icon) +
       '<span class="gw-navitem__text">' + esc(item.label) + '</span>' + badge;
 
@@ -330,10 +336,82 @@
   }
 
   function groupHTML(g) {
+    /* The padlock is on the LABEL, not on every row — measured 791:4936, where
+       "FOR INTERNAL USE" carries one 12px glyph and the three rows beneath carry
+       none.
+
+       IT SHOWS ONLY WHILE SIGNED OUT. RULED by Utsav 29 Sep 2026, and the ruling
+       is the authority here, NOT the file: both Figma frames draw the lock,
+       including the signed-in one (791:4936), and he confirmed that is a mistake
+       in the drawing. Do not "correct" this back to match the frames — a lock is
+       a closed door, so once you are through it there is nothing left to say.
+       This supersedes the 16 Sep 2026 ruling, which kept the badge after sign-in
+       and swapped it for an open padlock. */
+    var showLock = g.lock && session.gate && !session.signedIn;
+    var lock = showLock
+      ? '<span class="gw-navlabel__lock" title="Sign in to open these">' + icon('lock') + '</span>'
+      : '';
     return '<nav class="gw-navgroup" aria-label="' + esc(g.label) + '">' +
-      '<div class="gw-navlabel">' + esc(g.label) + '</div>' +
+      '<div class="gw-navlabel">' + esc(g.label) + lock + '</div>' +
       g.items.map(function (i) { return itemHTML(i, g.tier); }).join('') +
       '</nav>';
+  }
+
+  /* ---------------------------------------------------------------------------
+     THE PROFILE MARK. Measured off Figma Q9L6q38dEj3Qu1JkjiT13y 791:2938 at 1:1:
+     a 40x40 tile, a 3x3 grid of 5x5 dots on a 7px pitch (5 + 2 gap), the 19x19
+     grid centred in the tile. The radius is the one derived value — the corner
+     arc measures ~7.4 design px, which lands on --gw-radius-8.
+
+     COLOUR IS THE LEVEL and is never random. PATTERN IS THE PERSON, chosen from
+     a fixed twelve by a hash of their email, so the same address always draws the
+     same mark — on every device, in every session, with nothing stored and
+     nothing fetched. Google's avatar is deliberately not used.
+
+     The twelve are generated under a rule rather than drawn: centre cell always
+     filled, four to six dots, every row and column touched, and either symmetric
+     or orthogonally connected. Rotations and mirrors count as one shape. The
+     first two are the admin/team and owner marks from the Figma. See
+     preview/avatars.html for the full set drawn out.
+     ------------------------------------------------------------------------- */
+  var AVATAR_PATTERNS = [190, 341, 151, 403, 186, 149, 343, 189, 179, 307, 95, 159];
+
+  var AVATAR_LEVELS = {
+    owner: { fill: 'var(--gw-color-yellow-300)',   label: 'Owner' },
+    admin: { fill: 'var(--gw-color-black)',        label: 'Admin' },
+    team:  { fill: 'var(--gw-color-primary-300)',  label: 'Gushwork team' }
+  };
+
+  function avatarLevel() {
+    if (session.owner) return 'owner';
+    if (session.admin) return 'admin';
+    return 'team';
+  }
+
+  /* FNV-1a. Small, stable across engines, and good enough to spread a dozen
+     buckets — this picks a picture, it is not protecting anything. */
+  function avatarIndex(seed) {
+    var h = 2166136261, str = String(seed || '').toLowerCase();
+    for (var i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = (h + (h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24)) >>> 0;
+    }
+    return h % AVATAR_PATTERNS.length;
+  }
+
+  function avatarSVG(seed, level) {
+    var mask = AVATAR_PATTERNS[avatarIndex(seed)];
+    var fill = (AVATAR_LEVELS[level] || AVATAR_LEVELS.team).fill;
+    var dots = '';
+    for (var i = 0; i < 9; i++) {
+      if (!(mask >> i & 1)) continue;
+      var r = Math.floor(i / 3), c = i % 3;
+      dots += '<rect x="' + (11 + c * 7) + '" y="' + (11 + r * 7) +
+              '" width="5" height="5" rx="1.5" fill="var(--gw-color-white)"/>';
+    }
+    return '<svg viewBox="0 0 40 40" aria-hidden="true" focusable="false">' +
+             '<rect width="40" height="40" rx="8" fill="' + fill + '"/>' + dots +
+           '</svg>';
   }
 
   function footerHTML() {
@@ -343,19 +421,48 @@
       return '<button class="gw-signin" type="button" data-open-modal>' +
         GOOGLE_G + '<span>Continue with Google</span></button>';
     }
-    var initial = (session.name || session.email || '?').trim().charAt(0).toUpperCase();
-    var avatar = session.picture
-      ? '<img src="' + esc(session.picture) + '" alt="" referrerpolicy="no-referrer">'
-      : esc(initial);
+    /* session.picture (Google's avatar) is deliberately ignored — see the note
+       above avatarSVG. The seed is the address, not the display name, because a
+       name can change and the mark should not. */
+    var level = avatarLevel();
+    var avatar = avatarSVG(session.email || session.name, level);
     return '<div class="gw-user">' +
         '<span class="gw-user__av">' + avatar + '</span>' +
         '<span class="gw-user__txt">' +
           '<span class="gw-user__name" title="' + esc(session.name || session.email) + '">' +
             esc(session.name || session.email) + '</span>' +
-          '<span class="gw-user__role">' + (session.admin ? 'Admin' : 'Gushwork') + '</span>' +
+          '<span class="gw-user__role">' + AVATAR_LEVELS[level].label + '</span>' +
         '</span>' +
         '<button class="gw-user__out" type="button" data-signout aria-label="Sign out">' +
           icon('sign-out') + '</button>' +
+      '</div>';
+  }
+
+  /* REDESIGNED 29 Sep 2026 — Figma 791:4691. There is no full-width topbar any
+     more: the wordmark sits at the top of the rail (measured 791:4933: 198x32 at
+     24,40) and the search field sits under it, inside the rail's own 280 column.
+     `.gw-topbar` still exists but is PHONE ONLY now — it carries the burger,
+     which the rail cannot, because on phone the rail is the thing being opened.
+
+     THE THEME CONTROL IS NOT IN THE FIGMA. Rather than delete a working feature
+     on the strength of it not being drawn, it moves onto the wordmark row here.
+     Flagged to Utsav — if it is meant to go, it is one line. */
+  function railTopHTML() {
+    return '<div class="gw-railtop">' +
+        '<div class="gw-railtop__row">' +
+          '<a class="gw-brand" href="/">' +
+            '<span class="gw-brand__chip' + (INTERNAL_PAGE ? ' gw-brand__chip--internal' : '') +
+                 '" style="color:var(--gw-color-white)">' + MARK + '</span>' +
+            '<span class="gw-brand__name">Gushwork Design</span>' +
+          '</a>' +
+        '</div>' +
+        '<div class="gw-search" data-search-open role="button" tabindex="0" ' +
+             'aria-haspopup="dialog" title="Search  ' + SHORTCUT + '">' +
+          icon('magnifying-glass') +
+          '<input type="search" placeholder="Search any keyword..." tabindex="-1" ' +
+                 'aria-hidden="true">' +
+          '<span class="gw-search__key" aria-hidden="true">' + esc(SHORTCUT) + '</span>' +
+        '</div>' +
       '</div>';
   }
 
@@ -364,9 +471,66 @@
     var end = (session.admin ? '<div class="gw-navgroups">' + groupHTML(ADMIN_GROUP) + '</div>' : '') +
               footerHTML();
     return '<aside class="gw-sidebar" id="gw-rail">' +
+        railTopHTML() +
         '<div class="gw-navgroups">' + groups + '</div>' +
         '<div class="gw-navend">' + end + '</div>' +
       '</aside>';
+  }
+
+  /* ---------------------------------------------------------------------------
+     THE "ON THIS PAGE" RAIL. This used to be copied into each page that wanted
+     one, which is how preview/tools and staging ended up with the markup and no
+     script — the collapse button did nothing at all.
+
+     It also had to move here because the SCROLL SPY WAS BROKEN EVERYWHERE the
+     moment the content panel became its own scrollport: the per-page copies
+     listened on `window`, and the window no longer scrolls. It listens on the
+     panel now, and measures the threshold from the panel's own top edge.
+     ------------------------------------------------------------------------- */
+  function initIndexRail() {
+    var idx = document.querySelector('.idx');
+    if (!idx) return;
+
+    var col = idx.querySelector('[data-idx-collapse]');
+    if (col) {
+      col.addEventListener('click', function () {
+        var next = idx.getAttribute('data-collapsed') !== 'true';
+        idx.setAttribute('data-collapsed', next ? 'true' : 'false');
+        col.setAttribute('aria-expanded', next ? 'false' : 'true');
+        col.setAttribute('aria-label', next ? 'Expand the section list'
+                                            : 'Collapse the section list');
+      });
+    }
+
+    var links = [].slice.call(idx.querySelectorAll('.idx__list a'));
+    if (!links.length) return;
+    var secs = links.map(function (a) {
+      try { return document.querySelector(a.getAttribute('href')); } catch (e) { return null; }
+    });
+
+    /* The scrollport is the panel when there is one, the document otherwise —
+       the login screen and any page rendered without the shell still work. */
+    var port = document.querySelector('.gw-main');
+    var target = port || window;
+
+    function spy() {
+      var origin = port ? port.getBoundingClientRect().top : 0;
+      var best = 0;
+      for (var i = 0; i < secs.length; i++) {
+        if (secs[i] && (secs[i].getBoundingClientRect().top - origin) <= 140) best = i;
+      }
+      for (var j = 0; j < links.length; j++) {
+        links[j].classList.toggle('now', j === best);
+      }
+    }
+
+    var queued = false;
+    target.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(function () { queued = false; spy(); });
+    }, { passive: true });
+    spy();
   }
 
   function modalHTML() {
@@ -473,12 +637,14 @@
       opts[i].classList.toggle('is-on', on);
       opts[i].setAttribute('aria-checked', on ? 'true' : 'false');
     }
-    /* The trigger wears the chosen option's glyph, so the bar shows the answer
-       without the menu being open. */
+    /* The trigger keeps a CONSTANT display glyph — per Figma 791:2637 it says
+       "theme lives here" rather than mirroring the current state, which the open
+       menu already shows with a checked radio. Only the label changes, so the
+       answer is still available to a screen reader without the menu open. */
     var chosen = THEMES.filter(function (t) { return t.id === pref; })[0] || THEMES[0];
     var triggers = document.querySelectorAll('[data-theme-trigger]');
     for (var j = 0; j < triggers.length; j++) {
-      triggers[j].innerHTML = icon(chosen.icon);
+      triggers[j].innerHTML = icon('desktop');
       triggers[j].setAttribute('aria-label', 'Colour theme: ' + chosen.label);
     }
   }
@@ -824,15 +990,19 @@
     shell.appendChild(el(topbarHTML()));
     shell.appendChild(el(sidebarHTML()));
     shell.appendChild(main);
-    /* The phone dock. The artifact notes why this is a duplicate rather than a
-       move: "CSS cannot move a node between parents — the theme JS already
-       keeps every [data-theme-set] in sync." Hidden above the phone
-       breakpoint; the topbar copy is hidden below it. */
+    /* The theme control. It is NOT in the Figma yet (Utsav, 29 Sep: "i havent
+       added theme button yet"), so rather than delete a working feature it sits
+       as a fixed toggle in the bottom-right corner INSIDE the white panel — his
+       own suggested placement. One instance at every width now; the theme JS
+       keeps every [data-theme-set] in sync regardless. */
     shell.appendChild(el(
-      '<div class="gw-phone-dock">' + themeHTML() + '</div>'));
+      '<div class="gw-theme-dock">' + themeHTML() + '</div>'));
     document.body.appendChild(el(modalHTML()));
 
     initTheme();
+    /* After the content has been moved into .gw-main, so the rail and its
+       sections are both inside the panel the spy measures against. */
+    initIndexRail();
     fit();
 
     /* One delegated listener for everything the chrome does. */

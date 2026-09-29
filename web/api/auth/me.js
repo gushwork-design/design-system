@@ -4,7 +4,7 @@
 
    Always 200 — "nobody" is a valid answer, not an error. */
 
-import { COOKIE, verify, readCookie, sessionSecret, authModes, GATE_ENABLED }
+import { COOKIE, verify, readCookie, sessionSecret, authModes, GATE_ENABLED, isOwner }
   from '../_session.js';
 import { loadRules, isAdmin, groupsFor } from '../_access.js';
 
@@ -35,6 +35,9 @@ export default async function handler(req, res) {
     /* No email means the shared-password door, which is admin by design —
        isAdmin() has no address to look up and would draw an empty rail. */
     admin: payload.email ? isAdmin(payload.email, rules) : !!payload.admin,
+    /* The avatar's colour level. Owner is a strict subset of admin, so the shell
+       tests owner first. The shared-password door has no address and is neither. */
+    owner: payload.email ? isOwner(payload.email) : false,
     /* Named groups this address belongs to (e.g. "gtm") — shell.js uses this
        to decide which nav sections to draw, the same rules.groups an admin
        edits at /admin/access-control. */

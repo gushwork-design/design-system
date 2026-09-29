@@ -192,6 +192,17 @@ export function adminEmails() {
   return raw.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
 }
 
+/** Owner is the third avatar level (black). Same shape as ADMIN_EMAILS so there is
+    one way to name people, not two; OWNER_EMAILS overrides the default entirely. */
+export function ownerEmails() {
+  const raw = process.env.OWNER_EMAILS || 'utsav.singh@gushwork.ai';
+  return raw.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+}
+
+export function isOwner(email) {
+  return !!email && ownerEmails().includes(String(email).toLowerCase());
+}
+
 export function isAdmin(email) {
   return !!email && adminEmails().includes(String(email).toLowerCase());
 }

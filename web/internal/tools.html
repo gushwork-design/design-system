@@ -9,116 +9,233 @@
 <link rel="stylesheet" href="/shell.css">
 <script src="/shell.js" defer></script>
 <style>
-  .tools{display:grid;gap:12px}
-  .tool{display:grid;gap:4px;padding:20px 22px;text-decoration:none;
-        background:var(--gw-color-white);border:1px solid var(--gw-color-neutral-100);
-        border-radius:12px;transition:border-color 140ms ease}
-  .tool:hover{border-color:var(--gw-color-primary-500)}
-  .tool:focus-visible{outline:2px solid var(--gw-color-primary-500);outline-offset:2px}
-  .tool__name{font-family:var(--gw-font-display);font-size:16px;font-weight:600;
-              color:var(--gw-color-black)}
-  .tool__what{font-size:14px;line-height:1.55;color:var(--gw-color-neutral-700)}
-  .tool__meta{font-size:12.5px;color:var(--gw-color-neutral-400);margin-top:2px}
+  /* ===========================================================================
+     PAGE SHELL — the same one web/style-guide.html and web/downloads.html use.
+     Only the Overview gets its own treatment (the blue gw-hero); every other page
+     in the sidebar shares this: 1200 column, 60/40/120 padding, a 44px display
+     title over a dotted rule, sections inset by 40, and the shared `.idx` rail.
+     Values mirrored from .sg / .dl rather than re-derived.
+     =========================================================================== */
+  .tl{max-width:1200px;margin:0 auto;
+      padding:var(--gw-space-60) var(--gw-space-40) var(--gw-space-120);
+      display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--gw-space-60)}
+  .tl__main{min-width:0;display:flex;flex-direction:column;gap:var(--gw-space-32)}
+  /* The dotted rule is 2px with a round cap and a [0.1,4] dash — a dot, not a dash. */
+  .tl__hd{padding:0 var(--gw-space-40) var(--gw-space-32);
+          background-image:radial-gradient(circle closest-side,
+                           var(--s-rule) 100%, transparent 100%);
+          background-size:4.1px 2px;background-position:left bottom;
+          background-repeat:repeat-x;
+          display:flex;flex-direction:column;gap:var(--gw-space-20)}
+  .tl__title{margin:0;font:600 44px/1.2 var(--gw-font-display);color:var(--s-heading)}
+  .tl__meta{margin:0;font:var(--gw-text-body-14-med);
+            letter-spacing:var(--gw-text-body-14-med-tracking);
+            color:var(--gw-color-neutral-400)}
+  .tl__body{display:flex;flex-direction:column;gap:var(--gw-space-60)}
+  .tl-sec{padding-left:var(--gw-space-40);display:flex;flex-direction:column;
+          gap:var(--gw-space-20);scroll-margin-top:var(--gw-space-24)}
+  .tl-sec :where(h2){margin:0;font:600 28px/1.2 var(--gw-font-display);color:var(--s-heading)}
+  .tl-sec :where(p){margin:0;font:var(--gw-text-body-18-med);
+            letter-spacing:var(--gw-text-body-18-med-tracking);color:var(--s-body)}
+  .tl-sec :where(p) a{color:inherit;font-weight:600;text-decoration:underline;
+            text-underline-offset:3px;text-decoration-thickness:1px;
+            text-decoration-color:var(--gw-color-neutral-300)}
+  .tl-sec :where(p) a:hover{color:var(--s-heading);text-decoration-color:currentColor}
+  @media(max-width:700px){
+    .tl{padding-left:var(--gw-space-20);padding-right:var(--gw-space-20)}
+    .tl__hd,.tl-sec{padding-left:0}
+    .tl__hd{padding-right:0}
+    .tl__title{font-size:32px}
+  }
 
-  /* A template is not a page you open, so its card is not a link. It states what the thing is
-     and where it lives; you get it by installing the plugin, not by downloading it from here.
-     The catalogue hands over a pointer — a copy taken from a page goes stale the moment the
-     template moves, and nothing tells the person holding it. */
-  .tpl{display:grid;gap:4px;padding:20px 22px;background:var(--gw-color-white);
-       border:1px solid var(--gw-color-neutral-100);border-radius:12px}
-  .tpl__name{font-family:var(--gw-font-display);font-size:16px;font-weight:600;
-             color:var(--gw-color-black)}
-  .tpl__what{font-size:14px;line-height:1.55;color:var(--gw-color-neutral-700)}
-  .tpl__path{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12.5px;
-             color:var(--gw-color-neutral-600);background:var(--gw-color-neutral-25);
-             border:1px solid var(--gw-color-neutral-100);border-radius:6px;
-             padding:3px 8px}
-  .tpl__foot{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
-  /* Copies a prompt rather than pretending to launch anything. These templates only exist
-     once the plugin is installed locally, so a link out to the web would promise something
-     it cannot deliver — the honest action is to hand you the words. */
-  .use{font-family:var(--gw-font-body);font-size:13px;font-weight:600;line-height:1;
-       color:var(--gw-color-black);background:var(--gw-color-white);
-       border:1px solid var(--gw-color-neutral-200);border-radius:10px;
-       padding:9px 14px;cursor:pointer;transition:border-color 140ms ease,color 140ms ease}
+  /* ===========================================================================
+     ITEMS — one per section, six in a row down the page.
+     There are no group headings, so the difference between a thing you OPEN and
+     a thing you COPY is carried entirely by the item's own shape:
+       · a tool    — the whole block is a link, preview bleeds to the edge, and
+                     the bar ends in a travelling arrow
+       · a template — not a link at all, preview inset in a well, and the bar
+                     carries the path plus an explicit Copy prompt button
+     =========================================================================== */
+  :root{
+    --t-card:var(--gw-color-white);
+    --t-card-border:var(--gw-color-neutral-100);
+    --t-well:var(--gw-color-neutral-25);
+    --t-heading:var(--gw-color-black);
+    --t-body:var(--gw-color-neutral-700);
+    --t-muted:var(--gw-color-neutral-600);
+    --t-faint:var(--gw-color-neutral-400);
+  }
+  :root[data-theme="dark"]{
+    --t-card:var(--gw-color-neutral-900);
+    --t-card-border:var(--gw-color-neutral-800);
+    --t-well:var(--gw-color-neutral-800);
+    --t-heading:var(--gw-color-white);
+    --t-body:var(--gw-color-neutral-200);
+    --t-muted:var(--gw-color-neutral-300);
+    --t-faint:var(--gw-color-neutral-400);
+  }
+
+  .item{display:block;background:var(--t-card);border:1px solid var(--t-card-border);
+        border-radius:var(--gw-radius-20);overflow:hidden}
+  /* CHOSEN, not measured: 12/5 for a full-width preview. At the 1012 column that
+     is ~420 tall — enough to read the layout, short enough that six of them do
+     not turn the page into a scroll. Nothing documents a figure for this. */
+  .item__shot{display:block;width:100%;height:auto;aspect-ratio:12/5;object-fit:cover;
+              object-position:top center;background:var(--t-well)}
+  .item__bar{display:flex;align-items:center;gap:var(--gw-space-16);flex-wrap:wrap;
+             padding:var(--gw-space-16) var(--gw-space-20);
+             border-top:1px solid var(--t-card-border)}
+  a.item{text-decoration:none;transition:border-color 140ms ease}
+  a.item:hover{border-color:var(--gw-color-primary-500)}
+  a.item:focus-visible{outline:2px solid var(--gw-color-primary-500);outline-offset:2px}
+  .go{display:flex;align-items:center;gap:var(--gw-space-8);margin-left:auto;
+      font:var(--gw-text-button-14);color:var(--gw-color-primary-600)}
+  .go svg{width:14px;height:14px;fill:currentColor;transition:transform 140ms ease}
+  a.item:hover .go svg{transform:translateX(3px)}
+
+  .well{padding:var(--gw-space-16);background:var(--t-well)}
+  .well img{display:block;width:100%;height:auto;aspect-ratio:12/5;object-fit:cover;
+            object-position:top center;border-radius:var(--gw-radius-8);
+            border:1px solid var(--t-card-border)}
+
+  /* Chips follow web/downloads.html's .dl-chip exactly — Badge Color=Neutral,
+     Size=Small semantics. No signal is carried by colour; the word is the label. */
+  .chips{display:flex;flex-wrap:wrap;gap:var(--gw-space-8)}
+  .chip{padding:var(--gw-space-4) var(--gw-space-8);border-radius:var(--gw-radius-8);
+        background:var(--gw-color-neutral-25);color:var(--t-muted);
+        font:var(--gw-text-button-12);line-height:16px}
+  :root[data-theme="dark"] .chip{background:var(--gw-color-neutral-800)}
+
+  .path{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px;
+        color:var(--t-muted);background:var(--gw-color-neutral-25);
+        border:1px solid var(--t-card-border);border-radius:var(--gw-radius-8);
+        padding:var(--gw-space-4) var(--gw-space-8);overflow-wrap:anywhere}
+  :root[data-theme="dark"] .path{background:var(--gw-color-neutral-800)}
+  .use{margin-left:auto;font:var(--gw-text-button-14);color:var(--t-heading);
+       background:var(--t-card);border:1px solid var(--gw-color-neutral-200);
+       border-radius:var(--gw-radius-8);padding:var(--gw-space-8) var(--gw-space-16);
+       cursor:pointer;transition:border-color 140ms ease,color 140ms ease}
   .use:hover{border-color:var(--gw-color-primary-500);color:var(--gw-color-primary-600)}
   .use:focus-visible{outline:2px solid var(--gw-color-primary-500);outline-offset:2px}
   .use[data-done="1"]{border-color:var(--gw-color-primary-500);color:var(--gw-color-primary-600)}
-  .use__hint{font-size:12.5px;color:var(--gw-color-neutral-400)}
-  .lede{font-size:14px;line-height:1.6;color:var(--gw-color-neutral-700);margin:0 0 4px;max-width:70ch}
-  .lede a{color:var(--gw-color-primary-600)}
+  :root[data-theme="dark"] .use{border-color:var(--gw-color-neutral-700)}
 </style>
 </head>
 <body data-gw-page="tools">
 
-<div class="gw-col">
-  <div class="gw-section gw-stack-40">
-    <div class="gw-prose gw-stack-20">
-      <h2>Tools &amp; Templates</h2>
-      <p>The small utilities that mint official assets, and the starting points you copy
-         rather than rebuild.</p>
-    </div>
+<div class="tl">
+  <div class="tl__main">
 
-    <div class="gw-prose gw-stack-20">
-      <h3>Tools</h3>
-      <p class="lede">Hosted here. Open one, fill it in, export.</p>
-    </div>
-    <div class="tools">
-      <a class="tool" href="/internal/employee-id-card">
-        <span class="tool__name">Employee ID Card Generator</span>
-        <span class="tool__what">Fills a card from a name, role and photo, then exports print-ready
-          PNG and PDF for front and back.</span>
-        <span class="tool__meta">Moved here 15 Sep 2026 from its own Vercel project · no backend</span>
-      </a>
-      <a class="tool" href="/internal/email-signature">
-        <span class="tool__name">Email Signature Creator</span>
-        <span class="tool__what">Builds an on-brand email signature from a name, title and photo,
-          ready to paste straight into Gmail or Outlook.</span>
-        <span class="tool__meta">Moved here 15 Sep 2026 from a private Netlify project · no backend</span>
-      </a>
-    </div>
+    <header class="tl__hd">
+      <h1 class="tl__title">Tools &amp; templates</h1>
+      <p class="tl__meta">Last updated 29th Sep, 2026</p>
+    </header>
 
-    <div class="gw-prose gw-stack-20">
-      <h3>Templates</h3>
-      <p class="lede">These are not downloads. Each one lives in the design system itself, so
-         <a href="/internal/claude-plugin">installing the plugin</a> is how you get them — and how
-         you keep getting them when they change. Copy a template to a new name and fill it in;
-         tokens, fonts and brand assets resolve out of the repo, so no template owns its own copy
-         of anything.</p>
-    </div>
-    <div class="tools">
-      <div class="tpl">
-        <span class="tpl__name">Ad landing page</span>
-        <span class="tpl__what">The paid-ad lander. Form-first hero, proof ticks, logo ticker,
-          testimonial, media fold, four feature rows, the agent marquee, a four-step timeline, a
-          comparison table, FAQs with an ask-anything row, and the closing CTA. Every campaign
-          string is a token — <code>check-placeholders.sh</code> fails while any remain. Ships with
-          an <code>og-source.html</code> and the favicon set. Nothing to build — open it in a browser.</span>
-        <span class="tpl__foot"><code class="tpl__path">skills/gushwork-web/templates/ad-page/</code><button class="use" type="button" data-prompt="Use the Gushwork ad-page template at skills/gushwork-web/templates/ad-page/ to build a paid-ad landing page. Copy the folder to a new campaign slug first, then fill in its tokens from the brief I give you next. Leave the product truth alone — the eight agents, the four onboarding steps, the comparison rows and the six FAQs are correct as written. Never fabricate a client logo, name or quote. Re-render og.png from og-source.html with the page's own H1, and run check-placeholders.sh before it goes anywhere.">Use in Claude</button><span class="use__hint">copies a prompt</span></span>
-      </div>
-      <div class="tpl">
-        <span class="tpl__name">Case study page</span>
-        <span class="tpl__what">One customer story, told as a page. Hero with the outcome numbers,
-          a prose column with a sticky rail CTA, and the closing CTA fold. Ships with an
-          <code>og-source.html</code> for the social card. Nothing to build — open it in a browser.</span>
-        <span class="tpl__foot"><code class="tpl__path">skills/gushwork-web/templates/case-study/</code><button class="use" type="button" data-prompt="Use the Gushwork case-study page template at skills/gushwork-web/templates/case-study/ to build a case study page. Copy the folder to a new client slug first, then fill it in from the brief I give you next. Keep every value on the design system's tokens.">Use in Claude</button><span class="use__hint">copies a prompt</span></span>
-      </div>
-      <div class="tpl">
-        <span class="tpl__name">Lead magnet</span>
-        <span class="tpl__what">The downloadable PDF behind an ad landing page. US Letter, nine
-          pages, print-ready and text-selectable. Render it with <code>render.sh</code>.</span>
-        <span class="tpl__foot"><code class="tpl__path">templates/lead-magnet/</code><button class="use" type="button" data-prompt="Use the Gushwork lead-magnet template at templates/lead-magnet/ to build a lead magnet from the brief I give you next. It is US Letter, nine pages, print-ready. Render it with render.sh when the content is done.">Use in Claude</button><span class="use__hint">copies a prompt</span></span>
-      </div>
-      <div class="tpl">
-        <span class="tpl__name">Slide deck</span>
-        <span class="tpl__what">The base for every Gushwork deck. Eleven layouts at 1920 × 1080 on
-          the blue blueprint ground. The reference build doubles as the layout library.</span>
-        <span class="tpl__foot"><code class="tpl__path">templates/slide-deck/</code><button class="use" type="button" data-prompt="Use the Gushwork slide-deck template at templates/slide-deck/ to build a deck from the brief I give you next. Eleven layouts at 1920x1080 are already in it — pick from them rather than inventing new ones.">Use in Claude</button><span class="use__hint">copies a prompt</span></span>
-      </div>
+    <div class="tl__body">
+
+      <section class="tl-sec">
+        <p>The small utilities that mint official assets, and the starting points you copy rather
+        than rebuild. The first two are hosted here — open one, fill it in, export. The other four
+        are not downloads: each lives inside the design system, so
+        <a href="/install">installing the plugin</a> is how you get them, and how you keep getting
+        them when they change. Every preview below is a real render of the thing itself.</p>
+      </section>
+
+      <section class="tl-sec" id="employee-id-card">
+        <h2>Employee ID card generator</h2>
+        <p>Fills a card from a name, role and photo, then exports print-ready PNG and PDF for front and back. Moved here 15 Sep 2026 from its own Vercel project.</p>
+        <a class="item" href="/internal/employee-id-card/">
+          <img class="item__shot" src="/assets/tools/tool-employee-id.png" alt="The employee ID card generator, showing the editor panel on the left and the front and back of a card on the right" loading="lazy">
+          <span class="item__bar">
+            <span class="chips"><span class="chip">Hosted here</span><span class="chip">PNG + PDF</span></span>
+            <span class="go">Open the tool <svg viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></span>
+          </span>
+        </a>
+      </section>
+      <section class="tl-sec" id="email-signature">
+        <h2>Email signature creator</h2>
+        <p>Builds an on-brand signature from a name, title and photo, ready to paste straight into Gmail or Outlook. Moved here 15 Sep 2026 from a private Netlify project.</p>
+        <a class="item" href="/internal/email-signature/">
+          <img class="item__shot" src="/assets/tools/tool-email-signature.png" alt="The email signature creator, showing the editor panel on the left and a live signature preview on the right" loading="lazy">
+          <span class="item__bar">
+            <span class="chips"><span class="chip">Hosted here</span><span class="chip">Copy or download HTML</span></span>
+            <span class="go">Open the tool <svg viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></span>
+          </span>
+        </a>
+      </section>
+      <section class="tl-sec" id="ad-landing-page">
+        <h2>Ad landing page</h2>
+        <p>The paid-ad lander. Form-first hero, proof ticks, logo ticker, media fold, four feature rows, the agent marquee, a four-step timeline, a comparison table, FAQs and the closing CTA. Ships with an og-source.html and the favicon set.</p>
+        <div class="item">
+          <div class="well"><img src="/assets/tools/tpl-ad-page.png" alt="The ad landing page template, showing a form-first hero with proof ticks and a client logo ticker" loading="lazy"></div>
+          <div class="item__bar">
+            <span class="chips"><span class="chip">Web</span><span class="chip">23 campaign tokens</span><span class="chip">Opens in a browser</span></span>
+            <code class="path">skills/gushwork-web/templates/ad-page/</code>
+            <button class="use" type="button" data-prompt="Use the Gushwork ad-page template at skills/gushwork-web/templates/ad-page/ to build a paid-ad landing page. Copy the folder to a new campaign slug first, then fill in its tokens from the brief I give you next. Leave the product truth alone — the eight agents, the four onboarding steps, the comparison rows and the six FAQs are correct as written. Never fabricate a client logo, name or quote. Re-render og.png from og-source.html with the page&amp;#x27;s own H1, and run check-placeholders.sh before it goes anywhere.">Copy prompt</button>
+          </div>
+        </div>
+      </section>
+      <section class="tl-sec" id="case-study-page">
+        <h2>Case study page</h2>
+        <p>One customer story, told as a page. Hero with the outcome numbers, a prose column with a sticky rail CTA, and the closing CTA fold. Ships with an og-source.html for the social card.</p>
+        <div class="item">
+          <div class="well"><img src="/assets/tools/tpl-case-study.png" alt="The case study page template, showing the outcome hero with three statistics beneath it" loading="lazy"></div>
+          <div class="item__bar">
+            <span class="chips"><span class="chip">Web</span><span class="chip">25 tokens</span><span class="chip">Opens in a browser</span></span>
+            <code class="path">skills/gushwork-web/templates/case-study/</code>
+            <button class="use" type="button" data-prompt="Use the Gushwork case-study page template at skills/gushwork-web/templates/case-study/ to build a case study page. Copy the folder to a new client slug first, then fill it in from the brief I give you next. Keep every value on the design system&amp;#x27;s tokens.">Copy prompt</button>
+          </div>
+        </div>
+      </section>
+      <section class="tl-sec" id="lead-magnet">
+        <h2>Lead magnet</h2>
+        <p>The downloadable PDF behind an ad landing page. Print-ready and text-selectable, rendered with its own render.sh.</p>
+        <div class="item">
+          <div class="well"><img src="/assets/tools/tpl-lead-magnet.png" alt="The first page of the lead magnet template, a dark cover with a large headline and an illustration" loading="lazy"></div>
+          <div class="item__bar">
+            <span class="chips"><span class="chip">Lead magnet</span><span class="chip">US Letter &middot; 9 pages</span><span class="chip">Render with render.sh</span></span>
+            <code class="path">templates/lead-magnet/</code>
+            <button class="use" type="button" data-prompt="Use the Gushwork lead-magnet template at templates/lead-magnet/ to build a lead magnet from the brief I give you next. It is US Letter, nine pages, print-ready. Render it with render.sh when the content is done.">Copy prompt</button>
+          </div>
+        </div>
+      </section>
+      <section class="tl-sec" id="slide-deck">
+        <h2>Slide deck</h2>
+        <p>The base for every Gushwork deck, on the blue blueprint ground. The reference build doubles as the layout library.</p>
+        <div class="item">
+          <div class="well"><img src="/assets/tools/tpl-slide-deck.png" alt="The cover slide of the deck template, white type on the blue blueprint ground" loading="lazy"></div>
+          <div class="item__bar">
+            <span class="chips"><span class="chip">Slides</span><span class="chip">1920 &times; 1080 &middot; 11 layouts</span><span class="chip">Exports .pptx</span></span>
+            <code class="path">templates/slide-deck/</code>
+            <button class="use" type="button" data-prompt="Use the Gushwork slide-deck template at templates/slide-deck/ to build a deck from the brief I give you next. Eleven layouts at 1920x1080 are already in it — pick from them rather than inventing new ones.">Copy prompt</button>
+          </div>
+        </div>
+      </section>
+
     </div>
   </div>
-</div>
 
+  <!-- On this page — the same shared `.idx` rail the Style Guide and Downloads use -->
+  <nav class="idx" aria-label="On this page" data-collapsed="false">
+    <div class="idx__t">
+      <button class="idx__col" type="button" data-idx-collapse aria-expanded="true"
+              aria-controls="tl-toc" aria-label="Collapse the section list">
+        <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M184.49,136.49l-80,80a12,12,0,0,1-17-17L159,128,87.51,56.49a12,12,0,1,1,17-17l80,80A12,12,0,0,1,184.49,136.49Z"/></svg>
+      </button>
+      <svg class="idx__ico" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z"/></svg>
+      <span>On this page</span>
+    </div>
+    <div class="idx__list" id="tl-toc">
+      <a href="#employee-id-card">Employee ID card</a>
+      <a href="#email-signature">Email signature</a>
+      <a href="#ad-landing-page">Ad landing page</a>
+      <a href="#case-study-page">Case study page</a>
+      <a href="#lead-magnet">Lead magnet</a>
+      <a href="#slide-deck">Slide deck</a>
+    </div>
+  </nav>
+</div>
 
 <script>
 /* Clipboard needs a user gesture and a secure context; both hold here. execCommand is the

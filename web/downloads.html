@@ -75,7 +75,7 @@
 /* -- sections ------------------------------------------------------------- */
 .dl__body{display:flex;flex-direction:column;gap:var(--gw-space-60)}
 .dl-sec{padding-left:var(--gw-space-40);display:flex;flex-direction:column;
-        gap:var(--gw-space-20);scroll-margin-top:calc(60px + var(--gw-space-24))}
+        gap:var(--gw-space-20);scroll-margin-top:var(--gw-space-24)}
 .dl-sec :where(h2){margin:0;font:600 28px/1.2 var(--gw-font-display);color:var(--s-heading)}
 .dl-sec :where(p){margin:0;font:var(--gw-text-body-18-med);
           letter-spacing:var(--gw-text-body-18-med-tracking);color:var(--s-body)}
@@ -611,30 +611,10 @@
     });
   }
 
-  /* -- TOC: collapse + scroll spy (same behaviour as the Style Guide) -------- */
-  var idx = document.querySelector('.idx');
-  var col = document.querySelector('[data-idx-collapse]');
-  if (col && idx) {
-    col.addEventListener('click', function () {
-      var next = idx.getAttribute('data-collapsed') !== 'true';
-      idx.setAttribute('data-collapsed', next ? 'true' : 'false');
-      col.setAttribute('aria-expanded', next ? 'false' : 'true');
-      col.setAttribute('aria-label', next ? 'Expand the section list' : 'Collapse the section list');
-    });
-  }
-  var links = [].slice.call(document.querySelectorAll('.idx__list a'));
-  var secs = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
-  function spy() {
-    var best = 0;
-    for (var i = 0; i < secs.length; i++) {
-      if (secs[i] && secs[i].getBoundingClientRect().top <= 140) best = i;
-    }
-    links.forEach(function (a, i) { a.classList.toggle('now', i === best); });
-  }
-  var t = false;
-  addEventListener('scroll', function () {
-    if (t) return; t = true;
-    requestAnimationFrame(function () { t = false; spy(); });
+  /* The TOC rail is wired by shell.js (initIndexRail) — collapse AND the
+     scroll spy. It moved there on 29 Sep 2026 because each page had its own
+     copy listening on `window`, and the window stopped scrolling when the
+     content panel became its own scrollport. */
   }, { passive: true });
   spy();
 })();

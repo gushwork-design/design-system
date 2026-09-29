@@ -32,7 +32,7 @@
 #
 # TWO WAYS TO POST, and the difference decides whether ✅ can work:
 #
-#   A. via api/post-notice.js  — needs GUSHWORK_NOTICE_TOKEN. The server posts with a bot
+#   A. via api/post-notice (gw.js → _post-notice.js) — needs GUSHWORK_NOTICE_TOKEN. The server posts with a bot
 #      token and records `ts → component`, which is the ONLY way a later ✅ reaction can be
 #      resolved back to what it approved. Pass --surface/--key to enable that.
 #   B. via the Incoming Webhook — needs GUSHWORK_SLACK_WEBHOOK. Posts fine, returns no ts,

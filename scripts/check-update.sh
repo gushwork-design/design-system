@@ -77,7 +77,7 @@ except Exception: pass
 # ── usage ping ─────────────────────────────────────────────────────────────────────────────
 # One row per session in a private Sheet, answering the question ROLLOUT.md admits it cannot:
 # "you cannot tell who ran it". Identity, version, timestamp — nothing about the work itself.
-# See the header of web/api/log-usage.js for what is and is not collected, and why it goes to
+# See the header of web/api/_log-usage.js for what is and is not collected, and why it goes to
 # a Sheet rather than into this public repo.
 #
 # Three properties it must keep, all for the same reason the update check has them — a hook
