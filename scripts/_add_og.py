@@ -24,6 +24,7 @@ import html
 import json
 import os
 import re
+import shutil
 import sys
 
 BASE = "https://design.gushwork.ai"
@@ -83,14 +84,28 @@ def block(url, title, desc):
 
 
 def remember(cards, stage, path, s):
-    """Record route -> [og:title, og:image] for gated pages, read back from the page's own tags."""
+    """Record route -> [title, image, description] for gated pages, read back from the page's own tags.
+
+    A bot cannot fetch an image that sits under /internal or /library (the gate bounces it), so such
+    an image is copied to /assets/og/ in the stage and the map points there."""
     r = route(stage, path)
     if not (r.startswith("/internal") or r.startswith("/library")):
         return
     t = re.search(r'<meta property="og:title" content="([^"]*)"', s)
     i = re.search(r'<meta property="og:image" content="([^"]*)"', s)
-    if t and i:
-        cards[r.rstrip("/") or "/"] = [html.unescape(t.group(1)), html.unescape(i.group(1))]
+    if not (t and i):
+        return
+    d = re.search(r'<meta property="og:description" content="([^"]*)"', s)
+    image = html.unescape(i.group(1))
+    m = re.match(r"https?://[^/]+(/(?:internal|library)/.*)$", image)
+    if m:
+        src = os.path.join(stage, m.group(1).lstrip("/"))
+        if os.path.exists(src):
+            name = "gated-" + r.strip("/").replace("/", "-") + os.path.splitext(src)[1]
+            os.makedirs(os.path.join(stage, "assets", "og"), exist_ok=True)
+            shutil.copyfile(src, os.path.join(stage, "assets", "og", name))
+            image = f"{BASE}/assets/og/{name}"
+    cards[r.rstrip("/") or "/"] = [html.unescape(t.group(1)), image, html.unescape(d.group(1)) if d else ""]
 
 
 def main(stage):
