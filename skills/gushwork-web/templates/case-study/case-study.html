@@ -121,7 +121,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .cs-inner{width:100%;max-width:var(--cs-content-w);margin:0 auto;padding:0 var(--gw-space-20)}
 
 /* ==========================================================================
-   NAVBAR — navbar/navbar, Type=Brand. Fixed, always opaque — a deliberate
+   NAVBAR — navbar/navbar, Type=Brand (now styled as the ad-page bar, below). Fixed, always opaque — a deliberate
    departure from the live site, which stays transparent over the hero and
    only takes a white-80% background once scrolled (confirmed: `is-scrolled`
    → rgba(255,255,255,.8), the token this file already used). Made fully
@@ -129,18 +129,25 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
    a permanent reading-progress bar — that only reads correctly if the bar
    beneath it is never hidden or half-transparent.
    ========================================================================== */
+/* Matches the ad-page navbar (Figma 1890:42047): opaque neutral/25, a 1px neutral/100 bottom
+   stroke, content on the same 1240 column with 100px side margins, and the CTA carries the
+   arrow. Changed 30 Sep 2026 so the two templates read as one system; the progress bar below
+   is the case study's own and stays. */
 .cs-nav{
   position:fixed;inset:0 0 auto;z-index:100;height:var(--cs-nav-h);
   display:flex;align-items:center;justify-content:space-between;
-  padding:0 var(--cs-gutter);
-  background:var(--gw-color-white);
+  padding:0 max(100px, calc((100% - 1240px) / 2));
+  background:var(--gw-color-neutral-25);
+  border-bottom:1px solid var(--gw-color-neutral-100);
+  box-sizing:border-box;
 }
 /* ONE stroke at the bottom of the navbar, not two — a separate static hairline
    plus this fill read as two parallel lines running together. 4px, full-bleed:
    0% at the top of the page, 100% at the bottom. Width is set by the scroll
    listener below. */
 .cs-nav-progress{
-  position:absolute;left:0;bottom:0;height:4px;width:0%;
+  /* bottom:-1px so the fill sits over the navbar's own 1px stroke rather than beside it. */
+  position:absolute;left:0;bottom:-1px;height:4px;width:0%;
   background:var(--gw-color-primary-500);
   transition:width .1s linear;
 }
@@ -160,15 +167,15 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 }
 .cs-nav-link:hover{background:var(--gw-color-neutral-50)}
 .cs-nav-link svg{width:10px;height:10px;flex:none;fill:currentColor}
-/* Button, Style=Blue/ Filled, Size=Small (34). Figma r6 + 0.89px white@10% stroke. */
+/* The same button the ad-page navbar carries: Blue, Small, with the trailing arrow. */
 .cs-nav-cta{
-  display:inline-flex;align-items:center;justify-content:center;
-  height:32px;padding:var(--gw-space-8) var(--gw-space-12);
+  display:inline-flex;align-items:center;justify-content:center;gap:var(--gw-space-8);
+  height:36px;padding:var(--gw-space-8) var(--gw-space-12);
   background:var(--gw-color-primary-500);color:var(--gw-color-white);
-  border:1px solid var(--gw-color-neutral-alpha-10-white);
-  border-radius:6px; /* OFF-TOKEN: measured 6, ramp has 4 then 8 */
-  font:var(--gw-text-body-14-med);letter-spacing:var(--gw-text-body-14-med-tracking);
+  border-radius:var(--gw-radius-8);
+  font:var(--gw-text-button-14);box-shadow:var(--gw-shadow-s2);
 }
+.cs-nav-cta svg{width:16px;height:16px;flex:none;fill:currentColor}
 .cs-nav-cta:hover{background:var(--gw-color-primary-600)}
 /* Phone-only menu button. Declared before the media query — equal specificity,
    so source order decides. */
@@ -764,7 +771,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
         <a class="cs-nav-link" href="/case-study">Customers</a>
         <a class="cs-nav-link" href="/pricing">Pricing</a>
       </div>
-      <a class="cs-nav-cta" href="https://www.gushwork.ai/demo">Book a Demo</a>
+      <a class="cs-nav-cta" href="https://www.gushwork.ai/demo">Book a Demo <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M204,64V168a12,12,0,0,1-24,0V93L72.49,200.49a12,12,0,0,1-17-17L163,76H88a12,12,0,0,1,0-24H192A12,12,0,0,1,204,64Z"/></svg></a>
       <button class="cs-nav-burger" aria-label="Open menu">
         <svg viewBox="0 0 256 256" aria-hidden="true"><path d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12ZM40 76h176a12 12 0 0 0 0-24H40a12 12 0 0 0 0 24Zm176 104H40a12 12 0 0 0 0 24h176a12 12 0 0 0 0-24Z"/></svg>
       </button>

@@ -47,7 +47,7 @@ correct as written. Edit it when the offer changes, not by reflex per campaign.
 | `{{PROOF_1..3}}` | The three ticks. Also used in the closing CTA note |
 | `{{FORM_HEADING}}` `{{FORM_CTA}}` | Form CTAs stay action-specific — do **not** normalise to `Book a Demo` |
 | `{{EXPERT_VIDEO}}` | The talking-head avatar in the form. A real file, not a data URI — inlining it cost 650KB |
-| `{{QUOTE}}` `{{QUOTE_NAME}}` `{{QUOTE_ROLE}}` | Hero testimonial |
+| `{{QUOTE}}` `{{QUOTE_NAME}}` `{{QUOTE_ROLE}}` | Hero testimonial. Wrap the phrase that should carry the accent in `<em>` — `.quote blockquote em` renders it `--gw-color-primary-500`, upright. Without it the whole quote is black |
 | `{{CTA_HEADING}}` `{{CTA_SUB}}` `{{CTA_NOTE}}` | Closing CTA |
 | `{{CTA_QUOTE}}` `{{CTA_QUOTE_NAME}}` `{{CTA_QUOTE_ROLE}}` | The card inside the closing CTA |
 | `{{OG_HEADLINE}}` | In `og-source.html` only |
