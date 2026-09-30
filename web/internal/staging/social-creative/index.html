@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Social creative — Gushwork Design</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="Build an on-brand social image with the real Gushwork logo and fonts, and export it as a PNG.">
+<link rel="icon" href="/assets/logo/gushwork-symbol-original.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/foundation/tokens.css">
+<style>
+/* ============================================================================
+   SOCIAL CREATIVE — staging build, 30 Sep 2026.
+
+   WHY THIS EXISTS. Image generators repaint the logo and the type, so a poster made
+   by one comes out with the wrong mark and the wrong face however good the brief is.
+   This draws both itself: the logo is the real SVG file, the type is the real Vert
+   Grotesk Display and Inter, on a canvas, exported as a PNG. Nothing here is
+   generated, so nothing can drift.
+
+   Colour comes from foundation/tokens.css at draw time (see tok() below), never
+   typed in. Layout first: the composition below is one measured guess at what a
+   post should hold — logo, eyebrow, headline, subhead, up to four points, a button,
+   and a slot for artwork — to be confirmed before it is polished.
+   ============================================================================ */
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--gw-color-neutral-50);color:var(--gw-color-neutral-900);
+     font:var(--gw-text-body-14-reg);-webkit-font-smoothing:antialiased}
+.top{display:flex;align-items:center;gap:var(--gw-space-12);padding:var(--gw-space-16) var(--gw-space-24);
+     background:var(--gw-color-white);border-bottom:1px solid var(--gw-color-neutral-100)}
+.top img{width:28px;height:28px;display:block}
+.top h1{margin:0;font:600 20px/1.2 var(--gw-font-display);color:var(--gw-color-black)}
+.top__sp{flex:1}
+.btn{height:36px;padding:0 var(--gw-space-16);display:inline-flex;align-items:center;gap:var(--gw-space-8);
+     border-radius:var(--gw-radius-10);border:1px solid var(--gw-color-neutral-200);
+     background:var(--gw-color-white);color:var(--gw-color-black);font:var(--gw-text-button-14);cursor:pointer}
+.btn:hover{background:var(--gw-color-neutral-50)}
+.btn--solid{background:var(--gw-color-black);border-color:var(--gw-color-black);color:var(--gw-color-white)}
+.btn--solid:hover{background:var(--gw-color-neutral-900)}
+.btn:focus-visible,.field:focus-visible,.seg button:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.app{display:grid;grid-template-columns:380px minmax(0,1fr);gap:var(--gw-space-24);padding:var(--gw-space-24);
+     max-width:1500px;margin:0 auto;align-items:start}
+.panel{background:var(--gw-color-white);border:1px solid var(--gw-color-neutral-100);border-radius:var(--gw-radius-16);
+       padding:var(--gw-space-20);display:flex;flex-direction:column;gap:var(--gw-space-20);
+       position:sticky;top:var(--gw-space-24);max-height:calc(100vh - 100px);overflow:auto}
+.f{display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.f > label,.f > .lbl{font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking);color:var(--gw-color-neutral-600)}
+.f small{font:var(--gw-text-body-12-reg);color:var(--gw-color-neutral-500)}
+.field{width:100%;border:1px solid var(--gw-color-neutral-200);border-radius:var(--gw-radius-10);
+       background:var(--gw-color-white);color:var(--gw-color-neutral-900);padding:10px 12px;
+       font:var(--gw-text-body-14-reg);resize:vertical}
+textarea.field{min-height:64px;line-height:1.5}
+.seg{display:flex;border:1px solid var(--gw-color-neutral-200);border-radius:var(--gw-radius-10);overflow:hidden}
+.seg button{flex:1;height:36px;border:0;background:var(--gw-color-white);color:var(--gw-color-neutral-700);
+            font:var(--gw-text-button-14);cursor:pointer}
+.seg button + button{border-left:1px solid var(--gw-color-neutral-200)}
+.seg button[aria-pressed="true"]{background:var(--gw-color-neutral-900);color:var(--gw-color-white)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:var(--gw-space-12)}
+.stage{display:flex;flex-direction:column;align-items:center;gap:var(--gw-space-12)}
+.stage canvas{max-width:100%;max-height:calc(100vh - 150px);height:auto;width:auto;display:block;
+              border-radius:var(--gw-radius-12);box-shadow:var(--gw-shadow-s3);background:var(--gw-color-white)}
+.stage p{margin:0;font:var(--gw-text-body-12-reg);color:var(--gw-color-neutral-500);text-align:center;max-width:70ch}
+.err{color:var(--gw-color-red-500);font:var(--gw-text-body-12-med);min-height:16px}
+@media (max-width:900px){.app{grid-template-columns:minmax(0,1fr)}.panel{position:static;max-height:none}}
+</style></head>
+<body>
+<header class="top">
+  <img src="/assets/logo/gushwork-symbol-original.svg" alt="">
+  <h1>Social creative</h1>
+  <span class="top__sp"></span>
+  <button class="btn btn--solid" id="dl" type="button">Download PNG</button>
+</header>
+
+<main class="app">
+  <aside class="panel" aria-label="Post content">
+    <div class="f"><span class="lbl">Format</span>
+      <div class="seg" id="fmt" role="group" aria-label="Format">
+        <button type="button" data-v="portrait" aria-pressed="true">Portrait</button>
+        <button type="button" data-v="square" aria-pressed="false">Square</button>
+        <button type="button" data-v="link" aria-pressed="false">Link card</button>
+      </div>
+      <small id="fmtnote">1080 × 1350</small>
+    </div>
+
+    <div class="f"><span class="lbl">Background</span>
+      <div class="seg" id="theme" role="group" aria-label="Background">
+        <button type="button" data-v="light" aria-pressed="true">Light</button>
+        <button type="button" data-v="blue" aria-pressed="false">Blue</button>
+      </div>
+    </div>
+
+    <div class="f"><label for="eyebrow">Eyebrow</label>
+      <input class="field" id="eyebrow" value="Introducing" autocomplete="off"></div>
+
+    <div class="f"><label for="headline">Headline</label>
+      <textarea class="field" id="headline" rows="3">Your *AI marketing* teammate</textarea>
+      <small>Put words between *stars* to set them in blue.</small></div>
+
+    <div class="f"><label for="sub">Subhead</label>
+      <textarea class="field" id="sub" rows="2">Plan, create, publish and grow, all in one place.</textarea></div>
+
+    <div class="f"><label for="points">Points</label>
+      <textarea class="field" id="points" rows="4">Find opportunities
+Create content
+Plan and schedule
+Track results</textarea>
+      <small>One per line, up to four.</small></div>
+
+    <div class="f"><label for="cta">Button</label>
+      <input class="field" id="cta" value="Book a Demo" autocomplete="off"></div>
+
+    <div class="f"><label for="art">Artwork</label>
+      <input class="field" id="art" type="file" accept="image/png,image/jpeg,image/webp">
+      <div class="row2">
+        <button class="btn" id="artclear" type="button">Remove artwork</button>
+        <span class="err" id="err" role="status"></span>
+      </div>
+      <small>Use artwork with no text and no logo in it — the logo and type are drawn here.</small></div>
+  </aside>
+
+  <section class="stage" aria-label="Preview">
+    <canvas id="c" width="1080" height="1350" role="img" aria-label="Preview of the social image"></canvas>
+    <p>The logo is the real Gushwork SVG and the type is Vert Grotesk Display and Inter, drawn by
+       this page, so the PNG you download is exact.</p>
+  </section>
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---- what the canvas is allowed to be ------------------------------------------------ */
+  var FORMATS = {
+    portrait: { w: 1080, h: 1350, note: '1080 × 1350', name: 'portrait' },
+    square:   { w: 1080, h: 1080, note: '1080 × 1080', name: 'square' },
+    link:     { w: 1200, h: 630,  note: '1200 × 630 — link preview', name: 'link-card' }
+  };
+  var state = { fmt: 'portrait', theme: 'light', art: null };
+
+  var cv = document.getElementById('c'), ctx = cv.getContext('2d');
+  var $ = function (id) { return document.getElementById(id); };
+
+  /* Every colour is read from tokens.css at draw time, not typed here. */
+  function tok(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+  function palette(theme) {
+    if (theme === 'blue') {
+      return { ground: tok('--gw-color-primary-500'), head: tok('--gw-color-white'), hl: tok('--gw-color-primary-100'),
+               sub: tok('--gw-color-primary-50'), eyebrow: tok('--gw-color-primary-100'),
+               chipBg: 'rgba(255,255,255,.16)', chipBorder: 'rgba(255,255,255,.28)', chipText: tok('--gw-color-white'),
+               dot: tok('--gw-color-white'), ctaBg: tok('--gw-color-white'), ctaText: tok('--gw-color-primary-500'),
+               logo: 'gushwork-logo-white.svg' };
+    }
+    return { ground: tok('--gw-color-neutral-25'), head: tok('--gw-color-black'), hl: tok('--gw-color-primary-500'),
+             sub: tok('--gw-color-neutral-600'), eyebrow: tok('--gw-color-neutral-500'),
+             chipBg: tok('--gw-color-white'), chipBorder: tok('--gw-color-neutral-100'), chipText: tok('--gw-color-neutral-900'),
+             dot: tok('--gw-color-primary-500'), ctaBg: tok('--gw-color-primary-500'), ctaText: tok('--gw-color-white'),
+             logo: 'gushwork-logo-original.svg' };
+  }
+
+  /* ---- assets ---------------------------------------------------------------------------- */
+  var logos = {};
+  /* The SVGs carry a viewBox but no width or height, and Safari draws such an image at a
+     default size. Stating 421 x 80 (the file's own viewBox) makes it scale like a picture. */
+  function loadLogo(file) {
+    if (logos[file]) return logos[file];
+    logos[file] = fetch('/assets/logo/' + file).then(function (r) {
+      if (!r.ok) throw new Error('logo');
+      return r.text();
+    }).then(function (t) {
+      t = t.replace('<svg ', '<svg width="421" height="80" ');
+      var url = URL.createObjectURL(new Blob([t], { type: 'image/svg+xml' }));
+      return new Promise(function (res, rej) {
+        var i = new Image(); i.onload = function () { res(i); }; i.onerror = rej; i.src = url;
+      });
+    });
+    return logos[file];
+  }
+  var fontsReady = null;
+  function loadFonts() {
+    if (!fontsReady) {
+      fontsReady = Promise.all([
+        document.fonts.load('700 100px "Vert Grotesk Display"'),
+        document.fonts.load('400 30px Inter'), document.fonts.load('500 30px Inter'),
+        document.fonts.load('600 30px Inter')
+      ]);
+    }
+    return fontsReady;
+  }
+
+  /* ---- text layout ------------------------------------------------------------------------- */
+  var HEAD = '"Vert Grotesk Display", ui-sans-serif, system-ui, sans-serif';
+  var BODY = 'Inter, ui-sans-serif, system-ui, sans-serif';
+
+  /* "Your *AI marketing* teammate" -> words tagged blue or not, with hard breaks kept. */
+  function parseHeadline(str) {
+    var out = [], parts = String(str).split('*');
+    parts.forEach(function (seg, i) {
+      var hl = i % 2 === 1;
+      seg.split(/(\n)/).forEach(function (piece) {
+        if (piece === '\n') { out.push({ br: true }); return; }
+        piece.split(/\s+/).filter(Boolean).forEach(function (w) { out.push({ t: w, hl: hl }); });
+      });
+    });
+    return out;
+  }
+  function layoutWords(words, font, maxW) {
+    ctx.font = font;
+    var space = ctx.measureText(' ').width, lines = [[]], w = 0, ok = true;
+    words.forEach(function (wd) {
+      if (wd.br) { lines.push([]); w = 0; return; }
+      var ww = ctx.measureText(wd.t).width;
+      if (ww > maxW) ok = false;
+      var need = (lines[lines.length - 1].length ? space : 0) + ww;
+      if (w + need > maxW && lines[lines.length - 1].length) { lines.push([]); w = 0; need = ww; }
+      lines[lines.length - 1].push({ t: wd.t, hl: wd.hl, w: ww }); w += need;
+    });
+    return { lines: lines.filter(function (l) { return l.length; }), space: space, ok: ok };
+  }
+  function wrapPlain(text, font, maxW) {
+    var words = [];
+    String(text).split('\n').forEach(function (p, i, a) {
+      p.split(/\s+/).filter(Boolean).forEach(function (t) { words.push({ t: t, hl: false }); });
+      if (i < a.length - 1) words.push({ br: true });
+    });
+    return layoutWords(words, font, maxW);
+  }
+  function rrect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+  }
+  function tracked(on, px) { if ('letterSpacing' in ctx) ctx.letterSpacing = on ? px + 'px' : '0px'; }
+
+  /* ---- the composition ---------------------------------------------------------------------- */
+  function draw(logoImg) {
+    var F = FORMATS[state.fmt], P = palette(state.theme);
+    var W = F.w, H = F.h, land = state.fmt === 'link';
+    cv.width = W; cv.height = H;
+
+    var M = land ? 56 : 80;                         /* outer margin */
+    var colW = land ? Math.round(W * 0.54) - M : W - M * 2;   /* text column */
+    var headMax = state.fmt === 'portrait' ? 108 : state.fmt === 'square' ? 92 : 68;
+    var headMin = land ? 40 : 56, headLines = land ? 4 : 4;
+    var subSize = land ? 26 : 36, chipSize = land ? 20 : 27, ctaSize = land ? 22 : 30;
+
+    ctx.fillStyle = P.ground; ctx.fillRect(0, 0, W, H);
+
+    /* logo */
+    /* Logo height is a documented size step (16, 20, 24, 40 or 80), never in between; the width
+       follows from the file's own 421:80, so it cannot be squashed. It was 48 and 34, off the steps. */
+    var logoH = land ? 24 : 40, logoW = Math.round(logoH * 421 / 80), y = M;   /* top margin = outer margin */
+    ctx.drawImage(logoImg, M, y, logoW, logoH);
+    y += logoH + (land ? 32 : 60);   /* spacing tokens only */
+
+    /* eyebrow */
+    var eyebrow = $('eyebrow').value.trim();
+    if (eyebrow) {
+      var es = land ? 16 : 22;
+      /* Sentence case, as typed. It was uppercased and tracked out, which voice.md rules against
+         for eyebrows and R21 records as an export bug. */
+      ctx.font = '500 ' + es + 'px ' + BODY; ctx.fillStyle = P.eyebrow; ctx.textBaseline = 'top';
+      ctx.fillText(eyebrow, M, y);
+      y += es + (land ? 16 : 24);
+    }
+
+    /* headline: the largest size at which it fits the column in at most N lines */
+    var words = parseHeadline($('headline').value), fit = null, size;
+    for (size = headMax; size >= headMin; size -= 4) {
+      var L = layoutWords(words, '700 ' + size + 'px ' + HEAD, colW);
+      if (L.ok && L.lines.length <= headLines) { fit = L; break; }
+    }
+    if (!fit) { size = headMin; fit = layoutWords(words, '700 ' + size + 'px ' + HEAD, colW); }
+    var lh = Math.round(size * 1.2);   /* the display tokens' line-height; was 1.14 */
+    ctx.font = '700 ' + size + 'px ' + HEAD; ctx.textBaseline = 'top';
+    fit.lines.forEach(function (line) {
+      var x = M;
+      line.forEach(function (wd) { ctx.fillStyle = wd.hl ? P.hl : P.head; ctx.fillText(wd.t, x, y); x += wd.w + fit.space; });
+      y += lh;
+    });
+    y += land ? 12 : 24;
+
+    /* subhead */
+    var sub = $('sub').value.trim();
+    if (sub) {
+      var sl = Math.round(subSize * 1.4), S = wrapPlain(sub, '400 ' + subSize + 'px ' + BODY, colW);
+      ctx.font = '400 ' + subSize + 'px ' + BODY; ctx.fillStyle = P.sub;
+      S.lines.forEach(function (line) {
+        var x = M; line.forEach(function (wd) { ctx.fillText(wd.t, x, y); x += wd.w + S.space; }); y += sl;
+      });
+      y += land ? 12 : 32;
+    }
+
+    /* points, as chips that wrap across the column */
+    var pts = $('points').value.split('\n').map(function (s) { return s.trim(); }).filter(Boolean).slice(0, 4);
+    if (pts.length) {
+      var chH = Math.round(chipSize * 2.3), gap = land ? 10 : 14, px = 0, py = y, padX = Math.round(chipSize * 0.95), dotR = Math.round(chipSize * 0.2);
+      ctx.font = '500 ' + chipSize + 'px ' + BODY;
+      pts.forEach(function (t) {
+        var tw = ctx.measureText(t).width, cw = padX + dotR * 2 + Math.round(chipSize * 0.5) + tw + padX;
+        if (px > 0 && px + cw > colW) { px = 0; py += chH + gap; }
+        rrect(M + px, py, cw, chH, chH / 2); ctx.fillStyle = P.chipBg; ctx.fill();
+        ctx.lineWidth = 2; ctx.strokeStyle = P.chipBorder; ctx.stroke();
+        ctx.fillStyle = P.dot; ctx.beginPath(); ctx.arc(M + px + padX + dotR, py + chH / 2, dotR, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = P.chipText; ctx.textBaseline = 'middle';
+        ctx.fillText(t, M + px + padX + dotR * 2 + Math.round(chipSize * 0.5), py + chH / 2 + 1); ctx.textBaseline = 'top';
+        px += cw + gap;
+      });
+      y = py + chH + (land ? 24 : 40);
+    }
+
+    /* button */
+    var cta = $('cta').value.trim();
+    if (cta) {
+      var label = cta + '  →', bh = Math.round(ctaSize * 2.5), bw;
+      ctx.font = '600 ' + ctaSize + 'px ' + BODY; bw = ctx.measureText(label).width + ctaSize * 2.6;
+      rrect(M, y, bw, bh, bh / 2); ctx.fillStyle = P.ctaBg; ctx.fill();
+      ctx.fillStyle = P.ctaText; ctx.textBaseline = 'middle'; ctx.fillText(label, M + ctaSize * 1.3, y + bh / 2 + 1); ctx.textBaseline = 'top';
+      y += bh;
+    }
+
+    /* artwork: whatever room is left, contained, never over the text */
+    if (state.art) {
+      var ax, ay, aw, ah;
+      if (land) { ax = Math.round(W * 0.56); ay = 36; aw = W - ax - 36; ah = H - 72; }
+      else { ax = M; ay = y + 40; aw = W - M * 2; ah = H - ay - M; }
+      if (aw > 40 && ah > 40) {
+        var s = Math.min(aw / state.art.width, ah / state.art.height), dw = state.art.width * s, dh = state.art.height * s;
+        ctx.drawImage(state.art, ax + (aw - dw) / 2, ay + (ah - dh), dw, dh);
+      }
+    }
+  }
+
+  var busy = 0;
+  function render() {
+    var n = ++busy;
+    Promise.all([loadFonts(), loadLogo(palette(state.theme).logo)]).then(function (r) {
+      if (n === busy) draw(r[1]);
+    }).catch(function () { $('err').textContent = 'Could not load the logo or fonts.'; });
+  }
+  window.__creative = { render: render, state: state };   /* a test hook, harmless to leave in */
+
+  /* ---- controls ------------------------------------------------------------------------------- */
+  function seg(id, key, after) {
+    $(id).addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      [].forEach.call($(id).children, function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+      state[key] = b.getAttribute('data-v'); if (after) after(); render();
+    });
+  }
+  seg('fmt', 'fmt', function () { $('fmtnote').textContent = FORMATS[state.fmt].note; });
+  seg('theme', 'theme');
+  var t = null;
+  ['eyebrow', 'headline', 'sub', 'points', 'cta'].forEach(function (id) {
+    $(id).addEventListener('input', function () { clearTimeout(t); t = setTimeout(render, 60); });
+  });
+  $('art').addEventListener('change', function () {
+    var f = this.files && this.files[0]; $('err').textContent = ''; if (!f) return;
+    if (f.size > 12 * 1024 * 1024) { $('err').textContent = 'That file is over 12 MB.'; this.value = ''; return; }
+    var img = new Image(), url = URL.createObjectURL(f);
+    img.onload = function () { state.art = img; render(); };
+    img.onerror = function () { $('err').textContent = 'That file could not be read as an image.'; };
+    img.src = url;
+  });
+  $('artclear').addEventListener('click', function () { state.art = null; $('art').value = ''; $('err').textContent = ''; render(); });
+
+  $('dl').addEventListener('click', function () {
+    var slug = ($('headline').value.replace(/\*/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'post').slice(0, 40);
+    cv.toBlob(function (b) {
+      var a = document.createElement('a'); a.href = URL.createObjectURL(b);
+      a.download = 'gushwork-' + FORMATS[state.fmt].name + '-' + slug + '.png';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(a.href); }, 5000);
+    }, 'image/png');
+  });
+
+  render();
+})();
+</script>
+</body></html>

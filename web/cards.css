@@ -1,0 +1,164 @@
+/* cards.css — the card grid shared by /internal/tools and /internal/templates. */
+  /* ===========================================================================
+     Tools and Templates share these cards — measured off Figma 807:3718 (GW Gushwork Design);
+     the page frame off 800:2879.
+
+     The page frame is shell.css's SHARED PAGE LAYOUT: `.sg` / `.sg__hd` /
+     `.sg__main`, the same 800 + 220 split the style guide, downloads, staging
+     and the changelog use. 800:2900 measures a 40 outer pad, an 800 column
+     inset 20, and a 220 rail — which is that block exactly, so none of it is
+     restated here. This sheet styles only what is this page's own.
+
+     WHAT CHANGED from the six-sections-in-a-row version: the difference between
+     a thing you OPEN and a thing you COPY is now carried by two labelled groups
+     rather than by two subtly different item shapes. Both are the same 2-up card:
+     a tool shows an app in a device frame and is a link; a template shows its own
+     render edge to edge and carries a Preview link and a Use with Claude button.
+     =========================================================================== */
+
+  /* Two card-edge steps. The drawing uses Neutral/50 for a card at rest and
+     Neutral/100 for the raised one; in dark both collapse onto the panel, so
+     each gets its own dark value rather than a token that disappears. */
+  :root{--tl-edge:var(--gw-color-neutral-50); --tl-edge-hi:var(--gw-color-neutral-100)}
+  :root[data-theme="dark"]{--tl-edge:var(--gw-color-neutral-800); --tl-edge-hi:var(--gw-color-neutral-700)}
+
+  /* Figma 807:3718 (30 Sep 2026): the card is Neutral/25 on a Neutral/50 edge, the pills are
+     Neutral/50, and the buttons are white with a Neutral/100 edge. In dark each steps onto the
+     panel ramp so it does not vanish. */
+  :root{--tl-card:var(--gw-color-neutral-25); --tl-pill:var(--gw-color-neutral-50); --tl-btn:var(--gw-color-white)}
+  :root[data-theme="dark"]{--tl-card:var(--gw-color-neutral-900); --tl-pill:var(--gw-color-neutral-800); --tl-btn:var(--gw-color-neutral-800)}
+
+  /* No rail on this page, so the column takes the whole row instead of leaving 220 empty. 1200 is
+     chosen, not measured: uncapped, three cards would each run to ~470 on a wide screen. */
+  body[data-gw-page="tools"] .sg__main,
+  body[data-gw-page="templates"] .sg__main{grid-column:1 / -1;max-width:1200px}
+
+  /* 800:2909 is ONE text node with a blank line in it, not two siblings of the
+     60-gap section stack — so the two paragraphs sit a line apart, not 60. */
+
+  /* ── badges ── (800:3273/3274) px 8, py 4, r4, Body/body-12-med.
+     Access badge Neutral/100 on Neutral/600; status badge Green/alpha-10 on
+     Green/500. Only two colours exist in the drawing, so only two are built. */
+  .bdg{display:inline-flex;align-items:center;
+       padding:var(--gw-space-4) var(--gw-space-8);
+       border-radius:var(--gw-radius-4);
+       font:var(--gw-text-body-12-med);
+       letter-spacing:var(--gw-text-body-12-med-tracking);
+       white-space:nowrap;
+       background:var(--tl-pill);color:var(--s-body)}
+  .bdg--on{background:var(--gw-color-green-alpha-10);color:var(--gw-color-green-500)}
+  /* Not finished yet: same shape as Active, in yellow. Yellow-600 for the label — yellow-500 on its own
+     10% tint is under 4.5:1. */
+  .bdg--wip{background:var(--gw-color-yellow-alpha-10);color:var(--gw-color-yellow-600)}
+  .bdgs{display:flex;gap:var(--gw-space-4);align-items:flex-start;flex-wrap:wrap}
+  /* ── the buttons ── (809:3852 / 809:3853) 44 tall, px 20, r8, a Neutral/100 edge, gap 8,
+     Body/body-14-med in Neutral/black, 18px icons. The main one is white with Shadows/S2 and
+     takes the free width; Preview is unfilled and hugs its content. Not blue: the drawing
+     has them black, and it supersedes the blue pass from earlier the same day. */
+  .tl-go,.tuse{display:inline-flex;align-items:center;justify-content:center;gap:var(--gw-space-8);
+               height:44px;padding:0 var(--gw-space-20);box-sizing:border-box;
+               border:1px solid var(--tl-edge-hi);border-radius:var(--gw-radius-8);
+               background:var(--tl-btn);box-shadow:var(--gw-shadow-s2);
+               font:var(--gw-text-body-14-med);letter-spacing:var(--gw-text-body-14-med-tracking);
+               color:var(--s-heading);text-decoration:none;white-space:nowrap;cursor:pointer}
+  .tl-go svg{width:18px;height:18px;flex:none;fill:currentColor;transition:transform var(--gw-motion-fast)}
+  .tuse:focus-visible,.tl-go:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+
+  /* ===========================================================================
+     TOOLS — a 2-up grid (800:3260, gap 12 both axes).
+     =========================================================================== */
+  .tl-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+            gap:var(--gw-space-20)}
+  /* Two across below 1200 (the viewport, which includes the 260 sidebar: at that width three cards
+     would each be under 290). It sits AFTER the grid rule on purpose — at equal specificity the later
+     rule wins, and above it the media query was being overridden. */
+  @media (max-width:1200px){.tl-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+  /* 800:3261 — white, 1px Neutral/50, r16, padding 8, inner stack gap 8.
+     The drawing shows ONE card with a Neutral/100 edge and Shadows/S3 and three
+     without: that is the hover state, not a fifth border colour. */
+  .tcard{display:flex;flex-direction:column;gap:var(--gw-space-8);
+         background:var(--tl-card);
+         border:1px solid var(--tl-edge);
+         border-radius:var(--gw-radius-16);
+         padding:var(--gw-space-8);overflow:hidden;
+         text-decoration:none;color:inherit;
+         transition:border-color var(--gw-motion-fast), box-shadow var(--gw-motion-fast)}
+  a.tcard:hover{border-color:var(--tl-edge-hi);box-shadow:var(--gw-shadow-s3)}
+  a.tcard:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+  a.tcard:hover .tl-go svg{transform:translate(2px,-2px)}
+
+  /* A tool the viewer's access rules do not let them open: still shown, so they know it exists
+     and who it is for, but not a link. Filled in by the script at the foot of the page. */
+  .tcard--locked{opacity:.65;cursor:not-allowed}
+  a.tcard--locked:hover{border-color:var(--tl-edge);box-shadow:none}
+  .tcard--locked .tl-go{color:var(--gw-color-neutral-500)}
+  .tuse[disabled]{cursor:not-allowed}
+  .bdg[hidden]{display:none}
+  a.tcard--locked:hover .tl-go svg{transform:none}
+
+  /* 800:3262 — the preview well: white (changed 30 Sep 2026, was Neutral/50), 180 tall, r12, clipped. */
+  .tcard__well{height:180px;border-radius:var(--gw-radius-12);
+               background:var(--tl-btn);overflow:hidden;position:relative}
+  /* 800:3302 — a tool with no render yet gets the same well one step darker and
+     nothing in it. Better an honest empty slab than a stretched screenshot. */
+  .tcard__well--empty{background:var(--s-lock-bg)}
+
+  /* 807:3721 — the device: 300 x 177.78, r6.465, a 2.424 Neutral/200 edge and Shadows/S3,
+     centred, 37.11 from the top of a 180 well — so the render runs off the bottom edge rather
+     than being letterboxed. Inside it (807:3722) a display r5.061 with a .556 Neutral/100 edge.
+     The odd decimals are a scaled-down instance of the dashboard frame: geometry, written as
+     measured, not tokens. */
+  .tcard__dev{position:absolute;top:37.11px;left:50%;transform:translateX(-50%);
+              width:min(300px,calc(100% - 24px));height:177.78px;
+              border:2.424px solid var(--gw-color-neutral-200);
+              border-radius:6.465px;background:var(--s-chrome-bg);
+              box-shadow:var(--gw-shadow-s3);overflow:hidden;
+              display:flex;flex-direction:column}
+  /* 807:3723 — the title strip: 22.3 x 10.9, three 3.33px dots at a 4.44 pitch, 5.06 in. */
+  .tcard__bar{flex:none;height:10.925px;display:flex;align-items:center;
+              gap:1.11px;padding-left:5.06px}
+  .tcard__bar i{width:3.333px;height:3.333px;border-radius:var(--gw-radius-full);
+                background:var(--gw-color-neutral-300)}
+  .tcard__dev img{flex:1 1 auto;min-height:0;width:100%;
+                  object-fit:cover;object-position:top left;display:block;
+                  border-top:.556px solid var(--tl-edge-hi);background:var(--gw-color-white)}
+
+  /* 800:3271 — the card body: padding 8, stack gap 16. */
+  .tcard__b{display:flex;flex-direction:column;gap:var(--gw-space-16);
+            padding:var(--gw-space-8)}
+  .tcard__t{display:flex;flex-direction:column;gap:var(--gw-space-4)}
+  .tcard__t > h3{margin:0;font:var(--gw-text-body-18-med);
+                 letter-spacing:var(--gw-text-body-18-med-tracking);
+                 color:var(--s-heading)}
+  .tcard__t > p{margin:0;font:var(--gw-text-body-14-reg);
+                letter-spacing:var(--gw-text-body-14-reg-tracking);
+                color:var(--s-body)}
+
+  /* ===========================================================================
+     Tools and templates are the same card. The first pill says which (Tool or Template), ahead
+     of the access pill and the status pill, and a template's render sits in the same device
+     frame a tool's does, cropped from the TOP (the fold is what identifies a page).
+     =========================================================================== */
+  .tcard--tpl:hover{border-color:var(--tl-edge-hi)}
+  /* The body fills the card and the actions sit on its floor, so in a row of three the buttons
+     line up whatever the copy above them runs to. */
+  .tcard__b{flex:1 1 auto}
+  /* 809:3851 — the action row: gap 8, on the card floor. The main button takes the free width;
+     Preview (a template's only extra) hugs its content. */
+  .tcard__act{display:flex;align-items:center;gap:var(--gw-space-8);margin-top:auto}
+  .tcard__act > .tl-go:last-child,.tcard__act > .tuse{flex:1 1 0;min-width:0}
+  .tcard__act > .tl-go--sec{flex:0 0 auto;background:transparent;box-shadow:none}
+  a.tcard:hover .tl-go svg{transform:translate(2px,-2px)}
+  .tl-go:hover,.tuse:hover{border-color:var(--gw-color-neutral-300)}
+
+  /* Phone — the card grid goes single-column and a template's thumbnail moves above
+     its text. `.sg` itself reflows in shell.css. */
+  @media (max-width:767px){
+    .tl-cards{grid-template-columns:minmax(0,1fr)}
+    .trow{flex-direction:column}
+    .trow__pv{width:100%}
+    .trow__b{align-self:auto}
+    .tcard__dev{width:100%;left:0;transform:none;border-left:0;border-right:0;
+                border-radius:0}
+  }

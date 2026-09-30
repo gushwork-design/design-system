@@ -1,3 +1,12 @@
+<meta charset="utf-8">
+<!-- The charset comes FIRST, and this note comes after it, because
+     scripts/_add_shell.py splices the shell tags in after the first ">" it finds and
+     would otherwise cut a leading comment in half — the tail then renders as text at
+     the top of the page. Keep angle brackets out of any comment above the shell tags.
+     This sheet has no head wrapper (it is served as a fragment and the browser builds
+     one), so the charset still has to be declared here: without it the em dashes and
+     the 32x32 multiplication signs in the tables come out as mojibake whenever the
+     server does not send a charset of its own. -->
 <title>Gushwork Design System — component catalogue</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20width%3D%2280%22%20height%3D%2280%22%20rx%3D%2220%22%20fill%3D%22%230d0d0d%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
 <style>
@@ -26,8 +35,11 @@
   --ok-f:#22c55e1a; --ok-t:#16a34a; --warn-f:#f59e0b1a; --warn-t:#d97706;
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);
-  font-size:15px;line-height:1.6;letter-spacing:-0.002em;
+/* Body/body-16-reg, the site-wide page default ruled 29 Sep 2026 (796:12917).
+   This sheet had its own 15/1.6 — the same shape, one step small. */
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:var(--gw-text-body-16-reg);
+  letter-spacing:var(--gw-text-body-16-reg-tracking);
   -webkit-font-smoothing:antialiased}
 .wrap{max-width:1080px;margin:0 auto;padding:56px 24px 96px;display:flex;flex-direction:column;gap:44px}
 header h1{font-family:var(--display);font-weight:700;font-size:clamp(34px,5vw,52px);
@@ -71,7 +83,7 @@ footer a{color:var(--blue)}
 
 <div class="wrap">
 <header>
-  <h1>Gushwork Design System</h1>
+  <h1>Catalogue</h1>
   <p>Every component in the library, and — the part that usually goes unsaid — how far each one
   has actually been verified against Figma.</p>
   <div class="tot">

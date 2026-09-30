@@ -67,7 +67,19 @@ t('an empty ruleset is rejected so the caller falls back', normalise({ routes: [
 t('a route with no leading slash is dropped', normalise({ routes: [{ path: 'x' }, { path: '/ok' }] }).routes.length, 1);
 t('an unknown access level is not a wildcard', normalise({ routes: [{ path: '/x', access: 'wide-open' }] }).routes[0].access, 'internal');
 t('non-addresses are filtered out of the admin list', normalise({ routes: [{ path: '/x' }], admins: ['nope', 'a@b.co'] }).admins, ['a@b.co']);
-t('the compiled fallback is the old two tiers', defaultRules().routes.map(r => r.access), ['admin', 'internal']);
+/* The compiled routes, in order: /admin, /internal, /library, /library/review, the owner-only
+   usage log, and the one public ad lander. This used to assert just the first two and went stale
+   as routes were added; it now names them all so adding one is a deliberate edit here. */
+t('the compiled fallback routes and their tiers', defaultRules().routes.map(r => r.access),
+  ['admin', 'internal', 'internal', 'admin', 'owner', 'public']);
+
+/* The usage log lists who ran a session. It is the owner tier, so an admin who is not an
+   owner is kept out, while the owner is let in. Uses the COMPILED rules, which is what a
+   deploy with no Edge Config store serves. */
+const compiled = normalise(defaultRules());
+t('usage log: an admin who is not an owner is forbidden',
+  decide('/admin/usage-log', S('priya@gushwork.ai'), { ...compiled, admins: ['priya@gushwork.ai'] }), 'forbid');
+t('usage log: an owner is let in', decide('/admin/usage-log', S('utsav.singh@gushwork.ai'), compiled), 'allow');
 
 /* The unconfigured path — no Edge Config store — is what every deployment
    serves until a store is attached, and it is the one the page crashed on:

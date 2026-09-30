@@ -136,6 +136,10 @@
     {
       "source": "/api/approvals",
       "destination": "/api/gw?action=approvals"
+    },
+    {
+      "source": "/api/tools",
+      "destination": "/api/gw?action=tools"
     }
   ]
 }

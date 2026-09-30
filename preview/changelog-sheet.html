@@ -27,8 +27,11 @@
      either ground, and routing them through semantics would flatten them into body text. */
   *,*::before,*::after{box-sizing:border-box}
   html{scroll-behavior:smooth}
+  /* Body/body-16-reg, the site-wide page default ruled 29 Sep 2026 (796:12917).
+     This sheet had 18-med as its page default and every prose rule below repeated
+     it, so the ruling reached the shell and stopped at this page's own stylesheet. */
   body{margin:0;background:var(--s-page-bg, var(--gw-color-white));
-       font:var(--gw-text-body-18-med);letter-spacing:var(--gw-text-body-18-med-tracking);
+       font:var(--gw-text-body-16-reg);letter-spacing:var(--gw-text-body-16-reg-tracking);
        color:var(--s-heading, var(--gw-color-neutral-900));-webkit-font-smoothing:antialiased}
   /* Two families only — the browser's default <code> face would be a third. Size and
      line-height are INHERITED rather than set: binding a 14px token here made every chip
@@ -38,53 +41,25 @@
        background:var(--s-chrome-bg, var(--gw-color-neutral-35));border-radius:var(--gw-radius-4);
        padding:0 var(--gw-space-4)}
 
-  /* Column split measured off the styleguide page (478:15070 → Frame
-     2147260130): 40 pad, main column 800, gutter 60, TOC rail 260, 40 pad —
-     1200 across, which is the content column beside the 240 sidebar. */
-  /* 60 top and 40 sides are the measured page padding; the 120 at the bottom
-     is deliberate and Utsav's call — a long scrolling page wants run-out room
-     under the last release. */
-  .page{max-width:1200px;margin:0 auto;
-        padding:var(--gw-space-60) var(--gw-space-40) var(--gw-space-120);
-        /* `auto` for the rail, not a fixed 260 — collapsing it to 48 widens the
-           main column to the measured 1012 with no second rule. */
-        display:grid;grid-template-columns:minmax(0,1fr) auto;
-        /* Column gap 60 is the measured gutter. Row gap is 32, NOT 60 — the
-           styleguide puts 32 between the header rule and the body
-           (header ends 93, line 125, body 157). */
-        column-gap:var(--gw-space-60);row-gap:var(--gw-space-32)}
+  /* ── page geometry ──
+     There is none here any more. `.cl` / `.cl__hd` / `.cl__main` are styled by
+     THE SHARED PAGE LAYOUT in shell.css, the same block the style guide,
+     downloads and staging use: an 800 content column and a 220 rail inside the
+     panel's 1106 body, header spanning both, 40 of page padding either side.
 
-  /* ── header ──
-     Measured off the styleguide header (Frame 2147260129): the block is
-     inset 40 left and right while the rule below it runs the full column
-     width, stack gap 20, and the divider is 2px Neutral/200 — not the 1px
-     Neutral/100 this sheet used to draw. */
-  /* Column 1 only. `grid-column:1 / -1` was left over from the old layout,
-     where the header spanned a narrow 168px index — under the styleguide's
-     split it ran the rule 1120 wide, straight under the TOC. The measured
-     line (478:15076) is 800: the main column, and nothing past the gutter. */
-  .hd{grid-column:1;grid-row:1;
-      display:flex;flex-direction:column;gap:var(--gw-space-20);
-      padding:0 var(--gw-space-40) var(--gw-space-32);
-      /* DOTTED, not solid. Line 14 (478:15076) measures strokeWeight 2,
-         strokeCap ROUND, dashPattern [0.1, 4] — a zero-length dash with a
-         round cap is a 2px dot, repeating every 4.1px. Drawn as a gradient
-         because a CSS `dotted` border leaves dot size and spacing to the UA.
-         The style guide carries the same rule; change both together. */
-      border-bottom:0;
-      background-image:radial-gradient(circle closest-side,
-                       var(--s-card-border, var(--gw-color-neutral-200)) 100%, transparent 100%);
-      background-size:4.1px 2px;
-      background-position:left bottom;
-      background-repeat:repeat-x}
-  main{grid-column:1;grid-row:2;min-width:0}
-  /* The rail top-aligns with the header, not with the body — in Figma both
-     the main column and the rail start at y=60. */
-  /* `1 / -1` does NOT work here: with no explicit rows, -1 resolves to the end
-     of the explicit grid (line 1), so the rail landed in row 1 alone and its
-     ~760px height forced that row open, shoving the body down to y=972.
-     `span 2` spans both rows for real, so its height is satisfied across them. */
-  .idx{grid-column:2;grid-row:1 / span 2;align-self:start}
+     This sheet used to carry its own copy — 1200 max-width centred, a 60
+     gutter, a 260 rail, and a 2px dotted header rule from 478:15076. Every one
+     of those is a measurement of an older revision of the page, and keeping a
+     private copy is how it stayed an older revision for months. The rule is
+     solid 1px Neutral/100 now (re-measured 796:10015), and it spans the full
+     1106 rather than stopping at the content column.
+
+     The cost is that this file no longer stands up standalone out of preview/
+     with no shell — it will render as a single unstyled column. That is already
+     true of every other page on the site, and a half-copy that drifts is worse
+     than an honest dependency. It is published to /internal/changelog, which
+     always has the shell.
+     -------------------------------------------------------------------- */
   /* Styleguide page title, measured: Vert Grotesk Display Semibold 44/120%,
      ls 0, Neutral/black. No text style is bound in Figma, and --gw-text-h3 is
      the wrong weight (700), so the ramp is spelled out. */
@@ -98,8 +73,8 @@
   /* One sentence saying what this is, then the housekeeping as separate lines. They were
      one dense paragraph and nobody reads a description that also explains its own
      derivation. */
-  .lede{margin:0;max-width:64ch;font:var(--gw-text-body-18-med);
-        letter-spacing:var(--gw-text-body-18-med-tracking);color:var(--s-body, var(--gw-color-neutral-600))}
+  .lede{margin:0;max-width:64ch;font:var(--gw-text-body-16-reg);
+        letter-spacing:var(--gw-text-body-16-reg-tracking);color:var(--s-body, var(--gw-color-neutral-600))}
   .hd__note{margin:0;max-width:72ch;
             font:var(--gw-text-body-14-med);
             letter-spacing:var(--gw-text-body-14-med-tracking);
@@ -108,11 +83,16 @@
   /* The page's one-sentence description. It sits BELOW the header rule, in the slot
      the styleguide and downloads pages put their intro prose in — the header itself is
      just title, date and rule on every page now. */
-  .intro{padding:0 var(--gw-space-40) var(--gw-space-32)}
+  /* No page padding — `.cl__main` carries it. This is just the gap to the list. */
+  .intro{padding:0}
 
   /* ── release list ── */
+  /* No left inset. The old layout put sections 40 inside a wider column; under the
+     shared grid `__main` already carries the 20 that aligns the content with the
+     header (796:11946 — the 800 column's sections are 780, flush). A second 40 here
+     pushed every section right of its own page title. */
   .rel{display:grid;grid-template-columns:152px minmax(0,1fr);gap:var(--gw-space-40);
-       padding:0 var(--gw-space-40) var(--gw-space-32);
+       padding:0 0 var(--gw-space-32);
        scroll-margin-top:var(--gw-space-24)}
   /* Top padding travels WITH the border, because it exists to sit below one. On .rel it left
      the first release padded away from the header rule with nothing in between — 64px from
@@ -132,15 +112,17 @@
   .tag{margin-top:var(--gw-space-4);font:500 10px/1.6 var(--gw-font-body);
        text-transform:uppercase;color:var(--gw-color-neutral-400)}
 
+  /* 18-sem STAYS. This is the release's headline, the same role the tools page's
+     card titles play at 18 — not body copy, so the 16-reg page default is not it. */
   .body__sum{margin:0;font:var(--gw-text-body-18-sem);
              letter-spacing:var(--gw-text-body-18-sem-tracking);
              color:var(--s-heading, var(--gw-color-neutral-900));max-width:64ch}
   .prose{margin-top:var(--gw-space-12);color:var(--s-body, var(--gw-color-neutral-600))}
-  .prose p{margin:0 0 var(--gw-space-8);font:var(--gw-text-body-18-med);
-           letter-spacing:var(--gw-text-body-18-med-tracking);max-width:72ch}
+  .prose p{margin:0 0 var(--gw-space-8);font:var(--gw-text-body-16-reg);
+           letter-spacing:var(--gw-text-body-16-reg-tracking);max-width:72ch}
   .prose ul{margin:0 0 var(--gw-space-8);padding-left:var(--gw-space-20);max-width:72ch}
-  .prose li{margin-bottom:var(--gw-space-4);font:var(--gw-text-body-18-med);
-            letter-spacing:var(--gw-text-body-18-med-tracking)}
+  .prose li{margin-bottom:var(--gw-space-4);font:var(--gw-text-body-16-reg);
+            letter-spacing:var(--gw-text-body-16-reg-tracking)}
   .prose li::marker{color:var(--gw-color-neutral-300)}
   .prose > :last-child{margin-bottom:0}
   .prose strong{font-weight:600;color:var(--s-heading, var(--gw-color-neutral-800))}
@@ -170,8 +152,13 @@
   .meta__l:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
   .gl{width:14px;height:14px;flex:none;display:block}
   .none{font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-300)}
-  .lnk{color:var(--gw-color-primary-500);text-decoration:none;word-break:break-word}
-  .lnk:hover{text-decoration:underline}
+  /* Links take the colour of the prose they sit in, and carry the underline instead —
+     a 16px blue `CHANGELOG.md` mid-sentence read as the loudest thing in the lede, which
+     is the one line on the page that is not a link. The underline is the affordance;
+     blue is the hover tell. */
+  /* Colour, weight, underline and both states are shell.css's. All that is left
+     is the wrap: these links carry full URLs, which will not break on their own. */
+  .lnk{word-break:break-word}
 
   /* ── version index ── */
   /* `padding-right` is the gutter the scrollbar sits in. Without it the row highlights run
@@ -179,65 +166,13 @@
      so it is not enough to let the classic scrollbar reserve its own width.
      `scrollbar-gutter:stable` keeps the column from shifting when the bar appears. */
   /* ── on this page ──
-     Measured off the styleguide TOC rail (478:15070 → Frame 2147260252):
-     260 wide, stack gap 16; a 22x22 r8 caret button filled Neutral/100 with a
-     1px Neutral/200 stroke, then a 16px List icon and the label at
-     Button/button-14-med Neutral/900; the links indented 32, gap 16, at
-     Button/button-14-med Neutral/700, and the active one Primary/500-main.
-     Kept from the old rail: sticky, its own scroll, and the gutter — the
-     styleguide lists 7 sections and this lists 46 releases. */
-  .idx{position:sticky;top:var(--gw-space-40);align-self:start;
-       max-height:calc(100vh - 80px);overflow-y:auto;overscroll-behavior:contain;
-       scrollbar-gutter:stable;
-       display:flex;flex-direction:column;gap:var(--gw-space-16)}
-  .idx__t{display:flex;align-items:center;gap:var(--gw-space-8);
-          font:var(--gw-text-button-14);letter-spacing:0;
-          color:var(--s-heading, var(--gw-color-neutral-900));
-          padding-bottom:var(--gw-space-8);
-          /* PAGE bg, not card: this is a sticky mask over the scrolling list, so it has to
-             be the colour it sits on. --s-card-bg is white, which showed as a slab. */
-          position:sticky;top:0;z-index:1;background:var(--s-page-bg, var(--gw-color-white))}
-  .idx__ico{width:16px;height:16px;flex:none;display:block}
-  /* The caret button, measured 22x22 with 4 padding around a 12px glyph. It
-     collapses the rail; the styleguide draws it, so it is drawn here. */
-  .idx__col{width:22px;height:22px;flex:none;display:grid;place-items:center;
-            padding:var(--gw-space-4);border-radius:var(--gw-radius-8);
-            background:var(--s-lock-bg, var(--gw-color-neutral-100));
-            border:1px solid var(--s-card-border, var(--gw-color-neutral-200));
-            color:var(--s-heading, var(--gw-color-neutral-800));cursor:pointer}
-  .idx__col svg{width:12px;height:12px;display:block;
-                transition:transform var(--gw-motion-fast)}
-  .idx__col:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
-  /* The indented link list — pad-left 32 on the group, not on each row. */
-  .idx__list{display:flex;flex-direction:column;gap:var(--gw-space-16);
-             padding-left:var(--gw-space-32)}
-  .idx a{font:var(--gw-text-button-14);letter-spacing:0;
-         font-variant-numeric:tabular-nums;
-         color:var(--s-body, var(--gw-color-neutral-700));text-decoration:none}
-  .idx a:hover{color:var(--s-nav-label, var(--gw-color-neutral-900))}
-  .idx a:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
-  /* The release currently at the top of the page. The styleguide marks its
-     active entry with colour alone — Primary/500-main, no tint, no weight
-     change. `font-variant-numeric` is re-declared because the `font`
-     shorthand resets it, and losing tabular figures makes the column jitter. */
-  .idx a.now{color:var(--gw-color-primary-500);font-variant-numeric:tabular-nums}
-  /* Collapsed state, measured against frame 478:15652 — the same page with the
-     rail collapsed. Not just "hide the links": the rail goes 260 -> 48, the
-     main column and its divider go 800 -> 1012, the label is hidden, and the
-     22x22 caret button becomes a 48x26 pill with the List glyph inside it.
-     The column rule above turns the rail's width into the split, so 1012 is
-     arithmetic rather than another declaration. */
-  .idx{width:260px}
-  .idx[data-collapsed="true"]{width:48px}
-  .idx[data-collapsed="true"] .idx__list{display:none}
-  .idx[data-collapsed="true"] .idx__col svg{transform:rotate(90deg)}
-  .idx[data-collapsed="true"] .idx__t{
-    width:48px;height:26px;padding:var(--gw-space-4);
-    gap:var(--gw-space-8);justify-content:center;
-    border-radius:var(--gw-radius-8);background:var(--s-lock-bg, var(--gw-color-neutral-100))}
-  .idx[data-collapsed="true"] .idx__col{
-    width:12px;height:12px;padding:0;background:none;border:0}
-  .idx[data-collapsed="true"] .idx__t > span{display:none}
+     shell.css styles `.idx` — 220 wide (796:11928), sticky 40 into the
+     scrollport, its own scroll, the 22x22 caret, the 32 indent, and the
+     collapsed 48x26 pill. All of it used to be duplicated here at the old 260,
+     which overflowed the shared grid's rail track by 40 and ate the page's
+     right padding. Nothing about this page's rail differs, so nothing is
+     restated. The 46-release list scrolls because `.idx` is capped at
+     100vh - 140 up there, not because of a rule here. */
 
   /* Slim rounded scrollbar, thumb only — the default chrome is heavy next to 12px rows.
      Both properties are needed: `scrollbar-width`/`-color` is the standard and covers
@@ -260,21 +195,16 @@
 
   /* Phone — reflow to one column. See shell.css section 10 for why this page
      reflows while `dashboard-build` scales. */
+  /* `.cl` and `.idx` reflow in shell.css; only this page's own parts are here. */
   @media (max-width:767px){
-    .page{max-width:none;grid-template-columns:minmax(0,1fr);
-          column-gap:0;row-gap:var(--gw-bp-content-gap);
-          padding:var(--gw-bp-pad-section-v) var(--gw-bp-pad-page-h)}
-    .hd,main{grid-column:1;grid-row:auto}
-    .hd{padding-left:0;padding-right:0}
     h1{font-size:var(--gw-bp-type-h1)}
-    .idx{display:none}
     .rel{grid-template-columns:minmax(0,1fr);gap:var(--gw-space-12);
          padding-left:0;padding-right:0}
     .rail{flex-direction:row;align-items:center;gap:var(--gw-space-12)}
     .pill,.tag{margin:0}
   }
 </style></head>
-<body>
+<body data-gw-page="changelog">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <!-- Phosphor. `fill` is re-applied to the symbol: it lives on the source <svg>, and
        stripping that wrapper drops it, which renders every path black. -->
@@ -285,18 +215,21 @@
   <symbol id="i-list" viewBox="0 0 256 256" fill="currentColor"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z"/></symbol>
   <symbol id="i-caret-right" viewBox="0 0 256 256" fill="currentColor"><path d="M184.49,136.49l-80,80a12,12,0,0,1-17-17L159,128,87.51,56.49a12,12,0,1,1,17-17l80,80A12,12,0,0,1,184.49,136.49Z"/></symbol>
 </svg>
-<div class="page">
-  <header class="hd">
-    <h1>Changelog</h1>
-    <p class="hd__meta"><strong>v1.51.0</strong> · last updated 30 Sep 2026, 15:15</p>
+<div class="cl">
+  <header class="cl__hd">
+    <div class="pa-top">
+      <h1>Change Log</h1>
+      <div class="pa" data-page-actions></div>
+    </div>
+    <p class="hd__meta">Last updated 30th Sep, 2026</p>
   </header>
-  <main>
+  <main class="cl__main">
     <section class="intro"><p class="lede">Release notes for the Gushwork design system, including new
        components, corrected measurements, and rulings by version. This page is
        generated from <a class="lnk" href="https://github.com/gushwork-design/design-system/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer">CHANGELOG.md</a>
        on GitHub.</p></section>
-    <article class="rel" id="v1-51-0">
-      <div class="rail">
+    <article class="rel" id="v1-51-0" data-md-heading="v1.51.0 · 30 Sep 2026, 15:15">
+      <div class="rail" data-md-skip>
         <span class="pill pill--now">v1.51.0</span>
         <span class="when">30 Sep 2026</span>
         <span class="when">15:15</span>
@@ -311,8 +244,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-50-0">
-      <div class="rail">
+    <article class="rel" id="v1-50-0" data-md-heading="v1.50.0 · 30 Sep 2026, 15:12">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.50.0</span>
         <span class="when">30 Sep 2026</span>
         <span class="when">15:12</span>
@@ -326,8 +259,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-49-0">
-      <div class="rail">
+    <article class="rel" id="v1-49-0" data-md-heading="v1.49.0 · 24 Sep 2026, 20:17">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.49.0</span>
         <span class="when">24 Sep 2026</span>
         <span class="when">20:17</span>
@@ -340,8 +273,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-48-0">
-      <div class="rail">
+    <article class="rel" id="v1-48-0" data-md-heading="v1.48.0 · 23 Sep 2026, 11:59">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.48.0</span>
         <span class="when">23 Sep 2026</span>
         <span class="when">11:59</span>
@@ -355,8 +288,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-47-0">
-      <div class="rail">
+    <article class="rel" id="v1-47-0" data-md-heading="v1.47.0 · 23 Sep 2026, 11:00">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.47.0</span>
         <span class="when">23 Sep 2026</span>
         <span class="when">11:00</span>
@@ -369,8 +302,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-46-0">
-      <div class="rail">
+    <article class="rel" id="v1-46-0" data-md-heading="v1.46.0 · 15 Sep 2026, 23:46">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.46.0</span>
         <span class="when">15 Sep 2026</span>
         <span class="when">23:46</span>
@@ -383,8 +316,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-45-0">
-      <div class="rail">
+    <article class="rel" id="v1-45-0" data-md-heading="v1.45.0 · 07 Sep 2026, 15:27">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.45.0</span>
         <span class="when">07 Sep 2026</span>
         <span class="when">15:27</span>
@@ -397,8 +330,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-44-0">
-      <div class="rail">
+    <article class="rel" id="v1-44-0" data-md-heading="v1.44.0 · 01 Sep 2026, 19:53">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.44.0</span>
         <span class="when">01 Sep 2026</span>
         <span class="when">19:53</span>
@@ -411,8 +344,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-43-0">
-      <div class="rail">
+    <article class="rel" id="v1-43-0" data-md-heading="v1.43.0 · 01 Sep 2026, 14:55">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.43.0</span>
         <span class="when">01 Sep 2026</span>
         <span class="when">14:55</span>
@@ -430,8 +363,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-42-0">
-      <div class="rail">
+    <article class="rel" id="v1-42-0" data-md-heading="v1.42.0 · 28 Aug 2026, 14:04">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.42.0</span>
         <span class="when">28 Aug 2026</span>
         <span class="when">14:04</span>
@@ -449,8 +382,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-41-1">
-      <div class="rail">
+    <article class="rel" id="v1-41-1" data-md-heading="v1.41.1 · 28 Aug 2026, 10:43">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.41.1</span>
         <span class="when">28 Aug 2026</span>
         <span class="when">10:43</span>
@@ -469,8 +402,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-41-0">
-      <div class="rail">
+    <article class="rel" id="v1-41-0" data-md-heading="v1.41.0 · 26 Aug 2026, 13:20">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.41.0</span>
         <span class="when">26 Aug 2026</span>
         <span class="when">13:20</span>
@@ -488,8 +421,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-40-0">
-      <div class="rail">
+    <article class="rel" id="v1-40-0" data-md-heading="v1.40.0 · 26 Aug 2026, 12:23">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.40.0</span>
         <span class="when">26 Aug 2026</span>
         <span class="when">12:23</span>
@@ -507,8 +440,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-39-0">
-      <div class="rail">
+    <article class="rel" id="v1-39-0" data-md-heading="v1.39.0 · 15 Aug 2026, 19:29">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.39.0</span>
         <span class="when">15 Aug 2026</span>
         <span class="when">19:29</span>
@@ -526,8 +459,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-38-0">
-      <div class="rail">
+    <article class="rel" id="v1-38-0" data-md-heading="v1.38.0 · 14 Aug 2026, 14:40">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.38.0</span>
         <span class="when">14 Aug 2026</span>
         <span class="when">14:40</span>
@@ -545,8 +478,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-37-0">
-      <div class="rail">
+    <article class="rel" id="v1-37-0" data-md-heading="v1.37.0 · 11 Aug 2026, 18:39">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.37.0</span>
         <span class="when">11 Aug 2026</span>
         <span class="when">18:39</span>
@@ -564,8 +497,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-36-0">
-      <div class="rail">
+    <article class="rel" id="v1-36-0" data-md-heading="v1.36.0 · 11 Aug 2026, 18:35">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.36.0</span>
         <span class="when">11 Aug 2026</span>
         <span class="when">18:35</span>
@@ -583,8 +516,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-35-0">
-      <div class="rail">
+    <article class="rel" id="v1-35-0" data-md-heading="v1.35.0 · 11 Aug 2026, 18:31">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.35.0</span>
         <span class="when">11 Aug 2026</span>
         <span class="when">18:31</span>
@@ -602,8 +535,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-34-0">
-      <div class="rail">
+    <article class="rel" id="v1-34-0" data-md-heading="v1.34.0 · 11 Aug 2026, 18:28">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.34.0</span>
         <span class="when">11 Aug 2026</span>
         <span class="when">18:28</span>
@@ -621,8 +554,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-33-0">
-      <div class="rail">
+    <article class="rel" id="v1-33-0" data-md-heading="v1.33.0 · 11 Aug 2026, 18:24">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.33.0</span>
         <span class="when">11 Aug 2026</span>
         <span class="when">18:24</span>
@@ -640,8 +573,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-32-0">
-      <div class="rail">
+    <article class="rel" id="v1-32-0" data-md-heading="v1.32.0 · 11 Aug 2026, 18:11">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.32.0</span>
         <span class="when">11 Aug 2026</span>
         <span class="when">18:11</span>
@@ -659,8 +592,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-31-0">
-      <div class="rail">
+    <article class="rel" id="v1-31-0" data-md-heading="v1.31.0 · 11 Aug 2026, 17:53">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.31.0</span>
         <span class="when">11 Aug 2026</span>
         <span class="when">17:53</span>
@@ -678,8 +611,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-30-0">
-      <div class="rail">
+    <article class="rel" id="v1-30-0" data-md-heading="v1.30.0 · 11 Aug 2026, 13:21">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.30.0</span>
         <span class="when">11 Aug 2026</span>
         <span class="when">13:21</span>
@@ -697,8 +630,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-29-1">
-      <div class="rail">
+    <article class="rel" id="v1-29-1" data-md-heading="v1.29.1 · 11 Aug 2026, 13:17">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.29.1</span>
         <span class="when">11 Aug 2026</span>
         <span class="when">13:17</span>
@@ -717,8 +650,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-29-0">
-      <div class="rail">
+    <article class="rel" id="v1-29-0" data-md-heading="v1.29.0 · 08 Aug 2026, 18:34">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.29.0</span>
         <span class="when">08 Aug 2026</span>
         <span class="when">18:34</span>
@@ -736,8 +669,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-28-1">
-      <div class="rail">
+    <article class="rel" id="v1-28-1" data-md-heading="v1.28.1 · 08 Aug 2026, 18:06">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.28.1</span>
         <span class="when">08 Aug 2026</span>
         <span class="when">18:06</span>
@@ -752,8 +685,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-28-0">
-      <div class="rail">
+    <article class="rel" id="v1-28-0" data-md-heading="v1.28.0 · 08 Aug 2026, 18:05">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.28.0</span>
         <span class="when">08 Aug 2026</span>
         <span class="when">18:05</span>
@@ -771,8 +704,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-27-0">
-      <div class="rail">
+    <article class="rel" id="v1-27-0" data-md-heading="v1.27.0 · 08 Aug 2026, 17:59">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.27.0</span>
         <span class="when">08 Aug 2026</span>
         <span class="when">17:59</span>
@@ -790,8 +723,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-26-0">
-      <div class="rail">
+    <article class="rel" id="v1-26-0" data-md-heading="v1.26.0 · 08 Aug 2026, 17:50">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.26.0</span>
         <span class="when">08 Aug 2026</span>
         <span class="when">17:50</span>
@@ -809,8 +742,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-25-0">
-      <div class="rail">
+    <article class="rel" id="v1-25-0" data-md-heading="v1.25.0 · 08 Aug 2026, 17:40">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.25.0</span>
         <span class="when">08 Aug 2026</span>
         <span class="when">17:40</span>
@@ -828,8 +761,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-24-1">
-      <div class="rail">
+    <article class="rel" id="v1-24-1" data-md-heading="v1.24.1 · 08 Aug 2026, 17:08">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.24.1</span>
         <span class="when">08 Aug 2026</span>
         <span class="when">17:08</span>
@@ -848,8 +781,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-24-0">
-      <div class="rail">
+    <article class="rel" id="v1-24-0" data-md-heading="v1.24.0 · 08 Aug 2026, 14:05">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.24.0</span>
         <span class="when">08 Aug 2026</span>
         <span class="when">14:05</span>
@@ -867,8 +800,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-23-0">
-      <div class="rail">
+    <article class="rel" id="v1-23-0" data-md-heading="v1.23.0 · 08 Aug 2026, 13:59">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.23.0</span>
         <span class="when">08 Aug 2026</span>
         <span class="when">13:59</span>
@@ -886,8 +819,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-22-0">
-      <div class="rail">
+    <article class="rel" id="v1-22-0" data-md-heading="v1.22.0 · 08 Aug 2026, 13:43">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.22.0</span>
         <span class="when">08 Aug 2026</span>
         <span class="when">13:43</span>
@@ -905,8 +838,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-21-0">
-      <div class="rail">
+    <article class="rel" id="v1-21-0" data-md-heading="v1.21.0 · 08 Aug 2026, 13:23">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.21.0</span>
         <span class="when">08 Aug 2026</span>
         <span class="when">13:23</span>
@@ -924,8 +857,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-20-0">
-      <div class="rail">
+    <article class="rel" id="v1-20-0" data-md-heading="v1.20.0 · 08 Aug 2026, 12:48">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.20.0</span>
         <span class="when">08 Aug 2026</span>
         <span class="when">12:48</span>
@@ -943,8 +876,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-19-0">
-      <div class="rail">
+    <article class="rel" id="v1-19-0" data-md-heading="v1.19.0 · 07 Aug 2026, 22:24">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.19.0</span>
         <span class="when">07 Aug 2026</span>
         <span class="when">22:24</span>
@@ -962,8 +895,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-18-0">
-      <div class="rail">
+    <article class="rel" id="v1-18-0" data-md-heading="v1.18.0 · 07 Aug 2026, 20:47">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.18.0</span>
         <span class="when">07 Aug 2026</span>
         <span class="when">20:47</span>
@@ -981,8 +914,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-17-0">
-      <div class="rail">
+    <article class="rel" id="v1-17-0" data-md-heading="v1.17.0 · 07 Aug 2026, 20:38">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.17.0</span>
         <span class="when">07 Aug 2026</span>
         <span class="when">20:38</span>
@@ -1000,8 +933,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-16-0">
-      <div class="rail">
+    <article class="rel" id="v1-16-0" data-md-heading="v1.16.0 · 07 Aug 2026, 20:32">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.16.0</span>
         <span class="when">07 Aug 2026</span>
         <span class="when">20:32</span>
@@ -1019,8 +952,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-15-0">
-      <div class="rail">
+    <article class="rel" id="v1-15-0" data-md-heading="v1.15.0 · 07 Aug 2026, 20:28">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.15.0</span>
         <span class="when">07 Aug 2026</span>
         <span class="when">20:28</span>
@@ -1038,8 +971,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-14-0">
-      <div class="rail">
+    <article class="rel" id="v1-14-0" data-md-heading="v1.14.0 · 07 Aug 2026, 20:13">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.14.0</span>
         <span class="when">07 Aug 2026</span>
         <span class="when">20:13</span>
@@ -1057,8 +990,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-13-2">
-      <div class="rail">
+    <article class="rel" id="v1-13-2" data-md-heading="v1.13.2 · 07 Aug 2026, 20:07">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.13.2</span>
         <span class="when">07 Aug 2026</span>
         <span class="when">20:07</span>
@@ -1077,8 +1010,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-13-1">
-      <div class="rail">
+    <article class="rel" id="v1-13-1" data-md-heading="v1.13.1 · 07 Aug 2026, 20:03">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.13.1</span>
         <span class="when">07 Aug 2026</span>
         <span class="when">20:03</span>
@@ -1097,8 +1030,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-13-0">
-      <div class="rail">
+    <article class="rel" id="v1-13-0" data-md-heading="v1.13.0 · 07 Aug 2026, 20:01">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.13.0</span>
         <span class="when">07 Aug 2026</span>
         <span class="when">20:01</span>
@@ -1116,8 +1049,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-12-1">
-      <div class="rail">
+    <article class="rel" id="v1-12-1" data-md-heading="v1.12.1 · 07 Aug 2026, 18:37">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.12.1</span>
         <span class="when">07 Aug 2026</span>
         <span class="when">18:37</span>
@@ -1136,8 +1069,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-12-0">
-      <div class="rail">
+    <article class="rel" id="v1-12-0" data-md-heading="v1.12.0 · 07 Aug 2026, 18:32">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.12.0</span>
         <span class="when">07 Aug 2026</span>
         <span class="when">18:32</span>
@@ -1155,8 +1088,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-11-0">
-      <div class="rail">
+    <article class="rel" id="v1-11-0" data-md-heading="v1.11.0 · 07 Aug 2026, 18:11">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.11.0</span>
         <span class="when">07 Aug 2026</span>
         <span class="when">18:11</span>
@@ -1174,8 +1107,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-10-0">
-      <div class="rail">
+    <article class="rel" id="v1-10-0" data-md-heading="v1.10.0 · 07 Aug 2026, 17:50">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.10.0</span>
         <span class="when">07 Aug 2026</span>
         <span class="when">17:50</span>
@@ -1193,8 +1126,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-9-0">
-      <div class="rail">
+    <article class="rel" id="v1-9-0" data-md-heading="v1.9.0 · 07 Aug 2026, 16:36">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.9.0</span>
         <span class="when">07 Aug 2026</span>
         <span class="when">16:36</span>
@@ -1212,8 +1145,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-8-0">
-      <div class="rail">
+    <article class="rel" id="v1-8-0" data-md-heading="v1.8.0 · 07 Aug 2026, 16:31">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.8.0</span>
         <span class="when">07 Aug 2026</span>
         <span class="when">16:31</span>
@@ -1231,8 +1164,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-7-0">
-      <div class="rail">
+    <article class="rel" id="v1-7-0" data-md-heading="v1.7.0 · 07 Aug 2026, 16:26">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.7.0</span>
         <span class="when">07 Aug 2026</span>
         <span class="when">16:26</span>
@@ -1250,8 +1183,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-6-0">
-      <div class="rail">
+    <article class="rel" id="v1-6-0" data-md-heading="v1.6.0 · 07 Aug 2026, 16:14">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.6.0</span>
         <span class="when">07 Aug 2026</span>
         <span class="when">16:14</span>
@@ -1269,8 +1202,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-5-0">
-      <div class="rail">
+    <article class="rel" id="v1-5-0" data-md-heading="v1.5.0 · 07 Aug 2026, 16:11">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.5.0</span>
         <span class="when">07 Aug 2026</span>
         <span class="when">16:11</span>
@@ -1288,8 +1221,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-4-0">
-      <div class="rail">
+    <article class="rel" id="v1-4-0" data-md-heading="v1.4.0 · 07 Aug 2026, 16:07">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.4.0</span>
         <span class="when">07 Aug 2026</span>
         <span class="when">16:07</span>
@@ -1307,8 +1240,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-3-0">
-      <div class="rail">
+    <article class="rel" id="v1-3-0" data-md-heading="v1.3.0 · 07 Aug 2026, 16:02">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.3.0</span>
         <span class="when">07 Aug 2026</span>
         <span class="when">16:02</span>
@@ -1326,8 +1259,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-2-0">
-      <div class="rail">
+    <article class="rel" id="v1-2-0" data-md-heading="v1.2.0 · 07 Aug 2026, 15:52">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.2.0</span>
         <span class="when">07 Aug 2026</span>
         <span class="when">15:52</span>
@@ -1345,8 +1278,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-1-0">
-      <div class="rail">
+    <article class="rel" id="v1-1-0" data-md-heading="v1.1.0 · 06 Aug 2026, 17:57">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.1.0</span>
         <span class="when">06 Aug 2026</span>
         <span class="when">17:57</span>
@@ -1364,8 +1297,8 @@
         </div>
       </div>
     </article>
-    <article class="rel" id="v1-0-0">
-      <div class="rail">
+    <article class="rel" id="v1-0-0" data-md-heading="v1.0.0 · 06 Aug 2026, 09:35">
+      <div class="rail" data-md-skip>
         <span class="pill">v1.0.0</span>
         <span class="when">06 Aug 2026</span>
         <span class="when">09:35</span>
@@ -1456,52 +1389,4 @@
     </div>
   </nav>
 </div>
-<script>
-(function () {
-  var links = Array.prototype.slice.call(document.querySelectorAll('.idx a'));
-  if (!links.length) return;
-  var idx = document.querySelector('.idx');
-  var arts = links.map(function (a) { return document.getElementById(a.getAttribute('href').slice(1)); });
-  var active = 0;
-
-  function update() {
-    // Releases are in DOM order, newest first, so the last one whose top has passed the
-    // band is the one being read. Once one fails, every later one fails too.
-    var best = 0;
-    for (var i = 0; i < arts.length; i++) {
-      if (arts[i] && arts[i].getBoundingClientRect().top <= 80) best = i; else break;
-    }
-    if (best === active && links[active].classList.contains('now')) return;
-    links[active].classList.remove('now');
-    links[best].classList.add('now');
-    active = best;
-
-    var l = links[best].getBoundingClientRect(), box = idx.getBoundingClientRect();
-    if (l.top < box.top + 24) idx.scrollTop -= (box.top + 24 - l.top);
-    else if (l.bottom > box.bottom - 8) idx.scrollTop += (l.bottom - box.bottom + 8);
-  }
-
-  var ticking = false;
-  addEventListener('scroll', function () {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(function () { ticking = false; update(); });
-  }, { passive: true });
-  addEventListener('resize', update, { passive: true });
-  update();
-
-  /* The styleguide draws a collapse caret on the rail, so it works here.
-     Collapsed, the rail keeps its header row and drops the 46 anchors. */
-  var col = document.querySelector('[data-idx-collapse]');
-  if (col && idx) {
-    col.addEventListener('click', function () {
-      var next = idx.getAttribute('data-collapsed') !== 'true';
-      idx.setAttribute('data-collapsed', next ? 'true' : 'false');
-      col.setAttribute('aria-expanded', next ? 'false' : 'true');
-      col.setAttribute('aria-label',
-        next ? 'Expand the release list' : 'Collapse the release list');
-    });
-  }
-})();
-</script>
 </body></html>

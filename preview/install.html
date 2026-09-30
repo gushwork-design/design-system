@@ -53,33 +53,18 @@
     margin:0;
     background:var(--s-page-bg, var(--gw-color-neutral-25));
     color:var(--s-body, var(--gw-color-neutral-600));
-    font:var(--gw-text-body-18-med);
-    letter-spacing:var(--gw-text-body-18-med-tracking);
+    font:var(--gw-text-body-16-reg);
+    letter-spacing:var(--gw-text-body-16-reg-tracking);
     -webkit-font-smoothing:antialiased;
   }
 
   /* -- page frame ---------------------------------------------------------- */
-  .sg{
-    max-width:1200px;margin:0 auto;
-    padding:var(--gw-space-60) var(--gw-space-40) var(--gw-space-120);
-    display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--gw-space-60);
-  }
-  .sg__main{min-width:0;display:flex;flex-direction:column;gap:var(--gw-space-32)}
+  /* Layout (grid, header rule, section gaps) is shared — see "THE SHARED PAGE
+     LAYOUT" in shell.css. This page only styles its own content. */
 
   /* The dotted rule is a 2px radial repeated every 4.1px — a real hairline at
      any zoom, where a 1px border rounds away. 691:6698 draws it as a 2px line
      with dasharray 0.1 4 and a round cap, which is the same thing. */
-  .sg__hd{
-    padding:0 var(--gw-space-40) var(--gw-space-32);
-    display:flex;flex-direction:column;gap:var(--gw-space-20);
-    /* --s-rule is defined page-locally in style-guide.html, so it does NOT reach here even
-       with the shell — falling straight to a light neutral put a bright hairline on a black
-       page. --s-card-border is in shell.css and themes (neutral-100 / neutral-800). */
-    background-image:radial-gradient(circle closest-side,
-      var(--s-rule, var(--s-card-border, var(--gw-color-neutral-200))) 100%, transparent 100%);
-    background-size:4.1px 2px;background-position:bottom left;
-    background-repeat:repeat-x;
-  }
   .sg__titlerow{display:flex;align-items:center;gap:var(--gw-space-12);flex-wrap:wrap}
   .sg__title{
     margin:0;font:600 44px/1.2 var(--gw-font-display);letter-spacing:0;
@@ -119,20 +104,27 @@
   /* The standfirst is below the rule, not in the header — it belongs to the
      page's content, and the rule separates the stamp from all of it. */
   .sg__sub{
-    margin:0;padding-left:var(--gw-space-40);max-width:68ch;
-    font:var(--gw-text-body-18-med);
-    letter-spacing:var(--gw-text-body-18-med-tracking);
+    margin:0;max-width:68ch;
+    font:var(--gw-text-body-16-reg);
+    letter-spacing:var(--gw-text-body-16-reg-tracking);
     color:var(--s-body, var(--gw-color-neutral-600));
   }
-  /* A section's own standfirst is already inside the section's 40 inset. */
-  .sg-sec > .sg__sub{padding-left:0}
+  /* No left inset. The old layout put sections 40 inside a wider column; under the
+     shared grid `__main` already carries the 20 that aligns the content with the
+     header (796:11946 — the 800 column's sections are 780, flush). A second 40 here
+     pushed every section right of its own page title. */
   .sg-sec{
-    padding-left:var(--gw-space-40);
     display:flex;flex-direction:column;gap:var(--gw-space-40);
     scroll-margin-top:var(--gw-space-24);
   }
+  /* `.sg-sec`'s own gap is 40 — right between blocks, too loose under the heading,
+     which left the h2 sitting 60 above / 40 below and reading as unattached to the
+     section it names. The negative margin pulls only the heading's edge of that gap
+     back to 16; block-to-block stays 40. (The style guide has no equivalent rule
+     because its h2 lives INSIDE an `.sg-block`, where the gap is already 20.) */
   .sg-sec > h2{
-    margin:0;font:600 28px/1.2 var(--gw-font-display);letter-spacing:0;
+    margin:0 0 calc(var(--gw-space-16) - var(--gw-space-40));
+    font:600 28px/1.2 var(--gw-font-display);letter-spacing:0;
     color:var(--s-heading, var(--gw-color-black));
   }
   /* A step is a heading and prose, not a card with a numbered disc. The order
@@ -145,15 +137,18 @@
   }
   .sg-block > p{
     margin:0;max-width:68ch;
-    font:var(--gw-text-body-18-med);
-    letter-spacing:var(--gw-text-body-18-med-tracking);
+    font:var(--gw-text-body-16-reg);
+    letter-spacing:var(--gw-text-body-16-reg-tracking);
     color:var(--s-body, var(--gw-color-neutral-600));
   }
   .sg-block > p strong{
     font-weight:700;color:var(--s-heading, var(--gw-color-black));
   }
-  .sg-block a{color:var(--s-heading, var(--gw-color-black));text-decoration:underline}
-  .sg-block a:hover{color:var(--gw-color-primary-500)}
+  /* No colour, no underline set here. shell.css gives every inline link the
+     sentence's own colour, semibold and an underline. This forced Neutral/black,
+     which made the link the darkest thing in a Neutral/600 paragraph — the
+     opposite of the ruling, where blue is the highlight and everything else
+     carries weight instead of colour. */
   .sg-block code{
     font:var(--gw-text-body-14-reg);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
     background:var(--s-lock-bg, var(--gw-color-neutral-100));
@@ -211,84 +206,43 @@
   .code__btn[data-state="done"] span{display:inline}
   .code__btn:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
 
-  /* -- "On this page" rail -------------------------------------------------
-     Measured off the styleguide TOC (478:15070 -> Frame 2147260252): 260 wide,
-     stack gap 16, a 22x22 r8 caret button, links indented 32. shell.css holds
-     the canonical copy; this one exists so the sheet stands alone.
-     --------------------------------------------------------------------- */
-  .idx{
-    position:sticky;top:var(--gw-space-40);align-self:start;
-    max-height:calc(100vh - 80px);overflow-y:auto;overscroll-behavior:contain;
-    scrollbar-gutter:stable;width:260px;
-    display:flex;flex-direction:column;gap:var(--gw-space-16);
-  }
-  .idx__t{
-    display:flex;align-items:center;gap:var(--gw-space-8);
-    font:var(--gw-text-button-14);line-height:20px;
-    color:var(--s-nav-label, var(--gw-color-neutral-900));
-    padding-bottom:var(--gw-space-8);
-    position:sticky;top:0;z-index:1;
-    background:var(--s-page-bg, var(--gw-color-neutral-25));
-  }
-  .idx__ico{width:16px;height:16px;flex:none;display:block}
-  .idx__col{
-    width:22px;height:22px;flex:none;display:grid;place-items:center;
-    padding:var(--gw-space-4);border-radius:var(--gw-radius-8);
-    background:var(--s-lock-bg, var(--gw-color-neutral-100));
-    border:1px solid var(--s-field-border, var(--gw-color-neutral-200));
-    color:var(--s-body, var(--gw-color-neutral-600));cursor:pointer;
-  }
-  .idx__col svg{width:12px;height:12px;display:block;transition:transform var(--gw-motion-fast)}
-  .idx__col:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
-  .idx__list{display:flex;flex-direction:column;gap:var(--gw-space-16);padding-left:var(--gw-space-32)}
-  .idx a{
-    font:var(--gw-text-button-14);line-height:20px;font-variant-numeric:tabular-nums;
-    color:var(--gw-color-neutral-700);text-decoration:none;
-  }
-  .idx a:hover{color:var(--s-nav-label, var(--gw-color-neutral-900))}
-  .idx a:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
-  /* Active entry is marked with colour alone — no tint, no weight change. */
-  .idx a.now{color:var(--gw-color-primary-500)}
-  .idx[data-collapsed="true"]{width:48px}
-  .idx[data-collapsed="true"] .idx__list{display:none}
-  .idx[data-collapsed="true"] .idx__col svg{transform:rotate(90deg)}
-  .idx[data-collapsed="true"] .idx__t{
-    width:48px;height:26px;padding:var(--gw-space-4);gap:var(--gw-space-8);
-    justify-content:center;border-radius:var(--gw-radius-8);
-    background:var(--s-lock-bg, var(--gw-color-neutral-100));
-    padding-bottom:var(--gw-space-4);
-  }
-  .idx[data-collapsed="true"] .idx__t > span{display:none}
+  /* The "On this page" rail is shell.css's — `.idx`, 220 wide per 796:11928.
+     This page used to carry its own copy at 260, which overflowed the shared
+     grid's rail track and ate the page's right padding. Removed rather than
+     corrected: the page grid itself only exists in shell.css now, so a local
+     copy of half the geometry buys nothing and drifts on its own. */
 
   /* The rail is a desktop affordance — there is no phone design for it, and the
      three sections are reachable by scrolling. Same breakpoint as shell.css. */
+  /* `.sg` and `.idx` reflow in shell.css; only this page's own type steps down here. */
   @media (max-width:767px){
-    .idx{display:none}
-    .sg{grid-template-columns:minmax(0,1fr);padding:var(--gw-space-32) var(--gw-space-20) var(--gw-space-60)}
-    .sg__hd{padding-left:0;padding-right:0}
     .sg__sub,.sg-sec{padding-left:0}
     .sg__title{font-size:32px}
     .sg-sec > h2{font-size:24px}
   }
 </style>
-<body>
+<body data-gw-page="claude-plugin">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-copy" viewBox="0 0 256 256" fill="currentColor"><path d="M216,28H88A12,12,0,0,0,76,40V76H40A12,12,0,0,0,28,88V216a12,12,0,0,0,12,12H168a12,12,0,0,0,12-12V180h36a12,12,0,0,0,12-12V40A12,12,0,0,0,216,28ZM156,204H52V100H156Zm48-48H180V88a12,12,0,0,0-12-12H100V52H204Z"/></symbol>
   <symbol id="i-check" viewBox="0 0 256 256" fill="currentColor"><path d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z"/></symbol>
 </svg>
 
 <div class="sg">
-  <div class="sg__main">
 
-    <header class="sg__hd">
+  <!-- The header is its own full-width grid row — 796:10015 spans both columns.
+       Lifted out of __main so `grid-column:1/-1` in shell.css can reach it. -->
+  <header class="sg__hd">
       <div class="sg__titlerow">
-        <h1 class="sg__title">Gushwork Design Plugin</h1>
+        <h1 class="sg__title">Claude Plugin</h1>
         <span class="chip">v1.51.0</span>
       </div>
       <p class="meta">Last updated 30 Sep 2026, 15:15 ·
          <a href="changelog-sheet.html" target="_blank" rel="noopener noreferrer">Change log</a></p>
     </header>
 
+  <div class="sg__main">
+
+    
     <div class="sg__body">
 
       <p class="sg__sub">A Claude Code plugin. Install it once and Claude builds Gushwork pages,
@@ -455,36 +409,10 @@
   });
 })();
 </script>
-<script>
-/* Rail: collapse + scroll spy. Same behaviour as the style guide's, so the two
-   pages feel identical to use. */
-(function () {
-  'use strict';
-  var idx = document.querySelector('.idx');
-  var col = document.querySelector('[data-idx-collapse]');
-  if (col && idx) {
-    col.addEventListener('click', function () {
-      var next = idx.getAttribute('data-collapsed') !== 'true';
-      idx.setAttribute('data-collapsed', next ? 'true' : 'false');
-      col.setAttribute('aria-expanded', next ? 'false' : 'true');
-      col.setAttribute('aria-label', next ? 'Expand the section list' : 'Collapse the section list');
-    });
-  }
-  var links = [].slice.call(document.querySelectorAll('.idx__list a'));
-  var secs = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
-  function spy() {
-    var best = 0;
-    for (var i = 0; i < secs.length; i++) {
-      if (secs[i] && secs[i].getBoundingClientRect().top <= 140) best = i;
-    }
-    links.forEach(function (a, i) { a.classList.toggle('now', i === best); });
-  }
-  var t = false;
-  addEventListener('scroll', function () {
-    if (t) return; t = true;
-    requestAnimationFrame(function () { t = false; spy(); });
-  }, { passive: true });
-  spy();
-})();
-</script>
+<!-- No rail script here. shell.js's initIndexRail() does the collapse, the scroll
+     spy and keeping the active entry in view, on every page. This page carried its
+     own copy, so the caret had TWO click handlers: each toggled data-collapsed, the
+     second undid the first, and the rail never collapsed. Its spy also listened on
+     `window`, which does not scroll — the panel's .gw-scroll does. Same defect that
+     was removed from the tools, staging and changelog pages. -->
 </body></html>

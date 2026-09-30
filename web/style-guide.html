@@ -25,36 +25,31 @@
      cards          r20 Neutral/100 · inner cards r16
    ========================================================================= */
 
-/* -- page frame: main + TOC, same split the changelog uses ---------------- */
-/* minmax(0,800px) — not a fixed 800 — so the main column gives way before the
-   TOC does. The content area here is the viewport minus the 240 rail, so a
-   hard 800 + 60 + 260 would overflow on anything under a 1440 screen. */
-.sg{
-  max-width:1200px;margin:0 auto;
-  padding:var(--gw-space-60) var(--gw-space-40) var(--gw-space-120);
-  /* `auto` for the rail, not a fixed 260 — collapsing it to 48 then widens
-     the main column to the measured 1012 with no extra rule. */
-  display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--gw-space-60);
-}
-.sg__main{min-width:0;display:flex;flex-direction:column;gap:var(--gw-space-32)}
+/* -- page frame -----------------------------------------------------------
+   `.sg` is THE SHARED PAGE LAYOUT in shell.css — the same grid downloads,
+   staging, tools and the changelog use. This page carried a private copy of it,
+   which is why collapsing the TOC stopped widening the content column here
+   after the layout was consolidated: a page <style> outranks the shell link, so
+   the local fixed 220 track quietly won. Removed rather than corrected.
+   -------------------------------------------------------------------------- */
+/* 60 between sections, measured across all eight in 796:9441 — every gap is 60. */
+.sg__main{min-width:0;display:flex;flex-direction:column;gap:var(--gw-space-60);
+          /* 796:9441 — the sections are 780 wide inside the 800 column. */
+          padding-left:var(--gw-space-20)}
 
-/* -- header (Frame 2147260129): inset 40, rule runs the full column ------- */
-/* The rule under the header is DOTTED, not solid. Measured on Line 14
-   (478:15076): strokeWeight 2, strokeCap ROUND, dashPattern [0.1, 4] — a
-   dash of essentially zero length under a round cap is a dot, 2px across
-   (the weight), repeating every 4.1px.
-   Drawn as a gradient rather than `border-bottom: 2px dotted`, because the
-   dot size and spacing of a CSS dotted border are left to the UA and differ
-   between engines; this pins both to the measured numbers. `closest-side`
-   makes the radius min(4.1,2)/2 = 1px, so the dot is exactly 2px wide. */
-.sg__hd{padding:0 var(--gw-space-40) var(--gw-space-32);
-        border-bottom:0;
-        background-image:radial-gradient(circle closest-side,
-                         var(--s-rule) 100%, transparent 100%);
-        background-size:4.1px 2px;
-        background-position:left bottom;
-        background-repeat:repeat-x;
-        display:flex;flex-direction:column;gap:var(--gw-space-20)}
+/* -- header (Frame 2147260129): inset 40,20 · rule runs the full column ---- */
+/* SOLID, 1px, Neutral/100. Re-measured on 796:10015: the rule at the header's
+   bottom edge is an unbroken run of #e7e8e9 across all 1106 — no breaks at all.
+   It used to be drawn as a dotted gradient from 478:15076, which is an older
+   node; that revision is gone. */
+.sg__hd{grid-column:1/-1;
+        /* Inner block at 40,20. 40 + (53 title + 16 + 20 meta) + 40 = 169; the
+           drawing says 171, and the last 2 are off the spacing scale. */
+        padding:var(--gw-space-40) 0 var(--gw-space-40) var(--gw-space-20);
+        border-bottom:1px solid var(--gw-color-neutral-100);
+        background-image:none;
+        /* Title 53 tall, meta at y=69 — a 16 gap, measured 796:10016/10017. */
+        display:flex;flex-direction:column;gap:var(--gw-space-16)}
 .sg__title{margin:0;font:600 44px/1.2 var(--gw-font-display);letter-spacing:0;
            color:var(--s-heading)}
 .sg__meta{margin:0;font:var(--gw-text-body-14-med);
@@ -63,7 +58,7 @@
 
 /* -- sections ------------------------------------------------------------- */
 .sg__body{display:flex;flex-direction:column;gap:var(--gw-space-60)}
-.sg-sec{padding-left:var(--gw-space-40);display:flex;flex-direction:column;
+.sg-sec{padding-left:0;display:flex;flex-direction:column;
         gap:var(--gw-space-40);scroll-margin-top:var(--gw-space-24)}
 .sg-block{display:flex;flex-direction:column;gap:var(--gw-space-20)}
 .sg-sec :where(h2){margin:0;font:600 28px/1.2 var(--gw-font-display);letter-spacing:0;
@@ -73,8 +68,8 @@
 /* :where() so this contributes ZERO specificity. As `.sg-sec p` it scored
    0,1,1 and out-ranked every specimen class below (0,1,0) — which silently
    rendered the 40px Vert Grotesk display specimen as 18px Inter body copy. */
-.sg-sec :where(p){margin:0;font:var(--gw-text-body-18-med);
-          letter-spacing:var(--gw-text-body-18-med-tracking);color:var(--s-body)}
+.sg-sec :where(p){margin:0;font:var(--gw-text-body-16-reg);
+          letter-spacing:var(--gw-text-body-16-reg-tracking);color:var(--s-body)}
 .sg-head{display:flex;flex-direction:column;gap:var(--gw-space-12)}
 
 /* -- the standard specimen card ------------------------------------------ */
@@ -266,8 +261,8 @@
                color:var(--s-heading)}
 .sg-type__display{margin:0;font:700 40px/1.2 var(--gw-font-display);
                   letter-spacing:0;color:var(--s-heading)}
-.sg-type__para{margin:0;font:var(--gw-text-body-18-med);
-               letter-spacing:var(--gw-text-body-18-med-tracking);
+.sg-type__para{margin:0;font:var(--gw-text-body-16-reg);
+               letter-spacing:var(--gw-text-body-16-reg-tracking);
                color:var(--s-heading)}
 .sg-use{margin:0;font:var(--gw-text-body-16-med);
         letter-spacing:var(--gw-text-body-16-med-tracking);color:var(--s-body)}
@@ -478,13 +473,20 @@
 <body data-gw-page="style-guide">
 
 <div class="sg">
+
+  <!-- Measured 796:10015: the header is 1106 wide — the FULL body width, above both
+       columns — not 800. It used to sit inside the content column. -->
+  <header class="sg__hd">
+    <div class="pa-top">
+      <h1 class="sg__title">Style Guide</h1>
+      <!-- data-bundle-default: Copy page here is the whole kit — this page plus the Downloads
+           page's files and the logo SVG source. See buildBrandKit in shell.js. -->
+      <div class="pa" data-page-actions="public" data-bundle="/downloads" data-bundle-role="guidelines" data-bundle-default></div>
+    </div>
+    <p class="sg__meta">Last updated 30th Sep, 2026</p>
+  </header>
+
   <div class="sg__main">
-
-    <header class="sg__hd">
-      <h1 class="sg__title">Gushwork Style Guide</h1>
-      <p class="sg__meta">Last updated 30th Sep, 2026</p>
-    </header>
-
     <div class="sg__body">
 
       <!-- intro (Frame 2147260245) -->
@@ -1083,8 +1085,6 @@
      scroll spy. It moved there on 29 Sep 2026 because each page had its own
      copy listening on `window`, and the window stopped scrolling when the
      content panel became its own scrollport. */
-  }, { passive: true });
-  spy();
 })();
 </script>
 </body></html>

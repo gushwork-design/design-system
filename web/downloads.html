@@ -55,18 +55,10 @@
 }
 
 /* -- page frame: identical split to the Style Guide ----------------------- */
-.dl{max-width:1200px;margin:0 auto;
-    padding:var(--gw-space-60) var(--gw-space-40) var(--gw-space-120);
-    display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--gw-space-60)}
-.dl__main{min-width:0;display:flex;flex-direction:column;gap:var(--gw-space-32)}
+/* Layout (grid, header rule, section gaps) is shared — see "THE SHARED PAGE
+   LAYOUT" in shell.css. This page only styles its own content. */
 
 /* -- header: same dotted rule as the Style Guide (2px, round cap, [0.1,4]) - */
-.dl__hd{padding:0 var(--gw-space-40) var(--gw-space-32);
-        background-image:radial-gradient(circle closest-side,
-                         var(--d-rule) 100%, transparent 100%);
-        background-size:4.1px 2px;background-position:left bottom;
-        background-repeat:repeat-x;
-        display:flex;flex-direction:column;gap:var(--gw-space-20)}
 .dl__title{margin:0;font:600 44px/1.2 var(--gw-font-display);color:var(--s-heading)}
 .dl__meta{margin:0;font:var(--gw-text-body-14-med);
           letter-spacing:var(--gw-text-body-14-med-tracking);
@@ -74,21 +66,20 @@
 
 /* -- sections ------------------------------------------------------------- */
 .dl__body{display:flex;flex-direction:column;gap:var(--gw-space-60)}
-.dl-sec{padding-left:var(--gw-space-40);display:flex;flex-direction:column;
+/* No left inset. The old layout put sections 40 inside a wider column; under the
+   shared grid `__main` already carries the 20 that aligns the content with the
+   header (796:11946 — the 800 column's sections are 780, flush). A second 40 here
+   pushed every section right of its own page title. */
+.dl-sec{display:flex;flex-direction:column;
         gap:var(--gw-space-20);scroll-margin-top:var(--gw-space-24)}
 .dl-sec :where(h2){margin:0;font:600 28px/1.2 var(--gw-font-display);color:var(--s-heading)}
-.dl-sec :where(p){margin:0;font:var(--gw-text-body-18-med);
-          letter-spacing:var(--gw-text-body-18-med-tracking);color:var(--s-body)}
+.dl-sec :where(p){margin:0;font:var(--gw-text-body-16-reg);
+          letter-spacing:var(--gw-text-body-16-reg-tracking);color:var(--s-body)}
 /* Links carry no colour of their own — weight and the underline do the work,
    so a paragraph reads as one piece of text rather than as prose with blue
    holes punched through it. */
-.dl-sec :where(p) a{color:inherit;font-weight:600;text-decoration:underline;
-          text-underline-offset:3px;text-decoration-thickness:1px;
-          text-decoration-color:var(--gw-color-neutral-300)}
-.dl-sec :where(p) a:hover{color:var(--s-heading);
-          text-decoration-color:currentColor}
-.dl-sec :where(p) a:focus-visible{outline:var(--gw-focus-ring);
-          outline-offset:var(--gw-focus-offset);border-radius:var(--gw-radius-2)}
+/* Inline links are shell.css's — inherit the sentence's colour, semibold,
+   underlined one step back. This page had its own copy. */
 /* The lock is the same glyph the sidebar puts on a gated row, so the note and
    the rows it describes read as one statement. */
 .dl-note--lock{display:flex;align-items:flex-start;gap:var(--gw-space-8)}
@@ -145,6 +136,21 @@
 
 /* -- action button + format menu ------------------------------------------ */
 .dl-act{position:relative;display:inline-block}
+/* "Download all" — styled as the Copy page control is (white, 1px border, 36 tall, radius 10),
+   not as a blue CTA. It was blue for a while; on a page whose only other button is the
+   per-row Download, a filled blue one read as louder than the page's own content. */
+.pa-acts{display:flex;align-items:center;gap:var(--gw-space-8);flex:none}
+.dl-all{height:36px;display:inline-flex;align-items:center;gap:var(--gw-space-8);
+        padding:0 var(--gw-space-16) 0 var(--gw-space-12);
+        border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+        background:var(--s-card-bg);color:var(--s-heading);cursor:pointer;
+        font:var(--gw-text-button-14);white-space:nowrap;
+        transition:background var(--gw-motion-fast)}
+.dl-all svg{width:16px;height:16px;display:block;flex:none}
+.dl-all:hover{background:var(--s-nav-hover)}
+.dl-all:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.dl-all[disabled]{cursor:progress;opacity:.75}
+@media (max-width:767px){.pa-acts{flex-wrap:wrap}}
 .dl-btn{width:107px;height:32px;display:inline-flex;align-items:center;
         text-decoration:none;
         justify-content:center;gap:var(--gw-space-8);
@@ -194,10 +200,14 @@
          background:var(--gw-color-neutral-25);color:var(--d-muted);
          font:var(--gw-text-button-12);line-height:16px}
 :root[data-theme="dark"] .dl-chip{background:var(--gw-color-neutral-800)}
-.dl-spec__foot{display:flex;align-items:center;justify-content:space-between;
-               gap:var(--gw-space-16);margin-top:var(--gw-space-4);
-               padding-top:var(--gw-space-16);
-               border-top:1px solid var(--d-card-border)}
+/* The card ends in one full-width Download. The rule above it and the weight range beside it
+   are gone: neither told anyone anything the file does not. */
+.dl-spec__foot{display:flex;margin-top:var(--gw-space-4)}
+.dl-btn--wide{width:100%;height:40px}
+.dl-chip--link{text-decoration:none;cursor:pointer;transition:background var(--gw-motion-fast)}
+.dl-chip--link:hover{background:var(--gw-color-neutral-50);color:var(--s-heading)}
+:root[data-theme="dark"] .dl-chip--link:hover{background:var(--gw-color-neutral-700)}
+.dl-chip--link:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
 
 /* -- tokens block ---------------------------------------------------------- */
 .dl-code{background:var(--d-card);border:1px solid var(--d-card-border);
@@ -252,14 +262,30 @@
 <body data-gw-page="downloads">
 
 <div class="dl">
-  <div class="dl__main">
 
-    <!-- HEADER — 683:7562 -->
-    <header class="dl__hd">
-      <h1 class="dl__title">Download Gushwork Assets</h1>
+  <!-- The header is its own full-width grid row — 796:10015 spans both columns.
+       Lifted out of __main so `grid-column:1/-1` in shell.css can reach it. -->
+  <header class="dl__hd">
+      <div class="pa-top">
+        <h1 class="dl__title">Downloads</h1>
+        <!-- No Copy page control on this page: Download all is the one action here. The page's
+             Markdown is still produced (shell.js exposes it on every page) because the Style
+             Guide's copy reads this page through a hidden frame to include the file list. -->
+        <div class="pa-acts">
+          <button type="button" class="dl-all" data-dl-all>
+            <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0Zm-101.66,5.66a8,8,0,0,0,11.32,0l40-40a8,8,0,0,0-11.32-11.32L136,124.69V32a8,8,0,0,0-16,0v92.69L93.66,98.34a8,8,0,0,0-11.32,11.32Z"/></svg>
+            <span data-dl-all-label>Download all</span>
+          </button>
+        </div>
+        <span class="gw-sr" role="status" aria-live="polite" data-dl-all-live></span>
+      </div>
       <p class="dl__meta">Last updated 16th Sep, 2026</p>
     </header>
 
+  <div class="dl__main">
+
+    <!-- HEADER — 683:7562 -->
+    
     <div class="dl__body">
 
       <!-- INTRO — 683:7568, verbatim from the Figma text node -->
@@ -269,6 +295,9 @@
            mark that drifts.</p>
         <p>How to use them is the Style Guide&rsquo;s job. This page just hands you the files.
            <a href="/style-guide">Explore the Style Guide</a></p>
+        <p>Using ChatGPT or another AI tool? Copy the page from the Style Guide and attach the
+           zip from Download all as well. The tool cannot fetch these files itself, and without
+           them it redraws the logo and picks its own fonts.</p>
       </section>
 
       <!-- 01 · OUR LOGO — 683:7569 -->
@@ -289,31 +318,31 @@
           </thead>
           <tbody>
             <tr>
-              <td class="c-prev"><span class="dl-pv"><img src="/assets/logo/gushwork-logo-original.svg" alt=""></span></td>
+              <td class="c-prev"><span class="dl-pv" data-md-skip><img src="/assets/logo/gushwork-logo-original.svg" alt=""></span></td>
               <td class="c-type">Original Full Logo</td>
               <td class="c-use u">White and light surfaces</td>
               <td class="c-act" data-asset="Original Full Logo" data-slug="logo-original"></td>
             </tr>
             <tr>
-              <td class="c-prev"><span class="dl-pv" data-bg="blue"><img src="/assets/logo/gushwork-logo-white.svg" alt=""></span></td>
+              <td class="c-prev"><span class="dl-pv" data-md-skip data-bg="blue"><img src="/assets/logo/gushwork-logo-white.svg" alt=""></span></td>
               <td class="c-type">White Full Logo</td>
               <td class="c-use u">Blue and dark surfaces or images</td>
               <td class="c-act" data-asset="White Full Logo" data-slug="logo-white"></td>
             </tr>
             <tr>
-              <td class="c-prev"><span class="dl-pv"><img src="/assets/logo/gushwork-logo-dark.svg" alt=""></span></td>
+              <td class="c-prev"><span class="dl-pv" data-md-skip><img src="/assets/logo/gushwork-logo-dark.svg" alt=""></span></td>
               <td class="c-type">Dark Full Logo</td>
               <td class="c-use u">Monochrome and no-color print</td>
               <td class="c-act" data-asset="Dark Full Logo" data-slug="logo-dark"></td>
             </tr>
             <tr>
-              <td class="c-prev"><span class="dl-pv" data-art="symbol"><img src="/assets/logo/gushwork-symbol-original.svg" alt=""></span></td>
+              <td class="c-prev"><span class="dl-pv" data-md-skip data-art="symbol"><img src="/assets/logo/gushwork-symbol-original.svg" alt=""></span></td>
               <td class="c-type">Original Symbol</td>
               <td class="c-use u">Favicons, avatars, app icons</td>
               <td class="c-act" data-asset="Original Symbol" data-slug="symbol-original"></td>
             </tr>
             <tr>
-              <td class="c-prev"><span class="dl-pv" data-bg="blue" data-art="symbol"><img src="/assets/logo/gushwork-symbol-white.svg" alt=""></span></td>
+              <td class="c-prev"><span class="dl-pv" data-md-skip data-bg="blue" data-art="symbol"><img src="/assets/logo/gushwork-symbol-white.svg" alt=""></span></td>
               <td class="c-type">White Symbol</td>
               <td class="c-use u">Blue and dark surfaces</td>
               <td class="c-act" data-asset="White Symbol" data-slug="symbol-white"></td>
@@ -339,7 +368,7 @@
           </thead>
           <tbody>
             <tr>
-              <td class="c-prev"><span class="dl-pv" data-art="sheet">
+              <td class="c-prev"><span class="dl-pv" data-md-skip data-art="sheet">
                 <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM160,51.31,188.69,80H160ZM200,216H56V40h88V88a8,8,0,0,0,8,8h48V216Zm-40-72a8,8,0,0,1-8,8H104a8,8,0,0,1,0-16h48A8,8,0,0,1,160,144Zm0,32a8,8,0,0,1-8,8H104a8,8,0,0,1,0-16h48A8,8,0,0,1,160,176Z"/></svg>
               </span></td>
               <td class="c-type">Color reference sheet</td>
@@ -347,7 +376,7 @@
               <td class="c-act" data-asset="Color reference sheet" data-formats="sheet"></td>
             </tr>
             <tr>
-              <td class="c-prev"><span class="dl-pv" data-art="chips">
+              <td class="c-prev"><span class="dl-pv" data-md-skip data-art="chips">
                 <i style="background:var(--gw-color-primary-500)"></i>
                 <i style="background:var(--gw-color-black)"></i>
                 <i style="background:var(--gw-color-neutral-400)"></i>
@@ -373,12 +402,9 @@
             <p class="dl-spec__art">Aa<small>Rank, publish, compound</small></p>
             <div class="dl-chips">
               <span class="dl-chip">Display &amp; headings</span>
-              <span class="dl-chip">Variable</span>
-              <span class="dl-chip">57 KB</span>
             </div>
             <div class="dl-spec__foot">
-              <span class="dl-note">400&ndash;700 &middot; no italics</span>
-              <a class="dl-btn dl-btn--auto" href="/fonts/Vert_Grotesk_Display_VF.ttf" download>
+              <a class="dl-btn dl-btn--wide" href="/fonts/Vert_Grotesk_Display_VF.ttf" download>
                 <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M74.34,133.66a8,8,0,0,1,11.32-11.32L120,156.69V40a8,8,0,0,1,16,0V156.69l34.34-34.35a8,8,0,0,1,11.32,11.32l-48,48a8,8,0,0,1-11.32,0ZM216,144a8,8,0,0,0-8,8v56H48V152a8,8,0,0,0-16,0v56a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V152A8,8,0,0,0,216,144Z"/></svg>
                 <span>Download</span><span class="gw-sr"> Vert Grotesk Display, TTF</span></a>
             </div>
@@ -389,21 +415,23 @@
             <p class="dl-spec__art">Aa<small>Body copy, tables, interface</small></p>
             <div class="dl-chips">
               <span class="dl-chip">Body &amp; UI</span>
-              <span class="dl-chip">Variable + italic</span>
-              <span class="dl-chip">854 / 883 KB</span>
+              <a class="dl-chip dl-chip--link" href="/fonts/Inter-Italic-VariableFont_opsz_wght.ttf" download>Download italic</a>
             </div>
             <div class="dl-spec__foot">
-              <span class="dl-note">100&ndash;900 &middot; roman and italic</span>
-              <a class="dl-btn dl-btn--auto" href="/fonts/Inter-VariableFont_opsz_wght.ttf" download>
+              <a class="dl-btn dl-btn--wide" href="/fonts/Inter-VariableFont_opsz_wght.ttf" download>
                 <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M74.34,133.66a8,8,0,0,1,11.32-11.32L120,156.69V40a8,8,0,0,1,16,0V156.69l34.34-34.35a8,8,0,0,1,11.32,11.32l-48,48a8,8,0,0,1-11.32,0ZM216,144a8,8,0,0,0-8,8v56H48V152a8,8,0,0,0-16,0v56a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V152A8,8,0,0,0,216,144Z"/></svg>
                 <span>Download</span><span class="gw-sr"> Inter, TTF</span></a>
             </div>
           </div>
         </div>
 
-        <p>Decks exported to Google Slides or <code>.pptx</code> come back in Plus Jakarta Sans —
+        <!-- Plus Jakarta Sans is Slides' stand-in, not a brand face. It stays on the page for
+             people exporting decks, but is kept OUT of the zip (data-no-zip) and OUT of the
+             copied Markdown (data-md-skip): "two faces, and no third" is the rule, and a
+             model told that decks come back in Plus Jakarta will reach for it. -->
+        <p data-md-skip>Decks exported to Google Slides or <code>.pptx</code> come back in Plus Jakarta Sans —
            Slides cannot load a custom face. That substitution is expected, not drift.
-           <a href="/fonts/PlusJakartaSans-VariableFont_wght.ttf" download>Download Plus Jakarta Sans</a></p>
+           <a href="/fonts/PlusJakartaSans-VariableFont_wght.ttf" download data-no-zip>Download Plus Jakarta Sans</a></p>
       </section>
 
       <!-- 04 · TOKENS -->
@@ -427,7 +455,6 @@
             </button>
           </div>
         </div>
-        <p class="dl-note">tokens.css &middot; 32 KB</p>
       </section>
 
       <!-- 05 · WHAT ISN'T HERE -->
@@ -439,7 +466,7 @@
         <div class="dl-outs">
           <a class="dl-out" href="/internal/claude-plugin">Claude Plugin
             <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M224.49,136.49l-72,72a12,12,0,0,1-17-17L187,140H40a12,12,0,0,1,0-24H187L135.51,64.48a12,12,0,0,1,17-17l72,72A12,12,0,0,1,224.49,136.49Z"/></svg></a>
-          <a class="dl-out" href="/internal/tools">Tools &amp; Templates
+          <a class="dl-out" href="/internal/templates">Templates
             <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M224.49,136.49l-72,72a12,12,0,0,1-17-17L187,140H40a12,12,0,0,1,0-24H187L135.51,64.48a12,12,0,0,1,17-17l72,72A12,12,0,0,1,224.49,136.49Z"/></svg></a>
         </div>
         <p class="dl-note dl-note--lock">
@@ -511,6 +538,9 @@
 
     var id = 'dlm-' + (++seq);
     var asset = cell.getAttribute('data-asset');
+    /* Marks the cell for the page's Markdown export (shell.js): its format menu is
+       closed and hidden, and would otherwise be left out along with the files in it. */
+    cell.setAttribute('data-md-links', '');
 
     var btn = document.createElement('button');
     btn.type = 'button';
@@ -546,6 +576,93 @@
     wrap.appendChild(menu);
     cell.appendChild(wrap);
   });
+
+  /* -- Download all ---------------------------------------------------------
+     One zip of every file this page offers, built here from the page's own links — the
+     format menus and the font buttons — so it cannot drift from what the page lists.
+     The zip is written by hand (STORE, no compression): the set is ~3 MB of PNG, JPG,
+     PDF and fonts that are already compressed, and it saves shipping a library. */
+  var CRC = (function () {
+    var t = new Uint32Array(256);
+    for (var n = 0; n < 256; n++) { var c = n; for (var k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; }
+    return t;
+  })();
+  function crc32(u8) { var c = 0xFFFFFFFF; for (var i = 0; i < u8.length; i++) c = CRC[(c ^ u8[i]) & 255] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+
+  function makeZip(files) {
+    var enc = new TextEncoder(), parts = [], central = [], offset = 0, now = new Date();
+    var dosTime = (now.getHours() << 11) | (now.getMinutes() << 5) | (now.getSeconds() >> 1);
+    var dosDate = ((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate();
+    files.forEach(function (f) {
+      var name = enc.encode(f.name), crc = crc32(f.data), size = f.data.length;
+      var lh = new DataView(new ArrayBuffer(30));
+      lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true);
+      lh.setUint16(8, 0, true); lh.setUint16(10, dosTime, true); lh.setUint16(12, dosDate, true);
+      lh.setUint32(14, crc, true); lh.setUint32(18, size, true); lh.setUint32(22, size, true);
+      lh.setUint16(26, name.length, true); lh.setUint16(28, 0, true);
+      parts.push(lh.buffer, name, f.data);
+      var ch = new DataView(new ArrayBuffer(46));
+      ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true);
+      ch.setUint16(8, 0x0800, true); ch.setUint16(10, 0, true); ch.setUint16(12, dosTime, true);
+      ch.setUint16(14, dosDate, true); ch.setUint32(16, crc, true); ch.setUint32(20, size, true);
+      ch.setUint32(24, size, true); ch.setUint16(28, name.length, true); ch.setUint16(30, 0, true);
+      ch.setUint16(32, 0, true); ch.setUint16(34, 0, true); ch.setUint16(36, 0, true);
+      ch.setUint32(38, 0, true); ch.setUint32(42, offset, true);
+      central.push(ch.buffer, name);
+      offset += 30 + name.length + size;
+    });
+    var cdSize = 0; central.forEach(function (b) { cdSize += b.byteLength !== undefined ? b.byteLength : b.length; });
+    var end = new DataView(new ArrayBuffer(22));
+    end.setUint32(0, 0x06054b50, true); end.setUint16(4, 0, true); end.setUint16(6, 0, true);
+    end.setUint16(8, files.length, true); end.setUint16(10, files.length, true);
+    end.setUint32(12, cdSize, true); end.setUint32(16, offset, true); end.setUint16(20, 0, true);
+    return new Blob(parts.concat(central, [end.buffer]), { type: 'application/zip' });
+  }
+
+  /* /assets/logo/x.svg -> logo/x.svg, /fonts/x -> fonts/x, /foundation/x -> tokens/x */
+  function zipPath(href) {
+    return href.replace(/^\/assets\//, '').replace(/^\/foundation\//, 'tokens/').replace(/^\//, '');
+  }
+
+  (function () {
+    var btn = document.querySelector('[data-dl-all]'); if (!btn) return;
+    var label = btn.querySelector('[data-dl-all-label]'), live = document.querySelector('[data-dl-all-live]');
+    function say(t) { label.textContent = t; if (live) live.textContent = t; }
+
+    btn.addEventListener('click', function () {
+      var seen = {}, hrefs = [];
+      [].forEach.call(document.querySelectorAll('a[download][href]:not([data-no-zip])'), function (a) {
+        var h = a.getAttribute('href'); if (h && !seen[h]) { seen[h] = 1; hrefs.push(h); }
+      });
+      if (!hrefs.length) return;
+      btn.disabled = true;
+      var done = 0, failed = [];
+      say('Preparing 0/' + hrefs.length + '\u2026');
+      Promise.all(hrefs.map(function (h) {
+        return fetch(h).then(function (r) { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
+          .then(function (b) { return { name: zipPath(h), data: new Uint8Array(b) }; })
+          .catch(function () { failed.push(h); return null; })
+          .then(function (f) { say('Preparing ' + (++done) + '/' + hrefs.length + '\u2026'); return f; });
+      })).then(function (files) {
+        files = files.filter(Boolean);
+        /* Better no zip than a quietly incomplete one: a brand kit missing its logo is worse
+           than an error, because nobody checks the contents. */
+        if (failed.length) { say('Could not fetch ' + failed.length + ' file' + (failed.length === 1 ? '' : 's')); btn.disabled = false; return; }
+        var readme = 'Gushwork brand assets\r\n\r\nDownloaded from ' + location.origin + '/downloads\r\n\r\n' +
+          'Use these files as they are: do not redraw, recolour, restyle or re-typeset the logo.\r\n' +
+          'How to use them is the Style Guide\u2019s job: ' + location.origin + '/style-guide\r\n';
+        files.push({ name: 'README.txt', data: new TextEncoder().encode(readme) });
+        files.forEach(function (f) { f.name = 'gushwork-brand-assets/' + f.name; });
+        var url = URL.createObjectURL(makeZip(files));
+        var a = document.createElement('a');
+        a.href = url; a.download = 'gushwork-brand-assets.zip';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+        say('Downloaded ' + files.length + ' files');
+        setTimeout(function () { say('Download all'); btn.disabled = false; }, 2500);
+      });
+    });
+  })();
 
   /* -- one open menu at a time --------------------------------------------- */
   function closeAll(except) {
@@ -615,8 +732,6 @@
      scroll spy. It moved there on 29 Sep 2026 because each page had its own
      copy listening on `window`, and the window stopped scrolling when the
      content panel became its own scrollport. */
-  }, { passive: true });
-  spy();
 })();
 </script>
 

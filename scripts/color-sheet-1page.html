@@ -1,0 +1,99 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<title>Gushwork color palette — one page</title>
+<link rel="stylesheet" href="../foundation/tokens.css">
+<style>
+@page { size: A4 landscape; margin: 9mm; }
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:var(--gw-color-black);
+     font:var(--gw-text-body-14-med);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.sheet{display:flex;flex-direction:column;gap:11px}
+.masthead{display:flex;align-items:flex-end;justify-content:space-between;
+          gap:24px;padding-bottom:12px;border-bottom:2px solid var(--gw-color-neutral-200)}
+h1{margin:0;font:600 22px/1.15 var(--gw-font-display)}
+.sub{margin:6px 0 0;font:var(--gw-text-body-14-med);color:var(--gw-color-neutral-600)}
+.mark img{height:19px;display:block}
+h2{margin:0 0 6px;font:600 13px/1.2 var(--gw-font-display)}
+h3{margin:0 0 3px;font:var(--gw-text-button-12);text-transform:uppercase;
+   letter-spacing:.08em;color:var(--gw-color-neutral-600)}
+
+.cards{padding:3px;border-radius:14px;background:var(--gw-color-neutral-100);
+       display:grid;grid-template-columns:300px minmax(0,1fr);gap:4px}
+.colcol{display:grid;grid-template-rows:1fr 1fr;gap:4px}
+.col{border-radius:12px;padding:12px;display:flex;flex-direction:column;
+     justify-content:space-between;gap:10px;min-height:70px}
+.col.blue{background:#0070FF;min-height:150px}
+.col.white{background:#fff} .col.black{background:#0D0D0D}
+.hd{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.nm{font:var(--gw-text-body-16-med)}
+.role,.k{font:var(--gw-text-button-10)}
+.groups{display:flex;gap:24px;flex-wrap:wrap}
+.col.blue .groups{flex-direction:column;gap:12px}
+.col.black .groups{gap:20px}
+.grp{display:flex;flex-direction:column;gap:5px}
+dl{display:flex;gap:18px;margin:0}
+dt{margin:0;min-width:58px;font:var(--gw-text-button-10)}
+dd{margin:0;font:var(--gw-text-button-10)}
+.blue .nm,.blue dd,.blue dt{color:#fff} .blue .role,.blue .k{color:#ffffff80}
+.white .nm,.white dd,.white dt{color:#0D0D0D} .white .role,.white .k{color:#959BA4}
+.black .nm,.black dd,.black dt{color:#fff} .black .role,.black .k{color:#ffffff80}
+
+.fam{break-inside:avoid;margin-bottom:7px}
+.grid{display:grid;grid-template-columns:repeat(11,minmax(0,1fr));gap:3px}
+.sw{border-radius:7px;padding:5px;min-height:34px;display:flex;
+    flex-direction:column;justify-content:flex-end;gap:2px;
+    border:1px solid rgba(13,13,13,.08)}
+.sw b,.sw span{display:block;font:var(--gw-text-button-10);line-height:1.3}
+.sw span{opacity:.72;font-size:8px}
+.ink-light,.ink-light b,.ink-light span{color:#fff}
+.ink-dark,.ink-dark b,.ink-dark span{color:#0D0D0D}
+.page1up{break-before:auto}
+.foot{margin-top:6px;font:var(--gw-text-button-10);color:var(--gw-color-neutral-400)}
+
+
+.sheet{zoom:0.80}
+</style></head><body>
+<div class="sheet">
+  <div class="masthead">
+    <div><h1>Color palette</h1>
+      <p class="sub">Every value read from <code>foundation/tokens.css</code> — the file the
+         plugin builds with, so this sheet and the code cannot drift apart.</p></div>
+    <div class="mark"><img src="../assets/logo/gushwork-logo-original.svg" alt="Gushwork"></div>
+  </div>
+
+  <section><h2>Brand colors</h2><div class="cards"><div class="col blue">
+      <div class="hd"><span class="nm">Brandeis Blue</span><span class="role">Primary</span></div>
+      <div class="groups">
+        <div class="grp"><span class="k">FOR SCREENS</span>
+          <dl><dt>HEX</dt><dd>#0070FF</dd></dl>
+          <dl><dt>RGB</dt><dd>0&nbsp; 112&nbsp; 255</dd></dl>
+          <dl><dt>HSB</dt><dd>214&deg;&nbsp; 100%&nbsp; 100%</dd></dl></div>
+        <div class="grp"><span class="k">FOR PRINTS</span>
+          <dl><dt>CMYK</dt><dd>100&nbsp; 45&nbsp; 0&nbsp; 19</dd></dl>
+          <dl><dt>PANTONE</dt><dd>285 C</dd></dl></div>
+      </div></div><div class="colcol"><div class="col white">
+      <div class="hd"><span class="nm">Full White</span><span class="role">Neutral</span></div>
+      <div class="groups">
+        <div class="grp"><span class="k">FOR SCREENS</span>
+          <dl><dt>HEX</dt><dd>#FFFFFF</dd></dl>
+          <dl><dt>RGB</dt><dd>255&nbsp; 255&nbsp; 255</dd></dl>
+          <dl><dt>HSB</dt><dd>0&deg;&nbsp; 0%&nbsp; 100%</dd></dl></div>
+        <div class="grp"><span class="k">FOR PRINTS</span>
+          <dl><dt>CMYK</dt><dd>0&nbsp; 0&nbsp; 0&nbsp; 0</dd></dl>
+          <dl><dt>PANTONE</dt><dd>000 C</dd></dl></div>
+      </div></div><div class="col black">
+      <div class="hd"><span class="nm">Flat Black</span><span class="role">Neutral</span></div>
+      <div class="groups">
+        <div class="grp"><span class="k">FOR SCREENS</span>
+          <dl><dt>HEX</dt><dd>#0D0D0D</dd></dl>
+          <dl><dt>RGB</dt><dd>13&nbsp; 13&nbsp; 13</dd></dl>
+          <dl><dt>HSB</dt><dd>0&deg;&nbsp; 0%&nbsp; 5%</dd></dl></div>
+        <div class="grp"><span class="k">FOR PRINTS</span>
+          <dl><dt>CMYK</dt><dd>0&nbsp; 0&nbsp; 0&nbsp; 95</dd></dl>
+          <dl><dt>PANTONE</dt><dd>BLACK 6 C</dd></dl></div>
+      </div></div></div></div></section>
+
+  <section class="page1up"><h2>Extended palette</h2><section class="fam"><h3>Primary</h3><div class="grid"><div class="sw ink-dark" style="background:#f2f8ff"><b>primary-25</b><span>#F2F8FF</span></div><div class="sw ink-dark" style="background:#e5f1ff"><b>primary-50</b><span>#E5F1FF</span></div><div class="sw ink-dark" style="background:#cce2ff"><b>primary-100</b><span>#CCE2FF</span></div><div class="sw ink-dark" style="background:#99c6ff"><b>primary-200</b><span>#99C6FF</span></div><div class="sw ink-dark" style="background:#66a9ff"><b>primary-300</b><span>#66A9FF</span></div><div class="sw ink-light" style="background:#338cff"><b>primary-400</b><span>#338CFF</span></div><div class="sw ink-light" style="background:#0070ff"><b>primary-500</b><span>#0070FF</span></div><div class="sw ink-light" style="background:#0061e0"><b>primary-600</b><span>#0061E0</span></div><div class="sw ink-light" style="background:#004ebf"><b>primary-700</b><span>#004EBF</span></div><div class="sw ink-light" style="background:#003a8c"><b>primary-800</b><span>#003A8C</span></div><div class="sw ink-light" style="background:#002559"><b>primary-900</b><span>#002559</span></div></div></section><section class="fam"><h3>Neutral</h3><div class="grid"><div class="sw ink-dark" style="background:#f7f8f9"><b>neutral-25</b><span>#F7F8F9</span></div><div class="sw ink-dark" style="background:#f5f5f5"><b>neutral-35</b><span>#F5F5F5</span></div><div class="sw ink-dark" style="background:#f1f2f3"><b>neutral-50</b><span>#F1F2F3</span></div><div class="sw ink-dark" style="background:#e7e8e9"><b>neutral-100</b><span>#E7E8E9</span></div><div class="sw ink-dark" style="background:#cfd1d4"><b>neutral-200</b><span>#CFD1D4</span></div><div class="sw ink-dark" style="background:#bcbec2"><b>neutral-250</b><span>#BCBEC2</span></div><div class="sw ink-dark" style="background:#bbbec4"><b>neutral-300</b><span>#BBBEC4</span></div><div class="sw ink-dark" style="background:#959ba4"><b>neutral-400</b><span>#959BA4</span></div><div class="sw ink-light" style="background:#878b94"><b>neutral-500</b><span>#878B94</span></div><div class="sw ink-light" style="background:#6a7077"><b>neutral-600</b><span>#6A7077</span></div><div class="sw ink-light" style="background:#535a61"><b>neutral-700</b><span>#535A61</span></div><div class="sw ink-light" style="background:#4d545c"><b>neutral-800</b><span>#4D545C</span></div><div class="sw ink-light" style="background:#333333"><b>neutral-850</b><span>#333333</span></div><div class="sw ink-light" style="background:#262a2e"><b>neutral-900</b><span>#262A2E</span></div></div></section><section class="fam"><h3>Base</h3><div class="grid"><div class="sw ink-light" style="background:#111827"><b>secondary-500</b><span>#111827</span></div><div class="sw ink-dark" style="background:#ffffff"><b>white</b><span>#FFFFFF</span></div><div class="sw ink-light" style="background:#0d0d0d"><b>black</b><span>#0D0D0D</span></div><div class="sw ink-dark" style="background:#9784ff"><b>chart-violet</b><span>#9784FF</span></div></div></section><section class="fam"><h3>Red</h3><div class="grid"><div class="sw ink-dark" style="background:#fff1f2"><b>red-25</b><span>#FFF1F2</span></div><div class="sw ink-dark" style="background:#ffe4e6"><b>red-50</b><span>#FFE4E6</span></div><div class="sw ink-dark" style="background:#fecdd3"><b>red-100</b><span>#FECDD3</span></div><div class="sw ink-dark" style="background:#fda4af"><b>red-200</b><span>#FDA4AF</span></div><div class="sw ink-dark" style="background:#fb7185"><b>red-300</b><span>#FB7185</span></div><div class="sw ink-light" style="background:#f43f5e"><b>red-400</b><span>#F43F5E</span></div><div class="sw ink-light" style="background:#e11d48"><b>red-500</b><span>#E11D48</span></div><div class="sw ink-light" style="background:#be123c"><b>red-600</b><span>#BE123C</span></div><div class="sw ink-light" style="background:#9f1239"><b>red-700</b><span>#9F1239</span></div><div class="sw ink-light" style="background:#881337"><b>red-800</b><span>#881337</span></div><div class="sw ink-light" style="background:#4c0519"><b>red-900</b><span>#4C0519</span></div></div></section><section class="fam"><h3>Yellow</h3><div class="grid"><div class="sw ink-dark" style="background:#fffbeb"><b>yellow-25</b><span>#FFFBEB</span></div><div class="sw ink-dark" style="background:#fef3c7"><b>yellow-50</b><span>#FEF3C7</span></div><div class="sw ink-dark" style="background:#fde68a"><b>yellow-100</b><span>#FDE68A</span></div><div class="sw ink-dark" style="background:#fcd34d"><b>yellow-200</b><span>#FCD34D</span></div><div class="sw ink-dark" style="background:#fbbf24"><b>yellow-300</b><span>#FBBF24</span></div><div class="sw ink-dark" style="background:#f59e0b"><b>yellow-400</b><span>#F59E0B</span></div><div class="sw ink-light" style="background:#d97706"><b>yellow-500</b><span>#D97706</span></div><div class="sw ink-light" style="background:#b45309"><b>yellow-600</b><span>#B45309</span></div><div class="sw ink-light" style="background:#92400e"><b>yellow-700</b><span>#92400E</span></div><div class="sw ink-light" style="background:#78350f"><b>yellow-800</b><span>#78350F</span></div><div class="sw ink-light" style="background:#451a03"><b>yellow-900</b><span>#451A03</span></div></div></section><section class="fam"><h3>Orange</h3><div class="grid"><div class="sw ink-dark" style="background:#fff7ed"><b>orange-25</b><span>#FFF7ED</span></div><div class="sw ink-dark" style="background:#ffedd5"><b>orange-50</b><span>#FFEDD5</span></div><div class="sw ink-dark" style="background:#fed7aa"><b>orange-100</b><span>#FED7AA</span></div><div class="sw ink-dark" style="background:#fdba74"><b>orange-200</b><span>#FDBA74</span></div><div class="sw ink-dark" style="background:#fb923c"><b>orange-300</b><span>#FB923C</span></div><div class="sw ink-light" style="background:#f97316"><b>orange-400</b><span>#F97316</span></div><div class="sw ink-light" style="background:#ea580c"><b>orange-500</b><span>#EA580C</span></div><div class="sw ink-light" style="background:#c2410c"><b>orange-600</b><span>#C2410C</span></div><div class="sw ink-light" style="background:#9a3412"><b>orange-700</b><span>#9A3412</span></div><div class="sw ink-light" style="background:#7c2d12"><b>orange-800</b><span>#7C2D12</span></div><div class="sw ink-light" style="background:#431407"><b>orange-900</b><span>#431407</span></div></div></section><section class="fam"><h3>Green</h3><div class="grid"><div class="sw ink-dark" style="background:#f0fdf4"><b>green-25</b><span>#F0FDF4</span></div><div class="sw ink-dark" style="background:#dcfce7"><b>green-50</b><span>#DCFCE7</span></div><div class="sw ink-dark" style="background:#bbf7d0"><b>green-100</b><span>#BBF7D0</span></div><div class="sw ink-dark" style="background:#86efac"><b>green-200</b><span>#86EFAC</span></div><div class="sw ink-dark" style="background:#4ade80"><b>green-300</b><span>#4ADE80</span></div><div class="sw ink-dark" style="background:#22c55e"><b>green-400</b><span>#22C55E</span></div><div class="sw ink-light" style="background:#16a34a"><b>green-500</b><span>#16A34A</span></div><div class="sw ink-light" style="background:#15803d"><b>green-600</b><span>#15803D</span></div><div class="sw ink-light" style="background:#166534"><b>green-700</b><span>#166534</span></div><div class="sw ink-light" style="background:#14532d"><b>green-800</b><span>#14532D</span></div><div class="sw ink-light" style="background:#052e16"><b>green-900</b><span>#052E16</span></div></div></section>
+    <p class="foot">Alpha tokens are omitted — they carry transparency that neither print nor a
+       swatch library can hold. They stay in tokens.css. &middot; design.gushwork.ai/downloads</p>
+  </section>
+</div></body></html>

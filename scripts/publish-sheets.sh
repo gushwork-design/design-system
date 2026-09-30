@@ -21,7 +21,8 @@
 #   /style-guide            holding page        public
 #   /downloads              holding page        public
 #   /internal/claude-plugin  = install.html     @gushwork.ai
-#   /internal/tools          tools + templates  @gushwork.ai
+#   /internal/tools          tools  @gushwork.ai
+#   /internal/templates      templates  @gushwork.ai
 #   /internal/changelog      = changelog-sheet  @gushwork.ai
 #   /admin/review-sheet      = review-sheet     ADMIN_EMAILS only
 #   /admin/catalogue         = catalogue        ADMIN_EMAILS only
@@ -106,6 +107,11 @@ mkdir -p "$STAGE"
 # 1. The site itself — pages, shell, auth functions, middleware, vercel.json.
 #    web/ mirrors the deploy root one-for-one, so this is a straight copy.
 # ---------------------------------------------------------------------------
+# The bell in the panel bar reads web/notifications.json, which is derived from
+# CHANGELOG.md. Regenerate before staging so a release can never ship with the
+# panel still advertising the one before it.
+bash scripts/notifications.sh
+
 cp -R web/. "$STAGE/"
 # README-auth.md is documentation for us, not a page. Don't serve it.
 rm -f "$STAGE/README-auth.md"
@@ -227,6 +233,13 @@ VJ
 python3 scripts/_search_index.py "$STAGE" > "$STAGE/search-index.json"
 
 cp foundation/tokens.css "$STAGE/foundation/"
+
+# Live previews of the page templates — what the Preview links on /internal/templates open.
+# Generated into the STAGED copy from the templates themselves, so a preview is never edited
+# by hand and cannot drift from the template it shows. They sit under /internal/, so the gate
+# covers them. Their fonts and assets are staged by the sweep further down.
+echo "Template previews:"
+python3 scripts/template-previews.py "$STAGE/internal/templates"
 cp fonts/*.ttf "$STAGE/fonts/"
 
 # The /downloads page hands over files the grep below CANNOT see. It builds its
@@ -272,10 +285,10 @@ done
   for pair in "${SHEETS[@]}"; do
     grep -ohE '(href|src)="(\.\./|/)assets/[^"]+"' "$STAGE/${pair##*|}" 2>/dev/null || true
   done
-  grep -rohE '(href|src)="/assets/[^"]+"' "$STAGE"/*.html "$STAGE"/internal/*.html 2>/dev/null || true
+  grep -rohE '(href|src)="/assets/[^"]+"' "$STAGE"/*.html "$STAGE"/internal/*.html "$STAGE"/internal/templates/*/index.html 2>/dev/null || true
   # CSS url() too — the style guide masks the logo through -webkit-mask to draw
   # the "don't" panel, and those references carry no href= or src= to match.
-  grep -rohE "url\(['\"]?/assets/[^)'\"]+" "$STAGE"/*.html "$STAGE"/internal/*.html 2>/dev/null \
+  grep -rohE "url\(['\"]?/assets/[^)'\"]+" "$STAGE"/*.html "$STAGE"/internal/*.html "$STAGE"/internal/templates/*/index.html 2>/dev/null \
     | sed "s|^url(['\"]\{0,1\}|src=\"|;s|$|\"|" || true
 } | sed 's/.*="//;s/"$//;s|^\.\./||;s|^/||' | sort -u | while read -r a; do
   [ -n "$a" ] || continue

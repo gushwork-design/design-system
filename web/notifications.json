@@ -1,0 +1,68 @@
+{
+  "items": [
+    {
+      "date": "2026-09-30",
+      "at": "15:15",
+      "title": "Log which Gushwork skill ran and the names of the files it wrote",
+      "version": "v1.51.0",
+      "href": "/internal/changelog",
+      "label": "30 Sep 2026"
+    },
+    {
+      "date": "2026-09-30",
+      "at": "15:12",
+      "title": "Identify usage-log sessions by the signed-in Claude account, and say in ONBOARDING what is logged",
+      "version": "v1.50.0",
+      "href": "/internal/changelog",
+      "label": "30 Sep 2026"
+    },
+    {
+      "date": "2026-09-24",
+      "at": "20:17",
+      "title": "Withdraw the three ad-page elements, and R26 \u2014 pages are built from templates, not from other pages",
+      "version": "v1.49.0",
+      "href": "/internal/changelog",
+      "label": "24 Sep 2026"
+    },
+    {
+      "date": "2026-09-23",
+      "at": "11:59",
+      "title": "The ad-page template, the measured FAQ accordion, and the OG and favicon rule for ad pages",
+      "version": "v1.48.0",
+      "href": "/internal/changelog",
+      "label": "23 Sep 2026"
+    },
+    {
+      "date": "2026-09-23",
+      "at": "11:00",
+      "title": "Component library as a site at /library, the ad-page fold set, and the review-pass gate",
+      "version": "v1.47.0",
+      "href": "/internal/changelog",
+      "label": "23 Sep 2026"
+    },
+    {
+      "date": "2026-09-15",
+      "at": "23:46",
+      "title": "Slides skill, rulings R14-R24, and the site rebuilt from Figma",
+      "version": "v1.46.0",
+      "href": "/internal/changelog",
+      "label": "15 Sep 2026"
+    },
+    {
+      "date": "2026-09-07",
+      "at": "15:27",
+      "title": "the case-study page template, and five page rules that came with it",
+      "version": "v1.45.0",
+      "href": "/internal/changelog",
+      "label": "7 Sep 2026"
+    },
+    {
+      "date": "2026-09-01",
+      "at": "19:53",
+      "title": "the plugin moves to design@gushwork.ai, and drift notices reach every surface",
+      "version": "v1.44.0",
+      "href": "/internal/changelog",
+      "label": "1 Sep 2026"
+    }
+  ]
+}
