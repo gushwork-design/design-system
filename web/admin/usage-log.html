@@ -317,8 +317,6 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
 .ul-badge--ok { background: var(--ul-b-ok-bg); color: var(--ul-b-ok-fg); }
 .ul-badge--bad { background: var(--gw-color-red-alpha-10); color: var(--gw-color-red-600); }
 :root[data-theme="dark"] .ul-badge--bad { color: var(--gw-color-red-300); }
-/* Outputs table: its own grid, same rules as .ul-row (fixed first track, floors on the rest). */
-.ul-row--o { grid-template-columns: 110px minmax(120px, 1fr) minmax(130px, 1.1fr) minmax(120px, .9fr) minmax(190px, 1.4fr) 140px; column-gap: var(--gw-space-16); min-width: 940px; }
 .ul-c--chk { display: flex; align-items: center; gap: var(--gw-space-8); overflow: visible; }
 .ul-c--out a { color: var(--ul-value); text-decoration: underline; text-underline-offset: 2px; }
 .ul-row--chat { cursor: pointer; }
@@ -398,7 +396,6 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
       <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="ul-h-out">
         <div class="ul-sh"><div class="ul-sh__t"><h2 id="ul-h-out">Outputs</h2><span class="ul-sh__q" id="ul-q-out"></span></div></div>
         <div class="ul-inner"><div class="ul-metrics" id="ul-out-metrics" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr))"></div></div>
-        <div class="ul-scroll"><div class="ul-tbl" id="ul-out" role="table" aria-label="Outputs made with the skills"></div></div>
       </section>
 
       <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="ul-h-log">
@@ -802,7 +799,16 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
       if (!open) return parent;
       return parent + c.rows.map(function (r) {
         var sk = skillInfo(r, m);
-        return '<div class="ul-row ul-row--kid" role="row"><div class="ul-c" role="cell" title="' + esc(r.at.toISOString()) + '">' + esc(r.at.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })) + '</div>' +
+        var t = '<div class="ul-c" role="cell" title="' + esc(r.at.toISOString()) + '">' + esc(r.at.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })) + '</div>';
+        if (isOut(r)) {
+          var what = r.event === 'artifact'
+            ? 'Artifact: <a href="' + esc(r.url) + '" target="_blank" rel="noopener">' + esc(r.url.replace(/^.*\//, '').slice(0, 8)) + '…</a>'
+            : 'File: ' + fileLink(r, r.file);
+          return '<div class="ul-row ul-row--kid" role="row">' + t + '<div class="ul-c ul-c--chk" role="cell">' + checksHTML(r) + '</div><div class="ul-c"></div>' +
+            '<div class="ul-c" role="cell">' + outcomeHTML(r) + '</div>' +
+            '<div class="ul-c ul-c--out" role="cell" title="' + esc(evtText(r)) + '">' + what + '</div></div>';
+        }
+        return '<div class="ul-row ul-row--kid" role="row">' + t +
           '<div class="ul-c"></div><div class="ul-c"></div>' +
           '<div class="ul-c ul-c--none" role="cell">' + esc(sk.n && r.event !== 'skill' ? sk.n + (sk.inferred ? ' ~' : '') : '') + '</div>' +
           '<div class="ul-c ul-c--out" role="cell" title="' + esc(evtText(r)) + '">' + (fileHref(r) ? 'File: ' + fileLink(r, r.file) : esc(evtText(r))) + '</div></div>';
@@ -880,55 +886,40 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
     var s = skillInfo(r, m);
     return s.n;
   }
+  /* The summary cards. The outputs themselves live inside their chat (the By chat view), where
+     each one shows its link, its on-brand checks and the owner's verdict next to the skill that
+     made it, so there is one table to read and not two that repeat each other. */
   function renderOutputs(m) {
-    var mt = $('ul-out-metrics'), tbl = $('ul-out'), q = $('ul-q-out');
-    if (S.status === 'loading') { mt.innerHTML = ['Outputs', 'On-brand', 'Approved', 'Needs changes'].map(skelMetric).join(''); tbl.innerHTML = ''; q.textContent = ''; return; }
-    var outs = m.curAll.filter(isOut).sort(function (a, b) { return b.at - a.at; });
+    var mt = $('ul-out-metrics'), q = $('ul-q-out');
+    if (S.status === 'loading') { mt.innerHTML = ['Outputs', 'On-brand', 'Approved', 'Needs changes'].map(skelMetric).join(''); q.textContent = ''; return; }
+    var outs = m.curAll.filter(isOut);
     var measured = outs.filter(function (r) { return r.flags; });
     var on = measured.filter(function (r) { return onBrand(r.flags); }).length;
     var appr = outs.filter(function (r) { return S.outcomes[r.key] === 'approved'; }).length;
     var chg = outs.filter(function (r) { return S.outcomes[r.key] === 'changes'; }).length;
-    q.textContent = plural(outs.length, 'output') + ', ' + PERIOD_NAME[S.period];
+    q.textContent = plural(outs.length, 'output') + ', ' + PERIOD_NAME[S.period] + (outs.length ? '. Open a chat below to see them' : '');
     mt.innerHTML =
       metricCard('Outputs', String(outs.length), plural(outs.filter(function (r) { return r.event === 'artifact'; }).length, 'artifact') + ' published') +
       metricCard('On-brand', measured.length ? Math.round(on / measured.length * 100) + '%' : 'None', measured.length ? on + ' of ' + measured.length + ' measured' : 'Nothing measured yet') +
       metricCard('Approved', String(appr), 'marked by an owner') +
       metricCard('Needs changes', String(chg), 'marked by an owner');
-    if (!outs.length) {
-      tbl.innerHTML = '<div class="ul-empty"><div class="ul-empty__copy"><h2>No outputs yet</h2><p>Outputs appear when a Gushwork skill has run and the session then writes an HTML or SVG file, a PDF, a deck, an image, or publishes an artifact. They start arriving on plugin 1.54.0.</p></div></div>';
-      return;
-    }
-    var head = '<div class="ul-row ul-row--o ul-row--h" role="row"><div role="columnheader"><span class="ul-th"><span class="ul-th--plain">When</span></span></div>' +
-      '<div role="columnheader"><span class="ul-th"><span class="ul-th--plain">Person</span></span></div>' +
-      '<div role="columnheader"><span class="ul-th"><span class="ul-th--plain">Output</span></span></div>' +
-      '<div role="columnheader"><span class="ul-th"><span class="ul-th--plain">Skill</span></span></div>' +
-      '<div role="columnheader"><span class="ul-th"><span class="ul-th--plain">Checks</span></span></div>' +
-      '<div role="columnheader"><span class="ul-th"><span class="ul-th--plain">Outcome</span></span></div></div>';
-    var body = outs.slice(0, 25).map(function (r) {
-      var who = r.email ? '<div class="ul-c ul-c--who" role="cell" title="' + esc(r.email) + '">' + esc(r.email) + '</div>' : '<div class="ul-c ul-c--none" role="cell">Not identified</div>';
-      var what = r.event === 'artifact'
-        ? '<a href="' + esc(r.url) + '" target="_blank" rel="noopener">Artifact ' + esc(r.url.replace(/^.*\//, '').slice(0, 8)) + '…</a>'
-        : fileLink(r, r.file);
-      var f = r.flags, chk;
-      if (!f) chk = '<span class="ul-c--none">Not measured</span>';
-      else {
-        var ok = onBrand(f);
-        chk = '<span class="ul-badge ' + (ok ? 'ul-badge--ok' : 'ul-badge--bad') + '">' + (ok ? 'On-brand' : 'Off-brand') + '</span>' +
-          '<span class="ul-c--none" title="tokens ' + (f.tokens ? 'yes' : 'no') + ', fonts ' + esc(f.fonts) + ', logo ' + (f.logo ? 'yes' : 'no') + ', stamp ' + (f.stamp ? 'yes' : 'no') + '">' +
-          esc(ok ? (f.stamp ? 'built by a skill' : 'tokens and fonts ok') : whyOff(f)) + '</span>';
-      }
-      var v = S.outcomes[r.key] || '';
-      var sel = '<label class="ul-select ul-select--sm"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Outcome</span>' +
-        '<select data-outcome="' + esc(r.key) + '"><option value=""' + (v === '' ? ' selected' : '') + '>Not reviewed</option><option value="approved"' + (v === 'approved' ? ' selected' : '') +
-        '>Approved</option><option value="changes"' + (v === 'changes' ? ' selected' : '') + '>Needs changes</option></select>' + icon('caret-down') + '</label>';
-      return '<div class="ul-row ul-row--o ul-row--d" role="row"><div class="ul-c" role="cell" title="' + esc(r.at.toISOString()) + '">' + esc(fmtWhen(r.at)) + '</div>' + who +
-        '<div class="ul-c ul-c--out" role="cell" title="' + esc(r.event === 'artifact' ? r.url : r.file) + '">' + what + '</div>' +
-        '<div class="ul-c" role="cell">' + esc(skillFor(r, m) || 'Unknown') + '</div>' +
-        '<div class="ul-c ul-c--chk" role="cell">' + chk + '</div><div class="ul-c" role="cell">' + sel + '</div></div>';
-    }).join('');
-    tbl.innerHTML = head + body + (outs.length > 25 ? '<p class="ul-note-line" style="padding:var(--gw-space-12) var(--gw-space-24)">Showing the newest 25 of ' + outs.length + '.</p>' : '');
   }
-  $('ul-out').addEventListener('change', function (e) {
+  /* The checks and the verdict control for one output, shared by the chat rows. */
+  function checksHTML(r) {
+    var f = r.flags;
+    if (!f) return '<span class="ul-c--none">Not measured</span>';
+    var ok = onBrand(f);
+    return '<span class="ul-badge ' + (ok ? 'ul-badge--ok' : 'ul-badge--bad') + '">' + (ok ? 'On-brand' : 'Off-brand') + '</span>' +
+      '<span class="ul-c--none" title="tokens ' + (f.tokens ? 'yes' : 'no') + ', fonts ' + esc(f.fonts) + ', logo ' + (f.logo ? 'yes' : 'no') + ', stamp ' + (f.stamp ? 'yes' : 'no') + '">' +
+      esc(ok ? (f.stamp ? 'built by a skill' : 'tokens and fonts ok') : whyOff(f)) + '</span>';
+  }
+  function outcomeHTML(r) {
+    var v = S.outcomes[r.key] || '';
+    return '<label class="ul-select ul-select--sm"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Outcome</span>' +
+      '<select data-outcome="' + esc(r.key) + '"><option value=""' + (v === '' ? ' selected' : '') + '>Not reviewed</option><option value="approved"' + (v === 'approved' ? ' selected' : '') +
+      '>Approved</option><option value="changes"' + (v === 'changes' ? ' selected' : '') + '>Needs changes</option></select>' + icon('caret-down') + '</label>';
+  }
+  $('ul-table').addEventListener('change', function (e) {
     var sel = e.target.closest('select[data-outcome]'); if (!sel) return;
     var key = sel.getAttribute('data-outcome'), want = sel.value, before = S.outcomes[key] || '';
     if (want) S.outcomes[key] = want; else delete S.outcomes[key];
