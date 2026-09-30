@@ -118,6 +118,10 @@
   ],
   "rewrites": [
     {
+      "source": "/api/usage-log",
+      "destination": "/api/gw?action=usage-log"
+    },
+    {
       "source": "/api/log-usage",
       "destination": "/api/gw?action=log-usage"
     },
