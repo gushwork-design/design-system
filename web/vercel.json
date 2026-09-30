@@ -118,6 +118,10 @@
   ],
   "rewrites": [
     {
+      "source": "/api/log-output",
+      "destination": "/api/gw?action=log-output"
+    },
+    {
       "source": "/api/usage-log",
       "destination": "/api/gw?action=usage-log"
     },
@@ -140,6 +144,12 @@
     {
       "source": "/api/tools",
       "destination": "/api/gw?action=tools"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/gw?action=purge-outputs",
+      "schedule": "17 3 * * *"
     }
   ]
 }

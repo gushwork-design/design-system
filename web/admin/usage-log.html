@@ -443,7 +443,7 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
   function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
 
   var S = { status: 'loading', rows: [], period: '30', q: '', ver: '', sortKey: 'at', sortDir: -1,
-            evt: '', view: 'chat', open: {}, outcomes: {}, page: 1, per: 25, fetchedAt: 0, busy: false, skipped: 0, capped: false };
+            evt: '', view: 'chat', open: {}, outcomes: {}, files: {}, page: 1, per: 25, fetchedAt: 0, busy: false, skipped: 0, capped: false };
   var DAY = 86400000;
 
   /* ── data ───────────────────────────────────────────────────────────────────────── */
@@ -805,7 +805,7 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
         return '<div class="ul-row ul-row--kid" role="row"><div class="ul-c" role="cell" title="' + esc(r.at.toISOString()) + '">' + esc(r.at.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })) + '</div>' +
           '<div class="ul-c"></div><div class="ul-c"></div>' +
           '<div class="ul-c ul-c--none" role="cell">' + esc(sk.n && r.event !== 'skill' ? sk.n + (sk.inferred ? ' ~' : '') : '') + '</div>' +
-          '<div class="ul-c" role="cell" title="' + esc(evtText(r)) + '">' + esc(evtText(r)) + '</div></div>';
+          '<div class="ul-c ul-c--out" role="cell" title="' + esc(evtText(r)) + '">' + (fileHref(r) ? 'File: ' + fileLink(r, r.file) : esc(evtText(r))) + '</div></div>';
       }).join('');
     }).join('');
     tbl.innerHTML = head + (slice.length ? body :
@@ -833,6 +833,17 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
      instead of the text, so "on-brand" here is a measurement, not a review. On-brand means it uses
      the tokens and names no typeface outside the system. Whether it was GOOD is the verdict, which
      is the owner's and is kept apart from the log so a usage row is never rewritten. */
+  /* A kept copy exists for a file row when the plugin sent one (plugin 1.57.0 on, a private store
+     connected, the file small enough). Its address is owner-only: the link goes through the same
+     gate as the log, so opening it signed out or as a non-owner gets a refusal, not a file. */
+  function fileHref(r) {
+    return r.event === 'file' && r.sess && S.files[r.sess + '|' + r.file]
+      ? '/api/usage-log?file=' + encodeURIComponent(r.sess + '|' + r.file) : '';
+  }
+  function fileLink(r, label) {
+    var h = fileHref(r);
+    return h ? '<a href="' + esc(h) + '" target="_blank" rel="noopener">' + esc(label) + '</a>' : esc(label);
+  }
   function isOut(r) { return r.event === 'file' || r.event === 'artifact'; }
   function onBrand(f) { return !!f && f.tokens === true && f.fonts !== 'foreign'; }
   function whyOff(f) {
@@ -897,7 +908,7 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
       var who = r.email ? '<div class="ul-c ul-c--who" role="cell" title="' + esc(r.email) + '">' + esc(r.email) + '</div>' : '<div class="ul-c ul-c--none" role="cell">Not identified</div>';
       var what = r.event === 'artifact'
         ? '<a href="' + esc(r.url) + '" target="_blank" rel="noopener">Artifact ' + esc(r.url.replace(/^.*\//, '').slice(0, 8)) + '…</a>'
-        : esc(r.file);
+        : fileLink(r, r.file);
       var f = r.flags, chk;
       if (!f) chk = '<span class="ul-c--none">Not measured</span>';
       else {
@@ -982,7 +993,7 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
     }).then(function (j) {
       if (!j) return;
       if (!j.configured) { S.status = 'unconfigured'; return; }
-      S.outcomes = j.outcomes || {}; S.rows = parse(j.rows || []); S.skipped = j.skipped || 0; S.capped = !!j.capped; S.fetchedAt = Date.now();
+      S.outcomes = j.outcomes || {}; S.files = {}; (j.files || []).forEach(function (k) { S.files[k] = 1; }); S.rows = parse(j.rows || []); S.skipped = j.skipped || 0; S.capped = !!j.capped; S.fetchedAt = Date.now();
       S.status = S.rows.length ? 'ready' : 'empty';
     }).catch(function () { S.status = 'error'; }).then(function () {
       S.busy = false; $('ul-refresh').removeAttribute('aria-busy'); render();

@@ -26,6 +26,8 @@ import slackEvents from './_slack-events.js';
 import approvals from './_approvals.js';
 import tools from './_tools.js';
 import usageLog from './_usage-log.js';
+import logOutput from './_log-output.js';
+import purgeOutputs from './_purge-outputs.js';
 
 const ROUTES = {
   'log-usage': logUsage,
@@ -34,6 +36,8 @@ const ROUTES = {
   'approvals': approvals,
   'tools': tools,
   'usage-log': usageLog,
+  'log-output': logOutput,
+  'purge-outputs': purgeOutputs,
 };
 
 export default async function handler(req, res) {

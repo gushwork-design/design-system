@@ -25,6 +25,7 @@ import { isOwner } from './_access.js';
 const LIST_KEY = 'gw:usage';
 const OUTCOME_KEY = 'gw:outcome';   // hash: row timestamp -> approved | changes
 const STATUSES = ['approved', 'changes'];
+const FILES_KEY = 'gw:files';        // hash: "<sess>|<file>" -> where the kept copy is (see _log-output.js)
 const MAX_ROWS = 5000;        // log-usage.js trims the list to this, so it is also the read bound
 
 function store() {
@@ -76,6 +77,47 @@ async function setOutcome(req, res) {
   }
 }
 
+/* GET ?file=<sess>|<name>: hand the owner the kept copy of an output. The same owner check as
+   the log. A type that a browser would RUN on our origin (html, svg) is sent as a download, never
+   rendered, and every response is marked no-sniff and sandboxed, so a file a stranger managed
+   to get in cannot execute here. */
+const SERVE = {
+  pdf: ['application/pdf', 'inline'], png: ['image/png', 'inline'],
+  pptx: ['application/vnd.openxmlformats-officedocument.presentationml.presentation', 'attachment'],
+  html: ['application/octet-stream', 'attachment'], svg: ['application/octet-stream', 'attachment'],
+};
+async function serveFile(req, res, key) {
+  const cfg = store();
+  const token = process.env.BLOB_READ_WRITE_TOKEN;
+  if (!cfg || !token) return json(res, 404, { error: 'No kept copy.' });
+  try {
+    const r = await fetch(`${cfg.url}/pipeline`, {
+      method: 'POST',
+      headers: { authorization: `Bearer ${cfg.token}`, 'content-type': 'application/json' },
+      body: JSON.stringify([['HGET', FILES_KEY, key]]),
+    });
+    const [{ result }] = await r.json();
+    if (!result) return json(res, 404, { error: 'No kept copy.' });
+    const entry = JSON.parse(result);
+    const { get } = await import('@vercel/blob');
+    const blob = await get(entry.p, { access: 'private', token });
+    if (!blob || !blob.stream) return json(res, 404, { error: 'No kept copy.' });
+    const name = key.split('|').slice(1).join('|');
+    const ext = (name.split('.').pop() || '').toLowerCase();
+    const [type, disp] = SERVE[ext] || ['application/octet-stream', 'attachment'];
+    res.setHeader('Content-Type', type);
+    res.setHeader('Content-Disposition', `${disp}; filename="${name.replace(/[^A-Za-z0-9 _.()\-]/g, '_')}"`);
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Content-Security-Policy', 'sandbox');
+    res.setHeader('Cache-Control', 'no-store, private');
+    const { Readable } = await import('node:stream');
+    res.status(200);
+    Readable.fromWeb(blob.stream).pipe(res);
+  } catch {
+    return json(res, 502, { error: 'Could not open the kept copy.' });
+  }
+}
+
 export default async function handler(req, res) {
   if (req.method === 'POST') return setOutcome(req, res);
   if (req.method !== 'GET') return json(res, 405, { error: 'GET or POST only' });
@@ -84,6 +126,9 @@ export default async function handler(req, res) {
   if (!session || !session.email) return json(res, 401, { error: 'Not signed in.' });
   if (!isOwner(session.email)) return json(res, 403, { error: 'Owners only.' });
 
+  const wanted = req.query && req.query.file;
+  if (wanted) return serveFile(req, res, String(wanted).slice(0, 200));
+
   const cfg = store();
   if (!cfg) return json(res, 200, { configured: false, rows: [] });
 
@@ -91,10 +136,10 @@ export default async function handler(req, res) {
     const r = await fetch(`${cfg.url}/pipeline`, {
       method: 'POST',
       headers: { authorization: `Bearer ${cfg.token}`, 'content-type': 'application/json' },
-      body: JSON.stringify([['LRANGE', LIST_KEY, '0', String(MAX_ROWS - 1)], ['HGETALL', OUTCOME_KEY]]),
+      body: JSON.stringify([['LRANGE', LIST_KEY, '0', String(MAX_ROWS - 1)], ['HGETALL', OUTCOME_KEY], ['HKEYS', FILES_KEY]]),
     });
     if (!r.ok) throw new Error(`kv ${r.status}`);
-    const [{ result }, { result: flat }] = await r.json();
+    const [{ result }, { result: flat }, { result: fileKeys }] = await r.json();
 
     /* HGETALL comes back as a flat [field, value, field, value, ...] array. */
     const outcomes = {};
@@ -112,7 +157,7 @@ export default async function handler(req, res) {
         if (o && typeof o.at === 'string') rows.push(o); else skipped++;
       } catch { skipped++; }
     }
-    return json(res, 200, { configured: true, rows, outcomes, skipped, capped: (result || []).length >= MAX_ROWS });
+    return json(res, 200, { configured: true, rows, outcomes, files: fileKeys || [], skipped, capped: (result || []).length >= MAX_ROWS });
   } catch {
     // No stack, no credential detail — same posture as log-usage.js.
     return json(res, 502, { error: 'Could not read the log.' });
