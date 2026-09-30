@@ -25,8 +25,10 @@ Claude Code. Nothing to do at all if your repo has a `.claude/settings.json` men
 
 **What the plugin logs.** When a Claude session starts with the plugin installed, it records who you
 are (your Claude account email, or your git email if that is missing), which plugin version you are
-on, and when. It records nothing about what you ask for or build. It exists so we can see whether
-the design system is being used and who is running an old version. To turn it off, set
+on, and when. When you run a Gushwork skill it also records the skill's name, and the file names
+(not the contents, not the folder) of any page or document it writes in that session. It never
+records your prompts or what is inside your files. It exists so we can see whether the design system
+is being used, what for, and who is running an old version. To turn it off, set
 `GW_NO_USAGE_PING=1` in your shell.
 
 ## Then just ask for what you want

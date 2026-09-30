@@ -39,6 +39,18 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Skill|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/scripts/log-activity.sh",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   }
 }
