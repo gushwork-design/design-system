@@ -288,24 +288,28 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
 .ul-select select { appearance: none; -webkit-appearance: none; height: 36px; padding: 0 calc(var(--gw-space-12) + 16px) 0 var(--gw-space-12);
   border: 0; border-radius: var(--gw-radius-8); background: var(--ul-field-bg); color: var(--ul-field-fg);
   box-shadow: inset 0 0 0 1px var(--ul-field-line); font: var(--gw-text-button-14); cursor: pointer; }
+.ul-pair .ul-sec { display: flex; flex-direction: column; }
+.ul-pair .ul-inner { flex: 1; display: flex; flex-direction: column; }
+.ul-foot { margin: auto 0 0; padding-top: var(--gw-space-12); font: var(--gw-text-body-12-med); color: var(--ul-sub); }
 /* out-of-date people */
 .ul-old { display: flex; flex-direction: column; }
-.ul-old__r { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; column-gap: var(--gw-space-16); padding: var(--gw-space-12) 0; }
+.ul-old__r { display: grid; grid-template-columns: minmax(0, 1fr) 112px 148px; align-items: center; column-gap: var(--gw-space-16); padding: var(--gw-space-12) 0; }
 .ul-old__r + .ul-old__r { border-top: 1px solid var(--ul-hdr-line); }
 .ul-old__who { min-width: 0; }
 .ul-old__who b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--gw-text-body-12-med); font-weight: 600; color: var(--ul-value); }
 .ul-old__who span { font: var(--gw-text-body-12-med); color: var(--ul-sub); }
 .ul-old__v { font: var(--gw-text-body-12-med); color: var(--ul-cell); }
-.ul-old__s { display: flex; justify-content: flex-end; min-width: 132px; }
+.ul-old__s { display: flex; justify-content: flex-end; }
+.ul-old__v { text-align: left; }
 /* skills donut */
-.ul-donut { display: flex; align-items: center; gap: var(--gw-space-32); flex-wrap: wrap; padding: var(--gw-space-8) 0; }
-.ul-donut__c { position: relative; width: 168px; height: 168px; flex: none; }
+.ul-donut { flex: 1; display: flex; align-items: center; justify-content: center; gap: var(--gw-space-40); flex-wrap: wrap; padding: var(--gw-space-8) 0; }
+.ul-donut__c { position: relative; width: 160px; height: 160px; flex: none; }
 .ul-donut__c svg { width: 100%; height: 100%; transform: rotate(-90deg); }
 .ul-donut__c circle { fill: none; stroke-width: 26; }
 .ul-donut__n { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .ul-donut__n b { font: var(--gw-text-body-24-sem, 600 24px/1.2 var(--gw-font-body)); color: var(--ul-value); }
 .ul-donut__n span { font: var(--gw-text-body-12-med); color: var(--ul-sub); }
-.ul-leg { flex: 1; min-width: 180px; margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--gw-space-12); }
+.ul-leg { flex: 0 1 240px; min-width: 180px; margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--gw-space-12); }
 .ul-leg li { display: grid; grid-template-columns: 12px minmax(0, 1fr) auto auto; align-items: center; column-gap: var(--gw-space-8); font: var(--gw-text-body-12-med); color: var(--ul-cell); }
 .ul-leg i { width: 12px; height: 12px; border-radius: var(--gw-radius-4); }
 .ul-leg li span:nth-child(2) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ul-value); }
@@ -742,7 +746,7 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
         '<span class="ul-old__v">' + esc(plural(w.old, 'older session')) + '</span><div class="ul-old__s">' + status + '</div></div>';
     }).join('');
     host.innerHTML = '<div class="ul-old">' + rows + '</div>' +
-      '<p class="ul-note-line" style="margin-top:var(--gw-space-8)">' + (stale ? stale + (stale === 1 ? ' person' : ' people') + ' still behind' : 'No one is behind now') +
+      '<p class="ul-foot">' + (stale ? stale + (stale === 1 ? ' person' : ' people') + ' still behind' : 'No one is behind now') +
       (list.length > 8 ? ' · ' + (list.length - 8) + ' more not shown' : '') +
       (anon ? ' · ' + plural(anon, 'session') + ' with no email on an older version' : '') + '.</p>';
   }
@@ -769,7 +773,7 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
     }).join('');
     host.innerHTML = '<div class="ul-donut"><div class="ul-donut__c"><svg viewBox="0 0 168 168" role="img" aria-label="Skill runs">' + arcs + '</svg>' +
       '<div class="ul-donut__n"><b>' + total + '</b><span>' + (total === 1 ? 'run' : 'runs') + '</span></div></div><ul class="ul-leg">' + legend + '</ul></div>' +
-      '<p class="ul-note-line" style="margin-top:var(--gw-space-8)">' + esc(plural(m.nFiles, 'output file')) + ' named in this period. Names only, never the contents.</p>';
+      '<p class="ul-foot">' + esc(plural(m.nFiles, 'output file')) + ' named in this period. Names only, never the contents.</p>';
   }
 
   /* ── log table ──────────────────────────────────────────────────────────────────── */
