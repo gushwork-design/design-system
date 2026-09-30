@@ -761,24 +761,18 @@
   content: "";
   position: absolute;
   inset: 0;
-  background-image:
-    linear-gradient(to right, var(--gw-color-primary-600) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--gw-color-primary-600) 1px, transparent 1px);
-  background-size: 40px 40px;
+  /* 795:5585 `bg` (815:4899) — one 1121 x 321 vector: the 40px grid with its lines fading in
+     along a diagonal, and the three filled cells drawn in the same gradient. Placed as the design
+     has it at 1106 wide (2 past the right edge, 21.5 down from centre), but pinned to the RIGHT so a
+     wider banner gains plain blue on the left — where the gradient is transparent anyway — rather
+     than a hard cut on the right, where the lines are at full strength. */
+  background: url("/assets/hero-bg.svg") no-repeat;
+  background-size: 1121px 321px;
+  background-position: calc(100% + 2px) calc(50% + 21.5px);
   pointer-events: none;
 }
-/* The two filled cells in the measured grid (Rectangle 42844, 43908) — the
-   design has exactly two, offset from each other. */
-.gw-hero__cell {
-  position: absolute;
-  width: 40px; height: 40px;
-  background: var(--gw-color-primary-600);
-  pointer-events: none;
-}
-/* Lift the text above the ::before grid. Must exclude the cells — they are
-   absolutely positioned, and a blanket `.gw-hero > *` turns them back into
-   flex items that push the title down the column. */
-.gw-hero > :not(.gw-hero__cell) { position: relative; }
+/* Lift the text above the ::before grid. */
+.gw-hero > * { position: relative; }
 /* title — Vert Grotesk Display Semibold 60/100%, ls 0, white. No text style
    bound in Figma; --gw-text-h1 is 700/1.2 so it does NOT match. */
 .gw-hero__title {
@@ -1714,8 +1708,6 @@
     border-radius: var(--gw-bp-radius-large);
   }
   .gw-hero__title { font-size: var(--gw-bp-type-hero); }
-  /* The three grid cells are placed at desktop coordinates; off-canvas here. */
-  .gw-hero__cell { display: none; }
 
   /* The "On this page" rail is a desktop affordance — there is no phone design
      for it, and the sections are reachable by scrolling. */
@@ -1851,6 +1843,29 @@
    once with the panel and once with the colour. */
 .gw-iconbtn[aria-expanded="true"] { color: var(--s-heading); background: var(--s-nav-hover); }
 .gw-iconbtn:focus-visible { outline: var(--gw-focus-ring); outline-offset: var(--gw-focus-offset); }
+/* The hover tooltip: a white pill with a 1px Neutral/200 edge, 8 radius, 4 x 8 padding, Body/body-14-med,
+   4 below the button and centred on it. Drawn from the attribute so the label lives in one place, and
+   gone while the control's own menu is open — the menu is what to look at then. The last control in
+   the bar (Help) right-aligns instead of centring so the pill cannot run off the viewport edge. */
+.gw-iconbtn[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute; top: calc(100% + var(--gw-space-4)); left: 50%;
+  transform: translateX(-50%);
+  padding: var(--gw-space-4) var(--gw-space-8);
+  border: 1px solid var(--gw-color-neutral-200);
+  border-radius: var(--gw-radius-8);
+  background: var(--s-card-bg); color: var(--s-heading);
+  font: var(--gw-text-body-14-med); letter-spacing: var(--gw-text-body-14-med-tracking);
+  white-space: nowrap; box-shadow: var(--gw-shadow-s2);
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transition: opacity var(--gw-motion-fast), visibility var(--gw-motion-fast);
+  z-index: 70;
+}
+.gw-iconbtn[data-tip-end]::after { left: auto; right: 0; transform: none; }
+.gw-iconbtn[data-tip]:hover::after,
+.gw-iconbtn[data-tip]:focus-visible::after { opacity: 1; visibility: visible; }
+.gw-iconbtn[data-tip][aria-expanded="true"]::after { opacity: 0; visibility: hidden; }
+:root[data-theme="dark"] .gw-iconbtn[data-tip]::after { border-color: var(--gw-color-neutral-700); }
 /* The unread dot — measured 795:5817: a 6px ellipse at 13,5 inside the 24 box. */
 .gw-iconbtn__dot {
   position: absolute; top: 5px; left: 13px;

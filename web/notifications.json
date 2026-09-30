@@ -2,6 +2,14 @@
   "items": [
     {
       "date": "2026-09-30",
+      "at": "17:00",
+      "title": "Add the sign-up ad page template, and R27: ask for the hero, then take folds from either template",
+      "version": "v1.52.0",
+      "href": "/internal/changelog",
+      "label": "30 Sep 2026"
+    },
+    {
+      "date": "2026-09-30",
       "at": "15:15",
       "title": "Log which Gushwork skill ran and the names of the files it wrote",
       "version": "v1.51.0",
@@ -55,14 +63,6 @@
       "version": "v1.45.0",
       "href": "/internal/changelog",
       "label": "7 Sep 2026"
-    },
-    {
-      "date": "2026-09-01",
-      "at": "19:53",
-      "title": "the plugin moves to design@gushwork.ai, and drift notices reach every surface",
-      "version": "v1.44.0",
-      "href": "/internal/changelog",
-      "label": "1 Sep 2026"
     }
   ]
 }
