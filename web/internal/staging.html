@@ -9,42 +9,266 @@
 <link rel="stylesheet" href="/foundation/tokens.css">
 <link rel="stylesheet" href="/shell.css">
 <script src="/shell.js" defer></script>
+<style>
+  /* ===========================================================================
+     PAGE SHELL — the same one web/style-guide.html, web/downloads.html and
+     web/internal/tools.html use. Only the Overview gets its own treatment (the
+     blue gw-hero). Values mirrored from .sg / .dl rather than re-derived.
+     =========================================================================== */
+  .st{max-width:1200px;margin:0 auto;
+      padding:var(--gw-space-60) var(--gw-space-40) var(--gw-space-120);
+      display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--gw-space-60)}
+  .st__main{min-width:0;display:flex;flex-direction:column;gap:var(--gw-space-32)}
+  /* The rule is DOTTED: 2px, round cap, [0.1,4] dash — a dot, not a dash. */
+  .st__hd{padding:0 var(--gw-space-40) var(--gw-space-32);
+          background-image:radial-gradient(circle closest-side,
+                           var(--s-rule) 100%, transparent 100%);
+          background-size:4.1px 2px;background-position:left bottom;
+          background-repeat:repeat-x;
+          display:flex;flex-direction:column;gap:var(--gw-space-20)}
+  .st__title{margin:0;font:600 44px/1.2 var(--gw-font-display);color:var(--s-heading)}
+  .st__meta{margin:0;font:var(--gw-text-body-14-med);
+            letter-spacing:var(--gw-text-body-14-med-tracking);
+            color:var(--gw-color-neutral-400)}
+  .st__body{display:flex;flex-direction:column;gap:var(--gw-space-60)}
+  .st-sec{padding-left:var(--gw-space-40);display:flex;flex-direction:column;
+          gap:var(--gw-space-20);scroll-margin-top:var(--gw-space-24)}
+  .st-sec :where(h2){margin:0;font:600 28px/1.2 var(--gw-font-display);color:var(--s-heading)}
+  .st-sec :where(p){margin:0;font:var(--gw-text-body-18-med);
+            letter-spacing:var(--gw-text-body-18-med-tracking);color:var(--s-body)}
+  .st-sec :where(p) a{color:inherit;font-weight:600;text-decoration:underline;
+            text-underline-offset:3px;text-decoration-thickness:1px;
+            text-decoration-color:var(--gw-color-neutral-300)}
+  .st-sec :where(p) a:hover{color:var(--s-heading);text-decoration-color:currentColor}
+  .st-note{font:var(--gw-text-body-14-reg)!important;color:var(--gw-color-neutral-600)!important}
+  /* Both page-local in web/downloads.html rather than in shell.css, so they are
+     redefined here rather than inherited. */
+  .gw-sr{position:absolute;width:1px;height:1px;margin:0;overflow:hidden;
+         clip-path:inset(50%);white-space:nowrap}
+  .st-sec code{font:500 15px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;
+               background:var(--gw-color-neutral-100);color:var(--s-heading);
+               padding:1px 6px;border-radius:var(--gw-radius-4)}
+  :root[data-theme="dark"] .st-sec code{background:var(--gw-color-neutral-800)}
+
+  /* ===========================================================================
+     TABLES — the same .dl-table the Downloads page uses, with one change: the
+     preview cell carries a real screenshot at 16:10 rather than a 132x48 asset
+     tile, so the row height goes to 120. Everything else is mirrored.
+     =========================================================================== */
+  :root{
+    --d-card:var(--gw-color-white);
+    --d-card-border:var(--gw-color-neutral-100);
+    --d-row-border:var(--gw-color-neutral-100);
+    --d-head-bg:var(--gw-color-neutral-25);
+    --d-muted:var(--gw-color-neutral-600);
+  }
+  :root[data-theme="dark"]{
+    --d-card:var(--gw-color-neutral-900);
+    --d-card-border:var(--gw-color-neutral-800);
+    --d-row-border:var(--gw-color-neutral-800);
+    --d-head-bg:var(--gw-color-neutral-800);
+    --d-muted:var(--gw-color-neutral-300);
+  }
+  .st-table{width:100%;border-collapse:separate;border-spacing:0;
+            background:var(--d-card);border:1px solid var(--d-card-border);
+            border-radius:var(--gw-radius-20)}
+  .st-table th{height:48px;padding:0 var(--gw-space-16);text-align:left;
+               background:var(--d-head-bg);border-bottom:1px solid var(--d-row-border);
+               font:var(--gw-text-body-14-sem);
+               letter-spacing:var(--gw-text-body-14-sem-tracking);color:var(--d-muted)}
+  .st-table th:first-child{border-top-left-radius:var(--gw-radius-20)}
+  .st-table th:last-child{border-top-right-radius:var(--gw-radius-20)}
+  .st-table td{height:120px;padding:var(--gw-space-16);vertical-align:middle;
+               border-bottom:1px solid var(--d-row-border);
+               font:var(--gw-text-body-14-med);
+               letter-spacing:var(--gw-text-body-14-med-tracking);color:var(--s-heading)}
+  .st-table tr:last-child td{border-bottom:0}
+  .st-table td.u{color:var(--s-body)}
+  .st-table .c-prev{width:196px}
+  .st-table .c-name{width:210px}
+  .st-table .c-act{width:120px;text-align:right}
+
+  /* Preview tile: a real render, 16:10, cropped to the top of the page. */
+  .st-pv{display:block;width:164px;height:auto;aspect-ratio:16/10;object-fit:cover;
+         object-position:top center;border-radius:var(--gw-radius-10);
+         border:1px solid var(--gw-color-neutral-100);background:var(--gw-color-neutral-25)}
+  :root[data-theme="dark"] .st-pv{border-color:var(--gw-color-neutral-800)}
+
+  .st-open{display:inline-flex;align-items:center;gap:var(--gw-space-8);
+           text-decoration:none;font:var(--gw-text-button-14);
+           color:var(--gw-color-primary-600)}
+  .st-open svg{width:14px;height:14px;fill:currentColor;transition:transform 140ms ease}
+  .st-open:hover svg{transform:translateX(3px)}
+  .st-open:focus-visible{outline:2px solid var(--gw-color-primary-500);outline-offset:2px;
+                         border-radius:var(--gw-radius-4)}
+
+  @media(max-width:700px){
+    .st{padding-left:var(--gw-space-20);padding-right:var(--gw-space-20)}
+    .st__hd,.st-sec{padding-left:0}
+    .st__hd{padding-right:0}
+    .st__title{font-size:32px}
+    /* 526px of columns will not survive 390, and a horizontally scrolling table
+       is a table nobody scrolls — same reasoning as .dl-table's phone rules. */
+    .st-table,.st-table tbody,.st-table tr,.st-table td{display:block;width:auto}
+    .st-table thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+    .st-table td{height:auto;border-bottom:0;padding-bottom:0}
+    .st-table tr{border-bottom:1px solid var(--d-row-border);padding:var(--gw-space-16) 0}
+    .st-table tr:last-child{border-bottom:0}
+    .st-table .c-prev,.st-table .c-name,.st-table .c-act{width:auto;text-align:left}
+    .st-pv{width:100%}
+  }
+</style>
 </head>
 <body data-gw-page="staging">
 
-<div class="gw-col">
-  <div class="gw-section gw-stack-40">
-    <div class="gw-prose gw-stack-20">
-      <h2>Staging</h2>
-      <p>Live previews of work in progress, kept off the official surface until it's ready.
-         Not indexed, and not linked from anywhere public. Default is committed straight into
-         this repo, under this domain — no separate project, unless one genuinely needs its
-         own backend.</p>
-    </div>
+<div class="st">
+  <div class="st__main">
 
-    <div class="gw-prose">
-      <ul>
-        <li>
-          <a href="/internal/staging/homepage-neo">Homepage Neo</a>
-          — the marketing homepage redesign, ahead of replacing the live site.
-        </li>
-        <li>
-          <a href="/internal/staging/crm-studio-deck">CRM Studio discovery deck</a>
-          — the deck an AE drives live on a call: five discovery questions, then the
-          prospect's current stack and a day in the life with Gushwork.
-        </li>
-        <li>
-          <a href="/internal/staging/case-study-gen-studio">Case Study Gen Studio</a>
-          — the bulk case-study generator. This one keeps its own project (its own database
-          and API routes), embedded here in a frame — see the note below.
-        </li>
-      </ul>
-      <p style="margin-top:16px;font-size:12.5px;color:var(--gw-color-neutral-600)">
-        Every link stays on this domain either way. Bookmark or share the design.gushwork.ai
-        link, not a project's own <code>.vercel.app</code> address.
-      </p>
+    <header class="st__hd">
+      <h1 class="st__title">Staging</h1>
+      <p class="st__meta">Last updated 29th Sep, 2026</p>
+    </header>
+
+    <div class="st__body">
+
+      <section class="st-sec">
+        <p>Live previews of work in progress, kept off the official surface until it is ready.
+        Not indexed, and not linked from anywhere public. The default is committed straight into
+        this repo under this domain — no separate project, unless one genuinely needs its own
+        backend. Every link below stays on this domain either way, so bookmark or share the
+        design.gushwork.ai address rather than a project&rsquo;s own <code>.vercel.app</code> one.</p>
+      </section>
+
+      <section class="st-sec" id="landing-pages">
+        <h2>Landing pages</h2>
+          <table class="st-table">
+            <thead>
+              <tr>
+                <th class="c-prev" scope="col">Preview</th>
+                <th class="c-name" scope="col">Project</th>
+                <th scope="col">What it is</th>
+                <th class="c-act" scope="col"><span class="gw-sr">Open</span></th>
+              </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td class="c-prev"><img class="st-pv" src="/assets/staging/aeo-lander.png" alt="The AEO lander, showing its hero and form" loading="lazy"></td>
+              <td class="c-name">AEO lander</td>
+              <td class="u">Getting found when a buyer asks ChatGPT, Perplexity or Gemini for a business like yours.</td>
+              <td class="c-act"><a class="st-open" href="/internal/staging/aeo-lander">Open <svg viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a></td>
+            </tr>
+            <tr>
+              <td class="c-prev"><img class="st-pv" src="/assets/staging/ai-agents-lander.png" alt="The AI agents lander, showing its hero and form" loading="lazy"></td>
+              <td class="c-name">AI agents lander</td>
+              <td class="u">Six agents that research the market, publish the pages, build the citations and send leads to your inbox.</td>
+              <td class="c-act"><a class="st-open" href="/internal/staging/ai-agents-lander">Open <svg viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a></td>
+            </tr>
+            <tr>
+              <td class="c-prev"><img class="st-pv" src="/assets/staging/ai-crm-lander.png" alt="The AI CRM lander, showing its hero and form" loading="lazy"></td>
+              <td class="c-name">AI CRM lander</td>
+              <td class="u">A CRM built around how you sell — free migration, agents that follow up, live in under 24 hours.</td>
+              <td class="c-act"><a class="st-open" href="/internal/staging/ai-crm-lander">Open <svg viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a></td>
+            </tr>
+            <tr>
+              <td class="c-prev"><img class="st-pv" src="/assets/staging/ai-services-lander.png" alt="The AI services lander, showing its hero and form" loading="lazy"></td>
+              <td class="c-name">AI services lander</td>
+              <td class="u">One AI system across CRM, invoicing, support and lead follow-up, with agents running the daily work.</td>
+              <td class="c-act"><a class="st-open" href="/internal/staging/ai-services-lander">Open <svg viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a></td>
+            </tr>
+            </tbody>
+          </table>
+      </section>
+
+      <section class="st-sec" id="site-pages">
+        <h2>Site pages</h2>
+          <table class="st-table">
+            <thead>
+              <tr>
+                <th class="c-prev" scope="col">Preview</th>
+                <th class="c-name" scope="col">Project</th>
+                <th scope="col">What it is</th>
+                <th class="c-act" scope="col"><span class="gw-sr">Open</span></th>
+              </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td class="c-prev"><img class="st-pv" src="/assets/staging/homepage-neo.png" alt="The Homepage Neo redesign, showing its hero and product screenshot" loading="lazy"></td>
+              <td class="c-name">Homepage Neo</td>
+              <td class="u">The marketing homepage redesign, ahead of replacing the live site.</td>
+              <td class="c-act"><a class="st-open" href="/internal/staging/homepage-neo">Open <svg viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a></td>
+            </tr>
+            </tbody>
+          </table>
+      </section>
+
+      <section class="st-sec" id="decks">
+        <h2>Decks</h2>
+          <table class="st-table">
+            <thead>
+              <tr>
+                <th class="c-prev" scope="col">Preview</th>
+                <th class="c-name" scope="col">Project</th>
+                <th scope="col">What it is</th>
+                <th class="c-act" scope="col"><span class="gw-sr">Open</span></th>
+              </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td class="c-prev"><img class="st-pv" src="/assets/staging/crm-studio-deck.png" alt="The CRM Studio discovery deck, showing its opening slide" loading="lazy"></td>
+              <td class="c-name">CRM Studio discovery deck</td>
+              <td class="u">The deck an AE drives live on a call: five discovery questions, then the prospect’s current stack and a day in the life with Gushwork.</td>
+              <td class="c-act"><a class="st-open" href="/internal/staging/crm-studio-deck">Open <svg viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a></td>
+            </tr>
+            </tbody>
+          </table>
+      </section>
+
+      <section class="st-sec" id="apps">
+        <h2>Apps</h2>
+        <p class="st-note">One project here runs its own backend, so it lives in its own Vercel
+        project and is framed into this domain rather than committed into this repo.</p>
+          <table class="st-table">
+            <thead>
+              <tr>
+                <th class="c-prev" scope="col">Preview</th>
+                <th class="c-name" scope="col">Project</th>
+                <th scope="col">What it is</th>
+                <th class="c-act" scope="col"><span class="gw-sr">Open</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="c-prev"><span class="st-pv" style="display:grid;place-items:center">
+                  <svg viewBox="0 0 256 256" fill="var(--gw-color-neutral-400)" aria-hidden="true" style="width:24px;height:24px"><path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,16V88H40V56ZM40,200V104H216v96Z"/></svg>
+                </span></td>
+                <td class="c-name">Case Study Gen Studio</td>
+                <td class="u">The bulk case-study generator. This one keeps its own project — its own database and API routes — and is embedded here in a frame, which is why it has no screenshot of its own.</td>
+                <td class="c-act"><a class="st-open" href="/internal/staging/case-study-gen-studio">Open <svg viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a></td>
+              </tr>
+            </tbody>
+          </table>
+      </section>
+
     </div>
   </div>
+
+  <!-- On this page — the same shared `.idx` rail the Style Guide, Downloads and Tools use -->
+  <nav class="idx" aria-label="On this page" data-collapsed="false">
+    <div class="idx__t">
+      <button class="idx__col" type="button" data-idx-collapse aria-expanded="true"
+              aria-controls="st-toc" aria-label="Collapse the section list">
+        <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M184.49,136.49l-80,80a12,12,0,0,1-17-17L159,128,87.51,56.49a12,12,0,1,1,17-17l80,80A12,12,0,0,1,184.49,136.49Z"/></svg>
+      </button>
+      <svg class="idx__ico" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z"/></svg>
+      <span>On this page</span>
+    </div>
+    <div class="idx__list" id="st-toc">
+      <a href="#landing-pages">Landing pages</a>
+      <a href="#site-pages">Site pages</a>
+      <a href="#decks">Decks</a>
+      <a href="#apps">Apps</a>
+    </div>
+  </nav>
 </div>
 
 </body></html>

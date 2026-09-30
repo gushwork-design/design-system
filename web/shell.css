@@ -40,7 +40,13 @@
    ------------------------------------------------------------------------ */
 :root,
 :root[data-theme="light"] {
-  --s-page-bg:       var(--gw-color-neutral-25);   /* measured: screen 478:14788 fill */
+  /* REDESIGNED 29 Sep 2026 — Figma Q9L6q38dEj3Qu1JkjiT13y, overview 791:2395.
+     The chrome no longer has a fill or a border of its own: topbar and sidebar sit
+     directly on the page ground, and the CONTENT is a white panel floating on it.
+     --s-chrome-bg / --s-chrome-border are kept because the modal, the palette and
+     the login screen still reference them. */
+  --s-page-bg:       var(--gw-color-neutral-50);   /* measured 791:2395: screen fill */
+  --s-panel-bg:      var(--gw-color-white);        /* measured 791:2396: content panel */
   --s-chrome-bg:     var(--gw-color-neutral-50);   /* measured: topbar + sidebar fill */
   --s-chrome-border: var(--gw-color-neutral-100);  /* measured: 1.5px stroke */
 
@@ -52,8 +58,14 @@
   --s-nav-hover:     var(--gw-color-neutral-25);   /* measured: audit §12 row 2 */
   --s-group-label:   var(--gw-color-neutral-400);  /* measured: list label fill */
 
-  --s-field-bg:      var(--gw-color-neutral-25);   /* measured: search field fill */
-  --s-field-border:  var(--gw-color-neutral-200);  /* measured: search + toggle stroke */
+  /* The field now sits on the grey ground rather than on a grey topbar, so it
+     inverts: white fill, lighter stroke. Measured 791:2642. */
+  /* MEASURED AGAIN 29 Sep on 791:4937, after the field moved into the rail: the
+     fill is Neutral/25, NOT white. Two independent reads agree — the node's
+     variable set contains no white at all (the old topbar field's did), and the
+     render samples #f7f8f9 inside the border. */
+  --s-field-bg:      var(--gw-color-neutral-25);   /* measured 791:4937: search fill */
+  --s-field-border:  var(--gw-color-neutral-100);  /* measured 791:2642: search stroke */
   --s-placeholder:   var(--gw-color-neutral-400);  /* measured: placeholder fill */
   --s-field-icon:    var(--gw-color-neutral-600);  /* measured: MagnifyingGlass vector */
 
@@ -83,7 +95,9 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     /* measured — audit §5, read off frame 236:33407 */
-    --s-chrome-bg:     var(--gw-color-neutral-900);  /* topbar / sidebar → Neutral/900 */
+    --s-panel-bg:      var(--gw-color-neutral-900);  /* content panel → Neutral/900 */
+    --s-panel-bg:      var(--gw-color-neutral-900);  /* content panel → Neutral/900 */
+  --s-chrome-bg:     var(--gw-color-neutral-900);  /* topbar / sidebar → Neutral/900 */
     --s-chrome-border: var(--gw-color-neutral-800);  /* border → Neutral/800 */
     --s-heading:       var(--gw-color-white);        /* all Vert Grotesk headings → white */
     --s-body:          var(--gw-color-neutral-300);  /* muted icon/text → Neutral/300 */
@@ -127,6 +141,7 @@
 
 :root[data-theme="dark"] {
   /* measured — audit §5, read off frame 236:33407 */
+  --s-panel-bg:      var(--gw-color-neutral-900);  /* content panel → Neutral/900 */
   --s-chrome-bg:     var(--gw-color-neutral-900);  /* topbar / sidebar → Neutral/900 */
   --s-chrome-border: var(--gw-color-neutral-800);  /* border → Neutral/800 */
   --s-heading:       var(--gw-color-white);        /* all Vert Grotesk headings → white */
@@ -209,17 +224,39 @@
 }
 
 /* shell.js moves the page's original children in here. */
+/* The panel is FIXED and the content scrolls INSIDE it — ruled 29 Sep 2026. The
+   frame, the topbar and the rail never move; only the document within the panel
+   does. Measured 791:2396: x 304, y 76, 1116x824 in a 1440x920 frame, which is
+   20 clear on the right and the bottom.
+
+   `position: fixed` rather than a tall box with `overflow`, because the panel has
+   to hold its own corners against the viewport at every scroll position, and a
+   margin box would scroll its bottom edge away. */
 .gw-main {
-  margin-top: 60px;    /* measured: topbar height */
-  margin-left: 240px;  /* measured: sidebar width */
-  min-height: calc(100vh - 60px);
+  position: fixed;
+  /* Measured 791:4692: x 304, y 20, 1116x880 in a 1440x920 frame. The panel runs
+     the full height now — the topbar it used to sit under is gone. */
+  top: 20px; right: 20px; bottom: 20px; left: 304px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  /* No visible scrollbar — ruled 29 Sep 2026. The panel still scrolls by wheel,
+     trackpad, keyboard and the rail's own links; it just does not draw a track
+     across the frame's rounded corner. */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  background: var(--s-panel-bg);
+  border-radius: var(--gw-radius-20);
 }
+.gw-main::-webkit-scrollbar { width: 0; height: 0; }
 
 /* Content column — measured 478:14832: 1200 wide, pad 60/40, gap 60.
    1200 − 80 = 1120 inner, which is what the hero and sections are. */
 .gw-col {
   max-width: 1200px;
-  padding: var(--gw-space-60) var(--gw-space-40);
+  /* Measured 791:4692 → the-playbook-cover at 41,41 inside the 1116 panel. The
+     60 top predates the panel and came from 478:14832, when the content sat on
+     the page. Built at 40 rather than 41: 41 is on no spacing step, 40 is. */
+  padding: var(--gw-space-40) var(--gw-space-40) var(--gw-space-60);
   display: flex;
   flex-direction: column;
   gap: var(--gw-space-60);
@@ -270,13 +307,16 @@
   position: fixed;
   inset: 0 0 auto 0;
   z-index: 40;
-  height: 60px;
+  /* Measured 791:2637: the row is 36 tall at y=20, inset 32 from the left — so
+     the band is 76. No fill and no border any more: the topbar sits on the page
+     ground, and the panel below is what has an edge. */
+  height: 76px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px var(--gw-space-40);
-  background: var(--s-chrome-bg);
-  border-bottom: 1.5px solid var(--s-chrome-border);
+  padding: var(--gw-space-20) var(--gw-space-32);
+  background: none;
+  border-bottom: 0;
 }
 
 /* dashboard-title 478:14790 — HUG, gap 8 */
@@ -417,7 +457,9 @@
 
 /* Above the phone breakpoint the dock is hidden; below it the menu would open
    off the bottom of the screen, so it opens upward from the dock instead. */
-.gw-phone-dock .gw-theme__menu { top: auto; bottom: calc(100% + var(--gw-space-8)); right: auto; left: 0; }
+/* Anchored at the bottom, so the menu opens UPWARD. Right-aligned to the
+   trigger, because the dock sits against the panel's right edge. */
+.gw-theme-dock .gw-theme__menu { top: auto; bottom: calc(100% + var(--gw-space-8)); right: 0; left: auto; }
 .gw-theme__btn:focus-visible { outline: var(--gw-focus-ring); outline-offset: var(--gw-focus-offset); }
 
 /* ---------------------------------------------------------------------------
@@ -428,14 +470,21 @@
    ------------------------------------------------------------------------ */
 .gw-sidebar {
   position: fixed;
-  top: 60px; left: 0; bottom: 0;
+  /* Measured 791:2653: the nav list is 280 wide at x=12, so the column is 304.
+     No fill, no right border — the rail sits on the page ground. */
+  top: 0; left: 0; bottom: 0;
   z-index: 30;
-  width: 240px;
+  /* Measured 791:4936 — the rail is 304 and everything inside it is a single
+     256 column inset 24 on BOTH sides (list-groups sits at x=12 and its items at
+     x=12 within that, so 24 absolute; 304 - 24 - 24 = 256). The inset used to be
+     stacked out of a rail padding plus a component padding, which left 24 on the
+     left and only 12 on the right. Each block now owns its own 24. */
+  width: 304px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background: var(--s-chrome-bg);
-  border-right: 1.5px solid var(--s-chrome-border);
+  background: none;
+  border-right: 0;
   /* The rail itself does not scroll; its nav list does. When the whole rail
      scrolled, a classic scrollbar — Windows, or macOS set to always show —
      took ~15px off the rail's content width, and the user card at the bottom
@@ -452,7 +501,9 @@
   display: flex;
   flex-direction: column;
   gap: var(--gw-space-24);
-  padding: var(--gw-space-24) var(--gw-space-20);
+  /* 24 all round: the 24 top is the measured gap from the search field (it ends
+     at y=56, the first group starts at 80), and 24 each side gives the 256 column. */
+  padding: var(--gw-space-24);
 }
 /* Only the top-level list scrolls — the child .gw-navgroups inside .gw-navend
    holds the ADMIN group and must not become its own scroll area. */
@@ -543,25 +594,20 @@
      the drawing specifies — a real account name like "Design gushwork" needs
      119px and the 20-padding slot gives 106, so the name arrived clipped. The
      drawing never hit this because it is mocked with "Bruce Wayne". */
-  padding: var(--gw-space-20) var(--gw-space-16) var(--gw-space-32);
-  border-top: 1.5px solid var(--s-chrome-border);
+  /* Measured 791:4968: the card's list-item is 256 wide at x=24, 20 from the top. */
+  padding: var(--gw-space-20) var(--gw-space-24) var(--gw-space-40);
+  /* No divider. It existed to separate the card from a rail that had its own
+     fill; the rail is now the page ground and 791:2678 draws no line. */
+  border-top: 0;
 }
-/* 683:5721 — a 40px squircle at r12, not a circle. Primary/200 ground with the
-   initials in Primary/600: the same pairing the eyebrow chips use, and quiet
-   enough that a photo dropping in over it is not a jump in weight. The hairline
-   is what keeps it off the rail's own Neutral/50 in light. */
+/* The mark draws its own tile — fill, radius and dots all live in the SVG, so the
+   span is just a 40x40 box. Measured 791:2827. No border and no background: a
+   ring around it would fight the tile's own corner. */
 .gw-user__av {
   width: 40px; height: 40px; flex: none;
-  border-radius: var(--gw-radius-12);
-  border: 1px solid var(--s-card-border);
-  background: var(--gw-color-primary-200);
-  color: var(--gw-color-primary-600);
-  display: grid; place-items: center;
-  font: var(--gw-text-body-14-sem);
-  letter-spacing: var(--gw-text-body-14-sem-tracking);
-  overflow: hidden;
+  display: block;
 }
-.gw-user__av img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.gw-user__av svg { width: 100%; height: 100%; display: block; }
 .gw-user__txt {
   flex: 1 1 auto; min-width: 0;
   display: flex; flex-direction: column; gap: var(--gw-space-4);
@@ -864,7 +910,9 @@
   position: sticky;
   top: calc(60px + var(--gw-space-40));
   align-self: start;
-  max-height: calc(100vh - 60px - 80px);
+  /* The panel, not the viewport: it runs 76 from the top and 20 from the bottom,
+     so its height is 100vh - 96. The extra 80 is the rail's own breathing room. */
+  max-height: calc(100vh - 40px - 80px);
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
@@ -879,7 +927,10 @@
   color: var(--s-nav-label);
   padding-bottom: var(--gw-space-8);
   position: sticky; top: 0; z-index: 1;
-  background: var(--s-page-bg);
+  /* The PANEL, not the page. This read --s-page-bg, which was the same colour as
+     the content until 29 Sep; once the content became a white panel on a grey
+     ground it showed as a grey band behind "On this page". */
+  background: var(--s-panel-bg);
 }
 .idx__ico { width: 16px; height: 16px; flex: none; display: block; }
 .idx__col {
@@ -1338,9 +1389,13 @@
    ------------------------------------------------------------------------ */
 :root.gw-shell-ready { scroll-padding-top: calc(60px + var(--gw-space-16)); }
 
-.gw-main .idx { top: calc(60px + var(--gw-space-40)); }  /* changelog index rail */
-.gw-main .nav { top: calc(60px + 20px); }                /* review sheet nav rail */
-.gw-main thead th { top: 60px; }                         /* sticky table headers */
+/* These used to add the 60px topbar because the PAGE scrolled under a fixed bar.
+   The panel is its own scrollport now and already starts below the bar, so the
+   offsets are measured from the panel's own top edge. Adding 60 here would park
+   every sticky element 60px too low. */
+.gw-main .idx { top: var(--gw-space-40); }  /* changelog index rail */
+.gw-main .nav { top: 20px; }                /* review sheet nav rail */
+.gw-main thead th { top: 0; }               /* sticky table headers */
 
 /* ---------------------------------------------------------------------------
    9. Below 1440 — SCALE the canvas. Do not reflow. RULED.
@@ -1476,6 +1531,11 @@
   /* `Menu` — the rail becomes a full-screen overlay under the bar. */
   .gw-sidebar {
     width: 100%;
+    padding-left: 0;
+    /* The desktop rail is transparent because it sits on the page ground. As a
+       phone OVERLAY it covers the content, so it has to carry that ground
+       itself or the nav reads through whatever is underneath. */
+    background: var(--s-page-bg);
     border-right: 0;
     border-bottom: 1.5px solid var(--s-chrome-border);
     transform: translateX(-100%);
@@ -1538,14 +1598,24 @@
    a border and Shadows/S3 so it reads against scrolling content. Surface
    aliases, so it still inverts in dark.
    ------------------------------------------------------------------------ */
-.gw-phone-dock { display: none; }
+/* The panel is inset 20 from the viewport, so 40 from the viewport puts the
+   control 20 inside the panel's own corner. */
+.gw-theme-dock {
+  display: flex; align-items: center; gap: var(--gw-space-8);
+  position: fixed; right: 40px; bottom: 40px; z-index: 35;
+}
+/* It floats over white content, so it needs an edge — the same neutral-25 fill
+   and neutral-100 stroke the search field carries, rather than a new treatment. */
+.gw-theme-dock .gw-theme {
+  background: var(--s-field-bg);
+  box-shadow: inset 0 0 0 1px var(--s-field-border);
+}
 
 @media (max-width: 599px) {
-  .gw-phone-dock {
-    display: flex; align-items: center; gap: var(--gw-space-8);
-    position: fixed; left: 20px; bottom: 20px; z-index: 50;
+  .gw-theme-dock {
+    right: auto; left: 20px; bottom: 20px; z-index: 50;
   }
-  .gw-phone-dock .gw-theme {
+  .gw-theme-dock .gw-theme {
     /* --s-card-bg, not the artifact's --s-card: same role, different name in
        this codebase's alias layer. Copied verbatim it resolved to nothing and
        the dock painted transparent. */
@@ -1567,3 +1637,46 @@
 /* The drawer trigger is `controls/tab` 36x36, radius/8, 1px neutral/200 with a
    16px List glyph — it had no border here before. */
 .gw-burger { border: 1px solid var(--s-field-border); }
+
+/* ============================================================================
+   RAIL TOP — the wordmark and the search field, which used to live in a
+   full-width topbar. Measured 791:4933 (brand 198x32 at 24,40) and 791:4936
+   (the rail column is 280 wide at x=12, and the field is the first thing in it).
+   ========================================================================== */
+.gw-railtop {
+  flex: none;
+  display: flex; flex-direction: column;
+  /* Measured 791:4933 / 791:4937: the wordmark row sits at y=40 and is 32 tall,
+     and the search field starts at y=104 — a 32 gap, not 16. The bottom is 0
+     because .gw-navgroups already carries the measured 24 above the first group. */
+  gap: var(--gw-space-32);
+  padding: var(--gw-space-40) var(--gw-space-24) 0;
+}
+.gw-railtop__row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--gw-space-8);
+  /* Measured 791:4933: the row is 32 — the wordmark's own height. Left implicit it
+     came out 36, because .gw-theme__btn is 28 plus 4 of padding on a content box,
+     and the taller sibling was centring the 32px chip 2px low. */
+  height: 32px;
+}
+/* The field fills the rail rather than holding the topbar's measured 400. */
+.gw-railtop .gw-search { width: 100%; }
+
+/* The one padlock, on the group label. 12px so it sits with 10px uppercase type
+   rather than over it. */
+.gw-navlabel { display: flex; align-items: center; gap: var(--gw-space-8); }
+.gw-navlabel__lock {
+  display: inline-flex; flex: none;
+  color: var(--s-lock-icon);
+}
+.gw-navlabel__lock svg { width: 12px; height: 12px; display: block; }
+
+/* The topbar is PHONE ONLY now — it exists to carry the burger, which the rail
+   cannot hold because on phone the rail is the thing the burger opens. */
+.gw-topbar { display: none; }
+@media (max-width: 767px) {
+  .gw-topbar { display: flex; }
+  .gw-railtop { padding-top: var(--gw-space-20); }
+  .gw-main { position: static; margin: 0; border-radius: 0; }
+}

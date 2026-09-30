@@ -109,7 +109,7 @@ post notice via chat.postMessage        → record ts → {surface, key, fingerp
         ↓
 reviewer reacts ✅ on that message
         ↓
-Slack POSTs reaction_added → web/api/slack-events.js
+Slack POSTs reaction_added → web/api/gw.js → _slack-events.js
         ↓  verify signature · verify reactor · look up ts
 records "approved: <surface>/<key> by <user> at <T>" in the queue
         ↓
