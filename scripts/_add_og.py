@@ -16,10 +16,12 @@ og:title (the page's <title>), og:description (its meta description, when it has
 its size and alt text, and the twitter:card set. og:url is the canonical address, so a link shared from
 the .vercel.app alias still names the real one.
 
-Gated pages (/internal, /admin) cannot unfurl for anyone signed out, since a crawler is bounced to
-sign-in; they get the tags anyway so a page that is later made public is not the one that unfurls blank.
+Gated pages (/internal, /admin) are bounced to sign-in for anyone signed out, a crawler included, so
+their own tags never reach it. This also writes og-map.json (route -> title, image, for /internal and
+/library), which web/middleware.js uses to answer link-preview bots with a tags-only stub.
 """
 import html
+import json
 import os
 import re
 import sys
@@ -56,6 +58,7 @@ def block(url, title, desc):
     if url in PAGE_CARDS:
         file, name = PAGE_CARDS[url]
         image, alt = f"{BASE}/assets/og/{file}", f"{name}, with the Gushwork logo on the brand blue grid"
+        title = f"{name} — {SITE}"
     t, d = html.escape(title, quote=True), html.escape(desc, quote=True)
     lines = [
         '<meta property="og:type" content="website">',
@@ -79,8 +82,20 @@ def block(url, title, desc):
     return "<!-- Social card: the hub's, added at publish by scripts/_add_og.py -->\n" + "\n".join(lines) + "\n"
 
 
+def remember(cards, stage, path, s):
+    """Record route -> [og:title, og:image] for gated pages, read back from the page's own tags."""
+    r = route(stage, path)
+    if not (r.startswith("/internal") or r.startswith("/library")):
+        return
+    t = re.search(r'<meta property="og:title" content="([^"]*)"', s)
+    i = re.search(r'<meta property="og:image" content="([^"]*)"', s)
+    if t and i:
+        cards[r.rstrip("/") or "/"] = [html.unescape(t.group(1)), html.unescape(i.group(1))]
+
+
 def main(stage):
     done = skipped = 0
+    cards = {}
     for root, _dirs, files in os.walk(stage):
         for f in files:
             if not f.endswith(".html"):
@@ -93,8 +108,12 @@ def main(stage):
             # Several hub pages leave </head> implicit, so the tags go before </head> when there is
             # one and before <body otherwise.
             mark = "</head>" if "</head>" in s else ("<body" if "<body" in s else "")
-            if "og:image" in s or not mark:
-                skipped += 1          # has its own card, or is not a full page
+            if not mark:
+                skipped += 1          # not a full page
+                continue
+            if "og:image" in s:
+                skipped += 1          # has its own card
+                remember(cards, stage, path, s)
                 continue
             m = re.search(r"<title>(.*?)</title>", s, re.S)
             title = html.unescape(m.group(1).strip()) if m else SITE
@@ -103,6 +122,10 @@ def main(stage):
             s = s.replace(mark, block(route(stage, path), title, desc) + mark, 1)
             open(path, "w", encoding="utf-8").write(s)
             done += 1
+            remember(cards, stage, path, s)
+    # What the gate hands a link-preview bot (see og-map.json in middleware.js).
+    with open(os.path.join(stage, "og-map.json"), "w", encoding="utf-8") as fh:
+        json.dump(cards, fh, sort_keys=True, separators=(",", ":"))
     print(f"  og: {done} pages given the hub card, {skipped} left with their own")
 
 
