@@ -64,6 +64,9 @@ SHEETS=(
 # here or the card 404s and the link unfurls blank.
 SOCIAL=(
   assets/og/install.png
+  assets/og/hub.png
+  assets/og/style-guide.png
+  assets/og/downloads.png
 )
 
 # The changelog sheet is generated, so a publish must not ship a stale one.
@@ -163,7 +166,7 @@ p = sys.argv[1]
 s = open(p, encoding="utf-8").read()
 before = s
 s = s.replace("https://gushwork-design.vercel.app/preview/install.html",
-              "https://gushwork-design.vercel.app/internal/claude-plugin")
+              "https://design.gushwork.ai/internal/claude-plugin")
 open(p, "w", encoding="utf-8").write(s)
 print("  rewrote og:url in claude-plugin.html" if s != before
       else "  og:url in claude-plugin.html already current")
