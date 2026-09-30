@@ -999,3 +999,33 @@ not what made it: a PDF dropped into the folder by another tool would be named t
 
 **What is still not seen.** Sessions without the plugin; files made outside the working directory or
 deeper than four folders; and whether an output was *good*, which only the verdict records.
+
+**Kept copies (added 30 Sep 2026, ruled by Utsav): the exception to "no file contents".** The log could
+name an output but not open it, which made it a list of things nobody could check. A finished PDF, PNG,
+PPTX, HTML or SVG up to 4 MB is now also sent to `/api/log-output` and stored as a private copy, so an
+owner can open it from the Usage Logs page.
+
+- **Private.** A Blob store created with private access. Nothing is reachable by URL. The only way
+  out is `/api/usage-log?file=…`, behind the same session and owner check as the log. HTML and SVG
+  are sent as a download, never rendered on our origin; every response is marked no-sniff and sandboxed.
+- **Bounded.** Five types only, 4 MB, the declared type must match the bytes, a per-IP limit, and a
+  cap of 300 copies a day across everyone. The endpoint is public (the plugin has no secret to keep),
+  so these are what stand between it and a flood. 4 MB and not 5 because a Vercel function rejects any
+  request body over 4.5 MB; the file is sent raw, not base64, to get that close. 5 MB would need the
+  client-upload route.
+- **No automatic expiry.** ONBOARDING tells people copies are deleted "after a few weeks"; in fact
+  nothing deletes them. Utsav will clear them by hand in the Vercel dashboard when storage becomes a
+  problem. A daily purge (list, delete older than 30 days) was written and then removed at his call,
+  to keep the surface small. The daily cap is the only bound on growth until then.
+- **Off switches.** `GW_NO_USAGE_PING=1` stops the whole hook; `GW_NO_OUTPUT_COPIES=1` keeps the
+  log and skips only the copy.
+- **Dormant until a store exists.** With no `BLOB_READ_WRITE_TOKEN` the endpoint answers 204 and
+  does nothing, so the code shipped ahead of the store.
+
+**Disclosure.** ONBOARDING.md says it. There is deliberately no in-session notice: Utsav's call
+("if someone notices, we will see then"). A teammate who never read ONBOARDING will not know their
+outputs are copied. The decision is recorded so it can be revisited.
+
+**A dependency, and what a copy can hold.** This is the site's first dependency (`@vercel/blob`),
+imported inside the two routes that use it rather than at the top, so a failure there cannot take
+`log-usage` or `usage-log` down. A copy can hold client copy and pricing; owners are the only readers.

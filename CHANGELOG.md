@@ -24,6 +24,7 @@ reports its own stale date.**
 
 | Version | Date | What changed | Commit | Session |
 |---|---|---|---|---|
+| **v1.57.0** | 30 Sep 2026 19:45 | Keep a private copy of each output, so the Usage Logs page can open it | [`f0adcf6`](https://github.com/gushwork-design/design-system/commit/f0adcf66c1d0734d021c19f46a0d3a70ea475e4c) | [Gushwork Design](claude://resume/4e52956e-ec36-4a86-a3ae-98d70291548d) |
 | **v1.56.0** | 30 Sep 2026 19:34 | Group the Usage Logs by chat, log PNG and HTML outputs, and let Admin and Owner scroll with the nav | [`8f000cc`](https://github.com/gushwork-design/design-system/commit/8f000ccbb60003037af6506122d55f55d381ba9c) | [Gushwork Design](claude://resume/4e52956e-ec36-4a86-a3ae-98d70291548d) |
 | **v1.55.0** | 30 Sep 2026 19:19 | Add a Skill column to the Usage Logs table, and log PDFs and decks that scripts make | [`aee6e53`](https://github.com/gushwork-design/design-system/commit/aee6e53f7bbc7196ce5ed78fe20370044b815069) | [Gushwork Design](claude://resume/4e52956e-ec36-4a86-a3ae-98d70291548d) |
 | **v1.54.0** | 30 Sep 2026 18:58 | Measure what the skills make: on-brand flags, artifact links and an owner verdict on the Usage Logs page, and R29 | [`5b0091d`](https://github.com/gushwork-design/design-system/commit/5b0091d4228c1f151ba2d79819b742167d70521e) | [Gushwork Design](claude://resume/4e52956e-ec36-4a86-a3ae-98d70291548d) |
