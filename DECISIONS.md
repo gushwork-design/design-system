@@ -990,8 +990,10 @@ land on. Tying the two together would need every output posted there, which is a
 **Script-made outputs (added 30 Sep 2026).** A lead magnet PDF or a deck is made by a script through
 Bash, not a Write, so the hook could not see it. After each Bash call in a session where a Gushwork
 skill has run, it now scans the working directory (four folders deep, at most 5,000 entries, skipping
-`node_modules`, `.git`, virtualenvs and hidden folders) for PDF and PPTX files written since the last
-look, and logs their basenames, at most five per call. A Bash call on a machine with no Gushwork
+`node_modules`, `.git`, virtualenvs and hidden folders) for PDF, PPTX, PNG and HTML files written since
+the last look, and logs their basenames, at most five per call (an HTML file is also measured for the four
+flags, locally, as one the Write tool made would be). The session-start ping now carries the same
+one-way session hash, so a chat's start, skills and outputs group exactly on the Usage Logs page. A Bash call on a machine with no Gushwork
 session marker exits before starting Python, so unrelated work pays nothing. It names what appeared,
 not what made it: a PDF dropped into the folder by another tool would be named too.
 

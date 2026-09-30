@@ -63,7 +63,7 @@ function store() {
    throttles a casual loop rather than a determined one — which is the honest claim. */
 const HITS = new Map();
 const WINDOW_MS = 5 * 60 * 1000;
-const PER_WINDOW = 12;
+const PER_WINDOW = 120;   // was 12. One office shares one IP, so 12 per 5 minutes across everyone silently dropped real rows
 
 function rateLimited(ip) {
   const now = Date.now();
