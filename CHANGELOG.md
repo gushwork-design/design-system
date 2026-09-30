@@ -24,6 +24,7 @@ reports its own stale date.**
 
 | Version | Date | What changed | Commit | Session |
 |---|---|---|---|---|
+| **v1.54.0** | 30 Sep 2026 18:58 | Measure what the skills make: on-brand flags, artifact links and an owner verdict on the Usage Logs page, and R29 | [`5b0091d`](https://github.com/gushwork-design/design-system/commit/5b0091d4228c1f151ba2d79819b742167d70521e) | [Gushwork Design](claude://resume/4e52956e-ec36-4a86-a3ae-98d70291548d) |
 | **v1.53.0** | 30 Sep 2026 18:13 | Add the gushwork-brand catch-all skill and a session-start brand rule, and R28: why the surface descriptions were not loosened | [`64d9cbc`](https://github.com/gushwork-design/design-system/commit/64d9cbc8ca7731895cf8e9c98dd5408f27b05f70) | [Gushwork Design](claude://resume/4e52956e-ec36-4a86-a3ae-98d70291548d) |
 | **v1.52.0** | 30 Sep 2026 17:00 | Add the sign-up ad page template, and R27: ask for the hero, then take folds from either template | [`3c0d75d`](https://github.com/gushwork-design/design-system/commit/3c0d75dd264ee3bb06dc5384acefb1a728ea21e4) | [Usage log, owner page, identity fix and the sign-up ad template](claude://resume/5fe4c650-9ccb-4f91-a4aa-549b15d4a4bc) |
 | **v1.51.0** | 30 Sep 2026 15:15 | Log which Gushwork skill ran and the names of the files it wrote | [`4a5e875`](https://github.com/gushwork-design/design-system/commit/4a5e8757af144ed99db38ac93fc96f6b42e44460) | [Usage log, owner page and identity fix](claude://resume/5fe4c650-9ccb-4f91-a4aa-549b15d4a4bc) |
