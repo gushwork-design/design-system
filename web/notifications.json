@@ -1,6 +1,22 @@
 {
   "items": [
     {
+      "date": "2026-09-30",
+      "at": "15:15",
+      "title": "Log which Gushwork skill ran and the names of the files it wrote",
+      "version": "v1.51.0",
+      "href": "/internal/changelog",
+      "label": "30 Sep 2026"
+    },
+    {
+      "date": "2026-09-30",
+      "at": "15:12",
+      "title": "Identify usage-log sessions by the signed-in Claude account, and say in ONBOARDING what is logged",
+      "version": "v1.50.0",
+      "href": "/internal/changelog",
+      "label": "30 Sep 2026"
+    },
+    {
       "date": "2026-09-24",
       "at": "20:17",
       "title": "Withdraw the three ad-page elements, and R26 \u2014 pages are built from templates, not from other pages",
@@ -47,22 +63,6 @@
       "version": "v1.44.0",
       "href": "/internal/changelog",
       "label": "1 Sep 2026"
-    },
-    {
-      "date": "2026-09-01",
-      "at": "14:55",
-      "title": "the lead-magnet skill, and a stamp that can see it",
-      "version": "v1.43.0",
-      "href": "/internal/changelog",
-      "label": "1 Sep 2026"
-    },
-    {
-      "date": "2026-08-28",
-      "at": "14:04",
-      "title": "the unavailable state, and a doc that pointed at nothing",
-      "version": "v1.42.0",
-      "href": "/internal/changelog",
-      "label": "28 Aug 2026"
     }
   ]
 }
