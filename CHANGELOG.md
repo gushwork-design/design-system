@@ -24,6 +24,7 @@ reports its own stale date.**
 
 | Version | Date | What changed | Commit | Session |
 |---|---|---|---|---|
+| **v1.52.0** | 30 Sep 2026 17:00 | Add the sign-up ad page template, and R27: ask for the hero, then take folds from either template | [`3c0d75d`](https://github.com/gushwork-design/design-system/commit/3c0d75dd264ee3bb06dc5384acefb1a728ea21e4) | [Usage log, owner page, identity fix and the sign-up ad template](claude://resume/5fe4c650-9ccb-4f91-a4aa-549b15d4a4bc) |
 | **v1.51.0** | 30 Sep 2026 15:15 | Log which Gushwork skill ran and the names of the files it wrote | [`4a5e875`](https://github.com/gushwork-design/design-system/commit/4a5e8757af144ed99db38ac93fc96f6b42e44460) | [Usage log, owner page and identity fix](claude://resume/5fe4c650-9ccb-4f91-a4aa-549b15d4a4bc) |
 | **v1.50.0** | 30 Sep 2026 15:12 | Identify usage-log sessions by the signed-in Claude account, and say in ONBOARDING what is logged | [`e64f050`](https://github.com/gushwork-design/design-system/commit/e64f050ba39fef059487c088d873d03a3edfd342) | [Usage log, owner page and identity fix](claude://resume/5fe4c650-9ccb-4f91-a4aa-549b15d4a4bc) |
 | **v1.49.0** | 24 Sep 2026 20:17 | Withdraw the three ad-page elements, and R26 — pages are built from templates, not from other pages | [`f06d59f`](https://github.com/gushwork-design/design-system/commit/f06d59ffb9ad8de3e11ab445e629832d96b14861) | [AEO ad lander](claude://resume/4bd963f4-cb45-46af-a030-5141ddb9025a) |
