@@ -320,8 +320,8 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
 .ul-menu__i:hover, .ul-menu__i.is-focus { background: var(--ul-row-hover); color: var(--ul-value); }
 .ul-menu__i[aria-selected="true"] { color: var(--ul-value); font-weight: 600; }
 .ul-menu__i svg { width: 12px; height: 12px; flex: none; color: var(--gw-color-primary-500); }
-.ul-select select:focus-visible { outline: 2px solid var(--gw-color-primary-500); outline-offset: 2px; }
-.ul-select.is-open select { box-shadow: inset 0 0 0 1px var(--ul-ctl-fg); }
+/* No focus ring or darker border on the dropdown buttons: the open menu is the state (owner's call, overrides the page-wide ring above). */
+.ul-scope .ul-select select:focus-visible { outline: none; }
 .ul-select--sm select { height: 28px; font: var(--gw-text-button-12); }
 .ul-select svg { position: absolute; right: var(--gw-space-12); top: 50%; width: 12px; height: 12px; margin-top: -6px; color: var(--ul-icon); pointer-events: none; }
 .ul-btn { height: 36px; padding: 0 var(--gw-space-12); border: 0; border-radius: var(--gw-radius-12); cursor: pointer;
