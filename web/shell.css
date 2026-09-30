@@ -111,28 +111,28 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     /* measured — audit §5, read off frame 236:33407 */
-    --s-panel-bg:      var(--gw-color-neutral-900);  /* content panel → Neutral/900 */
-    --s-panel-bg:      var(--gw-color-neutral-900);  /* content panel → Neutral/900 */
-  --s-chrome-bg:     var(--gw-color-neutral-900);  /* topbar / sidebar → Neutral/900 */
-    --s-chrome-border: var(--gw-color-neutral-800);  /* border → Neutral/800 */
+    --s-panel-bg:      var(--gw-color-black);        /* content panel: the same surface as the frame; a hairline separates them */
+    --s-panel-bg:      var(--gw-color-black);        /* content panel: the same surface as the frame; a hairline separates them */
+  --s-chrome-bg:     var(--gw-color-black);        /* topbar / sidebar: one surface with the page */
+    --s-chrome-border: var(--gw-color-neutral-900);  /* hairline */
     --s-heading:       var(--gw-color-white);        /* all Vert Grotesk headings → white */
-    --s-body:          var(--gw-color-neutral-300);  /* muted icon/text → Neutral/300 */
-    --s-card-bg:       var(--gw-color-neutral-900);  /* card fill → Neutral/900 */
-    --s-card-border:   var(--gw-color-neutral-800);  /* card border → Neutral/800 */
+    --s-body:          var(--gw-color-neutral-400);  /* muted text: one step down from white, not two */
+    --s-card-bg:       var(--gw-color-black);        /* a card has no fill of its own; its hairline is what draws it */
+    --s-card-border:   var(--gw-color-neutral-900);  /* hairline */
     --s-page-bg:       var(--gw-color-black);        /* table body row → Neutral/black */
 
     /* measured — audit §12 row "the selected stat in dark mode is neutral-600
        and hover should be 700", confirmed by Utsav against the dark frame */
-    --s-nav-sel:       var(--gw-color-neutral-600);
-    --s-nav-hover:     var(--gw-color-neutral-700);
-    --s-nav-row-hover: var(--gw-color-neutral-700);
+    --s-nav-sel:       var(--gw-color-neutral-900);
+    --s-nav-hover:     var(--gw-color-neutral-900);
+    --s-nav-row-hover: var(--gw-color-neutral-900);
 
     /* measured — audit line 358: the nav label tracks to white in dark */
     --s-nav-label:     var(--gw-color-white);
 
     /* measured — audit §9: dark primary button is a white fill with Neutral/900
        text, which is the same inversion the dark tab-active uses */
-    --s-thumb-idle:    var(--gw-color-neutral-300);
+    --s-thumb-idle:    var(--gw-color-neutral-400);
     --s-danger:        var(--gw-color-red-300);      /* measured: audit §5 Danger → Red/300 */
 
     /* RULINGS — not measured anywhere. The dark frame has no search field and
@@ -145,43 +145,43 @@
     --s-code-border:   var(--gw-color-primary-800);
     --s-code-fg:       var(--gw-color-primary-200);
     --s-field-bg:      var(--gw-color-black);
-    --s-field-border:  var(--gw-color-neutral-800);
-    --s-lock-bg:       var(--gw-color-neutral-800);
-    --s-toc-btn-bg:     var(--gw-color-neutral-800);
-    --s-toc-btn-border: var(--gw-color-neutral-700);
-    --s-toc-btn-fg:     var(--gw-color-neutral-300);
+    --s-field-border:  var(--gw-color-neutral-850);
+    --s-lock-bg:       var(--gw-color-neutral-900);
+    --s-toc-btn-bg:     var(--gw-color-neutral-900);
+    --s-toc-btn-border: var(--gw-color-neutral-850);
+    --s-toc-btn-fg:     var(--gw-color-neutral-400);
     /* One step up from --s-field-bg (black) so the chip still reads as a chip;
        the light pair sits one step DOWN from its field for the same reason. */
-    --s-kbd-bg:        var(--gw-color-neutral-800);
+    --s-kbd-bg:        var(--gw-color-neutral-900);
     --s-group-label:   var(--gw-color-neutral-400);  /* unchanged; legible on /900 */
     --s-placeholder:   var(--gw-color-neutral-400);
-    --s-field-icon:    var(--gw-color-neutral-300);
+    --s-field-icon:    var(--gw-color-neutral-400);
   }
 }
 
 :root[data-theme="dark"] {
   /* measured — audit §5, read off frame 236:33407 */
-  --s-panel-bg:      var(--gw-color-neutral-900);  /* content panel → Neutral/900 */
-  --s-chrome-bg:     var(--gw-color-neutral-900);  /* topbar / sidebar → Neutral/900 */
-  --s-chrome-border: var(--gw-color-neutral-800);  /* border → Neutral/800 */
+  --s-panel-bg:      var(--gw-color-black);        /* content panel: the same surface as the frame; a hairline separates them */
+  --s-chrome-bg:     var(--gw-color-black);        /* topbar / sidebar: one surface with the page */
+  --s-chrome-border: var(--gw-color-neutral-900);  /* hairline */
   --s-heading:       var(--gw-color-white);        /* all Vert Grotesk headings → white */
-  --s-body:          var(--gw-color-neutral-300);  /* muted icon/text → Neutral/300 */
-  --s-card-bg:       var(--gw-color-neutral-900);  /* card fill → Neutral/900 */
-  --s-card-border:   var(--gw-color-neutral-800);  /* card border → Neutral/800 */
+  --s-body:          var(--gw-color-neutral-400);  /* muted text: one step down from white, not two */
+  --s-card-bg:       var(--gw-color-black);        /* a card has no fill of its own; its hairline is what draws it */
+  --s-card-border:   var(--gw-color-neutral-900);  /* hairline */
   --s-page-bg:       var(--gw-color-black);        /* table body row → Neutral/black */
 
   /* measured — audit §12 row "the selected stat in dark mode is neutral-600
      and hover should be 700", confirmed by Utsav against the dark frame */
-  --s-nav-sel:       var(--gw-color-neutral-600);
-  --s-nav-hover:     var(--gw-color-neutral-700);
-  --s-nav-row-hover: var(--gw-color-neutral-700);
+  --s-nav-sel:       var(--gw-color-neutral-900);
+  --s-nav-hover:     var(--gw-color-neutral-900);
+  --s-nav-row-hover: var(--gw-color-neutral-900);
 
   /* measured — audit line 358: the nav label tracks to white in dark */
   --s-nav-label:     var(--gw-color-white);
 
   /* measured — audit §9: dark primary button is a white fill with Neutral/900
      text, which is the same inversion the dark tab-active uses */
-  --s-thumb-idle:    var(--gw-color-neutral-300);
+  --s-thumb-idle:    var(--gw-color-neutral-400);
   --s-danger:        var(--gw-color-red-300);      /* measured: audit §5 Danger → Red/300 */
 
   /* RULINGS — not measured anywhere. The dark frame has no search field and
@@ -192,14 +192,14 @@
   --s-code-border:   var(--gw-color-primary-800);
   --s-code-fg:       var(--gw-color-primary-200);
   --s-field-bg:      var(--gw-color-black);
-  --s-field-border:  var(--gw-color-neutral-800);
-  --s-lock-bg:       var(--gw-color-neutral-800);
-  --s-toc-btn-bg:     var(--gw-color-neutral-800);
-  --s-toc-btn-border: var(--gw-color-neutral-700);
-  --s-toc-btn-fg:     var(--gw-color-neutral-300);
+  --s-field-border:  var(--gw-color-neutral-850);
+  --s-lock-bg:       var(--gw-color-neutral-900);
+  --s-toc-btn-bg:     var(--gw-color-neutral-900);
+  --s-toc-btn-border: var(--gw-color-neutral-850);
+  --s-toc-btn-fg:     var(--gw-color-neutral-400);
   --s-group-label:   var(--gw-color-neutral-400);  /* unchanged; legible on /900 */
   --s-placeholder:   var(--gw-color-neutral-400);
-  --s-field-icon:    var(--gw-color-neutral-300);
+  --s-field-icon:    var(--gw-color-neutral-400);
 }
 
 /* ---------------------------------------------------------------------------
@@ -1865,7 +1865,7 @@
 .gw-iconbtn[data-tip]:hover::after,
 .gw-iconbtn[data-tip]:focus-visible::after { opacity: 1; visibility: visible; }
 .gw-iconbtn[data-tip][aria-expanded="true"]::after { opacity: 0; visibility: hidden; }
-:root[data-theme="dark"] .gw-iconbtn[data-tip]::after { border-color: var(--gw-color-neutral-700); }
+:root[data-theme="dark"] .gw-iconbtn[data-tip]::after { border-color: var(--gw-color-neutral-850); background: var(--gw-color-neutral-900); }
 /* The unread dot — measured 795:5817: a 6px ellipse at 13,5 inside the 24 box. */
 .gw-iconbtn__dot {
   position: absolute; top: 5px; left: 13px;
@@ -2121,7 +2121,9 @@
 .sg__hd, .dl__hd, .st__hd, .cl__hd {
   grid-column: 1 / -1;
   padding: var(--gw-space-40) 0 var(--gw-space-40) var(--gw-space-20);
-  border-bottom: 1px solid var(--gw-color-neutral-100);
+  /* the chrome hairline token, not Neutral/100 written out: same value in light, and a quiet line
+     in dark instead of a bright white one */
+  border-bottom: 1px solid var(--s-chrome-border);
   background-image: none;
   display: flex; flex-direction: column;
   /* Title 53 tall, meta at y=69 — a 16 gap, measured 796:10016/10017. */
@@ -2215,3 +2217,22 @@
 .pa__d { font: var(--gw-text-body-12-reg); color: var(--s-body); }
 .pa__live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 @media (max-width: 767px) { .pa__menu { width: min(320px, calc(100vw - 40px)); } }
+
+/* ── Dark mode, the surface model (30 Sep 2026, after Vercel's dashboard on Mobbin) ─────────────
+   One near-black surface carries the frame, the sidebar, the topbar and the panel. Depth comes
+   from hairlines and small lifts, not from a lighter slab behind everything: the panel is told
+   from the frame by a 1px line, a card is told from the panel by its own 1px line and no fill, and
+   only things that float (menus, tooltips, the palette) or are interactive (hover, selected, pills,
+   fields) step up to Neutral/900. No shadow: a shadow is invisible on black and reads as a smudge. */
+:root[data-theme="dark"] .gw-main { box-shadow: none; border: 1px solid var(--s-chrome-border); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .gw-main { box-shadow: none; border: 1px solid var(--s-chrome-border); }
+}
+/* The search field lost its fill-against-panel contrast when the panel and the field went to the
+   same black, so in dark it is drawn by a hairline instead. */
+:root[data-theme="dark"] .gw-search { box-shadow: inset 0 0 0 1px var(--gw-color-neutral-900); }
+:root[data-theme="dark"] .gw-pal__foot b { background: var(--gw-color-neutral-900); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .gw-search { box-shadow: inset 0 0 0 1px var(--gw-color-neutral-900); }
+  :root:not([data-theme="light"]) .gw-pal__foot b { background: var(--gw-color-neutral-900); }
+}

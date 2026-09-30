@@ -20,13 +20,13 @@
      Neutral/100 for the raised one; in dark both collapse onto the panel, so
      each gets its own dark value rather than a token that disappears. */
   :root{--tl-edge:var(--gw-color-neutral-50); --tl-edge-hi:var(--gw-color-neutral-100)}
-  :root[data-theme="dark"]{--tl-edge:var(--gw-color-neutral-800); --tl-edge-hi:var(--gw-color-neutral-700)}
+  :root[data-theme="dark"]{--tl-edge:var(--gw-color-neutral-900); --tl-edge-hi:var(--gw-color-neutral-850)}
 
   /* Figma 807:3718 (30 Sep 2026): the card is Neutral/25 on a Neutral/50 edge, the pills are
      Neutral/50, and the buttons are white with a Neutral/100 edge. In dark each steps onto the
      panel ramp so it does not vanish. */
   :root{--tl-card:var(--gw-color-neutral-25); --tl-pill:var(--gw-color-neutral-50); --tl-btn:var(--gw-color-white)}
-  :root[data-theme="dark"]{--tl-card:var(--gw-color-neutral-900); --tl-pill:var(--gw-color-neutral-800); --tl-btn:var(--gw-color-neutral-800)}
+  :root[data-theme="dark"]{--tl-card:var(--gw-color-black); --tl-pill:var(--gw-color-neutral-900); --tl-btn:var(--gw-color-neutral-900)}
 
   /* No rail on this page, so the column takes the whole row instead of leaving 220 empty. 1200 is
      chosen, not measured: uncapped, three cards would each run to ~470 on a wide screen. */
@@ -162,3 +162,13 @@
     .tcard__dev{width:100%;left:0;transform:none;border-left:0;border-right:0;
                 border-radius:0}
   }
+
+  /* Dark: a light-mode screenshot on a black page is the brightest thing on screen, so it is dimmed a
+     little and held by a hairline. Status pills take a tinted fill with a light tone of the colour. */
+  :root[data-theme="dark"] .tcard__dev img { filter: brightness(.86); }
+  :root[data-theme="dark"] .tcard__dev { border-color: var(--gw-color-neutral-850); box-shadow: none; }
+  :root[data-theme="dark"] .bdg { color: var(--gw-color-neutral-400); }
+  :root[data-theme="dark"] .bdg--on { color: var(--gw-color-green-300); }
+  :root[data-theme="dark"] .bdg--wip { color: var(--gw-color-yellow-300, var(--gw-color-yellow-500)); }
+  :root[data-theme="dark"] .tl-go, :root[data-theme="dark"] .tuse { box-shadow: none; border-color: var(--gw-color-neutral-850); }
+  :root[data-theme="dark"] .tl-go:hover, :root[data-theme="dark"] .tuse:hover { border-color: var(--gw-color-neutral-700); }
