@@ -920,3 +920,39 @@ template did not have. Building it as a copy of one template meant rewriting the
 and building it from a page meant carrying that page's content. Treating the folds as a pool
 avoids both, and turns the second template into a source of folds for the first.
 
+---
+
+## R28 — the brand has a floor that does not depend on a skill triggering
+
+*Ruled by Utsav, 30 Sep 2026.*
+
+A teammate with the plugin installed, and in the habit of using it, built a small game titled
+"Gushwork Corner Watch" and published it as a public Claude artifact. It carried the name and
+`#0070FF` and nothing else: a pixel font from Google Fonts, no `--gw-*` tokens, no real logo, no
+`gushwork-build` stamp. No skill loaded.
+
+**Why it happened.** A skill loads when the request matches its `description`, and the four surface
+skills each name a specific deliverable (landing page, dashboard, deck, PDF) and each says "not for"
+the others. A game is none of them. The descriptions were written to be disjoint, and disjoint
+vocabularies have gaps.
+
+**Ruling.** Two changes, both shipped together:
+
+1. **`gushwork-brand`**, a fifth skill that catches anything carrying the name, logo or blue that no
+   surface skill covers, and hands off to a surface skill when one fits.
+2. **`scripts/brand-rule.sh`**, a SessionStart hook that hands Claude the floor at the start of every
+   session (and after `clear` and `compact`, which drop it), independent of what is asked.
+
+**Why not loosen the four descriptions instead.** They are disjoint on purpose. Widening each to
+"or anything Gushwork" makes all four match the same request, and the wrong one wins: the web
+skill firing on a dashboard applies a blue primary button where the product uses black-and-outline,
+and loads a long rule set for the wrong surface. A miss is recoverable — the floor still holds — and
+a wrong-surface hit is not obvious. A separate catch-all keeps the four sharp.
+
+**What stays fixed, even for a toy:** tokens, Vert Grotesk Display and Inter (Plus Jakarta Sans
+Bold only where Vert cannot load, R21), the real logo file, the voice rules. **What stays free:** the
+idea, layout, motion and copy. An explicit request for an off-system look is honoured and named.
+
+**Not solved.** Nothing in the plugin can stop someone building the same thing in a session where
+the plugin is not installed, or on a surface where its hooks and skills are not loaded. This narrows the gap for
+everyone who has it installed; it does not close it.

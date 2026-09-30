@@ -93,12 +93,20 @@ closing: a deviation someone hit in a real build becomes a measured value everyo
 The system covers four surfaces that look and behave differently, so they are four skills with
 disjoint trigger vocabularies. They are deliberately **not** merged.
 
+A fifth skill, `gushwork-brand`, is the catch-all for everything else that carries the Gushwork
+name, logo or blue — a game, a poster, a one-off tool. It exists because a skill only loads when the
+request matches its description, and a request that matches none of the four loaded nothing. It
+holds the floor (tokens, two typefaces, the real logo, voice) and hands off to a surface skill when
+one fits. `hooks/hooks.json` also injects that floor at every session start, so the rule does not
+depend on any description matching.
+
 | Skill | Surface | Fires on |
 |---|---|---|
 | [`gushwork-web`](skills/gushwork-web/SKILL.md) | Public marketing site | landing page, ad lander, hero, fold, CTA section, pricing, comparison table, testimonial, case study, FAQ, navbar, footer |
 | [`gushwork-dashboard`](skills/gushwork-dashboard/SKILL.md) | Logged-in product | dashboard, app screen, KPI card, analytics panel, data table, side nav, filters, tabs, toasts |
 | [`gushwork-lead-magnet`](skills/gushwork-lead-magnet/SKILL.md) | Downloadable PDF | lead magnet, gated asset, PDF checklist, prompt pack, audit worksheet, playbook, buyer guide |
 | [`gushwork-slides`](skills/gushwork-slides/SKILL.md) | Presented deck | sales deck, pitch deck, QBR, investor update, slide, `.pptx`, Google Slides |
+| [`gushwork-brand`](skills/gushwork-brand/SKILL.md) | Anything else with the brand | game, poster, banner, social post, email header, animation, internal tool, one-off page — when none of the four above fits |
 
 Spacious white-and-blue marketing surfaces; dense gray-canvas product surfaces with
 black-and-outline actions; print-bound documents that invert the convention so the page is the
@@ -142,7 +150,8 @@ gushwork-design/
 │   ├── gushwork-web/SKILL.md
 │   ├── gushwork-dashboard/SKILL.md
 │   ├── gushwork-lead-magnet/SKILL.md
-│   └── gushwork-slides/SKILL.md
+│   ├── gushwork-slides/SKILL.md
+│   └── gushwork-brand/SKILL.md
 ├── notices/          declared elements and deviations, one file per piece of work
 └── exports/
     ├── web/          page-shell · folds · fold-elements · atoms · cards · button · avatar · images
