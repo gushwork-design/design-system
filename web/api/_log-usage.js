@@ -7,9 +7,14 @@
    hook that already runs every session (scripts/check-update.sh) fires one fire-and-forget
    ping here, and this appends a row.
 
-   WHAT IT DELIBERATELY DOES NOT COLLECT. Identity, plugin version, timestamp. Not the
-   prompt, not the output, not the repo, not file paths. Anything richer than "somebody used
-   version X on day Y" is a different product with a different consent conversation.
+   WHAT IT COLLECTS. Identity, plugin version, timestamp, and — since 30 Sep 2026, ruled by
+   Utsav after the consent conversation this header used to defer — which Gushwork SKILL ran
+   and the BASENAME of the output files it wrote (scripts/log-activity.sh).
+
+   WHAT IT DELIBERATELY STILL DOES NOT COLLECT. The prompt, the contents of any file, the
+   repo, or any file path — only a file's own name. Uploading the generated files is a
+   separate step that has NOT been taken: it needs its own store and its own decision, because
+   file contents can carry client copy and pricing.
 
    WHY KV AND NOT A GOOGLE SHEET. The Sheet route needs a service-account JSON key, and
    Google now blocks key creation by default on newer Workspace orgs
@@ -102,6 +107,10 @@ export default async function handler(req, res) {
     version: clean(body.version, 32),
     event: clean(body.event || 'session-start', 40),
     surface: clean(body.surface, 40),
+    /* Only present on the two activity events sent by scripts/log-activity.sh: the NAME of a
+       Gushwork skill, and the BASENAME of an output file. Never a path, never contents. */
+    ...(body.skill ? { skill: clean(body.skill, 80) } : {}),
+    ...(body.file ? { file: clean(body.file, 120) } : {}),
   });
 
   try {
