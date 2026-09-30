@@ -55,7 +55,18 @@
 
   --s-nav-label:     var(--gw-color-neutral-900);  /* measured: nav row label + icon */
   --s-nav-sel:       var(--gw-color-neutral-100);  /* measured: selected row fill */
-  --s-nav-hover:     var(--gw-color-neutral-25);   /* measured: audit §12 row 2 */
+  /* Neutral/50, from the Figma inspector on the control's hover fill (radius 4).
+     It was Neutral/25, a step too light — the hover barely registered against a
+     white panel. This is the hover AND open/selected fill for the bar controls;
+     the SELECTED NAV ROW stays --s-nav-sel at Neutral/100, which is what the
+     rail renders and what I sampled off 791:4691. */
+  --s-nav-hover:     var(--gw-color-neutral-50);
+  /* The hover for SIDEBAR nav rows, which is a different problem from the one above:
+     the sidebar ground is itself Neutral/50, so hovering to Neutral/50 changes nothing
+     you can see. This sits between the ground (Neutral/50) and the selected row
+     (Neutral/100) — 60% of the selected fill — so rest, hover and selected are three
+     visibly different steps, and hovering the current page does not change it. */
+  --s-nav-row-hover: color-mix(in srgb, var(--gw-color-neutral-100) 60%, transparent);
   --s-group-label:   var(--gw-color-neutral-400);  /* measured: list label fill */
 
   /* The field now sits on the grey ground rather than on a grey topbar, so it
@@ -70,6 +81,11 @@
   --s-field-icon:    var(--gw-color-neutral-600);  /* measured: MagnifyingGlass vector */
 
   --s-lock-bg:       var(--gw-color-neutral-100);  /* measured: lock badge fill */
+  /* "On this page" caret button, measured 796:11930: fill Neutral/50, 1px Neutral/200,
+     caret glyph Neutral/800 (#4D545C, read off the exported vector). */
+  --s-toc-btn-bg:     var(--gw-color-neutral-50);
+  --s-toc-btn-border: var(--gw-color-neutral-200);
+  --s-toc-btn-fg:     var(--gw-color-neutral-800);
   --s-kbd-bg:        var(--gw-color-neutral-50);   /* measured 683:5113: ⌘K chip fill */
   --s-lock-icon:     var(--gw-color-neutral-400);  /* measured: Lock / LockOpen vector */
 
@@ -109,6 +125,7 @@
        and hover should be 700", confirmed by Utsav against the dark frame */
     --s-nav-sel:       var(--gw-color-neutral-600);
     --s-nav-hover:     var(--gw-color-neutral-700);
+    --s-nav-row-hover: var(--gw-color-neutral-700);
 
     /* measured — audit line 358: the nav label tracks to white in dark */
     --s-nav-label:     var(--gw-color-white);
@@ -130,6 +147,9 @@
     --s-field-bg:      var(--gw-color-black);
     --s-field-border:  var(--gw-color-neutral-800);
     --s-lock-bg:       var(--gw-color-neutral-800);
+    --s-toc-btn-bg:     var(--gw-color-neutral-800);
+    --s-toc-btn-border: var(--gw-color-neutral-700);
+    --s-toc-btn-fg:     var(--gw-color-neutral-300);
     /* One step up from --s-field-bg (black) so the chip still reads as a chip;
        the light pair sits one step DOWN from its field for the same reason. */
     --s-kbd-bg:        var(--gw-color-neutral-800);
@@ -154,6 +174,7 @@
      and hover should be 700", confirmed by Utsav against the dark frame */
   --s-nav-sel:       var(--gw-color-neutral-600);
   --s-nav-hover:     var(--gw-color-neutral-700);
+  --s-nav-row-hover: var(--gw-color-neutral-700);
 
   /* measured — audit line 358: the nav label tracks to white in dark */
   --s-nav-label:     var(--gw-color-white);
@@ -173,6 +194,9 @@
   --s-field-bg:      var(--gw-color-black);
   --s-field-border:  var(--gw-color-neutral-800);
   --s-lock-bg:       var(--gw-color-neutral-800);
+  --s-toc-btn-bg:     var(--gw-color-neutral-800);
+  --s-toc-btn-border: var(--gw-color-neutral-700);
+  --s-toc-btn-fg:     var(--gw-color-neutral-300);
   --s-group-label:   var(--gw-color-neutral-400);  /* unchanged; legible on /900 */
   --s-placeholder:   var(--gw-color-neutral-400);
   --s-field-icon:    var(--gw-color-neutral-300);
@@ -218,8 +242,11 @@
   margin: 0;
   background: var(--s-page-bg);
   color: var(--s-body);
-  font: var(--gw-text-body-18-med);
-  letter-spacing: var(--gw-text-body-18-med-tracking);
+  /* 16 REGULAR site-wide since 796:12917 — ruled 29 Sep 2026. This is the page
+     default every surface inherits; the hero meta, the palette input and the
+     palette result title keep 18/med because each is a measured component. */
+  font: var(--gw-text-body-16-reg);
+  letter-spacing: var(--gw-text-body-16-reg-tracking);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -234,19 +261,30 @@
    margin box would scroll its bottom edge away. */
 .gw-main {
   position: fixed;
-  /* Measured 791:4692: x 304, y 20, 1116x880 in a 1440x920 frame. The panel runs
-     the full height now — the topbar it used to sit under is gone. */
-  top: 20px; right: 20px; bottom: 20px; left: 304px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  /* No visible scrollbar — ruled 29 Sep 2026. The panel still scrolls by wheel,
-     trackpad, keyboard and the rail's own links; it just does not draw a track
-     across the frame's rounded corner. */
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  /* Measured 796:12917 → 791:4692: x 240, y 12, 1188x896 in a 1440x920 frame — 12
+     clear on every side except the rail. The panel itself no longer scrolls;
+     .gw-scroll inside it does, so the bar at its top stays put. */
+  /* left tracks the rail — 260 since the widening above, not the measured 240. */
+  top: 12px; right: 12px; bottom: 12px; left: 260px;
+  display: flex; flex-direction: column;
+  overflow: hidden;
   background: var(--s-panel-bg);
-  border-radius: var(--gw-radius-20);
+  /* Radius/16 is in this frame's variable set; Radius/20 is not. The corner reads
+     larger than 16 because Figma smooths it — the measured profile falls off
+     flatter than a circle would, which is smoothing, not a bigger radius. */
+  border-radius: var(--gw-radius-16);
+  /* Shadows/S3, which 791:4692 carries: 0 16 32 -12 at #585C5F1A. The negative
+     spread is why it reads as a soft lift under the bottom edge rather than a halo
+     all round. */
+  box-shadow: var(--gw-shadow-s3);
 }
+/* The scrollport. No visible scrollbar — ruled 29 Sep 2026. */
+.gw-scroll {
+  flex: 1 1 auto; min-height: 0;
+  overflow-y: auto; overscroll-behavior: contain;
+  scrollbar-width: none; -ms-overflow-style: none;
+}
+.gw-scroll::-webkit-scrollbar { width: 0; height: 0; }
 .gw-main::-webkit-scrollbar { width: 0; height: 0; }
 
 /* Content column — measured 478:14832: 1200 wide, pad 60/40, gap 60.
@@ -267,8 +305,10 @@
 .gw-prose   { max-width: 820px; }
 .gw-prose p {
   margin: 0;
-  font: var(--gw-text-body-18-med);
-  letter-spacing: var(--gw-text-body-18-med-tracking);
+  /* 16 regular since 796:12917 — Body/body-16-reg is what the frame's variable set
+     carries for panel copy, and the drawing reads at 16 rather than 18. */
+  font: var(--gw-text-body-16-reg);
+  letter-spacing: var(--gw-text-body-16-reg-tracking, -0.2px);
   color: var(--s-body);
 }
 /* No margin — the gap comes from the .gw-stack-* flex container, which is how
@@ -295,6 +335,9 @@
 }
 
 .gw-stack-12 { display: flex; flex-direction: column; gap: var(--gw-space-12); }
+/* Heading to body is 16 — measured 798:3451/3452, where the heading box is 31 tall
+   and the paragraph starts at 47. It was 20. */
+.gw-stack-16 { display: flex; flex-direction: column; gap: var(--gw-space-16); }
 .gw-stack-20 { display: flex; flex-direction: column; gap: var(--gw-space-20); }
 .gw-stack-40 { display: flex; flex-direction: column; gap: var(--gw-space-40); }
 
@@ -364,7 +407,10 @@
   padding: var(--gw-space-8) var(--gw-space-12);
   border-radius: var(--gw-radius-8);
   background: var(--s-field-bg);
-  border: 1px solid var(--s-field-border);
+  /* NO border. Measured across every edge of 791:4937 — white runs straight into
+     the neutral-25 fill with nothing but antialiasing between them. It carried a
+     neutral-100 stroke from the old topbar field, which read as a frame. */
+  border: 0;
 }
 .gw-search svg { width: 16px; height: 16px; flex: none; color: var(--s-field-icon); }
 .gw-search input {
@@ -391,23 +437,22 @@
   border: 0; border-radius: var(--gw-radius-4);
   background: var(--s-kbd-bg);
   font: var(--gw-text-body-12-med); letter-spacing: 0;
-  color: var(--s-field-icon); white-space: nowrap;
+  /* Neutral/400, measured 791:4943 — a step lighter than the magnifier. It read at
+     the icon grey, which made the chip the loudest thing in the field. */
+  color: var(--gw-color-neutral-400); white-space: nowrap;
 }
 
-/* theme toggle 478:14798 — controls/tab 66x36, pad 4, gap 2, r12,
-   1px Neutral/200, no fill. Cells 28x28, pad 8, r8. */
+/* The theme control is a BARE 24x24 trigger — measured 795:5829, a frame holding
+   a 16px glyph with no fill and no stroke. It used to be the 66x36 two-cell
+   toggle from 478:14798, which carried a 1px inset ring; that component is not in
+   796:12917 at all, and the ring was drawing a frame around the icon that the
+   design does not have. This element now only anchors the menu. */
 .gw-theme {
   display: flex; align-items: center;
-  gap: var(--gw-space-2);
-  padding: var(--gw-space-4);
-  border-radius: var(--gw-radius-8);
-  /* The control has no declared size — 4 + 28 + 2 + 28 + 4 hugs to exactly
-     the measured 66x36. Figma centre-aligns strokes, so its 1px does not grow
-     the frame; a CSS border would, giving 68x38. An inset shadow draws the
-     same line without touching layout. */
-  box-shadow: inset 0 0 0 1px var(--s-field-border);
+  padding: 0;
   border: 0;
   background: none;
+  box-shadow: none;
 }
 .gw-theme__btn {
   width: 28px; height: 28px;
@@ -474,12 +519,11 @@
      No fill, no right border — the rail sits on the page ground. */
   top: 0; left: 0; bottom: 0;
   z-index: 30;
-  /* Measured 791:4936 — the rail is 304 and everything inside it is a single
-     256 column inset 24 on BOTH sides (list-groups sits at x=12 and its items at
-     x=12 within that, so 24 absolute; 304 - 24 - 24 = 256). The inset used to be
-     stacked out of a rail padding plus a component padding, which left 24 on the
-     left and only 12 on the right. Each block now owns its own 24. */
-  width: 304px;
+  /* Measured 791:4936 at 240, then WIDENED BY 20 to 260 — ruled by Utsav 29 Sep
+     2026, after seeing it built. The 16 insets stay, so the column inside grows
+     with it: 260 - 32 = 228. Noted as a deliberate departure from the drawing
+     rather than a mis-measurement. */
+  width: 260px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -500,10 +544,10 @@
 .gw-navgroups {
   display: flex;
   flex-direction: column;
-  gap: var(--gw-space-24);
-  /* 24 all round: the 24 top is the measured gap from the search field (it ends
-     at y=56, the first group starts at 80), and 24 each side gives the 256 column. */
-  padding: var(--gw-space-24);
+  /* Measured 795:5407: the nav block starts 56 below the wordmark's top — 24 below
+     its 32 height — and the groups sit 12 apart, not 24. */
+  gap: var(--gw-space-12);
+  padding: var(--gw-space-24) var(--gw-space-16) 0;
 }
 /* Only the top-level list scrolls — the child .gw-navgroups inside .gw-navend
    holds the ADMIN group and must not become its own scroll area. */
@@ -516,9 +560,14 @@
    Neutral/400, textCase UPPER. Matches Body/body-10-sem exactly. */
 .gw-navlabel {
   padding: var(--gw-space-4) var(--gw-space-8);
-  font: var(--gw-text-body-10-sem);
-  letter-spacing: var(--gw-text-body-10-sem-tracking);
-  text-transform: uppercase;
+  /* 12 MEDIUM since 791:4691 — the label text measures 15 tall inside a 23 row,
+     which is 12/15 plus the 4 padding. It was 10 semibold, sized for the
+     uppercase treatment this design dropped. */
+  font: var(--gw-text-body-12-med);
+  letter-spacing: var(--gw-text-body-12-med-tracking, 0);
+  /* Sentence case since 796:12917 — the labels read "Getting Started" and
+     "For Internal Use" in the drawing, not shouted. */
+  text-transform: none;
   color: var(--s-group-label);
 }
 
@@ -555,7 +604,7 @@
   line-height: 20px;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.gw-navitem:hover { background: var(--s-nav-hover); }
+.gw-navitem:hover { background: var(--s-nav-row-hover); }
 .gw-navitem[aria-current="page"] { background: var(--s-nav-sel); }
 .gw-navitem:focus-visible { outline: var(--gw-focus-ring); outline-offset: -2px; }
 
@@ -594,8 +643,14 @@
      the drawing specifies — a real account name like "Design gushwork" needs
      119px and the 20-padding slot gives 106, so the name arrived clipped. The
      drawing never hit this because it is mocked with "Bruce Wayne". */
-  /* Measured 791:4968: the card's list-item is 256 wide at x=24, 20 from the top. */
-  padding: var(--gw-space-20) var(--gw-space-24) var(--gw-space-40);
+  /* Measured 796:11261: the card is 208x56 at x=16, its inner row 192x40 on an 8
+     padding, sitting 40 clear of the bottom. It is a CARD now — white with a
+     border — rather than a bare row on the rail. */
+  margin: 0 var(--gw-space-16) var(--gw-space-40);
+  padding: var(--gw-space-8);
+  background: var(--s-card-bg);
+  border: 1px solid var(--s-card-border);
+  border-radius: var(--gw-radius-12);
   /* No divider. It existed to separate the card from a rail that had its own
      fill; the rail is now the page ground and 791:2678 draws no line. */
   border-top: 0;
@@ -642,9 +697,14 @@
   width: 24px; height: 24px; flex: none;
   display: grid; place-items: center;
   border: 0; border-radius: var(--gw-radius-4);
-  background: none; color: var(--s-body); cursor: pointer;
+  /* Neutral/600, from the Figma inspector on the sign-out glyph. --s-body already
+     resolves to it in light, but naming the token means a later change to body
+     copy colour cannot quietly move this icon with it. Dark keeps --s-body, which
+     lifts to Neutral/300 there — a 600 glyph on a 900 card would vanish. */
+  background: none; color: var(--gw-color-neutral-600); cursor: pointer;
   transition: background var(--gw-motion-fast);
 }
+:root[data-theme="dark"] .gw-user__out { color: var(--s-body); }
 .gw-user__out svg { width: 16px; height: 16px; display: block; }
 .gw-user__out:hover { background: var(--s-nav-hover); }
 .gw-user__out:focus-visible { outline: var(--gw-focus-ring); outline-offset: -2px; }
@@ -908,11 +968,15 @@
    ------------------------------------------------------------------------ */
 .idx {
   position: sticky;
-  top: calc(60px + var(--gw-space-40));
+  /* Sticky inside `.gw-scroll`, which already starts under the bar — so this is
+     40 from the top of the scrollport, not 40 plus a bar height. The old
+     `60px + 40` double-counted a topbar that is 76 tall now anyway, and parked
+     the stuck rail 100px low. */
+  top: var(--gw-space-40);
   align-self: start;
-  /* The panel, not the viewport: it runs 76 from the top and 20 from the bottom,
-     so its height is 100vh - 96. The extra 80 is the rail's own breathing room. */
-  max-height: calc(100vh - 40px - 80px);
+  /* The scrollport, not the viewport: the panel insets 12 top and bottom and the
+     bar takes 76, so the port is 100vh - 100. Sticking at 40 leaves 100vh - 140. */
+  max-height: calc(100vh - 140px);
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
@@ -923,7 +987,9 @@
   display: flex; align-items: center;
   gap: var(--gw-space-8);
   font: var(--gw-text-button-14);
-  line-height: 20px;
+  /* Button/button-14-med at line-height 1 (796:11934). It was 20px, which changed
+     nothing visible — the row is 22 tall from the button — but is not what is drawn. */
+  line-height: 1;
   color: var(--s-nav-label);
   padding-bottom: var(--gw-space-8);
   position: sticky; top: 0; z-index: 1;
@@ -938,9 +1004,15 @@
   display: grid; place-items: center;
   padding: var(--gw-space-4);
   border-radius: var(--gw-radius-8);
-  background: var(--s-lock-bg);
-  border: 1px solid var(--s-field-border);
-  color: var(--s-body);
+  /* Neutral/50 with a Neutral/200 stroke (796:11930). It was Neutral/100 with a
+     Neutral/100 stroke, which is why it read as a filled grey chip rather than the
+     outlined button drawn. */
+  background: var(--s-toc-btn-bg);
+  border: 1px solid var(--s-toc-btn-border);
+  color: var(--s-toc-btn-fg);
+  /* 10 between the button and the icon+label group, 8 inside that group: the row's
+     gap is 8, so the button carries the extra 2. There is no 10 in the spacing scale. */
+  margin-right: 2px;
   cursor: pointer;
 }
 .idx__col svg { width: 12px; height: 12px; display: block; transition: transform var(--gw-motion-fast); }
@@ -969,18 +1041,17 @@
    Collapsed TOC — measured against frame 478:15652, which is this same page
    with the rail collapsed. It is not just "hide the links":
 
-                     expanded (478:15070)   collapsed (478:15652)
-     main column     800                    1012
-     divider         800                    1012
-     rail            260                    48
-     caret pill      22x22, caret only      48x26, caret AND the List glyph
-     label + links   visible                hidden
+                     expanded   collapsed (478:15652)
+     rail            220        48
+     caret pill      22x22      48x26, caret AND the List glyph
+     label + links   visible    hidden
 
-   The column rule is `minmax(0,1fr) auto`, so the RAIL'S OWN WIDTH drives the
-   split and both measured states fall out of one declaration:
-     1120 inner - 60 gutter - 260 = 800    1120 - 60 - 48 = 1012
+   220, NOT 260. 260 came off the old styleguide (478:15070) and outlived it:
+   the shared page grid below tracks the rail at 220 (796:11928 — rail x=886
+   w=220 inside a 1106 content frame), so a 260 rail overflowed its track by
+   exactly 40 and ate the page's right padding on every page that has one.
    ------------------------------------------------------------------------ */
-.idx{width:260px}
+.idx{width:220px}
 .idx[data-collapsed="true"]{width:48px}
 
 /* Collapsed, the pill IS the header row: the List glyph moves inside it and
@@ -991,13 +1062,15 @@
      Figma default leftover rather than a decision, and there is no 10 in
      the spacing scale. Snapped to the token either side. */
   gap:var(--gw-space-8);justify-content:center;
-  border-radius:var(--gw-radius-8);background:var(--s-lock-bg);
+  border-radius:var(--gw-radius-8);background:var(--s-toc-btn-bg);
   /* 1px Neutral/200, per the drawing — the fill alone left the pill with no
-     edge against the page. Inset so the 48x26 measurement holds. */
-  box-shadow:inset 0 0 0 1px var(--s-field-border);
+     edge against the page. Inset so the 48x26 measurement holds. The colours follow
+     the expanded button (796:11930), since it is the same control folded up; only the
+     expanded state was measured, so this is carried over, not drawn. */
+  box-shadow:inset 0 0 0 1px var(--s-toc-btn-border);
   padding-bottom:var(--gw-space-4)}
 .idx[data-collapsed="true"] .idx__col{
-  width:12px;height:12px;padding:0;background:none;border:0}
+  width:12px;height:12px;padding:0;background:none;border:0;margin-right:0}
 .idx[data-collapsed="true"] .idx__t > span{display:none}
 
 
@@ -1016,19 +1089,34 @@
 .gw-pal[data-open="true"] { display: block; }
 .gw-pal__scrim { position: absolute; inset: 0; background: rgba(13,13,13,.44); }
 
+/* Measured 795:7451 — the card is 638x317 at x=401, y=240 in the 1440 overlay, so
+   it is centred with a 240 drop. Padding 12, and THREE STACKED BLOCKS 8 apart
+   rather than full-bleed rows divided by borders.
+
+   The grounds invert from what you would guess, and both were sampled: the CARD is
+   Neutral/50 and the SEARCH ROW inside it is WHITE. The list and the footer carry
+   no fill of their own and show the card through. */
 .gw-pal__box {
-  position: relative; margin: 96px auto 0;
-  /* 100% of .gw-pal (fixed, inset 0) = the content box, gutter excluded. */
-  width: min(640px, calc(100% - 32px));
-  max-height: calc(100vh - 160px); display: flex; flex-direction: column;
-  background: var(--s-card-bg); border: 1px solid var(--s-card-border);
+  position: relative; margin: 240px auto 0;
+  width: min(638px, calc(100% - 32px));
+  max-height: calc(100vh - 280px); display: flex; flex-direction: column;
+  gap: var(--gw-space-8);
+  padding: var(--gw-space-12);
+  background: var(--gw-color-neutral-50);
+  border: 1px solid var(--s-card-border);
   border-radius: var(--gw-radius-16); box-shadow: var(--gw-shadow-s3);
   overflow: hidden;
 }
+:root[data-theme="dark"] .gw-pal__box { background: var(--gw-color-neutral-900); }
+/* 614x61 at 12,12, its contents inset 16, the magnifier 20px. No bottom border —
+   the 8 gap to the list is what separates them. */
 .gw-pal__top {
   display: flex; align-items: center; gap: var(--gw-space-12);
-  padding: var(--gw-space-16) var(--gw-space-20);
-  border-bottom: 1px solid var(--s-card-border); flex: none;
+  min-height: 61px;
+  padding: var(--gw-space-16);
+  background: var(--s-card-bg);
+  border: 0; border-radius: var(--gw-radius-8);
+  flex: none;
 }
 .gw-pal__top svg { width: 20px; height: 20px; flex: none; color: var(--s-field-icon); }
 .gw-pal__top input {
@@ -1037,6 +1125,11 @@
   color: var(--s-heading);
 }
 .gw-pal__top input::placeholder { color: var(--s-placeholder); }
+/* Chrome draws its OWN clear button inside input[type=search] the moment there is a
+   value, which put an x in the field that the design does not have — and which is
+   not .gw-pal__x, so hiding that did nothing. This is the native one. */
+.gw-pal__top input::-webkit-search-cancel-button,
+.gw-search input::-webkit-search-cancel-button { -webkit-appearance: none; display: none; }
 /* Desktop closes with esc, and the footer legend says so — so this is phone only. */
 .gw-pal__x {
   display: none;
@@ -1047,50 +1140,97 @@
 .gw-pal__x svg { width: 16px; height: 16px; display: block; }
 .gw-pal__x:focus-visible { outline: var(--gw-focus-ring); outline-offset: var(--gw-focus-offset); }
 
-.gw-pal__list { overflow-y: auto; padding: var(--gw-space-8); flex: 1 1 auto; }
+/* 614x180 at 12,81. min-height holds the card at its measured 317 when there is
+   nothing to show, so it does not collapse around the empty line. */
+/* THE DEFAULT CARD HAS NO BODY. Re-measured 795:7451 on 29 Sep: 638x129, which is
+   12 + 61 row + 8 + 36 footer + 12 and nothing in between. An earlier revision of
+   the node carried a 180-tall "Type to search…" panel; that is gone, so the list
+   collapses entirely until there is something to put in it.
+
+   SEARCHING it grows to 280 and scrolls — 798:3770, card 638x417. The scrollbar is
+   4 wide and rounded, which 798:3768 draws as a real 4x120 rect rather than
+   leaving it to the OS. */
+.gw-pal__list {
+  overflow-y: auto; flex: 0 1 auto;
+  max-height: 280px; padding: 0;
+  display: flex; flex-direction: column; gap: var(--gw-space-4);
+  scrollbar-width: thin; scrollbar-color: var(--gw-color-neutral-200) transparent;
+}
+/* display:none, not height:0 — the card is a flex column with an 8 gap, and an
+   empty-but-present list would still spend two gaps on nothing. */
+.gw-pal[data-state="empty"] .gw-pal__list { display: none; }
+.gw-pal__list::-webkit-scrollbar { width: 4px; }
+.gw-pal__list::-webkit-scrollbar-track { background: transparent; }
+.gw-pal__list::-webkit-scrollbar-thumb {
+  background: var(--gw-color-neutral-200); border-radius: 999px;
+}
+/* 591x71 — measured 798:3597. Padding 12, a 24 icon column at x=8, the text at
+   x=36 so the gap is 12, and rows 4 apart. */
 .gw-pal__row {
-  display: block; width: 100%; text-align: left; border: 0; background: none;
-  cursor: pointer; padding: var(--gw-space-12); border-radius: var(--gw-radius-12);
-  display: grid; grid-template-columns: 20px minmax(0,1fr); gap: var(--gw-space-12);
-  align-items: start; text-decoration: none;
+  width: 100%; text-align: left; border: 0; background: none;
+  cursor: pointer; padding: var(--gw-space-12) var(--gw-space-8);
+  border-radius: var(--gw-radius-8);
+  display: grid; grid-template-columns: 24px minmax(0,1fr); gap: var(--gw-space-12);
+  align-items: start; text-decoration: none; flex: none;
 }
-/* Selection is a surface, not a colour change — the row still has to read as text. */
-.gw-pal__row[aria-selected="true"] { background: var(--s-nav-hover); }
+/* Selection is a surface, not a colour change — the row still has to read as text.
+
+   WHITE, not --s-nav-hover. The hover token moved to Neutral/50 on 29 Sep and the
+   palette card ground is ALSO Neutral/50, so the selected row became invisible:
+   the arrows were moving the selection correctly and all you could see was the
+   list scrolling under them. White lifts off the card, and matches the search
+   block above it. */
+.gw-pal__row[aria-selected="true"] { background: var(--s-card-bg); }
+.gw-pal__row:hover { background: var(--s-card-bg); }
+/* A Hash ICON in a 24 box, not a "#" character — 798:3625 draws the glyph. */
 .gw-pal__hash {
-  font: var(--gw-text-body-18-med); color: var(--s-placeholder);
-  line-height: 24px; text-align: center;
+  display: grid; place-items: center;
+  width: 24px; height: 29px; color: var(--s-placeholder);
 }
+.gw-pal__hash svg { width: 16px; height: 16px; display: block; }
 /* BLOCK, both of them. As inline spans they ran onto one line — the breadcrumb butted
    straight against the heading — and `text-overflow: ellipsis` silently does nothing on an
    inline box, so neither truncated either. */
 .gw-pal__t {
   display: block;
-  font: var(--gw-text-body-18-sem); letter-spacing: var(--gw-text-body-18-sem-tracking);
+  /* The title box measures 29 tall, which is 18/1.6 — 798:3619. */
+  font: var(--gw-text-body-18-med); letter-spacing: var(--gw-text-body-18-med-tracking);
   color: var(--s-heading); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .gw-pal__crumb {
   display: block;
-  margin-top: 2px; font: var(--gw-text-body-14-med);
-  letter-spacing: var(--gw-text-body-14-med-tracking); color: var(--s-body);
+  /* 14 tall at 4 below the title — 798:3624 sits at y=33 under a 29 title. */
+  margin-top: var(--gw-space-4); font: var(--gw-text-body-12-reg);
+  letter-spacing: var(--gw-text-body-12-reg-tracking, 0); color: var(--s-body);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .gw-pal__row mark { background: none; color: var(--gw-color-primary-500); font-weight: 600; }
 
+/* Only ever shown for "no matches" and "loading" now — the default state has no
+   body to centre anything in. Sized to its own content rather than a fixed 180. */
 .gw-pal__empty {
+  display: grid; place-items: center;
   padding: var(--gw-space-32) var(--gw-space-20); text-align: center;
   font: var(--gw-text-body-18-med); color: var(--s-body);
 }
+/* 614x36 at 12,269 — its own 8 padding, and the key caps are 20x20. */
 .gw-pal__foot {
   display: flex; align-items: center; gap: var(--gw-space-20); flex: none;
-  padding: var(--gw-space-12) var(--gw-space-20);
-  border-top: 1px solid var(--s-card-border); background: var(--s-chrome-bg);
+  min-height: 36px;
+  padding: var(--gw-space-8);
+  /* No border and no band — the 8 gap above it does the separating, and it shows
+     the card's own Neutral/50 through. */
+  border-top: 0; background: none;
   font: var(--gw-text-body-14-med); color: var(--s-body);
 }
+/* 20x20 caps on a Neutral/100 ground, radius 4 — measured 795:7458. The "esc" cap
+   is wider because its label is, which is why this is a min-width, not a width. */
 .gw-pal__foot b {
-  display: inline-block; min-width: 20px; padding: 0 var(--gw-space-4);
-  margin-right: var(--gw-space-8); text-align: center;
-  border: 1px solid var(--s-field-border); border-radius: var(--gw-radius-4);
-  background: var(--s-lock-bg); font-weight: 500; color: var(--s-heading);
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 20px; height: 20px; padding: 0 var(--gw-space-4);
+  margin-right: var(--gw-space-8);
+  border: 0; border-radius: var(--gw-radius-4);
+  background: var(--gw-color-neutral-100); font-weight: 500; color: var(--s-body);
 }
 
 @media (max-width: 767px) {
@@ -1643,23 +1783,13 @@
    full-width topbar. Measured 791:4933 (brand 198x32 at 24,40) and 791:4936
    (the rail column is 280 wide at x=12, and the field is the first thing in it).
    ========================================================================== */
+/* Measured 795:5408 / 791:4933: the block starts at y=40, x=16, and the wordmark
+   is 32 tall. The search field is no longer here — it is in the panel bar. */
 .gw-railtop {
   flex: none;
-  display: flex; flex-direction: column;
-  /* Measured 791:4933 / 791:4937: the wordmark row sits at y=40 and is 32 tall,
-     and the search field starts at y=104 — a 32 gap, not 16. The bottom is 0
-     because .gw-navgroups already carries the measured 24 above the first group. */
-  gap: var(--gw-space-32);
-  padding: var(--gw-space-40) var(--gw-space-24) 0;
+  padding: var(--gw-space-40) var(--gw-space-16) 0;
 }
-.gw-railtop__row {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: var(--gw-space-8);
-  /* Measured 791:4933: the row is 32 — the wordmark's own height. Left implicit it
-     came out 36, because .gw-theme__btn is 28 plus 4 of padding on a content box,
-     and the taller sibling was centring the 32px chip 2px low. */
-  height: 32px;
-}
+.gw-railtop .gw-brand { height: 32px; }
 /* The field fills the rail rather than holding the topbar's measured 400. */
 .gw-railtop .gw-search { width: 100%; }
 
@@ -1680,3 +1810,393 @@
   .gw-railtop { padding-top: var(--gw-space-20); }
   .gw-main { position: static; margin: 0; border-radius: 0; }
 }
+
+/* ============================================================================
+   PANEL BAR — new in 796:12917 (795:5467). 76 tall, inside the white panel and
+   above its scrollport, so it holds while the content moves. The search field is
+   640x36 at x=40; the controls are 24x24 on an 8 gap, right-inset 40. No bottom
+   rule: the measured bar is white edge to edge, the same as the panel.
+   ========================================================================== */
+.gw-bar {
+  flex: none;
+  height: 76px;
+  display: flex; align-items: center;
+  padding: 0 var(--gw-space-40);
+  gap: var(--gw-space-16);
+}
+.gw-bar .gw-search {
+  width: 640px; height: 36px; flex: none;
+  /* Measured 791:4938/4941: icon inset 8, text at 32, the key chip at x=602. */
+  padding: 0 var(--gw-space-8);
+}
+.gw-bar__acts {
+  margin-left: auto;
+  display: flex; align-items: center; gap: var(--gw-space-8);
+}
+
+/* A control in the bar. 24x24 with a 16px glyph — measured 795:5462. */
+.gw-iconbtn {
+  position: relative;
+  width: 24px; height: 24px; flex: none;
+  display: grid; place-items: center;
+  padding: 0; border: 0; border-radius: var(--gw-radius-4);
+  background: none; color: var(--s-thumb-idle);
+  cursor: pointer;
+  transition: color var(--gw-motion-fast), background var(--gw-motion-fast);
+}
+.gw-iconbtn svg { width: 16px; height: 16px; display: block; }
+.gw-iconbtn:hover { color: var(--s-heading); background: var(--s-nav-hover); }
+/* Open is the HOVER treatment, not an accent — the control stays grey and simply
+   keeps its background while its menu is down. The blue said "active" twice over,
+   once with the panel and once with the colour. */
+.gw-iconbtn[aria-expanded="true"] { color: var(--s-heading); background: var(--s-nav-hover); }
+.gw-iconbtn:focus-visible { outline: var(--gw-focus-ring); outline-offset: var(--gw-focus-offset); }
+/* The unread dot — measured 795:5817: a 6px ellipse at 13,5 inside the 24 box. */
+.gw-iconbtn__dot {
+  position: absolute; top: 5px; left: 13px;
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--gw-color-primary-500);
+  box-shadow: 0 0 0 2px var(--s-panel-bg);
+}
+.gw-iconbtn__dot[hidden] { display: none; }
+
+/* ---- the two popovers ---------------------------------------------------- */
+.gw-pop { position: relative; display: flex; }
+.gw-pop__menu {
+  position: absolute; top: calc(100% + var(--gw-space-12)); right: 0;
+  z-index: 60;
+  width: 280px;
+  padding: var(--gw-space-8);
+  border-radius: var(--gw-radius-12);
+  background: var(--s-card-bg);
+  border: 1px solid var(--s-card-border);
+  box-shadow: var(--gw-shadow-s3);
+}
+.gw-pop__menu[hidden] { display: none; }
+.gw-pop__t {
+  font: var(--gw-text-body-12-med);
+  color: var(--s-body);
+  padding: var(--gw-space-8) var(--gw-space-8) var(--gw-space-4);
+}
+.gw-pop__row {
+  display: flex; align-items: flex-start; gap: var(--gw-space-8);
+  padding: var(--gw-space-8);
+  border-radius: var(--gw-radius-8);
+  text-decoration: none; color: var(--s-heading);
+}
+.gw-pop__row:hover { background: var(--s-nav-hover); }
+.gw-pop__row svg { width: 16px; height: 16px; flex: none; margin-top: 2px; }
+.gw-pop__row span { display: flex; flex-direction: column; gap: 2px;
+                    font: var(--gw-text-body-14-med); }
+.gw-pop__row small { font: var(--gw-text-body-12-reg); color: var(--s-body); }
+
+/* Notifications — 796:10931.
+
+   THE ROWS ARE ROUNDED, like every other hoverable row in this shell (nav rows,
+   help rows, palette results). A square hover block was the odd one out.
+
+   THE DIVIDER IS THE HOVER COLOUR. Ruled 29 Sep 2026: a hairline in the card
+   border colour cut across the hover fill and made the row look clipped. Drawn in
+   --s-nav-hover it is a quiet separator at rest and DISAPPEARS INTO the fill when
+   the row lights up, because it is the same colour. The row above a hovered row
+   drops its own line too, so the fill has clean edges on both sides. */
+/* Capped at 420 — ruled 29 Sep 2026. The header stays put and only the list
+   scrolls, so "Recents" does not slide away. The scrollbar is hidden, matching the
+   main panel; the cap lands mid-row rather than on a boundary, which is what says
+   there is more below. */
+.gw-pop__menu--notif {
+  width: 320px;
+  max-height: 420px;
+  display: flex; flex-direction: column;
+}
+.gw-pop__menu--notif .gw-pop__t { flex: none; }
+.gw-pop__menu--notif .gw-notes {
+  flex: 1 1 auto; min-height: 0;
+  overflow-y: auto; overscroll-behavior: contain;
+  /* VISIBLE here, unlike the main panel — ruled 29 Sep 2026. A 420 cap that cuts
+     mid-row needs to say it is a cut and not the end of the list, and a popover
+     has no other affordance for that. Styled rather than left to the OS so it
+     reads as part of the card. */
+  scrollbar-width: thin;
+  scrollbar-color: var(--gw-color-neutral-200) transparent;
+}
+.gw-pop__menu--notif .gw-notes::-webkit-scrollbar { width: 6px; }
+.gw-pop__menu--notif .gw-notes::-webkit-scrollbar-track { background: transparent; }
+.gw-pop__menu--notif .gw-notes::-webkit-scrollbar-thumb {
+  background: var(--gw-color-neutral-200); border-radius: 999px;
+}
+.gw-pop__menu--notif .gw-notes::-webkit-scrollbar-thumb:hover {
+  background: var(--gw-color-neutral-300);
+}
+.gw-notes { display: flex; flex-direction: column; }
+.gw-notes__empty {
+  margin: 0; padding: var(--gw-space-12) var(--gw-space-8) var(--gw-space-20);
+  font: var(--gw-text-body-14-reg); color: var(--s-body);
+}
+.gw-note {
+  display: flex; flex-direction: column; gap: var(--gw-space-4);
+  padding: var(--gw-space-12) var(--gw-space-8);
+  text-decoration: none;
+  border-radius: var(--gw-radius-8);
+  border-top: 1px solid var(--s-nav-hover);
+}
+.gw-note:first-child { border-top-color: transparent; }
+.gw-note:hover { background: var(--s-nav-hover); border-top-color: transparent; }
+.gw-note:hover + .gw-note { border-top-color: transparent; }
+.gw-note__d { font: var(--gw-text-body-12-reg); color: var(--gw-color-neutral-400); }
+.gw-note__t { font: var(--gw-text-body-14-med); color: var(--s-heading); line-height: 1.45; }
+
+/* The content column inside the panel. Measured 795:5585: the hero is 1106 wide
+   in an 1186 bar, so 40 each side; the bar above already supplies the top. */
+/* The content tracks the PANEL, 40 clear on each side — measured 795:5585: the
+   hero is 1106 inside an 1186 content box, i.e. panel minus 80, at every width.
+
+   max-width:none matters. .gw-col caps at 1200 and has no auto margin, so on any
+   window wide enough for the panel to pass 1280 the column stopped growing and
+   every extra pixel piled up on the RIGHT — the banner looked inset 40 on the
+   left and far more on the right. Prose keeps its own 820 cap, so lines do not
+   run long. */
+.gw-scroll > .gw-col {
+  max-width: none;
+  padding: 0 var(--gw-space-40) var(--gw-space-60);
+}
+
+@media (max-width: 767px) {
+  .gw-bar { display: none; }
+}
+
+/* The help menu is compact: two rows, no header, sized to its content. */
+.gw-pop__menu--mini { width: auto; min-width: 190px; }
+.gw-pop__menu--mini .gw-pop__row { padding: var(--gw-space-8); }
+.gw-pop__menu--mini .gw-pop__row span { font: var(--gw-text-body-14-med); }
+
+/* ============================================================================
+   TEXT SELECTION — black ground, white type. Ruled 29 Sep 2026.
+
+   The browser default is a pale blue that belongs to the OS, not to us, and on a
+   blue hero it disappeared into the panel behind it. Black reads on every light
+   surface this site has.
+
+   INVERTED where the ground is already dark: the dark theme, and the blue hero,
+   which is the one inverse surface in the light shell. A black highlight on a
+   blue or black ground is a hole in the page.
+
+   Both rules are written twice because ::selection does not accept a comma-joined
+   list with ::-moz-selection — one invalid half drops the whole rule.
+   ========================================================================== */
+::selection      { background: var(--gw-color-black); color: var(--gw-color-white); }
+::-moz-selection { background: var(--gw-color-black); color: var(--gw-color-white); }
+
+:root[data-theme="dark"] ::selection,
+.gw-hero ::selection,
+.gw-hero::selection {
+  background: var(--gw-color-white); color: var(--gw-color-black);
+}
+:root[data-theme="dark"] ::-moz-selection,
+.gw-hero ::-moz-selection {
+  background: var(--gw-color-white); color: var(--gw-color-black);
+}
+
+/* ============================================================================
+   LINKS — semibold wherever they appear in running text. Ruled 29 Sep 2026.
+
+   BLUE IS NOT THE LINK COLOUR, it is the HIGHLIGHT: use it where a link should
+   pull the eye, and leave the rest carrying weight and an underline. That also
+   means a link never depends on colour alone to be findable.
+
+   Scoped to text contexts — paragraphs and lists — so nav rows, cards and
+   buttons keep the weights their own components set.
+   ========================================================================== */
+.gw-prose a,
+.gw-scroll p a,
+.gw-scroll li a,
+.gw-scroll dd a {
+  /* The half of the ruling that was missing. Weight and the underline lived here;
+     the COLOUR was left to each page, and the three pages that did not set one
+     diverged: downloads and the changelog inherited correctly, the plugin page
+     forced Neutral/black, and the tools page fell through to the user agent's
+     own rgb(0,0,238). A link takes the colour of the sentence it is in. */
+  color: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  /* The rule sits one step back from the text so the underline does not read as
+     heavier than the word above it. */
+  text-decoration-color: var(--gw-color-neutral-300);
+}
+/* Hover darkens toward the heading colour rather than going blue — blue is the
+   highlight, not the interaction. */
+.gw-prose a:hover,
+.gw-scroll p a:hover,
+.gw-scroll li a:hover,
+.gw-scroll dd a:hover {
+  color: var(--s-heading);
+  text-decoration-color: currentColor;
+}
+.gw-prose a:focus-visible,
+.gw-scroll p a:focus-visible,
+.gw-scroll li a:focus-visible,
+.gw-scroll dd a:focus-visible {
+  outline: var(--gw-focus-ring);
+  outline-offset: var(--gw-focus-offset);
+  border-radius: var(--gw-radius-2);
+}
+/* The highlight variant. .gw-inline-link already carried the blue; it is now
+   explicitly the "pull the eye" case rather than the default. Both states are
+   restated so they outrank the inherit/hover pair above. */
+.gw-prose a.gw-inline-link { color: var(--gw-color-primary-500); }
+.gw-prose a.gw-inline-link:hover { color: var(--gw-color-primary-600); }
+
+/* The keyboard legend is one style: all four hints, always at full strength. Select and Open used
+   to dim to 45% when the palette had no result to act on, leaving only Close dark, which read as
+   three broken hints and one working one. A legend describes the palette's keys; it need not
+   track the moment-to-moment state of the list. */
+
+/* ============================================================================
+   THE SHARED PAGE LAYOUT — every page inside the panel except the Overview.
+   Measured 796:7927: an 800 content column and a 220 rail inside the panel's
+   1106 body, with the header spanning both above them.
+
+   It lives HERE rather than in each page because four copies of the same grid is
+   exactly how they drifted apart in the first place: three of them still carried
+   a 1200 max-width with no auto margin, which piles every extra pixel on the
+   right once the panel passes 1280.
+
+   Page stylesheets are inline and therefore win on order, so each page's own
+   copy of this geometry has been removed rather than left to fight it.
+   ========================================================================== */
+.sg, .dl, .st, .cl {
+  max-width: none;
+  margin: 0;
+  padding: 0 var(--gw-space-40) var(--gw-space-120);
+  display: grid;
+  /* Both tracks are stated per state — see the collapsed rule below. An `auto`
+     rail track looks like the tidier way to write it, and does not work here:
+     `.sg__hd` spans 1/-1, and a spanning item's contribution is distributed into
+     the auto track, so the rail track sized to ~185 instead of the rail's own 48. */
+  grid-template-columns: minmax(0, 800px) 220px;
+  justify-content: space-between;
+  align-items: start;
+  column-gap: var(--gw-space-40);
+  row-gap: var(--gw-space-40);
+  /* No transition on grid-template-columns. It interpolates badly across
+     browsers and the snap reads as a deliberate re-layout rather than a glitch;
+     the rail's own width animates, which is the part the eye follows. */
+}
+/* Collapsed, THE RAIL'S OWN WIDTH DRIVES THE SPLIT: it goes 220 -> 48 and the
+   content column takes back exactly what it gave up, 800 + (220 - 48) = 972.
+   Written as the sum so the relationship survives a change to either width.
+
+   This is how it behaved before these five pages moved onto one grid — the old
+   per-page copies used `minmax(0,1fr) auto`. Consolidating them onto a fixed 220
+   track lost it: collapsing left the pill stranded mid-track with the content
+   column unchanged. `:has()` keeps the state on the rail, where the button
+   already puts it, so nothing else has to stay in sync. */
+.sg:has(.idx[data-collapsed="true"]),
+.dl:has(.idx[data-collapsed="true"]),
+.st:has(.idx[data-collapsed="true"]),
+.cl:has(.idx[data-collapsed="true"]) {
+  grid-template-columns: minmax(0, calc(800px + 220px - 48px)) 48px;
+}
+/* The header is its own full-width row — 796:10015 is 1106 wide, above both
+   columns. The rule under it is SOLID 1px Neutral/100: re-measured 29 Sep as an
+   unbroken run of #e7e8e9 across all 1106. It used to be a dotted gradient from
+   478:15076, which is an older revision of the node. */
+.sg__hd, .dl__hd, .st__hd, .cl__hd {
+  grid-column: 1 / -1;
+  padding: var(--gw-space-40) 0 var(--gw-space-40) var(--gw-space-20);
+  border-bottom: 1px solid var(--gw-color-neutral-100);
+  background-image: none;
+  display: flex; flex-direction: column;
+  /* Title 53 tall, meta at y=69 — a 16 gap, measured 796:10016/10017. */
+  gap: var(--gw-space-16);
+}
+/* The title and its date line. Measured 796:10016/10017 — Vert Grotesk Display
+   Semibold 44/1.2 over Body/body-14-med in Neutral/400. Five pages had a
+   byte-identical private copy of this (.sg__title, .dl__title, .st__title, the
+   changelog's bare `h1`); `:where()` keeps this at class specificity so those
+   copies and their phone overrides still win where they differ on purpose. */
+.sg__hd :where(h1), .dl__hd :where(h1), .st__hd :where(h1), .cl__hd :where(h1) {
+  margin: 0;
+  font: 600 44px/1.2 var(--gw-font-display);
+  letter-spacing: 0;
+  color: var(--s-heading);
+}
+.sg__hd > :where(p), .dl__hd > :where(p), .st__hd > :where(p), .cl__hd > :where(p) {
+  margin: 0;
+  font: var(--gw-text-body-14-med);
+  letter-spacing: var(--gw-text-body-14-med-tracking);
+  color: var(--gw-color-neutral-400);
+}
+
+/* 780 inside the 800 column (796:9441), and 60 between sections — every gap in
+   the style guide's eight sections measures 60. */
+.sg__main, .dl__main, .st__main, .cl__main {
+  min-width: 0;
+  padding-left: var(--gw-space-20);
+  display: flex; flex-direction: column;
+  gap: var(--gw-space-60);
+}
+@media (max-width: 767px) {
+  .sg, .dl, .st, .cl {
+    grid-template-columns: minmax(0, 1fr);
+    padding: var(--gw-space-20) var(--gw-space-20) var(--gw-space-60);
+  }
+  .sg__hd, .dl__hd, .st__hd, .cl__hd,
+  .sg__main, .dl__main, .st__main, .cl__main { padding-left: 0; }
+}
+
+
+/* ============================================================================
+   PAGE ACTIONS — "Copy page" split button + menu, beside a page's heading.
+   Built by shell.js (initPageActions) into any `.pa[data-page-actions]`.
+   The heading row is `.pa-top`: title left, control right, wrapping under the title
+   on a narrow screen rather than squeezing it.
+   ========================================================================== */
+.pa-top { display: flex; align-items: center; justify-content: space-between;
+          gap: var(--gw-space-16); flex-wrap: wrap; }
+.pa { position: relative; flex: none; }
+.pa__split { display: flex; border-radius: var(--gw-radius-10); }
+.pa__main, .pa__tog {
+  height: 36px; display: inline-flex; align-items: center; gap: var(--gw-space-8);
+  border: 1px solid var(--s-field-border); background: var(--s-card-bg); color: var(--s-heading);
+  font: var(--gw-text-button-14); cursor: pointer;
+  transition: background var(--gw-motion-fast);
+}
+.pa__main { padding: 0 var(--gw-space-16) 0 var(--gw-space-12); border-radius: var(--gw-radius-10) 0 0 var(--gw-radius-10); }
+.pa__tog  { width: 36px; padding: 0; justify-content: center; border-left: 0;
+            border-radius: 0 var(--gw-radius-10) var(--gw-radius-10) 0; }
+.pa__main svg, .pa__tog svg { width: 16px; height: 16px; display: block; flex: none; }
+.pa__tog svg { transform: rotate(90deg); transition: transform var(--gw-motion-fast); }
+.pa__tog[aria-expanded="true"] svg { transform: rotate(-90deg); }
+.pa__main:hover, .pa__tog:hover, .pa__tog[aria-expanded="true"] { background: var(--s-nav-hover); }
+.pa__main:focus-visible, .pa__tog:focus-visible { outline: var(--gw-focus-ring); outline-offset: var(--gw-focus-offset); position: relative; z-index: 1; }
+.pa.is-done .pa__main { color: var(--gw-color-primary-500); }
+
+.pa__menu {
+  position: absolute; right: 0; top: calc(100% + var(--gw-space-8)); z-index: 60; width: 320px;
+  padding: var(--gw-space-8);
+  background: var(--s-card-bg); border: 1px solid var(--s-card-border);
+  border-radius: var(--gw-radius-16); box-shadow: var(--gw-shadow-s4);
+}
+.pa__menu[hidden] { display: none; }
+.pa__row {
+  width: 100%; display: flex; align-items: center; gap: var(--gw-space-12);
+  padding: var(--gw-space-8); border: 0; border-radius: var(--gw-radius-12);
+  background: none; color: var(--s-heading); text-align: left; cursor: pointer;
+}
+.pa__row:hover, .pa__row:focus-visible { background: var(--s-nav-hover); outline: none; }
+.pa__ico {
+  flex: none; width: 40px; height: 40px; display: grid; place-items: center;
+  border: 1px solid var(--s-card-border); border-radius: var(--gw-radius-10);
+  background: var(--s-card-bg); color: var(--s-body);
+}
+.pa__ico svg { width: 18px; height: 18px; display: block; }
+.pa__md { font: 600 12px/1 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: -.02em; }
+.pa__t { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.pa__l { display: inline-flex; align-items: center; gap: var(--gw-space-6, 6px); font: var(--gw-text-body-14-med); }
+.pa__l svg { width: 12px; height: 12px; color: var(--s-body); flex: none; }
+.pa__d { font: var(--gw-text-body-12-reg); color: var(--s-body); }
+.pa__live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+@media (max-width: 767px) { .pa__menu { width: min(320px, calc(100vw - 40px)); } }

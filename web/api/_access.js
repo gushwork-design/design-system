@@ -59,6 +59,12 @@ export function defaultRules() {
          it is admin, and wins here by being the longer prefix. */
       { path: '/library',  access: 'internal', groups: [], people: [] },
       { path: '/library/review', access: 'admin', groups: [], people: [] },
+      /* The usage log lists who ran a session, which admins have no need to see.
+         NOTE: like any compiled route, this only fills a hole — once a store holds an
+         /admin rule it covers this path and this line is never added, so the page
+         is admin-tier at the edge and the OWNER check that really holds is the one in
+         api/_usage-log.js, which the data cannot be read without. */
+      { path: '/admin/usage-log', access: 'owner', groups: [], people: [] },
       /* Ad landers are public on purpose. An ad page's whole job is to be
          pasted into Slack, sent to a client and run as paid media, and a
          social card cannot render from behind the gate: the scraper fetching
@@ -203,7 +209,11 @@ export function normalise(raw) {
     .map(r => {
       const path = String((r && r.path) || '').trim();
       if (!path.startsWith('/')) return null;
-      const access = ['public', 'internal', 'admin', 'people'].includes(r.access)
+      /* `owner` sits ABOVE `admin`. Anything not on this list falls to `internal`,
+         which is why the level had to be added here before the page could offer it:
+         a stored `owner` rule would otherwise be silently loosened to any verified
+         @gushwork.ai account on the very next read. */
+      const access = ['public', 'internal', 'admin', 'owner', 'people'].includes(r.access)
         ? r.access : 'internal';
       return {
         path: path.replace(/\/+$/, '') || '/',
@@ -293,7 +303,17 @@ export function decide(pathname, session, rules) {
 
   const email = String(session.email).toLowerCase();
 
-  /* An admin can open anything. Stated once, here, rather than repeated as a
+  /* Owners-only is checked BEFORE the admin shortcut below, because that shortcut
+     is exactly what it exists to override: an admin can open anything except a
+     page that is set to owners. Owners are listed by the environment, not the
+     store, so an edited or emptied store cannot lock them out of their own tier.
+
+     One known gap, inherited rather than introduced: the shared-password door
+     above signs a session with no email and returns `allow` for every rule, and
+     an owners-only page is no exception. Closing it means closing that door. */
+  if (rule.access === 'owner') return isOwner(email) ? 'allow' : 'forbid';
+
+  /* An admin can open anything else. Stated once, here, rather than repeated as a
      special case inside each branch below. */
   if (isAdmin(email, rules)) return 'allow';
 
@@ -311,5 +331,44 @@ export function decide(pathname, session, rules) {
     }
     default:
       return 'forbid';
+  }
+}
+
+
+/* ── describing ───────────────────────────────────────────────────────────────
+   The words a page shows for a rule ("For everyone", "Only for HR"), so a badge is derived
+   from the rule and not typed next to it. The Tools page used to say "For everyone" on every
+   tool whatever its rule said, which is how a tool limited to HR went on advertising itself
+   to the whole company.
+
+   `internal` reads "For everyone" because the pages that show it are already inside the
+   company hub; only `public` needs the word Public. */
+function groupLabel(name) {
+  const g = String(name || '').trim();
+  if (!g) return '';
+  /* hr, gtm -> HR, GTM (initialisms); design -> Design */
+  return g.length <= 4 ? g.toUpperCase() : g.charAt(0).toUpperCase() + g.slice(1);
+}
+
+export function describeAccess(rule) {
+  if (!rule) return { level: 'internal', label: 'For everyone', restricted: false };
+  const level = rule.access;
+  switch (level) {
+    case 'public':   return { level, label: 'Public', restricted: false };
+    case 'internal': return { level, label: 'For everyone', restricted: false };
+    case 'admin':    return { level, label: 'Admins only', restricted: true };
+    case 'owner':    return { level, label: 'Owners only', restricted: true };
+    case 'people': {
+      const groups = (rule.groups || []).map(groupLabel).filter(Boolean);
+      const n = (rule.people || []).length;
+      if (groups.length) {
+        return { level, restricted: true,
+                 label: 'Only for ' + groups.join(', ') + (n ? ' + ' + n + (n === 1 ? ' person' : ' people') : '') };
+      }
+      /* Named people and no group. "Restricted", whatever the count: "One person" told everyone at the
+         company who the tool's single user was, and "Specific people" said nothing a lock does not. */
+      return { level, restricted: true, label: 'Restricted' };
+    }
+    default:         return { level: 'internal', label: 'For everyone', restricted: false };
   }
 }

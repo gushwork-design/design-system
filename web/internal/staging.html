@@ -15,31 +15,24 @@
      web/internal/tools.html use. Only the Overview gets its own treatment (the
      blue gw-hero). Values mirrored from .sg / .dl rather than re-derived.
      =========================================================================== */
-  .st{max-width:1200px;margin:0 auto;
-      padding:var(--gw-space-60) var(--gw-space-40) var(--gw-space-120);
-      display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--gw-space-60)}
-  .st__main{min-width:0;display:flex;flex-direction:column;gap:var(--gw-space-32)}
-  /* The rule is DOTTED: 2px, round cap, [0.1,4] dash — a dot, not a dash. */
-  .st__hd{padding:0 var(--gw-space-40) var(--gw-space-32);
-          background-image:radial-gradient(circle closest-side,
-                           var(--s-rule) 100%, transparent 100%);
-          background-size:4.1px 2px;background-position:left bottom;
-          background-repeat:repeat-x;
-          display:flex;flex-direction:column;gap:var(--gw-space-20)}
+  /* Layout (grid, header rule, section gaps) is shared — see "THE SHARED PAGE
+     LAYOUT" in shell.css. This page only styles its own content. */
   .st__title{margin:0;font:600 44px/1.2 var(--gw-font-display);color:var(--s-heading)}
   .st__meta{margin:0;font:var(--gw-text-body-14-med);
             letter-spacing:var(--gw-text-body-14-med-tracking);
             color:var(--gw-color-neutral-400)}
   .st__body{display:flex;flex-direction:column;gap:var(--gw-space-60)}
-  .st-sec{padding-left:var(--gw-space-40);display:flex;flex-direction:column;
+  /* No left inset. The old layout put sections 40 inside a wider column; under the
+     shared grid `__main` already carries the 20 that aligns the content with the
+     header (796:11946 — the 800 column's sections are 780, flush). A second 40 here
+     pushed every section right of its own page title. */
+  .st-sec{display:flex;flex-direction:column;
           gap:var(--gw-space-20);scroll-margin-top:var(--gw-space-24)}
   .st-sec :where(h2){margin:0;font:600 28px/1.2 var(--gw-font-display);color:var(--s-heading)}
-  .st-sec :where(p){margin:0;font:var(--gw-text-body-18-med);
-            letter-spacing:var(--gw-text-body-18-med-tracking);color:var(--s-body)}
-  .st-sec :where(p) a{color:inherit;font-weight:600;text-decoration:underline;
-            text-underline-offset:3px;text-decoration-thickness:1px;
-            text-decoration-color:var(--gw-color-neutral-300)}
-  .st-sec :where(p) a:hover{color:var(--s-heading);text-decoration-color:currentColor}
+  .st-sec :where(p){margin:0;font:var(--gw-text-body-16-reg);
+            letter-spacing:var(--gw-text-body-16-reg-tracking);color:var(--s-body)}
+  /* Inline links are shell.css's — inherit the sentence's colour, semibold,
+     underlined one step back. This page had its own copy. */
   .st-note{font:var(--gw-text-body-14-reg)!important;color:var(--gw-color-neutral-600)!important}
   /* Both page-local in web/downloads.html rather than in shell.css, so they are
      redefined here rather than inherited. */
@@ -122,21 +115,24 @@
 <body data-gw-page="staging">
 
 <div class="st">
-  <div class="st__main">
 
-    <header class="st__hd">
+  <!-- The header is its own full-width grid row — 796:10015 spans both columns.
+       Lifted out of __main so `grid-column:1/-1` in shell.css can reach it. -->
+  <header class="st__hd">
       <h1 class="st__title">Staging</h1>
-      <p class="st__meta">Last updated 29th Sep, 2026</p>
+      <p class="st__meta">Last updated 30th Sep, 2026</p>
     </header>
 
+  <div class="st__main">
+
+    
     <div class="st__body">
 
       <section class="st-sec">
-        <p>Live previews of work in progress, kept off the official surface until it is ready.
-        Not indexed, and not linked from anywhere public. The default is committed straight into
-        this repo under this domain — no separate project, unless one genuinely needs its own
-        backend. Every link below stays on this domain either way, so bookmark or share the
-        design.gushwork.ai address rather than a project&rsquo;s own <code>.vercel.app</code> one.</p>
+        <p>Work in progress, previewed here before it goes anywhere public. Nothing on this
+        page is indexed or linked from the outside. Every link stays on this domain, so share
+        the design.gushwork.ai address rather than a project&rsquo;s own <code>.vercel.app</code>
+        one.</p>
       </section>
 
       <section class="st-sec" id="landing-pages">
@@ -225,8 +221,9 @@
 
       <section class="st-sec" id="apps">
         <h2>Apps</h2>
-        <p class="st-note">One project here runs its own backend, so it lives in its own Vercel
-        project and is framed into this domain rather than committed into this repo.</p>
+        <p class="st-note">Tools rather than pages. Most are committed into this repo; the exception is
+        Case Study Gen Studio, which runs its own backend, so it lives in its own Vercel project
+        and is framed into this domain.</p>
           <table class="st-table">
             <thead>
               <tr>
@@ -237,6 +234,12 @@
               </tr>
             </thead>
             <tbody>
+              <tr>
+                <td class="c-prev"><img class="st-pv" src="/assets/staging/social-creative.png" alt="The social creative builder, with a form on the left and a live preview of the post on the right" loading="lazy"></td>
+                <td class="c-name">Social creative</td>
+                <td class="u">Builds a social image with the real Gushwork logo and fonts, drawn by code rather than generated, and exports it as a PNG. Portrait, square and link-card sizes.</td>
+                <td class="c-act"><a class="st-open" href="/internal/staging/social-creative/">Open <svg viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a></td>
+              </tr>
               <tr>
                 <td class="c-prev"><span class="st-pv" style="display:grid;place-items:center">
                   <svg viewBox="0 0 256 256" fill="var(--gw-color-neutral-400)" aria-hidden="true" style="width:24px;height:24px"><path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,16V88H40V56ZM40,200V104H216v96Z"/></svg>

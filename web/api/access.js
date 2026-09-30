@@ -95,6 +95,20 @@ export default async function handler(req, res) {
     });
   }
 
+  /* Which pages are owners-only is an owner's call. Otherwise an admin could open
+     an owners-only page to everyone by changing one dropdown — the tier would
+     restrict nothing it was meant to. Compared as path sets, so adding, removing
+     or re-levelling a rule at that tier all count, while editing an ordinary rule
+     does not. */
+  const ownerPaths = r => (r.routes || []).filter(x => x.access === 'owner')
+    .map(x => x.path).sort().join('\n');
+  if (!owner && ownerPaths(next) !== ownerPaths(rules)) {
+    return json(res, 403, {
+      error: 'Only an owner can change which pages are owners-only. ' +
+             'Your other changes were not saved.'
+    });
+  }
+
   /* An owner cannot be dropped from the admin list, because owners are admins
      by definition — storing it otherwise would make the page disagree with
      what the gate actually does. */

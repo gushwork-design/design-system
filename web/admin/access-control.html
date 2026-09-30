@@ -10,6 +10,19 @@
 <link rel="stylesheet" href="/shell.css">
 <script src="/shell.js" defer></script>
 <style>
+/* Frame. `.sg` / `.sg__hd` / `.sg__main` are shell.css's shared page layout, so the
+   title, the meta line and the rule match every other page. There is no "On this
+   page" rail here — three sections do not need one — so the 220 track the grid
+   reserves for it is given back and the content spans the row. 1000 is chosen, not
+   measured (no drawing covers this page): it is the width the cards already had,
+   and uncapped they would run to ~1430 on a wide screen. */
+body[data-gw-page="access-control"] .sg__main { grid-column: 1 / -1; max-width: 1000px; gap: var(--gw-space-32); }
+#ac-state:empty { display: none; }
+/* The cards were touching: this was `.gw-stack-24`, a class shell.css has never
+   defined, so the gap it names never existed. */
+#ac-sections { display: flex; flex-direction: column; gap: var(--gw-space-24); }
+#ac-sections > .ac-note { margin: 0; }
+
 /* Page-scoped. Product density per the dashboard rules — 4–32 spacing, 1px
    neutral borders, S1/S2 only, no blur. Everything colour-bearing is a token
    or one of shell.css's --s-* semantic pairs, so dark mode needs no second
@@ -18,40 +31,99 @@
   background: var(--s-card-bg);
   border: 1px solid var(--s-card-border);
   border-radius: var(--gw-radius-16);
-  overflow: hidden;
+  /* S3 at rest — the same soft drop the tools page gives its cards on hover. And NOT
+     `overflow:hidden` any more: the dropdown menu has to be able to leave the card,
+     so the header and footer bands round their own corners instead. */
+  box-shadow: var(--gw-shadow-s3);
 }
 .ac-card__hd {
-  display: flex; align-items: flex-start; justify-content: space-between;
+  display: flex; align-items: center; justify-content: space-between;
   gap: var(--gw-space-16);
   padding: var(--gw-space-20) var(--gw-space-24);
   border-bottom: 1px solid var(--s-card-border);
+  /* A tinted band: the title stops floating on the same white as the rows and reads
+     as the label of what is under it. */
+  background: var(--s-field-bg);
+  border-radius: calc(var(--gw-radius-16) - 1px) calc(var(--gw-radius-16) - 1px) 0 0;
+}
+/* Body/body-12-med on Neutral/100 — the same shape as the tools page's access badge. */
+.ac-card__n {
+  flex: none; padding: var(--gw-space-4) var(--gw-space-8);
+  border-radius: var(--gw-radius-4); background: var(--s-lock-bg);
+  font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking);
+  color: var(--s-body); white-space: nowrap;
 }
 .ac-card__hd h3 {
   margin: 0 0 var(--gw-space-4);
-  font: var(--gw-text-body-16-sem); color: var(--s-heading);
+  font: var(--gw-text-body-18-med);
+  letter-spacing: var(--gw-text-body-18-med-tracking); color: var(--s-heading);
 }
-.ac-card__hd p { margin: 0; font: var(--gw-text-body-12-reg); color: var(--s-nav-label); }
+/* 14 in the body colour. It was 12 in `--s-nav-label`, the sidebar's label colour,
+   which is Neutral/900 — so the description was the same weight as the title
+   above it and read as a second heading. */
+.ac-card__hd p { margin: 0; font: var(--gw-text-body-14-reg); color: var(--s-body); }
 .ac-card__body { padding: var(--gw-space-8) var(--gw-space-24) var(--gw-space-20); }
+/* The add-a-thing row used to float under the last row inside the body. As a band of
+   its own it separates "what exists" from "add one", which is the hierarchy the card
+   was missing. */
+.ac-card__ft {
+  display: flex; gap: var(--gw-space-8); flex-wrap: wrap; align-items: center;
+  padding: var(--gw-space-16) var(--gw-space-24);
+  border-top: 1px solid var(--s-card-border);
+  background: var(--s-field-bg);
+  border-radius: 0 0 calc(var(--gw-radius-16) - 1px) calc(var(--gw-radius-16) - 1px);
+}
+.ac-card__ft .ac-field { max-width: 280px; background: var(--s-card-bg); }
 
 /* Rows, not a <table>: each row carries a select and a token field, and a
    table's cell widths fight both of them at phone width. */
+/* 232 for the dropdown: "Specific people & groups" plus the chevron needs ~215, and at
+   the original 200 it was cut off mid-word. */
 .ac-row {
+  position: relative;
   display: grid;
-  grid-template-columns: minmax(180px, 1.1fr) 200px minmax(0, 1.4fr) 44px;
+  grid-template-columns: minmax(180px, 1.1fr) 232px minmax(0, 1.4fr) 44px;
   gap: var(--gw-space-12);
   align-items: center;
-  padding: var(--gw-space-12) 0;
-  border-bottom: 1px solid var(--s-card-border);
+  /* -12 / +12: the hover fill borrows the card body's padding so it can reach
+     past the text. */
+  margin: 0 calc(var(--gw-space-12) * -1);
+  padding: var(--gw-space-12);
+  border-radius: var(--gw-radius-10);
 }
-.ac-row:last-child { border-bottom: 0; }
+/* Dividers are inset pseudo-elements, not borders, so that on hover a row's own
+   divider and the one under it can both go and the fill reads as one rounded
+   shape — the same rule the menus follow. */
+.ac-row + .ac-row::before {
+  content: ""; position: absolute; top: 0;
+  left: var(--gw-space-12); right: var(--gw-space-12);
+  height: 1px; background: var(--s-card-border);
+}
+.ac-row:hover { background: var(--s-nav-hover); }
+.ac-row:hover::before,
+.ac-row:hover + .ac-row::before { background: transparent; }
 .ac-row__path { font: var(--gw-text-body-14-med); color: var(--s-heading); word-break: break-all; }
+/* The parent path recedes and the last segment leads: the page a rule is about is the
+   part that varies, and the prefix is what you already know. */
+.ac-path__d { color: var(--gw-color-neutral-400); font-weight: 500; }
+/* A tool row leads with a thumbnail — the same real render the Tools page shows, at
+   staging's 16:10, so a tool is recognised by its picture and not only its path. */
+.ac-tool { display: flex; align-items: center; gap: var(--gw-space-12); word-break: normal; }
+.ac-tool__pv {
+  flex: none; width: 64px; aspect-ratio: 16 / 10; object-fit: cover; object-position: top center;
+  border-radius: var(--gw-radius-8); border: 1px solid var(--s-card-border);
+  background: var(--s-chrome-bg);
+}
+.ac-tool__pv--all { display: block; }
+.ac-tool small code { font-size: .95em; }
 .ac-row__path small { display: block; font: var(--gw-text-body-12-reg); color: var(--s-nav-label); word-break: normal; }
 
 .ac-head {
   display: grid;
-  grid-template-columns: minmax(180px, 1.1fr) 200px minmax(0, 1.4fr) 44px;
+  grid-template-columns: minmax(180px, 1.1fr) 232px minmax(0, 1.4fr) 44px;
   gap: var(--gw-space-12);
-  padding: var(--gw-space-8) 0;
+  margin: 0 calc(var(--gw-space-12) * -1);
+  padding: var(--gw-space-8) var(--gw-space-12);
   border-bottom: 1px solid var(--s-card-border);
   font: var(--gw-text-body-10-sem); letter-spacing: .06em; text-transform: uppercase;
   color: var(--s-group-label);
@@ -65,6 +137,7 @@
   background: var(--s-field-bg);
   color: var(--s-heading);
   font: var(--gw-text-body-14-reg);
+  box-shadow: var(--gw-shadow-s2);
 }
 .ac-select { appearance: none; padding-right: var(--gw-space-32); }
 /* The chevron is a mask painted in currentColor, not a background SVG with the
@@ -97,6 +170,7 @@
 .ac-icbtn svg { width: 16px; height: 16px; display: block; }
 
 .ac-btn {
+  box-shadow: var(--gw-shadow-s2);
   min-height: 40px; padding: 0 var(--gw-space-16);
   display: inline-flex; align-items: center; gap: var(--gw-space-8);
   border-radius: var(--gw-radius-10);
@@ -118,19 +192,97 @@
 .ac-people { display: flex; flex-wrap: wrap; gap: var(--gw-space-8); align-items: center; }
 .ac-chip {
   display: inline-flex; align-items: center; gap: var(--gw-space-8);
-  height: 28px; padding: 0 var(--gw-space-4) 0 var(--gw-space-12);
+  height: 32px; padding: 0 var(--gw-space-4) 0 var(--gw-space-12);
   border-radius: var(--gw-radius-full);
-  background: var(--s-lock-bg); color: var(--s-heading);
+  background: var(--s-card-bg); color: var(--s-heading);
+  border: 1px solid var(--s-card-border);
+  box-shadow: var(--gw-shadow-s2);
   font: var(--gw-text-body-12-med);
 }
-.ac-chip--owner { padding-right: var(--gw-space-12); color: var(--s-nav-label); }
+/* An owner is fixed by the environment, so its chip carries a lock and no remove
+   button — the only difference between the two levels that has to be visible on the chip. */
+.ac-chip--owner { padding-right: var(--gw-space-12); }
+.ac-chip--owner svg { width: 12px; height: 12px; flex: none; color: var(--s-nav-label); }
 .ac-chip button {
-  width: 20px; height: 20px; display: grid; place-items: center;
+  width: 24px; height: 24px; display: grid; place-items: center;
   border: 0; background: none; border-radius: var(--gw-radius-full);
   color: var(--s-nav-label); cursor: pointer;
 }
-.ac-chip button:hover { color: var(--s-danger); }
+.ac-chip button:hover { color: var(--s-danger); background: var(--s-nav-hover); }
 .ac-chip button svg { width: 12px; height: 12px; display: block; }
+
+/* ── the two levels ── Owners and admins are different levels, not one list with a
+   suffix, so each gets its own panel with what that level can do. */
+.ac-lvls { display: flex; flex-direction: column; gap: var(--gw-space-12); padding-top: var(--gw-space-20); }
+.ac-lvl {
+  display: flex; flex-direction: column; gap: var(--gw-space-12);
+  padding: var(--gw-space-16) var(--gw-space-20);
+  border: 1px solid var(--s-card-border); border-radius: var(--gw-radius-12);
+  background: var(--s-field-bg);
+}
+.ac-lvl__hd { display: flex; flex-direction: column; gap: var(--gw-space-4); }
+.ac-lvl__t { display: flex; align-items: center; gap: var(--gw-space-8);
+             font: var(--gw-text-body-14-sem); color: var(--s-heading); }
+.ac-lvl__n { padding: 2px var(--gw-space-8); border-radius: var(--gw-radius-4);
+             background: var(--s-lock-bg); font: var(--gw-text-body-12-med); color: var(--s-body); }
+.ac-lvl__hd p { margin: 0; font: var(--gw-text-body-14-reg); color: var(--s-body); max-width: 68ch; }
+.ac-lvl .ac-field { background: var(--s-card-bg); max-width: 280px; }
+.ac-lvl__add { display: flex; gap: var(--gw-space-8); flex-wrap: wrap; }
+
+/* ── the dropdown ── replaces the native <select>. A native menu cannot be styled
+   past its closed state, so the open list rendered as the OS's grey box with none of
+   this page's type, radius or shadow. */
+.ac-dd { position: relative; }
+.ac-dd__btn {
+  width: 100%; min-height: 40px; box-sizing: border-box;
+  display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-8);
+  padding: 0 var(--gw-space-12);
+  border: 1px solid var(--s-field-border); border-radius: var(--gw-radius-10);
+  background: var(--s-card-bg); color: var(--s-heading);
+  box-shadow: var(--gw-shadow-s2);
+  font: var(--gw-text-body-14-reg); text-align: left; cursor: pointer;
+  transition: border-color var(--gw-motion-fast);
+}
+.ac-dd__btn > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ac-dd__btn::after {
+  content: ""; flex: none; width: 16px; height: 16px; background: var(--s-field-icon);
+  -webkit-mask: var(--ac-chevron) center / 16px no-repeat; mask: var(--ac-chevron) center / 16px no-repeat;
+  transition: transform var(--gw-motion-fast);
+}
+.ac-dd__btn:hover { border-color: var(--gw-color-neutral-300); }
+.ac-dd__btn[aria-expanded="true"] { border-color: var(--gw-color-primary-500); }
+.ac-dd__btn[aria-expanded="true"]::after { transform: rotate(180deg); }
+.ac-dd__btn:focus-visible { outline: var(--gw-focus-ring); outline-offset: var(--gw-focus-offset); }
+.ac-dd__btn:disabled { opacity: .55; cursor: not-allowed; box-shadow: none; }
+.ac-dd__menu {
+  position: absolute; z-index: 30; top: calc(100% + 6px); left: 0;
+  min-width: 100%; width: max-content; max-width: 320px;
+  padding: var(--gw-space-4);
+  background: var(--s-card-bg); border: 1px solid var(--s-card-border);
+  border-radius: var(--gw-radius-12); box-shadow: var(--gw-shadow-s4);
+}
+.ac-dd__menu[hidden] { display: none; }
+.ac-dd.is-up .ac-dd__menu { top: auto; bottom: calc(100% + 6px); }
+.ac-dd__opt {
+  width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) 16px; gap: 0 var(--gw-space-8);
+  align-items: center; text-align: left;
+  padding: var(--gw-space-8) var(--gw-space-12);
+  border: 0; border-radius: var(--gw-radius-8); background: none; color: var(--s-heading);
+  cursor: pointer;
+}
+.ac-dd__opt:hover, .ac-dd__opt:focus-visible { background: var(--s-nav-hover); outline: none; }
+.ac-dd__l { font: var(--gw-text-body-14-med); }
+.ac-dd__d { grid-column: 1; font: var(--gw-text-body-12-reg); color: var(--s-body); }
+.ac-dd__opt[aria-selected="true"]::after {
+  content: ""; grid-column: 2; grid-row: 1 / span 2; width: 16px; height: 16px;
+  background: var(--gw-color-primary-500);
+  -webkit-mask: var(--ac-check) center / 16px no-repeat; mask: var(--ac-check) center / 16px no-repeat;
+}
+.ac-dd__opt:disabled { opacity: .45; cursor: not-allowed; }
+.ac-dd__opt:disabled:hover { background: none; }
+:root {
+  --ac-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5 6.5 11.5 12.5 4.5' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
 
 .ac-note {
   display: flex; gap: var(--gw-space-12);
@@ -155,7 +307,7 @@
   border: 1px solid var(--s-card-border);
   border-radius: var(--gw-radius-12);
   background: var(--s-card-bg);
-  box-shadow: var(--gw-shadow-s2);
+  box-shadow: var(--gw-shadow-s4);
   font: var(--gw-text-body-14-med); color: var(--s-heading);
 }
 .ac-bar__actions { display: flex; gap: var(--gw-space-8); }
@@ -164,6 +316,7 @@
 
 @media (max-width: 760px) {
   .ac-head { display: none; }
+  .ac-row { margin: 0; padding-left: 0; padding-right: 0; }
   .ac-row { grid-template-columns: 1fr 44px; grid-template-areas: "path del" "who who" "people people"; row-gap: var(--gw-space-8); }
   .ac-row__path { grid-area: path; }
   .ac-row__who { grid-area: who; }
@@ -175,23 +328,25 @@
 </head>
 <body data-gw-page="access-control">
 
-<div class="gw-col">
-  <div class="gw-section gw-stack-40">
+<div class="sg">
 
-    <div class="gw-prose gw-stack-20">
-      <h2>Access control</h2>
-      <p>Who can open which page, and who is allowed to decide that. Changes apply at the
-         edge within seconds — there is no deploy to wait for, and no need for anyone to
-         sign out and back in.</p>
-    </div>
+  <header class="sg__hd">
+    <h1>Access Control</h1>
+    <p>Changes apply at the edge within seconds</p>
+  </header>
+
+  <main class="sg__main">
+
+    <p>Who can open which page, and who is allowed to decide that. There is no deploy to
+       wait for, and no need for anyone to sign out and back in.</p>
 
     <div id="ac-state"></div>
     <div id="ac-app" hidden>
-      <div class="gw-stack-24" id="ac-sections"></div>
+      <div id="ac-sections"></div>
       <div id="ac-barmount"></div>
     </div>
 
-  </div>
+  </main>
 </div>
 
 <script>
@@ -200,6 +355,7 @@
 
   var ICON = {
     trash: 'M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z',
+    lock: 'M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Zm-68-56a12,12,0,1,1-12-12A12,12,0,0,1,140,152Z',
     x: 'M208.49,191.51a12,12,0,0,1-17,17L128,145,64.49,208.49a12,12,0,0,1-17-17L111,128,47.51,64.49a12,12,0,0,1,17-17L128,111l63.51-63.52a12,12,0,0,1,17,17L145,128Z',
     plus: 'M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z',
     info: 'M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm16-40a8,8,0,0,1-8,8,16,16,0,0,1-16-16V128a8,8,0,0,1,0-16,16,16,0,0,1,16,16v40A8,8,0,0,1,144,176ZM112,84a12,12,0,1,1,12,12A12,12,0,0,1,112,84Z'
@@ -218,47 +374,81 @@
     return t.content.firstElementChild;
   }
 
+  /* Ordered from open to strict, so the menu reads as a ladder. Owners sit above
+     admins — the two are different levels — and the description says what each one
+     lets in, because "Admins only" and "Owners only" do not explain themselves. */
   var ACCESS = [
-    ['public',   'Everyone'],
-    ['internal', 'Anyone at {domain}'],
-    ['people',   'Specific people & groups'],
-    ['admin',    'Admins only']
+    ['public',   'Everyone',                 'Anyone with the link, no sign-in'],
+    ['internal', 'Anyone at {domain}',       'Any verified account on the domain'],
+    ['people',   'Specific people & groups', 'Only who is named on the row below'],
+    ['admin',    'Admins only',              'Admins and owners'],
+    ['owner',    'Owners only',              'Owners alone \u2014 admins are kept out too']
   ];
+  function levelLabel(v) {
+    for (var i = 0; i < ACCESS.length; i++) {
+      if (ACCESS[i][0] === v) return ACCESS[i][1].replace('{domain}', meta.domain);
+    }
+    return v;
+  }
 
   var state = null;   /* the server's answer, untouched — the baseline */
   var draft = null;   /* what the form is showing */
   var meta  = null;
 
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
+  function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
+  /* Parent path receding, last segment leading — see .ac-path__d. */
+  function pathHTML(p) {
+    var i = p.lastIndexOf('/');
+    return '<span class="ac-path__d">' + esc(p.slice(0, i + 1)) + '</span>' + esc(p.slice(i + 1));
+  }
   function dirty() { return JSON.stringify(draft) !== JSON.stringify(state); }
 
   /* -- render ------------------------------------------------------------- */
 
-  function routeRow(r, i) {
+  /* The level dropdown and the people field are the same control on a page row and on
+     a tool row, so they are built once. `access` is the level to SHOW, which for a tool
+     with no rule of its own is the level it inherits. */
+  function ddHTML(path, access, locked) {
     var opts = ACCESS.map(function (a) {
-      return '<option value="' + a[0] + '"' + (r.access === a[0] ? ' selected' : '') + '>' +
-        esc(a[1].replace('{domain}', meta.domain)) + '</option>';
+      var off = !meta.you.owner && a[0] === 'owner';
+      return '<button type="button" class="ac-dd__opt" role="option" data-v="' + a[0] + '" ' +
+        'aria-selected="' + (access === a[0]) + '"' + (off ? ' disabled' : '') + '>' +
+        '<span class="ac-dd__l">' + esc(a[1].replace('{domain}', meta.domain)) + '</span>' +
+        '<span class="ac-dd__d">' + esc(off ? 'Only an owner can set this' : a[2]) + '</span></button>';
     }).join('');
+    return '<div class="ac-dd" data-dd>' +
+      '<button type="button" class="ac-dd__btn" data-act="ddbtn" aria-haspopup="listbox" ' +
+        'aria-expanded="false"' + (locked ? ' disabled title="Only an owner can change this rule"' : '') +
+        ' aria-label="Who can see ' + esc(path) + ': ' + esc(levelLabel(access)) + '">' +
+        '<span>' + esc(levelLabel(access)) + '</span></button>' +
+      '<div class="ac-dd__menu" role="listbox" hidden>' + opts + '</div>' +
+    '</div>';
+  }
 
+  function peopleFieldHTML(r) {
+    if (r.access !== 'people') return '';
     var people = [].concat(
       (r.groups || []).map(function (g) { return '@' + g; }),
       r.people || []
     ).join(', ');
+    return '<input class="ac-field" data-act="people" data-suggest="people" autocomplete="off" value="' + esc(people) + '" ' +
+      'placeholder="name@' + esc(meta.domain) + ', @group" ' +
+      'aria-label="People and groups for ' + esc(r.path) + '" ' +
+      'data-1p-ignore="true" data-lpignore="true" data-form-type="other">';
+  }
+
+  function routeRow(r, i) {
+    /* Only an owner may put a page in, take a page out of, or move a page at the
+       owners tier — the server enforces it; this just says so before the click. */
+    var locked = !meta.you.owner && r.access === 'owner';
 
     return el(
       '<div class="ac-row" data-i="' + i + '">' +
-        '<div class="ac-row__path">' + esc(r.path) +
+        '<div class="ac-row__path">' + pathHTML(r.path) +
           (r.path === '/admin' ? '<small>Includes this page</small>' : '') + '</div>' +
-        '<div class="ac-row__who ac-selwrap"><select class="ac-select" data-act="access" ' +
-          'aria-label="Who can see ' + esc(r.path) + '">' + opts + '</select></div>' +
-        '<div class="ac-row__people">' +
-          (r.access === 'people'
-            ? '<input class="ac-field" data-act="people" value="' + esc(people) + '" ' +
-              'placeholder="name@' + esc(meta.domain) + ', @group" ' +
-              'aria-label="People and groups for ' + esc(r.path) + '" ' +
-              'data-1p-ignore="true" data-lpignore="true" data-form-type="other">'
-            : '') +
-        '</div>' +
+        '<div class="ac-row__who">' + ddHTML(r.path, r.access, locked) + '</div>' +
+        '<div class="ac-row__people">' + peopleFieldHTML(r) + '</div>' +
         '<div class="ac-row__del"><button class="ac-icbtn" type="button" data-act="drop" ' +
           (r.path === '/admin' ? 'disabled title="The admin area cannot be ungated here"' :
             'aria-label="Remove the rule for ' + esc(r.path) + '"') +
@@ -273,18 +463,19 @@
         '<div class="ac-card__hd">' +
           '<div><h3>Pages</h3><p>The most specific matching path wins, so a rule on ' +
             '<code>/internal/staging</code> overrides the one on <code>/internal</code>.</p></div>' +
+          '<span class="ac-card__n">' + plural(draft.routes.length, 'rule') + '</span>' +
         '</div>' +
         '<div class="ac-card__body">' +
           '<div class="ac-head"><span>Path</span><span>Who can see it</span>' +
             '<span>People &amp; groups</span><span></span></div>' +
           '<div data-rows></div>' +
-          '<div style="padding-top:16px;display:flex;gap:8px;flex-wrap:wrap">' +
-            '<input class="ac-field" data-newpath placeholder="/internal/new-page" ' +
-              'aria-label="Path to add" style="max-width:280px" ' +
-              'data-1p-ignore="true" data-lpignore="true" data-form-type="other">' +
-            '<button class="ac-btn" type="button" data-addpath>' + icon('plus') +
-              '<span>Add a page</span></button>' +
-          '</div>' +
+        '</div>' +
+        '<div class="ac-card__ft">' +
+          '<input class="ac-field" data-newpath placeholder="/internal/new-page" ' +
+            'aria-label="Path to add" ' +
+            'data-1p-ignore="true" data-lpignore="true" data-form-type="other">' +
+          '<button class="ac-btn" type="button" data-addpath>' + icon('plus') +
+            '<span>Add a page</span></button>' +
         '</div>' +
       '</section>'
     );
@@ -295,7 +486,6 @@
     rows.addEventListener('change', function (ev) {
       var row = ev.target.closest('.ac-row'); if (!row) return;
       var r = draft.routes[+row.dataset.i];
-      if (ev.target.dataset.act === 'access') { r.access = ev.target.value; render(); }
       if (ev.target.dataset.act === 'people') {
         var parts = ev.target.value.split(',').map(function (s) { return s.trim(); })
           .filter(Boolean);
@@ -307,6 +497,14 @@
       }
     });
     rows.addEventListener('click', function (ev) {
+      var trig = ev.target.closest('[data-act="ddbtn"]');
+      if (trig && !trig.disabled) { toggleDD(trig.closest('[data-dd]')); return; }
+      var opt = ev.target.closest('.ac-dd__opt');
+      if (opt && !opt.disabled) {
+        draft.routes[+opt.closest('.ac-row').dataset.i].access = opt.dataset.v;
+        render();
+        return;
+      }
       var btn = ev.target.closest('[data-act="drop"]'); if (!btn || btn.disabled) return;
       draft.routes.splice(+btn.closest('.ac-row').dataset.i, 1);
       render();
@@ -326,6 +524,145 @@
     return card;
   }
 
+  /* -- tools ------------------------------------------------------------------ */
+
+  /* The hosted tools, and the paths they live at. KEEP IN STEP with TOOLS in api/_tools.js and the
+     data-tool cards on /internal/tools: the badges there are built from the rules set here. A tool is just a page, so this
+     section is a friendlier view onto the SAME rules the Pages card edits — setting a
+     level here writes a rule for the tool's path, and it shows up there too. */
+  var TOOLS = [
+    { name: 'Email signature creator',    path: '/internal/email-signature',   img: '/assets/tools/tool-email-signature.png' },
+    { name: 'Employee ID card generator', path: '/internal/employee-id-card', img: '/assets/tools/tool-employee-id.png' }
+  ];
+
+  /* The templates. Each is a preview page under /internal/templates/, so a rule on one gates that
+     preview, and a rule on the first row gates the /internal/templates list and all four. KEEP IN
+     STEP with TOOLS in api/_tools.js and the data-tool cards on /internal/templates. */
+  var TEMPLATES = [
+    { name: 'All templates',   path: '/internal/templates', section: true },
+    { name: 'Ad landing page', path: '/internal/templates/ad-page',     img: '/assets/tools/tpl-ad-page.png' },
+    { name: 'Case study page', path: '/internal/templates/case-study',  img: '/assets/tools/tpl-case-study.png' },
+    { name: 'Lead magnet',     path: '/internal/templates/lead-magnet', img: '/assets/tools/tpl-lead-magnet.png' },
+    { name: 'Slide deck',      path: '/internal/templates/slide-deck',  img: '/assets/tools/tpl-slide-deck.png' }
+  ];
+
+  /* Longest matching prefix, exactly as the gate resolves it (_access.js ruleFor). */
+  function effectiveRule(path) {
+    var best = null;
+    draft.routes.forEach(function (r) {
+      if (path === r.path || path.indexOf(r.path + '/') === 0) {
+        if (!best || r.path.length > best.path.length) best = r;
+      }
+    });
+    return best;
+  }
+
+  function toolRow(t) {
+    var own = null;
+    draft.routes.forEach(function (r) { if (r.path === t.path) own = r; });
+    var eff = own || effectiveRule(t.path) || { path: t.path, access: 'internal', groups: [], people: [] };
+    var locked = !meta.you.owner && eff.access === 'owner';
+    /* No rule of its own means it follows its parent — say which, because otherwise the
+       dropdown shows a level nobody set on this row and it looks like a guess. */
+    var sub = own ? esc(t.path) : esc(t.path) + '<br>Follows <code>' + esc(eff.path) + '</code>';
+
+    return el(
+      '<div class="ac-row" data-tool="' + esc(t.path) + '">' +
+        '<div class="ac-row__path ac-tool">' +
+          (t.img ? '<img class="ac-tool__pv" src="' + esc(t.img) + '" alt="" loading="lazy">'
+                 : '<span class="ac-tool__pv ac-tool__pv--all" aria-hidden="true"></span>') +
+          '<div><div>' + esc(t.name) + '</div><small>' + sub + '</small></div>' +
+        '</div>' +
+        '<div class="ac-row__who">' + ddHTML(t.path, eff.access, locked) + '</div>' +
+        '<div class="ac-row__people">' + peopleFieldHTML(own || { path: t.path, access: 'x' }) + '</div>' +
+        '<div class="ac-row__del"><button class="ac-icbtn" type="button" data-act="drop" ' +
+          (own ? 'aria-label="Remove the rule for ' + esc(t.name) + ' so it follows its parent again"'
+               : 'disabled title="Already following its parent — nothing to remove"') +
+          '>' + icon('trash') + '</button></div>' +
+      '</div>'
+    );
+  }
+
+  function toolsCard() {
+    return accessCard({
+      title: 'Tools',
+      blurb: 'Who can open each tool. A tool follows the page it lives under ' +
+             'until it has a rule of its own — pick a level here and it gets one.',
+      noun: 'tool', head: 'Tool', items: TOOLS
+    });
+  }
+
+  function templatesCard() {
+    return accessCard({
+      title: 'Templates',
+      blurb: 'Who can see the templates. The first row covers the Templates page and all four ' +
+             'previews; give a single template its own level to open or close just that one.',
+      noun: 'template', head: 'Template', items: TEMPLATES, skipFromCount: 1
+    });
+  }
+
+  function accessCard(cfg) {
+    var count = cfg.items.length - (cfg.skipFromCount || 0);
+    var card = el(
+      '<section class="ac-card">' +
+        '<div class="ac-card__hd">' +
+          '<div><h3>' + cfg.title + '</h3><p>' + cfg.blurb + '</p></div>' +
+          '<span class="ac-card__n">' + plural(count, cfg.noun) + '</span>' +
+        '</div>' +
+        '<div class="ac-card__body">' +
+          '<div class="ac-head"><span>' + cfg.head + '</span><span>Who can see it</span>' +
+            '<span>People &amp; groups</span><span></span></div>' +
+          '<div data-rows></div>' +
+        '</div>' +
+      '</section>'
+    );
+    var rows = card.querySelector('[data-rows]');
+    cfg.items.forEach(function (t) { rows.appendChild(toolRow(t)); });
+
+    rows.addEventListener('click', function (ev) {
+      var trig = ev.target.closest('[data-act="ddbtn"]');
+      if (trig && !trig.disabled) { toggleDD(trig.closest('[data-dd]')); return; }
+
+      var opt = ev.target.closest('.ac-dd__opt');
+      if (opt && !opt.disabled) {
+        var path = opt.closest('.ac-row').dataset.tool, v = opt.dataset.v, found = null;
+        draft.routes.forEach(function (r) { if (r.path === path) found = r; });
+        if (found) {
+          found.access = v;
+        } else {
+          /* First choice on a tool that was following its parent: it needs a rule of
+             its own now. Nothing is carried over — a parent's named people are the parent's. */
+          draft.routes.push({ path: path, access: v, groups: [], people: [] });
+          draft.routes.sort(function (a, b) { return a.path.localeCompare(b.path); });
+        }
+        render();
+        return;
+      }
+
+      var drop = ev.target.closest('[data-act="drop"]');
+      if (drop && !drop.disabled) {
+        var dp = drop.closest('.ac-row').dataset.tool;
+        draft.routes = draft.routes.filter(function (r) { return r.path !== dp; });
+        render();
+      }
+    });
+
+    rows.addEventListener('change', function (ev) {
+      if (ev.target.dataset.act !== 'people') return;
+      var path = ev.target.closest('.ac-row').dataset.tool, r = null;
+      draft.routes.forEach(function (x) { if (x.path === path) r = x; });
+      if (!r) return;
+      var parts = ev.target.value.split(',').map(function (x) { return x.trim(); }).filter(Boolean);
+      r.groups = parts.filter(function (x) { return x.charAt(0) === '@'; })
+        .map(function (x) { return x.slice(1).toLowerCase(); });
+      r.people = parts.filter(function (x) { return x.charAt(0) !== '@'; })
+        .map(function (x) { return x.toLowerCase(); });
+      paintBar();
+    });
+
+    return card;
+  }
+
   function groupsCard() {
     var names = Object.keys(draft.groups || {}).sort();
     var card = el(
@@ -334,15 +671,15 @@
           '<div><h3>Groups</h3><p>A named list of people, so a page can be handed to a ' +
             'team rather than to seven addresses. Referred to as ' +
             '<code>@name</code> above.</p></div>' +
+          '<span class="ac-card__n">' + plural(names.length, 'group') + '</span>' +
         '</div>' +
-        '<div class="ac-card__body"><div data-groups></div>' +
-          '<div style="padding-top:16px;display:flex;gap:8px;flex-wrap:wrap">' +
-            '<input class="ac-field" data-newgroup placeholder="gtm" aria-label="Group name" ' +
-              'style="max-width:200px" data-1p-ignore="true" data-lpignore="true" ' +
-              'data-form-type="other">' +
-            '<button class="ac-btn" type="button" data-addgroup>' + icon('plus') +
-              '<span>Add a group</span></button>' +
-          '</div>' +
+        '<div class="ac-card__body"><div data-groups></div></div>' +
+        '<div class="ac-card__ft">' +
+          '<input class="ac-field" data-newgroup placeholder="gtm" aria-label="Group name" ' +
+            'style="max-width:200px" data-1p-ignore="true" data-lpignore="true" ' +
+            'data-form-type="other">' +
+          '<button class="ac-btn" type="button" data-addgroup>' + icon('plus') +
+            '<span>Add a group</span></button>' +
         '</div>' +
       '</section>'
     );
@@ -356,7 +693,7 @@
       mount.appendChild(el(
         '<div class="ac-row" style="grid-template-columns:minmax(120px,240px) minmax(0,1fr) 44px">' +
           '<div class="ac-row__path">@' + esc(name) + '</div>' +
-          '<div><input class="ac-field" data-group="' + esc(name) + '" ' +
+          '<div><input class="ac-field" data-group="' + esc(name) + '" data-suggest="members" autocomplete="off" ' +
             'value="' + esc(draft.groups[name].join(', ')) + '" ' +
             'aria-label="Members of ' + esc(name) + '" ' +
             'placeholder="name@' + esc(meta.domain) + ', name@' + esc(meta.domain) + '" ' +
@@ -404,41 +741,62 @@
     var card = el(
       '<section class="ac-card">' +
         '<div class="ac-card__hd">' +
-          '<div><h3>Admins</h3><p>Admins can open every page and change everything on ' +
-            'this one. Owners are set in the environment and cannot be edited here.</p></div>' +
+          '<div><h3>Owners &amp; admins</h3><p>Two levels. Owners can open every page and ' +
+            'manage this one. Admins can open every page except those set to Owners only.</p></div>' +
+          '<span class="ac-card__n">' + (owners.length + extra.length === 1 ? '1 person' : (owners.length + extra.length) + ' people') + '</span>' +
         '</div>' +
-        '<div class="ac-card__body">' +
-          '<div class="ac-people" style="padding:12px 0" data-admins></div>' +
-          (meta.you.owner
-            ? '<div style="padding-top:8px;display:flex;gap:8px;flex-wrap:wrap">' +
-                '<input class="ac-field" data-newadmin placeholder="name@' + esc(meta.domain) + '" ' +
-                  'type="email" aria-label="Email to make an admin" style="max-width:280px" ' +
-                  'data-1p-ignore="true" data-lpignore="true" data-form-type="other">' +
-                '<button class="ac-btn" type="button" data-addadmin>' + icon('plus') +
-                  '<span>Add an admin</span></button>' +
-              '</div>'
-            : '<div class="ac-note" style="margin-top:8px">' + icon('info') +
-              '<span>Only an owner can add or remove an admin. You can change page ' +
-              'access and groups.</span></div>') +
+        '<div class="ac-card__body ac-lvls">' +
+
+          '<div class="ac-lvl" data-lvl="owner">' +
+            '<div class="ac-lvl__hd">' +
+              '<div class="ac-lvl__t">Owners <span class="ac-lvl__n">' + owners.length + '</span></div>' +
+              '<p>Set in the environment, so they cannot be edited from here or locked out of ' +
+                'it. Owners add and remove admins, and decide which pages are Owners only.</p>' +
+            '</div>' +
+            '<div class="ac-people" data-owners></div>' +
+          '</div>' +
+
+          '<div class="ac-lvl" data-lvl="admin">' +
+            '<div class="ac-lvl__hd">' +
+              '<div class="ac-lvl__t">Admins <span class="ac-lvl__n">' + extra.length + '</span></div>' +
+              '<p>Change page access and groups here, and open every page an owner has not ' +
+                'kept to themselves. Admins cannot change who is an admin.</p>' +
+            '</div>' +
+            '<div class="ac-people" data-admins></div>' +
+            (meta.you.owner
+              ? '<div class="ac-lvl__add">' +
+                  '<input class="ac-field" data-newadmin data-suggest="admin" autocomplete="off" placeholder="name@' + esc(meta.domain) + '" ' +
+                    'type="email" aria-label="Email to make an admin" ' +
+                    'data-1p-ignore="true" data-lpignore="true" data-form-type="other">' +
+                  '<button class="ac-btn" type="button" data-addadmin>' + icon('plus') +
+                    '<span>Add an admin</span></button>' +
+                '</div>'
+              : '<div class="ac-note">' + icon('info') +
+                '<span>Only an owner can add or remove an admin, or change which pages are ' +
+                'Owners only. You can change everything else here.</span></div>') +
+          '</div>' +
+
         '</div>' +
       '</section>'
     );
 
-    var mount = card.querySelector('[data-admins]');
+    var ownersMount = card.querySelector('[data-owners]');
     owners.forEach(function (e) {
-      mount.appendChild(el('<span class="ac-chip ac-chip--owner">' + esc(e) +
-        ' &middot; owner</span>'));
+      ownersMount.appendChild(el('<span class="ac-chip ac-chip--owner">' + icon('lock') +
+        esc(e) + '</span>'));
     });
+
+    var mount = card.querySelector('[data-admins]');
     extra.forEach(function (e) {
       mount.appendChild(el('<span class="ac-chip">' + esc(e) +
         (meta.you.owner
           ? '<button type="button" data-dropadmin="' + esc(e) + '" ' +
             'aria-label="Remove ' + esc(e) + ' as an admin">' + icon('x') + '</button>'
-          : '') + '</span>'));
+          : '<span style="width:8px"></span>') + '</span>'));
     });
     if (!extra.length) {
       mount.appendChild(el('<span style="font:var(--gw-text-body-14-reg);' +
-        'color:var(--s-nav-label)">No admins beyond the owners.</span>'));
+        'color:var(--s-body)">No admins beyond the owners.</span>'));
     }
 
     mount.addEventListener('click', function (ev) {
@@ -551,6 +909,286 @@
       'gate is enforcing either way.</span></div>';
   }
 
+  /* -- the dropdown -------------------------------------------------------- */
+
+  function closeDDs(except) {
+    var all = document.querySelectorAll('[data-dd]');
+    for (var i = 0; i < all.length; i++) {
+      if (all[i] === except) continue;
+      var m = all[i].querySelector('.ac-dd__menu'), b = all[i].querySelector('.ac-dd__btn');
+      if (m) m.hidden = true;
+      if (b) b.setAttribute('aria-expanded', 'false');
+    }
+  }
+  function openDD(dd, focusSelected) {
+    closeDDs(dd);
+    var menu = dd.querySelector('.ac-dd__menu'), btn = dd.querySelector('.ac-dd__btn');
+    menu.hidden = false;
+    btn.setAttribute('aria-expanded', 'true');
+    /* Flip upward when the menu would run off the bottom of the scrollport — the
+       last rows sit near it, and a menu you have to scroll to is a broken menu. */
+    dd.classList.remove('is-up');
+    var port = document.querySelector('.gw-scroll');
+    var limit = (port ? port.getBoundingClientRect().bottom : window.innerHeight) - 8;
+    if (menu.getBoundingClientRect().bottom > limit) dd.classList.add('is-up');
+    if (focusSelected) {
+      var t = menu.querySelector('[aria-selected="true"]:not(:disabled)') ||
+              menu.querySelector('.ac-dd__opt:not(:disabled)');
+      if (t) t.focus();
+    }
+  }
+  function toggleDD(dd) {
+    var open = !dd.querySelector('.ac-dd__menu').hidden;
+    if (open) closeDDs(); else openDD(dd, false);
+  }
+
+  /* Bound once, on the document — render() rebuilds every row on each change, so
+     listeners on the rows themselves would be re-made constantly, and these two
+     have to see clicks and keys from outside the menu anyway. */
+  document.addEventListener('click', function (ev) {
+    if (!ev.target.closest('[data-dd]')) closeDDs();
+  });
+  document.addEventListener('keydown', function (ev) {
+    var dd = ev.target.closest && ev.target.closest('[data-dd]');
+    if (!dd) return;
+    var menu = dd.querySelector('.ac-dd__menu'), btn = dd.querySelector('.ac-dd__btn');
+    var opts = [].slice.call(menu.querySelectorAll('.ac-dd__opt:not(:disabled)'));
+    var open = !menu.hidden, k = ev.key;
+
+    if (ev.target === btn && !open && (k === 'ArrowDown' || k === 'ArrowUp')) {
+      ev.preventDefault(); openDD(dd, true); return;
+    }
+    if (!open) return;
+    if (k === 'Escape') { ev.preventDefault(); closeDDs(); btn.focus(); return; }
+    if (k === 'Tab') { closeDDs(); return; }
+    var i = opts.indexOf(document.activeElement);
+    if (k === 'ArrowDown') { ev.preventDefault(); (opts[i + 1] || opts[0]).focus(); }
+    else if (k === 'ArrowUp') { ev.preventDefault(); (opts[i - 1] || opts[opts.length - 1]).focus(); }
+    else if (k === 'Home') { ev.preventDefault(); opts[0].focus(); }
+    else if (k === 'End') { ev.preventDefault(); opts[opts.length - 1].focus(); }
+  });
+
+  /* -- suggestions --------------------------------------------------------- */
+  /* There is no company directory to search, so the candidates are everyone already
+     named ANYWHERE in the rules — owners, admins, group members, people on a page —
+     plus a completion to name@domain for someone who is not there yet. That covers
+     the actual job: putting a person you have already granted something onto a second
+     thing, and typing a new address without typing the domain. */
+
+  var sug = null, sugInput = null, sugItems = [], sugActive = -1;
+
+  function knownPeople() {
+    var who = {};
+    function add(e, tag) {
+      e = String(e || '').trim().toLowerCase();
+      if (e.indexOf('@') < 1) return;
+      var t = who[e] = who[e] || [];
+      if (tag && t.indexOf(tag) === -1) t.push(tag);
+    }
+    (meta.owners || []).forEach(function (e) { add(e, 'Owner'); });
+    (draft.admins || []).forEach(function (e) { add(e, 'Admin'); });
+    Object.keys(draft.groups || {}).forEach(function (g) {
+      (draft.groups[g] || []).forEach(function (e) { add(e, '@' + g); });
+    });
+    draft.routes.forEach(function (r) { (r.people || []).forEach(function (e) { add(e, null); }); });
+    if (meta.you) add(meta.you.email, 'You');
+    return who;
+  }
+
+  function tokensOf(input, atRest) {
+    var parts = input.value.split(',');
+    /* Focusing a field that already has addresses in it is not typing the last one.
+       Without this the last address was read as the half-typed token, so a filled
+       field suggested itself — or, being excluded as a duplicate, nothing at all. */
+    var typing = atRest ? '' : parts.pop();
+    return {
+      typing: typing.replace(/^\s+/, ''),
+      done: parts.map(function (x) { return x.trim().toLowerCase(); }).filter(Boolean)
+    };
+  }
+
+  function candidates(input, atRest) {
+    var kind = input.dataset.suggest, out = [];
+    var multi = kind !== 'admin';
+    var t = multi ? tokensOf(input, atRest) : { typing: input.value.trim(), done: [] };
+    var q = t.typing.toLowerCase(), taken = t.done.slice();
+    var who = knownPeople();
+    var owners = (meta.owners || []).map(function (e) { return e.toLowerCase(); });
+
+    function room() { return out.length < 6; }
+
+    /* @groups — only where a group is a valid thing to type. */
+    if (kind === 'people' && (q === '' || q.charAt(0) === '@')) {
+      var gq = q.replace(/^@/, '');
+      Object.keys(draft.groups || {}).sort().forEach(function (g) {
+        if (!room() || taken.indexOf('@' + g) !== -1) return;
+        if (gq && g.indexOf(gq) === -1) return;
+        out.push({ value: '@' + g, text: '@' + g, hint: ((draft.groups[g] || []).length === 1 ? '1 person' : (draft.groups[g] || []).length + ' people') });
+      });
+    }
+
+    if (q.charAt(0) !== '@') {
+      var list = Object.keys(who).filter(function (e) {
+        if (taken.indexOf(e) !== -1) return false;
+        if (kind === 'admin' && (owners.indexOf(e) !== -1 || (draft.admins || []).indexOf(e) !== -1)) return false;
+        return !q || e.indexOf(q) !== -1;
+      });
+      /* Starts-with before contains, then alphabetical: typing "sw" should put
+         swapnil@ above someone whose domain happens to contain it. */
+      list.sort(function (a, b) {
+        var as = a.indexOf(q) === 0 ? 0 : 1, bs = b.indexOf(q) === 0 ? 0 : 1;
+        return as - bs || a.localeCompare(b);
+      });
+      list.forEach(function (e) {
+        if (!room()) return;
+        out.push({ value: e, text: e, hint: who[e].slice(0, 2).join(' \u00b7 '), match: q });
+      });
+
+      /* Somebody new: complete the domain. Offered for "swap" and for "swap@gu",
+         not once the address is already whole. */
+      if (q && room()) {
+        var at = q.indexOf('@'), local = at === -1 ? q : q.slice(0, at);
+        var dom = at === -1 ? '' : q.slice(at + 1);
+        var full = local + '@' + meta.domain;
+        var okLocal = /^[a-z0-9._+-]+$/.test(local);
+        var partial = at === -1 || (dom !== meta.domain && meta.domain.indexOf(dom) === 0);
+        if (okLocal && partial && !who[full] && taken.indexOf(full) === -1) {
+          out.push({ value: full, text: full, hint: 'Add new', isNew: true, match: local });
+        }
+      }
+    }
+    return out;
+  }
+
+  function hi(text, m) {
+    if (!m) return esc(text);
+    var i = text.toLowerCase().indexOf(m);
+    if (i === -1) return esc(text);
+    return esc(text.slice(0, i)) + '<mark>' + esc(text.slice(i, i + m.length)) + '</mark>' +
+           esc(text.slice(i + m.length));
+  }
+
+  function ensureSug() {
+    if (sug) return sug;
+    sug = document.createElement('div');
+    sug.className = 'ac-sug'; sug.id = 'ac-sug'; sug.setAttribute('role', 'listbox');
+    sug.hidden = true;
+    document.body.appendChild(sug);
+    /* mousedown, not click: click fires after the input has blurred, and the blur
+       is what closes this. preventDefault keeps focus in the field. */
+    sug.addEventListener('mousedown', function (ev) {
+      var o = ev.target.closest('.ac-sug__o'); if (!o) return;
+      ev.preventDefault();
+      acceptSug(+o.dataset.i);
+    });
+    return sug;
+  }
+
+  function closeSug() {
+    if (!sug || sug.hidden) return;
+    sug.hidden = true;
+    if (sugInput) {
+      sugInput.setAttribute('aria-expanded', 'false');
+      sugInput.removeAttribute('aria-activedescendant');
+    }
+    sugActive = -1;
+  }
+
+  /* Under the field, or above it when there is no room below. Called on open AND on
+     every scroll: focusing a field near the bottom scrolls it into view, and closing
+     on that scroll — as this first did — meant the list vanished the instant it opened. */
+  function placeSug() {
+    if (!sug || sug.hidden || !sugInput) return;
+    var r = sugInput.getBoundingClientRect();
+    var port = document.querySelector('.gw-scroll');
+    var pr = port ? port.getBoundingClientRect() : { top: 0, bottom: window.innerHeight };
+    /* The field has scrolled out from under the bar, or off the bottom: stop. */
+    if (r.bottom < pr.top + 40 || r.top > pr.bottom - 8) { closeSug(); return; }
+    sug.style.left = r.left + 'px';
+    sug.style.width = Math.max(r.width, 260) + 'px';
+    sug.style.top = (r.bottom + 6) + 'px';
+    var h = sug.getBoundingClientRect().height;
+    if (r.bottom + 6 + h > window.innerHeight - 8) sug.style.top = Math.max(8, r.top - 6 - h) + 'px';
+  }
+
+  function paintSug() {
+    sug.innerHTML = sugItems.map(function (it, i) {
+      return '<button type="button" class="ac-sug__o' + (it.isNew ? ' ac-sug__o--new' : '') + '" role="option" ' +
+        'id="ac-sug-' + i + '" data-i="' + i + '" aria-selected="' + (i === sugActive) + '">' +
+        '<span class="ac-sug__t">' + hi(it.text, it.match) + '</span>' +
+        (it.hint ? '<span class="ac-sug__h">' + esc(it.hint) + '</span>' : '') + '</button>';
+    }).join('');
+    if (sugActive > -1) sugInput.setAttribute('aria-activedescendant', 'ac-sug-' + sugActive);
+    else sugInput.removeAttribute('aria-activedescendant');
+  }
+
+  function refreshSug(input, atRest) {
+    sugInput = input;
+    sugItems = candidates(input, atRest);
+    if (!sugItems.length) { closeSug(); return; }
+    ensureSug();
+    /* With something typed, the first match is already chosen so Enter/Tab takes it;
+       with nothing typed, nothing is, so Enter still means what it always did. */
+    var typing = input.dataset.suggest === 'admin' ? input.value.trim() : tokensOf(input, atRest).typing.trim();
+    sugActive = typing ? 0 : -1;
+    paintSug();
+    sug.hidden = false;
+    placeSug();
+    input.setAttribute('role', 'combobox');
+    input.setAttribute('aria-autocomplete', 'list');
+    input.setAttribute('aria-controls', 'ac-sug');
+    input.setAttribute('aria-expanded', 'true');
+  }
+
+  function acceptSug(i) {
+    var it = sugItems[i], inp = sugInput; if (!it || !inp) return;
+    if (inp.dataset.suggest === 'admin') {
+      inp.value = it.value;
+    } else {
+      var parts = inp.value.split(',');
+      parts.pop();
+      parts = parts.map(function (x) { return x.trim(); }).filter(Boolean);
+      parts.push(it.value);
+      inp.value = parts.join(', ') + ', ';
+    }
+    /* Both people fields commit on `change`, so fire it — the field's own handler then
+       updates the draft and the save bar exactly as if it had been typed and blurred. */
+    inp.dispatchEvent(new Event('change', { bubbles: true }));
+    closeSug();
+    inp.focus();
+  }
+
+  document.addEventListener('focusin', function (ev) {
+    if (ev.target.matches && ev.target.matches('[data-suggest]')) refreshSug(ev.target, true);
+  });
+  document.addEventListener('input', function (ev) {
+    if (ev.target.matches && ev.target.matches('[data-suggest]')) refreshSug(ev.target);
+  });
+  document.addEventListener('focusout', function (ev) {
+    if (ev.target.matches && ev.target.matches('[data-suggest]')) closeSug();
+  });
+  document.addEventListener('keydown', function (ev) {
+    if (!sug || sug.hidden || ev.target !== sugInput) return;
+    var k = ev.key;
+    if (k === 'ArrowDown' || k === 'ArrowUp') {
+      ev.preventDefault();
+      var n = sugItems.length;
+      sugActive = k === 'ArrowDown' ? (sugActive + 1) % n : (sugActive - 1 + n) % n;
+      paintSug();
+      var a = document.getElementById('ac-sug-' + sugActive);
+      if (a && a.scrollIntoView) a.scrollIntoView({ block: 'nearest' });
+    } else if ((k === 'Enter' || k === 'Tab') && sugActive > -1) {
+      ev.preventDefault();
+      acceptSug(sugActive);
+    } else if (k === 'Escape') {
+      ev.preventDefault();
+      closeSug();
+    }
+  });
+  /* A fixed popover does not follow the field by itself, so it is re-placed. */
+  document.addEventListener('scroll', placeSug, true);
+  window.addEventListener('resize', placeSug);
+
   /* -- boot --------------------------------------------------------------- */
 
   function render() {
@@ -565,6 +1203,8 @@
         '<span>The store is connected and empty. The rules below are the compiled ' +
         'defaults; your first save writes them into it.</span></div>'));
     }
+    mount.appendChild(toolsCard());
+    mount.appendChild(templatesCard());
     mount.appendChild(pagesCard());
     mount.appendChild(groupsCard());
     mount.appendChild(adminsCard());
