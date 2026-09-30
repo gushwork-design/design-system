@@ -345,7 +345,7 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
 
   <header class="sg__hd">
     <h1>Usage Logs</h1>
-    <p>Session starts only: who, which plugin version and when. Nothing about the work</p>
+    <p>Who starts a Claude session, which skills they run and the names of the files they make. Never the prompts or file contents</p>
   </header>
 
   <main class="sg__main">
@@ -378,18 +378,25 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
         <div class="ul-inner" id="ul-versions"></div>
       </section>
 
+      <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="ul-h-skills">
+        <div class="ul-sh"><div class="ul-sh__t"><h2 id="ul-h-skills">Skills</h2><span class="ul-sh__q" id="ul-q-skills"></span></div></div>
+        <div class="ul-inner" id="ul-skills"></div>
+      </section>
+
       <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="ul-h-log">
         <div class="ul-sh">
-          <div class="ul-sh__t"><h2 id="ul-h-log">Session log</h2><span class="ul-sh__q" id="ul-q-log"></span></div>
+          <div class="ul-sh__t"><h2 id="ul-h-log">Log</h2><span class="ul-sh__q" id="ul-q-log"></span></div>
           <div class="ul-tools">
             <label class="ul-input"><span class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Search the log</span>
               <span id="ul-i-search"></span>
               <input id="ul-search" type="search" placeholder="Search person or version" autocomplete="off"></label>
             <label class="ul-select"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Filter by version</span>
               <select id="ul-ver"></select><span class="ul-i-caret"></span></label>
+            <label class="ul-select"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Filter by event</span>
+              <select id="ul-evt"><option value="">All events</option><option value="session">Sessions</option><option value="skill">Skills</option><option value="file">Files</option></select><span class="ul-i-caret"></span></label>
           </div>
         </div>
-        <div class="ul-scroll"><div class="ul-tbl" id="ul-table" role="table" aria-label="Session log"></div></div>
+        <div class="ul-scroll"><div class="ul-tbl" id="ul-table" role="table" aria-label="Activity log"></div></div>
         <div class="ul-pg" id="ul-pg"></div>
       </section>
     </div>
@@ -416,7 +423,7 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
   function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
 
   var S = { status: 'loading', rows: [], period: '30', q: '', ver: '', sortKey: 'at', sortDir: -1,
-            page: 1, per: 25, fetchedAt: 0, busy: false, skipped: 0, capped: false };
+            evt: '', page: 1, per: 25, fetchedAt: 0, busy: false, skipped: 0, capped: false };
   var DAY = 86400000;
 
   /* ── data ───────────────────────────────────────────────────────────────────────── */
@@ -426,10 +433,11 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
       var r = raw[i], d = new Date(r.at);
       if (isNaN(d.getTime())) continue;
       out.push({ at: d, email: String(r.email || '').trim().toLowerCase(), version: String(r.version || '').trim(),
-                 event: String(r.event || '') });
+                 event: String(r.event || ''), skill: String(r.skill || ''), file: String(r.file || '') });
     }
     return out;
   }
+  function isSess(r) { return !r.event || r.event === 'session-start'; }
   function vparts(v) { var m = /^(\d+)\.(\d+)\.(\d+)/.exec(v); return m ? [+m[1], +m[2], +m[3]] : null; }
   function vcmp(a, b) {
     var x = vparts(a), y = vparts(b);
@@ -454,9 +462,14 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
     return rows.filter(function (r) { return r.at.getTime() >= cut; });
   }
   function compute() {
-    var all = S.rows, cur = inPeriod(all), now = new Date(), today = dayKey(now), yest = dayKey(new Date(now.getTime() - DAY));
+    /* A row is a SESSION only if it is a session-start (or predates the event field). Skill and
+       file rows are activity: counting them as sessions would inflate every number here. */
+    var all = S.rows, sessAll = all.filter(isSess), curAll = inPeriod(all), cur = curAll.filter(isSess), now = new Date(), today = dayKey(now), yest = dayKey(new Date(now.getTime() - DAY));
     var newest = '';
-    all.forEach(function (r) { if (r.version && vparts(r.version) && (!newest || vcmp(r.version, newest) > 0)) newest = r.version; });
+    sessAll.forEach(function (r) { if (r.version && vparts(r.version) && (!newest || vcmp(r.version, newest) > 0)) newest = r.version; });
+    var bySkill = {}; curAll.forEach(function (r) { if (r.event === 'skill' && r.skill) bySkill[r.skill] = (bySkill[r.skill] || 0) + 1; });
+    var skills = Object.keys(bySkill).sort(function (a, b) { return bySkill[b] - bySkill[a]; });
+    var nFiles = curAll.filter(function (r) { return r.event === 'file'; }).length;
     function people(rows) { var s = {}; rows.forEach(function (r) { if (r.email) s[r.email] = 1; }); return Object.keys(s).length; }
     var perDay = {}; cur.forEach(function (r) { var k = dayKey(r.at); perDay[k] = (perDay[k] || 0) + 1; });
     var busy = null; Object.keys(perDay).forEach(function (k) { if (!busy || perDay[k] > busy.n) busy = { k: k, n: perDay[k] }; });
@@ -467,12 +480,12 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
     });
     var onNewest = newest ? (byVer[newest] || 0) : 0;
     var oldest = ''; vers.forEach(function (v) { if (v !== 'Unknown' && vparts(v)) oldest = v; });
-    var last = all.length ? all.reduce(function (m, r) { return r.at > m ? r.at : m; }, all[0].at) : null;
+    var last = sessAll.length ? sessAll.reduce(function (m, r) { return r.at > m ? r.at : m; }, sessAll[0].at) : null;
     return {
-      cur: cur, all: all, newest: newest, perDay: perDay, byVer: byVer, vers: vers, oldest: oldest,
-      sessions: cur.length, people: people(cur), peopleAll: people(all),
-      today: all.filter(function (r) { return dayKey(r.at) === today; }).length,
-      yest: all.filter(function (r) { return dayKey(r.at) === yest; }).length,
+      cur: cur, curAll: curAll, all: all, sessTotal: sessAll.length, bySkill: bySkill, skills: skills, nFiles: nFiles, newest: newest, perDay: perDay, byVer: byVer, vers: vers, oldest: oldest,
+      sessions: cur.length, people: people(curAll), peopleAll: people(all),
+      today: sessAll.filter(function (r) { return dayKey(r.at) === today; }).length,
+      yest: sessAll.filter(function (r) { return dayKey(r.at) === yest; }).length,
       unknown: cur.filter(function (r) { return !r.email; }).length,
       onNewest: onNewest, busy: busy, busyDate: busyDate, last: last
     };
@@ -507,10 +520,10 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
       $('ul-metrics').innerHTML = ['Today', 'On the newest version', 'Not identified', 'Versions in use', 'Busiest day', 'Last session'].map(skelMetric).join('');
       return;
     }
-    var pctS = S.rows.length ? Math.round(m.sessions / S.rows.length * 100) : 0;
+    var pctS = m.sessTotal ? Math.round(m.sessions / m.sessTotal * 100) : 0;
     var pctP = m.peopleAll ? Math.round(m.people / m.peopleAll * 100) : 0;
     $('ul-kpis').innerHTML =
-      statCard('Sessions', String(m.sessions), 'of ' + S.rows.length + ' logged', pctS) +
+      statCard('Sessions', String(m.sessions), 'of ' + m.sessTotal + ' logged', pctS) +
       statCard('Active people', String(m.people), 'of ' + m.peopleAll + ' ever identified', pctP);
     var newestPct = m.sessions ? Math.round(m.onNewest / m.sessions * 100) + '%' : 'None';
     $('ul-metrics').innerHTML =
@@ -610,13 +623,33 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
     }).join('') + '</div>';
   }
 
+  function renderSkills(m) {
+    var host = $('ul-skills');
+    if (S.status === 'loading') { host.innerHTML = '<span class="sk" style="width:100%;height:96px;display:block"></span>'; $('ul-q-skills').textContent = ''; return; }
+    $('ul-q-skills').textContent = 'runs by skill, ' + PERIOD_NAME[S.period];
+    if (!m.skills.length) {
+      host.innerHTML = '<p class="ul-note-line">Nothing recorded yet. Skill and file events start arriving once people are on plugin 1.51.0.</p>';
+      return;
+    }
+    var max = m.bySkill[m.skills[0]];
+    host.innerHTML = '<div class="ul-bars">' + m.skills.map(function (k) {
+      var n = m.bySkill[k];
+      return '<div class="ul-bars__r"><span class="ul-bars__l" title="' + esc(k) + '">' + esc(k.replace(/^.*:/, '')) + '</span><div class="ul-bars__t"><div class="ul-bar-b" style="width:' +
+        (n / max * 100).toFixed(1) + '%"><span>' + n + '</span></div></div></div>';
+    }).join('') + '</div><p class="ul-note-line" style="margin-top:var(--gw-space-8)">' + esc(plural(m.nFiles, 'output file')) + ' named in this period. Names only, never the contents.</p>';
+  }
+
   /* ── log table ──────────────────────────────────────────────────────────────────── */
   function filtered(m) {
     var q = S.q.trim().toLowerCase();
-    var rows = m.cur.filter(function (r) {
+    var rows = m.curAll.filter(function (r) {
       if (S.ver && (r.version || 'Unknown') !== S.ver) return false;
+      if (S.evt === 'session' && !isSess(r)) return false;
+      if (S.evt === 'skill' && r.event !== 'skill') return false;
+      if (S.evt === 'file' && r.event !== 'file') return false;
       if (!q) return true;
-      return r.email.indexOf(q) !== -1 || r.version.toLowerCase().indexOf(q) !== -1;
+      return r.email.indexOf(q) !== -1 || r.version.toLowerCase().indexOf(q) !== -1 ||
+             r.skill.toLowerCase().indexOf(q) !== -1 || r.file.toLowerCase().indexOf(q) !== -1;
     });
     var k = S.sortKey, dir = S.sortDir;
     rows = rows.slice().sort(function (a, b) {
@@ -627,6 +660,11 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
       return c * dir || (b.at - a.at);
     });
     return rows;
+  }
+  function evtText(r) {
+    if (r.event === 'skill') return 'Skill: ' + (r.skill || 'unknown').replace(/^.*:/, '');
+    if (r.event === 'file') return 'File: ' + (r.file || 'unknown');
+    return 'Session start';
   }
   function th(key, label) {
     var on = S.sortKey === key;
@@ -653,7 +691,7 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
                         : '<div class="ul-c ul-c--none" role="cell">Not identified</div>';
       var badge = (m.newest && r.version === m.newest) ? '<span class="ul-badge ul-badge--ok">Newest</span>' : '';
       return '<div class="ul-row ul-row--d" role="row"><div class="ul-c" role="cell" title="' + esc(r.at.toISOString()) + '">' + esc(fmtWhen(r.at)) + '</div>' + who +
-        '<div class="ul-c ul-c--ver" role="cell">' + esc(r.version || 'Unknown') + badge + '</div><div class="ul-c" role="cell">' + esc(r.event) + '</div></div>';
+        '<div class="ul-c ul-c--ver" role="cell">' + esc(r.version || 'Unknown') + badge + '</div><div class="ul-c" role="cell" title="' + esc(evtText(r)) + '">' + esc(evtText(r)) + '</div></div>';
     }).join('');
     tbl.innerHTML = head + (slice.length ? body :
       '<div class="ul-empty"><div class="ul-empty__copy"><h2>No rows match</h2><p>Clear the search or pick another version to see the log again.</p></div></div>');
@@ -703,7 +741,7 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
     $('ul-bar').hidden = blocked;
     if (blocked) { renderBlocked(S.status); updated(); return; }
     var m = compute();
-    renderCards(m); renderChart(m); renderVersions(m);
+    renderCards(m); renderChart(m); renderVersions(m); renderSkills(m);
     if (S.status === 'ready') renderVerFilter(m);
     renderLog(m); updated();
     document.querySelectorAll('.ul-tab').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-period') === S.period)); });
@@ -736,12 +774,13 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
         so no handler is attached to an element that a render later replaces. ─────────── */
   $('ul-refresh').innerHTML = icon('arrow-clockwise');
   $('ul-i-search').innerHTML = icon('magnifying-glass');
-  document.querySelector('.ul-i-caret').outerHTML = icon('caret-down');
+  document.querySelectorAll('.ul-i-caret').forEach(function (c) { c.outerHTML = icon('caret-down'); });
   document.querySelectorAll('.ul-tab').forEach(function (b) {
     b.addEventListener('click', function () { S.period = b.getAttribute('data-period'); S.page = 1; render(); });
   });
   $('ul-refresh').addEventListener('click', load);
   $('ul-search').addEventListener('input', function (e) { S.q = e.target.value; S.page = 1; render(); $('ul-search').focus(); });
+  $('ul-evt').addEventListener('change', function (e) { S.evt = e.target.value; S.page = 1; render(); });
   $('ul-ver').addEventListener('change', function (e) { S.ver = e.target.value; S.page = 1; render(); });
   $('ul-table').addEventListener('click', function (e) {
     var b = e.target.closest('[data-sort]'); if (!b) return;
