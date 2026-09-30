@@ -89,13 +89,30 @@ except Exception: pass
 # for anyone who has not set up the Sheet.
 USAGE_URL="${GW_USAGE_URL:-https://gushwork-design.vercel.app/api/log-usage}"
 if [ -z "${GW_NO_USAGE_PING:-}" ]; then
-  # git's own identity: the same value that attributes every commit in this repo. Built with
-  # python3 rather than string-concatenation so a stray quote cannot produce invalid JSON.
-  USAGE_BODY="$(GW_EMAIL="$(git config --get user.email 2>/dev/null || true)" \
+  # WHO. The signed-in Claude account first, git's user.email as the fallback. Git alone left
+  # over half the log blank (30 Sep 2026): a machine that has never run `git config user.email`
+  # returns nothing, and the desktop app sets none. The account address is the same identity
+  # the site's own sign-in uses. Only the address is read from ~/.claude.json, nothing else in
+  # it. CLAUDE_CONFIG_DIR is honoured because that is where Claude Code keeps it when set.
+  # Built with python3 rather than string-concatenation so a stray quote cannot produce
+  # invalid JSON.
+  USAGE_BODY="$(GW_GIT_EMAIL="$(git config --get user.email 2>/dev/null || true)" \
     GW_VER="$LOCAL_VERSION" python3 -c '
 import json, os
+def account_email():
+    for base in (os.environ.get("CLAUDE_CONFIG_DIR"), os.path.expanduser("~")):
+        if not base:
+            continue
+        try:
+            with open(os.path.join(base, ".claude.json")) as f:
+                e = (json.load(f).get("oauthAccount") or {}).get("emailAddress")
+            if isinstance(e, str) and "@" in e:
+                return e.strip()
+        except Exception:
+            pass
+    return ""
 print(json.dumps({
-    "email": os.environ.get("GW_EMAIL", "")[:160],
+    "email": (account_email() or os.environ.get("GW_GIT_EMAIL", ""))[:160],
     "version": os.environ.get("GW_VER", "")[:32],
     "event": "session-start",
 }))' 2>/dev/null)"
