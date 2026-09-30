@@ -536,11 +536,12 @@ body[data-gw-page="access-control"] .sg__main { grid-column: 1 / -1; max-width: 
   ];
 
   /* The templates. Each is a preview page under /internal/templates/, so a rule on one gates that
-     preview, and a rule on the first row gates the /internal/templates list and all four. KEEP IN
+     preview, and a rule on the first row gates the /internal/templates list and all five. KEEP IN
      STEP with TOOLS in api/_tools.js and the data-tool cards on /internal/templates. */
   var TEMPLATES = [
     { name: 'All templates',   path: '/internal/templates', section: true },
     { name: 'Ad landing page', path: '/internal/templates/ad-page',     img: '/assets/tools/tpl-ad-page.png' },
+    { name: 'Sign-up ad page', path: '/internal/templates/ad-page-signup', img: '/assets/tools/tpl-ad-page-signup.png' },
     { name: 'Case study page', path: '/internal/templates/case-study',  img: '/assets/tools/tpl-case-study.png' },
     { name: 'Lead magnet',     path: '/internal/templates/lead-magnet', img: '/assets/tools/tpl-lead-magnet.png' },
     { name: 'Slide deck',      path: '/internal/templates/slide-deck',  img: '/assets/tools/tpl-slide-deck.png' }
@@ -595,7 +596,7 @@ body[data-gw-page="access-control"] .sg__main { grid-column: 1 / -1; max-width: 
   function templatesCard() {
     return accessCard({
       title: 'Templates',
-      blurb: 'Who can see the templates. The first row covers the Templates page and all four ' +
+      blurb: 'Who can see the templates. The first row covers the Templates page and all five ' +
              'previews; give a single template its own level to open or close just that one.',
       noun: 'template', head: 'Template', items: TEMPLATES, skipFromCount: 1
     });
