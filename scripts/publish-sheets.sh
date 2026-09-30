@@ -63,7 +63,7 @@ SHEETS=(
 # to resolve it, so it never matches the ../assets/ grep further down. List it
 # here or the card 404s and the link unfurls blank.
 SOCIAL=(
-  assets/og/install.png
+  assets/og/hub.png
 )
 
 # The changelog sheet is generated, so a publish must not ship a stale one.
@@ -163,7 +163,7 @@ p = sys.argv[1]
 s = open(p, encoding="utf-8").read()
 before = s
 s = s.replace("https://gushwork-design.vercel.app/preview/install.html",
-              "https://gushwork-design.vercel.app/internal/claude-plugin")
+              "https://design.gushwork.ai/internal/claude-plugin")
 open(p, "w", encoding="utf-8").write(s)
 print("  rewrote og:url in claude-plugin.html" if s != before
       else "  og:url in claude-plugin.html already current")
@@ -230,6 +230,10 @@ VJ
 # the shell has been injected and the sheets renamed to their routes, so every result links to
 # a URL that exists on this deploy. Building it from the repo instead would index files whose
 # routes do not exist, miss the renames, and drift the first time a route changed.
+# The hub's Open Graph card goes on every staged page that does not already carry its own
+# og:image (assets/og/hub.png, Figma 818:5074). Landers, templates and the tools keep theirs.
+python3 scripts/_add_og.py "$STAGE"
+
 python3 scripts/_search_index.py "$STAGE" > "$STAGE/search-index.json"
 
 cp foundation/tokens.css "$STAGE/foundation/"
