@@ -236,14 +236,16 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
 /* ── Graph / Line: single series + gradient fill ────────────────────────────────────── */
 /* Plot height 240 is NOT MEASURED. The measured Line is 400 tall in a 1028-wide chart; this
    sits inside a card beside two other sections, so it is shorter. Chosen, and said so. */
-.ul-line { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: var(--gw-space-12); }
+.ul-line { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: var(--gw-space-12);
+  /* room above the top label, below the dates, and right of the last date (centred on the plot edge) */
+  padding: var(--gw-space-16) var(--gw-space-32) var(--gw-space-16) var(--gw-space-8); }
 .ul-line__y { position: relative; height: 240px; width: 32px; }
 .ul-line__y span, .ul-line__x span { font: 500 12px/1 var(--gw-font-body); letter-spacing: -.2px; color: var(--ul-cell); }
 .ul-line__y span { position: absolute; right: 0; transform: translateY(-50%); }
 .ul-plot { position: relative; height: 240px; cursor: crosshair; }
 .ul-plot__g { position: absolute; left: 0; right: 0; height: 1px; background: var(--ul-grid); }
 .ul-plot svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.ul-line__x { grid-column: 2; position: relative; height: 12px; margin-top: var(--gw-space-12); }
+.ul-line__x { grid-column: 2; position: relative; height: 12px; margin-top: var(--gw-space-16); }
 .ul-line__x span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
 .ul-cross { position: absolute; top: 0; bottom: 0; width: 1px; pointer-events: none; display: none;
   /* crosshair is dashed 2 2 in the measured Line */
