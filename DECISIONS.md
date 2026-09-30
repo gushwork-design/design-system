@@ -1002,17 +1002,21 @@ deeper than four folders; and whether an output was *good*, which only the verdi
 
 **Kept copies (added 30 Sep 2026, ruled by Utsav): the exception to "no file contents".** The log could
 name an output but not open it, which made it a list of things nobody could check. A finished PDF, PNG,
-PPTX, HTML or SVG up to 3 MB is now also sent to `/api/log-output` and stored as a private copy, so an
+PPTX, HTML or SVG up to 4 MB is now also sent to `/api/log-output` and stored as a private copy, so an
 owner can open it from the Usage Logs page.
 
 - **Private.** A Blob store created with private access. Nothing is reachable by URL. The only way
   out is `/api/usage-log?file=…`, behind the same session and owner check as the log. HTML and SVG
   are sent as a download, never rendered on our origin; every response is marked no-sniff and sandboxed.
-- **Bounded.** Five types only, 3 MB, the declared type must match the bytes, a per-IP limit, and a
+- **Bounded.** Five types only, 4 MB, the declared type must match the bytes, a per-IP limit, and a
   cap of 300 copies a day across everyone. The endpoint is public (the plugin has no secret to keep),
-  so these are what stand between it and a flood.
-- **Expires.** A daily cron deletes copies and their index entries after 30 days
-  (`_purge-outputs.js`); it needs `CRON_SECRET` on the project and refuses without it.
+  so these are what stand between it and a flood. 4 MB and not 5 because a Vercel function rejects any
+  request body over 4.5 MB; the file is sent raw, not base64, to get that close. 5 MB would need the
+  client-upload route.
+- **No automatic expiry.** ONBOARDING tells people copies are deleted "after a few weeks"; in fact
+  nothing deletes them. Utsav will clear them by hand in the Vercel dashboard when storage becomes a
+  problem. A daily purge (list, delete older than 30 days) was written and then removed at his call,
+  to keep the surface small. The daily cap is the only bound on growth until then.
 - **Off switches.** `GW_NO_USAGE_PING=1` stops the whole hook; `GW_NO_OUTPUT_COPIES=1` keeps the
   log and skips only the copy.
 - **Dormant until a store exists.** With no `BLOB_READ_WRITE_TOKEN` the endpoint answers 204 and

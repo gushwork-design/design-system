@@ -26,9 +26,9 @@
 # hook's input.
 #
 # THE ONE EXCEPTION TO "NEVER THE CONTENTS" (30 Sep 2026, R29): a finished PDF, PNG, PPTX, HTML or
-# SVG up to 3 MB is also sent as a private copy to /api/log-output, so an owner can open it from the
-# Usage Logs page. It is kept in a private store, opened only through the owner-checked log
-# endpoint, and deleted after 30 days. GW_NO_OUTPUT_COPIES=1 keeps every other row and skips only
+# SVG up to 4 MB is also sent as a private copy to /api/log-output, so an owner can open it from the
+# Usage Logs page. It is kept in a private store and opened only through the owner-checked log
+# endpoint. Nothing expires it automatically; it is cleared by hand when storage becomes a problem. GW_NO_OUTPUT_COPIES=1 keeps every other row and skips only
 # the copy; GW_NO_USAGE_PING=1 stops the whole hook.
 #
 # THE PYTHON BELOW LIVES INSIDE A SINGLE-QUOTED SHELL STRING, so it must not contain a single quote
@@ -73,7 +73,7 @@ fi
 
 BODY="$(printf '%s' "$INPUT" | GW_GIT_EMAIL="$(git config --get user.email 2>/dev/null || true)" GW_ROOT="$ROOT" \
   python3 -c '
-import base64, hashlib, json, os, re, subprocess, sys, time
+import hashlib, json, os, re, subprocess, sys, time, urllib.parse
 
 try:
     d = json.load(sys.stdin)
@@ -151,7 +151,7 @@ def out(event, **extra):
 
 # Send a private copy of a finished output to the site, so an owner can open it from the Usage Logs
 # page. Detached (its own session, its own pipes), so the conversation never waits on the upload.
-# Only PDF, PNG, PPTX, HTML and SVG, and only up to 3 MB. GW_NO_OUTPUT_COPIES=1 skips it, and
+# Only PDF, PNG, PPTX, HTML and SVG, and only up to 4 MB (a Vercel function rejects a body over 4.5 MB). GW_NO_OUTPUT_COPIES=1 skips it, and
 # the site does nothing with it until a private store is connected (api/_log-output.js).
 def upload_copy(path, base):
     if os.environ.get("GW_NO_OUTPUT_COPIES"):
@@ -160,19 +160,16 @@ def upload_copy(path, base):
         return
     try:
         p = os.path.expanduser(path)
-        if not os.path.isfile(p) or os.path.getsize(p) > 3 * 1024 * 1024:
+        if not os.path.isfile(p) or os.path.getsize(p) > 4 * 1024 * 1024:
             return
-        with open(p, "rb") as f:
-            data = base64.b64encode(f.read()).decode()
-        payload = json.dumps({"sess": SESS, "file": base, "data": data})
         url = os.environ.get("GW_OUTPUT_URL") or "https://gushwork-design.vercel.app/api/log-output"
+        # The file goes as the raw request body; its session and name travel in headers.
         pr = subprocess.Popen(
-            ["curl", "-fsS", "--max-time", "20", "-X", "POST", "-H", "content-type: application/json",
-             "--data-binary", "@-", url],
-            stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            ["curl", "-fsS", "--max-time", "30", "-X", "POST", "-H", "content-type: application/octet-stream",
+             "-H", "x-gw-sess: " + SESS, "-H", "x-gw-file: " + urllib.parse.quote(base, safe=""),
+             "--data-binary", "@" + p, url],
+            stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
             start_new_session=True)
-        pr.stdin.write(payload.encode())
-        pr.stdin.close()
     except Exception:
         pass
 

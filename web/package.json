@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "gushwork-design.vercel.app \u2014 static pages plus the Google auth gate. No build step. One dependency, @vercel/blob, imported lazily inside the two output-copy routes (api/_log-output.js, api/_purge-outputs.js) so a failure there cannot take the other routes down; it exists so Vercel treats api/*.js and middleware.js as ES modules.",
+  "description": "gushwork-design.vercel.app \u2014 static pages plus the Google auth gate. No build step. One dependency, @vercel/blob, imported lazily inside the output routes (api/_log-output.js, api/_usage-log.js) so a failure there cannot take the other routes down; it exists so Vercel treats api/*.js and middleware.js as ES modules.",
   "dependencies": {
     "@vercel/blob": "^2.8.0"
   }

@@ -29,13 +29,13 @@ on, and when. When you run a Gushwork skill it also records the skill's name, an
 (the name, not the folder) of any page or document it writes in that session, the link
 of any Claude artifact you publish in it, and the file names of any PDF, PowerPoint, PNG or HTML file that
 appears in your working folder after a command runs (a deck or lead magnet is made by a script, not
-written directly). Only the name is sent, never the folder. A PDF, PNG, PowerPoint, HTML or SVG file up to 3 MB is also kept
-as a private copy, which only the owners can open from the usage page and which is deleted after 30 days. Set
-`GW_NO_OUTPUT_COPIES=1` to keep everything else but skip the copy. For an HTML or SVG output or a published artifact it
+written directly). Only the name is sent, never the folder. New designs you create with a skill (a PDF, image, PowerPoint or page, up to 4 MB) are
+kept for review, visible only to the owners, and deleted after a few weeks. Set `GW_NO_OUTPUT_COPIES=1` to
+keep everything else but skip this. For an HTML or SVG output or a published artifact it
 checks, on your machine, whether the page uses the Gushwork tokens, only the brand typefaces, the
 real logo and the build stamp, and sends those four yes/no answers instead of the text. A session
 is tied to its outputs by a short one-way hash that cannot be turned back into your session id. It
-never records your prompts, and keeps nothing of your files beyond those copies. It exists so we can see whether the design system
+never records your prompts. It exists so we can see whether the design system
 is being used, what for, and who is running an old version. To turn it off, set
 `GW_NO_USAGE_PING=1` in your shell.
 

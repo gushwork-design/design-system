@@ -9,13 +9,15 @@
      · PRIVATE STORE. The Blob store is created with private access: nothing is reachable by URL.
        The only way back out is /api/usage-log?file=…, which checks the session cookie and then
        OWNER_EMAILS, exactly as the log itself does.
-     · SMALL AND KNOWN. PDF, PNG, PPTX, HTML and SVG only, 3 MB raw at most (the request body
-       limit is 4.5 MB and base64 adds a third). Bigger files stay a name in the log.
+     · SMALL AND KNOWN. PDF, PNG, PPTX, HTML and SVG only, 4 MB at most. The plugin sends the raw
+       bytes, not base64, because a Vercel function rejects any request body over 4.5 MB: that is
+       the ceiling, and 5 MB would need the client-upload route instead. Bigger files stay a name.
      · CHECKED, NOT TRUSTED. This endpoint is public, like log-usage, because the plugin has no
        secret it could keep. So the declared type must match the bytes (a PDF starts %PDF, a PNG
        its signature, a PPTX is a zip), a daily cap bounds what any flood could store, and a
        per-IP limit slows a loop.
-     · EXPIRES. scripts purge it after RETENTION_DAYS (see _purge-outputs.js).
+     · NO AUTOMATIC EXPIRY. Copies are kept until someone deletes them in the Vercel dashboard,
+       which is to be done when storage becomes a problem. The daily cap below bounds growth.
      · OFF BY A SWITCH. GW_NO_USAGE_PING=1 stops the whole hook; GW_NO_OUTPUT_COPIES=1 keeps the
        log and skips only the copy (scripts/log-activity.sh).
 
@@ -30,7 +32,7 @@
 
 const INDEX_KEY = 'gw:files';          // hash: "<sess>|<file>" -> {p: pathname, n: bytes, at}
 const DAY_KEY = 'gw:files:day:';       // counter per UTC day
-const MAX_BYTES = 3 * 1024 * 1024;
+const MAX_BYTES = 4 * 1024 * 1024;
 const DAILY_CAP = 300;
 
 const TYPES = {
@@ -85,21 +87,16 @@ export default async function handler(req, res) {
   const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
   if (rateLimited(ip)) return res.status(429).json({ error: 'slow down' });
 
-  let body = req.body;
-  if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = null; } }
-  if (!body || typeof body !== 'object') return res.status(400).json({ error: 'bad body' });
-
-  const sess = String(body.sess || '');
-  const file = String(body.file || '');
+  /* The plugin sends the file as the request body, raw, with its session and name in headers. */
+  const buf = Buffer.isBuffer(req.body) ? req.body : null;
+  const sess = String(req.headers['x-gw-sess'] || '');
+  let file = '';
+  try { file = decodeURIComponent(String(req.headers['x-gw-file'] || '')); } catch { file = ''; }
   const ext = (file.split('.').pop() || '').toLowerCase();
   if (!/^[a-f0-9]{8,16}$/.test(sess)) return res.status(400).json({ error: 'bad session' });
   if (!/^[A-Za-z0-9][A-Za-z0-9 _.()\-]{0,118}$/.test(file) || !TYPES[ext]) return res.status(400).json({ error: 'bad file' });
-  if (typeof body.data !== 'string' || body.data.length > Math.ceil(MAX_BYTES * 4 / 3) + 8) {
-    return res.status(413).json({ error: 'too large' });
-  }
-
-  const buf = Buffer.from(body.data, 'base64');
-  if (!buf.length || buf.length > MAX_BYTES) return res.status(413).json({ error: 'too large' });
+  if (!buf || !buf.length) return res.status(400).json({ error: 'no file' });
+  if (buf.length > MAX_BYTES) return res.status(413).json({ error: 'too large' });
   if (!bytesMatch(ext, buf)) return res.status(400).json({ error: 'type does not match contents' });
 
   try {
