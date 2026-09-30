@@ -288,6 +288,44 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
 .ul-select select { appearance: none; -webkit-appearance: none; height: 36px; padding: 0 calc(var(--gw-space-12) + 16px) 0 var(--gw-space-12);
   border: 0; border-radius: var(--gw-radius-8); background: var(--ul-field-bg); color: var(--ul-field-fg);
   box-shadow: inset 0 0 0 1px var(--ul-field-line); font: var(--gw-text-button-14); cursor: pointer; }
+.ul-pair .ul-sec { display: flex; flex-direction: column; }
+.ul-pair .ul-inner { flex: 1; display: flex; flex-direction: column; }
+.ul-foot { margin: auto 0 0; padding-top: var(--gw-space-12); font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+/* out-of-date people */
+.ul-old { display: flex; flex-direction: column; }
+.ul-old__r { display: grid; grid-template-columns: minmax(0, 1fr) 112px 148px; align-items: center; column-gap: var(--gw-space-16); padding: var(--gw-space-12) 0; }
+.ul-old__r + .ul-old__r { border-top: 1px solid var(--ul-hdr-line); }
+.ul-old__who { min-width: 0; }
+.ul-old__who b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--gw-text-body-12-med); font-weight: 600; color: var(--ul-value); }
+.ul-old__who span { font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.ul-old__v { font: var(--gw-text-body-12-med); color: var(--ul-cell); }
+.ul-old__s { display: flex; justify-content: flex-end; }
+.ul-old__v { text-align: left; }
+/* skills donut */
+.ul-donut { flex: 1; display: flex; align-items: center; justify-content: center; gap: var(--gw-space-40); flex-wrap: wrap; padding: var(--gw-space-8) 0; }
+.ul-donut__c { position: relative; width: 160px; height: 160px; flex: none; }
+.ul-donut__c svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ul-donut__c circle { fill: none; stroke-width: 26; }
+.ul-donut__n { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.ul-donut__n b { font: var(--gw-text-body-24-sem, 600 24px/1.2 var(--gw-font-body)); color: var(--ul-value); }
+.ul-donut__n span { font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.ul-leg { flex: 0 1 240px; min-width: 180px; margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--gw-space-12); }
+.ul-leg li { display: grid; grid-template-columns: 12px minmax(0, 1fr) auto auto; align-items: center; column-gap: var(--gw-space-8); font: var(--gw-text-body-12-med); color: var(--ul-cell); }
+.ul-leg i { width: 12px; height: 12px; border-radius: var(--gw-radius-4); }
+.ul-leg li span:nth-child(2) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ul-value); }
+.ul-leg li span:last-child { min-width: 36px; text-align: right; color: var(--ul-sub); }
+/* ── dropdown menu: replaces the browser's own list, which is drawn by the OS and cannot be styled ── */
+.ul-menu { position: fixed; z-index: 50; min-width: 120px; max-height: 280px; overflow-y: auto; padding: var(--gw-space-4);
+  display: flex; flex-direction: column; gap: 2px; background: var(--ul-field-bg); border-radius: var(--gw-radius-12);
+  box-shadow: inset 0 0 0 1px var(--ul-hdr-line), var(--gw-shadow-s3); }
+.ul-menu__i { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-16); height: 32px; padding: 0 var(--gw-space-8) 0 var(--gw-space-12);
+  border: 0; border-radius: var(--gw-radius-8); background: none; text-align: left; white-space: nowrap; cursor: pointer;
+  font: var(--gw-text-body-12-med); color: var(--ul-cell); }
+.ul-menu__i:hover, .ul-menu__i.is-focus { background: var(--ul-row-hover); color: var(--ul-value); }
+.ul-menu__i[aria-selected="true"] { color: var(--ul-value); font-weight: 600; }
+.ul-menu__i svg { width: 12px; height: 12px; flex: none; color: var(--gw-color-primary-500); }
+/* No focus ring or darker border on the dropdown buttons: the open menu is the state (owner's call, overrides the page-wide ring above). */
+.ul-scope .ul-select select:focus-visible { outline: none; }
 .ul-select--sm select { height: 28px; font: var(--gw-text-button-12); }
 .ul-select svg { position: absolute; right: var(--gw-space-12); top: 50%; width: 12px; height: 12px; margin-top: -6px; color: var(--ul-icon); pointer-events: none; }
 .ul-btn { height: 36px; padding: 0 var(--gw-space-12); border: 0; border-radius: var(--gw-radius-12); cursor: pointer;
@@ -326,7 +364,7 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
 /* Each chat is a group: the row and its tray share one rounded container, so the open state reads as one object. */
 .ul-grp { position: relative; margin: 0 var(--gw-space-8); border-radius: var(--gw-radius-12); transition: background var(--gw-motion-fast); }
 .ul-grp:not(.is-open):hover { background: var(--ul-row-hover); }
-.ul-grp.is-open { background: var(--ul-hdr-bg); box-shadow: inset 0 0 0 1.5px var(--gw-color-primary-500); }
+.ul-grp.is-open { background: var(--ul-hdr-bg); }
 .ul-grp.is-open .ul-row--chat .ul-when b, .ul-grp.is-open .ul-row--chat .ul-chat__t svg { color: var(--gw-color-primary-500); }
 .ul-grp.is-open .ul-row--chat .ul-c--who { font-weight: 600; }
 /* While one chat is open, the closed ones step back so the open one is unmistakable. */
@@ -431,7 +469,7 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
 
       <div class="ul-pair">
       <section class="ul-sec" aria-labelledby="ul-h-ver">
-        <div class="ul-sh"><div class="ul-sh__t"><h2 id="ul-h-ver">Versions</h2><span class="ul-sh__q" id="ul-q-ver"></span></div></div>
+        <div class="ul-sh"><div class="ul-sh__t"><h2 id="ul-h-ver">Out of date</h2><span class="ul-sh__q" id="ul-q-ver"></span></div></div>
         <div class="ul-inner" id="ul-versions"></div>
       </section>
 
@@ -679,17 +717,39 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
   function renderVersions(m) {
     var host = $('ul-versions');
     if (S.status === 'loading') { host.innerHTML = '<span class="sk" style="width:100%;height:120px;display:block"></span>'; $('ul-q-ver').textContent = ''; return; }
-    $('ul-q-ver').textContent = 'sessions by plugin version, ' + PERIOD_NAME[S.period];
-    if (!m.vers.length) { host.innerHTML = '<p class="ul-note-line">No sessions in this period.</p>'; return; }
-    var max = m.vers.reduce(function (a, v) { return Math.max(a, m.byVer[v]); }, 0);
-    host.innerHTML = '<div class="ul-bars" style="--ul-lw:' + lblW(m.vers) + '">' + m.vers.map(function (v) {
-      var n = m.byVer[v];
-      /* each label shares a grid row with its bar, so the two cannot drift apart */
-      return '<div class="ul-bars__r"><span class="ul-bars__l">' + esc(v) + '</span><div class="ul-bars__t"><div class="ul-bar-b" style="width:' +
-        (n / max * 100).toFixed(1) + '%"><span>' + n + '</span></div></div></div>';
-    }).join('') + '</div>';
+    $('ul-q-ver').textContent = m.newest ? 'who used a version older than ' + m.newest + ', ' + PERIOD_NAME[S.period] : PERIOD_NAME[S.period];
+    if (!m.newest) { host.innerHTML = '<p class="ul-note-line">No versioned sessions yet.</p>'; return; }
+    var who = {}, anon = 0;
+    m.cur.forEach(function (r) {
+      var old = !r.version || !vparts(r.version) || vcmp(m.newest, r.version) > 0;
+      if (!r.email) { if (old) anon++; return; }
+      var w = who[r.email] || (who[r.email] = { email: r.email, last: r, old: 0 });
+      if (r.at > w.last.at) w.last = r;
+      if (old) w.old++;
+    });
+    var list = Object.keys(who).map(function (k) { return who[k]; }).filter(function (w) { return w.old > 0; });
+    list.forEach(function (w) {
+      var v = w.last.version, known = v && vparts(v), behind = !known || vcmp(m.newest, v) > 0;
+      w.behind = behind;
+      var pn = vparts(m.newest), pv = known ? vparts(v) : null;
+      w.gap = behind && pv ? (pn[0] === pv[0] ? pn[1] - pv[1] : 99) : 0;
+    });
+    list.sort(function (a, b) { return (b.behind - a.behind) || (b.gap - a.gap) || (b.last.at - a.last.at); });
+    var stale = list.filter(function (w) { return w.behind; }).length;
+    if (!list.length && !anon) { host.innerHTML = '<p class="ul-note-line">Everyone who started a session is on ' + esc(m.newest) + '.</p>'; return; }
+    var rows = list.slice(0, 8).map(function (w) {
+      var v = w.last.version || 'Unknown';
+      var status = w.behind
+        ? '<span class="ul-badge ul-badge--bad">' + (w.gap > 0 && w.gap < 99 ? plural(w.gap, 'release') + ' behind' : 'Behind') + '</span>'
+        : '<span class="ul-badge ul-badge--ok">Updated</span>';
+      return '<div class="ul-old__r"><div class="ul-old__who"><b title="' + esc(w.email) + '">' + esc(w.email) + '</b><span>' + (w.behind ? 'Still on ' : 'Now on ') + esc(v) + ' · last seen ' + esc(ago(Date.now() - w.last.at.getTime())) + '</span></div>' +
+        '<span class="ul-old__v">' + esc(plural(w.old, 'older session')) + '</span><div class="ul-old__s">' + status + '</div></div>';
+    }).join('');
+    host.innerHTML = '<div class="ul-old">' + rows + '</div>' +
+      '<p class="ul-foot">' + (stale ? stale + (stale === 1 ? ' person' : ' people') + ' still behind' : 'No one is behind now') +
+      (list.length > 8 ? ' · ' + (list.length - 8) + ' more not shown' : '') +
+      (anon ? ' · ' + plural(anon, 'session') + ' with no email on an older version' : '') + '.</p>';
   }
-
   function renderSkills(m) {
     var host = $('ul-skills');
     if (S.status === 'loading') { host.innerHTML = '<span class="sk" style="width:100%;height:96px;display:block"></span>'; $('ul-q-skills').textContent = ''; return; }
@@ -698,12 +758,22 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
       host.innerHTML = '<p class="ul-note-line">Nothing recorded yet. Skill and file events start arriving once people are on plugin 1.51.0.</p>';
       return;
     }
-    var max = m.bySkill[m.skills[0]];
-    host.innerHTML = '<div class="ul-bars" style="--ul-lw:' + lblW(m.skills.map(function (k) { return k.replace(/^.*:/, ''); })) + '">' + m.skills.map(function (k) {
-      var n = m.bySkill[k];
-      return '<div class="ul-bars__r"><span class="ul-bars__l" title="' + esc(k) + '">' + esc(k.replace(/^.*:/, '')) + '</span><div class="ul-bars__t"><div class="ul-bar-b" style="width:' +
-        (n / max * 100).toFixed(1) + '%"><span>' + n + '</span></div></div></div>';
-    }).join('') + '</div><p class="ul-note-line" style="margin-top:var(--gw-space-8)">' + esc(plural(m.nFiles, 'output file')) + ' named in this period. Names only, never the contents.</p>';
+    var COL = ['var(--gw-color-primary-500)', 'var(--gw-color-primary-300)', 'var(--gw-color-neutral-850)', 'var(--gw-color-primary-200)', 'var(--gw-color-neutral-400)', 'var(--gw-color-neutral-200)'];
+    var items = m.skills.slice(0, 5).map(function (k) { return { n: k.replace(/^.*:/, ''), full: k, v: m.bySkill[k] }; });
+    var rest = m.skills.slice(5).reduce(function (a, k) { return a + m.bySkill[k]; }, 0);
+    if (rest) items.push({ n: 'Other', full: 'Other skills', v: rest });
+    var total = items.reduce(function (a, x) { return a + x.v; }, 0), R = 70, C = 2 * Math.PI * R, off = 0;
+    var arcs = items.map(function (x, i) {
+      var len = x.v / total * C, gap = items.length > 1 ? 2 : 0;
+      var el = '<circle cx="84" cy="84" r="' + R + '" stroke="' + COL[i] + '" stroke-dasharray="' + Math.max(0, len - gap).toFixed(2) + ' ' + (C - Math.max(0, len - gap)).toFixed(2) + '" stroke-dashoffset="' + (-off).toFixed(2) + '"><title>' + esc(x.full + ': ' + x.v) + '</title></circle>';
+      off += len; return el;
+    }).join('');
+    var legend = items.map(function (x, i) {
+      return '<li title="' + esc(x.full) + '"><i style="background:' + COL[i] + '"></i><span>' + esc(x.n) + '</span><span>' + x.v + '</span><span>' + Math.round(x.v / total * 100) + '%</span></li>';
+    }).join('');
+    host.innerHTML = '<div class="ul-donut"><div class="ul-donut__c"><svg viewBox="0 0 168 168" role="img" aria-label="Skill runs">' + arcs + '</svg>' +
+      '<div class="ul-donut__n"><b>' + total + '</b><span>' + (total === 1 ? 'run' : 'runs') + '</span></div></div><ul class="ul-leg">' + legend + '</ul></div>' +
+      '<p class="ul-foot">' + esc(plural(m.nFiles, 'output file')) + ' named in this period. Names only, never the contents.</p>';
   }
 
   /* ── log table ──────────────────────────────────────────────────────────────────── */
@@ -1103,6 +1173,69 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
     if (S.sortKey === k) S.sortDir = -S.sortDir; else { S.sortKey = k; S.sortDir = k === 'at' ? -1 : 1; }
     S.page = 1; render();
   });
+  /* Custom dropdown. The native <select> stays in the DOM as the source of truth (value, change event);
+     only its popup is replaced, so every existing change handler keeps working. */
+  (function () {
+    var menu = null, owner = null, idx = -1;
+    var CHECK = '<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg>';
+    function close(refocus) {
+      if (!menu) return;
+      menu.remove(); menu = null;
+      if (owner) { var l = owner.closest('.ul-select'); if (l) l.classList.remove('is-open'); if (refocus && document.contains(owner)) owner.focus(); }
+      owner = null; idx = -1;
+      document.removeEventListener('mousedown', outside, true); window.removeEventListener('scroll', onScroll, true); window.removeEventListener('resize', close);
+    }
+    function outside(e) { if (menu && !menu.contains(e.target) && e.target !== owner) close(false); }
+    function onScroll(e) { if (menu && !menu.contains(e.target)) close(false); }
+    function focusAt(i) {
+      var items = menu.children; if (!items.length) return;
+      idx = (i + items.length) % items.length;
+      for (var k = 0; k < items.length; k++) items[k].classList.toggle('is-focus', k === idx);
+      items[idx].scrollIntoView({ block: 'nearest' });
+    }
+    function pick(i) {
+      var sel = owner, o = sel.options[i]; close(true);
+      if (o && sel.value !== o.value) { sel.value = o.value; sel.dispatchEvent(new Event('change', { bubbles: true })); }
+    }
+    function open(sel) {
+      close(false); owner = sel;
+      menu = document.createElement('div'); menu.className = 'ul-menu'; menu.setAttribute('role', 'listbox');
+      Array.prototype.forEach.call(sel.options, function (o, i) {
+        var b = document.createElement('button'); b.type = 'button'; b.className = 'ul-menu__i'; b.setAttribute('role', 'option');
+        b.setAttribute('aria-selected', o.selected ? 'true' : 'false');
+        b.innerHTML = '<span></span>' + (o.selected ? CHECK : ''); b.firstChild.textContent = o.text;
+        b.addEventListener('mousedown', function (e) { e.preventDefault(); });
+        b.addEventListener('click', function () { pick(i); });
+        menu.appendChild(b);
+      });
+      document.body.appendChild(menu);
+      var r = sel.getBoundingClientRect(), mh = menu.offsetHeight, below = window.innerHeight - r.bottom, up = below < mh + 12 && r.top > below;
+      menu.style.minWidth = r.width + 'px';
+      menu.style.left = Math.max(8, Math.min(r.left, window.innerWidth - menu.offsetWidth - 8)) + 'px';
+      menu.style.top = (up ? Math.max(8, r.top - mh - 4) : r.bottom + 4) + 'px';
+      sel.closest('.ul-select').classList.add('is-open');
+      focusAt(sel.selectedIndex);
+      document.addEventListener('mousedown', outside, true); window.addEventListener('resize', close);
+      setTimeout(function () { if (menu) window.addEventListener('scroll', onScroll, true); }, 150);
+    }
+    document.addEventListener('mousedown', function (e) {
+      var sel = e.target.closest && e.target.closest('.ul-select select'); if (!sel) return;
+      e.preventDefault(); sel.focus({ preventScroll: true });
+      if (menu && owner === sel) close(false); else open(sel);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (menu) {
+        if (e.key === 'Escape') { e.preventDefault(); close(true); }
+        else if (e.key === 'ArrowDown') { e.preventDefault(); focusAt(idx + 1); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); focusAt(idx - 1); }
+        else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(idx); }
+        else if (e.key === 'Tab') close(false);
+        return;
+      }
+      var sel = e.target.closest && e.target.closest('.ul-select select');
+      if (sel && (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown' || e.key === 'ArrowUp')) { e.preventDefault(); open(sel); }
+    });
+  })();
   setInterval(updated, 10000);
   render(); load();
 })();
