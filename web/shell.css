@@ -267,7 +267,13 @@
   /* left tracks the rail — 260 since the widening above, not the measured 240. */
   top: 12px; right: 12px; bottom: 12px; left: 260px;
   display: flex; flex-direction: column;
+  /* `clip`, not just `hidden`. A hidden box is still a scroll container, and a rail link
+     (href="#apps") makes the browser scroll EVERY scrollable ancestor to put the target at the
+     top: after .gw-scroll had done its part, it also scrolled this frame by the height of the
+     bar, so the search bar slid out of sight and the panel looked broken. A clipped box cannot
+     be scrolled by anything. `hidden` stays as the fallback for a browser without `clip`. */
   overflow: hidden;
+  overflow: clip;
   background: var(--s-panel-bg);
   /* Radius/16 is in this frame's variable set; Radius/20 is not. The corner reads
      larger than 16 because Figma smooths it — the measured profile falls off
@@ -536,6 +542,7 @@
      at Inter Medium 14) clipped. Overlay scrollbars hide the bug, which is why
      it survived review on a Mac. */
   overflow: hidden;
+  overflow: clip;
 }
 
 /* list-groups 478:14808 — measured pad 24/20, gap 24.
