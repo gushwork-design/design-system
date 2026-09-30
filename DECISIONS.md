@@ -956,3 +956,36 @@ idea, layout, motion and copy. An explicit request for an off-system look is hon
 **Not solved.** Nothing in the plugin can stop someone building the same thing in a session where
 the plugin is not installed, or on a surface where its hooks and skills are not loaded. This narrows the gap for
 everyone who has it installed; it does not close it.
+
+---
+
+## R29 — measure what the skills make, from flags computed on the machine, not from the files
+
+*Ruled by Utsav, 30 Sep 2026.*
+
+The usage log said who ran which skill and named the files. It could not say whether the output
+was on-brand, where it was, or what became of it (the Corner Watch game, R28, was found by accident).
+
+**Ruling.** Three additions, none of which uploads a file:
+
+1. **Four flags, computed locally.** On an HTML or SVG output, or a published artifact, the hook
+   reads the text on the person's machine and sends `stamp`, `tokens`, `fonts` (`ok`, `foreign` or
+   `none`) and `logo` instead of the text. "On-brand" is defined as: uses the `--gw-*` tokens and
+   names no typeface outside Vert Grotesk Display, Inter and the Plus Jakarta fallback. It is a
+   measurement, not a review.
+2. **The artifact link.** A published artifact's claude.ai link is logged, only in that exact shape.
+   Artifacts are private by default, so the link alone opens nothing for anyone without access.
+3. **A verdict, kept apart.** The owner marks an output Approved or Needs changes on the Usage Logs
+   page. It is stored in its own hash keyed by the row's timestamp, so a usage row is never
+   rewritten and the log stays append-only.
+
+A short one-way hash of the session id (`sess`) ties an output to the skill that ran in the same
+session. It cannot be reversed.
+
+**Why the verdict is not the Slack ✅.** The ✅ loop (REVIEW-LOOP.md) reviews *new components* a
+skill had to invent: a message the plugin posts, a mapping from its timestamp to a registry key.
+An output made in a teammate's session is never posted to Slack, so there is no message for a ✅ to
+land on. Tying the two together would need every output posted there, which is a larger decision.
+
+**What is still not seen.** Anything produced by a script through Bash, not Write; sessions without
+the plugin; and whether an output was *good*, which only the verdict records.

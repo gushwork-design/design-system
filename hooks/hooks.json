@@ -61,7 +61,7 @@
     ],
     "PostToolUse": [
       {
-        "matcher": "Skill|Write",
+        "matcher": "Skill|Write|Artifact",
         "hooks": [
           {
             "type": "command",

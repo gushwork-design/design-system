@@ -7,8 +7,23 @@
 #   · when a Gushwork skill is invoked:  who, version, event "skill", the skill name
 #   · after that, when a web/document output is written in the SAME session:
 #                                        who, version, event "file", the file's BASENAME
-# A basename, never a path, never the contents, never the prompt. Nothing else is read from the
-# hook's input.
+#   · when a Claude artifact is published in the same session:
+#                                        who, version, event "artifact", its claude.ai link
+# Every row also carries `sess`: a short one-way hash of the session id, so an output can be tied
+# to the skill that ran in the same session. It cannot be turned back into the id.
+#
+# On an HTML or SVG output, or a published artifact, the hook ALSO measures the file locally and
+# sends four flags, never the text it measured:
+#   stamp   the gushwork-build stamp is present (a skill built it, not an approximation)
+#   tokens  it uses the --gw-* tokens
+#   fonts   "ok" (only Vert Grotesk Display, Inter, or the named Plus Jakarta fallback, plus
+#           generic stacks), "foreign" (it names another typeface), or "none" (none declared)
+#   logo    the real logo is present (a logo file reference, or the symbol's own path data)
+# A basename, a link, four flags. Never a path, never the contents, never the prompt. Nothing else
+# is read from the hook's input.
+#
+# THE PYTHON BELOW LIVES INSIDE A SINGLE-QUOTED SHELL STRING, so it must not contain a single quote
+# anywhere, comments included. chr(39) is the quote character where one is needed.
 #
 # WHY IT IS GATED ON A SKILL HAVING RUN. This hook fires on every Write in every project on a
 # teammate's machine. Without the gate it would log the name of every file they touch in unrelated
@@ -39,7 +54,7 @@ USAGE_URL="${GW_USAGE_URL:-https://gushwork-design.vercel.app/api/log-usage}"
 # by python from stdin directly rather than being passed through an environment variable.
 BODY="$(GW_GIT_EMAIL="$(git config --get user.email 2>/dev/null || true)" GW_ROOT="$ROOT" \
   python3 -c '
-import json, os, re, sys, time
+import hashlib, json, os, re, sys, time
 
 try:
     d = json.load(sys.stdin)
@@ -57,6 +72,35 @@ marker = os.path.join(state_dir, "active-" + sid + ".json")
 
 # Output types worth naming. Deliberately narrow: what a design skill hands back.
 OUTPUT_EXT = (".html", ".svg", ".pdf", ".pptx", ".png")
+
+ALLOWED_FONTS = {
+    "vert grotesk display", "inter", "plus jakarta sans",
+    # generic and system stacks are not a choice of typeface
+    "sans-serif", "serif", "system-ui", "ui-sans-serif", "monospace", "ui-monospace", "ui-serif",
+    "-apple-system", "blinkmacsystemfont", "segoe ui", "helvetica", "helvetica neue", "arial",
+    "sf mono", "sfmono-regular", "menlo", "consolas", "monaco", "courier new", "courier",
+    "inherit", "initial", "unset",
+}
+
+# Four flags about a file. The text is measured here and never leaves this function.
+def flags_for(text):
+    families = set()
+    for decl in re.findall(r"font-family\s*:\s*([^;}{]+)", text, re.I):
+        for part in decl.split(","):
+            n = part.strip().strip(" \"" + chr(39)).lower()
+            if not n or n.startswith("var(") or (n.startswith("-") and n != "-apple-system"):
+                continue
+            families.add(n)
+    for fam in re.findall(r"fonts\.googleapis\.com/css2?\?[^\"\s)]*?family=([A-Za-z0-9+]+)", text):
+        families.add(fam.replace("+", " ").lower())
+    foreign = [f for f in families if f not in ALLOWED_FONTS]
+    return {
+        "stamp": "gushwork-build" in text,
+        "tokens": "var(--gw-" in text,
+        "fonts": "foreign" if foreign else ("ok" if families else "none"),
+        "logo": ("assets/logo/gushwork" in text or "gushwork-logo" in text
+                 or "gushwork-symbol" in text or "M76.6088 4.56344" in text),
+    }
 
 def account_email():
     for base in (os.environ.get("CLAUDE_CONFIG_DIR"), os.path.expanduser("~")):
@@ -78,9 +122,11 @@ def version():
     except Exception:
         return ""
 
+SESS = hashlib.sha256(sid.encode()).hexdigest()[:12]
+
 def out(event, **extra):
     row = {"email": (account_email() or os.environ.get("GW_GIT_EMAIL", ""))[:160],
-           "version": version(), "event": event}
+           "version": version(), "event": event, "sess": SESS}
     row.update(extra)
     print(json.dumps(row))
 
@@ -122,7 +168,35 @@ elif tool == "Write":
     st.setdefault("files", []).append(base)
     with open(marker, "w") as f:
         json.dump(st, f)
-    out("file", file=base[:120])
+    extra = {}
+    # Only text formats can be measured. A Write of a PDF, deck or PNG carries no readable text.
+    if base.lower().endswith((".html", ".svg")):
+        extra["flags"] = flags_for(str(inp.get("content") or ""))
+    out("file", file=base[:120], **extra)
+
+elif tool == "Artifact":
+    st = load()
+    if st is None:
+        sys.exit(0)                      # no Gushwork skill has run in this session
+    if str(inp.get("action") or "publish") != "publish" or not inp.get("file_path"):
+        sys.exit(0)                      # a read, list or asset upload is not a published page
+    blob = json.dumps(d.get("tool_response") or "")
+    m = re.search(r"https://claude\.ai/(?:code/)?artifact/[A-Za-z0-9-]+", blob)
+    if not m:
+        sys.exit(0)                      # nothing was published, so there is no result to record
+    url = m.group(0)
+    if url in st.get("urls", []):
+        sys.exit(0)                      # a republish of the same page is not a new result
+    st.setdefault("urls", []).append(url)
+    with open(marker, "w") as f:
+        json.dump(st, f)
+    extra = {}
+    try:
+        with open(os.path.expanduser(str(inp.get("file_path")))) as f:
+            extra["flags"] = flags_for(f.read())
+    except Exception:
+        pass
+    out("artifact", url=url, **extra)
 ' 2>/dev/null)"
 
 if [ -n "$BODY" ]; then

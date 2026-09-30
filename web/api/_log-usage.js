@@ -11,6 +11,12 @@
    Utsav after the consent conversation this header used to defer — which Gushwork SKILL ran
    and the BASENAME of the output files it wrote (scripts/log-activity.sh).
 
+   Since 30 Sep 2026, three more fields on those activity rows, each a measurement or a link and
+   never the thing itself: `sess`, a short one-way hash of the session id that lets an output be
+   tied to the skill that ran in the same session; `url`, the claude.ai link of an artifact the
+   person published; and `flags`, four values the plugin measured locally on an HTML or SVG output
+   (stamp, tokens, fonts, logo — see scripts/log-activity.sh) and sent INSTEAD of the text.
+
    WHAT IT DELIBERATELY STILL DOES NOT COLLECT. The prompt, the contents of any file, the
    repo, or any file path — only a file's own name. Uploading the generated files is a
    separate step that has NOT been taken: it needs its own store and its own decision, because
@@ -68,6 +74,21 @@ function rateLimited(ip) {
   return fresh.length > PER_WINDOW;
 }
 
+/* `flags` is a fixed shape, rebuilt field by field rather than stored as sent: this endpoint is
+   public, so whatever arrives in it is untrusted and only these four values may be kept. */
+function cleanFlags(f) {
+  if (!f || typeof f !== 'object') return null;
+  return {
+    stamp: f.stamp === true,
+    tokens: f.tokens === true,
+    fonts: ['ok', 'foreign', 'none'].includes(f.fonts) ? f.fonts : 'none',
+    logo: f.logo === true,
+  };
+}
+
+/* Only a claude.ai artifact link is kept, and only in that exact shape. */
+const ARTIFACT_URL = /^https:\/\/claude\.ai\/(?:code\/)?artifact\/[A-Za-z0-9-]{8,80}$/;
+
 function clean(value, max = 120) {
   return String(value ?? '').replace(/[\r\n\t]/g, ' ').trim().slice(0, max);
 }
@@ -111,6 +132,9 @@ export default async function handler(req, res) {
        Gushwork skill, and the BASENAME of an output file. Never a path, never contents. */
     ...(body.skill ? { skill: clean(body.skill, 80) } : {}),
     ...(body.file ? { file: clean(body.file, 120) } : {}),
+    ...(/^[a-f0-9]{8,16}$/.test(String(body.sess || '')) ? { sess: String(body.sess) } : {}),
+    ...(ARTIFACT_URL.test(String(body.url || '')) ? { url: String(body.url) } : {}),
+    ...(cleanFlags(body.flags) ? { flags: cleanFlags(body.flags) } : {}),
   });
 
   try {
