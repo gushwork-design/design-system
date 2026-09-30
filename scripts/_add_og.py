@@ -3,10 +3,11 @@
 
     python3 scripts/_add_og.py <stage-dir>
 
-The hub's social card is one image (assets/og/hub.png, Figma 818:5074), except Staging, Tools and
-Templates, which carry the blue ad-page card (see PAGE_CARDS). Rather than paste the same
-ten lines into every page, and have them drift, this adds them at publish time to any staged page
-that does not already carry its own og:image. That is what lets the landers, the case-study and
+The hub's social card is one image (assets/og/hub.png, Figma 818:5074), including the Staging,
+Tools and Templates collection pages. A few individual staging items carry the blue ad-page card
+instead (see PAGE_CARDS). Rather than paste the same ten lines into every page, and have them
+drift, this adds them at publish time to any staged page that does not already carry its own
+og:image. That is what lets the landers, the case-study and
 ad-page templates, the email signature and the ID-card tool keep the cards they have: a page with its
 own og:image is left alone.
 
@@ -27,15 +28,17 @@ BASE = "https://design.gushwork.ai"
 IMAGE = BASE + "/assets/og/hub.png"
 SITE = "Gushwork Design"
 
-# Three pages carry the ad-page card instead of the hub's: the blue one with the white logo and the
-# page's own name, rendered from assets/ads/og-template.html (the template the ad landers, the
-# case-study and the ad-page templates use). Staging, Tools and Templates are where that kind of
-# work is shown, so they look like it. Route -> (image, name). Add a route here and list its PNG in
-# SOCIAL in publish-sheets.sh.
+# Staging items with no card of their own carry the blue ad-page card instead of the hub's: the white
+# logo over the item's name, rendered from assets/ads/og-template.html (the template the ad landers
+# and the case-study and ad-page templates use). The collection pages (Staging, Tools, Templates)
+# keep the hub card. Route -> (image, name). Add a route here and list its PNG in SOCIAL in
+# publish-sheets.sh. The ID card and email signature tools point at their cards from their own
+# <meta> tags, so they are not listed.
 PAGE_CARDS = {
-    "/internal/staging": ("staging.png", "Staging"),
-    "/internal/tools": ("tools.png", "Tools"),
-    "/internal/templates": ("templates.png", "Templates"),
+    "/internal/staging/case-study-gen-studio": ("case-study-gen-studio.png", "Case Study Gen Studio"),
+    "/internal/staging/crm-studio-deck/": ("crm-studio-deck.png", "CRM Studio discovery deck"),
+    "/internal/staging/homepage-neo/": ("homepage-neo.png", "Homepage Neo"),
+    "/internal/staging/social-creative/": ("social-creative.png", "Social creative"),
 }
 
 
