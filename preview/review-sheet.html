@@ -11,7 +11,12 @@
 :root[data-theme=dark]{--bg:#131518;--surface:#1b1e22;--ink:#f1f2f3;--ink2:#959ba4;--ink3:#6a7077;--line:#2a2e33}
 :root[data-theme=light]{--bg:#f1f2f3;--surface:#fff;--ink:#0d0d0d;--ink2:#6a7077;--ink3:#878b94;--line:#e7e8e9}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6;letter-spacing:-.002em;-webkit-font-smoothing:antialiased}
+/* Body/body-16-reg, the site-wide page default ruled 29 Sep 2026 (796:12917).
+   This sheet had its own 15/1.6 — the same shape, one step small. */
+body{margin:0;background:var(--bg);color:var(--ink);
+     font:var(--gw-text-body-16-reg);
+     letter-spacing:var(--gw-text-body-16-reg-tracking);
+     -webkit-font-smoothing:antialiased}
 .wrap{max-width:1420px;margin:0 auto;padding:56px 22px 96px;display:flex;flex-direction:column;gap:40px}
 h1{font-family:var(--display);font-weight:700;font-size:clamp(32px,5vw,50px);line-height:1.15;margin:0 0 12px;text-wrap:balance}
 h2{font-family:var(--display);font-weight:600;font-size:26px;margin:0;letter-spacing:0}
@@ -114,7 +119,7 @@ border-bottom:1px solid var(--line);padding-bottom:16px}.navinner{flex-direction
 </style>
 <div class="wrap">
 <header>
-<h1>Full review sheet</h1>
+<h1>Review Gate</h1>
 <p>Every variant below is rendered from values <strong>measured off the Figma component</strong>,
 not from the annotations. Open the node id beside each group and compare.</p>
 </header>
