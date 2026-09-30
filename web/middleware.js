@@ -120,12 +120,56 @@ function isPublic(pathname) {
   return PUBLIC_PATHS.some(p => pathname === p || pathname.startsWith(p + '/'));
 }
 
+/* ── link previews from behind the gate ─────────────────────────────────────
+   A link-preview bot has no cookie, so it gets the sign-in bounce and unfurls
+   the home page's card for every gated link. For those bots only, answer with
+   a stub that holds the page's own title and card image and nothing else.
+   The pairs come from og-map.json, which scripts/_add_og.py writes at publish
+   from the pages' own og tags; an unmapped path gets no stub and is gated as
+   usual. What this reveals is a page's title and its card image (already
+   public) to anyone who sends a bot's User-Agent. Ruled by Utsav 1 Oct 2026. */
+const UNFURL_BOTS = /Slackbot|Slack-ImgProxy|LinkedInBot|Twitterbot|facebookexternalhit|Facebot|WhatsApp|Discordbot|TelegramBot|Applebot|SkypeUriPreview/i;
+
+const esc = v => String(v).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+
+async function unfurlStub(request, url) {
+  if (request.method !== 'GET' && request.method !== 'HEAD') return null;
+  if (!UNFURL_BOTS.test(request.headers.get('user-agent') || '')) return null;
+  try {
+    const res = await fetch(new URL('/og-map.json', url));
+    if (!res.ok) return null;
+    const map = await res.json();
+    const hit = map[url.pathname.replace(/\/+$/, '')];
+    if (!hit) return null;
+    const [title, image] = hit;
+    const t = esc(title), i = esc(image);
+    return new Response(
+      '<!doctype html><meta charset="utf-8"><title>' + t + '</title>' +
+      '<meta property="og:type" content="website">' +
+      '<meta property="og:site_name" content="Gushwork Design">' +
+      '<meta property="og:title" content="' + t + '">' +
+      '<meta property="og:url" content="' + esc(url.origin + url.pathname) + '">' +
+      '<meta property="og:image" content="' + i + '">' +
+      '<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">' +
+      '<meta name="twitter:card" content="summary_large_image">' +
+      '<meta name="twitter:title" content="' + t + '"><meta name="twitter:image" content="' + i + '">',
+      { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } }
+    );
+  } catch (e) {
+    return null;
+  }
+}
+
 export default async function middleware(request) {
   /* Returning undefined continues to the next handler, which serves the file. */
   if (!GATE_ENABLED) return undefined;
 
   const url = new URL(request.url);
   if (isPublic(url.pathname)) return undefined;
+
+  const stub = await unfurlStub(request, url);
+  if (stub) return stub;
+
   const modes = authModes();
 
   /* Fail closed if there is no way in at all — an unconfigured gate must not
