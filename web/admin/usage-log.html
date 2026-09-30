@@ -222,6 +222,8 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
 @media (prefers-reduced-motion: reduce) { .sk { animation: none; } .ul-ib[aria-busy="true"] svg { animation: none; } }
 
 /* ── card-shell lg + section-header ──────────────────────────────────────────────────── */
+.ul-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gw-space-24); margin-top: var(--gw-space-24); }
+@media (max-width: 960px) { .ul-pair { grid-template-columns: minmax(0, 1fr); } }
 .ul-sec { background: var(--s-card-bg); box-shadow: inset 0 0 0 1px var(--s-card-border);
   border-radius: var(--gw-radius-16); padding: var(--gw-space-12); display: flex; flex-direction: column; gap: var(--gw-space-16); }
 .ul-sh { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-8);
@@ -253,7 +255,8 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
   flex-direction: column; gap: var(--gw-space-8); background: var(--ul-tip-bg); box-shadow: inset 0 0 0 1px var(--ul-tip-line), var(--gw-shadow-s2);
   border-radius: var(--gw-radius-4); }
 .ul-tip__h { display: flex; align-items: center; gap: 2px; font: var(--gw-text-body-10-med); color: var(--ul-tip-head); }
-.ul-tip__h svg { width: 12px; height: 12px; }
+/* .ul-plot svg (the chart) would otherwise pin this icon to the tooltip's corner */
+.ul-tip__h svg { position: static; inset: auto; flex: none; width: 12px; height: 12px; }
 .ul-tip__m { font: var(--gw-text-body-10-med); color: var(--ul-tip-main); }
 .ul-tip__b { border-left: 1px dashed var(--gw-color-neutral-500); padding: var(--gw-space-4) 0 var(--gw-space-4) var(--gw-space-8);
   display: flex; flex-direction: column; gap: var(--gw-space-4); }
@@ -264,8 +267,8 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
 
 /* ── Graph / Bar: bars are primary/500, 10 tall, radius 2 on the trailing corners only ─── */
 .ul-bars { display: flex; flex-direction: column; gap: var(--gw-space-20); padding: var(--gw-space-8) 0; }
-.ul-bars__r { display: grid; grid-template-columns: 96px minmax(0, 1fr); align-items: center; gap: var(--gw-space-12); }
-.ul-bars__l { font: 500 12px/1.2 var(--gw-font-body); letter-spacing: -.2px; color: var(--ul-cell); white-space: nowrap; }
+.ul-bars__r { display: grid; grid-template-columns: var(--ul-lw, 96px) minmax(0, 1fr); align-items: center; gap: var(--gw-space-12); }
+.ul-bars__l { font: 500 12px/1.2 var(--gw-font-body); letter-spacing: -.2px; color: var(--ul-cell); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ul-bars__t { padding-right: 52px; min-width: 0; }
 .ul-bar-b { position: relative; height: 10px; min-width: 2px; background: var(--gw-color-primary-500); border-radius: 0 2px 2px 0; }
 .ul-bar-b span { position: absolute; left: calc(100% + 4px); top: -2px; white-space: nowrap;
@@ -320,28 +323,55 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
 .ul-c--chk { display: flex; align-items: center; gap: var(--gw-space-8); overflow: visible; }
 .ul-c--out a { color: var(--ul-value); text-decoration: underline; text-underline-offset: 2px; }
 .ul-row--chat { cursor: pointer; }
-.ul-detail { display: grid; grid-template-columns: minmax(170px, 230px) minmax(0, 1fr); column-gap: var(--gw-space-32);
-  padding: var(--gw-space-16) var(--gw-space-24) var(--gw-space-20); min-width: 820px; background: var(--ul-hdr-bg);
-  box-shadow: inset 0 -1px 0 var(--ul-row-line); }
-.ul-detail__h { margin: 0 0 var(--gw-space-8); font: var(--gw-text-body-12-med); color: var(--ul-hdr-fg); text-transform: uppercase; }
-.ul-tl { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--gw-space-8); }
-.ul-tl li { display: flex; align-items: baseline; gap: var(--gw-space-8); font: var(--gw-text-body-12-med); color: var(--ul-cell); }
-.ul-tl li::before { content: ""; flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--ul-track); transform: translateY(-1px); }
-.ul-tl time { color: var(--ul-sub); min-width: 52px; }
-.ul-outs { display: flex; flex-direction: column; gap: var(--gw-space-8); }
-.ul-o { display: grid; grid-template-columns: 44px minmax(0, 1.2fr) minmax(0, 1.6fr) 150px; column-gap: var(--gw-space-12); align-items: center;
-  padding: var(--gw-space-8) var(--gw-space-12); background: var(--ul-field-bg); border: 1px solid var(--ul-hdr-line); border-radius: var(--gw-radius-8); }
+/* Each chat is a group: the row and its tray share one rounded container, so the open state reads as one object. */
+.ul-grp { position: relative; margin: 0 var(--gw-space-8); border-radius: var(--gw-radius-12); transition: background var(--gw-motion-fast); }
+.ul-grp:not(.is-open):hover { background: var(--ul-row-hover); }
+.ul-grp.is-open { background: var(--ul-hdr-bg); box-shadow: inset 0 0 0 1.5px var(--gw-color-primary-500); }
+.ul-grp.is-open .ul-row--chat .ul-when b, .ul-grp.is-open .ul-row--chat .ul-chat__t svg { color: var(--gw-color-primary-500); }
+.ul-grp.is-open .ul-row--chat .ul-c--who { font-weight: 600; }
+/* While one chat is open, the closed ones step back so the open one is unmistakable. */
+.ul-tbl:has(.ul-grp.is-open) .ul-grp:not(.is-open) .ul-row--d { opacity: .55; transition: opacity var(--gw-motion-fast); }
+.ul-tbl:has(.ul-grp.is-open) .ul-grp:not(.is-open):hover .ul-row--d { opacity: 1; }
+.ul-grp + .ul-grp::before { content: ""; position: absolute; top: 0; left: var(--gw-space-16); right: var(--gw-space-16); height: 1px; background: var(--ul-hdr-line); }
+.ul-grp:hover::before, .ul-grp:hover + .ul-grp::before, .ul-grp.is-open::before, .ul-grp.is-open + .ul-grp::before { display: none; }
+.ul-grp .ul-row--d { height: 64px; box-shadow: none; background: none; padding: 0 var(--gw-space-16); min-width: 0; }
+.ul-grp .ul-row--d:hover { background: none; }
+.ul-when { display: flex; flex-direction: column; gap: 1px; line-height: 1.3; }
+.ul-when b { font: var(--gw-text-body-12-med); color: var(--ul-value); }
+.ul-when span { font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.ul-chat__t { gap: var(--gw-space-12); }
+.ul-skill { display: inline-flex; align-items: center; height: 24px; padding: 0 var(--gw-space-8); border-radius: var(--gw-radius-full);
+  border: 1px solid var(--ul-hdr-line); background: var(--ul-field-bg); font: var(--gw-text-body-12-med); color: var(--ul-cell); }
+.ul-grp--quiet .ul-row--d .ul-c { opacity: .7; }
+.ul-detail { display: flex; flex-direction: column; gap: var(--gw-space-16); min-width: 0;
+  padding: var(--gw-space-4) var(--gw-space-16) var(--gw-space-16); }
+.ul-detail__top { display: flex; align-items: baseline; justify-content: space-between; gap: var(--gw-space-16); }
+.ul-detail__h { margin: 0; font: var(--gw-text-body-14-sem, 600 14px/1.4 var(--gw-font-body)); color: var(--ul-value); }
+.ul-detail__h span { margin-left: var(--gw-space-8); font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.ul-detail__sum { font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.ul-outs { display: flex; flex-direction: column; background: var(--ul-field-bg); border: 1px solid var(--ul-hdr-line);
+  border-radius: var(--gw-radius-12); overflow: hidden; }
+.ul-o { display: grid; grid-template-columns: 44px minmax(0, 1fr) 112px 160px; column-gap: var(--gw-space-16); align-items: center;
+  padding: var(--gw-space-12) var(--gw-space-16); }
+.ul-o + .ul-o { border-top: 1px solid var(--ul-hdr-line); }
 .ul-o__t { justify-self: start; height: 20px; padding: 0 var(--gw-space-8); display: inline-flex; align-items: center; border-radius: var(--gw-radius-4);
   background: var(--ul-tab-hover); color: var(--ul-cell); font: var(--gw-text-body-10-sem, 600 10px/1 var(--gw-font-body)); letter-spacing: .02em; }
 .ul-o__n { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--gw-text-body-12-med); color: var(--ul-value); }
 .ul-o__n a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
-.ul-o__n small { display: block; font: var(--gw-text-body-12-med); color: var(--ul-sub); text-decoration: none; }
-.ul-o__c { display: flex; align-items: center; gap: var(--gw-space-8); min-width: 0; font: var(--gw-text-body-12-med); }
+.ul-o__n small { display: block; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; font: var(--gw-text-body-12-med); color: var(--ul-sub); text-decoration: none; }
+.ul-o__b { display: flex; }
+.ul-act { display: flex; align-items: center; gap: var(--gw-space-16); flex-wrap: wrap; font: var(--gw-text-body-12-med); color: var(--ul-cell); }
+.ul-act__h { color: var(--ul-sub); }
+.ul-act ol { display: contents; margin: 0; padding: 0; list-style: none; }
+.ul-act li { display: inline-flex; align-items: baseline; gap: var(--gw-space-8); }
+.ul-act li + li::before { content: ""; align-self: center; width: 16px; height: 1px; background: var(--ul-track); margin-right: var(--gw-space-8); }
+.ul-act time { color: var(--ul-sub); }
 .ul-chips { display: flex; flex-wrap: wrap; gap: var(--gw-space-4); align-items: center; }
 .ul-chat__t { display: inline-flex; align-items: center; gap: var(--gw-space-8); background: none; border: 0; padding: 0; color: inherit; font: inherit; cursor: pointer; }
 .ul-chat__t svg { width: 12px; height: 12px; color: var(--ul-icon); transition: transform var(--gw-motion-fast); }
 .ul-row--chat[aria-expanded="true"] .ul-chat__t svg { transform: rotate(180deg); }
 .ul-scroll { overflow-x: auto; }
+.ul-tbl:has(.ul-grp) .ul-row--h { margin: 0 var(--gw-space-8); padding: 0 var(--gw-space-16); min-width: 0; border-radius: var(--gw-radius-8); }
 /* pagination: 52h, pad 12, space-between; arrows are icon-button 28 */
 .ul-pg { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-8); padding: var(--gw-space-12); flex-wrap: wrap; }
 .ul-pg__l, .ul-pg__r { display: flex; align-items: center; gap: var(--gw-space-8); }
@@ -399,15 +429,17 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
         <div class="ul-inner" id="ul-chart"></div>
       </section>
 
-      <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="ul-h-ver">
+      <div class="ul-pair">
+      <section class="ul-sec" aria-labelledby="ul-h-ver">
         <div class="ul-sh"><div class="ul-sh__t"><h2 id="ul-h-ver">Versions</h2><span class="ul-sh__q" id="ul-q-ver"></span></div></div>
         <div class="ul-inner" id="ul-versions"></div>
       </section>
 
-      <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="ul-h-skills">
+      <section class="ul-sec" aria-labelledby="ul-h-skills">
         <div class="ul-sh"><div class="ul-sh__t"><h2 id="ul-h-skills">Skills</h2><span class="ul-sh__q" id="ul-q-skills"></span></div></div>
         <div class="ul-inner" id="ul-skills"></div>
       </section>
+      </div>
 
       <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="ul-h-out">
         <div class="ul-sh"><div class="ul-sh__t"><h2 id="ul-h-out">Outputs</h2><span class="ul-sh__q" id="ul-q-out"></span></div></div>
@@ -650,7 +682,7 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
     $('ul-q-ver').textContent = 'sessions by plugin version, ' + PERIOD_NAME[S.period];
     if (!m.vers.length) { host.innerHTML = '<p class="ul-note-line">No sessions in this period.</p>'; return; }
     var max = m.vers.reduce(function (a, v) { return Math.max(a, m.byVer[v]); }, 0);
-    host.innerHTML = '<div class="ul-bars">' + m.vers.map(function (v) {
+    host.innerHTML = '<div class="ul-bars" style="--ul-lw:' + lblW(m.vers) + '">' + m.vers.map(function (v) {
       var n = m.byVer[v];
       /* each label shares a grid row with its bar, so the two cannot drift apart */
       return '<div class="ul-bars__r"><span class="ul-bars__l">' + esc(v) + '</span><div class="ul-bars__t"><div class="ul-bar-b" style="width:' +
@@ -667,7 +699,7 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
       return;
     }
     var max = m.bySkill[m.skills[0]];
-    host.innerHTML = '<div class="ul-bars">' + m.skills.map(function (k) {
+    host.innerHTML = '<div class="ul-bars" style="--ul-lw:' + lblW(m.skills.map(function (k) { return k.replace(/^.*:/, ''); })) + '">' + m.skills.map(function (k) {
       var n = m.bySkill[k];
       return '<div class="ul-bars__r"><span class="ul-bars__l" title="' + esc(k) + '">' + esc(k.replace(/^.*:/, '')) + '</span><div class="ul-bars__t"><div class="ul-bar-b" style="width:' +
         (n / max * 100).toFixed(1) + '%"><span>' + n + '</span></div></div></div>';
@@ -733,6 +765,8 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
   }
   /* The collapsed row says what is inside without opening it: how many outputs, and whether any is
      off-brand or approved. The outputs themselves stay hidden until the chat is opened. */
+  /* Label column sized to the longest label, so a long skill name is never clipped under its bar. */
+  function lblW(list) { var n = list.reduce(function (a, x) { return Math.max(a, String(x).length); }, 0); return Math.max(96, Math.round(n * 7.4) + 8) + 'px'; }
   function chatChips(c) {
     var outs = c.rows.filter(isOut), sk = c.rows.filter(function (r) { return r.event === 'skill'; }).length;
     if (!outs.length && !sk) return '<span class="ul-c--none">Started only</span>';
@@ -823,31 +857,43 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
       c.rows.forEach(function (r) { if (r.event !== 'skill') { var i = skillInfo(r, m); if (i.n && skills.indexOf(i.n) === -1) skills.push(i.n); } });
       var badge = (m.newest && c.version === m.newest) ? '<span class="ul-badge ul-badge--ok">Newest</span>' : '';
       var who = c.email ? '<div class="ul-c ul-c--who" role="cell" title="' + esc(c.email) + '">' + esc(c.email) + '</div>' : '<div class="ul-c ul-c--none" role="cell">Not identified</div>';
+      var dayS = c.at.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+      var timeS = c.at.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+      var quiet = !c.rows.some(function (r) { return r.event === 'skill' || isOut(r); });
       var parent = '<div class="ul-row ul-row--d ul-row--chat" role="row" data-chat="' + esc(c.key) + '" aria-expanded="' + open + '" tabindex="0">' +
-        '<div class="ul-c" role="cell" title="' + esc(c.at.toISOString()) + '"><span class="ul-chat__t">' + icon('caret-down') + esc(fmtWhen(c.at)) + '</span></div>' + who +
+        '<div class="ul-c" role="cell" title="' + esc(c.at.toISOString()) + '"><span class="ul-chat__t">' + icon('caret-down') + '<span class="ul-when"><b>' + esc(dayS) + '</b><span>' + esc(timeS) + '</span></span></span></div>' + who +
         '<div class="ul-c ul-c--ver" role="cell">' + esc(c.version || 'Unknown') + badge + '</div>' +
-        '<div class="ul-c' + (skills.length ? '' : ' ul-c--none') + '" role="cell" title="' + esc(skills.join(', ')) + '">' + esc(skills.length ? skills.join(', ') : '') + '</div>' +
+        '<div class="ul-c" role="cell" title="' + esc(skills.join(', ')) + '" style="overflow:visible">' + skills.map(function (n) { return '<span class="ul-skill">' + esc(n) + '</span>'; }).join(' ') + '</div>' +
         '<div class="ul-c" role="cell" title="' + esc(chatSummary(c)) + '" style="overflow:visible">' + chatChips(c) + '</div></div>';
-      if (!open) return parent;
+      var grp = function (inner) { return '<div class="ul-grp' + (open ? ' is-open' : '') + (quiet ? ' ul-grp--quiet' : '') + '">' + inner + '</div>'; };
+      if (!open) return grp(parent);
       var time = function (r) { return r.at.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }); };
       var acts = c.rows.filter(function (r) { return !isOut(r); }).map(function (r) {
         var txt = r.event === 'skill' ? 'Ran ' + (r.skill || 'a skill').replace(/^.*:/, '') : 'Session started';
         return '<li><time datetime="' + esc(r.at.toISOString()) + '">' + esc(time(r)) + '</time><span>' + esc(txt) + '</span></li>';
       }).join('');
-      var outs = c.rows.filter(isOut).map(function (r) {
+      var outRows = c.rows.filter(isOut);
+      var outs = outRows.map(function (r) {
         var isArt = r.event === 'artifact';
         var ext = isArt ? 'LINK' : (r.file.split('.').pop() || '').toUpperCase().slice(0, 4);
         var name = isArt
           ? '<a href="' + esc(r.url) + '" target="_blank" rel="noopener">Artifact ' + esc(r.url.replace(/^.*\//, '').slice(0, 8)) + '…</a>'
           : fileLink(r, r.file);
-        var kept = isArt || fileHref(r) ? '' : '<small>Name only, no copy kept</small>';
+        var notes = [];
+        if (!isArt && !fileHref(r)) notes.push('Name only, no copy kept');
+        if (r.flags && !onBrand(r.flags)) notes.push(whyOff(r.flags));
+        else if (r.flags) notes.push(r.flags.stamp ? 'Built by a skill' : 'Tokens and fonts ok');
         return '<div class="ul-o"><span class="ul-o__t">' + esc(ext) + '</span>' +
-          '<div class="ul-o__n" title="' + esc(isArt ? r.url : r.file) + '">' + name + kept + '</div>' +
-          '<div class="ul-o__c">' + checksHTML(r) + '</div><div>' + outcomeHTML(r) + '</div></div>';
+          '<div class="ul-o__n" title="' + esc(isArt ? r.url : r.file) + '">' + name + (notes.length ? '<small>' + esc(notes.join(' · ')) + '</small>' : '') + '</div>' +
+          '<div class="ul-o__b">' + checkBadge(r) + '</div><div>' + outcomeHTML(r) + '</div></div>';
       }).join('');
-      return parent + '<div class="ul-detail" role="row">' +
-        '<div><h3 class="ul-detail__h">Activity</h3><ul class="ul-tl">' + (acts || '<li><span>Nothing else recorded</span></li>') + '</ul></div>' +
-        '<div><h3 class="ul-detail__h">Outputs</h3>' + (outs ? '<div class="ul-outs">' + outs + '</div>' : '<p class="ul-note-line">No outputs from this chat.</p>') + '</div></div>';
+      var off = outRows.filter(function (r) { return r.flags && !onBrand(r.flags); }).length;
+      var done = outRows.filter(function (r) { return S.outcomes[r.key]; }).length;
+      var sum = outRows.length ? [off ? off + ' off-brand' : '', done + ' of ' + outRows.length + ' reviewed'].filter(Boolean).join(' · ') : '';
+      return grp(parent + '<div class="ul-detail" role="row">' +
+        '<div class="ul-detail__top"><h3 class="ul-detail__h">Outputs<span>' + outRows.length + '</span></h3><span class="ul-detail__sum">' + esc(sum) + '</span></div>' +
+        (outs ? '<div class="ul-outs">' + outs + '</div>' : '<p class="ul-note-line">No outputs from this chat.</p>') +
+        '<div class="ul-act"><span class="ul-act__h">Activity</span><ol>' + (acts || '<li><span>Nothing else recorded</span></li>') + '</ol></div></div>');
     }).join('');
     tbl.innerHTML = head + (slice.length ? body :
       '<div class="ul-empty"><div class="ul-empty__copy"><h2>No chats match</h2><p>Clear the search or pick another version to see the log again.</p></div></div>');
@@ -940,6 +986,12 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
       metricCard('Needs changes', String(chg), 'marked by an owner');
   }
   /* The checks and the verdict control for one output, shared by the chat rows. */
+  function checkBadge(r) {
+    var f = r.flags;
+    if (!f) return '<span class="ul-badge">Not measured</span>';
+    var ok = onBrand(f);
+    return '<span class="ul-badge ' + (ok ? 'ul-badge--ok' : 'ul-badge--bad') + '" title="tokens ' + (f.tokens ? 'yes' : 'no') + ', fonts ' + esc(f.fonts) + ', logo ' + (f.logo ? 'yes' : 'no') + ', stamp ' + (f.stamp ? 'yes' : 'no') + '">' + (ok ? 'On-brand' : 'Off-brand') + '</span>';
+  }
   function checksHTML(r) {
     var f = r.flags;
     if (!f) return '<span class="ul-c--none">Not measured</span>';
