@@ -2260,3 +2260,22 @@
   :root:not([data-theme="light"]) .pa.is-done .pa__main { color: var(--gw-color-primary-400); }
   :root:not([data-theme="light"]) .gw-prose a.gw-inline-link:hover { color: var(--gw-color-primary-300); }
 }
+
+/* The owner and admin avatar tile is Neutral/black, which on the dark card is black on black, so the
+   tile vanished and only its dots floated. A hairline ring drawn over it (an overlay, because the
+   tile's own SVG fill would cover an inset shadow on the box) gives it back its frame. Same radius as
+   the tile. The light theme is untouched: there the tile reads against white. */
+:root[data-theme="dark"] .gw-user__av { position: relative; }
+:root[data-theme="dark"] .gw-user__av::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  border-radius: var(--gw-radius-8);
+  box-shadow: inset 0 0 0 1px var(--gw-color-neutral-850);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .gw-user__av { position: relative; }
+  :root:not([data-theme="light"]) .gw-user__av::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    border-radius: var(--gw-radius-8);
+    box-shadow: inset 0 0 0 1px var(--gw-color-neutral-850);
+  }
+}
