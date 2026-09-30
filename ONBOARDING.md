@@ -26,8 +26,12 @@ Claude Code. Nothing to do at all if your repo has a `.claude/settings.json` men
 **What the plugin logs.** When a Claude session starts with the plugin installed, it records who you
 are (your Claude account email, or your git email if that is missing), which plugin version you are
 on, and when. When you run a Gushwork skill it also records the skill's name, and the file names
-(not the contents, not the folder) of any page or document it writes in that session. It never
-records your prompts or what is inside your files. It exists so we can see whether the design system
+(not the contents, not the folder) of any page or document it writes in that session, and the link
+of any Claude artifact you publish in it. For an HTML or SVG output or a published artifact it
+checks, on your machine, whether the page uses the Gushwork tokens, only the brand typefaces, the
+real logo and the build stamp, and sends those four yes/no answers instead of the text. A session
+is tied to its outputs by a short one-way hash that cannot be turned back into your session id. It
+never records your prompts or what is inside your files. It exists so we can see whether the design system
 is being used, what for, and who is running an old version. To turn it off, set
 `GW_NO_USAGE_PING=1` in your shell.
 

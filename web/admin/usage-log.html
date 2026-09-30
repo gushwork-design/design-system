@@ -315,6 +315,12 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
 .ul-badge { display: inline-flex; align-items: center; height: 20px; padding: 0 var(--gw-space-8); border-radius: var(--gw-radius-4);
   font: var(--gw-text-button-12); background: var(--ul-b-no-bg); color: var(--ul-b-no-fg); }
 .ul-badge--ok { background: var(--ul-b-ok-bg); color: var(--ul-b-ok-fg); }
+.ul-badge--bad { background: var(--gw-color-red-alpha-10); color: var(--gw-color-red-600); }
+:root[data-theme="dark"] .ul-badge--bad { color: var(--gw-color-red-300); }
+/* Outputs table: its own grid, same rules as .ul-row (fixed first track, floors on the rest). */
+.ul-row--o { grid-template-columns: 120px minmax(140px, 1.1fr) minmax(150px, 1.2fr) minmax(140px, .9fr) minmax(210px, 1.5fr) 150px; min-width: 1000px; }
+.ul-c--chk { display: flex; align-items: center; gap: var(--gw-space-8); overflow: visible; }
+.ul-c--out a { color: var(--ul-value); text-decoration: underline; text-underline-offset: 2px; }
 .ul-scroll { overflow-x: auto; }
 /* pagination: 52h, pad 12, space-between; arrows are icon-button 28 */
 .ul-pg { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-8); padding: var(--gw-space-12); flex-wrap: wrap; }
@@ -345,7 +351,7 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
 
   <header class="sg__hd">
     <h1>Usage Logs</h1>
-    <p>Who starts a Claude session, which skills they run and the names of the files they make. Never the prompts or file contents</p>
+    <p>Who starts a Claude session, which skills they run, what they make and whether it is on-brand. Never the prompts or file contents</p>
   </header>
 
   <main class="sg__main">
@@ -383,6 +389,12 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
         <div class="ul-inner" id="ul-skills"></div>
       </section>
 
+      <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="ul-h-out">
+        <div class="ul-sh"><div class="ul-sh__t"><h2 id="ul-h-out">Outputs</h2><span class="ul-sh__q" id="ul-q-out"></span></div></div>
+        <div class="ul-inner"><div class="ul-metrics" id="ul-out-metrics" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr))"></div></div>
+        <div class="ul-scroll"><div class="ul-tbl" id="ul-out" role="table" aria-label="Outputs made with the skills"></div></div>
+      </section>
+
       <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="ul-h-log">
         <div class="ul-sh">
           <div class="ul-sh__t"><h2 id="ul-h-log">Log</h2><span class="ul-sh__q" id="ul-q-log"></span></div>
@@ -393,7 +405,7 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
             <label class="ul-select"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Filter by version</span>
               <select id="ul-ver"></select><span class="ul-i-caret"></span></label>
             <label class="ul-select"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Filter by event</span>
-              <select id="ul-evt"><option value="">All events</option><option value="session">Sessions</option><option value="skill">Skills</option><option value="file">Files</option></select><span class="ul-i-caret"></span></label>
+              <select id="ul-evt"><option value="">All events</option><option value="session">Sessions</option><option value="skill">Skills</option><option value="file">Files</option><option value="artifact">Artifacts</option></select><span class="ul-i-caret"></span></label>
           </div>
         </div>
         <div class="ul-scroll"><div class="ul-tbl" id="ul-table" role="table" aria-label="Activity log"></div></div>
@@ -423,7 +435,7 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
   function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
 
   var S = { status: 'loading', rows: [], period: '30', q: '', ver: '', sortKey: 'at', sortDir: -1,
-            evt: '', page: 1, per: 25, fetchedAt: 0, busy: false, skipped: 0, capped: false };
+            evt: '', outcomes: {}, page: 1, per: 25, fetchedAt: 0, busy: false, skipped: 0, capped: false };
   var DAY = 86400000;
 
   /* ── data ───────────────────────────────────────────────────────────────────────── */
@@ -433,7 +445,9 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
       var r = raw[i], d = new Date(r.at);
       if (isNaN(d.getTime())) continue;
       out.push({ at: d, email: String(r.email || '').trim().toLowerCase(), version: String(r.version || '').trim(),
-                 event: String(r.event || ''), skill: String(r.skill || ''), file: String(r.file || '') });
+                 event: String(r.event || ''), skill: String(r.skill || ''), file: String(r.file || ''),
+                 key: String(r.at), sess: String(r.sess || ''), url: String(r.url || ''),
+                 flags: r.flags && typeof r.flags === 'object' ? r.flags : null });
     }
     return out;
   }
@@ -647,6 +661,7 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
       if (S.evt === 'session' && !isSess(r)) return false;
       if (S.evt === 'skill' && r.event !== 'skill') return false;
       if (S.evt === 'file' && r.event !== 'file') return false;
+      if (S.evt === 'artifact' && r.event !== 'artifact') return false;
       if (!q) return true;
       return r.email.indexOf(q) !== -1 || r.version.toLowerCase().indexOf(q) !== -1 ||
              r.skill.toLowerCase().indexOf(q) !== -1 || r.file.toLowerCase().indexOf(q) !== -1;
@@ -664,6 +679,7 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
   function evtText(r) {
     if (r.event === 'skill') return 'Skill: ' + (r.skill || 'unknown').replace(/^.*:/, '');
     if (r.event === 'file') return 'File: ' + (r.file || 'unknown');
+    if (r.event === 'artifact') return 'Artifact: ' + (r.url ? r.url.replace(/^https:\/\/claude\.ai\//, '') : 'unknown');
     return 'Session start';
   }
   function th(key, label) {
@@ -712,6 +728,90 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
     if (keep && m.vers.indexOf(keep) === -1) S.ver = '';
   }
 
+  /* ── outputs ─────────────────────────────────────────────────────────────
+     What the skills MADE: a file written or a page published in a session where a Gushwork skill
+     had run. The plugin measured each one locally and sent four flags (stamp, tokens, fonts, logo)
+     instead of the text, so "on-brand" here is a measurement, not a review. On-brand means it uses
+     the tokens and names no typeface outside the system. Whether it was GOOD is the verdict, which
+     is the owner's and is kept apart from the log so a usage row is never rewritten. */
+  function isOut(r) { return r.event === 'file' || r.event === 'artifact'; }
+  function onBrand(f) { return !!f && f.tokens === true && f.fonts !== 'foreign'; }
+  function whyOff(f) {
+    var w = [];
+    if (!f.tokens) w.push('no tokens');
+    if (f.fonts === 'foreign') w.push('other typeface');
+    return w.join(', ');
+  }
+  function skillFor(r, m) {
+    if (!r.sess) return '';
+    var best = null;
+    m.all.forEach(function (x) {
+      if (x.event === 'skill' && x.sess === r.sess && x.at <= r.at && (!best || x.at > best.at)) best = x;
+    });
+    return best ? best.skill.replace(/^.*:/, '') : '';
+  }
+  function renderOutputs(m) {
+    var mt = $('ul-out-metrics'), tbl = $('ul-out'), q = $('ul-q-out');
+    if (S.status === 'loading') { mt.innerHTML = ['Outputs', 'On-brand', 'Approved', 'Needs changes'].map(skelMetric).join(''); tbl.innerHTML = ''; q.textContent = ''; return; }
+    var outs = m.curAll.filter(isOut).sort(function (a, b) { return b.at - a.at; });
+    var measured = outs.filter(function (r) { return r.flags; });
+    var on = measured.filter(function (r) { return onBrand(r.flags); }).length;
+    var appr = outs.filter(function (r) { return S.outcomes[r.key] === 'approved'; }).length;
+    var chg = outs.filter(function (r) { return S.outcomes[r.key] === 'changes'; }).length;
+    q.textContent = plural(outs.length, 'output') + ', ' + PERIOD_NAME[S.period];
+    mt.innerHTML =
+      metricCard('Outputs', String(outs.length), plural(outs.filter(function (r) { return r.event === 'artifact'; }).length, 'artifact') + ' published') +
+      metricCard('On-brand', measured.length ? Math.round(on / measured.length * 100) + '%' : 'None', measured.length ? on + ' of ' + measured.length + ' measured' : 'Nothing measured yet') +
+      metricCard('Approved', String(appr), 'marked by an owner') +
+      metricCard('Needs changes', String(chg), 'marked by an owner');
+    if (!outs.length) {
+      tbl.innerHTML = '<div class="ul-empty"><div class="ul-empty__copy"><h2>No outputs yet</h2><p>Outputs appear when a Gushwork skill has run and the session then writes an HTML or SVG file, a PDF, a deck, an image, or publishes an artifact. They start arriving on plugin 1.54.0.</p></div></div>';
+      return;
+    }
+    var head = '<div class="ul-row ul-row--o ul-row--h" role="row"><div role="columnheader"><span class="ul-th"><span class="ul-th--plain">When</span></span></div>' +
+      '<div role="columnheader"><span class="ul-th"><span class="ul-th--plain">Person</span></span></div>' +
+      '<div role="columnheader"><span class="ul-th"><span class="ul-th--plain">Output</span></span></div>' +
+      '<div role="columnheader"><span class="ul-th"><span class="ul-th--plain">Skill</span></span></div>' +
+      '<div role="columnheader"><span class="ul-th"><span class="ul-th--plain">Checks</span></span></div>' +
+      '<div role="columnheader"><span class="ul-th"><span class="ul-th--plain">Outcome</span></span></div></div>';
+    var body = outs.slice(0, 25).map(function (r) {
+      var who = r.email ? '<div class="ul-c ul-c--who" role="cell" title="' + esc(r.email) + '">' + esc(r.email) + '</div>' : '<div class="ul-c ul-c--none" role="cell">Not identified</div>';
+      var what = r.event === 'artifact'
+        ? '<a href="' + esc(r.url) + '" target="_blank" rel="noopener">Artifact ' + esc(r.url.replace(/^.*\//, '').slice(0, 8)) + '…</a>'
+        : esc(r.file);
+      var f = r.flags, chk;
+      if (!f) chk = '<span class="ul-c--none">Not measured</span>';
+      else {
+        var ok = onBrand(f);
+        chk = '<span class="ul-badge ' + (ok ? 'ul-badge--ok' : 'ul-badge--bad') + '">' + (ok ? 'On-brand' : 'Off-brand') + '</span>' +
+          '<span class="ul-c--none" title="tokens ' + (f.tokens ? 'yes' : 'no') + ', fonts ' + esc(f.fonts) + ', logo ' + (f.logo ? 'yes' : 'no') + ', stamp ' + (f.stamp ? 'yes' : 'no') + '">' +
+          esc(ok ? (f.stamp ? 'built by a skill' : 'tokens and fonts ok') : whyOff(f)) + '</span>';
+      }
+      var v = S.outcomes[r.key] || '';
+      var sel = '<label class="ul-select ul-select--sm"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Outcome</span>' +
+        '<select data-outcome="' + esc(r.key) + '"><option value=""' + (v === '' ? ' selected' : '') + '>Not reviewed</option><option value="approved"' + (v === 'approved' ? ' selected' : '') +
+        '>Approved</option><option value="changes"' + (v === 'changes' ? ' selected' : '') + '>Needs changes</option></select>' + icon('caret-down') + '</label>';
+      return '<div class="ul-row ul-row--o ul-row--d" role="row"><div class="ul-c" role="cell" title="' + esc(r.at.toISOString()) + '">' + esc(fmtWhen(r.at)) + '</div>' + who +
+        '<div class="ul-c ul-c--out" role="cell" title="' + esc(r.event === 'artifact' ? r.url : r.file) + '">' + what + '</div>' +
+        '<div class="ul-c" role="cell">' + esc(skillFor(r, m) || 'Unknown') + '</div>' +
+        '<div class="ul-c ul-c--chk" role="cell">' + chk + '</div><div class="ul-c" role="cell">' + sel + '</div></div>';
+    }).join('');
+    tbl.innerHTML = head + body + (outs.length > 25 ? '<p class="ul-note-line" style="padding:var(--gw-space-12) var(--gw-space-24)">Showing the newest 25 of ' + outs.length + '.</p>' : '');
+  }
+  $('ul-out').addEventListener('change', function (e) {
+    var sel = e.target.closest('select[data-outcome]'); if (!sel) return;
+    var key = sel.getAttribute('data-outcome'), want = sel.value, before = S.outcomes[key] || '';
+    if (want) S.outcomes[key] = want; else delete S.outcomes[key];
+    render();
+    fetch(API, { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ at: key, status: want }) })
+      .then(function (r) { if (!r.ok) throw new Error('http ' + r.status); })
+      .catch(function () {
+        /* The verdict did not save, so put the control back rather than show one that is not true. */
+        if (before) S.outcomes[key] = before; else delete S.outcomes[key];
+        render();
+      });
+  });
+
   /* ── page-level states. The whole page reads one source, so when it cannot be read there
         is nothing to keep the shape of: one empty-state, not five zeroed cards. ───────── */
   var BLOCK = {
@@ -741,7 +841,7 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
     $('ul-bar').hidden = blocked;
     if (blocked) { renderBlocked(S.status); updated(); return; }
     var m = compute();
-    renderCards(m); renderChart(m); renderVersions(m); renderSkills(m);
+    renderCards(m); renderChart(m); renderVersions(m); renderSkills(m); renderOutputs(m);
     if (S.status === 'ready') renderVerFilter(m);
     renderLog(m); updated();
     document.querySelectorAll('.ul-tab').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-period') === S.period)); });
@@ -763,7 +863,7 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
     }).then(function (j) {
       if (!j) return;
       if (!j.configured) { S.status = 'unconfigured'; return; }
-      S.rows = parse(j.rows || []); S.skipped = j.skipped || 0; S.capped = !!j.capped; S.fetchedAt = Date.now();
+      S.outcomes = j.outcomes || {}; S.rows = parse(j.rows || []); S.skipped = j.skipped || 0; S.capped = !!j.capped; S.fetchedAt = Date.now();
       S.status = S.rows.length ? 'ready' : 'empty';
     }).catch(function () { S.status = 'error'; }).then(function () {
       S.busy = false; $('ul-refresh').removeAttribute('aria-busy'); render();
