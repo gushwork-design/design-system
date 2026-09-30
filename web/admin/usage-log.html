@@ -368,6 +368,7 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
 .ul-grp:not(.is-open):hover { background: var(--ul-row-hover); }
 .ul-grp.is-open { background: var(--ul-hdr-bg); }
 .ul-grp.is-open .ul-row--chat .ul-when b, .ul-grp.is-open .ul-row--chat .ul-chat__t svg { color: var(--gw-color-primary-500); }
+:root[data-theme="dark"] .ul-grp.is-open .ul-row--chat .ul-when b, :root[data-theme="dark"] .ul-grp.is-open .ul-row--chat .ul-chat__t svg { color: var(--gw-color-primary-400); }
 .ul-grp.is-open .ul-row--chat .ul-c--who { font-weight: 600; }
 /* While one chat is open, the closed ones step back so the open one is unmistakable. */
 .ul-tbl:has(.ul-grp.is-open) .ul-grp:not(.is-open) .ul-row--d { opacity: .55; transition: opacity var(--gw-motion-fast); }

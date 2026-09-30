@@ -124,8 +124,8 @@
     /* measured — audit §12 row "the selected stat in dark mode is neutral-600
        and hover should be 700", confirmed by Utsav against the dark frame */
     --s-nav-sel:       var(--gw-color-neutral-900);
-    --s-nav-hover:     var(--gw-color-neutral-900);
-    --s-nav-row-hover: var(--gw-color-neutral-900);
+    --s-nav-hover:     color-mix(in srgb, var(--gw-color-neutral-900) 55%, transparent);  /* softer than selected */
+    --s-nav-row-hover: color-mix(in srgb, var(--gw-color-neutral-900) 55%, transparent);  /* softer than selected */
 
     /* measured — audit line 358: the nav label tracks to white in dark */
     --s-nav-label:     var(--gw-color-white);
@@ -173,8 +173,8 @@
   /* measured — audit §12 row "the selected stat in dark mode is neutral-600
      and hover should be 700", confirmed by Utsav against the dark frame */
   --s-nav-sel:       var(--gw-color-neutral-900);
-  --s-nav-hover:     var(--gw-color-neutral-900);
-  --s-nav-row-hover: var(--gw-color-neutral-900);
+  --s-nav-hover:     color-mix(in srgb, var(--gw-color-neutral-900) 55%, transparent);  /* softer than selected */
+  --s-nav-row-hover: color-mix(in srgb, var(--gw-color-neutral-900) 55%, transparent);  /* softer than selected */
 
   /* measured — audit line 358: the nav label tracks to white in dark */
   --s-nav-label:     var(--gw-color-white);
@@ -651,9 +651,6 @@
   background: var(--s-card-bg);
   border: 1px solid var(--s-card-border);
   border-radius: var(--gw-radius-12);
-  /* No divider. It existed to separate the card from a rail that had its own
-     fill; the rail is now the page ground and 791:2678 draws no line. */
-  border-top: 0;
 }
 /* The mark draws its own tile — fill, radius and dots all live in the SVG, so the
    span is just a 40x40 box. Measured 791:2827. No border and no background: a
@@ -2235,4 +2232,31 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .gw-search { box-shadow: inset 0 0 0 1px var(--gw-color-neutral-900); }
   :root:not([data-theme="light"]) .gw-pal__foot b { background: var(--gw-color-neutral-900); }
+}
+
+/* "On this page" in dark. The dark link colour (:root[data-theme] .idx a) outranks .idx a:hover and
+   .idx a.now, so neither state showed. Restated at the same weight: hover goes to white, the
+   current section to a light blue (the brand blue at 500 is under 4.5:1 on black), so the two read
+   as different things. */
+:root[data-theme="dark"] .idx a:hover { color: var(--gw-color-white); }
+:root[data-theme="dark"] .idx a.now { color: var(--gw-color-primary-400); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .idx a { color: var(--s-body); }
+  :root:not([data-theme="light"]) .idx a:hover { color: var(--gw-color-white); }
+  :root:not([data-theme="light"]) .idx a.now { color: var(--gw-color-primary-400); }
+}
+
+/* Blue TEXT in dark. The brand blue at 500 is about 4.1:1 on black, under the 4.5 a body-size link
+   needs, so text that is blue takes Primary/400 (about 6:1). Fills, borders and icons stay at 500. */
+:root[data-theme="dark"] .gw-prose a.gw-inline-link,
+:root[data-theme="dark"] .gw-pal__row mark,
+:root[data-theme="dark"] .gw-soon a,
+:root[data-theme="dark"] .pa.is-done .pa__main { color: var(--gw-color-primary-400); }
+:root[data-theme="dark"] .gw-prose a.gw-inline-link:hover { color: var(--gw-color-primary-300); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .gw-prose a.gw-inline-link,
+  :root:not([data-theme="light"]) .gw-pal__row mark,
+  :root:not([data-theme="light"]) .gw-soon a,
+  :root:not([data-theme="light"]) .pa.is-done .pa__main { color: var(--gw-color-primary-400); }
+  :root:not([data-theme="light"]) .gw-prose a.gw-inline-link:hover { color: var(--gw-color-primary-300); }
 }
