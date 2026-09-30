@@ -2245,3 +2245,18 @@
   :root:not([data-theme="light"]) .idx a:hover { color: var(--gw-color-white); }
   :root:not([data-theme="light"]) .idx a.now { color: var(--gw-color-primary-400); }
 }
+
+/* Blue TEXT in dark. The brand blue at 500 is about 4.1:1 on black, under the 4.5 a body-size link
+   needs, so text that is blue takes Primary/400 (about 6:1). Fills, borders and icons stay at 500. */
+:root[data-theme="dark"] .gw-prose a.gw-inline-link,
+:root[data-theme="dark"] .gw-pal__row mark,
+:root[data-theme="dark"] .gw-soon a,
+:root[data-theme="dark"] .pa.is-done .pa__main { color: var(--gw-color-primary-400); }
+:root[data-theme="dark"] .gw-prose a.gw-inline-link:hover { color: var(--gw-color-primary-300); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .gw-prose a.gw-inline-link,
+  :root:not([data-theme="light"]) .gw-pal__row mark,
+  :root:not([data-theme="light"]) .gw-soon a,
+  :root:not([data-theme="light"]) .pa.is-done .pa__main { color: var(--gw-color-primary-400); }
+  :root:not([data-theme="light"]) .gw-prose a.gw-inline-link:hover { color: var(--gw-color-primary-300); }
+}

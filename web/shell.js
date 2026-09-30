@@ -332,10 +332,10 @@
         '<button class="gw-iconbtn" type="button" data-theme-trigger data-tip="Appearance" ' +
                 'aria-haspopup="menu" aria-expanded="false" ' +
                 'aria-label="Colour theme: ' + esc(current.label) + '">' +
-          /* A constant display glyph, per Figma 791:2637 — the trigger says
-             "theme lives here", it does not mirror the current state. The menu
-             below is what shows which one is active. */
-          icon('desktop') +
+          /* The glyph of the ACTIVE theme (sun for light, moon for dark). It was a constant
+             display glyph per Figma 791:2637; changed 30 Sep 2026 at Utsav's call so the
+             button answers "which theme am I in" without opening the menu. */
+          icon(current.icon) +
         '</button>' +
         '<div class="gw-theme__menu" role="menu" hidden>' +
           THEMES.map(function (t) {
@@ -1394,14 +1394,12 @@
       opts[i].classList.toggle('is-on', on);
       opts[i].setAttribute('aria-checked', on ? 'true' : 'false');
     }
-    /* The trigger keeps a CONSTANT display glyph — per Figma 791:2637 it says
-       "theme lives here" rather than mirroring the current state, which the open
-       menu already shows with a checked radio. Only the label changes, so the
-       answer is still available to a screen reader without the menu open. */
+    /* The trigger shows the active theme's glyph, and its label says the same to a screen reader.
+       (It used to keep one constant glyph, per Figma 791:2637; changed 30 Sep 2026.) */
     var chosen = THEMES.filter(function (t) { return t.id === pref; })[0] || THEMES[0];
     var triggers = document.querySelectorAll('[data-theme-trigger]');
     for (var j = 0; j < triggers.length; j++) {
-      triggers[j].innerHTML = icon('desktop');
+      triggers[j].innerHTML = icon(chosen.icon);
       triggers[j].setAttribute('aria-label', 'Colour theme: ' + chosen.label);
     }
   }
