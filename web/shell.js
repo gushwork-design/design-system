@@ -526,17 +526,17 @@
 
   function sidebarHTML() {
     var groups = GROUPS.filter(groupVisible).map(groupHTML).join('');
-    /* Admin and Owner are two sections now (796:11238 / 796:11251), both pinned to
-       the bottom of the rail. Owner is a strict subset of admin, so it only draws
-       for an owner — an admin who is not one sees Admin and stops there. */
+    /* Admin and Owner are two sections (796:11238 / 796:11251). They used to be pinned to the
+       bottom of the rail, which left a gap under the last group and gave them nowhere to go if
+       the groups multiplied. They now follow the other groups inside the same scrolling list,
+       so the list grows downward and scrolls; only the user card stays pinned. Owner is a strict
+       subset of admin, so it only draws for an owner. */
     var tail = session.admin ? groupHTML(ADMIN_GROUP) : '';
     if (session.owner) tail += groupHTML(OWNER_GROUP);
-    var end = (tail ? '<div class="gw-navgroups">' + tail + '</div>' : '') +
-              footerHTML();
     return '<aside class="gw-sidebar" id="gw-rail">' +
         railTopHTML() +
-        '<div class="gw-navgroups">' + groups + '</div>' +
-        '<div class="gw-navend">' + end + '</div>' +
+        '<div class="gw-navgroups">' + groups + tail + '</div>' +
+        '<div class="gw-navend">' + footerHTML() + '</div>' +
       '</aside>';
   }
 

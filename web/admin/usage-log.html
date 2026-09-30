@@ -318,9 +318,15 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
 .ul-badge--bad { background: var(--gw-color-red-alpha-10); color: var(--gw-color-red-600); }
 :root[data-theme="dark"] .ul-badge--bad { color: var(--gw-color-red-300); }
 /* Outputs table: its own grid, same rules as .ul-row (fixed first track, floors on the rest). */
-.ul-row--o { grid-template-columns: 120px minmax(140px, 1.1fr) minmax(150px, 1.2fr) minmax(140px, .9fr) minmax(210px, 1.5fr) 150px; min-width: 1000px; }
+.ul-row--o { grid-template-columns: 110px minmax(120px, 1fr) minmax(130px, 1.1fr) minmax(120px, .9fr) minmax(190px, 1.4fr) 140px; column-gap: var(--gw-space-16); min-width: 940px; }
 .ul-c--chk { display: flex; align-items: center; gap: var(--gw-space-8); overflow: visible; }
 .ul-c--out a { color: var(--ul-value); text-decoration: underline; text-underline-offset: 2px; }
+.ul-row--chat { cursor: pointer; }
+.ul-row--kid { height: 44px; background: var(--ul-hdr-bg); }
+.ul-row--kid .ul-c:first-child { padding-left: var(--gw-space-24); }
+.ul-chat__t { display: inline-flex; align-items: center; gap: var(--gw-space-8); background: none; border: 0; padding: 0; color: inherit; font: inherit; cursor: pointer; }
+.ul-chat__t svg { width: 12px; height: 12px; color: var(--ul-icon); transition: transform var(--gw-motion-fast); }
+.ul-row--chat[aria-expanded="true"] .ul-chat__t svg { transform: rotate(180deg); }
 .ul-scroll { overflow-x: auto; }
 /* pagination: 52h, pad 12, space-between; arrows are icon-button 28 */
 .ul-pg { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-8); padding: var(--gw-space-12); flex-wrap: wrap; }
@@ -404,6 +410,8 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
               <input id="ul-search" type="search" placeholder="Search person or version" autocomplete="off"></label>
             <label class="ul-select"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Filter by version</span>
               <select id="ul-ver"></select><span class="ul-i-caret"></span></label>
+            <label class="ul-select"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">View</span>
+              <select id="ul-view"><option value="chat">By chat</option><option value="flat">All events</option></select><span class="ul-i-caret"></span></label>
             <label class="ul-select"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Filter by event</span>
               <select id="ul-evt"><option value="">All events</option><option value="session">Sessions</option><option value="skill">Skills</option><option value="file">Files</option><option value="artifact">Artifacts</option></select><span class="ul-i-caret"></span></label>
           </div>
@@ -435,7 +443,7 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
   function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
 
   var S = { status: 'loading', rows: [], period: '30', q: '', ver: '', sortKey: 'at', sortDir: -1,
-            evt: '', outcomes: {}, page: 1, per: 25, fetchedAt: 0, busy: false, skipped: 0, capped: false };
+            evt: '', view: 'chat', open: {}, outcomes: {}, page: 1, per: 25, fetchedAt: 0, busy: false, skipped: 0, capped: false };
   var DAY = 86400000;
 
   /* ── data ───────────────────────────────────────────────────────────────────────── */
@@ -654,9 +662,9 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
   }
 
   /* ── log table ──────────────────────────────────────────────────────────────────── */
-  function filtered(m) {
+  function rowPasses(r) {
     var q = S.q.trim().toLowerCase();
-    var rows = m.curAll.filter(function (r) {
+    {
       if (S.ver && (r.version || 'Unknown') !== S.ver) return false;
       if (S.evt === 'session' && !isSess(r)) return false;
       if (S.evt === 'skill' && r.event !== 'skill') return false;
@@ -665,7 +673,10 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
       if (!q) return true;
       return r.email.indexOf(q) !== -1 || r.version.toLowerCase().indexOf(q) !== -1 ||
              r.skill.toLowerCase().indexOf(q) !== -1 || r.file.toLowerCase().indexOf(q) !== -1;
-    });
+    }
+  }
+  function filtered(m) {
+    var rows = m.curAll.filter(rowPasses);
     var k = S.sortKey, dir = S.sortDir;
     rows = rows.slice().sort(function (a, b) {
       var c;
@@ -675,6 +686,45 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
       return c * dir || (b.at - a.at);
     });
     return rows;
+  }
+  /* ── chats ───────────────────────────────────────────────────────────────
+     A chat is one Claude session: its start, the skills it ran and what it made. Rows written by
+     plugin 1.56.0 onward all carry `sess`, so they group exactly. Older rows do not, so they are
+     grouped by inference: a session start opens a chat for that person, and their skill and file
+     rows attach to it until their next session start. A row with nothing to attach to stands alone. */
+  function buildChats(rows) {
+    var asc = rows.slice().sort(function (a, b) { return a.at - b.at; });
+    var byKey = {}, openFor = {}, list = [];
+    asc.forEach(function (r) {
+      var key;
+      if (r.sess) key = 'x|' + (r.email || '') + '|' + r.sess;
+      else if (isSess(r) || !openFor[r.email]) { key = 'i|' + (r.email || '') + '|' + r.key; openFor[r.email] = key; }
+      else key = openFor[r.email];
+      var c = byKey[key];
+      if (!c) { c = byKey[key] = { key: key, email: r.email, version: r.version, at: r.at, rows: [] }; list.push(c); }
+      c.rows.push(r);
+      if (!c.version && r.version) c.version = r.version;
+    });
+    return list;
+  }
+  function chatsFiltered(m) {
+    var chats = buildChats(m.curAll).filter(function (c) { return c.rows.some(rowPasses); });
+    var k = S.sortKey, dir = S.sortDir;
+    return chats.sort(function (a, b) {
+      var c;
+      if (k === 'at') c = a.at - b.at;
+      else if (k === 'email') { var x = a.email || '\uffff', y = b.email || '\uffff'; c = x < y ? -1 : x > y ? 1 : 0; }
+      else c = vcmp(a.version, b.version);
+      return c * dir || (b.at - a.at);
+    });
+  }
+  function chatSummary(c) {
+    var sk = c.rows.filter(function (r) { return r.event === 'skill'; }).length;
+    var outs = c.rows.filter(isOut).length;
+    var bits = [];
+    if (sk) bits.push(plural(sk, 'skill run'));
+    if (outs) bits.push(plural(outs, 'output'));
+    return 'Chat' + (bits.length ? ' · ' + bits.join(' · ') : ' · started only');
   }
   function evtText(r) {
     if (r.event === 'skill') return 'Skill: ' + (r.skill || 'unknown').replace(/^.*:/, '');
@@ -694,6 +744,7 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
       tbl.innerHTML = '<div class="ul-row ul-row--h"><span class="ul-th"><span class="ul-th--plain">WHEN</span></span><span class="ul-th"><span class="ul-th--plain">PERSON</span></span><span class="ul-th"><span class="ul-th--plain">VERSION</span></span><span class="ul-th"><span class="ul-th--plain">SKILL</span></span><span class="ul-th"><span class="ul-th--plain">EVENT</span></span></div>' + sk;
       pg.innerHTML = ''; $('ul-q-log').textContent = ''; return;
     }
+    if (S.view === 'chat') { renderChats(m); return; }
     var rows = filtered(m), pages = Math.max(1, Math.ceil(rows.length / S.per));
     S.page = Math.min(S.page, pages);
     var slice = rows.slice((S.page - 1) * S.per, S.page * S.per);
@@ -716,6 +767,49 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
     }).join('');
     tbl.innerHTML = head + (slice.length ? body :
       '<div class="ul-empty"><div class="ul-empty__copy"><h2>No rows match</h2><p>Clear the search or pick another version to see the log again.</p></div></div>');
+    pg.innerHTML =
+      '<div class="ul-pg__l"><span class="ul-pg__t">Items per page</span><label class="ul-select ul-select--sm"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Items per page</span>' +
+      '<select id="ul-per">' + [10, 25, 50].map(function (n) { return '<option' + (n === S.per ? ' selected' : '') + '>' + n + '</option>'; }).join('') + '</select>' + icon('caret-down') + '</label></div>' +
+      '<div class="ul-pg__r"><span class="ul-pg__t">Page ' + S.page + ' of ' + pages + '</span>' +
+      '<button class="ul-ib" id="ul-prev" type="button" aria-label="Previous page"' + (S.page <= 1 ? ' disabled' : '') + '>' + icon('arrow-left') + '</button>' +
+      '<button class="ul-ib" id="ul-next" type="button" aria-label="Next page"' + (S.page >= pages ? ' disabled' : '') + '>' + icon('arrow-right') + '</button></div>';
+    $('ul-per').addEventListener('change', function (e) { S.per = +e.target.value; S.page = 1; render(); });
+    $('ul-prev').addEventListener('click', function () { S.page--; render(); });
+    $('ul-next').addEventListener('click', function () { S.page++; render(); });
+  }
+  function renderChats(m) {
+    var tbl = $('ul-table'), pg = $('ul-pg');
+    var chats = chatsFiltered(m), pages = Math.max(1, Math.ceil(chats.length / S.per));
+    S.page = Math.min(S.page, pages);
+    var slice = chats.slice((S.page - 1) * S.per, S.page * S.per);
+    var order = S.sortKey === 'at' ? (S.sortDir < 0 ? 'newest first' : 'oldest first')
+      : 'by ' + (S.sortKey === 'email' ? 'person' : 'version') + (S.sortDir < 0 ? ', descending' : ', ascending');
+    $('ul-q-log').textContent = order + ', ' + plural(chats.length, 'chat');
+    var head = '<div class="ul-row ul-row--h" role="row">' + th('at', 'When') + th('email', 'Person') + th('version', 'Version') +
+      '<div role="columnheader"><span class="ul-th"><span class="ul-th--plain">Skill</span></span></div>' +
+      '<div role="columnheader"><span class="ul-th"><span class="ul-th--plain">Events</span></span></div></div>';
+    var body = slice.map(function (c) {
+      var open = !!S.open[c.key];
+      var skills = []; c.rows.forEach(function (r) { var n = skillInfo(r, m).n; if (r.event === 'skill' && n && skills.indexOf(n) === -1) skills.push(n); });
+      c.rows.forEach(function (r) { if (r.event !== 'skill') { var i = skillInfo(r, m); if (i.n && skills.indexOf(i.n) === -1) skills.push(i.n); } });
+      var badge = (m.newest && c.version === m.newest) ? '<span class="ul-badge ul-badge--ok">Newest</span>' : '';
+      var who = c.email ? '<div class="ul-c ul-c--who" role="cell" title="' + esc(c.email) + '">' + esc(c.email) + '</div>' : '<div class="ul-c ul-c--none" role="cell">Not identified</div>';
+      var parent = '<div class="ul-row ul-row--d ul-row--chat" role="row" data-chat="' + esc(c.key) + '" aria-expanded="' + open + '" tabindex="0">' +
+        '<div class="ul-c" role="cell" title="' + esc(c.at.toISOString()) + '"><span class="ul-chat__t">' + icon('caret-down') + esc(fmtWhen(c.at)) + '</span></div>' + who +
+        '<div class="ul-c ul-c--ver" role="cell">' + esc(c.version || 'Unknown') + badge + '</div>' +
+        '<div class="ul-c' + (skills.length ? '' : ' ul-c--none') + '" role="cell" title="' + esc(skills.join(', ')) + '">' + esc(skills.length ? skills.join(', ') : '') + '</div>' +
+        '<div class="ul-c" role="cell" title="' + esc(chatSummary(c)) + '">' + esc(chatSummary(c)) + '</div></div>';
+      if (!open) return parent;
+      return parent + c.rows.map(function (r) {
+        var sk = skillInfo(r, m);
+        return '<div class="ul-row ul-row--kid" role="row"><div class="ul-c" role="cell" title="' + esc(r.at.toISOString()) + '">' + esc(r.at.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })) + '</div>' +
+          '<div class="ul-c"></div><div class="ul-c"></div>' +
+          '<div class="ul-c ul-c--none" role="cell">' + esc(sk.n && r.event !== 'skill' ? sk.n + (sk.inferred ? ' ~' : '') : '') + '</div>' +
+          '<div class="ul-c" role="cell" title="' + esc(evtText(r)) + '">' + esc(evtText(r)) + '</div></div>';
+      }).join('');
+    }).join('');
+    tbl.innerHTML = head + (slice.length ? body :
+      '<div class="ul-empty"><div class="ul-empty__copy"><h2>No chats match</h2><p>Clear the search or pick another version to see the log again.</p></div></div>');
     pg.innerHTML =
       '<div class="ul-pg__l"><span class="ul-pg__t">Items per page</span><label class="ul-select ul-select--sm"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Items per page</span>' +
       '<select id="ul-per">' + [10, 25, 50].map(function (n) { return '<option' + (n === S.per ? ' selected' : '') + '>' + n + '</option>'; }).join('') + '</select>' + icon('caret-down') + '</label></div>' +
@@ -905,6 +999,13 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
   });
   $('ul-refresh').addEventListener('click', load);
   $('ul-search').addEventListener('input', function (e) { S.q = e.target.value; S.page = 1; render(); $('ul-search').focus(); });
+  $('ul-view').addEventListener('change', function (e) { S.view = e.target.value; S.page = 1; render(); });
+  function toggleChat(row) { var k = row.getAttribute('data-chat'); S.open[k] = !S.open[k]; render(); }
+  $('ul-table').addEventListener('click', function (e) { var row = e.target.closest('[data-chat]'); if (row) toggleChat(row); });
+  $('ul-table').addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    var row = e.target.closest('[data-chat]'); if (row) { e.preventDefault(); toggleChat(row); }
+  });
   $('ul-evt').addEventListener('change', function (e) { S.evt = e.target.value; S.page = 1; render(); });
   $('ul-ver').addEventListener('change', function (e) { S.ver = e.target.value; S.page = 1; render(); });
   $('ul-table').addEventListener('click', function (e) {

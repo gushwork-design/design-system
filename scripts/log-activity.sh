@@ -9,7 +9,7 @@
 #                                        who, version, event "file", the file's BASENAME
 #   · when a Claude artifact is published in the same session:
 #                                        who, version, event "artifact", its claude.ai link
-#   · after a Bash call in the same session, any PDF or PPTX written since the last look:
+#   · after a Bash call in the same session, any PDF, PPTX, PNG or HTML file written since the last look:
 #                                        who, version, event "file", the file's BASENAME
 #                                        (a deck or lead magnet is made by a script, not a Write)
 # Every row also carries `sess`: a short one-way hash of the session id, so an output can be tied
@@ -236,24 +236,33 @@ elif tool == "Bash":
             dirnames[:] = []
         for fn in filenames:
             seen += 1
-            if fn.lower().endswith((".pdf", ".pptx")):
+            if fn.lower().endswith((".pdf", ".pptx", ".png", ".html")):
                 try:
                     if os.path.getmtime(os.path.join(dirpath, fn)) >= since - 1:
-                        found.append(fn)
+                        found.append((fn, os.path.join(dirpath, fn)))
                 except OSError:
                     pass
         if seen > 5000:
             break
     fresh = []
-    for fn in found:
-        if fn not in st.get("files", []) and fn not in fresh:
-            fresh.append(fn)
+    for fn, full in found:
+        if fn not in st.get("files", []) and fn not in [x[0] for x in fresh]:
+            fresh.append((fn, full))
     fresh = fresh[:5]                    # the log endpoint rate-limits, and five is plenty per call
-    st.setdefault("files", []).extend(fresh)
+    st.setdefault("files", []).extend([x[0] for x in fresh])
     with open(marker, "w") as f:
         json.dump(st, f)
-    for fn in fresh:
-        out("file", file=fn[:120])
+    for fn, full in fresh:
+        extra = {}
+        # An HTML file can be measured like one the Write tool made: read here, flags sent, text kept.
+        if fn.lower().endswith(".html"):
+            try:
+                if os.path.getsize(full) <= 2000000:
+                    with open(full, errors="ignore") as f:
+                        extra["flags"] = flags_for(f.read())
+            except Exception:
+                pass
+        out("file", file=fn[:120], **extra)
 ' 2>/dev/null)"
 
 # One row per line. Sent from a detached subshell, so the session never waits on it.

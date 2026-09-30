@@ -96,9 +96,18 @@ if [ -z "${GW_NO_USAGE_PING:-}" ]; then
   # it. CLAUDE_CONFIG_DIR is honoured because that is where Claude Code keeps it when set.
   # Built with python3 rather than string-concatenation so a stray quote cannot produce
   # invalid JSON.
+  #
+  # WHICH CHAT. The hook input on stdin names the session. It is hashed (a short one-way hash,
+  # the same one scripts/log-activity.sh sends) and sent as `sess`, so the Usage Logs page can
+  # put a chat's session start, skill runs and outputs in one group. Read only when stdin is a
+  # pipe, so running this by hand from a terminal does not wait for input.
+  # read -t, not run_capped: a capped command runs in the background, and a background command
+  # in a script gets /dev/null for stdin, so it would read nothing.
+  HOOK_IN=""
+  [ -t 0 ] || IFS= read -r -t 2 -d '' HOOK_IN 2>/dev/null || true
   USAGE_BODY="$(GW_GIT_EMAIL="$(git config --get user.email 2>/dev/null || true)" \
-    GW_VER="$LOCAL_VERSION" python3 -c '
-import json, os
+    GW_HOOK_IN="$HOOK_IN" GW_VER="$LOCAL_VERSION" python3 -c '
+import hashlib, json, os, re
 def account_email():
     for base in (os.environ.get("CLAUDE_CONFIG_DIR"), os.path.expanduser("~")):
         if not base:
@@ -111,11 +120,20 @@ def account_email():
         except Exception:
             pass
     return ""
-print(json.dumps({
+def session_hash():
+    try:
+        sid = re.sub(r"[^A-Za-z0-9_-]", "", str(json.loads(os.environ.get("GW_HOOK_IN") or "{}").get("session_id") or ""))[:64]
+    except Exception:
+        return ""
+    return hashlib.sha256(sid.encode()).hexdigest()[:12] if sid else ""
+row = {
     "email": (account_email() or os.environ.get("GW_GIT_EMAIL", ""))[:160],
     "version": os.environ.get("GW_VER", "")[:32],
     "event": "session-start",
-}))' 2>/dev/null)"
+}
+if session_hash():
+    row["sess"] = session_hash()
+print(json.dumps(row))' 2>/dev/null)"
   if [ -n "$USAGE_BODY" ]; then
     ( nohup curl -fsS --max-time 3 -X POST \
         -H 'content-type: application/json' \

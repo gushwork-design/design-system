@@ -549,9 +549,9 @@
   gap: var(--gw-space-12);
   padding: var(--gw-space-24) var(--gw-space-16) 0;
 }
-/* Only the top-level list scrolls — the child .gw-navgroups inside .gw-navend
-   holds the ADMIN group and must not become its own scroll area. */
-.gw-sidebar > .gw-navgroups { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+/* The list scrolls, and it holds EVERY group including Admin and Owner, so the rail can grow
+   without pushing the user card off the bottom. */
+.gw-sidebar > .gw-navgroups { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding-bottom: var(--gw-space-16); }
 .gw-navend { flex: none; }
 /* list-group 478:14809 — vertical, gap 0 */
 .gw-navgroup { display: flex; flex-direction: column; gap: 0; }
@@ -624,16 +624,9 @@
 }
 .gw-lock svg { width: 16px; height: 16px; display: block; }
 
-/* End block — admin group + user card, pinned to the bottom by the
-   sidebar's space-between. Footer padding 20/20/32 is the dashboard's
-   measured footer (audit line 349). */
+/* End block — the user card, pinned to the bottom. Admin and Owner used to live here and now sit
+   in the scrolling list above it (see sidebarHTML). */
 .gw-navend { display: flex; flex-direction: column; }
-/* 40 below the last admin row, matching the 40 above GETTING STARTED so the
-   rail is symmetrically inset top and bottom. */
-.gw-navend .gw-navgroups {
-  padding-top: var(--gw-space-24);
-  padding-bottom: var(--gw-space-40);
-}
 
 .gw-user {
   display: flex;
