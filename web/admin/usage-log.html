@@ -320,8 +320,24 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
 .ul-c--chk { display: flex; align-items: center; gap: var(--gw-space-8); overflow: visible; }
 .ul-c--out a { color: var(--ul-value); text-decoration: underline; text-underline-offset: 2px; }
 .ul-row--chat { cursor: pointer; }
-.ul-row--kid { height: 44px; background: var(--ul-hdr-bg); }
-.ul-row--kid .ul-c:first-child { padding-left: var(--gw-space-24); }
+.ul-detail { display: grid; grid-template-columns: minmax(170px, 230px) minmax(0, 1fr); column-gap: var(--gw-space-32);
+  padding: var(--gw-space-16) var(--gw-space-24) var(--gw-space-20); min-width: 820px; background: var(--ul-hdr-bg);
+  box-shadow: inset 0 -1px 0 var(--ul-row-line); }
+.ul-detail__h { margin: 0 0 var(--gw-space-8); font: var(--gw-text-body-12-med); color: var(--ul-hdr-fg); text-transform: uppercase; }
+.ul-tl { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--gw-space-8); }
+.ul-tl li { display: flex; align-items: baseline; gap: var(--gw-space-8); font: var(--gw-text-body-12-med); color: var(--ul-cell); }
+.ul-tl li::before { content: ""; flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--ul-track); transform: translateY(-1px); }
+.ul-tl time { color: var(--ul-sub); min-width: 52px; }
+.ul-outs { display: flex; flex-direction: column; gap: var(--gw-space-8); }
+.ul-o { display: grid; grid-template-columns: 44px minmax(0, 1.2fr) minmax(0, 1.6fr) 150px; column-gap: var(--gw-space-12); align-items: center;
+  padding: var(--gw-space-8) var(--gw-space-12); background: var(--ul-field-bg); border: 1px solid var(--ul-hdr-line); border-radius: var(--gw-radius-8); }
+.ul-o__t { justify-self: start; height: 20px; padding: 0 var(--gw-space-8); display: inline-flex; align-items: center; border-radius: var(--gw-radius-4);
+  background: var(--ul-tab-hover); color: var(--ul-cell); font: var(--gw-text-body-10-sem, 600 10px/1 var(--gw-font-body)); letter-spacing: .02em; }
+.ul-o__n { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--gw-text-body-12-med); color: var(--ul-value); }
+.ul-o__n a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.ul-o__n small { display: block; font: var(--gw-text-body-12-med); color: var(--ul-sub); text-decoration: none; }
+.ul-o__c { display: flex; align-items: center; gap: var(--gw-space-8); min-width: 0; font: var(--gw-text-body-12-med); }
+.ul-chips { display: flex; flex-wrap: wrap; gap: var(--gw-space-4); align-items: center; }
 .ul-chat__t { display: inline-flex; align-items: center; gap: var(--gw-space-8); background: none; border: 0; padding: 0; color: inherit; font: inherit; cursor: pointer; }
 .ul-chat__t svg { width: 12px; height: 12px; color: var(--ul-icon); transition: transform var(--gw-motion-fast); }
 .ul-row--chat[aria-expanded="true"] .ul-chat__t svg { transform: rotate(180deg); }
@@ -715,6 +731,22 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
       return c * dir || (b.at - a.at);
     });
   }
+  /* The collapsed row says what is inside without opening it: how many outputs, and whether any is
+     off-brand or approved. The outputs themselves stay hidden until the chat is opened. */
+  function chatChips(c) {
+    var outs = c.rows.filter(isOut), sk = c.rows.filter(function (r) { return r.event === 'skill'; }).length;
+    if (!outs.length && !sk) return '<span class="ul-c--none">Started only</span>';
+    var bad = outs.filter(function (r) { return r.flags && !onBrand(r.flags); }).length;
+    var appr = outs.filter(function (r) { return S.outcomes[r.key] === 'approved'; }).length;
+    var chg = outs.filter(function (r) { return S.outcomes[r.key] === 'changes'; }).length;
+    var h = '<div class="ul-chips">';
+    if (outs.length) h += '<span class="ul-badge">' + esc(plural(outs.length, 'output')) + '</span>';
+    else h += '<span class="ul-badge">' + esc(plural(sk, 'skill run')) + '</span>';
+    if (bad) h += '<span class="ul-badge ul-badge--bad">' + bad + ' off-brand</span>';
+    if (appr) h += '<span class="ul-badge ul-badge--ok">' + appr + ' approved</span>';
+    if (chg) h += '<span class="ul-badge ul-badge--bad">' + chg + ' needs changes</span>';
+    return h + '</div>';
+  }
   function chatSummary(c) {
     var sk = c.rows.filter(function (r) { return r.event === 'skill'; }).length;
     var outs = c.rows.filter(isOut).length;
@@ -795,24 +827,27 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
         '<div class="ul-c" role="cell" title="' + esc(c.at.toISOString()) + '"><span class="ul-chat__t">' + icon('caret-down') + esc(fmtWhen(c.at)) + '</span></div>' + who +
         '<div class="ul-c ul-c--ver" role="cell">' + esc(c.version || 'Unknown') + badge + '</div>' +
         '<div class="ul-c' + (skills.length ? '' : ' ul-c--none') + '" role="cell" title="' + esc(skills.join(', ')) + '">' + esc(skills.length ? skills.join(', ') : '') + '</div>' +
-        '<div class="ul-c" role="cell" title="' + esc(chatSummary(c)) + '">' + esc(chatSummary(c)) + '</div></div>';
+        '<div class="ul-c" role="cell" title="' + esc(chatSummary(c)) + '" style="overflow:visible">' + chatChips(c) + '</div></div>';
       if (!open) return parent;
-      return parent + c.rows.map(function (r) {
-        var sk = skillInfo(r, m);
-        var t = '<div class="ul-c" role="cell" title="' + esc(r.at.toISOString()) + '">' + esc(r.at.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })) + '</div>';
-        if (isOut(r)) {
-          var what = r.event === 'artifact'
-            ? 'Artifact: <a href="' + esc(r.url) + '" target="_blank" rel="noopener">' + esc(r.url.replace(/^.*\//, '').slice(0, 8)) + '…</a>'
-            : 'File: ' + fileLink(r, r.file);
-          return '<div class="ul-row ul-row--kid" role="row">' + t + '<div class="ul-c ul-c--chk" role="cell">' + checksHTML(r) + '</div><div class="ul-c"></div>' +
-            '<div class="ul-c" role="cell">' + outcomeHTML(r) + '</div>' +
-            '<div class="ul-c ul-c--out" role="cell" title="' + esc(evtText(r)) + '">' + what + '</div></div>';
-        }
-        return '<div class="ul-row ul-row--kid" role="row">' + t +
-          '<div class="ul-c"></div><div class="ul-c"></div>' +
-          '<div class="ul-c ul-c--none" role="cell">' + esc(sk.n && r.event !== 'skill' ? sk.n + (sk.inferred ? ' ~' : '') : '') + '</div>' +
-          '<div class="ul-c ul-c--out" role="cell" title="' + esc(evtText(r)) + '">' + (fileHref(r) ? 'File: ' + fileLink(r, r.file) : esc(evtText(r))) + '</div></div>';
+      var time = function (r) { return r.at.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }); };
+      var acts = c.rows.filter(function (r) { return !isOut(r); }).map(function (r) {
+        var txt = r.event === 'skill' ? 'Ran ' + (r.skill || 'a skill').replace(/^.*:/, '') : 'Session started';
+        return '<li><time datetime="' + esc(r.at.toISOString()) + '">' + esc(time(r)) + '</time><span>' + esc(txt) + '</span></li>';
       }).join('');
+      var outs = c.rows.filter(isOut).map(function (r) {
+        var isArt = r.event === 'artifact';
+        var ext = isArt ? 'LINK' : (r.file.split('.').pop() || '').toUpperCase().slice(0, 4);
+        var name = isArt
+          ? '<a href="' + esc(r.url) + '" target="_blank" rel="noopener">Artifact ' + esc(r.url.replace(/^.*\//, '').slice(0, 8)) + '…</a>'
+          : fileLink(r, r.file);
+        var kept = isArt || fileHref(r) ? '' : '<small>Name only, no copy kept</small>';
+        return '<div class="ul-o"><span class="ul-o__t">' + esc(ext) + '</span>' +
+          '<div class="ul-o__n" title="' + esc(isArt ? r.url : r.file) + '">' + name + kept + '</div>' +
+          '<div class="ul-o__c">' + checksHTML(r) + '</div><div>' + outcomeHTML(r) + '</div></div>';
+      }).join('');
+      return parent + '<div class="ul-detail" role="row">' +
+        '<div><h3 class="ul-detail__h">Activity</h3><ul class="ul-tl">' + (acts || '<li><span>Nothing else recorded</span></li>') + '</ul></div>' +
+        '<div><h3 class="ul-detail__h">Outputs</h3>' + (outs ? '<div class="ul-outs">' + outs + '</div>' : '<p class="ul-note-line">No outputs from this chat.</p>') + '</div></div>';
     }).join('');
     tbl.innerHTML = head + (slice.length ? body :
       '<div class="ul-empty"><div class="ul-empty__copy"><h2>No chats match</h2><p>Clear the search or pick another version to see the log again.</p></div></div>');
