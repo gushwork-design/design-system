@@ -288,6 +288,28 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
 .ul-select select { appearance: none; -webkit-appearance: none; height: 36px; padding: 0 calc(var(--gw-space-12) + 16px) 0 var(--gw-space-12);
   border: 0; border-radius: var(--gw-radius-8); background: var(--ul-field-bg); color: var(--ul-field-fg);
   box-shadow: inset 0 0 0 1px var(--ul-field-line); font: var(--gw-text-button-14); cursor: pointer; }
+/* out-of-date people */
+.ul-old { display: flex; flex-direction: column; }
+.ul-old__r { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; column-gap: var(--gw-space-16); padding: var(--gw-space-12) 0; }
+.ul-old__r + .ul-old__r { border-top: 1px solid var(--ul-hdr-line); }
+.ul-old__who { min-width: 0; }
+.ul-old__who b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--gw-text-body-12-med); font-weight: 600; color: var(--ul-value); }
+.ul-old__who span { font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.ul-old__v { font: var(--gw-text-body-12-med); color: var(--ul-cell); }
+.ul-old__s { display: flex; justify-content: flex-end; min-width: 132px; }
+/* skills donut */
+.ul-donut { display: flex; align-items: center; gap: var(--gw-space-32); flex-wrap: wrap; padding: var(--gw-space-8) 0; }
+.ul-donut__c { position: relative; width: 168px; height: 168px; flex: none; }
+.ul-donut__c svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ul-donut__c circle { fill: none; stroke-width: 26; }
+.ul-donut__n { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.ul-donut__n b { font: var(--gw-text-body-24-sem, 600 24px/1.2 var(--gw-font-body)); color: var(--ul-value); }
+.ul-donut__n span { font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.ul-leg { flex: 1; min-width: 180px; margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--gw-space-12); }
+.ul-leg li { display: grid; grid-template-columns: 12px minmax(0, 1fr) auto auto; align-items: center; column-gap: var(--gw-space-8); font: var(--gw-text-body-12-med); color: var(--ul-cell); }
+.ul-leg i { width: 12px; height: 12px; border-radius: var(--gw-radius-4); }
+.ul-leg li span:nth-child(2) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ul-value); }
+.ul-leg li span:last-child { min-width: 36px; text-align: right; color: var(--ul-sub); }
 /* ── dropdown menu: replaces the browser's own list, which is drawn by the OS and cannot be styled ── */
 .ul-menu { position: fixed; z-index: 50; min-width: 120px; max-height: 280px; overflow-y: auto; padding: var(--gw-space-4);
   display: flex; flex-direction: column; gap: 2px; background: var(--ul-field-bg); border-radius: var(--gw-radius-12);
@@ -443,7 +465,7 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
 
       <div class="ul-pair">
       <section class="ul-sec" aria-labelledby="ul-h-ver">
-        <div class="ul-sh"><div class="ul-sh__t"><h2 id="ul-h-ver">Versions</h2><span class="ul-sh__q" id="ul-q-ver"></span></div></div>
+        <div class="ul-sh"><div class="ul-sh__t"><h2 id="ul-h-ver">Out of date</h2><span class="ul-sh__q" id="ul-q-ver"></span></div></div>
         <div class="ul-inner" id="ul-versions"></div>
       </section>
 
@@ -691,17 +713,39 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
   function renderVersions(m) {
     var host = $('ul-versions');
     if (S.status === 'loading') { host.innerHTML = '<span class="sk" style="width:100%;height:120px;display:block"></span>'; $('ul-q-ver').textContent = ''; return; }
-    $('ul-q-ver').textContent = 'sessions by plugin version, ' + PERIOD_NAME[S.period];
-    if (!m.vers.length) { host.innerHTML = '<p class="ul-note-line">No sessions in this period.</p>'; return; }
-    var max = m.vers.reduce(function (a, v) { return Math.max(a, m.byVer[v]); }, 0);
-    host.innerHTML = '<div class="ul-bars" style="--ul-lw:' + lblW(m.vers) + '">' + m.vers.map(function (v) {
-      var n = m.byVer[v];
-      /* each label shares a grid row with its bar, so the two cannot drift apart */
-      return '<div class="ul-bars__r"><span class="ul-bars__l">' + esc(v) + '</span><div class="ul-bars__t"><div class="ul-bar-b" style="width:' +
-        (n / max * 100).toFixed(1) + '%"><span>' + n + '</span></div></div></div>';
-    }).join('') + '</div>';
+    $('ul-q-ver').textContent = m.newest ? 'who used a version older than ' + m.newest + ', ' + PERIOD_NAME[S.period] : PERIOD_NAME[S.period];
+    if (!m.newest) { host.innerHTML = '<p class="ul-note-line">No versioned sessions yet.</p>'; return; }
+    var who = {}, anon = 0;
+    m.cur.forEach(function (r) {
+      var old = !r.version || !vparts(r.version) || vcmp(m.newest, r.version) > 0;
+      if (!r.email) { if (old) anon++; return; }
+      var w = who[r.email] || (who[r.email] = { email: r.email, last: r, old: 0 });
+      if (r.at > w.last.at) w.last = r;
+      if (old) w.old++;
+    });
+    var list = Object.keys(who).map(function (k) { return who[k]; }).filter(function (w) { return w.old > 0; });
+    list.forEach(function (w) {
+      var v = w.last.version, known = v && vparts(v), behind = !known || vcmp(m.newest, v) > 0;
+      w.behind = behind;
+      var pn = vparts(m.newest), pv = known ? vparts(v) : null;
+      w.gap = behind && pv ? (pn[0] === pv[0] ? pn[1] - pv[1] : 99) : 0;
+    });
+    list.sort(function (a, b) { return (b.behind - a.behind) || (b.gap - a.gap) || (b.last.at - a.last.at); });
+    var stale = list.filter(function (w) { return w.behind; }).length;
+    if (!list.length && !anon) { host.innerHTML = '<p class="ul-note-line">Everyone who started a session is on ' + esc(m.newest) + '.</p>'; return; }
+    var rows = list.slice(0, 8).map(function (w) {
+      var v = w.last.version || 'Unknown';
+      var status = w.behind
+        ? '<span class="ul-badge ul-badge--bad">' + (w.gap > 0 && w.gap < 99 ? plural(w.gap, 'release') + ' behind' : 'Behind') + '</span>'
+        : '<span class="ul-badge ul-badge--ok">Updated</span>';
+      return '<div class="ul-old__r"><div class="ul-old__who"><b title="' + esc(w.email) + '">' + esc(w.email) + '</b><span>' + (w.behind ? 'Still on ' : 'Now on ') + esc(v) + ' · last seen ' + esc(ago(Date.now() - w.last.at.getTime())) + '</span></div>' +
+        '<span class="ul-old__v">' + esc(plural(w.old, 'older session')) + '</span><div class="ul-old__s">' + status + '</div></div>';
+    }).join('');
+    host.innerHTML = '<div class="ul-old">' + rows + '</div>' +
+      '<p class="ul-note-line" style="margin-top:var(--gw-space-8)">' + (stale ? stale + (stale === 1 ? ' person' : ' people') + ' still behind' : 'No one is behind now') +
+      (list.length > 8 ? ' · ' + (list.length - 8) + ' more not shown' : '') +
+      (anon ? ' · ' + plural(anon, 'session') + ' with no email on an older version' : '') + '.</p>';
   }
-
   function renderSkills(m) {
     var host = $('ul-skills');
     if (S.status === 'loading') { host.innerHTML = '<span class="sk" style="width:100%;height:96px;display:block"></span>'; $('ul-q-skills').textContent = ''; return; }
@@ -710,12 +754,22 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
       host.innerHTML = '<p class="ul-note-line">Nothing recorded yet. Skill and file events start arriving once people are on plugin 1.51.0.</p>';
       return;
     }
-    var max = m.bySkill[m.skills[0]];
-    host.innerHTML = '<div class="ul-bars" style="--ul-lw:' + lblW(m.skills.map(function (k) { return k.replace(/^.*:/, ''); })) + '">' + m.skills.map(function (k) {
-      var n = m.bySkill[k];
-      return '<div class="ul-bars__r"><span class="ul-bars__l" title="' + esc(k) + '">' + esc(k.replace(/^.*:/, '')) + '</span><div class="ul-bars__t"><div class="ul-bar-b" style="width:' +
-        (n / max * 100).toFixed(1) + '%"><span>' + n + '</span></div></div></div>';
-    }).join('') + '</div><p class="ul-note-line" style="margin-top:var(--gw-space-8)">' + esc(plural(m.nFiles, 'output file')) + ' named in this period. Names only, never the contents.</p>';
+    var COL = ['var(--gw-color-primary-500)', 'var(--gw-color-primary-300)', 'var(--gw-color-neutral-850)', 'var(--gw-color-primary-200)', 'var(--gw-color-neutral-400)', 'var(--gw-color-neutral-200)'];
+    var items = m.skills.slice(0, 5).map(function (k) { return { n: k.replace(/^.*:/, ''), full: k, v: m.bySkill[k] }; });
+    var rest = m.skills.slice(5).reduce(function (a, k) { return a + m.bySkill[k]; }, 0);
+    if (rest) items.push({ n: 'Other', full: 'Other skills', v: rest });
+    var total = items.reduce(function (a, x) { return a + x.v; }, 0), R = 70, C = 2 * Math.PI * R, off = 0;
+    var arcs = items.map(function (x, i) {
+      var len = x.v / total * C, gap = items.length > 1 ? 2 : 0;
+      var el = '<circle cx="84" cy="84" r="' + R + '" stroke="' + COL[i] + '" stroke-dasharray="' + Math.max(0, len - gap).toFixed(2) + ' ' + (C - Math.max(0, len - gap)).toFixed(2) + '" stroke-dashoffset="' + (-off).toFixed(2) + '"><title>' + esc(x.full + ': ' + x.v) + '</title></circle>';
+      off += len; return el;
+    }).join('');
+    var legend = items.map(function (x, i) {
+      return '<li title="' + esc(x.full) + '"><i style="background:' + COL[i] + '"></i><span>' + esc(x.n) + '</span><span>' + x.v + '</span><span>' + Math.round(x.v / total * 100) + '%</span></li>';
+    }).join('');
+    host.innerHTML = '<div class="ul-donut"><div class="ul-donut__c"><svg viewBox="0 0 168 168" role="img" aria-label="Skill runs">' + arcs + '</svg>' +
+      '<div class="ul-donut__n"><b>' + total + '</b><span>' + (total === 1 ? 'run' : 'runs') + '</span></div></div><ul class="ul-leg">' + legend + '</ul></div>' +
+      '<p class="ul-note-line" style="margin-top:var(--gw-space-8)">' + esc(plural(m.nFiles, 'output file')) + ' named in this period. Names only, never the contents.</p>';
   }
 
   /* ── log table ──────────────────────────────────────────────────────────────────── */
