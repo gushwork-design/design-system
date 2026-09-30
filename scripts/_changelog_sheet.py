@@ -358,8 +358,8 @@ SPRITE = """
 # assets/. scripts/_favicon.txt holds the same string for the hand-maintained sheets.
 FAVICON = (
     "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%"
-    "22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20width%3D%2280%22%20height%3"
-    "D%2280%22%20rx%3D%2220%22%20fill%3D%22%230d0d0d%22%2F%3E%3Cg%20transform%3D%"
+    "22%20viewBox%3D%220%200%2080%2080%22%3E"
+    "%3Crect%20x%3D%221%22%20y%3D%221%22%20width%3D%2278%22%20height%3D%2278%22%20rx%3D%2219%22%20fill%3D%22%230070ff%22%20stroke%3D%22%230061e0%22%20stroke-width%3D%222%22%2F%3E%3Cg%20transform%3D%"
     "22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.608"
     "8%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200"
     "%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%"

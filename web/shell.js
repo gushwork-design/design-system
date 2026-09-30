@@ -329,7 +329,7 @@
        padding and rounded box, which drew a frame the design does not have. It is
        the same .gw-iconbtn the bell and the help trigger use now. */
     return '<div class="gw-theme" data-theme-menu>' +
-        '<button class="gw-iconbtn" type="button" data-theme-trigger ' +
+        '<button class="gw-iconbtn" type="button" data-theme-trigger data-tip="Appearance" ' +
                 'aria-haspopup="menu" aria-expanded="false" ' +
                 'aria-label="Colour theme: ' + esc(current.label) + '">' +
           /* A constant display glyph, per Figma 791:2637 — the trigger says
@@ -1196,7 +1196,7 @@
 
   function notifHTML() {
     return '<div class="gw-pop" data-pop>' +
-        '<button class="gw-iconbtn" type="button" data-pop-trigger="notif" ' +
+        '<button class="gw-iconbtn" type="button" data-pop-trigger="notif" data-tip="What\u2019s new" ' +
                 'aria-haspopup="menu" aria-expanded="false" aria-label="What\u2019s new">' +
           icon('bell') +
           '<span class="gw-iconbtn__dot" data-notif-dot hidden></span>' +
@@ -1215,7 +1215,7 @@
      Utsav on Slack — rather than inventing a help centre that does not exist. */
   function helpHTML() {
     return '<div class="gw-pop" data-pop>' +
-        '<button class="gw-iconbtn" type="button" data-pop-trigger="help" ' +
+        '<button class="gw-iconbtn" type="button" data-pop-trigger="help" data-tip="Help" data-tip-end ' +
                 'aria-haspopup="menu" aria-expanded="false" aria-label="Help">' +
           icon('question') +
         '</button>' +

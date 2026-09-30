@@ -815,7 +815,7 @@ worked example, however close a match it looks.** **Ruled 24 Sep 2026 by Utsav.*
 
 | Deliverable | Template |
 |---|---|
-| Ad landing page | `skills/gushwork-web/templates/ad-page/` |
+| Ad landing page | `skills/gushwork-web/templates/ad-page/` or `skills/gushwork-web/templates/ad-page-signup/` — see R27 |
 | Case study | `skills/gushwork-web/templates/case-study/` |
 | Lead magnet PDF | `templates/lead-magnet/` |
 | Slide deck | `templates/slide-deck/` |
@@ -848,6 +848,10 @@ The real conclusion is that a **product-agnostic ad template**, one that tokenis
 folds too, does not exist and should. Until it does, expect the body rewrite on every lander
 that is not selling the CRM.
 
+> **Update, 30 Sep 2026:** `templates/ad-page-signup/` is that template. It tokenises every string,
+> so a page built from it carries no product's claims. The body rewrite described above still
+> applies to `templates/ad-page/` against a non-CRM offer. See R27.
+
 **The carve-out: cleared content, never structure.** Testimonials for an ad lander are taken
 from `web/internal/staging/ai-crm-lander` and stay the same unless Utsav asks otherwise —
 Stephanie Snyder (hero) and Ryan Cimo (closing CTA), each with the avatar that belongs to that
@@ -875,3 +879,44 @@ read the repo.
 One real gap does remain: `scripts/_search_index.py` points at a non-existent
 `internal/mini-tools.html`, so the Tools & Templates page is absent from the site's search index
 and no template name is findable in it.
+
+## R27 — ad pages: ask for the hero, then fill the folds from either template
+
+**Every ad landing page starts by asking what kind of hero the user wants. Start from the ad-page
+template whose hero matches, then fill the remaining folds by what the content needs, taking
+folds from either template. The same holds for every ad-page template added later.**
+**Ruled 30 Sep 2026 by Utsav.**
+
+| Template | Hero |
+|---|---|
+| `skills/gushwork-web/templates/ad-page/` | Form-first: headline, proof ticks, demo form |
+| `skills/gushwork-web/templates/ad-page-signup/` | Illustrated: headline, one-click Google sign-up, a picture card |
+
+**What it changes.** R26 said every page starts as a `cp -r` of the matching template and that a
+non-CRM lander pays a rewrite of the body folds. That stays true for copying from a template
+rather than from a shipped page. What R27 adds is that the templates are a **shared pool of folds**,
+not two separate starting points: the navbar, the white frame around the folds, the logo ticker,
+the FAQs and the closing call to action are built the same way in both, so a fold from one drops
+into a page started from the other.
+
+**Rules that go with it.**
+
+1. **One question up front, and it is the hero.** Everything else is decided from the content.
+2. **A fold is built the same way wherever it appears.** Text and destination change per page (a
+   button can say and do something different); the design does not. Utsav, 30 Sep 2026: "the design
+   build should be the same." When a fold exists in a template, take it from there rather than
+   rebuilding it from the Figma. A fold that has two Figma designs is a **variation** of that fold,
+   named in the template — the comparison table is the first: plain (ad-page) and with check marks
+   (`.cmp--checks`, ad-page-signup).
+3. **Name the source of each fold** when stating the layout, and keep the stamp's `components` list true.
+4. **R26 still holds.** Folds come from templates, never from another shipped page, and the cleared
+   testimonials are the only content taken from one.
+5. **Adding an ad-page template means adding a row here**, a card on `/internal/templates`, an entry
+   in `scripts/template-previews.py`, and the hero question in `SKILL.md` gains an option.
+
+**Why.** The follow-ups lander needed the ad-page template's navbar, frame, ticker, FAQs and
+footer, and its own hero, problem cards, feature rows and a black call to action the ad-page
+template did not have. Building it as a copy of one template meant rewriting the other's folds,
+and building it from a page meant carrying that page's content. Treating the folds as a pool
+avoids both, and turns the second template into a source of folds for the first.
+
