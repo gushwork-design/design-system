@@ -23,6 +23,12 @@ moved when you are behind.
 Claude Code. Nothing to do at all if your repo has a `.claude/settings.json` mentioning
 `gushwork` — it installs itself.*
 
+**What the plugin logs.** When a Claude session starts with the plugin installed, it records who you
+are (your Claude account email, or your git email if that is missing), which plugin version you are
+on, and when. It records nothing about what you ask for or build. It exists so we can see whether
+the design system is being used and who is running an old version. To turn it off, set
+`GW_NO_USAGE_PING=1` in your shell.
+
 ## Then just ask for what you want
 
 > "Build a dashboard for the sales team to see show-ups over the week"
