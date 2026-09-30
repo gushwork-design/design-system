@@ -3,9 +3,11 @@
 
     python3 scripts/_add_og.py <stage-dir>
 
-The hub's social card is one image (assets/og/hub.png, Figma 818:5074). Rather than paste the same
-ten lines into every page, and have them drift, this adds them at publish time to any staged page
-that does not already carry its own og:image. That is what lets the landers, the case-study and
+The hub's social card is one image (assets/og/hub.png, Figma 818:5074), including the Staging,
+Tools and Templates collection pages. A few individual staging items carry the blue ad-page card
+instead (see PAGE_CARDS). Rather than paste the same ten lines into every page, and have them
+drift, this adds them at publish time to any staged page that does not already carry its own
+og:image. That is what lets the landers, the case-study and
 ad-page templates, the email signature and the ID-card tool keep the cards they have: a page with its
 own og:image is left alone.
 
@@ -26,6 +28,19 @@ BASE = "https://design.gushwork.ai"
 IMAGE = BASE + "/assets/og/hub.png"
 SITE = "Gushwork Design"
 
+# Staging items with no card of their own carry the blue ad-page card instead of the hub's: the white
+# logo over the item's name, rendered from assets/ads/og-template.html (the template the ad landers
+# and the case-study and ad-page templates use). The collection pages (Staging, Tools, Templates)
+# keep the hub card. Route -> (image, name). Add a route here and list its PNG in SOCIAL in
+# publish-sheets.sh. The ID card and email signature tools point at their cards from their own
+# <meta> tags, so they are not listed.
+PAGE_CARDS = {
+    "/internal/staging/case-study-gen-studio": ("case-study-gen-studio.png", "Case Study Gen Studio"),
+    "/internal/staging/crm-studio-deck/": ("crm-studio-deck.png", "CRM Studio discovery deck"),
+    "/internal/staging/homepage-neo/": ("homepage-neo.png", "Homepage Neo"),
+    "/internal/staging/social-creative/": ("social-creative.png", "Social creative"),
+}
+
 
 def route(stage, path):
     rel = os.path.relpath(path, stage).replace(os.sep, "/")
@@ -37,6 +52,10 @@ def route(stage, path):
 
 
 def block(url, title, desc):
+    image, alt = IMAGE, "Gushwork Design Hub, on a dark grid with the Gushwork logo"
+    if url in PAGE_CARDS:
+        file, name = PAGE_CARDS[url]
+        image, alt = f"{BASE}/assets/og/{file}", f"{name}, with the Gushwork logo on the brand blue grid"
     t, d = html.escape(title, quote=True), html.escape(desc, quote=True)
     lines = [
         '<meta property="og:type" content="website">',
@@ -47,16 +66,16 @@ def block(url, title, desc):
     if desc:
         lines.append(f'<meta property="og:description" content="{d}">')
     lines += [
-        f'<meta property="og:image" content="{IMAGE}">',
+        f'<meta property="og:image" content="{image}">',
         '<meta property="og:image:width" content="1200">',
         '<meta property="og:image:height" content="630">',
-        '<meta property="og:image:alt" content="Gushwork Design Hub, on a dark grid with the Gushwork logo">',
+        f'<meta property="og:image:alt" content="{alt}">',
         '<meta name="twitter:card" content="summary_large_image">',
         f'<meta name="twitter:title" content="{t}">',
     ]
     if desc:
         lines.append(f'<meta name="twitter:description" content="{d}">')
-    lines.append(f'<meta name="twitter:image" content="{IMAGE}">')
+    lines.append(f'<meta name="twitter:image" content="{image}">')
     return "<!-- Social card: the hub's, added at publish by scripts/_add_og.py -->\n" + "\n".join(lines) + "\n"
 
 

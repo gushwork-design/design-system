@@ -64,6 +64,12 @@ SHEETS=(
 # here or the card 404s and the link unfurls blank.
 SOCIAL=(
   assets/og/hub.png
+  assets/og/id-card.png
+  assets/og/email-signature.png
+  assets/og/case-study-gen-studio.png
+  assets/og/crm-studio-deck.png
+  assets/og/homepage-neo.png
+  assets/og/social-creative.png
 )
 
 # The changelog sheet is generated, so a publish must not ship a stale one.
