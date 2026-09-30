@@ -69,6 +69,14 @@ t('an unknown access level is not a wildcard', normalise({ routes: [{ path: '/x'
 t('non-addresses are filtered out of the admin list', normalise({ routes: [{ path: '/x' }], admins: ['nope', 'a@b.co'] }).admins, ['a@b.co']);
 t('the compiled fallback is the old two tiers', defaultRules().routes.map(r => r.access), ['admin', 'internal']);
 
+/* The usage log lists who ran a session. It is the owner tier, so an admin who is not an
+   owner is kept out, while the owner is let in. Uses the COMPILED rules, which is what a
+   deploy with no Edge Config store serves. */
+const compiled = normalise(defaultRules());
+t('usage log: an admin who is not an owner is forbidden',
+  decide('/admin/usage-log', S('priya@gushwork.ai'), { ...compiled, admins: ['priya@gushwork.ai'] }), 'forbid');
+t('usage log: an owner is let in', decide('/admin/usage-log', S('utsav.singh@gushwork.ai'), compiled), 'allow');
+
 /* The unconfigured path — no Edge Config store — is what every deployment
    serves until a store is attached, and it is the one the page crashed on:
    defaultRules() omitted `groups`/`people`, so the UI's r.groups.map threw.

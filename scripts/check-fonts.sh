@@ -121,7 +121,16 @@ def look(text):
         # The system's own idiom: name nothing inline, defer to the font tokens. A file doing
         # this is doing it right, and an earlier version of this check called it a violation —
         # which is how a checker earns the right to be ignored.
-        "tokenref": bool(re.search(r'var\(--gw-font', low)),
+        #
+        # --gw-text-* counts too, and this is the third false positive the check has produced.
+        # A page writing `font:var(--gw-text-h4)` IS naming the display face: the h-ramp spells
+        # out --gw-font-display inside tokens.css. Matching only `var(--gw-font` meant such a
+        # page passed solely on some incidental `font-family:var(--gw-font-body)` elsewhere in
+        # it — so the eight library foundation pages started failing the moment their body rule
+        # moved to the type ramp, having changed nothing about which face they render in.
+        # This does not soften the rule: a file referencing the tokens without resolving them
+        # still fails on the tokencss/tokendef branch below.
+        "tokenref": bool(re.search(r'var\(--gw-(font|text)', low)),
         "tokencss": "tokens.css" in low,
         # A self-contained page may define the font tokens inline instead of linking the
         # sheet. That resolves just as well, and calling it a violation was the second false

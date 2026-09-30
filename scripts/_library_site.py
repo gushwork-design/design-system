@@ -91,7 +91,12 @@ def href(from_page, to_path):
 
 CSS = """
 *{box-sizing:border-box}
-body{margin:0;background:var(--s-page-bg);font-family:var(--gw-font-body);
+/* Body/body-16-reg, the site-wide page default ruled 29 Sep 2026 (796:12917).
+   This sheet named the family but no size, so it fell to the browser's 16px at
+   `normal` leading — the right size by accident, the wrong line-height. */
+body{margin:0;background:var(--s-page-bg);
+     font:var(--gw-text-body-16-reg);
+     letter-spacing:var(--gw-text-body-16-reg-tracking);
      color:var(--s-body);-webkit-font-smoothing:antialiased}
 a{color:inherit}
 h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
