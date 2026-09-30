@@ -141,18 +141,20 @@ async function unfurlStub(request, url) {
     const map = await res.json();
     const hit = map[url.pathname.replace(/\/+$/, '')];
     if (!hit) return null;
-    const [title, image] = hit;
-    const t = esc(title), i = esc(image);
+    const [title, image, desc] = hit;
+    const t = esc(title), i = esc(image), d = desc ? esc(desc) : '';
     return new Response(
-      '<!doctype html><meta charset="utf-8"><title>' + t + '</title>' +
+      '<!doctype html><html><head><meta charset="utf-8"><title>' + t + '</title>' +
       '<meta property="og:type" content="website">' +
       '<meta property="og:site_name" content="Gushwork Design">' +
       '<meta property="og:title" content="' + t + '">' +
+      (d ? '<meta property="og:description" content="' + d + '"><meta name="description" content="' + d + '">' : '') +
       '<meta property="og:url" content="' + esc(url.origin + url.pathname) + '">' +
       '<meta property="og:image" content="' + i + '">' +
       '<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">' +
       '<meta name="twitter:card" content="summary_large_image">' +
-      '<meta name="twitter:title" content="' + t + '"><meta name="twitter:image" content="' + i + '">',
+      '<meta name="twitter:title" content="' + t + '"><meta name="twitter:image" content="' + i + '">' +
+      '</head><body></body></html>',
       { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } }
     );
   } catch (e) {
