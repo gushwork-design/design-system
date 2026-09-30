@@ -9,6 +9,9 @@
 #                                        who, version, event "file", the file's BASENAME
 #   · when a Claude artifact is published in the same session:
 #                                        who, version, event "artifact", its claude.ai link
+#   · after a Bash call in the same session, any PDF or PPTX written since the last look:
+#                                        who, version, event "file", the file's BASENAME
+#                                        (a deck or lead magnet is made by a script, not a Write)
 # Every row also carries `sess`: a short one-way hash of the session id, so an output can be tied
 # to the skill that ran in the same session. It cannot be turned back into the id.
 #
@@ -30,8 +33,9 @@
 # work. The gate is a small marker file per session, written only when a Gushwork skill runs, and
 # a file event needs it. A Write before any Gushwork skill has run in that session is ignored.
 #
-# WHAT IT CANNOT SEE. Only files written with the Write tool. A PDF or deck produced by a script
-# through Bash is not a Write, so it is not logged. That is a limit of the hook, not an oversight.
+# WHAT IT CANNOT SEE. A file made somewhere outside the working directory, deeper than four folders,
+# or by a tool that is neither Write nor Bash. The Bash look is a scan of the working directory for
+# new PDF and PPTX files, so it names what appeared, not who or what made it.
 #
 # HARD RULES, same as check-update.sh, because this runs after tool calls on someone else's machine:
 #   · always exit 0 — a non-zero exit prints a hook error
@@ -50,9 +54,18 @@ command -v curl    >/dev/null 2>&1 || exit 0
 ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." 2>/dev/null && pwd)}"
 USAGE_URL="${GW_USAGE_URL:-https://gushwork-design.vercel.app/api/log-usage}"
 
-# The hook's input arrives on stdin and can be large (a Write carries the whole file), so it is read
-# by python from stdin directly rather than being passed through an environment variable.
-BODY="$(GW_GIT_EMAIL="$(git config --get user.email 2>/dev/null || true)" GW_ROOT="$ROOT" \
+# The hook's input arrives on stdin and can be large (a Write carries the whole file), so it is handed
+# to python on stdin rather than through an environment variable.
+INPUT="$(cat)"
+
+# This hook now also fires after EVERY Bash call, in every project on the machine. Starting python
+# for each one would be a cost on work that has nothing to do with Gushwork, so a Bash call exits
+# here unless some Gushwork skill has run on this machine lately (a marker file exists).
+if printf '%s' "$INPUT" | grep -q '"tool_name" *: *"Bash"'; then
+  ls "$HOME/.claude/gushwork"/active-*.json >/dev/null 2>&1 || exit 0
+fi
+
+BODY="$(printf '%s' "$INPUT" | GW_GIT_EMAIL="$(git config --get user.email 2>/dev/null || true)" GW_ROOT="$ROOT" \
   python3 -c '
 import hashlib, json, os, re, sys, time
 
@@ -143,6 +156,7 @@ if tool == "Skill":
         sys.exit(0)
     os.makedirs(state_dir, exist_ok=True)
     st = load() or {"files": []}
+    st.setdefault("scan", time.time())   # outputs are looked for from the first skill run on
     with open(marker, "w") as f:
         json.dump(st, f)
     # Old markers are dead weight; drop any not touched for a week.
@@ -197,11 +211,57 @@ elif tool == "Artifact":
     except Exception:
         pass
     out("artifact", url=url, **extra)
+
+elif tool == "Bash":
+    # A PDF or a deck is usually made by a script run through Bash (render.sh, a headless
+    # browser, node), which is not a Write and so is invisible above. After each Bash call in a
+    # session where a Gushwork skill has run, look in the working directory for PDF or PPTX files
+    # written since the last look, and name them. Only the basename leaves the machine, as with
+    # every other file. The walk is bounded in depth and in entries, and skips dependency and
+    # build folders, so it stays cheap in a large repo.
+    st = load()
+    if st is None:
+        sys.exit(0)                      # no Gushwork skill has run in this session
+    root = str(d.get("cwd") or "")
+    if not root or not os.path.isdir(root):
+        sys.exit(0)
+    since = float(st.get("scan") or time.time())
+    st["scan"] = time.time()
+    SKIP = {"node_modules", ".git", ".venv", "venv", "__pycache__", ".next", ".cache", "Library"}
+    found, seen = [], 0
+    base_depth = root.rstrip(os.sep).count(os.sep)
+    for dirpath, dirnames, filenames in os.walk(root):
+        dirnames[:] = [x for x in dirnames if x not in SKIP and not x.startswith(".")]
+        if dirpath.count(os.sep) - base_depth >= 4:
+            dirnames[:] = []
+        for fn in filenames:
+            seen += 1
+            if fn.lower().endswith((".pdf", ".pptx")):
+                try:
+                    if os.path.getmtime(os.path.join(dirpath, fn)) >= since - 1:
+                        found.append(fn)
+                except OSError:
+                    pass
+        if seen > 5000:
+            break
+    fresh = []
+    for fn in found:
+        if fn not in st.get("files", []) and fn not in fresh:
+            fresh.append(fn)
+    fresh = fresh[:5]                    # the log endpoint rate-limits, and five is plenty per call
+    st.setdefault("files", []).extend(fresh)
+    with open(marker, "w") as f:
+        json.dump(st, f)
+    for fn in fresh:
+        out("file", file=fn[:120])
 ' 2>/dev/null)"
 
+# One row per line. Sent from a detached subshell, so the session never waits on it.
 if [ -n "$BODY" ]; then
-  ( nohup curl -fsS --max-time 3 -X POST \
-      -H 'content-type: application/json' \
-      --data "$BODY" "$USAGE_URL" >/dev/null 2>&1 & ) >/dev/null 2>&1
+  ( printf '%s\n' "$BODY" | while IFS= read -r ROW; do
+      [ -n "$ROW" ] || continue
+      curl -fsS --max-time 3 -X POST -H 'content-type: application/json' \
+        --data "$ROW" "$USAGE_URL" >/dev/null 2>&1
+    done ) >/dev/null 2>&1 &
 fi
 exit 0

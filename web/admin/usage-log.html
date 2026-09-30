@@ -297,8 +297,8 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ul-tbl { background: var(--gw-color-black); } }
 /* Every row is its own grid, so a content-sized track would resolve per row. The first track
    is fixed and the rest are minmax(floor, 1fr): floors resolve identically for every row. */
-.ul-row { display: grid; grid-template-columns: 200px minmax(160px, 1.6fr) minmax(96px, 1fr) minmax(120px, 1fr);
-  column-gap: var(--gw-space-32); align-items: center; padding: 0 var(--gw-space-24); min-width: 640px; }
+.ul-row { display: grid; grid-template-columns: 200px minmax(160px, 1.6fr) minmax(96px, 1fr) minmax(130px, 1fr) minmax(130px, 1.1fr);
+  column-gap: var(--gw-space-32); align-items: center; padding: 0 var(--gw-space-24); min-width: 820px; }
 .ul-row--h { height: 44px; background: var(--ul-hdr-bg); box-shadow: inset 0 -1px 0 var(--ul-hdr-line); }
 .ul-row--d { height: 56px; box-shadow: inset 0 -1px 0 var(--ul-row-line); transition: background var(--gw-motion-fast); }
 .ul-row--d:hover { background: var(--ul-row-hover); }
@@ -690,8 +690,8 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
   function renderLog(m) {
     var tbl = $('ul-table'), pg = $('ul-pg');
     if (S.status === 'loading') {
-      var sk = ''; for (var i = 0; i < 5; i++) sk += '<div class="ul-row ul-row--d"><span class="sk" style="width:120px;height:12px"></span><span class="sk" style="width:180px;height:12px"></span><span class="sk" style="width:60px;height:12px"></span><span class="sk" style="width:90px;height:12px"></span></div>';
-      tbl.innerHTML = '<div class="ul-row ul-row--h"><span class="ul-th"><span class="ul-th--plain">WHEN</span></span><span class="ul-th"><span class="ul-th--plain">PERSON</span></span><span class="ul-th"><span class="ul-th--plain">VERSION</span></span><span class="ul-th"><span class="ul-th--plain">EVENT</span></span></div>' + sk;
+      var sk = ''; for (var i = 0; i < 5; i++) sk += '<div class="ul-row ul-row--d"><span class="sk" style="width:120px;height:12px"></span><span class="sk" style="width:180px;height:12px"></span><span class="sk" style="width:60px;height:12px"></span><span class="sk" style="width:80px;height:12px"></span><span class="sk" style="width:90px;height:12px"></span></div>';
+      tbl.innerHTML = '<div class="ul-row ul-row--h"><span class="ul-th"><span class="ul-th--plain">WHEN</span></span><span class="ul-th"><span class="ul-th--plain">PERSON</span></span><span class="ul-th"><span class="ul-th--plain">VERSION</span></span><span class="ul-th"><span class="ul-th--plain">SKILL</span></span><span class="ul-th"><span class="ul-th--plain">EVENT</span></span></div>' + sk;
       pg.innerHTML = ''; $('ul-q-log').textContent = ''; return;
     }
     var rows = filtered(m), pages = Math.max(1, Math.ceil(rows.length / S.per));
@@ -701,13 +701,18 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
       : 'by ' + (S.sortKey === 'email' ? 'person' : 'version') + (S.sortDir < 0 ? ', descending' : ', ascending');
     $('ul-q-log').textContent = order + ', ' + plural(rows.length, 'row');
     var head = '<div class="ul-row ul-row--h" role="row">' + th('at', 'When') + th('email', 'Person') + th('version', 'Version') +
+      '<div role="columnheader"><span class="ul-th"><span class="ul-th--plain">Skill</span></span></div>' +
       '<div role="columnheader"><span class="ul-th"><span class="ul-th--plain">Event</span></span></div></div>';
     var body = slice.map(function (r) {
       var who = r.email ? '<div class="ul-c ul-c--who" role="cell" title="' + esc(r.email) + '">' + esc(r.email) + '</div>'
                         : '<div class="ul-c ul-c--none" role="cell">Not identified</div>';
       var badge = (m.newest && r.version === m.newest) ? '<span class="ul-badge ul-badge--ok">Newest</span>' : '';
+      var sk = skillInfo(r, m);
+      var skCell = sk.n
+        ? '<div class="ul-c" role="cell" title="' + esc(sk.n + (sk.inferred ? ' (inferred: this row has no session tag, so it is the same person\'s latest skill run)' : '')) + '">' + esc(sk.n) + (sk.inferred ? ' <span class="ul-c--none">~</span>' : '') + '</div>'
+        : '<div class="ul-c ul-c--none" role="cell">' + (isSess(r) ? '' : 'Unknown') + '</div>';
       return '<div class="ul-row ul-row--d" role="row"><div class="ul-c" role="cell" title="' + esc(r.at.toISOString()) + '">' + esc(fmtWhen(r.at)) + '</div>' + who +
-        '<div class="ul-c ul-c--ver" role="cell">' + esc(r.version || 'Unknown') + badge + '</div><div class="ul-c" role="cell" title="' + esc(evtText(r)) + '">' + esc(evtText(r)) + '</div></div>';
+        '<div class="ul-c ul-c--ver" role="cell">' + esc(r.version || 'Unknown') + badge + '</div>' + skCell + '<div class="ul-c" role="cell" title="' + esc(evtText(r)) + '">' + esc(evtText(r)) + '</div></div>';
     }).join('');
     tbl.innerHTML = head + (slice.length ? body :
       '<div class="ul-empty"><div class="ul-empty__copy"><h2>No rows match</h2><p>Clear the search or pick another version to see the log again.</p></div></div>');
@@ -742,13 +747,33 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
     if (f.fonts === 'foreign') w.push('other typeface');
     return w.join(', ');
   }
+  /* Which skill a row belongs to. A skill row is its own answer. Newer rows carry `sess`, a hash of
+     the session, so an output joins to the skill that ran in the same session exactly. Older rows do
+     not, so they are INFERRED: the same person's latest skill run, stopping at their next session
+     start, since a new session is a new conversation. That can be wrong when someone runs two
+     sessions at once, so an inferred answer is marked. A session start has no skill. */
+  function skillInfo(r, m) {
+    if (r.event === 'skill') return { n: (r.skill || '').replace(/^.*:/, ''), inferred: false };
+    if (isSess(r)) return { n: '', inferred: false };
+    if (r.sess) {
+      var best = null;
+      m.all.forEach(function (x) {
+        if (x.event === 'skill' && x.sess === r.sess && x.at <= r.at && (!best || x.at > best.at)) best = x;
+      });
+      if (best) return { n: best.skill.replace(/^.*:/, ''), inferred: false };
+    }
+    if (!r.email) return { n: '', inferred: false };
+    var mine = m.all.filter(function (x) { return x.email === r.email && x.at <= r.at && x !== r; })
+      .sort(function (a, b) { return b.at - a.at; });
+    for (var i = 0; i < mine.length; i++) {
+      if (mine[i].event === 'skill') return { n: mine[i].skill.replace(/^.*:/, ''), inferred: true };
+      if (isSess(mine[i])) break;
+    }
+    return { n: '', inferred: false };
+  }
   function skillFor(r, m) {
-    if (!r.sess) return '';
-    var best = null;
-    m.all.forEach(function (x) {
-      if (x.event === 'skill' && x.sess === r.sess && x.at <= r.at && (!best || x.at > best.at)) best = x;
-    });
-    return best ? best.skill.replace(/^.*:/, '') : '';
+    var s = skillInfo(r, m);
+    return s.n;
   }
   function renderOutputs(m) {
     var mt = $('ul-out-metrics'), tbl = $('ul-out'), q = $('ul-q-out');

@@ -987,5 +987,13 @@ skill had to invent: a message the plugin posts, a mapping from its timestamp to
 An output made in a teammate's session is never posted to Slack, so there is no message for a ✅ to
 land on. Tying the two together would need every output posted there, which is a larger decision.
 
-**What is still not seen.** Anything produced by a script through Bash, not Write; sessions without
-the plugin; and whether an output was *good*, which only the verdict records.
+**Script-made outputs (added 30 Sep 2026).** A lead magnet PDF or a deck is made by a script through
+Bash, not a Write, so the hook could not see it. After each Bash call in a session where a Gushwork
+skill has run, it now scans the working directory (four folders deep, at most 5,000 entries, skipping
+`node_modules`, `.git`, virtualenvs and hidden folders) for PDF and PPTX files written since the last
+look, and logs their basenames, at most five per call. A Bash call on a machine with no Gushwork
+session marker exits before starting Python, so unrelated work pays nothing. It names what appeared,
+not what made it: a PDF dropped into the folder by another tool would be named too.
+
+**What is still not seen.** Sessions without the plugin; files made outside the working directory or
+deeper than four folders; and whether an output was *good*, which only the verdict records.
