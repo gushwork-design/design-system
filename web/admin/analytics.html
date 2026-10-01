@@ -405,7 +405,11 @@ body[data-gw-page="analytics"] .sg__main > * { min-width: 0; }
 .ul-tbl > .ul-row--d { position: relative; margin: 0 var(--gw-space-8); padding: 0 var(--gw-space-16); border-radius: var(--gw-radius-12); box-shadow: none; }
 .ul-tbl > .ul-row--d + .ul-row--d::before { content: ""; position: absolute; top: 0; left: var(--gw-space-16); right: var(--gw-space-16); height: 1px; background: var(--ul-hdr-line); }
 .ul-tbl > .ul-row--d:hover::before, .ul-tbl > .ul-row--d:hover + .ul-row--d::before { display: none; }
-.ul-tbl .ul-row--h { margin: 0 var(--gw-space-8); padding: 0 var(--gw-space-16); border-radius: var(--gw-radius-8); }
+/* The header row is a plain row with a firmer rule under it: no fill, no corners (a rounded header curls the
+   rule up at both ends), the line one step stronger than the hairlines between rows. */
+.ul-tbl .ul-row--h { position: relative; margin: 0 var(--gw-space-8); padding: 0 var(--gw-space-16); border-radius: 0; background: none; box-shadow: none; }
+.ul-tbl .ul-row--h::after { content: ""; position: absolute; left: var(--gw-space-16); right: var(--gw-space-16); bottom: 0; height: 1px; background: var(--gw-color-neutral-200); }
+:root[data-theme="dark"] .ul-tbl .ul-row--h::after { background: var(--gw-color-neutral-800); }
 .ul-when { display: flex; flex-direction: column; gap: 1px; line-height: 1.3; }
 .ul-when b { font: var(--gw-text-body-12-med); color: var(--ul-value); }
 .ul-when span { font: var(--gw-text-body-12-med); color: var(--ul-sub); }
@@ -441,7 +445,7 @@ body[data-gw-page="analytics"] .sg__main > * { min-width: 0; }
 .ul-chat__t svg { width: 12px; height: 12px; color: var(--ul-icon); transition: transform var(--gw-motion-fast); }
 .ul-row--chat[aria-expanded="true"] .ul-chat__t svg { transform: rotate(180deg); }
 .ul-scroll { overflow-x: auto; }
-.ul-tbl:has(.ul-grp) .ul-row--h { margin: 0 var(--gw-space-8); padding: 0 var(--gw-space-16); min-width: 0; border-radius: var(--gw-radius-8); }
+.ul-tbl:has(.ul-grp) .ul-row--h { margin: 0 var(--gw-space-8); padding: 0 var(--gw-space-16); min-width: 0; border-radius: 0; }
 /* pagination: 52h, pad 12, space-between; arrows are icon-button 28 */
 .ul-pg { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-8); padding: var(--gw-space-12); flex-wrap: wrap; }
 .ul-pg__l, .ul-pg__r { display: flex; align-items: center; gap: var(--gw-space-8); }
