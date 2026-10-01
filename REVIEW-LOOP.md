@@ -235,3 +235,32 @@ registry records it -> library-site.sh -> PR (main needs a review) -> publish
   "No visual yet", and `bash scripts/check-previews.sh` lists them (a pre-push WARN, never a block).
 - **The old sheets** (`/admin/review-sheet`, `/library`, `/library/review`, `/library/components`) redirect to the Design
   System page. The generated library pages stay on disk because `data.json` is built from them, but nothing links to them.
+
+### Pass, Rework and Reject write to GitHub themselves (1 Oct 2026)
+
+With `GW_GITHUB_TOKEN` set on the site, a button no longer waits for a Claude session. `web/api/_review-github.js` commits the
+decision to ONE branch, `review/decisions`, behind ONE open pull request titled "Review decisions". Each commit is one
+decision, written exactly the way `scripts/review-pass.sh` writes it. The row shows "in PR #N". Nothing reaches `main` until a
+person approves and merges that pull request, the same rule as every other change.
+
+```
+[ Pass ] -> POST /api/review -> commit on review/decisions (registry JSON) -> PR "Review decisions" (opened once, then added to)
+                                      |                                              |
+                          gw:review-state (for the badge)               approve + merge -> publish -> plain "passed"
+```
+
+- **Fingerprint.** The one the page was showing, sent with the decision. If the source moved since, the stored fingerprint no
+  longer matches and the pass reads "expired" straight away.
+- **Undo** takes the decision back out of the pull request (the item is put back as `main` has it), then clears the badge.
+- **A merged batch starts fresh.** When the pull request is merged or closed, the next decision resets the branch to `main`
+  and opens a new one.
+- **Rework** is also queued for a session, because its note is the brief for the fix. The session does not record it again.
+- **Fallbacks.** No token, no fingerprint, or GitHub failing: the decision is queued for a session exactly as before, and the
+  toast says why. A decision is never dropped.
+- **Publishing.** A merged decision changes a registry and nothing else, which makes the committed `preview/library` stale.
+  `publish-sheets.sh` therefore regenerates it for the deploy instead of refusing.
+
+**Setting it up (one time).** Create a *fine-grained* personal access token at github.com/settings/personal-access-tokens, with
+Repository access = Only select repositories, `gushwork-design/design-system`, and Repository permissions Contents = Read and
+write, Pull requests = Read and write, nothing else. Add it to the Vercel project (gushwork-design) as `GW_GITHUB_TOKEN` for
+Production, then redeploy. Rotate it when the person it belongs to leaves.

@@ -74,8 +74,14 @@ bash scripts/release-log.sh --check
 
 # The component library is generated from tokens.css, the registries and the measured
 # Figma. Publishing a stale one would show a reviewer values the system no longer holds,
-# which is worse than not publishing it at all.
-bash scripts/library-site.sh --check
+# which is worse than not publishing it at all. It used to refuse; it now REGENERATES, because
+# a review decision merged from the Design System page changes a registry and nothing else, and
+# a registry-only change is exactly what makes the committed library stale. The regenerated files
+# stay in the working tree (commit them, or discard them if this was a clean checkout).
+if ! bash scripts/library-site.sh --check >/dev/null 2>&1; then
+  echo "preview/library was behind its sources (a registry or token moved): regenerating it for this deploy."
+  bash scripts/library-site.sh
+fi
 
 # And the version fields must agree before anything goes out, because version.json below
 # becomes the number every machine compares itself against. v1.40.0 shipped with
