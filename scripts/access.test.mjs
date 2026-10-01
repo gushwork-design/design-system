@@ -71,7 +71,7 @@ t('non-addresses are filtered out of the admin list', normalise({ routes: [{ pat
    usage log, and the one public ad lander. This used to assert just the first two and went stale
    as routes were added; it now names them all so adding one is a deliberate edit here. */
 t('the compiled fallback routes and their tiers', defaultRules().routes.map(r => r.access),
-  ['admin', 'internal', 'internal', 'admin', 'owner', 'public']);
+  ['admin', 'internal', 'admin', 'admin', 'owner', 'owner', 'public']);
 
 /* The usage log lists who ran a session. It is the owner tier, so an admin who is not an
    owner is kept out, while the owner is let in. Uses the COMPILED rules, which is what a
@@ -79,6 +79,11 @@ t('the compiled fallback routes and their tiers', defaultRules().routes.map(r =>
 const compiled = normalise(defaultRules());
 t('analytics: an admin who is not an owner is forbidden',
   decide('/admin/analytics', S('priya@gushwork.ai'), { ...compiled, admins: ['priya@gushwork.ai'] }), 'forbid');
+t('review sheet: an admin who is not an owner is forbidden',
+  decide('/admin/review-sheet', S('priya@gushwork.ai'), { ...compiled, admins: ['priya@gushwork.ai'] }), 'forbid');
+t('review sheet: an owner is let in', decide('/admin/review-sheet', S('utsav.singh@gushwork.ai'), compiled), 'allow');
+t('library: an ordinary teammate is kept out', decide('/library', S('sam@gushwork.ai'), compiled), 'forbid');
+t('library: an admin is let in', decide('/library', S('priya@gushwork.ai'), { ...compiled, admins: ['priya@gushwork.ai'] }), 'allow');
 t('analytics: an owner is let in', decide('/admin/analytics', S('utsav.singh@gushwork.ai'), compiled), 'allow');
 
 /* The unconfigured path — no Edge Config store — is what every deployment

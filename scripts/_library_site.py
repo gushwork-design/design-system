@@ -130,6 +130,10 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
 @media (max-width:820px){.lb-find{display:none}}
 
 /* ---- three columns ------------------------------------------------------- */
+/* Shown inside a tab of /admin/design-system (a frame named gw-embed): that page already has the title and
+   the theme button, so the library's own bar steps aside and its rails start at the top. */
+.lb-embed .lb-top{display:none}
+.lb-embed .lb-rail,.lb-embed .lb-toc{top:0;max-height:100vh}
 .lb-3{display:grid;grid-template-columns:240px minmax(0,1fr) 212px;align-items:start;
       max-width:1600px;margin:0 auto}
 .lb-rail{position:sticky;top:60px;max-height:calc(100vh - 60px);overflow-y:auto;
@@ -441,6 +445,7 @@ def chrome(page, extra_css=""):
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{esc(page.title or "Component Library")} — Gushwork</title>
 <meta name="robots" content="noindex">
+<script>if(window.name==='gw-embed'||/[?&]embed=1(&|$)/.test(location.search))document.documentElement.classList.add('lb-embed')</script>
 <script>try{{var t=localStorage.getItem('gw-theme');if(t!=='dark')t='light';
 document.documentElement.setAttribute('data-theme',t)}}catch(e){{
 document.documentElement.setAttribute('data-theme','light')}}</script>

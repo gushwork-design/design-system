@@ -55,10 +55,15 @@ export function defaultRules() {
       { path: '/internal', access: 'internal', groups: [], people: [] },
       /* The component library. Its own surface rather than a page under
          /internal, because it renders its own chrome instead of the site shell
-         — but the same tier: any verified @gushwork.ai. The review sheet under
-         it is admin, and wins here by being the longer prefix. */
-      { path: '/library',  access: 'internal', groups: [], people: [] },
+         — now admin tier, like the rest of the design system admin. The review queue
+         under it is admin too, and wins here by being the longer prefix. */
+      { path: '/library',  access: 'admin', groups: [], people: [] },
+      /* Moved from the internal tier to admin on 1 Oct 2026, when the library became a tab of
+         /admin/design-system next to the Catalogue and the Review Gate. */
       { path: '/library/review', access: 'admin', groups: [], people: [] },
+      /* The review sheet is where a component is passed into skills/, so it is the owner's, and the
+         Review tab of /admin/design-system asks for an owner account before it opens it. */
+      { path: '/admin/review-sheet', access: 'owner', groups: [], people: [] },
       /* Analytics (usage log, visits and insights on one page) lists who ran a session and who opened
          which page, which admins have no need to see. The old /admin/usage-log, /visits and /insights
          paths redirect here before middleware runs (web/vercel.json).

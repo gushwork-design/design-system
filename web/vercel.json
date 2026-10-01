@@ -9,11 +9,6 @@
       "permanent": false
     },
     {
-      "source": "/admin/component-library",
-      "destination": "/library",
-      "permanent": false
-    },
-    {
       "source": "/preview/install",
       "destination": "/internal/claude-plugin",
       "permanent": false
@@ -49,28 +44,23 @@
       "permanent": false
     },
     {
-      "source": "/admin/review",
-      "destination": "/admin/review-sheet",
-      "permanent": false
-    },
-    {
       "source": "/preview/review-sheet",
-      "destination": "/admin/review-sheet",
+      "destination": "/admin/design-system#review",
       "permanent": false
     },
     {
       "source": "/preview/review-sheet.html",
-      "destination": "/admin/review-sheet",
+      "destination": "/admin/design-system#review",
       "permanent": false
     },
     {
       "source": "/preview/catalogue",
-      "destination": "/admin/catalogue",
+      "destination": "/admin/design-system#catalogue",
       "permanent": false
     },
     {
       "source": "/preview/catalogue.html",
-      "destination": "/admin/catalogue",
+      "destination": "/admin/design-system#catalogue",
       "permanent": false
     },
     {
@@ -91,6 +81,21 @@
     {
       "source": "/admin/insights",
       "destination": "/admin/analytics#insights",
+      "permanent": false
+    },
+    {
+      "source": "/admin/component-library",
+      "destination": "/admin/design-system#library",
+      "permanent": false
+    },
+    {
+      "source": "/admin/catalogue",
+      "destination": "/admin/design-system#catalogue",
+      "permanent": false
+    },
+    {
+      "source": "/admin/review",
+      "destination": "/admin/design-system#review",
       "permanent": false
     }
   ],

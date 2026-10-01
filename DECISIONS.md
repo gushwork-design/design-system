@@ -1054,3 +1054,13 @@ Ruled by Utsav, 1 Oct 2026: add Claude tokens consumed to the usage log, and rep
 - **Not retroactive.** Only sessions on a plugin that ships this hook have figures; the pages say so rather than showing zeros.
 - **Disclosure.** ONBOARDING.md, in the usage-ping paragraph. `GW_NO_USAGE_PING=1` turns it off with everything else.
 
+
+## R32 — the Component Library, the Catalogue and the Review Gate are one admin page
+
+Ruled by Utsav, 1 Oct 2026, the same shape as Analytics.
+
+- **One page, three tabs.** `/admin/design-system`: Library (the library overview and everything under it), Catalogue (the All components table) and Review (the review sheet). Each tab shows the existing page in a frame named `gw-embed`; `shell.js` and the library's pages see that name (or `?embed=1`) and drop their own chrome, so nothing is drawn twice. A tab loads the first time it is opened. `/admin/catalogue`, `/admin/component-library` and `/admin/review` redirect to their tabs.
+- **Who.** Admins only for the Library and the Catalogue: `/library` moves from the internal tier to admin, so teammates who are not admins lose it. Review is owner-only: `/admin/review-sheet` gets a compiled owner rule, and the tab shows a locked card with "Sign in with an owner account" (Google's account chooser, then back to the tab) instead of loading the sheet for anyone who is not an owner.
+- **Sidebar.** Admin: Access Control, Design System, Design Workflow. Owner: Analytics. Review Gate is no longer its own row.
+- **Left as it was.** Deep links inside the library (`/library/parts/web/button`) and `/admin/review-sheet` itself still work on their own; the old `preview/catalogue.html` is superseded by the All components tab and no longer linked.
+

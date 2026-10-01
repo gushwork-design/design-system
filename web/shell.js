@@ -142,23 +142,12 @@
     label: 'Admin',
     tier: 'admin',
     items: [
-      /* Access Control is its own page, not a renamed catalogue — ruled by
-         Utsav 15 Sep 2026. The Figma rail draws three rows because it assumed
-         the rename; the catalogue keeps its own row until it and the review
-         sheet are merged, which is a separate piece of work. */
       { label: 'Access Control', href: '/admin/access-control', icon: 'gear' },
-      /* Review Sheet is no longer here — 796:11238 re-cuts Admin to three rows and
-         moves the review queue into the new Owner group as "Review Gate". Ruled by
-         Utsav 29 Sep 2026 that the two are the same page renamed.
-
-         Catalogue is NOT in the drawing either, and is kept anyway: the page exists
-         and is published, and dropping its only link would strand it. Flagged. */
-      { label: 'Catalogue',    href: '/admin/catalogue',    icon: 'squares-four' },
-      /* Its own surface at /library, not a page under /admin — it renders its own
-         chrome, because its left column is the library's inventory rather than this
-         rail. Listed here anyway so there is one place you look for it. The review
-         queue inside it is admin; the libraries are open to any @gushwork.ai. */
-      { label: 'Component Library', href: '/library', icon: 'swatches' },
+      /* The Component Library, the Catalogue and the Review Gate are one page with three tabs
+         (/admin/design-system), the same way Analytics holds the usage log, visits and insights.
+         The Review tab asks for an owner account; the other two are for admins. Ruled by Utsav,
+         1 Oct 2026. */
+      { label: 'Design System', href: '/admin/design-system', icon: 'swatches' },
       /* Was 'flow-arrow', which is not in ICON — the row drew an empty <path>.
          683:5282 gives Workflow the same stacked glyph as Change Log. */
       { label: 'Design Workflow', href: '/admin/workflow',  icon: 'stack-overflow-logo' }
@@ -173,7 +162,6 @@
     label: 'Owner',
     tier: 'admin',
     items: [
-      { label: 'Review Gate',  href: '/admin/review-sheet', icon: 'checks' },
       { label: 'Analytics',    href: '/admin/analytics',    icon: 'chart-line-up' }
     ]
   };
@@ -271,7 +259,7 @@
 
   /* The logo chip is brand blue everywhere except the two owner pages (Review Gate, Analytics),
      where it goes black so the bar says you are somewhere only the owner is. Ruled by Utsav, 1 Oct 2026. */
-  var OWNER_PAGE = /^\/admin\/(analytics|review-sheet)$/.test(normalise(location.pathname));
+  var OWNER_PAGE = /^\/admin\/analytics$/.test(normalise(location.pathname));
 
   /* -- markup ------------------------------------------------------------ */
   function topbarHTML() {
@@ -1914,7 +1902,13 @@
     palWire();
   }
 
-  if (document.readyState === 'loading') {
+  /* A page shown inside the Design system tabs (/admin/design-system) is loaded in a frame named
+     gw-embed, or with ?embed=1. It must not draw the site chrome a second time, so the shell stands
+     down and the page renders on its own; the theme is already applied by the head snippet. */
+  var EMBEDDED = window.name === 'gw-embed' || /[?&]embed=1(&|$)/.test(location.search);
+  if (EMBEDDED) {
+    document.documentElement.classList.add('gw-embed');
+  } else if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', mount);
   } else {
     mount();
