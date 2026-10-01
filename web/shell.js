@@ -267,9 +267,9 @@
   }
   function isCurrent(href) { return normalise(location.pathname) === normalise(href); }
 
-  /* Behind the gate? /internal/* and /admin/* are exactly what middleware.js
-     matches, so the two cannot drift. */
-  var INTERNAL_PAGE = /^\/(internal|admin)(\/|$)/.test(normalise(location.pathname));
+  /* The logo chip is brand blue everywhere except the two owner pages (Review Gate, Usage Logs),
+     where it goes black so the bar says you are somewhere only the owner is. Ruled by Utsav, 1 Oct 2026. */
+  var OWNER_PAGE = /^\/admin\/(usage-log|review-sheet)$/.test(normalise(location.pathname));
 
   /* -- markup ------------------------------------------------------------ */
   function topbarHTML() {
@@ -280,7 +280,7 @@
              chip is Neutral/black rather than Primary/500. It is drawn for the
              pages behind the gate, so the bar itself tells you which side of
              it you are on without reading the URL. */
-          '<span class="gw-brand__chip' + (INTERNAL_PAGE ? ' gw-brand__chip--internal' : '') +
+          '<span class="gw-brand__chip' + (OWNER_PAGE ? ' gw-brand__chip--owner' : '') +
                '" style="color:var(--gw-color-white)">' + MARK + '</span>' +
           '<span class="gw-brand__name">Gushwork Design</span>' +
         '</a>' +
@@ -497,7 +497,7 @@
   function railTopHTML() {
     return '<div class="gw-railtop">' +
         '<a class="gw-brand" href="/">' +
-          '<span class="gw-brand__chip' + (INTERNAL_PAGE ? ' gw-brand__chip--internal' : '') +
+          '<span class="gw-brand__chip' + (OWNER_PAGE ? ' gw-brand__chip--owner' : '') +
                '" style="color:var(--gw-color-white)">' + MARK + '</span>' +
           '<span class="gw-brand__name">Gushwork Design</span>' +
         '</a>' +
