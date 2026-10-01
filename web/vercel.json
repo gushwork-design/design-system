@@ -55,12 +55,12 @@
     },
     {
       "source": "/preview/catalogue",
-      "destination": "/admin/design-system#catalogue",
+      "destination": "/admin/design-system#library",
       "permanent": false
     },
     {
       "source": "/preview/catalogue.html",
-      "destination": "/admin/design-system#catalogue",
+      "destination": "/admin/design-system#library",
       "permanent": false
     },
     {
@@ -90,7 +90,7 @@
     },
     {
       "source": "/admin/catalogue",
-      "destination": "/admin/design-system#catalogue",
+      "destination": "/admin/design-system#library",
       "permanent": false
     },
     {

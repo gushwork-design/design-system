@@ -160,10 +160,24 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
 .lb-toc a.l3{padding-left:var(--gw-space-12)}
 @media (max-width:1180px){.lb-3{grid-template-columns:220px minmax(0,1fr)}
                           .lb-toc{display:none}}
-@media (max-width:820px){.lb-3{grid-template-columns:1fr}
+@media (max-width:820px){.lb-3{grid-template-columns:minmax(0,1fr)}
+                         /* `.lb-mid{grid-column:2}` above made the grid two columns even here, so the rail
+                            was squeezed to 0 wide and there was no way to move between sections. Both
+                            go back to column 1, and the rail becomes one scrolling row of chips instead
+                            of a 400px list in front of the content. */
+                         .lb-mid,.lb-rail{grid-column:1}
                          .lb-rail{position:static;max-height:none;border-right:0;
-                                  border-bottom:1px solid var(--s-chrome-border)}
+                                  border-bottom:1px solid var(--s-chrome-border);
+                                  display:flex;flex-direction:row;align-items:center;gap:var(--gw-space-8);
+                                  overflow-x:auto;padding:var(--gw-space-12) var(--gw-space-20);
+                                  scrollbar-width:none}
+                         .lb-rail::-webkit-scrollbar{display:none}
+                         .lb-rail__t,.lb-rail__sep{display:none}
+                         .lb-rail a{flex:none;white-space:nowrap;gap:var(--gw-space-4);
+                                    padding:6px var(--gw-space-12);border-radius:var(--gw-radius-full);
+                                    border:1px solid var(--s-chrome-border)}
                          .lb-mid{padding:var(--gw-space-24) var(--gw-space-20)}}
+@media (max-width:640px){.lb-crumb{display:none}}
 
 /* ---- page head ----------------------------------------------------------- */
 .lb-h{display:flex;flex-direction:column;gap:var(--gw-space-8)}

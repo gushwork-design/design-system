@@ -25,7 +25,6 @@
 #   /internal/templates      templates  @gushwork.ai
 #   /internal/changelog      = changelog-sheet  @gushwork.ai
 #   /admin/review-sheet      = review-sheet     ADMIN_EMAILS only
-#   /admin/catalogue         = catalogue        ADMIN_EMAILS only
 #   /admin/workflow          = web/admin/workflow.html (built from Figma 661:5802)  ADMIN_EMAILS only
 #
 # THE SHEETS ARE STILL NEVER EDITED. They are generated, and release-log.sh
@@ -55,7 +54,6 @@ SHEETS=(
   "preview/install.html|internal/claude-plugin.html"
   "preview/changelog-sheet.html|internal/changelog.html"
   "preview/review-sheet.html|admin/review-sheet.html"
-  "preview/catalogue.html|admin/catalogue.html"
 )
 
 # Social card images. A page's og:image must be an absolute URL for crawlers

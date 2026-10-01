@@ -3,7 +3,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Design System — Gushwork Design</title>
 <meta name="robots" content="noindex">
-<meta name="description" content="The component library, the catalogue, the review gate and the design workflow, for admins.">
+<meta name="description" content="The foundations and component library, the review gate and the design workflow, for admins.">
 <script>try{var t=localStorage.getItem('gw-theme');if(t!=='dark')t='light';document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20width%3D%2280%22%20height%3D%2280%22%20rx%3D%2220%22%20fill%3D%22%230d0d0d%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
 <link rel="stylesheet" href="/foundation/tokens.css">
@@ -595,6 +595,58 @@ code { font: 500 .87em/1 var(--gw-font-mono, ui-monospace, "SF Mono", Menlo, mon
 }
 
 body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
+/* ---- Foundations library (native). Layout after the token pages in Arcade, MagicPath and AirOps (Mobbin):
+   grouped swatch cards, a type-scale table with a live specimen, and counts on the sub-tabs. Everything
+   is drawn from /foundation/tokens.json, so a token change shows here with no second copy to edit. ---- */
+.fd { display: flex; flex-direction: column; gap: var(--gw-space-32); }
+.fd[hidden] { display: none; }
+.fd-nav { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--gw-space-12); }
+.fd-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--gw-space-12); }
+.fd-head__r .ds-a { font: 500 13px/1 var(--gw-font-body); color: var(--ul-cell); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--ul-hdr-line); }
+/* The pill rows are long (eight sections, seven foundations). They scroll sideways and never wrap a pill's label. */
+.ds-panel .ul-tabs { max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+.ds-panel .ul-tabs::-webkit-scrollbar { display: none; }
+.ds-panel .ul-tab { white-space: nowrap; flex: none; }
+.fd-head p { margin: 0; font: var(--gw-text-body-14-reg); color: var(--ul-sub); max-width: 62ch; }
+.fd-head__r { display: flex; align-items: center; gap: var(--gw-space-12); }
+.fd-sec { display: flex; flex-direction: column; gap: var(--gw-space-16); }
+.fd-sec > h3 { margin: 0; display: flex; align-items: baseline; gap: var(--gw-space-8); font: 600 16px/1.3 var(--gw-font-body); color: var(--ul-value); }
+.fd-sec > h3 span { font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
+.fd-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: var(--gw-space-12); }
+.fd-sw { all: unset; box-sizing: border-box; cursor: pointer; display: flex; flex-direction: column; gap: var(--gw-space-8); padding: var(--gw-space-8); border-radius: var(--gw-radius-16); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); transition: background var(--gw-motion-fast); }
+.fd-sw:hover { background: var(--ul-row-hover); }
+.fd-sw:focus-visible { outline: var(--gw-focus-ring); outline-offset: 2px; }
+.fd-sw__c { height: 64px; border-radius: var(--gw-radius-12); box-shadow: inset 0 0 0 1px var(--ul-ctl-line); }
+.fd-sw__c--a { background-image: conic-gradient(rgba(128,128,128,.25) 25%, transparent 0 50%, rgba(128,128,128,.25) 0 75%, transparent 0); background-size: 12px 12px; position: relative; }
+.fd-sw__c--a > i { position: absolute; inset: 0; border-radius: inherit; }
+.fd-sw b { font: 600 12.5px/1.3 var(--gw-font-body); color: var(--ul-value); padding: 0 var(--gw-space-4); }
+.fd-sw span { font: 500 11.5px/1.3 var(--gw-font-mono, ui-monospace, "SF Mono", Menlo, monospace); color: var(--ul-sub); padding: 0 var(--gw-space-4); text-transform: uppercase; }
+.fd-sw span.fd-alias { text-transform: none; }
+.fd-faces { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--gw-space-12); }
+.fd-face { display: flex; flex-direction: column; gap: var(--gw-space-12); padding: var(--gw-space-20); border-radius: var(--gw-radius-16); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }
+.fd-face__aa { font-size: 64px; line-height: 1; font-weight: 600; color: var(--ul-value); }
+.fd-face__n { font: 600 14px/1.3 var(--gw-font-body); color: var(--ul-value); }
+.fd-face__m { font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
+.fd-face__w { display: flex; flex-wrap: wrap; gap: var(--gw-space-12); font-size: 15px; color: var(--ul-cell); }
+.fd-list { display: flex; flex-direction: column; }
+.fd-r { display: grid; grid-template-columns: minmax(200px, 300px) minmax(0, 1fr); gap: var(--gw-space-16); align-items: center; padding: var(--gw-space-12) var(--gw-space-8); box-shadow: inset 0 -1px 0 var(--ul-hdr-line); }
+.fd-r:last-child { box-shadow: none; }
+.fd-r__l { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.fd-r__l b { font: 600 13px/1.3 var(--gw-font-body); color: var(--ul-value); }
+.fd-r__l span { font: 500 11.5px/1.4 var(--gw-font-mono, ui-monospace, "SF Mono", Menlo, monospace); color: var(--ul-sub); overflow-wrap: anywhere; }
+.fd-r__s { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--ul-value); }
+.fd-bar { height: 12px; border-radius: 4px; background: var(--gw-color-primary-500); min-width: 2px; }
+.fd-shapes { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: var(--gw-space-12); }
+.fd-shape { display: flex; flex-direction: column; gap: var(--gw-space-8); padding: var(--gw-space-12); border-radius: var(--gw-radius-16); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }
+.fd-shape__b { height: 64px; background: var(--gw-color-primary-50); box-shadow: inset 0 0 0 1.5px var(--gw-color-primary-500); }
+.fd-shape b { font: 600 12.5px/1.3 var(--gw-font-body); color: var(--ul-value); }
+.fd-shape span { font: 500 11.5px/1.3 var(--gw-font-mono, ui-monospace, "SF Mono", Menlo, monospace); color: var(--ul-sub); }
+.fd-lifts { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--gw-space-24); padding: var(--gw-space-24); border-radius: var(--gw-radius-16); background: var(--ul-hdr-bg); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }
+.fd-lift { display: flex; flex-direction: column; gap: var(--gw-space-8); padding: var(--gw-space-20); border-radius: var(--gw-radius-12); background: var(--ul-field-bg); min-height: 96px; }
+.fd-lift b { font: 600 13px/1.3 var(--gw-font-body); color: var(--ul-value); }
+.fd-lift span { font: 500 11px/1.4 var(--gw-font-mono, ui-monospace, "SF Mono", Menlo, monospace); color: var(--ul-sub); overflow-wrap: anywhere; }
+@media (max-width: 767px) { .fd-r { grid-template-columns: 1fr; gap: var(--gw-space-8); } }
+
 .ds-panel[hidden] { display: none; }
 .ds-panel { display: flex; flex-direction: column; gap: var(--gw-space-24); }
 .ds-panel > * { min-width: 0; }
@@ -621,7 +673,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 
   <header class="sg__hd">
     <h1>Design System</h1>
-    <p>The component library, every component in one list, the review gate and how design runs</p>
+    <p>The foundations and component library, the review gate and how design runs</p>
   </header>
 
   <main class="sg__main">
@@ -629,7 +681,6 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     <div class="an-bar">
       <div class="ul-tabs an-tabs" id="ds-tabs" role="tablist" aria-label="Design system">
         <button class="ul-tab" role="tab" data-tab="library" aria-selected="true">Library</button>
-        <button class="ul-tab" role="tab" data-tab="catalogue" aria-selected="false">Catalogue</button>
         <button class="ul-tab" role="tab" data-tab="review" id="ds-tab-review" aria-selected="false" hidden>Review</button>
         <button class="ul-tab" role="tab" data-tab="workflow" aria-selected="false">Workflow</button>
       </div>
@@ -638,16 +689,11 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     <section class="ds-panel" id="ds-library" role="tabpanel">
       <div class="ul-metrics" id="ds-lib-stats"></div>
       <div class="ds-tools"><div class="ul-tabs" id="ds-lib-tabs" role="tablist" aria-label="Library section"></div><input class="ds-find" id="ds-lib-find" type="search" aria-label="Filter this list" placeholder="Filter this list" autocomplete="off"></div>
-      <section class="ul-sec" aria-labelledby="ds-lib-h">
+      <div class="fd" id="ds-fd" hidden></div>
+      <section class="ul-sec" id="ds-lib-sec" aria-labelledby="ds-lib-h">
         <div class="ul-sh"><div class="ul-sh__t"><h2 id="ds-lib-h">Library</h2><span class="ul-sh__q" id="ds-lib-q"></span></div></div>
         <div class="ul-scroll vs-t" id="ds-lib-table"></div>
       </section>
-    </section>
-
-    <section class="ds-panel" id="ds-catalogue" role="tabpanel" hidden>
-      <div class="ul-metrics" id="ds-cat-stats"></div>
-      <div class="ds-tools"><div class="ul-tabs" id="ds-cat-tabs" role="tablist" aria-label="Catalogue filter"></div><input class="ds-find" id="ds-cat-find" type="search" aria-label="Filter components" placeholder="Filter components" autocomplete="off"></div>
-      <div id="ds-cat-body" style="display:flex;flex-direction:column;gap:var(--gw-space-24)"></div>
     </section>
 
     <section class="ds-panel" id="ds-review" role="tabpanel" hidden>
@@ -755,7 +801,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 <script>
 (function () {
   'use strict';
-  var TABS = ['library', 'catalogue', 'review', 'workflow'], started = {}, owner = false;
+  var TABS = ['library', 'review', 'workflow'], started = {}, owner = false;
   var LIB = '/library/';
   var me = fetch('/api/auth/me', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : {}; })
     .then(function (j) { owner = !!(j && j.owner); }).catch(function () {});
@@ -782,8 +828,125 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   }
   function failed(host, msg) { host.innerHTML = '<div class="ul-empty"><div class="ul-empty__copy"><h2>' + esc(msg) + '</h2></div></div>'; }
 
+  /* ---------------- Foundations (native, drawn from /foundation/tokens.json) ---------------- */
+  var F = { tab: 'color' }, tokP = null;
+  function tokens() { return tokP || (tokP = fetch('/foundation/tokens.json', { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw new Error('tokens ' + r.status); return r.json(); })); }
+  var FD_TABS = [['color', 'Color'], ['type', 'Typography'], ['spacing', 'Spacing'], ['radius', 'Radius'], ['elevation', 'Elevation'], ['layout', 'Layout'], ['motion', 'Motion and focus']];
+  var FD_KEY = { color: 'color', type: 'type', spacing: 'spacing', radius: 'radius', elevation: 'elevation', layout: 'breakpoint' };
+  function resolve(t, v, n) {
+    n = n || 0; var m = /^var\(--(gw-[a-z0-9-]+)\)$/.exec(String(v).trim());
+    return m && t[m[1]] != null && n < 5 ? resolve(t, t[m[1]], n + 1) : String(v).trim();
+  }
+  function keys(t, re) { return Object.keys(t).filter(function (k) { return re.test(k); }); }
+  function px(v) { var m = /^(-?[\d.]+)px$/.exec(String(v).trim()); return m ? parseFloat(m[1]) : null; }
+  /* A ramp reads 25, 50, 100 ... 900, and the alpha steps come after it, in order. */
+  function rampOrder(a, b) {
+    var fa = /alpha/.test(a), fb = /alpha/.test(b); if (fa !== fb) return fa ? 1 : -1;
+    var na = parseFloat((a.match(/-(\d+)$/) || [0, 0])[1]), nb = parseFloat((b.match(/-(\d+)$/) || [0, 0])[1]);
+    return na - nb;
+  }
+  function swatch(t, k) {
+    var raw = t[k], val = resolve(t, raw), short = k.replace('gw-color-', ''), alias = raw !== val;
+    var alpha = /^#[0-9a-f]{8}$/i.test(val);
+    return '<button type="button" class="fd-sw" data-copy="--' + esc(k) + '" title="Copy --' + esc(k) + '">' +
+      '<div class="fd-sw__c' + (alpha ? ' fd-sw__c--a' : '') + '"' + (alpha ? '' : ' style="background:' + esc(val) + '"') + '>' + (alpha ? '<i style="background:' + esc(val) + '"></i>' : '') + '</div>' +
+      '<b>' + esc(short) + '</b><span>' + esc(val) + '</span>' + (alias ? '<span class="fd-alias">uses ' + esc(String(raw).replace(/var\(--gw-color-|\)/g, '')) + '</span>' : '') + '</button>';
+  }
+  function fdColor(t) {
+    var G = [['Brand', ['primary', 'secondary']], ['Neutral', ['neutral']], ['Base', ['white', 'black']], ['Status', ['green', 'yellow', 'orange', 'red']], ['Chart', ['chart']]];
+    return G.map(function (g) {
+      var ks = []; g[1].forEach(function (f) { ks = ks.concat(keys(t, new RegExp('^gw-color-' + f + '(-|$)')).sort(rampOrder)); });
+      if (!ks.length) return '';
+      return '<section class="fd-sec"><h3>' + esc(g[0]) + '<span>' + plural(ks.length, 'token') + '</span></h3><div class="fd-grid">' + ks.map(function (k) { return swatch(t, k); }).join('') + '</div></section>';
+    }).join('');
+  }
+  function fam(v) { return /display/.test(v) ? 'Vert Grotesk Display' : /mono/.test(v) ? 'Mono' : 'Inter'; }
+  function fdType(t) {
+    var faces = [['gw-font-display', 'Headings', '600 700'], ['gw-font-body', 'Everything else', '400 500 600']].filter(function (f) { return t[f[0]]; });
+    var h = '<section class="fd-sec"><h3>Typefaces<span>' + plural(faces.length, 'family') + '</span></h3><div class="fd-faces">' + faces.map(function (f) {
+      var name = String(t[f[0]]).split(',')[0].replace(/['"]/g, '').trim();
+      return '<div class="fd-face"><div class="fd-face__aa" style="font-family:var(--' + f[0] + ')">Aa</div><div><div class="fd-face__n">' + esc(name) + '</div><div class="fd-face__m">' + esc(f[1]) + ' · weights ' + esc(f[2]) + '</div></div>' +
+        '<div class="fd-face__w" style="font-family:var(--' + f[0] + ')"><span style="font-weight:400">Regular</span><span style="font-weight:500">Medium</span><span style="font-weight:600">Semibold</span><span style="font-weight:700">Bold</span></div></div>';
+    }).join('') + '</div></section>';
+    var ks = keys(t, /^gw-text-/).filter(function (k) { return !/-tracking$/.test(k) && /^\d/.test(String(t[k])); });
+    var groups = [['Headings', /^gw-text-h\d/], ['Body', /^gw-text-body-/], ['Buttons', /^gw-text-button-/], ['Other', /./]], used = {};
+    groups.forEach(function (g) {
+      var mine = ks.filter(function (k) { return !used[k] && g[1].test(k); }); mine.forEach(function (k) { used[k] = 1; });
+      if (!mine.length) return;
+      h += '<section class="fd-sec"><h3>' + esc(g[0]) + '<span>' + plural(mine.length, 'style') + '</span></h3><div class="fd-list">' + mine.map(function (k) {
+        var v = String(t[k]), m = /^(\d+)\s+([\d.]+)px\/([^\s]+)\s+(.*)$/.exec(v), tr = t[k + '-tracking'];
+        var meta = m ? fam(m[4]) + ' · ' + m[1] + ' · ' + m[2] + 'px / ' + m[3] + (tr != null ? ' · tracking ' + tr : '') : v;
+        var big = m && parseFloat(m[2]) >= 40;
+        return '<div class="fd-r"><div class="fd-r__l"><b>' + esc(k.replace('gw-text-', '')) + '</b><span>' + esc(meta) + '</span></div><div class="fd-r__s" style="font:var(--' + k + ');letter-spacing:var(--' + k + '-tracking,0)">' + (big ? 'Design that scales' : 'The quick brown fox jumps over the lazy dog') + '</div></div>';
+      }).join('') + '</div></section>';
+    });
+    return h;
+  }
+  function fdSpacing(t) {
+    var ks = keys(t, /^gw-space-/);
+    return '<section class="fd-sec"><h3>Scale<span>' + plural(ks.length, 'step') + '</span></h3><div class="fd-list">' + ks.map(function (k) {
+      var n = px(t[k]);
+      return '<div class="fd-r"><div class="fd-r__l"><b>' + esc(k.replace('gw-', '')) + '</b><span>' + esc(t[k]) + '</span></div><div><div class="fd-bar" style="width:' + Math.min(n || 0, 240) + 'px"></div></div></div>';
+    }).join('') + '</div></section>';
+  }
+  function fdRadius(t) {
+    var ks = keys(t, /^gw-radius-/).sort(function (a, b) {
+      var n = function (k) { return t[k] === '0' ? -1 : px(t[k]) == null ? 1e9 : px(t[k]); }; return n(a) - n(b);
+    });
+    return '<section class="fd-sec"><h3>Corners<span>' + plural(ks.length, 'step') + '</span></h3><div class="fd-shapes">' + ks.map(function (k) {
+      return '<div class="fd-shape"><div class="fd-shape__b" style="border-radius:' + (px(t[k]) != null ? Math.min(px(t[k]), 32) + 'px' : (t[k] === '0' ? '0' : '9999px')) + '"></div><b>' + esc(k.replace('gw-radius-', '')) + '</b><span>' + esc(t[k]) + '</span></div>';
+    }).join('') + '</div></section>';
+  }
+  function fdElevation(t) {
+    var ks = keys(t, /^gw-shadow-/);
+    return '<section class="fd-sec"><h3>Shadows<span>' + plural(ks.length, 'level') + '</span></h3><div class="fd-lifts">' + ks.map(function (k) {
+      return '<div class="fd-lift" style="box-shadow:var(--' + k + ')"><b>' + esc(k.replace('gw-shadow-', '').toUpperCase()) + '</b><span>' + esc(t[k]) + '</span></div>';
+    }).join('') + '</div></section>';
+  }
+  function rows(t, ks) {
+    return '<div class="fd-list">' + ks.map(function (k) {
+      return '<div class="fd-r"><div class="fd-r__l"><b>' + esc(k.replace('gw-', '')) + '</b><span>--' + esc(k) + '</span></div><div class="fd-r__s" style="font:var(--gw-text-body-14-med)">' + esc(String(t[k]).split('\n')[0]) + '</div></div>';
+    }).join('') + '</div>';
+  }
+  function fdLayout(t) {
+    var a = keys(t, /^gw-content-/), b = keys(t, /^gw-bp-/);
+    return '<section class="fd-sec"><h3>Content<span>' + plural(a.length, 'token') + '</span></h3>' + rows(t, a) + '</section>' +
+      '<section class="fd-sec"><h3>Breakpoint tokens<span>' + plural(b.length, 'token') + '</span></h3>' + rows(t, b) + '</section>';
+  }
+  function fdMotion(t) {
+    var a = keys(t, /^gw-(motion|focus|toast)-/);
+    return '<section class="fd-sec"><h3>Motion and focus<span>' + plural(a.length, 'token') + '</span></h3>' + rows(t, a) + '</section>';
+  }
+  var FD_NOTE = {
+    color: 'Every colour in tokens.css. Click a swatch to copy its custom property.',
+    type: 'Two typefaces, and the styles built from them. The specimen is drawn with the real token.',
+    spacing: 'The spacing scale. Bars are drawn to scale up to 240px.',
+    radius: 'Corner radii, drawn at their real size up to 32px.',
+    elevation: 'Shadow levels, each applied to a card.',
+    layout: 'Content width, margins and the breakpoint tokens.',
+    motion: 'Transition timing, the focus ring and the toast timer.'
+  };
+  function renderFoundations(d, t) {
+    var host = $('ds-fd');
+    var count = {
+      color: keys(t, /^gw-color-/).length, type: keys(t, /^gw-text-/).filter(function (k) { return !/-tracking$/.test(k); }).length + 2, spacing: keys(t, /^gw-space-/).length, radius: keys(t, /^gw-radius-/).length,
+      elevation: keys(t, /^gw-shadow-/).length, layout: keys(t, /^gw-(content|bp)-/).length, motion: keys(t, /^gw-(motion|focus|toast)-/).length
+    };
+    var body = { color: fdColor, type: fdType, spacing: fdSpacing, radius: fdRadius, elevation: fdElevation, layout: fdLayout, motion: fdMotion }[F.tab](t);
+    var gk = FD_KEY[F.tab], g = gk && (d.foundations || []).filter(function (x) { return x.key === gk; })[0];
+    host.innerHTML = '<div class="fd-nav"><div class="ul-tabs" id="ds-fd-tabs" role="tablist" aria-label="Foundations"></div></div>' +
+      '<div class="fd-head"><p>' + esc(FD_NOTE[F.tab]) + '</p><div class="fd-head__r">' + (g ? review(g.review) + ' <a class="ds-a" href="' + esc(LIB + g.href) + '">Standalone page</a>' : '') + '</div></div>' + body;
+    pills($('ds-fd-tabs'), FD_TABS.map(function (x) { return [x[0], x[1] + ' ' + count[x[0]]]; }), F.tab, function (v) { F.tab = v; try { history.replaceState(null, '', '#library/' + v); } catch (e) {} renderFoundations(d, t); });
+    host.querySelectorAll('.fd-sw').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var span = b.querySelector('b'), old = span.textContent;
+        try { navigator.clipboard.writeText('var(' + b.getAttribute('data-copy') + ')'); span.textContent = 'Copied'; setTimeout(function () { span.textContent = old; }, 1100); } catch (e) {}
+      });
+    });
+  }
+
   /* ---------------- Library ---------------- */
-  var L = { sec: 'web', q: '' };
+  var L = { sec: 'foundations', q: '' };
   function renderLibrary(d) {
     var s = d.stats;
     $('ds-lib-stats').innerHTML =
@@ -792,6 +955,9 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       metric('Libraries', String(s.libraries), 'foundations plus ' + d.surfaces.length + ' surfaces') + metric('Open gaps', String(s.gaps), 'known gaps in the source');
     var items = [['foundations', 'Foundations']].concat(d.surfaces.map(function (x) { return [x.key, x.title]; })).concat([['recipes', 'Recipes']]);
     pills($('ds-lib-tabs'), items, L.sec, function (v) { L.sec = v; renderLibrary(d); });
+    var nat = L.sec === 'foundations';
+    $('ds-fd').hidden = !nat; $('ds-lib-sec').hidden = nat; $('ds-lib-find').hidden = nat;
+    if (nat) { tokens().then(function (t) { renderFoundations(d, t); }).catch(function () { $('ds-fd').innerHTML = '<div class="ul-empty"><div class="ul-empty__copy"><h2>Could not load the tokens</h2></div></div>'; }); return; }
     var q = L.q.toLowerCase(), rows = [], title, sub, cols, heads;
     if (L.sec === 'foundations') {
       title = 'Foundations'; sub = plural(d.foundations.length, 'group') + ', shared by every surface';
@@ -812,36 +978,6 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     }
     $('ds-lib-h').textContent = title; $('ds-lib-q').textContent = sub;
     $('ds-lib-table').innerHTML = table(cols, heads, rows, q ? 'Nothing matches' : 'Nothing measured yet');
-  }
-
-  /* ---------------- Catalogue ---------------- */
-  var C = { f: 'all', q: '' };
-  var FID = { measured: ['Measured', ' ul-badge--ok'], inventory: ['Inventory', ' ul-badge--warn'], annotated: ['Annotated', ''] };
-  function renderCatalogue(d) {
-    var all = d.catalogue, tot = all.length, spec = all.filter(function (e) { return e.href; }).length;
-    var vr = all.reduce(function (a, e) { return a + (e.variants || 0); }, 0);
-    var n = function (k) { return all.filter(function (e) { return e.fidelity === k; }).length; };
-    $('ds-cat-stats').innerHTML = metric('Components', String(tot), vr.toLocaleString() + ' variants') + metric('With a spec page', String(spec), (tot - spec) + ' still without') +
-      metric('Measured', String(n('measured')), n('inventory') + ' inventory only, ' + n('annotated') + ' annotated only');
-    pills($('ds-cat-tabs'), [['all', 'All'], ['nospec', 'No spec page'], ['measured', 'Measured'], ['inventory', 'Inventory only'], ['annotated', 'Annotated only']], C.f, function (v) { C.f = v; renderCatalogue(d); });
-    var q = C.q.toLowerCase(), by = {}, order = [];
-    all.forEach(function (e) {
-      if (C.f === 'nospec' && e.href) return;
-      if (['measured', 'inventory', 'annotated'].indexOf(C.f) !== -1 && e.fidelity !== C.f) return;
-      if (q && (e.name + ' ' + e.note + ' ' + (e.node || '') + ' ' + e.title).toLowerCase().indexOf(q) === -1) return;
-      if (!by[e.surface]) { by[e.surface] = { title: e.title, rows: [] }; order.push(e.surface); }
-      by[e.surface].rows.push(e);
-    });
-    var cols = 'minmax(220px,2fr) 120px 110px 90px 110px 130px', heads = ['Component', 'Group', 'Node', 'Variants', 'Verified', 'Library'];
-    $('ds-cat-body').innerHTML = order.length ? order.map(function (k) {
-      var g = by[k], rows = g.rows.map(function (e) {
-        var f = e.fidelity ? '<span class="ul-badge' + FID[e.fidelity][1] + '">' + FID[e.fidelity][0] + '</span>' : '<span class="ul-c--none">—</span>';
-        var name = (e.href ? link(e.href, e.name) : '<b style="font-weight:600">' + esc(e.name) + '</b>') + (e.note ? '<div style="font:var(--gw-text-body-12-reg);color:var(--ul-sub);white-space:normal;line-height:1.35">' + esc(e.note) + '</div>' : '');
-        return '<div class="ul-row ul-row--d" role="row" style="height:auto;min-height:56px;padding-top:8px;padding-bottom:8px">' + cell(name, '') + txt(e.group || '') + txt(e.node || '—') + txt(e.variants ? e.variants.toLocaleString() : '—') + cell(f) +
-          cell(e.href ? '<a class="ds-a" href="' + esc(LIB + e.href) + '">Spec page</a>' : '<span class="ul-badge ul-badge--bad">no spec page yet</span>') + '</div>';
-      });
-      return '<section class="ul-sec"><div class="ul-sh"><div class="ul-sh__t"><h2>' + esc(g.title) + '</h2><span class="ul-sh__q">' + plural(g.rows.length, 'component') + '</span></div></div><div class="ul-scroll vs-t">' + table(cols, heads, rows, '') + '</div></section>';
-    }).join('') : '<section class="ul-sec"><div class="ul-empty"><div class="ul-empty__copy"><h2>Nothing matches</h2></div></div></section>';
   }
 
   /* ---------------- Review ---------------- */
@@ -870,16 +1006,15 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     if (name === 'library') data().then(function (d) {
       renderLibrary(d); $('ds-lib-find').addEventListener('input', function (e) { L.q = e.target.value; renderLibrary(d); });
     }).catch(function () { failed($('ds-lib-table'), 'Could not load the library list'); });
-    if (name === 'catalogue') data().then(function (d) {
-      renderCatalogue(d); $('ds-cat-find').addEventListener('input', function (e) { C.q = e.target.value; renderCatalogue(d); });
-    }).catch(function () { failed($('ds-cat-body'), 'Could not load the catalogue'); });
     if (name === 'review') me.then(function () {
       $('ds-review-lock').hidden = owner; $('ds-review-app').hidden = !owner;
       if (owner) data().then(renderReview).catch(function () { failed($('ds-rev-table'), 'Could not load the review queue'); });
     });
   }
   function show(name, push) {
+    var sub0 = name.split('/')[1]; name = name.split('/')[0];
     if (TABS.indexOf(name) === -1) name = 'library';
+    if (name === 'library' && sub0 && FD_TABS.some(function (x) { return x[0] === sub0; })) F.tab = sub0;
     TABS.forEach(function (t) { $('ds-' + t).hidden = t !== name; });
     document.querySelectorAll('#ds-tabs .ul-tab').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-tab') === name)); });
     if (push) { try { history.replaceState(null, '', '#' + name); } catch (e) { location.hash = name; } }
