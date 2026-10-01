@@ -489,6 +489,10 @@ body[data-gw-page="design-system"] .sg__main > * { min-width: 0; }
    the right, so the two controls read as different things. */
 .an-bar { position: sticky; top: 0; z-index: 6; background: var(--s-panel-bg); margin-top: calc(var(--gw-space-8) * -1); padding-top: var(--gw-space-8); align-self: stretch; display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-16); box-shadow: inset 0 -1px 0 var(--ul-hdr-line); }
 @media (max-width: 767px) { .an-bar { top: 76px; } }
+/* The library's category bar is the second bar: it sticks under the first (48 tall: 8 above, 40 of tabs), so
+   Library / Review / Workflow stays on top and the categories stay in reach while a long list scrolls. */
+.ds-cats { top: 48px; z-index: 5; margin-top: 0; padding-top: 0; }
+@media (max-width: 767px) { .ds-cats { top: 124px; } }
 .sg__main .an-bar > .an-tabs { display: flex; gap: var(--gw-space-24); height: auto; padding: 0; border-radius: 0; background: none; box-shadow: none; }
 /* "Hide my activity": a small switch in the topbar-icon family (no stroke on the label, a filled track when on). */
 .an-me { display: inline-flex; align-items: center; gap: var(--gw-space-8); cursor: pointer; user-select: none; font: var(--gw-text-body-12-med); color: var(--ul-sub); }
@@ -609,9 +613,13 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .fd-tpl__b { display: flex; flex-direction: column; gap: 4px; padding: 0 var(--gw-space-4); flex: 1; }
 .fd-tpl__b b { font: 600 14px/1.3 var(--gw-font-body); color: var(--ul-value); }
 .fd-tpl__b span { font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
+.fd-tpl__img em { display: grid; place-items: center; height: 100%; font: var(--gw-text-body-12-reg); font-style: normal; color: var(--ul-sub); }
+.fd-tpl__a { display: flex; flex-wrap: wrap; gap: var(--gw-space-8); margin: 0 var(--gw-space-4) var(--gw-space-4); }
+.fd-tpl__a .ds-pv { margin: 0; }
+.ds-pv--q { box-shadow: none; color: var(--ul-cell); }
 .ds-pv { align-self: flex-start; display: inline-flex; align-items: center; height: 32px; margin: 0 var(--gw-space-4) var(--gw-space-4); padding: 0 var(--gw-space-12); border-radius: var(--gw-radius-10); box-shadow: inset 0 0 0 1px var(--ul-ctl-line); font: var(--gw-text-button-14); color: var(--ul-ctl-fg); text-decoration: none; transition: background var(--gw-motion-fast); }
 .ds-pv:hover { background: var(--ul-ctl-hover); }
-.fd-side { position: sticky; top: 92px; display: flex; flex-direction: column; gap: 2px; }
+.fd-side { position: sticky; top: 112px; display: flex; flex-direction: column; gap: 2px; }
 .fd-side__i { all: unset; box-sizing: border-box; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-8); height: 36px; padding: 0 var(--gw-space-12); border-radius: var(--gw-radius-10); font: var(--gw-text-body-14-med); color: var(--ul-cell); transition: background var(--gw-motion-fast), color var(--gw-motion-fast); }
 .fd-side__i i { font: 500 12px/1 var(--gw-font-body); font-style: normal; color: var(--ul-sub); font-variant-numeric: tabular-nums; }
 .fd-side__i:hover { background: var(--ul-tab-hover); color: var(--ul-value); }
@@ -713,7 +721,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 
     <section class="ds-panel" id="ds-library" role="tabpanel">
       <div class="ul-metrics" id="ds-lib-stats"></div>
-      <div class="ds-tools"><div class="ul-tabs" id="ds-lib-tabs" role="tablist" aria-label="Library"></div></div>
+      <div class="an-bar ds-cats"><div class="ul-tabs an-tabs" id="ds-lib-tabs" role="tablist" aria-label="Library"></div></div>
       <div class="fd" id="ds-fd"></div>
     </section>
 
@@ -973,12 +981,29 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   ];
   var L = { cat: 'foundations', sub: {} };
   function subOf(c) { var s = c.subs; return !s ? null : (s.filter(function (x) { return x.key === L.sub[c.key]; })[0] || s[0]); }
-  function tplCards(keys) {
-    if (!keys.length) return '';
-    return '<section class="fd-sec"><h3>Templates<span>' + plural(keys.length, 'template') + '</span></h3><div class="fd-tpls">' + keys.map(function (k) {
-      var x = TPL[k]; if (!x) return '';
-      return '<div class="fd-tpl"><div class="fd-tpl__img"><img src="/assets/tools/' + esc(x[2]) + '" alt="" loading="lazy"></div><div class="fd-tpl__b"><b>' + esc(x[0]) + '</b><span>' + esc(x[1]) + '</span></div>' +
-        '<a class="ds-pv" href="/internal/templates/' + esc(k) + '" target="_blank" rel="noopener">Preview</a></div>';
+  /* A recipe and a template are the same thing to the reader: a starting point. Four recipes have a built template
+     (they share a card, with a Preview and a link to the recipe); three have none yet (a card with no preview);
+     two templates have no recipe. Only the word "template" is shown. */
+  var PAIR = { 'case-study': 'case-study', 'ad-landing-page': 'ad-page', 'lead-magnet-doc': 'lead-magnet', 'sales-deck': 'slide-deck' };
+  function paired(recipeKey) { return PAIR[recipeKey]; }
+  function startPoints(d, sub) {
+    var items = sub.templates.map(function (k) {
+      var rk = Object.keys(PAIR).filter(function (r) { return PAIR[r] === k && sub.recipes.indexOf(r) !== -1; })[0];
+      var r = rk && d.recipes.filter(function (x) { return x.key === rk; })[0];
+      return { name: TPL[k][0], what: TPL[k][1], img: TPL[k][2], preview: '/internal/templates/' + k, recipe: r ? LIB + r.href : '' };
+    });
+    sub.recipes.filter(function (r) { return !paired(r) || sub.templates.indexOf(PAIR[r]) === -1; }).forEach(function (rk) {
+      var r = d.recipes.filter(function (x) { return x.key === rk; })[0];
+      if (r) items.push({ name: r.title, what: r.what, img: '', preview: '', recipe: LIB + r.href });
+    });
+    return items;
+  }
+  function tplCards(items) {
+    if (!items.length) return '';
+    return '<section class="fd-sec"><h3>Templates<span>' + plural(items.length, 'template') + '</span></h3><div class="fd-tpls">' + items.map(function (x) {
+      return '<div class="fd-tpl"><div class="fd-tpl__img">' + (x.img ? '<img src="/assets/tools/' + esc(x.img) + '" alt="" loading="lazy">' : '<em>No preview yet</em>') + '</div><div class="fd-tpl__b"><b>' + esc(x.name) + '</b><span>' + esc(x.what) + '</span></div>' +
+        '<div class="fd-tpl__a">' + (x.preview ? '<a class="ds-pv" href="' + esc(x.preview) + '" target="_blank" rel="noopener">Preview</a>' : '') +
+        (x.recipe ? '<a class="ds-pv ds-pv--q" href="' + esc(x.recipe) + '">' + (x.preview ? 'How it is built' : 'Open') + '</a>' : '') + '</div></div>';
     }).join('') + '</div></section>';
   }
   function compTable(sf) {
@@ -986,17 +1011,11 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     return '<section class="fd-sec"><h3>Components<span>' + plural(rows.length, 'component') + '</span></h3><div class="ul-scroll vs-t">' +
       table('minmax(200px,1.6fr) 90px 150px minmax(140px,1fr) 140px', ['Component', 'Version', 'Spec last moved', 'Doc', 'Review'], rows, 'Nothing measured yet') + '</div></section>';
   }
-  function recipeTable(d, ks) {
-    var rs = d.recipes.filter(function (r) { return ks.indexOf(r.key) !== -1; });
-    if (!rs.length) return '';
-    return '<section class="fd-sec"><h3>Recipes<span>' + plural(rs.length, 'recipe') + '</span></h3><div class="ul-scroll vs-t">' +
-      table('minmax(180px,1.2fr) 140px minmax(260px,2.4fr)', ['Recipe', 'Pinned to', 'For'], rs.map(function (r) { return row([cell(link(r.href, r.title)), txt(r.pins === '—' ? 'No pin' : r.pins), txt(r.what)]); }), 'None') + '</div></section>';
-  }
   function renderLibrary(d, t) {
     var s = d.stats;
     $('ds-lib-stats').innerHTML =
       metric('Tokens', String(s.tokens), plural(d.foundations.length, 'foundation group')) + metric('Components', String(s.components), 'across ' + plural(d.surfaces.length, 'surface')) +
-      metric('Recipes', String(s.recipes), 'what to build from') + metric('Passed review', s.passed + ' / ' + s.total, 'foundation groups and components') +
+      metric('Templates', String(Object.keys(PAIR).length ? (s.recipes + Object.keys(TPL).length - Object.keys(PAIR).length) : s.recipes), 'what to build from') + metric('Passed review', s.passed + ' / ' + s.total, 'foundation groups and components') +
       metric('Libraries', String(s.libraries), 'foundations plus ' + d.surfaces.length + ' surfaces') + metric('Open gaps', String(s.gaps), 'known gaps in the source');
     pills($('ds-lib-tabs'), CATS.map(function (c) { return [c.key, c.title]; }), L.cat, function (v) { L.cat = v; setHash(); renderLibrary(d, t); });
     var host = $('ds-fd'), cat = CATS.filter(function (c) { return c.key === L.cat; })[0] || CATS[0], side, main;
@@ -1013,9 +1032,9 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       var sub = subOf(cat), sf = sub.surface ? d.surfaces.filter(function (x) { return x.key === sub.surface; })[0] : null;
       side = cat.subs.length > 1 ? cat.subs.map(function (x) {
         var sx = x.surface ? d.surfaces.filter(function (y) { return y.key === x.surface; })[0] : null;
-        return [x.key, x.title, (sx ? sx.components.length : 0) + x.templates.length, x === sub];
+        return [x.key, x.title, (sx ? sx.components.length : 0) + startPoints(d, x).length, x === sub];
       }) : null;
-      main = '<div class="fd-head"><p>' + esc((sf && sf.what) || (cat.title + ' · ' + sub.title)) + '</p></div>' + tplCards(sub.templates) + compTable(sf) + recipeTable(d, sub.recipes);
+      main = '<div class="fd-head"><p>' + esc((sf && sf.what) || (cat.title + ' · ' + sub.title)) + '</p></div>' + tplCards(startPoints(d, sub)) + compTable(sf);
     }
     host.setAttribute('data-solo', side ? '0' : '1');
     host.innerHTML = (side ? '<nav class="fd-side" aria-label="' + esc(cat.title) + '">' + side.map(function (x) {
