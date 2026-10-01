@@ -606,6 +606,19 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .fd-main { display: flex; flex-direction: column; gap: var(--gw-space-32); min-width: 0; }
 /* Not another pill toggle: the pills above choose the library, so the foundations are a plain list beside the content. */
 .fd[data-solo="1"] { grid-template-columns: minmax(0, 1fr); }
+.fd-cg { display: flex; flex-direction: column; gap: var(--gw-space-12); }
+.fd-cg + .fd-cg { margin-top: var(--gw-space-16); }
+.fd-cg[hidden], .fd-comp[hidden] { display: none; }
+.fd-cg h4 { margin: 0; display: flex; align-items: baseline; gap: var(--gw-space-8); font: 600 13px/1.3 var(--gw-font-body); color: var(--ul-cell); }
+.fd-cg h4 span { font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
+.fd-comps { display: grid; grid-template-columns: repeat(auto-fill, minmax(236px, 1fr)); gap: var(--gw-space-12); }
+.fd-comp { display: flex; flex-direction: column; gap: var(--gw-space-8); padding: var(--gw-space-12) var(--gw-space-16); border-radius: var(--gw-radius-12); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); transition: background var(--gw-motion-fast); }
+.fd-comp:hover { background: var(--ul-row-hover); }
+.fd-comp__t { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-8); }
+.fd-comp__t .ds-a { font: 600 13.5px/1.3 var(--gw-font-body); overflow-wrap: anywhere; }
+.fd-comp__m { font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
+.fd-comp__d { align-self: flex-start; font: 500 11.5px/1.3 var(--gw-font-mono, ui-monospace, "SF Mono", Menlo, monospace); color: var(--ul-cell); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--ul-hdr-line); overflow-wrap: anywhere; }
+.fd-comp__d:hover { color: var(--ul-value); }
 .fd-tpls { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--gw-space-12); }
 .fd-tpl { display: flex; flex-direction: column; gap: var(--gw-space-12); padding: var(--gw-space-8); border-radius: var(--gw-radius-16); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }
 .fd-tpl__img { aspect-ratio: 16 / 10; overflow: hidden; border-radius: var(--gw-radius-12); background: var(--ul-hdr-bg); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }
@@ -1030,10 +1043,34 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     String(doc).split('/').forEach(function (seg) { if (seg === '..') out.pop(); else if (seg && seg !== '.') out.push(seg); });
     return REPO + out.join('/');
   }
+  /* Components, grouped by the doc that describes them (folds, cards, atoms, and so on) and drawn as cards: the
+     name opens the spec page, with the version, when the spec last moved, the review state and the doc beside it.
+     A surface whose components each have their own doc is not grouped, because four groups of one is noise. */
+  var GROUP = { 'folds': 'Folds', 'folds.json': 'Folds', 'built-here.json': 'Built here, not in Figma', 'cards': 'Cards', 'atoms': 'Atoms', 'button': 'Atoms', 'avatar': 'Atoms', 'images': 'Atoms',
+    'fold-elements': 'Fold elements', 'page-shell': 'Page shell', 'cards-and-chrome': 'Cards and chrome', 'primitives': 'Primitives', 'controls': 'Controls', 'overlays': 'Overlays',
+    'feedback': 'Feedback', 'toast': 'Feedback', 'phone': 'Phone', 'data-table': 'Data table', 'elements': 'Elements', 'deck': 'Deck', 'cover': 'Cover', 'layouts': 'Layouts' };
+  function groupOf(doc) {
+    if (!doc) return 'Other';
+    if (/templates\//.test(doc)) return 'Pages';
+    var last = String(doc).split('/').pop(), stem = last.replace(/\.md$/, '');
+    return GROUP[last] || GROUP[stem] || stem.replace(/-/g, ' ').replace(/^./, function (c) { return c.toUpperCase(); });
+  }
+  function compCard(sf, c) {
+    return '<div class="fd-comp" data-q="' + esc((c.name + ' ' + (c.doc || '')).toLowerCase()) + '">' +
+      '<div class="fd-comp__t"><a class="ds-a" href="' + esc(LIB + c.href) + '" title="Open the spec page">' + esc(c.name) + '</a>' + review(c.review) + '</div>' +
+      '<div class="fd-comp__m">v' + esc(c.version || '—') + ' · moved ' + esc(c.changed || '—') + (c.breaking ? ' <span class="ul-badge ul-badge--bad">breaking</span>' : '') + '</div>' +
+      (c.doc ? '<a class="fd-comp__d" href="' + esc(docHref(sf.key, c.doc)) + '" target="_blank" rel="noopener" title="Open ' + esc(c.doc) + ' on GitHub">' + esc(String(c.doc).split('/').pop()) + '</a>' : '') + '</div>';
+  }
   function compTable(sf) {
-    var rows = sf ? sf.components.map(function (c) { return row([cell(link(c.href, c.name)), txt(c.version || '—'), cell(esc(c.changed || '—') + (c.breaking ? ' <span class="ul-badge ul-badge--bad">breaking</span>' : '')), (c.doc ? cell('<a class="ds-a" href="' + esc(docHref(sf.key, c.doc)) + '" target="_blank" rel="noopener" title="Open ' + esc(c.doc) + ' on GitHub">' + esc(c.doc) + '</a>') : txt('—')), cell(review(c.review))]); }) : [];
-    return '<section class="fd-sec"><h3>Components<span>' + plural(rows.length, 'component') + '</span></h3><div class="ul-scroll vs-t">' +
-      table('minmax(200px,1.6fr) 90px 150px minmax(140px,1fr) 140px', ['Component', 'Version', 'Spec last moved', 'Doc', 'Review'], rows, 'Nothing measured yet') + '</div></section>';
+    var cs = sf ? sf.components : [], by = {}, order = [];
+    cs.forEach(function (c) { var g = groupOf(c.doc); if (!by[g]) { by[g] = []; order.push(g); } by[g].push(c); });
+    var flat = order.length > Math.ceil(cs.length / 2);
+    var body = !cs.length ? '<div class="ul-empty"><div class="ul-empty__copy"><h2>Nothing measured yet</h2></div></div>'
+      : (flat ? [['', cs]] : order.map(function (g) { return [g, by[g]]; })).map(function (g) {
+        return '<div class="fd-cg">' + (g[0] ? '<h4>' + esc(g[0]) + '<span>' + g[1].length + '</span></h4>' : '') + '<div class="fd-comps">' + g[1].map(function (c) { return compCard(sf, c); }).join('') + '</div></div>';
+      }).join('');
+    return '<section class="fd-sec"><h3>Components<span>' + plural(cs.length, 'component') + '</span></h3>' +
+      (cs.length > 8 ? '<input class="ds-find" id="ds-comp-find" type="search" aria-label="Filter components" placeholder="Filter components" autocomplete="off">' : '') + '<div id="ds-comps">' + body + '</div></section>';
   }
   function renderLibrary(d, t) {
     var s = d.stats;
@@ -1066,6 +1103,12 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       }).join('') + '</nav>' : '') + '<div class="fd-main">' + main + '</div>';
     host.querySelectorAll('.fd-side__i').forEach(function (b) {
       b.addEventListener('click', function () { var v = b.getAttribute('data-v'); if (cat.key === 'foundations') F.tab = v; else L.sub[cat.key] = v; setHash(); renderLibrary(d, t); });
+    });
+    var cf = $('ds-comp-find');
+    if (cf) cf.addEventListener('input', function () {
+      var q = cf.value.trim().toLowerCase();
+      host.querySelectorAll('.fd-comp').forEach(function (c) { c.hidden = !!q && c.getAttribute('data-q').indexOf(q) === -1; });
+      host.querySelectorAll('.fd-cg').forEach(function (g) { g.hidden = !g.querySelector('.fd-comp:not([hidden])'); });
     });
     host.querySelectorAll('[data-use]').forEach(function (b) {
       b.addEventListener('click', function () {
