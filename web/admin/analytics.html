@@ -400,6 +400,12 @@ body[data-gw-page="analytics"] .sg__main > * { min-width: 0; }
 .ul-grp:hover::before, .ul-grp:hover + .ul-grp::before, .ul-grp.is-open::before, .ul-grp.is-open + .ul-grp::before { display: none; }
 .ul-grp .ul-row--d { height: 64px; box-shadow: none; background: none; padding: 0 var(--gw-space-16); min-width: 0; }
 .ul-grp .ul-row--d:hover { background: none; }
+/* Plain table rows follow the chat groups above: inset 8, a 12 radius on hover, and the hairline between
+   rows drawn as a pseudo-element that steps out of the way of the row being hovered. */
+.ul-tbl > .ul-row--d { position: relative; margin: 0 var(--gw-space-8); padding: 0 var(--gw-space-16); border-radius: var(--gw-radius-12); box-shadow: none; }
+.ul-tbl > .ul-row--d + .ul-row--d::before { content: ""; position: absolute; top: 0; left: var(--gw-space-16); right: var(--gw-space-16); height: 1px; background: var(--ul-hdr-line); }
+.ul-tbl > .ul-row--d:hover::before, .ul-tbl > .ul-row--d:hover + .ul-row--d::before { display: none; }
+.ul-tbl .ul-row--h { margin: 0 var(--gw-space-8); padding: 0 var(--gw-space-16); border-radius: var(--gw-radius-8); }
 .ul-when { display: flex; flex-direction: column; gap: 1px; line-height: 1.3; }
 .ul-when b { font: var(--gw-text-body-12-med); color: var(--ul-value); }
 .ul-when span { font: var(--gw-text-body-12-med); color: var(--ul-sub); }
