@@ -286,6 +286,15 @@ breaking, changed = v["breaking"], v["changed"]
 flipped = os.environ.get("FLIPPED") == "yes"
 
 head = f"Gushwork design system v{remote} is out — this session is on v{local}."
+# How far behind, in minor releases, when the major matches: "11 releases behind" is a different
+# message from "1 behind", and the first is the one that gets acted on.
+try:
+    lm, rm = [int(x) for x in local.split(".")[:2]], [int(x) for x in remote.split(".")[:2]]
+    gap = rm[1] - lm[1] if lm[0] == rm[0] else 0
+    if gap >= 3:
+        head += f" That is {gap} releases behind."
+except Exception:
+    pass
 bits = []
 if breaking:
     bits.append(f"{len(breaking)} breaking: " + ", ".join(breaking[:6])
@@ -299,17 +308,24 @@ if flipped:
     tail = ("Auto-update was off on this machine — it is on now, so the next start picks this up. "
             "To take it now: claude plugin update gushwork-design@gushwork, then restart.")
 else:
-    tail = ("Auto-update is on, so this lands at your next start. To take it now: "
+    tail = ("Auto-update should land this at your next start. To take it now: "
             "claude plugin update gushwork-design@gushwork, then restart.")
 
-print(json.dumps({"hookSpecificOutput": {
+# `systemMessage` is a UNIVERSAL field and sits at the TOP LEVEL of the envelope. Inside
+# `hookSpecificOutput` it is silently ignored (confirmed against the hooks docs, 1 Oct 2026), which
+# is why this notice never reached anyone: only Claude saw it, through additionalContext.
+print(json.dumps({"systemMessage": head + " " + tail, "hookSpecificOutput": {
     "hookEventName": "SessionStart",
-    "systemMessage": head + " " + tail,
     "additionalContext": (
         f"Gushwork design system: running v{local}, v{remote} is available. "
         + (f"Breaking since v{local}: {', '.join(breaking)}. " if breaking else "")
         + (f"Also changed: {', '.join(changed)}. " if changed else "")
         + "If the user asks whether they are current, they are not. "
+        # The user may not see systemMessage in every client (the desktop app, a stripped terminal),
+        # so Claude says it once as well, in the first reply, in one sentence.
+        + "Tell the user, once, in your first reply and in one sentence, that this session is on "
+          f"v{local} and v{remote} is out, with the update command below. Then carry on with what "
+          "they asked; do not repeat it. "
         # Only claim components moved when some actually did. A release can bump the plugin
         # without touching a component doc, and pointing at "the components listed above" when
         # nothing was listed reads as a bug and costs the whole notice its credibility.

@@ -57,11 +57,11 @@ names = ", ".join(f"{s}/{k}" for s, k in items)
 cmds = " ; ".join(f"bash scripts/review-pass.sh {s} {k}" for s, k in items)
 n = len(items)
 
-print(json.dumps({"hookSpecificOutput": {
-    "hookEventName": "SessionStart",
-    "systemMessage": (
+# systemMessage is a top-level field; inside hookSpecificOutput it is ignored.
+print(json.dumps({"systemMessage": (
         f"{n} component{'s' if n != 1 else ''} approved in Slack, not yet recorded: {names}"
-    ),
+    ), "hookSpecificOutput": {
+    "hookEventName": "SessionStart",
     "additionalContext": (
         f"These were approved by ✅ reaction in Slack but the pass is NOT recorded yet: {names}. "
         f"To apply, from the design-system repo: {cmds}. "
