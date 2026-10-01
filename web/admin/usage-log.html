@@ -297,6 +297,11 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
 .ul-sh--nw { flex-wrap: nowrap; }
 .ul-sh--nw .ul-sh__t { flex: 1 1 auto; }
 .ul-sh--nw .ul-sh__q { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.ul-split { display: flex; height: 8px; gap: 2px; margin-top: var(--gw-space-24); border-radius: var(--gw-radius-full); overflow: hidden; }
+.ul-split i { display: block; height: 100%; min-width: 2px; background: var(--gw-color-neutral-400); }
+.ul-split i:first-child { background: var(--gw-color-primary-500); }
+.ul-split__k { display: flex; justify-content: space-between; gap: var(--gw-space-16); margin: var(--gw-space-8) 0 0; font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.ul-split__k b { font-weight: 600; color: var(--ul-value); }
 .ul-link { flex: none; white-space: nowrap; border: 0; background: none; padding: 0; cursor: pointer; font: var(--gw-text-body-14-med); color: var(--ul-sub); transition: color var(--gw-motion-fast); }
 .ul-link:hover { color: var(--ul-value); }
 .ul-link[hidden] { display: none; }
@@ -773,7 +778,11 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
     }).join('');
     var head = stale ? stale + (stale === 1 ? ' person' : ' people') + ' still behind' : 'No one is behind now';
     var sub = anon ? plural(anon, 'session') + ' with no email on an older version' : '';
-    host.innerHTML = '<p class="ul-big">' + head + '</p>' + (sub ? '<p class="ul-foot" style="margin:0;padding-top:var(--gw-space-4)">' + esc(sub) + '</p>' : '');
+    var vt = m.vers.reduce(function (a, v) { return a + m.byVer[v]; }, 0), vn = m.byVer[m.newest] || 0, vo = vt - vn;
+    var chart = vt ? '<div class="ul-split" role="img" aria-label="' + vn + ' sessions on ' + esc(m.newest) + ', ' + vo + ' on older versions">' +
+      (vn ? '<i style="flex:' + vn + '"></i>' : '') + (vo ? '<i style="flex:' + vo + '"></i>' : '') + '</div>' +
+      '<p class="ul-split__k"><span><b>' + Math.round(vn / vt * 100) + '%</b> on ' + esc(m.newest) + '</span><span><b>' + Math.round(vo / vt * 100) + '%</b> older</span></p>' : '';
+    host.innerHTML = '<p class="ul-big">' + head + '</p>' + (sub ? '<p class="ul-foot" style="margin:0;padding-top:var(--gw-space-4)">' + esc(sub) + '</p>' : '') + chart;
     $('ul-ver-dlg-q').textContent = 'on a version older than ' + m.newest + ', ' + PERIOD_NAME[S.period];
     $('ul-ver-dlg-b').innerHTML = (rows ? '<div class="ul-old">' + rows + '</div>' : '') +
       '<p class="ul-foot">' + esc(head) + (sub ? ' · ' + esc(sub) : '') + '.</p>';
