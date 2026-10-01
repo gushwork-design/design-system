@@ -1040,3 +1040,17 @@ Ruled by Utsav, 1 Oct 2026: track who logs in to the design hub and to any stagi
 - **How much.** One row per person per page per 30 minutes (an NX key with a TTL), the list trimmed to 5000, about two or three KV commands per new view.
 - **Who reads it.** the Visits tab of `/admin/analytics`, fed by `api/_visits.js` behind `gw.js` (no new function), owner-checked on every request like the usage log. The public ad landers are not in the matcher and are not recorded.
 - **Disclosure.** ONBOARDING.md says it in the same section as the plugin usage ping. There is deliberately no on-page notice, matching R29.
+
+
+## R31 — the plugin reports how many tokens a Gushwork session used, as three numbers
+
+Ruled by Utsav, 1 Oct 2026: add Claude tokens consumed to the usage log, and report how the system is doing on it in Insights.
+
+- **What leaves the machine.** `tok: {i, o, c}` on the skill, file and artifact rows, and on one `session-end` row from a new `SessionEnd` hook: i = input plus cache-written tokens, o = output tokens, c = tokens re-read from the cache, all for the session so far. `scripts/log-activity.sh` reads them from the `usage` fields in Claude Code's own transcript (`transcript_path` in the hook input) and sends nothing else from it: no text, no tool input.
+- **Gate.** The same one as every other row: nothing is recorded for a session in which no Gushwork skill ran, so unrelated work in other projects reports no tokens.
+- **Cost.** The read is incremental (a byte offset and the running sums live in the session marker), capped at 5 s per call, and a message streamed more than once in the transcript counts once (largest figures win).
+- **What "used" means.** Input plus output, including context written to the cache. Cache re-reads are about 90% of the raw total in a long session and are cheap, so they are shown apart and never added in.
+- **Where it shows.** Usage tab: Tokens used, Per session, Re-read from cache, a tokens badge on each chat. Insights tab: tokens per session, tokens to first output and tokens used, each compared with the previous period, a Tokens-to-output column per skill, and findings (costliest skill to a first output, a 10%+ move in tokens per session).
+- **Not retroactive.** Only sessions on a plugin that ships this hook have figures; the pages say so rather than showing zeros.
+- **Disclosure.** ONBOARDING.md, in the usage-ping paragraph. `GW_NO_USAGE_PING=1` turns it off with everything else.
+

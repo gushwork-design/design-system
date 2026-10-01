@@ -17,6 +17,9 @@
    person published; and `flags`, four values the plugin measured locally on an HTML or SVG output
    (stamp, tokens, fonts, logo — see scripts/log-activity.sh) and sent INSTEAD of the text.
 
+   Since 1 Oct 2026, a fourth field on the same rows: `tok`, the session's token totals so far, three whole
+   numbers read from Claude Code's own transcript by scripts/log-activity.sh (never any text from it).
+
    WHAT IT DELIBERATELY STILL DOES NOT COLLECT. The prompt, the contents of any file, the
    repo, or any file path — only a file's own name. Uploading the generated files is a
    separate step that has NOT been taken: it needs its own store and its own decision, because
@@ -86,6 +89,15 @@ function cleanFlags(f) {
   };
 }
 
+/* `tok` is three whole numbers, rebuilt and capped like `flags`: input + cache-written tokens (i), output
+   tokens (o) and tokens re-read from the cache (c), for the session so far. Counts, nothing else. */
+function cleanTok(t) {
+  if (!t || typeof t !== 'object') return null;
+  const n = (v) => (Number.isFinite(+v) && +v >= 0 ? Math.min(Math.floor(+v), 1e11) : 0);
+  const out = { i: n(t.i), o: n(t.o), c: n(t.c) };
+  return out.i || out.o ? out : null;
+}
+
 /* Only a claude.ai artifact link is kept, and only in that exact shape. */
 const ARTIFACT_URL = /^https:\/\/claude\.ai\/(?:code\/)?artifact\/[A-Za-z0-9-]{8,80}$/;
 
@@ -135,6 +147,7 @@ export default async function handler(req, res) {
     ...(/^[a-f0-9]{8,16}$/.test(String(body.sess || '')) ? { sess: String(body.sess) } : {}),
     ...(ARTIFACT_URL.test(String(body.url || '')) ? { url: String(body.url) } : {}),
     ...(cleanFlags(body.flags) ? { flags: cleanFlags(body.flags) } : {}),
+    ...(cleanTok(body.tok) ? { tok: cleanTok(body.tok) } : {}),
   });
 
   try {

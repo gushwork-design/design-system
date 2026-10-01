@@ -469,6 +469,8 @@ body[data-gw-page="analytics"] .sg__main > * { min-width: 0; }
 .in-list .in-tag { font: var(--gw-text-body-12-med); color: var(--ul-sub); white-space: nowrap; }
 .in-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gw-space-24); margin-top: var(--gw-space-24); }
 @media (max-width: 960px) { .in-pair { grid-template-columns: minmax(0, 1fr); } }
+.vs-t .ul-th { white-space: nowrap; }
+#in-skill .ul-row { column-gap: var(--gw-space-16); padding: 0 var(--gw-space-16); }
 .in-pair .vs-t .ul-row { min-width: 0; padding: 0 var(--gw-space-16); column-gap: var(--gw-space-16); }
 .in-h { margin: var(--gw-space-24) 0 var(--gw-space-8); font: var(--gw-text-body-12-med); letter-spacing: .06em; text-transform: uppercase; color: var(--ul-sub); }
 
@@ -538,6 +540,9 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
       <p class="in-h">Plugin speed</p>
       <div class="ul-metrics" id="in-speed"></div>
 
+      <p class="in-h">Tokens</p>
+      <div class="ul-metrics" id="in-tokens"></div>
+
       <p class="in-h">Review cycles</p>
       <div class="ul-metrics" id="in-review"></div>
 
@@ -591,6 +596,7 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
     <div id="ul-app">
       <div class="ul-kpis" id="ul-kpis"></div>
       <div class="ul-metrics" id="ul-metrics" style="margin-top: var(--gw-space-8)"></div>
+      <div class="ul-metrics" id="ul-tokens" style="margin-top: var(--gw-space-8)"></div>
 
       <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="ul-h-chart">
         <div class="ul-sh"><div class="ul-sh__t"><h2 id="ul-h-chart">Sessions</h2><span class="ul-sh__q" id="ul-q-chart"></span></div></div>
@@ -735,11 +741,41 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
     raw.forEach(function (r) {
       var d = new Date(r.at); if (isNaN(d.getTime())) return;
       out.push({ at: d, key: String(r.at), email: String(r.email || '').trim().toLowerCase(), version: String(r.version || '').trim(), event: String(r.event || ''),
-                 skill: String(r.skill || ''), file: String(r.file || ''), sess: String(r.sess || ''), flags: r.flags && typeof r.flags === 'object' ? r.flags : null });
+                 skill: String(r.skill || ''), file: String(r.file || ''), sess: String(r.sess || ''), flags: r.flags && typeof r.flags === 'object' ? r.flags : null,
+                 tok: r.tok && typeof r.tok === 'object' ? { i: +r.tok.i || 0, o: +r.tok.o || 0, c: +r.tok.c || 0 } : null });
     });
     return out;
   }
   function inPeriod(d) { return S.period === 'all' || d.getTime() >= Date.now() - (+S.period) * DAY; }
+  function inPrev(d) { return S.period !== 'all' && d.getTime() >= Date.now() - 2 * (+S.period) * DAY && d.getTime() < Date.now() - (+S.period) * DAY; }
+  function fmtTok(n) { n = Math.round(n || 0); return n >= 1e9 ? (n / 1e9).toFixed(1) + 'B' : n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1e3 ? Math.round(n / 1e3) + 'k' : String(n); }
+  /* Token figures for any slice of rows. A skill, file or artifact row carries the session's running
+     totals, so a session's use is the largest it reached, and tokens to a first output is the figure at
+     the first output minus the figure when the first skill started. Input + output only; cache re-reads
+     are counted apart. */
+  function tokenStats(rows) {
+    var by = {};
+    rows.forEach(function (r) { if (r.sess) (by[r.sess] = by[r.sess] || []).push(r); });
+    var perSession = [], toOutput = [], toBySkill = {}, used = 0, cache = 0;
+    Object.keys(by).forEach(function (k) {
+      var evs = by[k].slice().sort(function (a, b) { return a.at - b.at; }), top = null;
+      evs.forEach(function (r) { if (r.tok && (!top || r.tok.i + r.tok.o > top.i + top.o)) top = r.tok; });
+      if (!top) return;
+      perSession.push(top.i + top.o); used += top.i + top.o; cache += top.c;
+      var sk = evs.filter(function (r) { return r.event === 'skill' && r.tok; })[0];
+      var out = evs.filter(function (r) { return (r.event === 'file' || r.event === 'artifact') && r.tok; })[0];
+      if (sk && out && out.at >= sk.at) {
+        var dlt = (out.tok.i + out.tok.o) - (sk.tok.i + sk.tok.o);
+        if (dlt >= 0) { toOutput.push(dlt); var n = skillName(sk.skill); (toBySkill[n] = toBySkill[n] || []).push(dlt); }
+      }
+    });
+    return { perSession: perSession, toOutput: toOutput, toBySkill: toBySkill, used: used, cache: cache };
+  }
+  function trend(cur, prev, what) {
+    if (S.period === 'all' || cur == null || prev == null || !prev) return 'no earlier period to compare';
+    var d = Math.round((cur - prev) / prev * 100);
+    return (d === 0 ? 'level with' : Math.abs(d) + '% ' + (d < 0 ? 'lower than' : 'higher than')) + ' the previous ' + S.period + ' days';
+  }
   function isSess(r) { return !r.event || r.event === 'session-start'; }
   function onBrand(f) { return !!f && f.tokens === true && f.fonts !== 'foreign'; }
 
@@ -824,7 +860,8 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
     var top = Object.keys(opened).map(function (k) { return opened[k]; }).sort(function (a, b) { return b.views - a.views; });
     var firstVisit = S.visits.length ? S.visits.reduce(function (m, r) { return r.at < m ? r.at : m; }, S.visits[0].at) : null;
 
-    return { rows: rows, sessions: sessions, withSkill: withSkill, withOutput: withOutput, reran: reran, times: times, outList: outList, measured: measured, onB: onB,
+    var tkNow = tokenStats(rows), tkPrev = tokenStats(S.usage.filter(function (r) { return inPrev(r.at); }));
+    return { tk: tkNow, tkPrev: tkPrev, rows: rows, sessions: sessions, withSkill: withSkill, withOutput: withOutput, reran: reran, times: times, outList: outList, measured: measured, onB: onB,
              reworked: reworked, appr: appr, chg: chg, fail: fail, perSkill: perSkill, newest: newest, behind: behind, vrows: vrows, top: top, never: never, allPages: allPages, firstVisit: firstVisit };
   }
 
@@ -850,6 +887,15 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
     if (m.measured.length >= 3 && m.fail[fk] > 0) a.push(['Most common miss: <b>' + esc(fk.toLowerCase()) + '</b>, in ' + m.fail[fk] + ' of ' + m.measured.length + ' measured outputs.', 'review cycles']);
     var rw = m.perSkill.filter(function (s) { return s.outs >= 3 && s.rework > 0; }).sort(function (x, y) { return y.rework / y.outs - x.rework / x.outs; })[0];
     if (rw) a.push(['<b>' + esc(rw.name) + '</b> gets rewritten most: ' + rw.rework + ' of ' + rw.outs + ' outputs were written more than once in a session.', 'review cycles']);
+    var tsk = Object.keys(m.tk.toBySkill).filter(function (n) { return m.tk.toBySkill[n].length >= 3; }).sort(function (x, y) { return median(m.tk.toBySkill[y]) - median(m.tk.toBySkill[x]); })[0];
+    if (tsk) a.push(['<b>' + esc(tsk) + '</b> costs the most to reach a first output: about ' + fmtTok(median(m.tk.toBySkill[tsk])) + ' tokens.', 'plugin speed']);
+    var tm = median(m.tk.perSession), tp = median(m.tkPrev.perSession);
+    if (tm != null && tp && m.tk.perSession.length >= 3 && m.tkPrev.perSession.length >= 3) {
+      var td = Math.round((tm - tp) / tp * 100);
+      if (Math.abs(td) >= 10) a.push(['Tokens per session are <b>' + (td < 0 ? 'down ' : 'up ') + Math.abs(td) + '%</b> on the previous ' + S.period + ' days.', 'plugin speed']);
+    } else if (!m.tk.perSession.length) {
+      a.push(['No token figures yet. They arrive as people update the plugin, and this page then shows how usage is trending.', 'plugin speed']);
+    }
     var sl = m.perSkill.filter(function (s) { return s.med != null; }).sort(function (x, y) { return y.med - x.med; })[0];
     if (sl && m.times.length >= 3) a.push(['<b>' + esc(sl.name) + '</b> is the slowest to a first output: about ' + dur(sl.med) + ' from the skill starting.', 'plugin speed']);
     if (m.behind.length) a.push([(m.behind.length === 1 ? '1 person is' : m.behind.length + ' people are') + ' still on a plugin older than ' + esc(m.newest) + ', so ' + (m.behind.length === 1 ? 'they miss' : 'they miss') + ' recent fixes.', 'plugin speed']);
@@ -873,15 +919,20 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
       metric('Skill to first output', med == null ? 'None' : dur(med), med == null ? 'no session has both yet' : 'median of ' + plural(m.times.length, 'session')) +
       metric('Skill runs that made something', pctS(m.withOutput, m.withSkill), m.withOutput + ' of ' + plural(m.withSkill, 'session') + ' with a skill') +
       metric('Sessions that re-ran a skill', pctS(m.reran, m.withSkill), m.reran + ' of ' + m.withSkill + ', a sign the first run missed');
+    var tmed = median(m.tk.perSession), pmed = median(m.tkPrev.perSession), omed = median(m.tk.toOutput), opmed = median(m.tkPrev.toOutput);
+    $('in-tokens').innerHTML =
+      metric('Tokens per session', tmed == null ? 'None' : fmtTok(tmed), tmed == null ? 'arrives as people update the plugin' : trend(tmed, pmed) + ', ' + plural(m.tk.perSession.length, 'session')) +
+      metric('Tokens to first output', omed == null ? 'None' : fmtTok(omed), omed == null ? 'no session has both yet' : trend(omed, opmed)) +
+      metric('Tokens used', m.tk.perSession.length ? fmtTok(m.tk.used) : 'None', m.tk.perSession.length ? 'plus ' + fmtTok(m.tk.cache) + ' re-read from cache' : 'input + output, Gushwork skill sessions');
     $('in-review').innerHTML =
       metric('On-brand on the first pass', pctS(m.onB, m.measured.length), m.onB + ' of ' + m.measured.length + ' measured outputs') +
       metric('Outputs written more than once', pctS(m.reworked, m.outList.length), m.reworked + ' of ' + plural(m.outList.length, 'output')) +
       metric('Approved / needs changes', m.appr + ' / ' + m.chg, 'marked by an owner');
 
     $('in-q-skill').textContent = plural(m.perSkill.length, 'skill') + ' run, ' + (S.period === 'all' ? 'all time' : 'last ' + S.period + ' days');
-    $('in-skill').innerHTML = table('minmax(180px,1.6fr) 80px 90px 100px 100px 120px 110px', ['Skill', 'Runs', 'Outputs', 'On-brand', 'Rewritten', 'Needs changes', 'To first output'],
+    $('in-skill').innerHTML = table('minmax(170px,1.6fr) 64px 84px 88px 92px 120px 112px 130px', ['Skill', 'Runs', 'Outputs', 'On-brand', 'Rewritten', 'Needs changes', 'Time to output', 'Tokens to output'],
       m.perSkill.map(function (s) {
-        return row([cell(s.name, 'ul-c--who'), cell(String(s.runs)), cell(String(s.outs)), cell(pctS(s.on, s.measured)), cell(pctS(s.rework, s.outs)), cell(String(s.chg)), cell(s.med == null ? '—' : dur(s.med))]);
+        return row([cell(s.name, 'ul-c--who'), cell(String(s.runs)), cell(String(s.outs)), cell(pctS(s.on, s.measured)), cell(pctS(s.rework, s.outs)), cell(String(s.chg)), cell(s.med == null ? '—' : dur(s.med)), cell(m.tk.toBySkill[s.name] && m.tk.toBySkill[s.name].length ? fmtTok(median(m.tk.toBySkill[s.name])) : '—')]);
       }), 'No skill runs in this period');
 
     $('in-fail').innerHTML = table('minmax(160px,1.4fr) 80px 90px', ['Check', 'Missed', 'Share'],
@@ -990,7 +1041,8 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
       out.push({ at: d, email: String(r.email || '').trim().toLowerCase(), version: String(r.version || '').trim(),
                  event: String(r.event || ''), skill: String(r.skill || ''), file: String(r.file || ''),
                  key: String(r.at), sess: String(r.sess || ''), url: String(r.url || ''),
-                 flags: r.flags && typeof r.flags === 'object' ? r.flags : null });
+                 flags: r.flags && typeof r.flags === 'object' ? r.flags : null,
+                 tok: r.tok && typeof r.tok === 'object' ? { i: +r.tok.i || 0, o: +r.tok.o || 0, c: +r.tok.c || 0 } : null });
     }
     return out;
   }
@@ -1075,6 +1127,7 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
     if (loading) {
       $('ul-kpis').innerHTML = skelStat('Sessions') + skelStat('Active people');
       $('ul-metrics').innerHTML = ['Today', 'On the newest version', 'Not identified', 'Versions in use', 'Busiest day', 'Last session'].map(skelMetric).join('');
+      $('ul-tokens').innerHTML = ['Tokens used', 'Per session', 'Re-read from cache'].map(skelMetric).join('');
       return;
     }
     var pctS = m.sessTotal ? Math.round(m.sessions / m.sessTotal * 100) : 0;
@@ -1090,6 +1143,15 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
       metricCard('Versions in use', String(m.vers.length), m.oldest ? 'oldest is ' + m.oldest : 'in ' + PERIOD_NAME[S.period]) +
       metricCard('Busiest day', m.busy ? String(m.busy.n) : 'None', m.busyDate ? fmtDay(m.busyDate) : 'in ' + PERIOD_NAME[S.period]) +
       metricCard('Last session', m.last ? ago(Date.now() - m.last.getTime()) : 'None', m.last ? fmtWhen(m.last) : 'Nothing logged');
+    var st = sessTokens(m.curAll), ks = Object.keys(st), used = 0, cache = 0, per = [];
+    ks.forEach(function (k) { var t = st[k]; used += t.i + t.o; cache += t.c; per.push(t.i + t.o); });
+    per.sort(function (a, b) { return a - b; });
+    var med = per.length ? (per.length % 2 ? per[per.length >> 1] : (per[(per.length >> 1) - 1] + per[per.length >> 1]) / 2) : 0;
+    var none = 'Arrives as people update the plugin';
+    $('ul-tokens').innerHTML =
+      metricCard('Tokens used', ks.length ? fmtTok(used) : 'None', ks.length ? 'input + output, ' + plural(ks.length, 'session') + ' measured' : none) +
+      metricCard('Per session', ks.length ? fmtTok(med) : 'None', ks.length ? 'median, in Gushwork skill sessions' : 'No token figures yet') +
+      metricCard('Re-read from cache', ks.length ? fmtTok(cache) : 'None', 'not counted above, cheap to repeat');
   }
 
   /* Line chart. One series, primary/500, 2px, with a 30% to 0% gradient beneath. */
@@ -1303,6 +1365,8 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
     var appr = outs.filter(function (r) { return S.outcomes[r.key] === 'approved'; }).length;
     var chg = outs.filter(function (r) { return S.outcomes[r.key] === 'changes'; }).length;
     var h = '<div class="ul-chips">';
+    var tk = chatTok(c);
+    if (tk) h += '<span class="ul-badge" title="' + esc(fmtTok(tk.i) + ' in, ' + fmtTok(tk.o) + ' out, ' + fmtTok(tk.c) + ' re-read from cache') + '">' + esc(fmtTok(tk.i + tk.o)) + ' tokens</span>';
     if (outs.length) h += '<span class="ul-badge">' + esc(plural(outs.length, 'output')) + '</span>';
     else h += '<span class="ul-badge">' + esc(plural(sk, 'skill run')) + '</span>';
     if (bad) h += '<span class="ul-badge ul-badge--bad">' + bad + ' off-brand</span>';
@@ -1318,7 +1382,18 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
     if (outs) bits.push(plural(outs, 'output'));
     return 'Chat' + (bits.length ? ' · ' + bits.join(' · ') : ' · started only');
   }
+  /* Tokens. Each skill, file and artifact row carries the session's running totals, so a session's total
+     is the largest it reached. "Used" is input + output (including context written to the cache);
+     tokens re-read from the cache are shown apart, because they are cheap and would swamp the sum. */
+  function fmtTok(n) { n = Math.round(n || 0); return n >= 1e9 ? (n / 1e9).toFixed(1) + 'B' : n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1e3 ? Math.round(n / 1e3) + 'k' : String(n); }
+  function sessTokens(rows) {
+    var by = {};
+    rows.forEach(function (r) { if (r.sess && r.tok && (!by[r.sess] || r.tok.i + r.tok.o > by[r.sess].i + by[r.sess].o)) by[r.sess] = r.tok; });
+    return by;
+  }
+  function chatTok(c) { var t = null; c.rows.forEach(function (r) { if (r.tok && (!t || r.tok.i + r.tok.o > t.i + t.o)) t = r.tok; }); return t; }
   function evtText(r) {
+    if (r.event === 'session-end') return 'Session ended' + (r.tok ? ' · ' + fmtTok(r.tok.i + r.tok.o) + ' tokens' : '');
     if (r.event === 'skill') return 'Skill: ' + (r.skill || 'unknown').replace(/^.*:/, '');
     if (r.event === 'file') return 'File: ' + (r.file || 'unknown');
     if (r.event === 'artifact') return 'Artifact: ' + (r.url ? r.url.replace(/^https:\/\/claude\.ai\//, '') : 'unknown');

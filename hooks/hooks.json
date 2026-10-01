@@ -29,7 +29,12 @@
     "session, independent of the request, and points at the gushwork-brand skill for the detail. Its",
     "matcher is wider than the other two on purpose: clear and compact DROP the session's context, so",
     "a rule injected only at startup would be gone after the first compaction. The update notices stay",
-    "startup|resume because repeating them reads as a bug; repeating a rule does not."
+    "startup|resume because repeating them reads as a bug; repeating a rule does not.",
+    "",
+    "SessionEnd runs log-activity.sh once more when a session closes, so a session that ends records its",
+    "final token totals. It does nothing unless a Gushwork skill ran in that session (the same gate as",
+    "every other row), and a closed laptop or a crash simply means the last skill, file or artifact row",
+    "carries the most recent figures instead."
   ],
   "hooks": {
     "SessionStart": [
@@ -62,6 +67,17 @@
     "PostToolUse": [
       {
         "matcher": "Skill|Write|Artifact|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/scripts/log-activity.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
         "hooks": [
           {
             "type": "command",

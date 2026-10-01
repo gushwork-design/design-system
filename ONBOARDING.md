@@ -34,7 +34,10 @@ kept for review, visible only to the owners, and deleted after a few weeks. Set 
 keep everything else but skip this. For an HTML or SVG output or a published artifact it
 checks, on your machine, whether the page uses the Gushwork tokens, only the brand typefaces, the
 real logo and the build stamp, and sends those four yes/no answers instead of the text. A session
-is tied to its outputs by a short one-way hash that cannot be turned back into your session id. It
+is tied to its outputs by a short one-way hash that cannot be turned back into your session id. For
+a session in which a Gushwork skill ran, it also records how many tokens that session has used so far
+(three numbers read from the usage figures Claude Code keeps, never any text from them), so we can see
+what the skills cost and whether they are getting cheaper. It
 never records your prompts. It exists so we can see whether the design system
 is being used, what for, and who is running an old version. To turn it off, set
 `GW_NO_USAGE_PING=1` in your shell.
