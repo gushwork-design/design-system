@@ -12,6 +12,12 @@
 #   · after a Bash call in the same session, any PDF, PPTX, PNG or HTML file written since the last look:
 #                                        who, version, event "file", the file's BASENAME
 #                                        (a deck or lead magnet is made by a script, not a Write)
+# TOKENS (1 Oct 2026). The skill, file and artifact rows, and one more "session-end" row when the
+# session closes, also carry `tok`: three whole numbers for the session SO FAR, read from the usage
+# figures Claude Code already writes into its own transcript (i = input and cache-written tokens,
+# o = output tokens, c = tokens re-read from the cache). Counts only: the transcript is read for
+# its numbers and nothing else, no text from it leaves the machine, and a session in which no
+# Gushwork skill ran records none (the same gate as every other row).
 # Every row also carries `sess`: a short one-way hash of the session id, so an output can be tied
 # to the skill that ran in the same session. It cannot be turned back into the id.
 #
@@ -180,6 +186,70 @@ def load():
     except Exception:
         return None
 
+# Running token totals for this session, read from the transcript Claude Code keeps. Incremental: the
+# byte offset and the running sums live in the session marker, so each call reads only what is new,
+# and a long session never costs a full re-read. A message is written to the transcript more than once
+# while it streams, so repeats of one message id keep the largest figures rather than adding up.
+def usage_totals(d, st):
+    path = str(d.get("transcript_path") or "")
+    if not path or not os.path.isfile(path):
+        return None
+    tk = st.get("tk") or {}
+    off, last_id = int(tk.get("off") or 0), str(tk.get("id") or "")
+    last = list(tk.get("u") or [0, 0, 0])
+    tot = list(tk.get("sum") or [0, 0, 0])
+    try:
+        if off > os.path.getsize(path):
+            off, last_id, last, tot = 0, "", [0, 0, 0], [0, 0, 0]
+        deadline = time.time() + 5
+        with open(path, "rb") as f:
+            f.seek(off)
+            for line in f:
+                if not line.endswith(b"\n"):
+                    break                 # a half-written last line is read next time
+                off += len(line)
+                if b"\"usage\"" in line:
+                    try:
+                        row = json.loads(line)
+                    except Exception:
+                        row = None
+                    m = (row or {}).get("message") or {}
+                    u = m.get("usage")
+                    if (row or {}).get("type") == "assistant" and isinstance(u, dict):
+                        mid = str(m.get("id") or row.get("requestId") or "")
+                        cur = [int(u.get("input_tokens") or 0) + int(u.get("cache_creation_input_tokens") or 0),
+                               int(u.get("output_tokens") or 0), int(u.get("cache_read_input_tokens") or 0)]
+                        if mid and mid == last_id:
+                            last = [max(a, b) for a, b in zip(last, cur)]
+                        else:
+                            tot = [a + b for a, b in zip(tot, last)]
+                            last_id, last = mid, cur
+                if time.time() > deadline:
+                    break                 # keep the hook quick; the rest is read on the next call
+    except Exception:
+        return None
+    st["tk"] = {"off": off, "id": last_id, "u": last, "sum": tot}
+    now = [a + b for a, b in zip(tot, last)]
+    return {"i": now[0], "o": now[1], "c": now[2]}
+
+def tok_extra(d, st):
+    t = usage_totals(d, st)
+    try:
+        with open(marker, "w") as f:
+            json.dump(st, f)
+    except Exception:
+        pass
+    return {"tok": t} if t and (t["i"] or t["o"]) else {}
+
+if (d.get("hook_event_name") or "") == "SessionEnd":
+    st = load()
+    if st is None:
+        sys.exit(0)                      # no Gushwork skill ran in this session, so nothing is recorded
+    t = tok_extra(d, st)
+    if t:
+        out("session-end", **t)
+    sys.exit(0)
+
 if tool == "Skill":
     name = str(inp.get("skill") or "")
     if "gushwork" not in name.lower():
@@ -197,7 +267,7 @@ if tool == "Skill":
                 os.remove(p)
     except Exception:
         pass
-    out("skill", skill=name[:80])
+    out("skill", skill=name[:80], **tok_extra(d, load() or st))
 
 elif tool == "Write":
     st = load()
@@ -216,7 +286,7 @@ elif tool == "Write":
     # Only text formats can be measured. A Write of a PDF, deck or PNG carries no readable text.
     if base.lower().endswith((".html", ".svg")):
         extra["flags"] = flags_for(str(inp.get("content") or ""))
-    out("file", file=base[:120], **extra)
+    out("file", file=base[:120], **extra, **tok_extra(d, st))
     upload_copy(path, base)
 
 elif tool == "Artifact":
@@ -241,7 +311,7 @@ elif tool == "Artifact":
             extra["flags"] = flags_for(f.read())
     except Exception:
         pass
-    out("artifact", url=url, **extra)
+    out("artifact", url=url, **extra, **tok_extra(d, st))
 
 elif tool == "Bash":
     # A PDF or a deck is usually made by a script run through Bash (render.sh, a headless
@@ -283,8 +353,9 @@ elif tool == "Bash":
     st.setdefault("files", []).extend([x[0] for x in fresh])
     with open(marker, "w") as f:
         json.dump(st, f)
+    tokx = tok_extra(d, st) if fresh else {}
     for fn, full in fresh:
-        extra = {}
+        extra = dict(tokx)
         # An HTML file can be measured like one the Write tool made: read here, flags sent, text kept.
         if fn.lower().endswith(".html"):
             try:
