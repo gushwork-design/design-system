@@ -70,10 +70,11 @@ out="$(run "$(fake "$OLD")" "file://$TMP/v.json")"; rc=$?
 [ "$rc" = 0 ] && ck ok "behind: exit 0" || ck no "behind: exit 0 (got $rc)"
 printf '%s' "$out" | python3 -c "
 import json,sys
-d=json.load(sys.stdin)['hookSpecificOutput']
+o=json.load(sys.stdin); d=o['hookSpecificOutput']
 assert d['hookEventName']=='SessionStart'
-assert '$CUR' in d['systemMessage'] and '$OLD' in d['systemMessage']
-assert d['additionalContext']
+assert 'systemMessage' not in d, 'systemMessage inside hookSpecificOutput is ignored by Claude Code'
+assert '$CUR' in o['systemMessage'] and '$OLD' in o['systemMessage']
+assert d['additionalContext'] and 'first reply' in d['additionalContext']
 " 2>/dev/null && ck ok "behind: names both versions in a valid envelope" \
                 || ck no "behind: envelope malformed"
 
@@ -87,7 +88,7 @@ printf '%s' "$out" | grep -q "components named above" \
 # 3 · breaking components are named, and counted separately from the rest
 run "$(fake "$OLD")" "file://$TMP/breaking.json" | python3 -c "
 import json,sys
-m=json.load(sys.stdin)['hookSpecificOutput']['systemMessage']
+m=json.load(sys.stdin)['systemMessage']
 assert '2 breaking' in m and 'badge' in m and 'data-table' in m, m
 assert '1 changed' in m, m
 " 2>/dev/null && ck ok "breaking: counted and named" || ck no "breaking: not reported"
