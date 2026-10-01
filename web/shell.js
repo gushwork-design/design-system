@@ -538,6 +538,9 @@
     return '<aside class="gw-sidebar" id="gw-rail">' +
         railTopHTML() +
         '<div class="gw-navgroups">' + groups + tail + '</div>' +
+        /* Phone only (hidden by CSS above it). The panel bar holds the theme, the bell and help on
+           desktop, and it is not drawn on a phone, so without this they could not be reached at all. */
+        '<div class="gw-navtools">' + themeHTML() + (session.signedIn ? notifHTML() : '') + helpHTML() + '</div>' +
         '<div class="gw-navend">' + footerHTML() + '</div>' +
       '</aside>';
   }
@@ -1234,20 +1237,22 @@
   }
 
   function loadNotices() {
-    var list = document.querySelector('[data-notif-list]');
-    var dot  = document.querySelector('[data-notif-dot]');
-    if (!list) return;
+    /* The bell is drawn twice on a phone-capable page (panel bar and drawer), so paint every copy. */
+    var lists = [].slice.call(document.querySelectorAll('[data-notif-list]'));
+    var dots  = [].slice.call(document.querySelectorAll('[data-notif-dot]'));
+    if (!lists.length) return;
     fetch('/notifications.json', { cache: 'no-cache' })
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (d) {
         notices = (d && d.items) || [];
         if (!notices.length) return;
-        list.innerHTML = notices.map(function (it) {
+        var html = notices.map(function (it) {
           return '<a class="gw-note" href="' + esc(it.href || '/internal/changelog') + '">' +
                    '<span class="gw-note__d">' + esc(it.label || it.date) + '</span>' +
                    '<span class="gw-note__t">' + esc(it.title) + '</span>' +
                  '</a>';
         }).join('');
+        lists.forEach(function (l) { l.innerHTML = html; });
         /* The dot means "there is something here you have not looked at yet",
            not "something shipped this week" — so it needs BOTH: inside the
            7-day window, and newer than whatever you had already seen. */
@@ -1255,7 +1260,7 @@
         var unread = notices.some(function (it) {
           return withinWindow(it.date) && notifKey(it) > seen;
         });
-        if (dot) dot.hidden = !unread;
+        dots.forEach(function (dt) { dt.hidden = !unread; });
       })
       .catch(function () { /* an empty state is a fine answer */ });
   }
