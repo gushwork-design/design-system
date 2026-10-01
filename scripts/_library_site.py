@@ -462,7 +462,7 @@ document.documentElement.setAttribute('data-theme','light')}}</script>
   {crumb}
   <div class="lb-top__r">{find}
     <button class="lb-tbtn" id="lb-theme" type="button" aria-label="Switch theme">
-      {ic('sun-dim')}</button></div>
+      {ic('sun')}</button></div>
 </header>
 {body}
 <script>{JS}</script>

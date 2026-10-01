@@ -628,7 +628,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       <div class="ul-tabs an-tabs" id="ds-tabs" role="tablist" aria-label="Design system">
         <button class="ul-tab" role="tab" data-tab="library" aria-selected="true">Library</button>
         <button class="ul-tab" role="tab" data-tab="catalogue" aria-selected="false">Catalogue</button>
-        <button class="ul-tab" role="tab" data-tab="review" aria-selected="false">Review<svg id="ds-lock" viewBox="0 0 256 256" width="12" height="12" fill="currentColor" aria-hidden="true" style="margin-left:6px;vertical-align:-1px" hidden><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96Zm112,152H48V96H208V208Z"/></svg></button>
+        <button class="ul-tab" role="tab" data-tab="review" id="ds-tab-review" aria-selected="false" hidden>Review</button>
         <button class="ul-tab" role="tab" data-tab="workflow" aria-selected="false">Workflow</button>
       </div>
     </div>
@@ -881,11 +881,14 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     TABS.forEach(function (t) { $('ds-' + t).hidden = t !== name; });
     document.querySelectorAll('#ds-tabs .ul-tab').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-tab') === name)); });
     if (push) { try { history.replaceState(null, '', '#' + name); } catch (e) { location.hash = name; } }
-    me.then(function () { $('ds-lock').hidden = owner; start(name); });
+    me.then(function () { start(name); });
   }
   document.querySelectorAll('#ds-tabs .ul-tab').forEach(function (b) { b.addEventListener('click', function () { show(b.getAttribute('data-tab'), true); }); });
   window.addEventListener('hashchange', function () { show(location.hash.slice(1), false); });
   $('ds-signin').addEventListener('click', function () { location.href = '/api/auth/login?next=' + encodeURIComponent('/admin/design-system#review'); });
+  /* Review is for the owner: the tab does not exist for anyone else. Someone who opens #review anyway
+     (a bookmark, an old link) still gets the owner sign-in card rather than the sheet. */
+  me.then(function () { $('ds-tab-review').hidden = !owner; });
   show(location.hash.slice(1), false);
 })();
 </script>
