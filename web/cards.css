@@ -159,8 +159,8 @@
     .trow{flex-direction:column}
     .trow__pv{width:100%}
     .trow__b{align-self:auto}
-    .tcard__dev{width:100%;left:0;transform:none;border-left:0;border-right:0;
-                border-radius:0}
+    /* The device keeps its desktop size and centring. It used to stretch edge to edge here, which
+       cropped the render into a wide strip with a blank band above it. */
   }
 
   /* Dark: a light-mode screenshot on a black page is the brightest thing on screen, so it is dimmed a

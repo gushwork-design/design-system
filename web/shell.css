@@ -1982,11 +1982,17 @@
    3. The column's 0 top padding (right for desktop, where the bar is outside the scrollport) put the
       home hero under the bar, and its 40 side padding beat the phone token set above. */
 @media (max-width: 767px) {
-  .gw-scroll { overflow: visible; overscroll-behavior: auto; }
+  .gw-scroll { overflow: visible; overscroll-behavior: auto; padding-top: 76px; }
   .gw-topbar { background: var(--s-panel-bg); }
   .gw-scroll > .gw-col {
-    padding: 76px var(--gw-bp-pad-page-h) var(--gw-bp-pad-section-v);
+    padding: 0 var(--gw-bp-pad-page-h) var(--gw-bp-pad-section-v);
   }
+  /* The bar is 76 and sits over the page, so EVERY page starts 76 down, once, here. The page families
+     (.sg .dl .st .cl) used to guess at it with their own top padding and some, like the style guide,
+     added a second 60 on top. They start flush now, and the header's own 20 is the only gap. */
+  .gw-scroll :is(.sg, .dl, .st, .cl) { padding-top: 0; row-gap: var(--gw-space-32); }
+  .gw-scroll :is(.sg__hd, .dl__hd, .st__hd, .cl__hd) { padding-top: var(--gw-space-20); }
+  .gw-scroll :is(.sg__main, .dl__main, .st__main, .cl__main, .sg-sec) { padding-left: 0; }
 }
 
 @media (max-width: 767px) {
