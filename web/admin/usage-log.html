@@ -306,8 +306,7 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
 .ul-link:hover { color: var(--ul-value); }
 .ul-link[hidden] { display: none; }
 .ul-big { margin: 0; font: var(--gw-text-body-24-sem, 600 24px/1.2 var(--gw-font-body)); color: var(--ul-value); }
-.ul-vmid { margin: auto 0; padding: var(--gw-space-16) 0; }
-.ul-vtxt { margin-top: auto; }
+.ul-vmid { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: var(--gw-space-16) 0; }
 .ul-dlg { width: min(640px, calc(100vw - 32px)); max-height: min(560px, calc(100vh - 64px)); padding: 0; border: 0; border-radius: var(--gw-radius-16);
   background: var(--ul-field-bg); color: var(--ul-value); box-shadow: inset 0 0 0 1px var(--ul-hdr-line), var(--gw-shadow-s3); }
 .ul-dlg[open] { display: flex; flex-direction: column; }
