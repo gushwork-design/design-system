@@ -321,7 +321,7 @@ def review_of(block, key):
     """The registry's word on one entry. Absent means pending — never 'fine'."""
     r = (block or {}).get(key) or {}
     state = r.get("reviewed", "pending")
-    if state not in ("passed", "pending", "rejected"):
+    if state not in ("passed", "pending", "rejected", "rework"):
         state = "pending"
     return {
         "state": state,

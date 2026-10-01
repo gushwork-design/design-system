@@ -151,6 +151,10 @@
       "destination": "/api/gw?action=visits"
     },
     {
+      "source": "/api/review",
+      "destination": "/api/gw?action=review"
+    },
+    {
       "source": "/api/usage-log",
       "destination": "/api/gw?action=usage-log"
     },

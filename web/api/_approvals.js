@@ -23,6 +23,8 @@
 import crypto from 'node:crypto';
 
 const QUEUE_KEY = 'gw:approvals';
+const DECISIONS_KEY = 'gw:review-decisions';   // the owner's Pass / Rework / Reject buttons, see _review.js
+const STATE_KEY = 'gw:review-state';
 
 function store() {
   const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
@@ -61,6 +63,35 @@ export default async function handler(req, res) {
   if (!secretOk(given)) return res.status(401).json({ error: 'nope' });
 
   const peek = String((req.query && req.query.peek) || '') === '1';
+
+  // ?kind=decisions: what the owner decided on the site. A row counts only while it is still that item's
+  // latest decision (an Undo, or a newer press, removes or replaces it), and only the newest per item.
+  if (String((req.query && req.query.kind) || '') === 'decisions') {
+    try {
+      const out = await redis(cfg, [['LRANGE', DECISIONS_KEY, '0', '499'], ['HGETALL', STATE_KEY]]);
+      const state = {};
+      const flat = out[1].result || [];
+      for (let i = 0; i + 1 < flat.length; i += 2) { const r = safe(flat[i + 1]); if (r) state[flat[i]] = r; }
+      const seen = new Set(), live = [];
+      for (const raw of (out[0].result || [])) {
+        const row = safe(raw);
+        if (!row) continue;
+        const field = `${row.scope}/${row.key}`;
+        if (seen.has(field)) continue;
+        seen.add(field);
+        if (state[field] && state[field].at === row.at) live.push(row);
+      }
+      if (!peek) {
+        // Applying a pass or a reject writes it into the registry, which is the record from then on, so the
+        // site's copy goes. A rework stays until a newer decision replaces it: it is still outstanding.
+        const done = live.filter((r) => r.action === 'pass' || r.action === 'reject').map((r) => `${r.scope}/${r.key}`);
+        await redis(cfg, [['DEL', DECISIONS_KEY], ...(done.length ? [['HDEL', STATE_KEY, ...done]] : [])]);
+      }
+      return res.status(200).json({ decisions: live });
+    } catch {
+      return res.status(502).json({ error: 'could not read' });
+    }
+  }
 
   try {
     if (peek) {
