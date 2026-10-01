@@ -1006,8 +1006,18 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
         (x.recipe ? '<a class="ds-pv ds-pv--q" href="' + esc(x.recipe) + '">' + (x.preview ? 'How it is built' : 'Open') + '</a>' : '') + '</div></div>';
     }).join('') + '</div></section>';
   }
+  /* A component's doc is a file in exports/<surface>/ in the repo (some point up and across, like
+     ../../skills/...). The row opens it on GitHub, in a new tab. */
+  var REPO = 'https://github.com/gushwork-design/design-system/blob/main/';
+  function docHref(surface, doc) {
+    /* Shared components are held once, so their docs are not under exports/shared: the wordmark and icons are
+       described in foundation/, and the badge in the dashboard's primitives. */
+    var out = surface === 'shared' ? (/^v2\//.test(doc) ? ['exports', 'dashboard'] : ['foundation']) : ['exports', surface];
+    String(doc).split('/').forEach(function (seg) { if (seg === '..') out.pop(); else if (seg && seg !== '.') out.push(seg); });
+    return REPO + out.join('/');
+  }
   function compTable(sf) {
-    var rows = sf ? sf.components.map(function (c) { return row([cell(link(c.href, c.name)), txt(c.version || '—'), cell(esc(c.changed || '—') + (c.breaking ? ' <span class="ul-badge ul-badge--bad">breaking</span>' : '')), txt(c.doc || '—'), cell(review(c.review))]); }) : [];
+    var rows = sf ? sf.components.map(function (c) { return row([cell(link(c.href, c.name)), txt(c.version || '—'), cell(esc(c.changed || '—') + (c.breaking ? ' <span class="ul-badge ul-badge--bad">breaking</span>' : '')), (c.doc ? cell('<a class="ds-a" href="' + esc(docHref(sf.key, c.doc)) + '" target="_blank" rel="noopener" title="Open ' + esc(c.doc) + ' on GitHub">' + esc(c.doc) + '</a>') : txt('—')), cell(review(c.review))]); }) : [];
     return '<section class="fd-sec"><h3>Components<span>' + plural(rows.length, 'component') + '</span></h3><div class="ul-scroll vs-t">' +
       table('minmax(200px,1.6fr) 90px 150px minmax(140px,1fr) 140px', ['Component', 'Version', 'Spec last moved', 'Doc', 'Review'], rows, 'Nothing measured yet') + '</div></section>';
   }
@@ -1027,7 +1037,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       var body = { color: fdColor, type: fdType, spacing: fdSpacing, radius: fdRadius, elevation: fdElevation, layout: fdLayout, motion: fdMotion }[F.tab](t);
       var gk = FD_KEY[F.tab], g = gk && (d.foundations || []).filter(function (x) { return x.key === gk; })[0];
       side = FD_TABS.map(function (x) { return [x[0], x[1], count[x[0]], x[0] === F.tab]; });
-      main = '<div class="fd-head"><p>' + esc(FD_NOTE[F.tab]) + '</p><div class="fd-head__r">' + (g ? review(g.review) + ' <a class="ds-a" href="' + esc(LIB + g.href) + '">Standalone page</a>' : '') + '</div></div>' + body;
+      main = '<div class="fd-head"><p>' + esc(FD_NOTE[F.tab]) + '</p><div class="fd-head__r">' + (g ? review(g.review) : '') + '</div></div>' + body;
     } else {
       var sub = subOf(cat), sf = sub.surface ? d.surfaces.filter(function (x) { return x.key === sub.surface; })[0] : null;
       side = cat.subs.length > 1 ? cat.subs.map(function (x) {
