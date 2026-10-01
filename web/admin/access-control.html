@@ -602,7 +602,7 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
     var locked = !meta.you.owner && eff.access === 'owner';
     /* No rule of its own means it follows its parent — say which, because otherwise the
        dropdown shows a level nobody set on this row and it looks like a guess. */
-    var sub = own ? esc(t.path) : esc(t.path) + '<br>Follows <code>' + esc(eff.path) + '</code>';
+    var sub = own ? esc(t.path) : '<span title="Has no rule of its own, so it follows ' + esc(eff.path) + '">' + esc(t.path) + '</span>';
 
     return el(
       '<div class="ac-row" data-tool="' + esc(t.path) + '">' +
