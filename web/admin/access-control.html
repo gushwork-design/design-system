@@ -348,6 +348,16 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
 .ac-head { background: none; border-radius: 0; box-shadow: none; border-bottom: 1px solid var(--s-chrome-border); }
 .ac-card__ft { background: none; border-radius: 0; border-top: 1px solid var(--s-chrome-border); padding: var(--gw-space-16) var(--gw-space-12) 0; margin-top: var(--gw-space-8); }
 .ac-card__ft .ac-field { background: var(--s-field-bg); }
+/* No description under the tab (it only repeated what the tab and the columns say), and rows with room to
+   breathe: more padding, and looser lines in the name / path / follows stack. */
+.ac-card__hd { display: none; }
+.ac-row { padding: var(--gw-space-20) var(--gw-space-12); gap: var(--gw-space-16); }
+.ac-row__path { line-height: 1.5; }
+.ac-row__path small { margin-top: var(--gw-space-4); line-height: 1.5; }
+.ac-tool { gap: var(--gw-space-16); }
+.ac-row, .ac-head { grid-template-columns: minmax(280px, 1.5fr) 232px minmax(0, 1.2fr) 44px; }
+.ac-tool__pv { width: 72px; }
+.ac-head { padding: 0 var(--gw-space-12) var(--gw-space-12); }
 /* The owner and admin boxes inside the last tab lose their frames too: two sections divided by a hairline. */
 .ac-lvls { gap: 0; padding-top: 0; }
 .ac-card__body:has(.ac-lvls) { padding: 0; }
