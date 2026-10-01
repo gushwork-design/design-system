@@ -115,7 +115,7 @@
     --s-panel-bg:      var(--gw-color-black);        /* content panel: the same surface as the frame; a hairline separates them */
   --s-chrome-bg:     var(--gw-color-black);        /* topbar / sidebar: one surface with the page */
     --s-chrome-border: var(--gw-color-neutral-900);  /* hairline */
-    --s-heading:       var(--gw-color-white);        /* all Vert Grotesk headings → white */
+    --s-heading:       var(--gw-color-neutral-100);  /* softened from white 1 Oct 2026: white on near-black was too hard an edge */
     --s-body:          var(--gw-color-neutral-400);  /* muted text: one step down from white, not two */
     --s-card-bg:       var(--gw-color-black);        /* a card has no fill of its own; its hairline is what draws it */
     --s-card-border:   var(--gw-color-neutral-900);  /* hairline */
@@ -128,7 +128,7 @@
     --s-nav-row-hover: color-mix(in srgb, var(--gw-color-neutral-900) 55%, transparent);  /* softer than selected */
 
     /* measured — audit line 358: the nav label tracks to white in dark */
-    --s-nav-label:     var(--gw-color-white);
+    --s-nav-label:     var(--gw-color-neutral-300);  /* a mid grey like Vercel; the open page and hover step up to neutral-100 */
 
     /* measured — audit §9: dark primary button is a white fill with Neutral/900
        text, which is the same inversion the dark tab-active uses */
@@ -164,7 +164,7 @@
   --s-panel-bg:      var(--gw-color-black);        /* content panel: the same surface as the frame; a hairline separates them */
   --s-chrome-bg:     var(--gw-color-black);        /* topbar / sidebar: one surface with the page */
   --s-chrome-border: var(--gw-color-neutral-900);  /* hairline */
-  --s-heading:       var(--gw-color-white);        /* all Vert Grotesk headings → white */
+  --s-heading:       var(--gw-color-neutral-100);  /* softened from white 1 Oct 2026: white on near-black was too hard an edge */
   --s-body:          var(--gw-color-neutral-400);  /* muted text: one step down from white, not two */
   --s-card-bg:       var(--gw-color-black);        /* a card has no fill of its own; its hairline is what draws it */
   --s-card-border:   var(--gw-color-neutral-900);  /* hairline */
@@ -177,7 +177,7 @@
   --s-nav-row-hover: color-mix(in srgb, var(--gw-color-neutral-900) 55%, transparent);  /* softer than selected */
 
   /* measured — audit line 358: the nav label tracks to white in dark */
-  --s-nav-label:     var(--gw-color-white);
+  --s-nav-label:     var(--gw-color-neutral-300);  /* a mid grey like Vercel; the open page and hover step up to neutral-100 */
 
   /* measured — audit §9: dark primary button is a white fill with Neutral/900
      text, which is the same inversion the dark tab-active uses */
@@ -613,6 +613,13 @@
 }
 .gw-navitem:hover { background: var(--s-nav-row-hover); }
 .gw-navitem[aria-current="page"] { background: var(--s-nav-sel); }
+/* Dark: idle rows are a mid grey, the open page and a hovered row step up to neutral-100 (not white). */
+:root[data-theme="dark"] .gw-navitem[aria-current="page"],
+:root[data-theme="dark"] .gw-navitem:hover { color: var(--gw-color-neutral-100); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .gw-navitem[aria-current="page"],
+  :root:not([data-theme="light"]) .gw-navitem:hover { color: var(--gw-color-neutral-100); }
+}
 .gw-navitem:focus-visible { outline: var(--gw-focus-ring); outline-offset: -2px; }
 
 /* lock badge 683:5282 — 24x24, pad 4, r4, Lock / LockOpen Regular 16 in
