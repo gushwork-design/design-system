@@ -596,7 +596,6 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
     <div id="ul-app">
       <div class="ul-kpis" id="ul-kpis"></div>
       <div class="ul-metrics" id="ul-metrics" style="margin-top: var(--gw-space-8)"></div>
-      <div class="ul-metrics" id="ul-tokens" style="margin-top: var(--gw-space-8)"></div>
 
       <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="ul-h-chart">
         <div class="ul-sh"><div class="ul-sh__t"><h2 id="ul-h-chart">Sessions</h2><span class="ul-sh__q" id="ul-q-chart"></span></div></div>
@@ -1126,32 +1125,28 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
     var loading = S.status === 'loading';
     if (loading) {
       $('ul-kpis').innerHTML = skelStat('Sessions') + skelStat('Active people');
-      $('ul-metrics').innerHTML = ['Today', 'On the newest version', 'Not identified', 'Versions in use', 'Busiest day', 'Last session'].map(skelMetric).join('');
-      $('ul-tokens').innerHTML = ['Tokens used', 'Per session', 'Re-read from cache'].map(skelMetric).join('');
+      $('ul-metrics').innerHTML = ['Tokens used', 'Per session', 'On the newest version'].map(skelMetric).join('');
       return;
     }
     var pctS = m.sessTotal ? Math.round(m.sessions / m.sessTotal * 100) : 0;
     var pctP = m.peopleAll ? Math.round(m.people / m.peopleAll * 100) : 0;
     $('ul-kpis').innerHTML =
-      statCard('Sessions', String(m.sessions), 'of ' + m.sessTotal + ' logged', pctS) +
+      statCard('Sessions', String(m.sessions), 'of ' + m.sessTotal + ' logged' + (m.unknown ? ', ' + m.unknown + ' without an email' : ''), pctS) +
       statCard('Active people', String(m.people), 'of ' + m.peopleAll + ' ever identified', pctP);
     var newestPct = m.sessions ? Math.round(m.onNewest / m.sessions * 100) + '%' : 'None';
-    $('ul-metrics').innerHTML =
-      metricCard('Today', String(m.today), m.yest + ' yesterday') +
-      metricCard('On the newest version', newestPct, m.newest ? m.newest + ' is the newest seen' : 'No version recorded') +
-      metricCard('Not identified', String(m.unknown), (m.sessions ? Math.round(m.unknown / m.sessions * 100) : 0) + '% of sessions have no email') +
-      metricCard('Versions in use', String(m.vers.length), m.oldest ? 'oldest is ' + m.oldest : 'in ' + PERIOD_NAME[S.period]) +
-      metricCard('Busiest day', m.busy ? String(m.busy.n) : 'None', m.busyDate ? fmtDay(m.busyDate) : 'in ' + PERIOD_NAME[S.period]) +
-      metricCard('Last session', m.last ? ago(Date.now() - m.last.getTime()) : 'None', m.last ? fmtWhen(m.last) : 'Nothing logged');
     var st = sessTokens(m.curAll), ks = Object.keys(st), used = 0, cache = 0, per = [];
     ks.forEach(function (k) { var t = st[k]; used += t.i + t.o; cache += t.c; per.push(t.i + t.o); });
     per.sort(function (a, b) { return a - b; });
     var med = per.length ? (per.length % 2 ? per[per.length >> 1] : (per[(per.length >> 1) - 1] + per[per.length >> 1]) / 2) : 0;
     var none = 'Arrives as people update the plugin';
-    $('ul-tokens').innerHTML =
-      metricCard('Tokens used', ks.length ? fmtTok(used) : 'None', ks.length ? 'input + output, ' + plural(ks.length, 'session') + ' measured' : none) +
+    /* Three numbers, chosen for what the owner acts on: what the skills cost in total, what a session
+       costs (the figure to push down), and whether people are on the build with the latest fixes.
+       Today, busiest day, last session, versions in use and not-identified are in the chart, the log and
+       the Out of date card below; cache re-reads sit in the note on tokens used. */
+    $('ul-metrics').innerHTML =
+      metricCard('Tokens used', ks.length ? fmtTok(used) : 'None', ks.length ? 'input + output, ' + plural(ks.length, 'session') + ' measured, plus ' + fmtTok(cache) + ' re-read from cache' : none) +
       metricCard('Per session', ks.length ? fmtTok(med) : 'None', ks.length ? 'median, in Gushwork skill sessions' : 'No token figures yet') +
-      metricCard('Re-read from cache', ks.length ? fmtTok(cache) : 'None', 'not counted above, cheap to repeat');
+      metricCard('On the newest version', newestPct, m.newest ? m.newest + ' is the newest seen' : 'No version recorded');
   }
 
   /* Line chart. One series, primary/500, 2px, with a 30% to 0% gradient beneath. */
