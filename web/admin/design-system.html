@@ -879,7 +879,10 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     n = n || 0; var m = /^var\(--(gw-[a-z0-9-]+)\)$/.exec(String(v).trim());
     return m && t[m[1]] != null && n < 5 ? resolve(t, t[m[1]], n + 1) : String(v).trim();
   }
-  function keys(t, re) { return Object.keys(t).filter(function (k) { return re.test(k); }); }
+  /* Tokens that exist in tokens.css but are not shown in the library. secondary-500 (#111827) is still used by the
+     ad-page templates, the wordmark's dark and the staging landers, so it is hidden here, not deleted. */
+  var HIDDEN = { 'gw-color-secondary-500': 1 };
+  function keys(t, re) { return Object.keys(t).filter(function (k) { return re.test(k) && !HIDDEN[k]; }); }
   function px(v) { var m = /^(-?[\d.]+)px$/.exec(String(v).trim()); return m ? parseFloat(m[1]) : null; }
   /* A ramp reads 25, 50, 100 ... 900, and the alpha steps come after it, in order. */
   function rampOrder(a, b) {
