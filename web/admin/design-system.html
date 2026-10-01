@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design System — Gushwork Design</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="The component library, the catalogue and the review gate, for admins.">
+<script>try{var t=localStorage.getItem('gw-theme');if(t!=='dark')t='light';document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20width%3D%2280%22%20height%3D%2280%22%20rx%3D%2220%22%20fill%3D%22%230d0d0d%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="/foundation/tokens.css">
+<link rel="stylesheet" href="/shell.css">
+<script src="/shell.js" defer></script>
+<style>
+/* /admin/usage-log — the session log, read back for the owner.
+
+   SHELL. This is an admin page inside the design-system site, so it takes the site's own
+   chrome (shell.css / shell.js, the same as /admin/access-control) rather than a
+   `dashboard-build` rail: a rail whose only row is this page would be chrome with nothing to
+   navigate. The CONTENT is dashboard: v2 stat-card, metric-card, card-shell, section-header,
+   table-row, pagination, tab-group, input and empty-state, from exports/dashboard/v2.
+
+   Width. 1120 is the measured v2 page-header / section-header width, not a value chosen here.
+   Everything not measured is marked NOT MEASURED below. */
+body[data-gw-page="design-system"] .sg__main { grid-column: 1 / -1; max-width: 1120px; gap: var(--gw-space-24); }
+body[data-gw-page="design-system"] .sg__main > * { min-width: 0; }
+
+/* ── theme aliases ─────────────────────────────────────────────────────────────────────
+   Declared in BOTH themes on purpose: an alias set in one block silently keeps the other
+   theme's value. Light is measured; dark is the measured light→dark map in v2/README.md,
+   and where the dark screen draws nothing (tab hover, tooltip, filled-button hover) the
+   value is DERIVED one step toward the element's own selected state and marked so. */
+:root {
+  --ul-label:      var(--gw-color-neutral-700);
+  --ul-value:      var(--gw-color-black);
+  --ul-sub:        var(--gw-color-neutral-500);
+  --ul-cell:       var(--gw-color-neutral-600);
+  --ul-icon:       var(--gw-color-neutral-600);
+  --ul-track:      var(--gw-color-neutral-200);
+  --ul-good:       var(--gw-color-green-400);
+  --ul-grid:       var(--gw-color-neutral-100);
+  --ul-hdr-bg:     var(--gw-color-neutral-25);
+  --ul-hdr-line:   var(--gw-color-neutral-100);
+  --ul-hdr-fg:     var(--gw-color-neutral-700);
+  --ul-row-line:   var(--gw-color-neutral-25);
+  --ul-row-bg:     transparent;
+  --ul-row-hover:  var(--gw-color-neutral-25);
+  --ul-ctl-line:   var(--gw-color-neutral-200);
+  --ul-ctl-fg:     var(--gw-color-neutral-900);
+  --ul-ctl-hover:  var(--gw-color-neutral-35);
+  --ul-field-bg:   var(--gw-color-white);
+  --ul-field-line: var(--gw-color-neutral-400);
+  --ul-field-fg:   var(--gw-color-neutral-900);
+  --ul-field-ph:   var(--gw-color-neutral-400);
+  --ul-tabs-bg:    var(--gw-color-neutral-50);
+  --ul-tabs-line:  var(--gw-color-neutral-100);
+  --ul-tab-fg:     var(--gw-color-neutral-900);
+  --ul-tab-hover:  var(--gw-color-neutral-100);
+  --ul-tab-on-bg:  var(--gw-color-black);
+  --ul-tab-on-fg:  var(--gw-color-white);
+  --ul-prim-bg:    var(--gw-color-black);
+  --ul-prim-fg:    var(--gw-color-white);
+  --ul-prim-hover: var(--gw-color-neutral-850);
+  --ul-tip-bg:     var(--gw-color-neutral-25);
+  --ul-tip-line:   var(--gw-color-neutral-100);
+  --ul-tip-head:   var(--gw-color-neutral-500);
+  --ul-tip-main:   var(--gw-color-neutral-900);
+  --ul-skel:       var(--gw-color-neutral-100);
+  --ul-circle:     var(--gw-color-neutral-50);
+  --ul-circle-fg:  var(--gw-color-neutral-400);
+  --ul-b-ok-bg:    var(--gw-color-green-25);
+  --ul-b-ok-fg:    var(--gw-color-green-500);
+  --ul-b-no-bg:    var(--gw-color-neutral-50);
+  --ul-b-no-fg:    var(--gw-color-neutral-700);
+  --ul-disabled:   var(--gw-color-neutral-250);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ul-label:      var(--gw-color-neutral-400);
+    --ul-value:      var(--gw-color-white);
+    --ul-sub:        var(--gw-color-neutral-500);       /* unchanged in dark, measured */
+    --ul-cell:       var(--gw-color-neutral-400);
+    --ul-icon:       var(--gw-color-neutral-400);
+    --ul-track:      var(--gw-color-neutral-600);
+    --ul-good:       var(--gw-color-green-300);
+    --ul-grid:       var(--gw-color-neutral-900);
+    --ul-hdr-bg:     var(--gw-color-black);
+    --ul-hdr-line:   var(--gw-color-neutral-900);
+    --ul-hdr-fg:     var(--gw-color-neutral-100);
+    --ul-row-line:   var(--gw-color-neutral-900);
+    --ul-row-bg:     var(--gw-color-black);
+    --ul-row-hover:  var(--gw-color-neutral-900);       /* RULED in v2/data-table.md, not drawn */
+    --ul-ctl-line:   var(--gw-color-neutral-850);
+    --ul-ctl-fg:     var(--gw-color-neutral-50);
+    --ul-ctl-hover:  var(--gw-color-neutral-850);       /* DERIVED: one step toward the border */
+    --ul-field-bg:   var(--gw-color-neutral-900);       /* DERIVED from the measured dark select */
+    --ul-field-line: var(--gw-color-neutral-600);
+    --ul-field-fg:   var(--gw-color-white);
+    --ul-field-ph:   var(--gw-color-neutral-400);
+    --ul-tabs-bg:    var(--gw-color-neutral-900);
+    --ul-tabs-line:  var(--gw-color-neutral-900);
+    --ul-tab-fg:     var(--gw-color-white);
+    --ul-tab-hover:  var(--gw-color-neutral-850);       /* DERIVED: hover moves toward the active fill */
+    --ul-tab-on-bg:  var(--gw-color-white);             /* the active tab inverts */
+    --ul-tab-on-fg:  var(--gw-color-black);
+    --ul-prim-bg:    var(--gw-color-white);             /* dark primary is a full inversion */
+    --ul-prim-fg:    var(--gw-color-neutral-900);
+    --ul-prim-hover: var(--gw-color-neutral-100);       /* DERIVED */
+    --ul-tip-bg:     var(--gw-color-neutral-900);       /* DERIVED: the dark screen draws no tooltip */
+    --ul-tip-line:   var(--gw-color-neutral-850);
+    --ul-tip-head:   var(--gw-color-neutral-400);
+    --ul-tip-main:   var(--gw-color-white);
+    --ul-skel:       var(--gw-color-neutral-900);
+    --ul-circle:     var(--gw-color-neutral-900);
+    --ul-circle-fg:  var(--gw-color-neutral-400);
+    --ul-b-ok-bg:    var(--gw-color-green-alpha-10);    /* dark tint: Alpha/10 fill + /300 label */
+    --ul-b-ok-fg:    var(--gw-color-green-300);
+    --ul-b-no-bg:    var(--gw-color-neutral-900);
+    --ul-b-no-fg:    var(--gw-color-neutral-400);
+    --ul-disabled:   var(--gw-color-neutral-600);
+  }
+}
+:root[data-theme="dark"] {
+    --ul-label:      var(--gw-color-neutral-400);
+    --ul-value:      var(--gw-color-white);
+    --ul-sub:        var(--gw-color-neutral-500);       /* unchanged in dark, measured */
+    --ul-cell:       var(--gw-color-neutral-400);
+    --ul-icon:       var(--gw-color-neutral-400);
+    --ul-track:      var(--gw-color-neutral-600);
+    --ul-good:       var(--gw-color-green-300);
+    --ul-grid:       var(--gw-color-neutral-900);
+    --ul-hdr-bg:     var(--gw-color-black);
+    --ul-hdr-line:   var(--gw-color-neutral-900);
+    --ul-hdr-fg:     var(--gw-color-neutral-100);
+    --ul-row-line:   var(--gw-color-neutral-900);
+    --ul-row-bg:     var(--gw-color-black);
+    --ul-row-hover:  var(--gw-color-neutral-900);       /* RULED in v2/data-table.md, not drawn */
+    --ul-ctl-line:   var(--gw-color-neutral-850);
+    --ul-ctl-fg:     var(--gw-color-neutral-50);
+    --ul-ctl-hover:  var(--gw-color-neutral-850);       /* DERIVED: one step toward the border */
+    --ul-field-bg:   var(--gw-color-neutral-900);       /* DERIVED from the measured dark select */
+    --ul-field-line: var(--gw-color-neutral-600);
+    --ul-field-fg:   var(--gw-color-white);
+    --ul-field-ph:   var(--gw-color-neutral-400);
+    --ul-tabs-bg:    var(--gw-color-neutral-900);
+    --ul-tabs-line:  var(--gw-color-neutral-900);
+    --ul-tab-fg:     var(--gw-color-white);
+    --ul-tab-hover:  var(--gw-color-neutral-850);       /* DERIVED: hover moves toward the active fill */
+    --ul-tab-on-bg:  var(--gw-color-white);             /* the active tab inverts */
+    --ul-tab-on-fg:  var(--gw-color-black);
+    --ul-prim-bg:    var(--gw-color-white);             /* dark primary is a full inversion */
+    --ul-prim-fg:    var(--gw-color-neutral-900);
+    --ul-prim-hover: var(--gw-color-neutral-100);       /* DERIVED */
+    --ul-tip-bg:     var(--gw-color-neutral-900);       /* DERIVED: the dark screen draws no tooltip */
+    --ul-tip-line:   var(--gw-color-neutral-850);
+    --ul-tip-head:   var(--gw-color-neutral-400);
+    --ul-tip-main:   var(--gw-color-white);
+    --ul-skel:       var(--gw-color-neutral-900);
+    --ul-circle:     var(--gw-color-neutral-900);
+    --ul-circle-fg:  var(--gw-color-neutral-400);
+    --ul-b-ok-bg:    var(--gw-color-green-alpha-10);    /* dark tint: Alpha/10 fill + /300 label */
+    --ul-b-ok-fg:    var(--gw-color-green-300);
+    --ul-b-no-bg:    var(--gw-color-neutral-900);
+    --ul-b-no-fg:    var(--gw-color-neutral-400);
+    --ul-disabled:   var(--gw-color-neutral-600);
+}
+
+/* Focus. No v2 component defines one; --gw-focus-ring on :focus-visible is mandatory (states.md). */
+.ul-scope :is(button, a, input, select, [tabindex]):focus-visible {
+  outline: var(--gw-focus-ring);
+  outline-offset: var(--gw-focus-offset);
+}
+
+/* ── controls row (page-header controls-row) ─────────────────────────────────────────── */
+.ul-bar { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-16); flex-wrap: wrap; }
+/* tab-group: 36h, radius/12, pad 4, gap 4. The 1px border is an inset shadow, not a CSS
+   border, so the 28h tab-items still fit — a border under border-box would eat 2px of them. */
+.ul-tabs { display: inline-flex; height: 36px; padding: var(--gw-space-4); gap: var(--gw-space-4);
+  border-radius: var(--gw-radius-12); background: var(--ul-tabs-bg); box-shadow: inset 0 0 0 1px var(--ul-tabs-line); }
+.ul-tab { height: 28px; padding: 0 var(--gw-space-12); border: 0; border-radius: var(--gw-radius-8);
+  background: none; font: var(--gw-text-button-12); color: var(--ul-tab-fg); cursor: pointer;
+  transition: background var(--gw-motion-fast); }
+.ul-tab:hover { background: var(--ul-tab-hover); }
+.ul-tab[aria-selected="true"] { background: var(--ul-tab-on-bg); color: var(--ul-tab-on-fg); }
+.ul-refresh { display: flex; align-items: center; gap: var(--gw-space-8); }
+.ul-refresh__t { font: var(--gw-text-button-10); color: var(--ul-label); }
+/* icon-button Size=28: radius/8, 12px glyph, 1px neutral/200 (inset, same reason as above) */
+.ul-ib { width: 28px; height: 28px; padding: 0; display: inline-grid; place-items: center; border: 0;
+  border-radius: var(--gw-radius-8); background: none; color: var(--ul-icon); cursor: pointer;
+  box-shadow: inset 0 0 0 1px var(--ul-ctl-line); transition: background var(--gw-motion-fast); }
+.ul-ib:hover:not(:disabled) { background: var(--ul-ctl-hover); }
+.ul-ib:disabled { color: var(--ul-disabled); cursor: default; }
+.ul-ib svg { width: 12px; height: 12px; display: block; }
+.ul-ib[aria-busy="true"] svg { animation: ul-spin 1s linear infinite; }
+@keyframes ul-spin { to { transform: rotate(360deg); } }
+
+/* ── stat-card / metric-card ─────────────────────────────────────────────────────────── */
+.ul-kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gw-space-8); }
+.ul-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gw-space-8); }
+/* stat-card 218 x 132 is the intrinsic size; these fill their column (a floor, not a width). */
+.ul-stat, .ul-metric { background: var(--s-card-bg); box-shadow: inset 0 0 0 1px var(--s-card-border);
+  border-radius: var(--gw-radius-12); display: flex; flex-direction: column; gap: var(--gw-space-16); min-width: 0; }
+.ul-stat { padding: var(--gw-space-12); min-height: 132px; }
+.ul-metric { padding: var(--gw-space-16); min-height: 124px; }   /* metric-card pad 16, not 12: measured */
+.ul-stat__lab { display: flex; align-items: center; gap: var(--gw-space-8); padding: 0 var(--gw-space-4); }
+.ul-lab { flex: 1; font: var(--gw-text-body-12-med); color: var(--ul-label); }
+.ul-dot { width: 8px; height: 8px; border-radius: var(--gw-radius-20); background: var(--gw-color-neutral-400); flex: none; }
+.ul-stat__body { display: flex; flex-direction: column; gap: var(--gw-space-8); padding: 0 var(--gw-space-4); margin-top: auto; }
+.ul-stat__row { display: flex; justify-content: space-between; align-items: flex-end; gap: var(--gw-space-8); }
+.ul-val { display: flex; flex-direction: column; gap: var(--gw-space-4); min-width: 0; }
+/* Dashboard/display-28-med — HAS NO TOKEN (v2/README.md, R15). Literal spec: Vert Grotesk
+   Display Medium 500, 28 / 120%. Deliberately not --gw-text-h6 (600 / 26). */
+.ul-num { font: 500 28px/1.2 var(--gw-font-display); color: var(--ul-value); }
+.ul-note { font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.ul-pct { font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.ul-metric__body { display: flex; flex-direction: column; gap: var(--gw-space-4); margin-top: auto; }
+/* progress-bar Size=md: 4px, radius/40, track neutral/200, fill green/400 (dark: 600 / green/300) */
+.ul-pb { height: 4px; border-radius: var(--gw-radius-40); background: var(--ul-track); overflow: hidden; }
+.ul-pb > i { display: block; height: 100%; border-radius: var(--gw-radius-40); background: var(--ul-good); }
+/* skeleton: one block per real element, never a 0 while data is in flight (states.md) */
+.sk { display: block; background: var(--ul-skel); border-radius: var(--gw-radius-4);
+  animation: ul-pulse 960ms ease-in-out infinite alternate; }   /* --gw-motion-fast x 8 */
+@keyframes ul-pulse { from { opacity: 1; } to { opacity: .45; } }
+@media (prefers-reduced-motion: reduce) { .sk { animation: none; } .ul-ib[aria-busy="true"] svg { animation: none; } }
+
+/* ── card-shell lg + section-header ──────────────────────────────────────────────────── */
+.ul-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gw-space-24); margin-top: var(--gw-space-24); }
+@media (max-width: 960px) { .ul-pair { grid-template-columns: minmax(0, 1fr); } }
+.ul-sec { background: var(--s-card-bg); box-shadow: inset 0 0 0 1px var(--s-card-border);
+  border-radius: var(--gw-radius-16); padding: var(--gw-space-12); display: flex; flex-direction: column; gap: var(--gw-space-16); }
+.ul-sh { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-8);
+  padding: 0 var(--gw-space-8); min-height: 24px; flex-wrap: wrap; }
+.ul-sh__t { display: flex; align-items: baseline; gap: var(--gw-space-8); min-width: 0; }
+.ul-sh h2 { margin: 0; font: var(--gw-text-body-16-sem); color: var(--ul-value); }
+.ul-sh__q { font: var(--gw-text-body-16-reg); color: var(--ul-sub); }
+.ul-inner { border-radius: var(--gw-radius-8); padding: 0 var(--gw-space-8) var(--gw-space-8); }
+
+/* ── Graph / Line: single series + gradient fill ────────────────────────────────────── */
+/* Plot height 240 is NOT MEASURED. The measured Line is 400 tall in a 1028-wide chart; this
+   sits inside a card beside two other sections, so it is shorter. Chosen, and said so. */
+.ul-line { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: var(--gw-space-12);
+  /* room above the top label, below the dates, and right of the last date (centred on the plot edge) */
+  padding: var(--gw-space-16) var(--gw-space-32) var(--gw-space-16) var(--gw-space-8); }
+.ul-line__y { position: relative; height: 240px; width: 32px; }
+.ul-line__y span, .ul-line__x span { font: 500 12px/1 var(--gw-font-body); letter-spacing: -.2px; color: var(--ul-cell); }
+.ul-line__y span { position: absolute; right: 0; transform: translateY(-50%); }
+.ul-plot { position: relative; height: 240px; cursor: crosshair; }
+.ul-plot__g { position: absolute; left: 0; right: 0; height: 1px; background: var(--ul-grid); }
+.ul-plot svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.ul-line__x { grid-column: 2; position: relative; height: 12px; margin-top: var(--gw-space-16); }
+.ul-line__x span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+.ul-cross { position: absolute; top: 0; bottom: 0; width: 1px; pointer-events: none; display: none;
+  /* crosshair is dashed 2 2 in the measured Line */
+  background: repeating-linear-gradient(to bottom, var(--gw-color-primary-500) 0 2px, transparent 2px 4px); }
+.ul-dotp { position: absolute; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: var(--gw-radius-full);
+  background: var(--gw-color-primary-500); box-shadow: 0 0 0 2px var(--s-card-bg); pointer-events: none; display: none; }
+/* Line tooltip: neutral/25, 1px neutral/100 (measured 0.5, rounded per R5), radius/4, p-8, gap-8, shadow S2 */
+.ul-tip { position: absolute; z-index: 2; min-width: 148px; padding: var(--gw-space-8); display: none; pointer-events: none;
+  flex-direction: column; gap: var(--gw-space-8); background: var(--ul-tip-bg); box-shadow: inset 0 0 0 1px var(--ul-tip-line), var(--gw-shadow-s2);
+  border-radius: var(--gw-radius-4); }
+.ul-tip__h { display: flex; align-items: center; gap: 2px; font: var(--gw-text-body-10-med); color: var(--ul-tip-head); }
+/* .ul-plot svg (the chart) would otherwise pin this icon to the tooltip's corner */
+.ul-tip__h svg { position: static; inset: auto; flex: none; width: 12px; height: 12px; }
+.ul-tip__m { font: var(--gw-text-body-10-med); color: var(--ul-tip-main); }
+.ul-tip__b { border-left: 1px dashed var(--gw-color-neutral-500); padding: var(--gw-space-4) 0 var(--gw-space-4) var(--gw-space-8);
+  display: flex; flex-direction: column; gap: var(--gw-space-4); }
+/* The measured breakdown rows are 8px, which is below legibility. Built at 10 and reported. */
+.ul-tip__r { display: flex; justify-content: space-between; gap: var(--gw-space-12); font: var(--gw-text-body-10-med); }
+.ul-tip__r span:first-child { color: var(--ul-cell); max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ul-tip__r span:last-child { color: var(--ul-label); }
+
+/* ── Graph / Bar: bars are primary/500, 10 tall, radius 2 on the trailing corners only ─── */
+.ul-bars { display: flex; flex-direction: column; gap: var(--gw-space-20); padding: var(--gw-space-8) 0; }
+.ul-bars__r { display: grid; grid-template-columns: var(--ul-lw, 96px) minmax(0, 1fr); align-items: center; gap: var(--gw-space-12); }
+.ul-bars__l { font: 500 12px/1.2 var(--gw-font-body); letter-spacing: -.2px; color: var(--ul-cell); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ul-bars__t { padding-right: 52px; min-width: 0; }
+.ul-bar-b { position: relative; height: 10px; min-width: 2px; background: var(--gw-color-primary-500); border-radius: 0 2px 2px 0; }
+.ul-bar-b span { position: absolute; left: calc(100% + 4px); top: -2px; white-space: nowrap;
+  font: 500 10px/1 var(--gw-font-body); letter-spacing: -.2px; color: var(--ul-tip-main); }
+
+/* ── input Type=search, select, buttons ───────────────────────────────────────────────── */
+.ul-tools { display: flex; align-items: center; gap: var(--gw-space-8); flex-wrap: wrap; }
+.ul-input { position: relative; display: block; }
+.ul-input svg { position: absolute; left: var(--gw-space-12); top: 10px; width: 16px; height: 16px; color: var(--ul-field-ph); pointer-events: none; }
+.ul-input input { width: 240px; max-width: 100%; height: 36px; padding: 0 var(--gw-space-12) 0 calc(var(--gw-space-12) + 24px);
+  border: 0; border-radius: var(--gw-radius-8); background: var(--ul-field-bg); color: var(--ul-field-fg);
+  box-shadow: inset 0 0 0 1px var(--ul-field-line); font: var(--gw-text-button-14); }
+.ul-input input::placeholder { color: var(--ul-field-ph); }
+.ul-input input:focus { box-shadow: inset 0 0 0 1px var(--gw-color-black); }
+:root[data-theme="dark"] .ul-input input:focus { box-shadow: inset 0 0 0 1px var(--gw-color-white); }
+.ul-select { position: relative; display: inline-block; }
+.ul-select select { appearance: none; -webkit-appearance: none; height: 36px; padding: 0 calc(var(--gw-space-12) + 16px) 0 var(--gw-space-12);
+  border: 0; border-radius: var(--gw-radius-8); background: var(--ul-field-bg); color: var(--ul-field-fg);
+  box-shadow: inset 0 0 0 1px var(--ul-field-line); font: var(--gw-text-button-14); cursor: pointer; }
+.ul-pair .ul-sec { display: flex; flex-direction: column; }
+.ul-pair .ul-inner { flex: 1; display: flex; flex-direction: column; }
+.ul-foot { margin: auto 0 0; padding-top: var(--gw-space-12); font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+/* out-of-date people */
+.ul-sh--nw { flex-wrap: nowrap; }
+.ul-sh--nw .ul-sh__t { flex: 1 1 auto; }
+.ul-sh--nw .ul-sh__q { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.ul-split { display: flex; height: 12px; gap: 2px; border-radius: var(--gw-radius-full); overflow: hidden; }
+.ul-split i { display: block; height: 100%; min-width: 2px; background: var(--gw-color-neutral-400); }
+.ul-split i:first-child { background: var(--gw-color-primary-500); }
+.ul-split__k { display: flex; justify-content: space-between; gap: var(--gw-space-16); margin: var(--gw-space-8) 0 0; font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.ul-split__k b { font-weight: 600; color: var(--ul-value); }
+.ul-link { flex: none; white-space: nowrap; border: 0; background: none; padding: 0; cursor: pointer; font: var(--gw-text-body-14-med); color: var(--ul-sub); transition: color var(--gw-motion-fast); }
+.ul-link:hover { color: var(--ul-value); }
+.ul-link[hidden] { display: none; }
+.ul-big { margin: 0; font: var(--gw-text-body-24-sem, 600 24px/1.2 var(--gw-font-body)); color: var(--ul-value); }
+.ul-vmid { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: var(--gw-space-16) 0; }
+.ul-dlg { width: min(640px, calc(100vw - 32px)); max-height: min(560px, calc(100vh - 64px)); padding: 0; border: 0; border-radius: var(--gw-radius-16);
+  background: var(--ul-field-bg); color: var(--ul-value); box-shadow: inset 0 0 0 1px var(--ul-hdr-line), var(--gw-shadow-s3); }
+.ul-dlg[open] { display: flex; flex-direction: column; }
+.ul-dlg::backdrop { background: rgba(0, 0, 0, 0.4); }
+.ul-dlg__h { display: flex; align-items: baseline; gap: var(--gw-space-8); padding: var(--gw-space-16) var(--gw-space-16) var(--gw-space-8) var(--gw-space-24); }
+.ul-dlg__h h2 { margin: 0; font: var(--gw-text-body-16-sem); }
+.ul-dlg__x { margin-left: auto; align-self: center; width: 28px; height: 28px; border: 0; border-radius: var(--gw-radius-8); background: none; cursor: pointer;
+  font-size: 20px; line-height: 1; color: var(--ul-sub); }
+.ul-dlg__x:hover { color: var(--ul-value); background: var(--ul-hdr-line); }
+.ul-dlg__b { padding: 0 var(--gw-space-24) var(--gw-space-24); overflow-y: auto; }
+.ul-old { display: flex; flex-direction: column; }
+.ul-old__r { display: grid; grid-template-columns: minmax(0, 1fr) 112px 148px; align-items: center; column-gap: var(--gw-space-16); padding: var(--gw-space-12) 0; }
+.ul-old__r + .ul-old__r { border-top: 1px solid var(--ul-hdr-line); }
+.ul-old__who { min-width: 0; }
+.ul-old__who b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--gw-text-body-12-med); font-weight: 600; color: var(--ul-value); }
+.ul-old__who span { font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.ul-old__v { font: var(--gw-text-body-12-med); color: var(--ul-cell); }
+.ul-old__s { display: flex; justify-content: flex-end; }
+.ul-old__v { text-align: left; }
+/* skills donut */
+.ul-donut { flex: 1; display: flex; align-items: center; justify-content: center; gap: var(--gw-space-40); flex-wrap: wrap; padding: var(--gw-space-8) 0; }
+.ul-donut__c { position: relative; width: 160px; height: 160px; flex: none; }
+.ul-donut__c svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ul-donut__c circle { fill: none; stroke-width: 26; }
+.ul-donut__n { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.ul-donut__n b { font: var(--gw-text-body-24-sem, 600 24px/1.2 var(--gw-font-body)); color: var(--ul-value); }
+.ul-donut__n span { font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.ul-leg { flex: 0 1 240px; min-width: 180px; margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--gw-space-12); }
+.ul-leg li { display: grid; grid-template-columns: 12px minmax(0, 1fr) auto auto; align-items: center; column-gap: var(--gw-space-8); font: var(--gw-text-body-12-med); color: var(--ul-cell); }
+.ul-leg i { width: 12px; height: 12px; border-radius: var(--gw-radius-4); }
+.ul-leg li span:nth-child(2) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ul-value); }
+.ul-leg li span:last-child { min-width: 36px; text-align: right; color: var(--ul-sub); }
+/* ── dropdown menu: replaces the browser's own list, which is drawn by the OS and cannot be styled ── */
+.ul-menu { position: fixed; z-index: 50; min-width: 120px; max-height: 280px; overflow-y: auto; padding: var(--gw-space-4);
+  display: flex; flex-direction: column; gap: 2px; background: var(--ul-field-bg); border-radius: var(--gw-radius-12);
+  box-shadow: inset 0 0 0 1px var(--ul-hdr-line), var(--gw-shadow-s3); }
+.ul-menu__i { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-16); height: 32px; padding: 0 var(--gw-space-8) 0 var(--gw-space-12);
+  border: 0; border-radius: var(--gw-radius-8); background: none; text-align: left; white-space: nowrap; cursor: pointer;
+  font: var(--gw-text-body-12-med); color: var(--ul-cell); }
+.ul-menu__i:hover, .ul-menu__i.is-focus { background: var(--ul-row-hover); color: var(--ul-value); }
+.ul-menu__i[aria-selected="true"] { color: var(--ul-value); font-weight: 600; }
+.ul-menu__i svg { width: 12px; height: 12px; flex: none; color: var(--gw-color-primary-500); }
+/* No focus ring or darker border on the dropdown buttons: the open menu is the state (owner's call, overrides the page-wide ring above). */
+.ul-scope .ul-select select:focus-visible { outline: none; }
+.ul-select--sm select { height: 28px; font: var(--gw-text-button-12); }
+.ul-select svg { position: absolute; right: var(--gw-space-12); top: 50%; width: 12px; height: 12px; margin-top: -6px; color: var(--ul-icon); pointer-events: none; }
+.ul-btn { height: 36px; padding: 0 var(--gw-space-12); border: 0; border-radius: var(--gw-radius-12); cursor: pointer;
+  font: var(--gw-text-button-14); background: var(--ul-prim-bg); color: var(--ul-prim-fg); transition: background var(--gw-motion-fast); }
+.ul-btn:hover { background: var(--ul-prim-hover); }
+
+/* ── data table: table-row 56h data / 44h header, px-24, gap 32; first column fixed ─── */
+.ul-tbl { border-radius: var(--gw-radius-8); overflow: hidden; background: var(--ul-row-bg); }
+:root[data-theme="dark"] .ul-tbl { background: var(--gw-color-black); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ul-tbl { background: var(--gw-color-black); } }
+/* Every row is its own grid, so a content-sized track would resolve per row. The first track
+   is fixed and the rest are minmax(floor, 1fr): floors resolve identically for every row. */
+.ul-row { display: grid; grid-template-columns: 200px minmax(160px, 1.6fr) minmax(96px, 1fr) minmax(130px, 1fr) minmax(130px, 1.1fr);
+  column-gap: var(--gw-space-32); align-items: center; padding: 0 var(--gw-space-24); min-width: 820px; }
+.ul-row--h { height: 44px; background: var(--ul-hdr-bg); box-shadow: inset 0 -1px 0 var(--ul-hdr-line); }
+.ul-row--d { height: 56px; box-shadow: inset 0 -1px 0 var(--ul-row-line); transition: background var(--gw-motion-fast); }
+.ul-row--d:hover { background: var(--ul-row-hover); }
+.ul-th { display: inline-flex; align-items: center; gap: var(--gw-space-4); justify-self: start; padding: 0; border: 0; background: none;
+  font: var(--gw-text-body-12-med); color: var(--ul-hdr-fg); text-transform: uppercase; cursor: pointer; }
+.ul-th svg { width: 12px; height: 12px; color: var(--ul-icon); }
+.ul-th span.ul-th--plain { cursor: default; }
+.ul-c { font: var(--gw-text-body-12-med); color: var(--ul-cell); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ul-c--who { color: var(--ul-value); }
+.ul-c--none { color: var(--ul-sub); }
+.ul-c--ver { display: flex; align-items: center; gap: var(--gw-space-8); overflow: visible; }
+/* badge Size=sm: radius/4, py-4 px-8, 20h, /25 tint. NOTE v2/primitives.md reports the light
+   tints at 3.07 to 3.15:1, under AA at 12px; built as measured, finding stands. */
+.ul-badge { display: inline-flex; align-items: center; height: 20px; padding: 0 var(--gw-space-8); border-radius: var(--gw-radius-4);
+  font: var(--gw-text-button-12); background: var(--ul-b-no-bg); color: var(--ul-b-no-fg); }
+.ul-badge--ok { background: var(--ul-b-ok-bg); color: var(--ul-b-ok-fg); }
+.ul-badge--bad { background: var(--gw-color-red-alpha-10); color: var(--gw-color-red-600); }
+:root[data-theme="dark"] .ul-badge--bad { color: var(--gw-color-red-300); }
+.ul-c--chk { display: flex; align-items: center; gap: var(--gw-space-8); overflow: visible; }
+.ul-c--out a { color: var(--ul-value); text-decoration: underline; text-underline-offset: 2px; }
+.ul-row--chat { cursor: pointer; }
+/* Each chat is a group: the row and its tray share one rounded container, so the open state reads as one object. */
+.ul-grp { position: relative; margin: 0 var(--gw-space-8); border-radius: var(--gw-radius-12); transition: background var(--gw-motion-fast); }
+.ul-grp:not(.is-open):hover { background: var(--ul-row-hover); }
+.ul-grp.is-open { background: var(--ul-hdr-bg); }
+.ul-grp.is-open .ul-row--chat .ul-when b, .ul-grp.is-open .ul-row--chat .ul-chat__t svg { color: var(--gw-color-primary-500); }
+:root[data-theme="dark"] .ul-grp.is-open .ul-row--chat .ul-when b, :root[data-theme="dark"] .ul-grp.is-open .ul-row--chat .ul-chat__t svg { color: var(--gw-color-primary-400); }
+.ul-grp.is-open .ul-row--chat .ul-c--who { font-weight: 600; }
+/* While one chat is open, the closed ones step back so the open one is unmistakable. */
+.ul-tbl:has(.ul-grp.is-open) .ul-grp:not(.is-open) .ul-row--d { opacity: .55; transition: opacity var(--gw-motion-fast); }
+.ul-tbl:has(.ul-grp.is-open) .ul-grp:not(.is-open):hover .ul-row--d { opacity: 1; }
+.ul-grp + .ul-grp::before { content: ""; position: absolute; top: 0; left: var(--gw-space-16); right: var(--gw-space-16); height: 1px; background: var(--ul-hdr-line); }
+.ul-grp:hover::before, .ul-grp:hover + .ul-grp::before, .ul-grp.is-open::before, .ul-grp.is-open + .ul-grp::before { display: none; }
+.ul-grp .ul-row--d { height: 64px; box-shadow: none; background: none; padding: 0 var(--gw-space-16); min-width: 0; }
+.ul-grp .ul-row--d:hover { background: none; }
+/* Plain table rows follow the chat groups above: inset 8, a 12 radius on hover, and the hairline between
+   rows drawn as a pseudo-element that steps out of the way of the row being hovered. */
+.ul-tbl > .ul-row--d { position: relative; margin: 0 var(--gw-space-8); padding: 0 var(--gw-space-16); border-radius: var(--gw-radius-12); box-shadow: none; }
+.ul-tbl > .ul-row--d + .ul-row--d::before { content: ""; position: absolute; top: 0; left: var(--gw-space-16); right: var(--gw-space-16); height: 1px; background: var(--ul-hdr-line); }
+.ul-tbl > .ul-row--d:hover::before, .ul-tbl > .ul-row--d:hover + .ul-row--d::before { display: none; }
+.ul-tbl .ul-row--h { margin: 0 var(--gw-space-8); padding: 0 var(--gw-space-16); border-radius: var(--gw-radius-8); }
+.ul-when { display: flex; flex-direction: column; gap: 1px; line-height: 1.3; }
+.ul-when b { font: var(--gw-text-body-12-med); color: var(--ul-value); }
+.ul-when span { font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.ul-chat__t { gap: var(--gw-space-12); }
+.ul-skill { display: inline-flex; align-items: center; height: 24px; padding: 0 var(--gw-space-8); border-radius: var(--gw-radius-full);
+  border: 1px solid var(--ul-hdr-line); background: var(--ul-field-bg); font: var(--gw-text-body-12-med); color: var(--ul-cell); }
+.ul-grp--quiet .ul-row--d .ul-c { opacity: .7; }
+.ul-detail { display: flex; flex-direction: column; gap: var(--gw-space-16); min-width: 0;
+  padding: var(--gw-space-4) var(--gw-space-16) var(--gw-space-16); }
+.ul-detail__top { display: flex; align-items: baseline; justify-content: space-between; gap: var(--gw-space-16); }
+.ul-detail__h { margin: 0; font: var(--gw-text-body-14-sem, 600 14px/1.4 var(--gw-font-body)); color: var(--ul-value); }
+.ul-detail__h span { margin-left: var(--gw-space-8); font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.ul-detail__sum { font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.ul-outs { display: flex; flex-direction: column; background: var(--ul-field-bg); border: 1px solid var(--ul-hdr-line);
+  border-radius: var(--gw-radius-12); overflow: hidden; }
+.ul-o { display: grid; grid-template-columns: 44px minmax(0, 1fr) 112px 160px; column-gap: var(--gw-space-16); align-items: center;
+  padding: var(--gw-space-12) var(--gw-space-16); }
+.ul-o + .ul-o { border-top: 1px solid var(--ul-hdr-line); }
+.ul-o__t { justify-self: start; height: 20px; padding: 0 var(--gw-space-8); display: inline-flex; align-items: center; border-radius: var(--gw-radius-4);
+  background: var(--ul-tab-hover); color: var(--ul-cell); font: var(--gw-text-body-10-sem, 600 10px/1 var(--gw-font-body)); letter-spacing: .02em; }
+.ul-o__n { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--gw-text-body-12-med); color: var(--ul-value); }
+.ul-o__n a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.ul-o__n small { display: block; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; font: var(--gw-text-body-12-med); color: var(--ul-sub); text-decoration: none; }
+.ul-o__b { display: flex; }
+.ul-act { display: flex; align-items: center; gap: var(--gw-space-16); flex-wrap: wrap; font: var(--gw-text-body-12-med); color: var(--ul-cell); }
+.ul-act__h { color: var(--ul-sub); }
+.ul-act ol { display: contents; margin: 0; padding: 0; list-style: none; }
+.ul-act li { display: inline-flex; align-items: baseline; gap: var(--gw-space-8); }
+.ul-act li + li::before { content: ""; align-self: center; width: 16px; height: 1px; background: var(--ul-track); margin-right: var(--gw-space-8); }
+.ul-act time { color: var(--ul-sub); }
+.ul-chips { display: flex; flex-wrap: wrap; gap: var(--gw-space-4); align-items: center; }
+.ul-chat__t { display: inline-flex; align-items: center; gap: var(--gw-space-8); background: none; border: 0; padding: 0; color: inherit; font: inherit; cursor: pointer; }
+.ul-chat__t svg { width: 12px; height: 12px; color: var(--ul-icon); transition: transform var(--gw-motion-fast); }
+.ul-row--chat[aria-expanded="true"] .ul-chat__t svg { transform: rotate(180deg); }
+.ul-scroll { overflow-x: auto; }
+.ul-tbl:has(.ul-grp) .ul-row--h { margin: 0 var(--gw-space-8); padding: 0 var(--gw-space-16); min-width: 0; border-radius: var(--gw-radius-8); }
+/* pagination: 52h, pad 12, space-between; arrows are icon-button 28 */
+.ul-pg { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-8); padding: var(--gw-space-12); flex-wrap: wrap; }
+.ul-pg__l, .ul-pg__r { display: flex; align-items: center; gap: var(--gw-space-8); }
+.ul-pg__t { font: var(--gw-text-button-14); color: var(--ul-cell); }
+
+/* ── empty-state: 480 wide, pad 40, gap 16, 40px circle ─────────────────────────────────── */
+.ul-empty { width: 100%; max-width: 480px; margin: 0 auto; padding: var(--gw-space-40); display: flex; flex-direction: column;
+  align-items: center; gap: var(--gw-space-16); text-align: center; }
+.ul-empty__c { width: 40px; height: 40px; border-radius: var(--gw-radius-full); background: var(--ul-circle); color: var(--ul-circle-fg); display: grid; place-items: center; }
+.ul-empty__c svg { width: 16px; height: 16px; }
+.ul-empty__copy { display: flex; flex-direction: column; gap: var(--gw-space-8); }
+.ul-empty h2 { margin: 0; font: var(--gw-text-body-16-sem); color: var(--ul-value); }
+.ul-empty p { margin: 0; font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.ul-note-line { margin: 0; font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+[hidden] { display: none !important; }
+
+/* Below the measured 1120 the content reflows. NOT MEASURED — R17 covers 1280 and 600 for a
+   dashboard-build shell; this page has no rail, so it reflows earlier and the card floors hold
+   by dropping columns rather than shrinking. */
+@media (max-width: 900px) { .ul-kpis, .ul-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .ul-kpis, .ul-metrics { grid-template-columns: minmax(0, 1fr); } .ul-input input { width: 100%; } }
+.vs-t .ul-row { grid-template-columns: var(--vs-cols); min-width: 640px; }
+.vs-more { display: flex; justify-content: center; padding: var(--gw-space-12); }
+.vs-sub { margin: 0; padding: var(--gw-space-4) var(--gw-space-8) 0; font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.vs-areas { display: flex; flex-wrap: wrap; gap: var(--gw-space-12); align-items: center; }
+.in-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.in-list li { display: grid; grid-template-columns: 8px 1fr auto; gap: var(--gw-space-12); align-items: baseline; padding: var(--gw-space-12) var(--gw-space-8); box-shadow: inset 0 -1px 0 var(--ul-hdr-line); font: var(--gw-text-body-14-reg); color: var(--ul-cell); }
+.in-list li:last-child { box-shadow: none; }
+.in-list b { color: var(--ul-value); font-weight: 600; }
+.in-list i { width: 8px; height: 8px; border-radius: 50%; background: var(--gw-color-primary-500); align-self: center; }
+.in-list .in-tag { font: var(--gw-text-body-12-med); color: var(--ul-sub); white-space: nowrap; }
+.in-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gw-space-24); margin-top: var(--gw-space-24); }
+@media (max-width: 960px) { .in-pair { grid-template-columns: minmax(0, 1fr); } }
+.vs-t .ul-th { white-space: nowrap; }
+#in-skill .ul-row { column-gap: var(--gw-space-16); padding: 0 var(--gw-space-16); }
+.in-pair .vs-t .ul-row { min-width: 0; padding: 0 var(--gw-space-16); column-gap: var(--gw-space-16); }
+.in-h { margin: var(--gw-space-24) 0 var(--gw-space-8); font: var(--gw-text-body-12-med); letter-spacing: .06em; text-transform: uppercase; color: var(--ul-sub); }
+
+/* Page-level tabs: flat text with an underline for the open one, on a full-width hairline (Exa Usage,
+   Xero, Laravel Cloud). The period control inside each tab stays the filled segmented pill, aligned to
+   the right, so the two controls read as different things. */
+.an-bar { position: sticky; top: 0; z-index: 6; background: var(--s-panel-bg); margin-top: calc(var(--gw-space-8) * -1); padding-top: var(--gw-space-8); align-self: stretch; display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-16); box-shadow: inset 0 -1px 0 var(--ul-hdr-line); }
+.sg__main .an-bar > .an-tabs { display: flex; gap: var(--gw-space-24); height: auto; padding: 0; border-radius: 0; background: none; box-shadow: none; }
+/* "Hide my activity": a small switch in the topbar-icon family (no stroke on the label, a filled track when on). */
+.an-me { display: inline-flex; align-items: center; gap: var(--gw-space-8); cursor: pointer; user-select: none; font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.an-me:hover { color: var(--ul-value); }
+.an-me input { position: absolute; opacity: 0; width: 0; height: 0; }
+.an-me__sw { position: relative; width: 28px; height: 16px; border-radius: 999px; background: var(--ul-hdr-line); transition: background var(--gw-motion-fast); }
+.an-me__sw::after { content: ''; position: absolute; left: 2px; top: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--gw-color-white); box-shadow: 0 1px 2px rgba(0, 0, 0, .25); transition: transform var(--gw-motion-fast); }
+.an-me input:checked + .an-me__sw { background: var(--ul-tab-on-bg); }
+.an-me input:checked + .an-me__sw::after { background: var(--ul-tab-on-fg); box-shadow: none; }
+.an-me input:checked + .an-me__sw::after { transform: translateX(12px); }
+.an-me input:checked ~ .an-me__t { color: var(--ul-value); }
+.an-me input:focus-visible + .an-me__sw { outline: var(--gw-focus-ring); outline-offset: 2px; }
+.sg__main .an-bar .an-tabs .ul-tab { position: relative; height: 40px; padding: 0 2px; border-radius: 0; background: none; color: var(--ul-sub); font: var(--gw-text-body-14-med); }
+.sg__main .an-bar .an-tabs .ul-tab:hover { background: none; color: var(--ul-value); }
+.sg__main .an-bar .an-tabs .ul-tab[aria-selected="true"] { background: none; color: var(--ul-value); }
+.sg__main .an-bar .an-tabs .ul-tab[aria-selected="true"]::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; border-radius: 2px 2px 0 0; background: var(--ul-value); }
+/* The period pills (7 days, 30 days, All time) sit on the left of each tab's controls, with Visits' area filter beside them; the refresh icon stays on the right. */
+
+/* One divider, not two: the tab row's hairline is the page header's rule. */
+body[data-gw-page="design-system"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw-space-8); }
+.an-panel { display: flex; flex-direction: column; gap: var(--gw-space-24); }
+.an-panel > * { min-width: 0; }
+.an-panel[hidden] { display: none; }
+.an-panel .ul-refresh__t { display: none; }
+.gw-iconbtn[aria-busy="true"] svg { animation: ul-spin 1s linear infinite; }
+body[data-gw-page="design-system"] .sg__main { max-width: none; }
+.ds-panel { display: block; }
+.ds-panel[hidden] { display: none; }
+.ds-frame { display: block; width: 100%; height: calc(100vh - 210px); min-height: 560px; border: 0; border-radius: var(--gw-radius-16); background: var(--s-panel-bg); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }
+.ds-lock { margin-top: var(--gw-space-24); }
+</style>
+</head>
+<body data-gw-page="design-system">
+
+<div class="sg ul-scope">
+
+  <header class="sg__hd">
+    <h1>Design System</h1>
+    <p>The component library, every component in one list, and the review gate that decides what reaches the skills</p>
+  </header>
+
+  <main class="sg__main">
+
+    <div class="an-bar">
+      <div class="ul-tabs an-tabs" id="ds-tabs" role="tablist" aria-label="Design system">
+        <button class="ul-tab" role="tab" data-tab="library" aria-selected="true">Library</button>
+        <button class="ul-tab" role="tab" data-tab="catalogue" aria-selected="false">Catalogue</button>
+        <button class="ul-tab" role="tab" data-tab="review" aria-selected="false">Review<svg id="ds-lock" viewBox="0 0 256 256" width="12" height="12" fill="currentColor" aria-hidden="true" style="margin-left:6px;vertical-align:-1px" hidden><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96Zm112,152H48V96H208V208Z"/></svg></button>
+      </div>
+    </div>
+
+    <section class="ds-panel" id="ds-library" role="tabpanel">
+      <iframe class="ds-frame" name="gw-embed" title="Component library" data-src="/library/index.html?embed=1"></iframe>
+    </section>
+    <section class="ds-panel" id="ds-catalogue" role="tabpanel" hidden>
+      <iframe class="ds-frame" name="gw-embed" title="Catalogue" data-src="/library/components.html?embed=1"></iframe>
+    </section>
+    <section class="ds-panel" id="ds-review" role="tabpanel" hidden>
+      <iframe class="ds-frame" name="gw-embed" title="Review gate" data-src="/admin/review-sheet?embed=1" hidden></iframe>
+      <div class="ds-lock" id="ds-review-lock" hidden>
+        <div class="ul-sec"><div class="ul-empty">
+          <div class="ul-empty__c"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96Zm112,152H48V96H208V208Zm-68-56a12,12,0,1,1-12-12A12,12,0,0,1,140,152Z"/></svg></div>
+          <div class="ul-empty__copy"><h2>Review needs an owner account</h2><p>Passing a component lets it into the skills, so only an owner can open this tab. Sign in with an owner Google account to continue. You will come back here afterwards.</p></div>
+          <button class="ul-btn" id="ds-signin" type="button">Sign in with an owner account</button>
+        </div></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var TABS = ['library', 'catalogue', 'review'], loaded = {}, owner = false, known = false;
+  var me = fetch('/api/auth/me', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : {}; })
+    .then(function (j) { owner = !!(j && j.owner); known = true; }).catch(function () { known = true; });
+
+  function frameOf(t) { return document.querySelector('#ds-' + t + ' iframe'); }
+  function sync(f) {
+    try { f.contentDocument.documentElement.setAttribute('data-theme', document.documentElement.getAttribute('data-theme') || 'light'); } catch (e) {}
+  }
+  function open(t) {
+    var f = frameOf(t);
+    if (t === 'review') {
+      /* Review is the owner's: a signed-in admin sees a locked card, not the sheet. */
+      document.getElementById('ds-review-lock').hidden = owner;
+      f.hidden = !owner;
+      if (!owner) return;
+    }
+    if (!loaded[t]) { loaded[t] = 1; f.addEventListener('load', function () { sync(f); }); f.src = f.getAttribute('data-src'); }
+  }
+  function show(name, push) {
+    if (TABS.indexOf(name) === -1) name = 'library';
+    TABS.forEach(function (t) { document.getElementById('ds-' + t).hidden = t !== name; });
+    document.querySelectorAll('#ds-tabs .ul-tab').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-tab') === name)); });
+    if (push) { try { history.replaceState(null, '', '#' + name); } catch (e) { location.hash = name; } }
+    me.then(function () { document.getElementById('ds-lock').hidden = owner; open(name); });
+  }
+  document.querySelectorAll('#ds-tabs .ul-tab').forEach(function (b) { b.addEventListener('click', function () { show(b.getAttribute('data-tab'), true); }); });
+  window.addEventListener('hashchange', function () { show(location.hash.slice(1), false); });
+  document.getElementById('ds-signin').addEventListener('click', function () {
+    location.href = '/api/auth/login?next=' + encodeURIComponent('/admin/design-system#review');
+  });
+  /* The frames read the theme once, when they load; follow the page when it is switched afterwards. */
+  new MutationObserver(function () { TABS.forEach(function (t) { var f = frameOf(t); if (f) sync(f); }); })
+    .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  show(location.hash.slice(1), false);
+})();
+</script>
+</body></html>
