@@ -603,6 +603,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .ds-tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--gw-space-12); }
 .ds-a { color: var(--ul-value); text-decoration: none; font-weight: 600; }
 .ds-a:hover { text-decoration: underline; text-underline-offset: 2px; }
+@media (max-width: 760px) { .ds-a { display: inline-flex; align-items: center; min-height: 24px; } }
 .ds-code { font: 500 11.5px/1 var(--gw-font-mono, ui-monospace, "SF Mono", Menlo, monospace); color: var(--ul-cell); }
 .ul-badge--warn { background: var(--gw-color-yellow-alpha-10); color: var(--gw-color-yellow-600); }
 :root[data-theme="dark"] .ul-badge--warn { color: var(--gw-color-yellow-300); }
@@ -635,7 +636,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 
     <section class="ds-panel" id="ds-library" role="tabpanel">
       <div class="ul-metrics" id="ds-lib-stats"></div>
-      <div class="ds-tools"><div class="ul-tabs" id="ds-lib-tabs" role="tablist" aria-label="Library section"></div><input class="ds-find" id="ds-lib-find" type="search" placeholder="Filter this list" autocomplete="off"></div>
+      <div class="ds-tools"><div class="ul-tabs" id="ds-lib-tabs" role="tablist" aria-label="Library section"></div><input class="ds-find" id="ds-lib-find" type="search" aria-label="Filter this list" placeholder="Filter this list" autocomplete="off"></div>
       <section class="ul-sec" aria-labelledby="ds-lib-h">
         <div class="ul-sh"><div class="ul-sh__t"><h2 id="ds-lib-h">Library</h2><span class="ul-sh__q" id="ds-lib-q"></span></div></div>
         <div class="ul-scroll vs-t" id="ds-lib-table"></div>
@@ -644,7 +645,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 
     <section class="ds-panel" id="ds-catalogue" role="tabpanel" hidden>
       <div class="ul-metrics" id="ds-cat-stats"></div>
-      <div class="ds-tools"><div class="ul-tabs" id="ds-cat-tabs" role="tablist" aria-label="Catalogue filter"></div><input class="ds-find" id="ds-cat-find" type="search" placeholder="Filter components" autocomplete="off"></div>
+      <div class="ds-tools"><div class="ul-tabs" id="ds-cat-tabs" role="tablist" aria-label="Catalogue filter"></div><input class="ds-find" id="ds-cat-find" type="search" aria-label="Filter components" placeholder="Filter components" autocomplete="off"></div>
       <div id="ds-cat-body" style="display:flex;flex-direction:column;gap:var(--gw-space-24)"></div>
     </section>
 

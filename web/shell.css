@@ -67,7 +67,7 @@
      (Neutral/100) — 60% of the selected fill — so rest, hover and selected are three
      visibly different steps, and hovering the current page does not change it. */
   --s-nav-row-hover: color-mix(in srgb, var(--gw-color-neutral-100) 60%, transparent);
-  --s-group-label:   var(--gw-color-neutral-400);  /* measured: list label fill */
+  --s-group-label:   var(--gw-color-neutral-600);  /* was neutral-400 (the measured list label fill), 2.5:1 on the sidebar; 600 clears 4.5:1 */
 
   /* The field now sits on the grey ground rather than on a grey topbar, so it
      inverts: white fill, lighter stroke. Measured 791:2642. */

@@ -113,7 +113,7 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
                 display:grid;place-items:center;flex:none}
 .lb-brand__chip svg{width:16px;height:16px;display:block}
 .lb-brand__n{font:var(--gw-text-h7);color:var(--s-heading)}
-.lb-crumb{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-400);
+.lb-crumb{font:var(--gw-text-body-14-reg);color:var(--s-group-label);
           white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lb-crumb a{color:var(--gw-color-primary-600);text-decoration:none}
 .lb-top__r{display:flex;align-items:center;gap:var(--gw-space-12);margin-left:auto}
@@ -135,7 +135,7 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
 .lb-rail{position:sticky;top:60px;max-height:calc(100vh - 60px);overflow-y:auto;
          border-right:1px solid var(--s-chrome-border);padding:var(--gw-space-24) 0}
 .lb-rail__t{font:var(--gw-text-body-12-med);text-transform:uppercase;letter-spacing:.06em;
-            color:var(--gw-color-neutral-400);padding:0 var(--gw-space-20) var(--gw-space-8)}
+            color:var(--s-group-label);padding:0 var(--gw-space-20) var(--gw-space-8)}
 .lb-rail a{display:flex;justify-content:space-between;gap:var(--gw-space-8);
            font:var(--gw-text-body-14-reg);color:var(--s-body);text-decoration:none;
            padding:6px var(--gw-space-20)}
@@ -177,6 +177,7 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
 a.cat-name{color:var(--gw-color-primary-600);text-decoration:none}
 :root[data-theme="dark"] a.cat-name{color:var(--gw-color-primary-400)}
 .cat-note{display:block;margin-top:2px;font:var(--gw-text-body-12-reg);color:var(--s-body)}
+@media (max-width:760px){.lb-mid td a,.lb-mid th a{display:inline-flex;align-items:center;min-height:24px}}
 .cat-link{font:var(--gw-text-body-14-med);color:var(--gw-color-primary-600);text-decoration:none}
 :root[data-theme="dark"] .cat-link{color:var(--gw-color-primary-400)}
 .cat-link:hover{text-decoration:underline}
@@ -408,7 +409,7 @@ def chrome(page, extra_css=""):
     home = "/admin/design-system#library"
     crumb = f'<span class="lb-crumb">{page.crumb}</span>' if page.crumb else ""
     find = ('<input class="lb-find" id="lb-find" type="search" '
-            'placeholder="Filter this library">' if page.rail else "")
+            'placeholder="Filter this library" aria-label="Filter this library">' if page.rail else "")
     rail = ""
     if page.rail:
         rows = []
@@ -445,6 +446,7 @@ def chrome(page, extra_css=""):
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{esc(page.title or "Component Library")} — Gushwork</title>
+<meta name="description" content="{esc(page.lede or (page.title or "Component Library") + " in the Gushwork component library")}">
 <meta name="robots" content="noindex">
 <script>try{{var t=localStorage.getItem('gw-theme');if(t!=='dark')t='light';
 document.documentElement.setAttribute('data-theme',t)}}catch(e){{
@@ -1249,7 +1251,7 @@ def build_components(reg, counts):
              + chip("passed", f"{spec} with a spec page") + chip("gap", f"{total - spec} without")
              + chip("measured", f"{fid['measured']} measured") + chip("transcribed", f"{fid['inventory']} inventory only")
              + chip("annotated", f"{fid['annotated']} annotated only"))
-    body = ('<input class="lb-rowfind" id="lb-rows" type="search" placeholder="Filter components">'
+    body = ('<input class="lb-rowfind" id="lb-rows" type="search" placeholder="Filter components" aria-label="Filter components">'
             + "".join(sections))
     return Page(path="components", title="All components",
                 lede="Every component in the design system, how many variants it has, how far it has "

@@ -2,6 +2,46 @@
   "items": [
     {
       "date": "2026-09-30",
+      "at": "19:45",
+      "title": "Keep a private copy of each output, so the Usage Logs page can open it",
+      "version": "v1.57.0",
+      "href": "/internal/changelog",
+      "label": "30 Sep 2026"
+    },
+    {
+      "date": "2026-09-30",
+      "at": "19:34",
+      "title": "Group the Usage Logs by chat, log PNG and HTML outputs, and let Admin and Owner scroll with the nav",
+      "version": "v1.56.0",
+      "href": "/internal/changelog",
+      "label": "30 Sep 2026"
+    },
+    {
+      "date": "2026-09-30",
+      "at": "19:19",
+      "title": "Add a Skill column to the Usage Logs table, and log PDFs and decks that scripts make",
+      "version": "v1.55.0",
+      "href": "/internal/changelog",
+      "label": "30 Sep 2026"
+    },
+    {
+      "date": "2026-09-30",
+      "at": "18:58",
+      "title": "Measure what the skills make: on-brand flags, artifact links and an owner verdict on the Usage Logs page, and R29",
+      "version": "v1.54.0",
+      "href": "/internal/changelog",
+      "label": "30 Sep 2026"
+    },
+    {
+      "date": "2026-09-30",
+      "at": "18:13",
+      "title": "Add the gushwork-brand catch-all skill and a session-start brand rule, and R28: why the surface descriptions were not loosened",
+      "version": "v1.53.0",
+      "href": "/internal/changelog",
+      "label": "30 Sep 2026"
+    },
+    {
+      "date": "2026-09-30",
       "at": "17:00",
       "title": "Add the sign-up ad page template, and R27: ask for the hero, then take folds from either template",
       "version": "v1.52.0",
@@ -23,46 +63,6 @@
       "version": "v1.50.0",
       "href": "/internal/changelog",
       "label": "30 Sep 2026"
-    },
-    {
-      "date": "2026-09-24",
-      "at": "20:17",
-      "title": "Withdraw the three ad-page elements, and R26 \u2014 pages are built from templates, not from other pages",
-      "version": "v1.49.0",
-      "href": "/internal/changelog",
-      "label": "24 Sep 2026"
-    },
-    {
-      "date": "2026-09-23",
-      "at": "11:59",
-      "title": "The ad-page template, the measured FAQ accordion, and the OG and favicon rule for ad pages",
-      "version": "v1.48.0",
-      "href": "/internal/changelog",
-      "label": "23 Sep 2026"
-    },
-    {
-      "date": "2026-09-23",
-      "at": "11:00",
-      "title": "Component library as a site at /library, the ad-page fold set, and the review-pass gate",
-      "version": "v1.47.0",
-      "href": "/internal/changelog",
-      "label": "23 Sep 2026"
-    },
-    {
-      "date": "2026-09-15",
-      "at": "23:46",
-      "title": "Slides skill, rulings R14-R24, and the site rebuilt from Figma",
-      "version": "v1.46.0",
-      "href": "/internal/changelog",
-      "label": "15 Sep 2026"
-    },
-    {
-      "date": "2026-09-07",
-      "at": "15:27",
-      "title": "the case-study page template, and five page rules that came with it",
-      "version": "v1.45.0",
-      "href": "/internal/changelog",
-      "label": "7 Sep 2026"
     }
   ]
 }

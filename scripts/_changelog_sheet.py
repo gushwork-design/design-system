@@ -280,6 +280,7 @@ CSS = """
            font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-500);
            text-decoration:none;border-radius:var(--gw-radius-4)}
   .meta__l:hover{color:var(--gw-color-primary-500)}
+  @media (max-width:760px){.meta__l{min-height:24px}}
   .meta__l:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
   .gl{width:14px;height:14px;flex:none;display:block}
   .none{font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-300)}
@@ -412,6 +413,7 @@ def main():
     w('<html lang="en"><head><meta charset="utf-8">')
     w('<meta name="viewport" content="width=device-width, initial-scale=1">')
     w("<title>Gushwork design system — changelog</title>")
+    w('<meta name="description" content="What changed in the Gushwork design system, release by release.">')
     w('<link rel="icon" type="image/svg+xml" href="%s">' % FAVICON)
     w('<link rel="stylesheet" href="../foundation/tokens.css">')
     w("<style>%s</style></head>" % CSS)

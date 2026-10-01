@@ -2,6 +2,7 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>skeleton — Gushwork</title>
+<meta name="description" content="Dashboard · v2/feedback.md">
 <meta name="robots" content="noindex">
 <script>try{var t=localStorage.getItem('gw-theme');if(t!=='dark')t='light';
 document.documentElement.setAttribute('data-theme',t)}catch(e){
@@ -264,7 +265,7 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
                 display:grid;place-items:center;flex:none}
 .lb-brand__chip svg{width:16px;height:16px;display:block}
 .lb-brand__n{font:var(--gw-text-h7);color:var(--s-heading)}
-.lb-crumb{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-400);
+.lb-crumb{font:var(--gw-text-body-14-reg);color:var(--s-group-label);
           white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lb-crumb a{color:var(--gw-color-primary-600);text-decoration:none}
 .lb-top__r{display:flex;align-items:center;gap:var(--gw-space-12);margin-left:auto}
@@ -286,7 +287,7 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
 .lb-rail{position:sticky;top:60px;max-height:calc(100vh - 60px);overflow-y:auto;
          border-right:1px solid var(--s-chrome-border);padding:var(--gw-space-24) 0}
 .lb-rail__t{font:var(--gw-text-body-12-med);text-transform:uppercase;letter-spacing:.06em;
-            color:var(--gw-color-neutral-400);padding:0 var(--gw-space-20) var(--gw-space-8)}
+            color:var(--s-group-label);padding:0 var(--gw-space-20) var(--gw-space-8)}
 .lb-rail a{display:flex;justify-content:space-between;gap:var(--gw-space-8);
            font:var(--gw-text-body-14-reg);color:var(--s-body);text-decoration:none;
            padding:6px var(--gw-space-20)}
@@ -328,6 +329,7 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
 a.cat-name{color:var(--gw-color-primary-600);text-decoration:none}
 :root[data-theme="dark"] a.cat-name{color:var(--gw-color-primary-400)}
 .cat-note{display:block;margin-top:2px;font:var(--gw-text-body-12-reg);color:var(--s-body)}
+@media (max-width:760px){.lb-mid td a,.lb-mid th a{display:inline-flex;align-items:center;min-height:24px}}
 .cat-link{font:var(--gw-text-body-14-med);color:var(--gw-color-primary-600);text-decoration:none}
 :root[data-theme="dark"] .cat-link{color:var(--gw-color-primary-400)}
 .cat-link:hover{text-decoration:underline}
@@ -412,7 +414,7 @@ a.cat-name{color:var(--gw-color-primary-600);text-decoration:none}
     <span class="lb-brand__chip"><svg viewBox="0 0 80 80" fill="none" aria-hidden="true"><path d="M76.6088 4.56344C77.5025 2.36058 75.8495 0 73.4723 0H9.14286C4.0934 0 0 4.0934 0 9.14286V66.7778C0 72.018 5.17081 75.6829 9.9603 73.5568C40.8494 59.8449 64.3785 34.7075 76.6088 4.56344Z" fill="currentColor"/><path d="M32.5161 80C31.4022 80 30.9357 78.5531 31.8259 77.8835C54.9007 60.5265 71.4338 35.8047 78.7658 8.0522C78.9403 7.39154 80 7.51618 80 8.19951V70.8571C80 75.9066 75.9066 80 70.8571 80H32.5161Z" fill="currentColor"/></svg></span>
     <span class="lb-brand__n">Component Library</span></a>
   <span class="lb-crumb"><a href="../../index.html">Library</a> / <a href="index.html">Dashboard</a></span>
-  <div class="lb-top__r"><input class="lb-find" id="lb-find" type="search" placeholder="Filter this library">
+  <div class="lb-top__r"><input class="lb-find" id="lb-find" type="search" placeholder="Filter this library" aria-label="Filter this library">
     <button class="lb-tbtn" id="lb-theme" type="button" aria-label="Switch theme">
       <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z"/></svg></button></div>
 </header>

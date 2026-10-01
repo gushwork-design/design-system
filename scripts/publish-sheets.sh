@@ -294,12 +294,16 @@ done
   for pair in "${SHEETS[@]}"; do
     grep -ohE '(href|src)="(\.\./|/)assets/[^"]+"' "$STAGE/${pair##*|}" 2>/dev/null || true
   done
+  # The library pages sit up to three folders deep and reach assets as ../../../assets/..., which
+  # none of the lines above match: hero-primary's two preview images 404ed on the live site for
+  # that reason. Only src= here, because the same pages' hrefs point at sibling pages.
+  grep -rohE 'src="(\.\./)+assets/[^"]+"' "$STAGE"/library 2>/dev/null || true
   grep -rohE '(href|src)="/assets/[^"]+"' "$STAGE"/*.html "$STAGE"/admin/*.html "$STAGE"/internal/*.html "$STAGE"/internal/templates/*/index.html 2>/dev/null || true
   # CSS url() too — the style guide masks the logo through -webkit-mask to draw
   # the "don't" panel, and those references carry no href= or src= to match.
   grep -rohE "url\(['\"]?/assets/[^)'\"]+" "$STAGE"/*.html "$STAGE"/admin/*.html "$STAGE"/internal/*.html "$STAGE"/internal/templates/*/index.html 2>/dev/null \
     | sed "s|^url(['\"]\{0,1\}|src=\"|;s|$|\"|" || true
-} | sed 's/.*="//;s/"$//;s|^\.\./||;s|^/||' | sort -u | while read -r a; do
+} | sed 's/.*="//;s/"$//;s|^\(\.\./\)*||;s|^/||' | sort -u | while read -r a; do
   [ -n "$a" ] || continue
   [ -f "$a" ] || { echo "  MISSING asset referenced by a page: $a" >&2; continue; }
   mkdir -p "$STAGE/$(dirname "$a")" && cp "$a" "$STAGE/$a"

@@ -363,6 +363,17 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
 .ac-card__body:has(.ac-lvls) { padding: 0; }
 .ac-lvl { background: none; border: 0; border-radius: 0; padding: var(--gw-space-20) 0; }
 .ac-lvl + .ac-lvl { border-top: 1px solid var(--s-chrome-border); }
+/* Phones. This sits last on purpose: the roomier desktop grid above is declared after the @media block
+   further up, so without this the three-column grid wins at every width and the rows run off the screen. */
+@media (max-width: 760px) {
+  .ac-row, .ac-head { grid-template-columns: minmax(0, 1fr) 44px; }
+  .ac-row { padding-left: 0; padding-right: 0; }
+  .ac-card__body, .ac-card__ft { padding-left: 0; padding-right: 0; }
+  .ac-tabbar { overflow-x: auto; scrollbar-width: none; }
+  .ac-tabbar::-webkit-scrollbar { display: none; }
+  .ac-tab { white-space: nowrap; flex: none; }
+  .ac-tool__pv { width: 56px; }
+}
 </style>
 </head>
 <body data-gw-page="access-control">
