@@ -244,11 +244,12 @@ people tell you what they're running, not the delivery mechanism.
 
 Tag the release so the next run has a clean starting point: `git tag v1.2.0 && git push --tags`.
 
-## Every new component goes on the review sheet — before it counts as done
+## Every new component gets a drawing — before it counts as done
 
-`preview/review-sheet.html` renders each measured component from its measured values so Utsav can
-confirm it against Figma. **A measurement that has not been rendered has not been checked.** The
-export file and the sheet move together; adding one without the other is half the job.
+A component's drawing is `web/previews/<surface>/<key>.frag`: a small piece of HTML, drawn from its measured values with
+`foundation/tokens.css`, that the review drawer in the Design System page shows beside Pass, Rework and Reject. Utsav
+confirms it against Figma there. **A measurement that has not been drawn has not been checked.** The export file and the
+drawing move together; adding one without the other is half the job. `bash scripts/check-previews.sh` lists what is missing.
 
 So when you add or correct a component, element or pattern:
 

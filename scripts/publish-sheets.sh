@@ -24,7 +24,6 @@
 #   /internal/tools          tools  @gushwork.ai
 #   /internal/templates      templates  @gushwork.ai
 #   /internal/changelog      = changelog-sheet  @gushwork.ai
-#   /admin/review-sheet      = review-sheet     ADMIN_EMAILS only
 #   /admin/workflow          = web/admin/workflow.html (built from Figma 661:5802)  ADMIN_EMAILS only
 #
 # THE SHEETS ARE STILL NEVER EDITED. They are generated, and release-log.sh
@@ -53,7 +52,6 @@ esac
 SHEETS=(
   "preview/install.html|internal/claude-plugin.html"
   "preview/changelog-sheet.html|internal/changelog.html"
-  "preview/review-sheet.html|admin/review-sheet.html"
 )
 
 # Social card images. A page's og:image must be an absolute URL for crawlers
@@ -154,7 +152,6 @@ fi
 # How much of the library the review sheet actually draws, counted at publish time rather than
 # typed. It matters more since the 15 Sep ruling made the sheet a gate: a set it cannot draw is a
 # set nobody can pass. Stamped into the STAGED copy only, so the repo's file stays as authored.
-python3 scripts/_sheet_coverage.py "$STAGE/admin/review-sheet.html"
 
 # install.html's social card still points at the old /preview/install.html.
 # Rewrite it in the staged copy so the unfurl lands on the live page. The old
@@ -284,8 +281,7 @@ for a in "${SOCIAL[@]}"; do
   mkdir -p "$STAGE/$(dirname "$a")" && cp "$a" "$STAGE/$a"
 done
 
-# Any page that links tokens.css needs the real fonts; review-sheet and
-# catalogue inline their own. Copy whatever else the pages reference, so a new
+# Any page that links tokens.css needs the real fonts; the changelog inlines its own. Copy whatever else the pages reference, so a new
 # sheet with assets just works. Both ../assets/ (from a one-deep page) and
 # /assets/ (from the shell) are picked up.
 {

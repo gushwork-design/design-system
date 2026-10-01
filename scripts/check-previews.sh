@@ -7,7 +7,7 @@
 #
 # A component is drawn in the Design System's review drawer when it has either
 #
-#   web/previews/<surface>/<key>.html    a small HTML file drawn from its measured values, using
+#   web/previews/<surface>/<key>.frag    a small HTML file drawn from its measured values, using
 #                                        foundation/tokens.css (shown live, in a frame), or
 #   assets/<surface>/<key>-desktop.png   its Figma render (the ad-page folds have these)
 #
@@ -35,7 +35,7 @@ print(f"{have} of {len(comps)} components have a visual · {len(miss)} do not")
 for scope, ks in by.items():
     print(f"\n{scope} — {len(ks)} without")
     for k in ks:
-        print(f"  · {k:28} add web/previews/{scope}/{k}.html")
+        print(f"  · {k:28} add web/previews/{scope}/{k}.frag")
 if miss:
-    print("\nA preview is plain HTML that links /foundation/tokens.css and draws the component's measured states.")
+    print("\nA preview is a piece of HTML (no <html> or <head>) that draws the component's measured states; the drawer puts it in a shadow root with the tokens and web/previews/_sheet.css.")
 PY

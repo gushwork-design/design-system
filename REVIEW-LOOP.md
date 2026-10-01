@@ -230,8 +230,8 @@ registry records it -> library-site.sh -> PR (main needs a review) -> publish
 - **Why a queue.** A serverless function cannot run `review-pass.sh` against a repo whose main needs a reviewed PR, and
   cannot re-check a fingerprint against source it does not have. The session applies; the site only records the decision.
 - **The visual.** A foundation is drawn from `tokens.json` (the same views as the Foundations library). A component shows,
-  in order: its own `web/previews/<surface>/<key>.html`, the drawing of its family lifted from the old review sheet
-  (`web/previews/_families/`), or its Figma render (`assets/<surface>/<key>-desktop.png`). If it has none the drawer says
+  in order: its own `web/previews/<surface>/<key>.frag` (a piece of HTML drawn from its measured values, shown in the drawer itself, not in a
+  frame), or its Figma render (`assets/<surface>/<key>-desktop.png`). If it has none the drawer says
   "No visual yet", and `bash scripts/check-previews.sh` lists them (a pre-push WARN, never a block).
 - **The old sheets** (`/admin/review-sheet`, `/library`, `/library/review`, `/library/components`) redirect to the Design
   System page. The generated library pages stay on disk because `data.json` is built from them, but nothing links to them.

@@ -18,7 +18,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 TOKENS = ROOT / "foundation" / "tokens.css"
 ICONS = ROOT / "assets" / "icons"
 LOGO = ROOT / "assets" / "logo" / "gushwork-symbol-white.svg"
-SHEET = ROOT / "preview" / "review-sheet.html"
+SHEET = ROOT / "preview" / "_vert-grotesk-face.css"   # the face, lifted from the review sheet when that was removed
 OUT = ROOT / "preview" / "gtm-command-center.html"
 
 # ─────────────────────────── build stamp ───────────────────────────
@@ -130,7 +130,7 @@ TRACK = "\n".join(f"  {n}-tracking: {_decl[n + '-tracking'].strip()};"
                   for n in EMIT if n.startswith('--gw-text-') and n + '-tracking' in _decl)
 
 # ─────────────────────────── fonts ───────────────────────────
-# Vert Grotesk is embedded (proven block, reused from review-sheet.html) so the BRAND FACE can
+# Vert Grotesk is embedded (proven block, kept in preview/_vert-grotesk-face.css) so the BRAND FACE can
 # never fall back — output-targets.md is explicit about that.
 #
 # Inter is now embedded for the same reason. It used to point at ../fonts/ relatively, which only
@@ -140,7 +140,7 @@ TRACK = "\n".join(f"  {n}-tracking: {_decl[n + '-tracking'].strip()};"
 # static file cannot depend on a sibling directory. local() stays first so an installed copy wins.
 _vg = re.search(r"@font-face\{font-family:'Vert Grotesk Display';[^}]*\}", SHEET.read_text())
 if not _vg:
-    sys.exit("could not lift the Vert Grotesk @font-face block out of review-sheet.html")
+    sys.exit("could not lift the Vert Grotesk @font-face block out of preview/_vert-grotesk-face.css")
 
 _inter_ttf = ROOT / "fonts" / "Inter-VariableFont_opsz_wght.ttf"
 if not _inter_ttf.exists():
