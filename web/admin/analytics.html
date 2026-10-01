@@ -485,7 +485,8 @@ body[data-gw-page="analytics"] .sg__main > * { min-width: 0; }
 .an-me input { position: absolute; opacity: 0; width: 0; height: 0; }
 .an-me__sw { position: relative; width: 28px; height: 16px; border-radius: 999px; background: var(--ul-hdr-line); transition: background var(--gw-motion-fast); }
 .an-me__sw::after { content: ''; position: absolute; left: 2px; top: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--gw-color-white); box-shadow: 0 1px 2px rgba(0, 0, 0, .25); transition: transform var(--gw-motion-fast); }
-.an-me input:checked + .an-me__sw { background: var(--gw-color-primary-500); }
+.an-me input:checked + .an-me__sw { background: var(--ul-tab-on-bg); }
+.an-me input:checked + .an-me__sw::after { background: var(--ul-tab-on-fg); box-shadow: none; }
 .an-me input:checked + .an-me__sw::after { transform: translateX(12px); }
 .an-me input:checked ~ .an-me__t { color: var(--ul-value); }
 .an-me input:focus-visible + .an-me__sw { outline: var(--gw-focus-ring); outline-offset: 2px; }
