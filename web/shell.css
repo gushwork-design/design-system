@@ -1973,6 +1973,22 @@
   padding: 0 var(--gw-space-40) var(--gw-space-60);
 }
 
+/* Phones. On a phone the panel is not a scroll box: .gw-main is static and the page itself scrolls under
+   a fixed 76 bar. Three things followed from that and were all wrong:
+   1. .gw-scroll stayed `overflow-y:auto; overscroll-behavior:contain`. A box that cannot scroll but is
+      still a scroll container with `contain` swallows the wheel and the touch, so the page would not
+      scroll at all. It is a plain block here.
+   2. The bar had no fill, so the page scrolled under its own logo and the two overlapped.
+   3. The column's 0 top padding (right for desktop, where the bar is outside the scrollport) put the
+      home hero under the bar, and its 40 side padding beat the phone token set above. */
+@media (max-width: 767px) {
+  .gw-scroll { overflow: visible; overscroll-behavior: auto; }
+  .gw-topbar { background: var(--s-panel-bg); }
+  .gw-scroll > .gw-col {
+    padding: 76px var(--gw-bp-pad-page-h) var(--gw-bp-pad-section-v);
+  }
+}
+
 @media (max-width: 767px) {
   .gw-bar { display: none; }
 }
