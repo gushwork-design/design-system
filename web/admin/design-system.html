@@ -986,15 +986,28 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
      two templates have no recipe. Only the word "template" is shown. */
   var PAIR = { 'case-study': 'case-study', 'ad-landing-page': 'ad-page', 'lead-magnet-doc': 'lead-magnet', 'sales-deck': 'slide-deck' };
   function paired(recipeKey) { return PAIR[recipeKey]; }
+  /* "Use with Claude" copies the same prompt the Templates page copies. It is read from that page rather than
+     written out again here, so the two cannot drift. A template with no prompt there simply gets no button. */
+  var promptP = null, PROMPTS = {};
+  function prompts() {
+    return promptP || (promptP = fetch('/internal/templates', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (html) {
+      var doc = new DOMParser().parseFromString(html, 'text/html');
+      doc.querySelectorAll('.tcard--tpl').forEach(function (card) {
+        var a = card.querySelector('a[href*="/internal/templates/"]'), b = card.querySelector('.tuse[data-prompt]');
+        var m = a && /\/internal\/templates\/([a-z0-9-]+)/.exec(a.getAttribute('href'));
+        if (m && b) PROMPTS[m[1]] = b.getAttribute('data-prompt');
+      });
+    }).catch(function () {}));
+  }
   function startPoints(d, sub) {
     var items = sub.templates.map(function (k) {
       var rk = Object.keys(PAIR).filter(function (r) { return PAIR[r] === k && sub.recipes.indexOf(r) !== -1; })[0];
       var r = rk && d.recipes.filter(function (x) { return x.key === rk; })[0];
-      return { name: TPL[k][0], what: TPL[k][1], img: TPL[k][2], preview: '/internal/templates/' + k, recipe: r ? LIB + r.href : '' };
+      return { key: k, name: TPL[k][0], what: TPL[k][1], img: TPL[k][2], preview: '/internal/templates/' + k, recipe: '' };
     });
     sub.recipes.filter(function (r) { return !paired(r) || sub.templates.indexOf(PAIR[r]) === -1; }).forEach(function (rk) {
       var r = d.recipes.filter(function (x) { return x.key === rk; })[0];
-      if (r) items.push({ name: r.title, what: r.what, img: '', preview: '', recipe: LIB + r.href });
+      if (r) items.push({ key: '', name: r.title, what: r.what, img: '', preview: '', recipe: LIB + r.href });
     });
     return items;
   }
@@ -1003,7 +1016,8 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     return '<section class="fd-sec"><h3>Templates<span>' + plural(items.length, 'template') + '</span></h3><div class="fd-tpls">' + items.map(function (x) {
       return '<div class="fd-tpl"><div class="fd-tpl__img">' + (x.img ? '<img src="/assets/tools/' + esc(x.img) + '" alt="" loading="lazy">' : '<em>No preview yet</em>') + '</div><div class="fd-tpl__b"><b>' + esc(x.name) + '</b><span>' + esc(x.what) + '</span></div>' +
         '<div class="fd-tpl__a">' + (x.preview ? '<a class="ds-pv" href="' + esc(x.preview) + '" target="_blank" rel="noopener">Preview</a>' : '') +
-        (x.recipe ? '<a class="ds-pv ds-pv--q" href="' + esc(x.recipe) + '">' + (x.preview ? 'How it is built' : 'Open') + '</a>' : '') + '</div></div>';
+        (x.key && PROMPTS[x.key] ? '<button type="button" class="ds-pv ds-pv--q" data-use="' + esc(x.key) + '">Use with Claude</button>' : '') +
+        (x.recipe ? '<a class="ds-pv ds-pv--q" href="' + esc(x.recipe) + '">Open</a>' : '') + '</div></div>';
     }).join('') + '</div></section>';
   }
   /* A component's doc is a file in exports/<surface>/ in the repo (some point up and across, like
@@ -1053,6 +1067,12 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     host.querySelectorAll('.fd-side__i').forEach(function (b) {
       b.addEventListener('click', function () { var v = b.getAttribute('data-v'); if (cat.key === 'foundations') F.tab = v; else L.sub[cat.key] = v; setHash(); renderLibrary(d, t); });
     });
+    host.querySelectorAll('[data-use]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var old = b.textContent;
+        try { navigator.clipboard.writeText(PROMPTS[b.getAttribute('data-use')]); b.textContent = 'Copied'; setTimeout(function () { b.textContent = old; }, 1200); } catch (e) {}
+      });
+    });
     host.querySelectorAll('.fd-sw').forEach(function (b) {
       b.addEventListener('click', function () {
         var span = b.querySelector('b'), old = span.textContent;
@@ -1088,7 +1108,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   /* ---------------- tabs ---------------- */
   function start(name) {
     if (started[name]) return; started[name] = 1;
-    if (name === 'library') Promise.all([data(), tokens()]).then(function (r) { renderLibrary(r[0], r[1]); })
+    if (name === 'library') Promise.all([data(), tokens(), prompts()]).then(function (r) { renderLibrary(r[0], r[1]); })
       .catch(function () { $('ds-fd').innerHTML = '<div class="ul-empty"><div class="ul-empty__copy"><h2>Could not load the library</h2></div></div>'; });
     if (name === 'review') me.then(function () {
       $('ds-review-lock').hidden = owner; $('ds-review-app').hidden = !owner;
