@@ -488,6 +488,7 @@ body[data-gw-page="analytics"] .sg__main > * { min-width: 0; }
    Xero, Laravel Cloud). The period control inside each tab stays the filled segmented pill, aligned to
    the right, so the two controls read as different things. */
 .an-bar { position: sticky; top: 0; z-index: 6; background: var(--s-panel-bg); margin-top: calc(var(--gw-space-8) * -1); padding-top: var(--gw-space-8); align-self: stretch; display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-16); box-shadow: inset 0 -1px 0 var(--ul-hdr-line); }
+@media (max-width: 767px) { .an-bar { top: 76px; } }
 .sg__main .an-bar > .an-tabs { display: flex; gap: var(--gw-space-24); height: auto; padding: 0; border-radius: 0; background: none; box-shadow: none; }
 /* "Hide my activity": a small switch in the topbar-icon family (no stroke on the label, a filled track when on). */
 .an-me { display: inline-flex; align-items: center; gap: var(--gw-space-8); cursor: pointer; user-select: none; font: var(--gw-text-body-12-med); color: var(--ul-sub); }
