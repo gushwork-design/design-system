@@ -135,9 +135,10 @@ Exported from Figma at `Size=80 px` and stripped of the swatch-frame chrome Figm
 into a node export. They carry a `viewBox` and no fixed width/height, so scale them with
 CSS to the `Size` step you need.
 
-**The wordmark's dark is `#111827` — that is `--gw-color-secondary-500`,** the file's
-single-step Secondary, and the same value the legacy `gray/900` variable carries. It is
-deliberately *not* `--gw-color-neutral-900` (`#262a2e`) or `--gw-color-black` (`#0d0d0d`).
+**The wordmark's dark is `#111827`, and it has no token.** `--gw-color-secondary-500` was that
+value and was removed on 1 Oct 2026 (page text and surfaces that used it now use `--gw-color-black`).
+The logo files keep their own `#111827`: it is deliberately *not* `--gw-color-neutral-900`
+(`#262a2e`) or `--gw-color-black` (`#0d0d0d`), and a logo file is not recoloured to match a token.
 The blue symbol is `#0070ff` — `--gw-color-primary-500`.
 
 ### Dashboard — `gushwork-logo-(internal-use)`

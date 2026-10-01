@@ -91,11 +91,6 @@
   --gw-color-primary-alpha-10: #0070ff1a;
   --gw-color-primary-alpha-40: #0070ff66;
 
-  /* --- Secondary -----------------------------------------------------------
-     Figma path Colors/Secondary/500-main. A single step, no ramp. Used as the
-     dark surface on page-build, navbar, footer and the comparison table. */
-  --gw-color-secondary-500: #111827;
-
   /* --- Neutral -------------------------------------------------------------
      Figma path Colors/Neutral/*. Cool-tinted, not pure gray. The 35/250/850
      steps are real variables but have no swatch on the canvas. */
