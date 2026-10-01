@@ -73,7 +73,12 @@ async function gh(token, path, init = {}) {
   const text = await r.text();
   let body = null;
   try { body = text ? JSON.parse(text) : null; } catch { /* leave null */ }
-  if (!r.ok) { const e = new Error(`github ${r.status}`); e.status = r.status; e.body = body; throw e; }
+  if (!r.ok) {
+    const e = new Error(`github ${r.status}`);
+    e.status = r.status; e.body = body;
+    e.step = `${(init.method || 'GET').toUpperCase()} ${path.split('?')[0].replace(/^\/repos\/[^/]+\/[^/]+/, '')}`;
+    throw e;
+  }
   return body;
 }
 async function ghMaybe(token, path) {
@@ -138,4 +143,13 @@ export async function recordViaGithub(token, row, who, today, undo = false) {
     });
   }
   return { pr: { number: pr.number, url: pr.html_url } };
+}
+
+/* What to show the owner when GitHub refuses: the status, GitHub's own reason, and which call it was, so a 403 can be told
+   apart (an unapproved token, a missing permission, a protected branch) without anyone reading logs. Never includes the token. */
+export function explain(e) {
+  if (!e) return 'GitHub could not be reached';
+  if (!e.status) return 'GitHub could not be reached';
+  const why = e.body && e.body.message ? String(e.body.message).replace(/\s+/g, ' ').slice(0, 140) : '';
+  return `GitHub said ${e.status}${why ? ': ' + why : ''}${e.step ? ' (' + e.step + ')' : ''}`;
 }
