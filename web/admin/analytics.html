@@ -472,7 +472,20 @@ body[data-gw-page="analytics"] .sg__main > * { min-width: 0; }
 .in-pair .vs-t .ul-row { min-width: 0; padding: 0 var(--gw-space-16); column-gap: var(--gw-space-16); }
 .in-h { margin: var(--gw-space-24) 0 var(--gw-space-8); font: var(--gw-text-body-12-med); letter-spacing: .06em; text-transform: uppercase; color: var(--ul-sub); }
 
-.an-tabs { align-self: flex-start; }
+/* Page-level tabs: flat text with an underline for the open one, on a full-width hairline (Exa Usage,
+   Xero, Laravel Cloud). The period control inside each tab stays the filled segmented pill, aligned to
+   the right, so the two controls read as different things. */
+.sg__main > .an-tabs { align-self: stretch; display: flex; gap: var(--gw-space-24); height: auto; padding: 0; border-radius: 0; background: none; box-shadow: inset 0 -1px 0 var(--ul-hdr-line); }
+.sg__main > .an-tabs .ul-tab { position: relative; height: 40px; padding: 0 2px; border-radius: 0; background: none; color: var(--ul-sub); font: var(--gw-text-body-14-med); }
+.sg__main > .an-tabs .ul-tab:hover { background: none; color: var(--ul-value); }
+.sg__main > .an-tabs .ul-tab[aria-selected="true"] { background: none; color: var(--ul-value); }
+.sg__main > .an-tabs .ul-tab[aria-selected="true"]::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; border-radius: 2px 2px 0 0; background: var(--ul-value); }
+.an-panel .ul-bar { justify-content: flex-end; gap: var(--gw-space-12); flex-wrap: nowrap; }
+.an-panel .vs-areas { display: contents; }
+.an-panel #vs-area-tabs { order: 0; margin-right: auto; }
+.an-panel .vs-areas .ul-tabs[aria-label="Period"] { order: 1; }
+.an-panel #vs-bar .ul-refresh { order: 2; }
+@media (max-width: 760px) { .an-panel .ul-bar { flex-wrap: wrap; } .an-panel #vs-area-tabs { margin-right: 0; } }
 .an-panel { display: flex; flex-direction: column; gap: var(--gw-space-24); }
 .an-panel > * { min-width: 0; }
 .an-panel[hidden] { display: none; }
