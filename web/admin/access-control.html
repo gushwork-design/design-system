@@ -30,6 +30,7 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
 .ac-tab[aria-selected="true"]::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2px;
   border-radius: 2px 2px 0 0; background: var(--s-heading); }
 .ac-tab:focus-visible { outline: var(--gw-focus-ring); outline-offset: 2px; }
+
 /* The cards were touching: this was `.gw-stack-24`, a class shell.css has never
    defined, so the gap it names never existed. */
 #ac-sections { display: flex; flex-direction: column; gap: var(--gw-space-24); }
@@ -336,6 +337,22 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
   .ac-row__del { grid-area: del; }
   .ac-bar { flex-direction: column; align-items: stretch; }
 }
+
+/* With one card on screen at a time the frame is only noise: the tab already names the section, so the card
+   drops its border, shadow, tinted bands and repeated title, and the rows sit straight on the page like the
+   tables in Analytics. What stays is the one-line description, the header row, the rows and the add row. */
+.ac-card { background: none; border: 0; box-shadow: none; border-radius: 0; }
+.ac-card__hd { background: none; border: 0; border-radius: 0; padding: 0 0 var(--gw-space-16); }
+.ac-card__hd h3, .ac-card__n { display: none; }
+.ac-card__body { padding: 0 var(--gw-space-12); }
+.ac-head { background: none; border-radius: 0; box-shadow: none; border-bottom: 1px solid var(--s-chrome-border); }
+.ac-card__ft { background: none; border-radius: 0; border-top: 1px solid var(--s-chrome-border); padding: var(--gw-space-16) var(--gw-space-12) 0; margin-top: var(--gw-space-8); }
+.ac-card__ft .ac-field { background: var(--s-field-bg); }
+/* The owner and admin boxes inside the last tab lose their frames too: two sections divided by a hairline. */
+.ac-lvls { gap: 0; padding-top: 0; }
+.ac-card__body:has(.ac-lvls) { padding: 0; }
+.ac-lvl { background: none; border: 0; border-radius: 0; padding: var(--gw-space-20) 0; }
+.ac-lvl + .ac-lvl { border-top: 1px solid var(--s-chrome-border); }
 </style>
 </head>
 <body data-gw-page="access-control">
