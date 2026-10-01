@@ -491,6 +491,8 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
 .an-panel { display: flex; flex-direction: column; gap: var(--gw-space-24); }
 .an-panel > * { min-width: 0; }
 .an-panel[hidden] { display: none; }
+.an-panel .ul-refresh__t { display: none; }
+.gw-iconbtn[aria-busy="true"] svg { animation: ul-spin 1s linear infinite; }
 </style>
 </head>
 <body data-gw-page="analytics">
@@ -520,7 +522,7 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
       </div>
       <div class="ul-refresh">
         <span class="ul-refresh__t" id="in-updated" aria-live="polite"></span>
-        <button class="ul-ib" id="in-refresh" type="button" aria-label="Refresh"></button>
+        <button class="gw-iconbtn" id="in-refresh" type="button" aria-label="Refresh" data-tip="Refresh" data-tip-end></button>
       </div>
     </div>
 
@@ -580,7 +582,7 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
       </div>
       <div class="ul-refresh">
         <span class="ul-refresh__t" id="ul-updated" aria-live="polite"></span>
-        <button class="ul-ib" id="ul-refresh" type="button" aria-label="Refresh the log"></button>
+        <button class="gw-iconbtn" id="ul-refresh" type="button" aria-label="Refresh" data-tip="Refresh" data-tip-end></button>
       </div>
     </div>
 
@@ -652,7 +654,7 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
       </div>
       <div class="ul-refresh">
         <span class="ul-refresh__t" id="vs-updated" aria-live="polite"></span>
-        <button class="ul-ib" id="vs-refresh" type="button" aria-label="Refresh the log"></button>
+        <button class="gw-iconbtn" id="vs-refresh" type="button" aria-label="Refresh" data-tip="Refresh" data-tip-end></button>
       </div>
     </div>
 
@@ -1902,6 +1904,14 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
   }
   document.querySelectorAll('#an-tabs .ul-tab').forEach(function (b) { b.addEventListener('click', function () { show(b.getAttribute('data-tab'), true); }); });
   window.addEventListener('hashchange', function () { show(location.hash.slice(1), false); });
+  /* The panels write "Updated 5 min ago" into a hidden span; the refresh button shows it as its tooltip. */
+  [['ul', 'Refresh the log'], ['vs', 'Refresh'], ['in', 'Refresh']].forEach(function (p) {
+    var span = document.getElementById(p[0] + '-updated'), btn = document.getElementById(p[0] + '-refresh');
+    if (!span || !btn) return;
+    function sync() { var t = span.textContent.trim(); btn.setAttribute('data-tip', t ? t + ' · click to refresh' : p[1]); }
+    new MutationObserver(sync).observe(span, { childList: true, characterData: true, subtree: true });
+    sync();
+  });
   show(location.hash.slice(1), false);
 })();
 </script>
