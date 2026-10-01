@@ -1075,6 +1075,12 @@ Ruled by Utsav, 1 Oct 2026. The Catalogue listed every Figma component with its 
 
 **Components view (same day).** Components are cards grouped by the doc that describes them (Folds, Cards, Atoms, Fold elements and Page shell on the web; Cards and chrome, Primitives, Controls, Overlays, Feedback, Phone and Data table on the dashboard), each with its name (opens the spec page), version, when the spec moved, review state and doc (opens it on GitHub). A surface whose components each have their own doc is not grouped. A filter shows above eight components. The spec pages are still the standalone ones, and stay linked.
 
+## R34 — `--gw-color-secondary-500` is removed; its uses are `--gw-color-black`
+Ruled by Utsav, 1 Oct 2026. The single-step Secondary (`#111827`, Figma `Colors/Secondary/500-main`) was a second near-black beside `--gw-color-black` (`#0d0d0d`). The token is deleted from `tokens.css`, `tokens.json`, `tokens.scss` and `tailwind-theme.js`, every `var()` of it is `--gw-color-black` (the ad-page templates' white button text and form headings, the staging landers, the component sheets), and the pages that re-declared it locally no longer do.
+
+- **Not changed, on purpose.** The logo files (`assets/logo/*.svg`, the email and ID-card copies) keep their own `#111827`; a logo is not recoloured to match a token, and the wordmark's dark now has no token. The palette downloads (`assets/color/*.clr`, `.ase`, `.pdf`) and the two colour sheets still list it until they are regenerated. `exports/ad-page/variables.json` still records the Figma binding `Colors/Secondary/500-main`, which is now a binding with no token, the same kind of gap as the bare legacy `White`.
+- **The visible change** is `#111827` to `#0d0d0d` on the text and surfaces that used it: barely perceptible, a touch darker.
+
 ## R35 — reviewing happens in a drawer in the Design System page, with buttons; the standalone sheets are gone
 Ruled by Utsav, 1 Oct 2026. The Review tab listed 97 commands to copy and the visual review sheet lived on another page, so judging something and recording the decision were two separate trips. The sheets are no longer a destination; the Review tab is an inbox and each item opens in a side drawer with its visual and three buttons.
 
