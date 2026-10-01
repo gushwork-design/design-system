@@ -147,12 +147,9 @@
       { label: 'Access Control', href: '/admin/access-control', icon: 'gear' },
       /* The Component Library, the Catalogue and the Review Gate are one page with three tabs
          (/admin/design-system), the same way Analytics holds the usage log, visits and insights.
-         The Review tab asks for an owner account; the other two are for admins. Ruled by Utsav,
-         1 Oct 2026. */
-      { label: 'Design System', href: '/admin/design-system', icon: 'swatches' },
-      /* Was 'flow-arrow', which is not in ICON — the row drew an empty <path>.
-         683:5282 gives Workflow the same stacked glyph as Change Log. */
-      { label: 'Design Workflow', href: '/admin/workflow',  icon: 'stack-overflow-logo' }
+         The Review tab asks for an owner account; the other two are for admins. The design workflow is
+         a fourth tab. Ruled by Utsav, 1 Oct 2026. */
+      { label: 'Design System', href: '/admin/design-system', icon: 'swatches' }
     ]
   };
 
@@ -1904,13 +1901,7 @@
     palWire();
   }
 
-  /* A page shown inside the Design system tabs (/admin/design-system) is loaded in a frame named
-     gw-embed, or with ?embed=1. It must not draw the site chrome a second time, so the shell stands
-     down and the page renders on its own; the theme is already applied by the head snippet. */
-  var EMBEDDED = window.name === 'gw-embed' || /[?&]embed=1(&|$)/.test(location.search);
-  if (EMBEDDED) {
-    document.documentElement.classList.add('gw-embed');
-  } else if (document.readyState === 'loading') {
+  if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', mount);
   } else {
     mount();

@@ -3,7 +3,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Design System — Gushwork Design</title>
 <meta name="robots" content="noindex">
-<meta name="description" content="The component library, the catalogue and the review gate, for admins.">
+<meta name="description" content="The component library, the catalogue, the review gate and the design workflow, for admins.">
 <script>try{var t=localStorage.getItem('gw-theme');if(t!=='dark')t='light';document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20width%3D%2280%22%20height%3D%2280%22%20rx%3D%2220%22%20fill%3D%22%230d0d0d%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
 <link rel="stylesheet" href="/foundation/tokens.css">
@@ -405,7 +405,11 @@ body[data-gw-page="design-system"] .sg__main > * { min-width: 0; }
 .ul-tbl > .ul-row--d { position: relative; margin: 0 var(--gw-space-8); padding: 0 var(--gw-space-16); border-radius: var(--gw-radius-12); box-shadow: none; }
 .ul-tbl > .ul-row--d + .ul-row--d::before { content: ""; position: absolute; top: 0; left: var(--gw-space-16); right: var(--gw-space-16); height: 1px; background: var(--ul-hdr-line); }
 .ul-tbl > .ul-row--d:hover::before, .ul-tbl > .ul-row--d:hover + .ul-row--d::before { display: none; }
-.ul-tbl .ul-row--h { margin: 0 var(--gw-space-8); padding: 0 var(--gw-space-16); border-radius: var(--gw-radius-8); }
+/* The header row is a plain row with a firmer rule under it: no fill, no corners (a rounded header curls the
+   rule up at both ends), the line one step stronger than the hairlines between rows. */
+.ul-tbl .ul-row--h { position: relative; margin: 0 var(--gw-space-8); padding: 0 var(--gw-space-16); border-radius: 0; background: none; box-shadow: none; }
+.ul-tbl .ul-row--h::after { content: ""; position: absolute; left: var(--gw-space-16); right: var(--gw-space-16); bottom: 0; height: 1px; background: var(--gw-color-neutral-200); }
+:root[data-theme="dark"] .ul-tbl .ul-row--h::after { background: var(--gw-color-neutral-800); }
 .ul-when { display: flex; flex-direction: column; gap: 1px; line-height: 1.3; }
 .ul-when b { font: var(--gw-text-body-12-med); color: var(--ul-value); }
 .ul-when span { font: var(--gw-text-body-12-med); color: var(--ul-sub); }
@@ -441,7 +445,7 @@ body[data-gw-page="design-system"] .sg__main > * { min-width: 0; }
 .ul-chat__t svg { width: 12px; height: 12px; color: var(--ul-icon); transition: transform var(--gw-motion-fast); }
 .ul-row--chat[aria-expanded="true"] .ul-chat__t svg { transform: rotate(180deg); }
 .ul-scroll { overflow-x: auto; }
-.ul-tbl:has(.ul-grp) .ul-row--h { margin: 0 var(--gw-space-8); padding: 0 var(--gw-space-16); min-width: 0; border-radius: var(--gw-radius-8); }
+.ul-tbl:has(.ul-grp) .ul-row--h { margin: 0 var(--gw-space-8); padding: 0 var(--gw-space-16); min-width: 0; border-radius: 0; }
 /* pagination: 52h, pad 12, space-between; arrows are icon-button 28 */
 .ul-pg { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-8); padding: var(--gw-space-12); flex-wrap: wrap; }
 .ul-pg__l, .ul-pg__r { display: flex; align-items: center; gap: var(--gw-space-8); }
@@ -509,11 +513,104 @@ body[data-gw-page="design-system"] .sg__hd { border-bottom: 0; padding-bottom: v
 .an-panel[hidden] { display: none; }
 .an-panel .ul-refresh__t { display: none; }
 .gw-iconbtn[aria-busy="true"] svg { animation: ul-spin 1s linear infinite; }
-body[data-gw-page="design-system"] .sg__main { max-width: none; }
-.ds-panel { display: block; }
+#ds-workflow {
+  --wf-ink: var(--gw-color-black);          --wf-inv-bg: var(--gw-color-black);      --wf-inv-fg: var(--gw-color-white);
+  --wf-card: var(--gw-color-white);         --wf-card-line: var(--gw-color-neutral-100);
+  --wf-stage: var(--gw-color-neutral-25);   --wf-hair: var(--gw-color-neutral-100);  --wf-dash: var(--gw-color-neutral-300);
+  --wf-sub: var(--gw-color-neutral-600);    --wf-mute: var(--gw-color-neutral-400);  --wf-mute2: var(--gw-color-neutral-300);
+  --wf-line: var(--gw-color-black);         --wf-blue: var(--gw-color-primary-500);  --wf-blue-ink: var(--gw-color-primary-600);
+  --wf-tint: var(--gw-color-primary-50);
+  --wf-red: var(--gw-color-red-600);        --wf-red-tint: var(--gw-color-red-50);
+  --wf-shadow: drop-shadow(0 8px 12px rgba(88, 92, 95, .10)); --wf-edge: var(--gw-color-neutral-300); --wf-dot: var(--gw-color-neutral-100); --wf-slate-tint: var(--gw-color-neutral-100);
+
+
+
+
+.block { display: flex; flex-direction: column; gap: var(--gw-space-16); }
+.eyebrow { display: flex; align-items: center; gap: var(--gw-space-12); }
+.eyebrow i { font-style: normal; width: 28px; height: 28px; border-radius: var(--gw-radius-8); display: grid; place-items: center;
+  font: 600 13px/1 var(--gw-font-display); color: var(--wf-blue-ink); background: var(--wf-tint); }
+.eyebrow h2 { margin: 0; font: 600 24px/1.2 var(--gw-font-display); letter-spacing: -.01em; color: var(--s-heading); }
+.lede { margin: 0; max-width: 74ch; font: var(--gw-text-body-14-reg); color: var(--s-body); }
+.lede strong, figcaption strong { color: var(--s-heading); font-weight: 600; }
+figure { margin: 0; display: flex; flex-direction: column; gap: var(--gw-space-16); }
+.figframe { background: var(--wf-stage); border-radius: var(--gw-radius-20); padding: var(--gw-space-24); overflow-x: auto; box-shadow: inset 0 0 0 1px var(--s-card-border); }
+svg.flow { display: block; width: 100%; height: auto; }
+#d1 { min-width: 820px; } #d2 { min-width: 860px; } #d3 { min-width: 760px; }
+.figframe { background-color: var(--wf-stage); background-image: radial-gradient(var(--wf-dot) 1px, transparent 1px); background-size: 20px 20px; }
+.wf-n { fill: var(--wf-card); stroke: var(--wf-card-line); stroke-width: 1; filter: var(--wf-shadow); }
+.wf-n--tint { fill: var(--wf-tint); stroke: none; filter: none; }
+.wf-n--ink { fill: var(--wf-inv-bg); stroke: none; }
+.wf-n--dash { fill: var(--wf-card); stroke: var(--wf-dash); stroke-dasharray: 5 4; filter: none; }
+.wf-n--ring-blue { stroke: var(--wf-blue); stroke-width: 1.6; }
+.wf-n--ring-ink { stroke: var(--wf-ink); stroke-width: 1.6; }
+.wf-t--blue { fill: var(--wf-tint); } .wf-t--ink { fill: var(--wf-inv-bg); } .wf-t--slate { fill: var(--wf-slate-tint); }
+.wf-ti--blue { fill: var(--wf-blue-ink); } .wf-ti--ink { fill: var(--wf-inv-fg); } .wf-ti--slate { fill: var(--wf-sub); }
+.wf-x--title-tint { fill: var(--wf-blue-ink); }
+.wf-x { font-family: var(--gw-font-body); }
+.wf-x--title { font-size: 14px; font-weight: 600; fill: var(--wf-ink); }
+.wf-x--title-ink { fill: var(--wf-inv-fg); }
+.wf-x--sub.wf-x--sub-c { font-size: 11px; }
+.wf-x--sub { font-size: 12px; fill: var(--wf-sub); }
+.wf-n--ink ~ .wf-x--sub { }
+.wf-x--over, .wf-x--col { font-size: 10.5px; font-weight: 600; letter-spacing: .09em; fill: var(--wf-mute); }
+.wf-x--col2 { font-size: 10.5px; fill: var(--wf-mute2); }
+.wf-x--row { font-size: 14px; font-weight: 600; fill: var(--wf-ink); }
+.wf-x--edge { font-size: 11px; fill: var(--wf-sub); }
+.wf-x--note { font-size: 11.5px; fill: var(--wf-mute); }
+.wf-e { fill: none; stroke: var(--wf-edge); stroke-width: 1.5; stroke-linecap: round; }
+.wf-e--d { stroke-dasharray: 5 5; } .wf-e--bd { stroke: var(--wf-blue); stroke-dasharray: 5 5; }
+.wf-p { fill: var(--wf-stage); stroke: var(--wf-edge); stroke-width: 1.5; } .wf-p--bd { stroke: var(--wf-blue); }
+.wf-pl { fill: var(--wf-card); stroke: var(--wf-card-line); } .wf-pl--b { fill: var(--wf-tint); stroke: none; }
+.wf-pt { font: 600 11px var(--gw-font-body); fill: var(--wf-ink); } .wf-pt--b { fill: var(--wf-blue-ink); font-weight: 500; }
+.wf-ch { fill: var(--wf-red-tint); stroke: var(--wf-red); stroke-width: 1.4; } .wf-cht { font: 700 12px var(--gw-font-body); fill: var(--wf-red); } .wf-cht--s { font-size: 10px; }
+.wf-rule { stroke: var(--wf-card-line); stroke-width: 1; }
+figcaption { max-width: 76ch; font: var(--gw-text-body-14-reg); color: var(--s-body); }
+ol.gaps { list-style: none; margin: var(--gw-space-8) 0 0; padding: 0; display: grid; gap: var(--gw-space-12); }
+ol.gaps li { display: grid; grid-template-columns: 28px 1fr; gap: var(--gw-space-16); padding: var(--gw-space-16) var(--gw-space-20);
+  background: var(--s-card-bg); border-radius: var(--gw-radius-16); box-shadow: inset 0 0 0 1px var(--s-card-border); }
+.num { width: 28px; height: 28px; border-radius: var(--gw-radius-8); background: var(--wf-red-tint); color: var(--wf-red);
+  font: 600 13px/1 var(--gw-font-display); display: grid; place-items: center; }
+ol.gaps b { display: block; font: 600 15px/1.3 var(--gw-font-body); color: var(--s-heading); margin-bottom: var(--gw-space-4); }
+ol.gaps p { margin: 0; font: var(--gw-text-body-14-reg); color: var(--s-body); }
+ol.gaps em { color: var(--s-heading); font-style: normal; font-weight: 600; }
+code { font: 500 .87em/1 var(--gw-font-mono, ui-monospace, "SF Mono", Menlo, monospace); padding: 2px 6px; border-radius: var(--gw-radius-4);
+  background: var(--s-code-bg); color: var(--s-code-fg); box-shadow: inset 0 0 0 1px var(--s-code-border); }
+.note { padding: var(--gw-space-16) var(--gw-space-20); border-radius: var(--gw-radius-16); background: var(--wf-tint); }
+.note b { display: block; font: 600 15px/1.3 var(--gw-font-body); color: var(--s-heading); margin-bottom: var(--gw-space-4); }
+.note p { margin: 0; font: var(--gw-text-body-14-reg); color: var(--s-body); }
+.wf-foot { margin: 0; padding-top: var(--gw-space-16); border-top: 1px solid var(--s-card-border); font: var(--gw-text-body-12-med); color: var(--s-body); }
+
+  :root[data-theme="dark"] & {
+  --wf-ink: var(--gw-color-white);          --wf-inv-bg: var(--gw-color-white);      --wf-inv-fg: var(--gw-color-black);
+  --wf-card: var(--gw-color-neutral-900);   --wf-card-line: var(--gw-color-neutral-850);
+  --wf-stage: var(--gw-color-black);        --wf-hair: var(--gw-color-neutral-850);  --wf-dash: var(--gw-color-neutral-700);
+  --wf-sub: var(--gw-color-neutral-400);    --wf-mute: var(--gw-color-neutral-400);  --wf-mute2: var(--gw-color-neutral-500);
+  --wf-line: var(--gw-color-neutral-300);   --wf-blue: var(--gw-color-primary-400);  --wf-blue-ink: var(--gw-color-primary-300);
+  --wf-tint: var(--gw-color-primary-900);
+  --wf-red: var(--gw-color-red-300);        --wf-red-tint: color-mix(in srgb, var(--gw-color-red-500) 18%, var(--gw-color-black));
+  --wf-shadow: none; --wf-edge: var(--gw-color-neutral-700); --wf-dot: var(--gw-color-neutral-900); --wf-slate-tint: var(--gw-color-neutral-850);
+  }
+}
+
+body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .ds-panel[hidden] { display: none; }
-.ds-frame { display: block; width: 100%; height: calc(100vh - 210px); min-height: 560px; border: 0; border-radius: var(--gw-radius-16); background: var(--s-panel-bg); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }
-.ds-lock { margin-top: var(--gw-space-24); }
+.ds-panel { display: flex; flex-direction: column; gap: var(--gw-space-24); }
+.ds-panel > * { min-width: 0; }
+#ds-workflow { gap: var(--gw-space-48, 48px); }
+.ds-find { width: 100%; max-width: 280px; height: 36px; padding: 0 12px; border: 0; border-radius: var(--gw-radius-12); background: var(--ul-field-bg); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); color: var(--ul-value); font: var(--gw-text-body-14-reg); }
+.ds-find::placeholder { color: var(--ul-sub); }
+.ds-tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--gw-space-12); }
+.ds-a { color: var(--ul-value); text-decoration: none; font-weight: 600; }
+.ds-a:hover { text-decoration: underline; text-underline-offset: 2px; }
+.ds-code { font: 500 11.5px/1 var(--gw-font-mono, ui-monospace, "SF Mono", Menlo, monospace); color: var(--ul-cell); }
+.ul-badge--warn { background: var(--gw-color-yellow-alpha-10); color: var(--gw-color-yellow-600); }
+:root[data-theme="dark"] .ul-badge--warn { color: var(--gw-color-yellow-300); }
+.ds-gap { display: grid; grid-template-columns: 28px 1fr; gap: var(--gw-space-12); padding: var(--gw-space-12) var(--gw-space-8); box-shadow: inset 0 -1px 0 var(--ul-hdr-line); font: var(--gw-text-body-14-reg); color: var(--ul-cell); }
+.ds-gap:last-child { box-shadow: none; }
+.ds-gap b { color: var(--ul-value); font: 600 12px/1.5 var(--gw-font-body); }
+.ds-copy { height: 24px; padding: 0 8px; border: 0; border-radius: var(--gw-radius-8); background: none; color: var(--ul-sub); font: var(--gw-text-body-12-med); cursor: pointer; }
+.ds-copy:hover { background: var(--ul-hdr-line); color: var(--ul-value); }
 </style>
 </head>
 <body data-gw-page="design-system">
@@ -522,7 +619,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: none; }
 
   <header class="sg__hd">
     <h1>Design System</h1>
-    <p>The component library, every component in one list, and the review gate that decides what reaches the skills</p>
+    <p>The component library, every component in one list, the review gate and how design runs</p>
   </header>
 
   <main class="sg__main">
@@ -532,24 +629,122 @@ body[data-gw-page="design-system"] .sg__main { max-width: none; }
         <button class="ul-tab" role="tab" data-tab="library" aria-selected="true">Library</button>
         <button class="ul-tab" role="tab" data-tab="catalogue" aria-selected="false">Catalogue</button>
         <button class="ul-tab" role="tab" data-tab="review" aria-selected="false">Review<svg id="ds-lock" viewBox="0 0 256 256" width="12" height="12" fill="currentColor" aria-hidden="true" style="margin-left:6px;vertical-align:-1px" hidden><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96Zm112,152H48V96H208V208Z"/></svg></button>
+        <button class="ul-tab" role="tab" data-tab="workflow" aria-selected="false">Workflow</button>
       </div>
     </div>
 
     <section class="ds-panel" id="ds-library" role="tabpanel">
-      <iframe class="ds-frame" name="gw-embed" title="Component library" data-src="/library/index.html?embed=1"></iframe>
+      <div class="ul-metrics" id="ds-lib-stats"></div>
+      <div class="ds-tools"><div class="ul-tabs" id="ds-lib-tabs" role="tablist" aria-label="Library section"></div><input class="ds-find" id="ds-lib-find" type="search" placeholder="Filter this list" autocomplete="off"></div>
+      <section class="ul-sec" aria-labelledby="ds-lib-h">
+        <div class="ul-sh"><div class="ul-sh__t"><h2 id="ds-lib-h">Library</h2><span class="ul-sh__q" id="ds-lib-q"></span></div></div>
+        <div class="ul-scroll vs-t" id="ds-lib-table"></div>
+      </section>
     </section>
+
     <section class="ds-panel" id="ds-catalogue" role="tabpanel" hidden>
-      <iframe class="ds-frame" name="gw-embed" title="Catalogue" data-src="/library/components.html?embed=1"></iframe>
+      <div class="ul-metrics" id="ds-cat-stats"></div>
+      <div class="ds-tools"><div class="ul-tabs" id="ds-cat-tabs" role="tablist" aria-label="Catalogue filter"></div><input class="ds-find" id="ds-cat-find" type="search" placeholder="Filter components" autocomplete="off"></div>
+      <div id="ds-cat-body" style="display:flex;flex-direction:column;gap:var(--gw-space-24)"></div>
     </section>
+
     <section class="ds-panel" id="ds-review" role="tabpanel" hidden>
-      <iframe class="ds-frame" name="gw-embed" title="Review gate" data-src="/admin/review-sheet?embed=1" hidden></iframe>
-      <div class="ds-lock" id="ds-review-lock" hidden>
+      <div id="ds-review-lock" hidden>
         <div class="ul-sec"><div class="ul-empty">
           <div class="ul-empty__c"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96Zm112,152H48V96H208V208Zm-68-56a12,12,0,1,1-12-12A12,12,0,0,1,140,152Z"/></svg></div>
           <div class="ul-empty__copy"><h2>Review needs an owner account</h2><p>Passing a component lets it into the skills, so only an owner can open this tab. Sign in with an owner Google account to continue. You will come back here afterwards.</p></div>
           <button class="ul-btn" id="ds-signin" type="button">Sign in with an owner account</button>
         </div></div>
       </div>
+      <div id="ds-review-app" hidden>
+        <div class="ul-metrics" id="ds-rev-stats"></div>
+        <section class="ul-sec" aria-labelledby="ds-rev-h">
+          <div class="ul-sh"><div class="ul-sh__t"><h2 id="ds-rev-h">Waiting on you</h2><span class="ul-sh__q" id="ds-rev-q"></span></div>
+            <a class="ds-a" href="/admin/review-sheet" style="font-size:13px">Open the visual review sheet</a></div>
+          <div class="ul-scroll vs-t" id="ds-rev-table"></div>
+          <div class="vs-more" id="ds-rev-more"></div>
+        </section>
+        <section class="ul-sec" aria-labelledby="ds-gap-h">
+          <div class="ul-sh"><div class="ul-sh__t"><h2 id="ds-gap-h">Known gaps in the source</h2><span class="ul-sh__q" id="ds-gap-q"></span></div></div>
+          <div class="ul-inner" id="ds-gaps"></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="ds-panel" id="ds-workflow" role="tabpanel" hidden>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="wi-funnel" viewBox="0 0 256 256"><path d="M234.29,47.91A20,20,0,0,0,216,36H40A20,20,0,0,0,25.2,69.45l.12.14L92,140.75V216a20,20,0,0,0,31.1,16.64l32-21.33A20,20,0,0,0,164,194.66V140.75l66.67-71.16.12-.14A20,20,0,0,0,234.29,47.91Zm-91,79.89A12,12,0,0,0,140,136v56.52l-24,16V136a12,12,0,0,0-3.25-8.2L49.23,60H206.77Z"/></symbol><symbol id="wi-lightning" viewBox="0 0 256 256"><path d="M219.71,117.38a12,12,0,0,0-7.25-8.52L161.28,88.39l10.59-70.61a12,12,0,0,0-20.64-10l-112,120a12,12,0,0,0,4.31,19.33l51.18,20.47L84.13,238.22a12,12,0,0,0,20.64,10l112-120A12,12,0,0,0,219.71,117.38ZM113.6,203.55l6.27-41.77a12,12,0,0,0-7.41-12.92L68.74,131.37,142.4,52.45l-6.27,41.77a12,12,0,0,0,7.41,12.92l43.72,17.49Z"/></symbol><symbol id="wi-pencil-simple" viewBox="0 0 256 256"><path d="M230.14,70.54,185.46,25.85a20,20,0,0,0-28.29,0L33.86,149.17A19.85,19.85,0,0,0,28,163.31V208a20,20,0,0,0,20,20H92.69a19.86,19.86,0,0,0,14.14-5.86L230.14,98.82a20,20,0,0,0,0-28.28ZM91,204H52V165l84-84,39,39ZM192,103,153,64l18.34-18.34,39,39Z"/></symbol><symbol id="wi-sparkle" viewBox="0 0 256 256"><path d="M199,125.31l-49.88-18.39L130.69,57a19.92,19.92,0,0,0-37.38,0L74.92,106.92,25,125.31a19.92,19.92,0,0,0,0,37.38l49.88,18.39L93.31,231a19.92,19.92,0,0,0,37.38,0l18.39-49.88L199,162.69a19.92,19.92,0,0,0,0-37.38Zm-63.38,35.16a12,12,0,0,0-7.11,7.11L112,212.28l-16.47-44.7a12,12,0,0,0-7.11-7.11L43.72,144l44.7-16.47a12,12,0,0,0,7.11-7.11L112,75.72l16.47,44.7a12,12,0,0,0,7.11,7.11L180.28,144ZM140,40a12,12,0,0,1,12-12h12V16a12,12,0,0,1,24,0V28h12a12,12,0,0,1,0,24H188V64a12,12,0,0,1-24,0V52H152A12,12,0,0,1,140,40ZM252,88a12,12,0,0,1-12,12h-4v4a12,12,0,0,1-24,0v-4h-4a12,12,0,0,1,0-24h4V72a12,12,0,0,1,24,0v4h4A12,12,0,0,1,252,88Z"/></symbol><symbol id="wi-toolbox" viewBox="0 0 256 256"><path d="M224,64H180V56a28,28,0,0,0-28-28H104A28,28,0,0,0,76,56v8H32A20,20,0,0,0,12,84V192a20,20,0,0,0,20,20H224a20,20,0,0,0,20-20V84A20,20,0,0,0,224,64ZM100,56a4,4,0,0,1,4-4h48a4,4,0,0,1,4,4v8H100ZM220,88v32H196v-4a12,12,0,0,0-24,0v4H84v-4a12,12,0,0,0-24,0v4H36V88ZM36,188V144H60v4a12,12,0,0,0,24,0v-4h88v4a12,12,0,0,0,24,0v-4h24v44Z"/></symbol><symbol id="wi-stack" viewBox="0 0 256 256"><path d="M234.36,170A12,12,0,0,1,230,186.37l-96,56a12,12,0,0,1-12.1,0l-96-56a12,12,0,0,1,12.09-20.74l90,52.48L218,165.63A12,12,0,0,1,234.36,170ZM218,117.63,128,170.11,38.05,117.63A12,12,0,0,0,26,138.37l96,56a12,12,0,0,0,12.1,0l96-56A12,12,0,0,0,218,117.63ZM20,80a12,12,0,0,1,6-10.37l96-56a12.06,12.06,0,0,1,12.1,0l96,56a12,12,0,0,1,0,20.74l-96,56a12,12,0,0,1-12.1,0l-96-56A12,12,0,0,1,20,80Zm35.82,0L128,122.11,200.18,80,128,37.89Z"/></symbol><symbol id="wi-figma-logo" viewBox="0 0 256 256"><path d="M198.15,96A44,44,0,0,0,168,20H96A44,44,0,0,0,65.85,96a43.9,43.9,0,0,0,1.23,65.12A48,48,0,1,0,148,196V167.17A44,44,0,0,0,198.15,96ZM188,64a20,20,0,0,1-20,20H148V44h20A20,20,0,0,1,188,64ZM76,64A20,20,0,0,1,96,44h28V84H96A20,20,0,0,1,76,64Zm20,84a20,20,0,0,1,0-40h28v40H96Zm28,48a24,24,0,1,1-24-24h24Zm44-48a20,20,0,1,1,20-20A20,20,0,0,1,168,148Z"/></symbol><symbol id="wi-file-text" viewBox="0 0 256 256"><path d="M216.49,79.52l-56-56A12,12,0,0,0,152,20H56A20,20,0,0,0,36,40V216a20,20,0,0,0,20,20H200a20,20,0,0,0,20-20V88A12,12,0,0,0,216.49,79.52ZM160,57l23,23H160ZM60,212V44h76V92a12,12,0,0,0,12,12h48V212Zm112-80a12,12,0,0,1-12,12H96a12,12,0,0,1,0-24h64A12,12,0,0,1,172,132Zm0,40a12,12,0,0,1-12,12H96a12,12,0,0,1,0-24h64A12,12,0,0,1,172,172Z"/></symbol><symbol id="wi-clipboard-text" viewBox="0 0 256 256"><path d="M172,164a12,12,0,0,1-12,12H96a12,12,0,0,1,0-24h64A12,12,0,0,1,172,164Zm-12-52H96a12,12,0,0,0,0,24h64a12,12,0,0,0,0-24Zm60-64V216a20,20,0,0,1-20,20H56a20,20,0,0,1-20-20V48A20,20,0,0,1,56,28H90.53a51.88,51.88,0,0,1,74.94,0H200A20,20,0,0,1,220,48ZM100.29,60h55.42a28,28,0,0,0-55.42,0ZM196,52H178.59A52.13,52.13,0,0,1,180,64v8a12,12,0,0,1-12,12H88A12,12,0,0,1,76,72V64a52.13,52.13,0,0,1,1.41-12H60V212H196Z"/></symbol><symbol id="wi-package" viewBox="0 0 256 256"><path d="M225.6,62.64l-88-48.17a19.91,19.91,0,0,0-19.2,0l-88,48.17A20,20,0,0,0,20,80.19v95.62a20,20,0,0,0,10.4,17.55l88,48.17a19.89,19.89,0,0,0,19.2,0l88-48.17A20,20,0,0,0,236,175.81V80.19A20,20,0,0,0,225.6,62.64ZM128,36.57,200,76,178.57,87.73l-72-39.42Zm0,78.83L56,76,81.56,62l72,39.41ZM44,96.79l72,39.4v76.67L44,173.44Zm96,116.07V136.19l24-13.13V152a12,12,0,0,0,24,0V109.92l24-13.13v76.65Z"/></symbol><symbol id="wi-terminal" viewBox="0 0 256 256"><path d="M120,137,48,201A12,12,0,1,1,32,183l61.91-55L32,73A12,12,0,1,1,48,55l72,64A12,12,0,0,1,120,137Zm96,43H120a12,12,0,0,0,0,24h96a12,12,0,0,0,0-24Z"/></symbol><symbol id="wi-shield-check" viewBox="0 0 256 256"><path d="M208,36H48A20,20,0,0,0,28,56v56c0,54.29,26.32,87.22,48.4,105.29,23.71,19.39,47.44,26,48.44,26.29a12.1,12.1,0,0,0,6.32,0c1-.28,24.73-6.9,48.44-26.29,22.08-18.07,48.4-51,48.4-105.29V56A20,20,0,0,0,208,36Zm-4,76c0,35.71-13.09,64.69-38.91,86.15A126.28,126.28,0,0,1,128,219.38a126.14,126.14,0,0,1-37.09-21.23C65.09,176.69,52,147.71,52,112V60H204ZM79.51,144.49a12,12,0,1,1,17-17L112,143l47.51-47.52a12,12,0,0,1,17,17l-56,56a12,12,0,0,1-17,0Z"/></symbol><symbol id="wi-seal-check" viewBox="0 0 256 256"><path d="M228.75,100.05c-3.52-3.67-7.15-7.46-8.34-10.33-1.06-2.56-1.14-7.83-1.21-12.47-.15-10-.34-22.44-9.18-31.27s-21.27-9-31.27-9.18c-4.64-.07-9.91-.15-12.47-1.21-2.87-1.19-6.66-4.82-10.33-8.34C148.87,20.46,140.05,12,128,12s-20.87,8.46-27.95,15.25c-3.67,3.52-7.46,7.15-10.33,8.34-2.56,1.06-7.83,1.14-12.47,1.21C67.25,37,54.81,37.14,46,46S37,67.25,36.8,77.25c-.07,4.64-.15,9.91-1.21,12.47-1.19,2.87-4.82,6.66-8.34,10.33C20.46,107.13,12,116,12,128S20.46,148.87,27.25,156c3.52,3.67,7.15,7.46,8.34,10.33,1.06,2.56,1.14,7.83,1.21,12.47.15,10,.34,22.44,9.18,31.27s21.27,9,31.27,9.18c4.64.07,9.91.15,12.47,1.21,2.87,1.19,6.66,4.82,10.33,8.34C107.13,235.54,116,244,128,244s20.87-8.46,27.95-15.25c3.67-3.52,7.46-7.15,10.33-8.34,2.56-1.06,7.83-1.14,12.47-1.21,10-.15,22.44-.34,31.27-9.18s9-21.27,9.18-31.27c.07-4.64.15-9.91,1.21-12.47,1.19-2.87,4.82-6.66,8.34-10.33C235.54,148.87,244,140.05,244,128S235.54,107.13,228.75,100.05Zm-17.32,39.29c-4.82,5-10.28,10.72-13.19,17.76-2.82,6.8-2.93,14.16-3,21.29-.08,5.36-.19,12.71-2.15,14.66s-9.3,2.07-14.66,2.15c-7.13.11-14.49.22-21.29,3-7,2.91-12.73,8.37-17.76,13.19C135.78,214.84,130.4,220,128,220s-7.78-5.16-11.34-8.57c-5-4.82-10.72-10.28-17.76-13.19-6.8-2.82-14.16-2.93-21.29-3-5.36-.08-12.71-.19-14.66-2.15s-2.07-9.3-2.15-14.66c-.11-7.13-.22-14.49-3-21.29-2.91-7-8.37-12.73-13.19-17.76C41.16,135.78,36,130.4,36,128s5.16-7.78,8.57-11.34c4.82-5,10.28-10.72,13.19-17.76,2.82-6.8,2.93-14.16,3-21.29C60.88,72.25,61,64.9,63,63s9.3-2.07,14.66-2.15c7.13-.11,14.49-.22,21.29-3,7-2.91,12.73-8.37,17.76-13.19C120.22,41.16,125.6,36,128,36s7.78,5.16,11.34,8.57c5,4.82,10.72,10.28,17.76,13.19,6.8,2.82,14.16,2.93,21.29,3,5.36.08,12.71.19,14.66,2.15s2.07,9.3,2.15,14.66c.11,7.13.22,14.49,3,21.29,2.91,7,8.37,12.73,13.19,17.76,3.41,3.56,8.57,8.94,8.57,11.34S214.84,135.78,211.43,139.34ZM176.49,95.51a12,12,0,0,1,0,17l-56,56a12,12,0,0,1-17,0l-24-24a12,12,0,1,1,17-17L112,143l47.51-47.52A12,12,0,0,1,176.49,95.51Z"/></symbol><symbol id="wi-arrow-down" viewBox="0 0 256 256"><path d="M208.49,152.49l-72,72a12,12,0,0,1-17,0l-72-72a12,12,0,0,1,17-17L116,187V40a12,12,0,0,1,24,0V187l51.51-51.52a12,12,0,0,1,17,17Z"/></symbol></defs></svg>
+
+<div class="block">
+  <div class="eyebrow"><i>1</i><h2>Routing a request</h2></div>
+  <p class="lede">Three gates, three lanes. The dashed path is the rule that makes the model compound
+  instead of silting up.</p>
+  <figure><div class="figframe"><svg id="d1" class="flow" viewBox="0 0 1000 690" role="img" aria-label="A design request passes three gates. If it is brand-defining or high-stakes it goes to the Desk lane. Otherwise, if the input shape is not known in advance it goes to the Skill lane. Otherwise, if it needs no durable address and no non-technical maker it goes to the Skill lane, and only if it needs both does it go to the Tool lane. A dashed path feeds Desk patterns into the template library, which feeds the Skill lane and the Tool lane once the input tightens."><path class="wf-e" d="M170 100 V148"/><path class="wf-e" d="M200 220 V288"/><path class="wf-e" d="M200 360 V428"/><path class="wf-e" d="M360 184 H540"/><path class="wf-e" d="M360 324 C450 324 450 340 540 340"/><path class="wf-e" d="M360 464 C450 464 450 340 540 340"/><path class="wf-e" d="M200 500 V578 Q200 600 222 600 H540"/><path class="wf-e wf-e--bd" d="M650 212 V260 Q650 272 662 272 H893 Q905 272 905 284 V308"/><path class="wf-e wf-e--bd" d="M830 340 H760"/><path class="wf-e wf-e--bd" d="M905 372 V578 Q905 600 883 600 H760"/><rect class="wf-n" x="40" y="44" width="260" height="56" rx="14"/><rect class="wf-t wf-t--ink" x="54" y="56.0" width="32" height="32" rx="10"/><use class="wf-ti wf-ti--ink" href="#wi-lightning" x="61" y="63.0" width="18" height="18"/><text class="wf-x wf-x--title" x="98" y="77.0">a request arrives</text><rect class="wf-n" x="40" y="148" width="320" height="72" rx="14"/><rect class="wf-t wf-t--blue" x="54" y="168.0" width="32" height="32" rx="10"/><use class="wf-ti wf-ti--blue" href="#wi-funnel" x="61" y="175.0" width="18" height="18"/><text class="wf-x wf-x--over" x="98" y="176.9">GATE 1</text><text class="wf-x wf-x--title" x="98" y="196.5">Brand-defining or high-stakes?</text><rect class="wf-n" x="40" y="288" width="320" height="72" rx="14"/><rect class="wf-t wf-t--blue" x="54" y="308.0" width="32" height="32" rx="10"/><use class="wf-ti wf-ti--blue" href="#wi-funnel" x="61" y="315.0" width="18" height="18"/><text class="wf-x wf-x--over" x="98" y="316.9">GATE 2</text><text class="wf-x wf-x--title" x="98" y="336.5">Input shape known in advance?</text><rect class="wf-n" x="40" y="428" width="320" height="72" rx="14"/><rect class="wf-t wf-t--blue" x="54" y="448.0" width="32" height="32" rx="10"/><use class="wf-ti wf-ti--blue" href="#wi-funnel" x="61" y="455.0" width="18" height="18"/><text class="wf-x wf-x--over" x="98" y="456.9">GATE 3</text><text class="wf-x wf-x--title" x="98" y="476.5">Durable address, or non-technical maker?</text><rect class="wf-n" x="540" y="148" width="220" height="64" rx="14"/><rect class="wf-t wf-t--ink" x="554" y="164.0" width="32" height="32" rx="10"/><use class="wf-ti wf-ti--ink" href="#wi-pencil-simple" x="561" y="171.0" width="18" height="18"/><text class="wf-x wf-x--title" x="598" y="175.5">Desk</text><text class="wf-x wf-x--sub" x="598" y="195.0">design, directly</text><rect class="wf-n" x="540" y="308" width="220" height="64" rx="14"/><rect class="wf-t wf-t--slate" x="554" y="324.0" width="32" height="32" rx="10"/><use class="wf-ti wf-ti--slate" href="#wi-sparkle" x="561" y="331.0" width="18" height="18"/><text class="wf-x wf-x--title" x="598" y="335.5">Skill</text><text class="wf-x wf-x--sub" x="598" y="355.0">Claude Code + a template</text><rect class="wf-n" x="540" y="568" width="220" height="64" rx="14"/><rect class="wf-t wf-t--blue" x="554" y="584.0" width="32" height="32" rx="10"/><use class="wf-ti wf-ti--blue" href="#wi-toolbox" x="561" y="591.0" width="18" height="18"/><text class="wf-x wf-x--title" x="598" y="595.5">Tool</text><text class="wf-x wf-x--sub" x="598" y="615.0">hosted form, anyone</text><rect class="wf-n wf-n--tint" x="830" y="308" width="150" height="64" rx="14"/><text class="wf-x wf-x--title wf-x--title-tint" x="905.0" y="335.5" text-anchor="middle">template library</text><text class="wf-x wf-x--sub wf-x--sub-c" x="905.0" y="355.0" text-anchor="middle">a pointer, never a download</text><text class="wf-x wf-x--col" x="40" y="26" text-anchor="start">THE GATES</text><text class="wf-x wf-x--col" x="540" y="26" text-anchor="start">THE LANE</text><text class="wf-x wf-x--col" x="840" y="26" text-anchor="start">WHAT COMPOUNDS</text><circle class="wf-p" cx="170" cy="100" r="4"/><circle class="wf-p" cx="170" cy="148" r="4"/><circle class="wf-p" cx="200" cy="220" r="4"/><circle class="wf-p" cx="200" cy="288" r="4"/><rect class="wf-pl" x="185.1" y="244" width="29.8" height="20" rx="10"/><text class="wf-pt" x="200" y="257.8" text-anchor="middle">no</text><circle class="wf-p" cx="200" cy="360" r="4"/><circle class="wf-p" cx="200" cy="428" r="4"/><rect class="wf-pl" x="182.2" y="384" width="35.7" height="20" rx="10"/><text class="wf-pt" x="200" y="397.8" text-anchor="middle">yes</text><circle class="wf-p" cx="360" cy="184" r="4"/><circle class="wf-p" cx="540" cy="184" r="4"/><rect class="wf-pl" x="432.1" y="174" width="35.7" height="20" rx="10"/><text class="wf-pt" x="450" y="187.8" text-anchor="middle">yes</text><circle class="wf-p" cx="360" cy="324" r="4"/><circle class="wf-p" cx="540" cy="340" r="4"/><rect class="wf-pl" x="435.1" y="322" width="29.8" height="20" rx="10"/><text class="wf-pt" x="450" y="335.8" text-anchor="middle">no</text><circle class="wf-p" cx="360" cy="464" r="4"/><rect class="wf-pl" x="435.1" y="392" width="29.8" height="20" rx="10"/><text class="wf-pt" x="450" y="405.8" text-anchor="middle">no</text><circle class="wf-p" cx="200" cy="500" r="4"/><circle class="wf-p" cx="540" cy="600" r="4"/><rect class="wf-pl" x="182.2" y="530" width="35.7" height="20" rx="10"/><text class="wf-pt" x="200" y="543.8" text-anchor="middle">yes</text><circle class="wf-p wf-p--bd" cx="650" cy="212" r="4"/><circle class="wf-p wf-p--bd" cx="905" cy="308" r="4"/><rect class="wf-pl wf-pl--b" x="679.5" y="262" width="200.9" height="20" rx="10"/><text class="wf-pt wf-pt--b" x="780" y="275.8" text-anchor="middle">if it turns out to be a pattern</text><circle class="wf-p wf-p--bd" cx="830" cy="340" r="4"/><circle class="wf-p wf-p--bd" cx="760" cy="340" r="4"/><rect class="wf-pl wf-pl--b" x="771.2" y="330" width="47.5" height="20" rx="10"/><text class="wf-pt wf-pt--b" x="795" y="343.8" text-anchor="middle">feeds</text><circle class="wf-p wf-p--bd" cx="905" cy="372" r="4"/><circle class="wf-p wf-p--bd" cx="760" cy="600" r="4"/><rect class="wf-pl wf-pl--b" x="828.1" y="470" width="153.7" height="20" rx="10"/><text class="wf-pt wf-pt--b" x="905" y="483.8" text-anchor="middle">once the input tightens</text><line class="wf-rule" x1="40" y1="648" x2="980" y2="648"/><text class="wf-x wf-x--note" x="40" y="672" text-anchor="start">No approval gate sits between a lane and its output — review is by sampling, or design is the bottleneck again.</text></svg></div>
+  <figcaption><strong>Gate 1 is tested first because it overrides the other two.</strong> Everything
+  else falls through in order, and only a request that clears all three can be served by a tool.
+  Without the dashed path the desk only ever grows, and design is the bottleneck again in four months
+  with better tooling.</figcaption></figure>
+</div>
+
+<div class="block">
+  <div class="eyebrow"><i>2</i><h2>How each team interacts with design</h2></div>
+  <p class="lede">Not which lane — <em>when design is involved at all</em>. For four teams the
+  involvement is front-loaded and then stops. For one it never stops, and that is deliberate.</p>
+  <figure><div class="figframe"><svg id="d2" class="flow" viewBox="0 0 1000 656" role="img" aria-label="A matrix of five teams against three phases. AE, CSM, GTM and HR each have a one-time setup phase where design builds their kit, then a steady state where they produce alone, then a rare exception that returns to the desk. The CEO office has no setup: the desk, permanently, for board decks, investor updates and all-hands. An exception the desk picks up becomes a template if it is a pattern, and the template feeds every team&#x27;s steady state."><path class="wf-e wf-e--bd" d="M835 472 V500"/><path class="wf-e wf-e--bd" d="M835 548 V584"/><path class="wf-e wf-e--bd" d="M712 608 H600 Q577 608 577 585 V472"/><rect class="wf-n" x="40" y="20" width="920" height="48" rx="14"/><rect class="wf-t wf-t--blue" x="54" y="28.0" width="32" height="32" rx="10"/><use class="wf-ti wf-ti--blue" href="#wi-funnel" x="61" y="35.0" width="18" height="18"/><text class="wf-x wf-x--title" x="98" y="49.0">One intake · the three gates above decide the lane · no team routes itself by preference</text><rect class="wf-n wf-n--tint" x="196" y="136" width="246" height="56" rx="14"/><text class="wf-x wf-x--title wf-x--title-tint" x="212" y="159.5">case study tool · deck skill</text><text class="wf-x wf-x--sub" x="212" y="179.0">tool is built, skill pending</text><rect class="wf-n" x="454" y="136" width="246" height="56" rx="14"/><text class="wf-x wf-x--title" x="470" y="159.5">produces alone</text><text class="wf-x wf-x--sub" x="470" y="179.0">design not involved</text><rect class="wf-n wf-n--dash" x="712" y="136" width="246" height="56" rx="14"/><text class="wf-x wf-x--title" x="728" y="159.5">a bespoke pitch</text><text class="wf-x wf-x--sub" x="728" y="179.0">for the largest deals only</text><rect class="wf-n wf-n--tint" x="196" y="206" width="246" height="56" rx="14"/><text class="wf-x wf-x--title wf-x--title-tint" x="212" y="229.5">review tool · template set</text><text class="wf-x wf-x--sub" x="212" y="249.0">conditional on structured data</text><rect class="wf-n" x="454" y="206" width="246" height="56" rx="14"/><text class="wf-x wf-x--title" x="470" y="229.5">produces alone</text><text class="wf-x wf-x--sub" x="470" y="249.0">design not involved</text><rect class="wf-n wf-n--dash" x="712" y="206" width="246" height="56" rx="14"/><text class="wf-x wf-x--title" x="728" y="229.5">an at-risk account</text><text class="wf-x wf-x--sub" x="728" y="249.0">a rescue, not a routine</text><rect class="wf-n wf-n--tint" x="196" y="276" width="246" height="56" rx="14"/><text class="wf-x wf-x--title wf-x--title-tint" x="212" y="299.5">lander tool · lead magnet</text><text class="wf-x wf-x--sub" x="212" y="319.0">plus variant support</text><rect class="wf-n" x="454" y="276" width="246" height="56" rx="14"/><text class="wf-x wf-x--title" x="470" y="299.5">produces alone</text><text class="wf-x wf-x--sub" x="470" y="319.0">highest volume of any team</text><rect class="wf-n wf-n--dash" x="712" y="276" width="246" height="56" rx="14"/><text class="wf-x wf-x--title" x="728" y="299.5">a brand campaign</text><text class="wf-x wf-x--sub" x="728" y="319.0">not a campaign asset</text><rect class="wf-n wf-n--tint" x="196" y="416" width="246" height="56" rx="14"/><text class="wf-x wf-x--title wf-x--title-tint" x="212" y="439.5">template set</text><text class="wf-x wf-x--sub" x="212" y="459.0">careers page is desk work, once</text><rect class="wf-n" x="454" y="416" width="246" height="56" rx="14"/><text class="wf-x wf-x--title" x="470" y="439.5">produces alone</text><text class="wf-x wf-x--sub" x="470" y="459.0">design not involved</text><rect class="wf-n wf-n--dash" x="712" y="416" width="246" height="56" rx="14"/><text class="wf-x wf-x--title" x="728" y="439.5">seldom</text><text class="wf-x wf-x--sub" x="728" y="459.0">once the templates exist</text><rect class="wf-n wf-n--ink" x="196" y="346" width="762" height="56" rx="14"/><text class="wf-x wf-x--title wf-x--title-ink" x="212" y="369.5">Desk, permanently — board decks, investor updates, all-hands</text><text class="wf-x wf-x--sub" x="212" y="389.0">There is no setup that makes this self-serve. Reserve capacity rather than building a path nobody will use</text><rect class="wf-n" x="712" y="500" width="246" height="48" rx="14"/><rect class="wf-t wf-t--ink" x="726" y="508.0" width="32" height="32" rx="10"/><use class="wf-ti wf-ti--ink" href="#wi-pencil-simple" x="733" y="515.0" width="18" height="18"/><text class="wf-x wf-x--title" x="770" y="529.0">Desk picks it up</text><rect class="wf-n wf-n--tint" x="712" y="584" width="246" height="48" rx="14"/><rect class="wf-t wf-t--blue" x="726" y="592.0" width="32" height="32" rx="10"/><use class="wf-ti wf-ti--blue" href="#wi-stack" x="733" y="599.0" width="18" height="18"/><text class="wf-x wf-x--title wf-x--title-tint" x="770" y="613.0">becomes a template</text><text class="wf-x wf-x--col" x="319" y="100" text-anchor="middle">ONE-TIME SETUP</text><text class="wf-x wf-x--col2" x="319" y="116" text-anchor="middle">design builds it</text><text class="wf-x wf-x--col" x="577" y="100" text-anchor="middle">STEADY STATE</text><text class="wf-x wf-x--col2" x="577" y="116" text-anchor="middle">team produces alone</text><text class="wf-x wf-x--col" x="835" y="100" text-anchor="middle">THE EXCEPTION</text><text class="wf-x wf-x--col2" x="835" y="116" text-anchor="middle">rare, returns to design</text><text class="wf-x wf-x--row" x="40" y="169" text-anchor="start">AE</text><text class="wf-x wf-x--row" x="40" y="239" text-anchor="start">CSM</text><text class="wf-x wf-x--row" x="40" y="309" text-anchor="start">GTM</text><text class="wf-x wf-x--row" x="40" y="449" text-anchor="start">HR</text><text class="wf-x wf-x--row" x="40" y="379" text-anchor="start">CEO office</text><circle class="wf-p wf-p--bd" cx="835" cy="472" r="4"/><circle class="wf-p wf-p--bd" cx="835" cy="500" r="4"/><rect class="wf-pl wf-pl--b" x="790.6" y="476" width="88.8" height="20" rx="10"/><text class="wf-pt wf-pt--b" x="835" y="489.8" text-anchor="middle">an exception</text><circle class="wf-p wf-p--bd" cx="835" cy="548" r="4"/><circle class="wf-p wf-p--bd" cx="835" cy="584" r="4"/><rect class="wf-pl wf-pl--b" x="772.9" y="556" width="124.2" height="20" rx="10"/><text class="wf-pt wf-pt--b" x="835" y="569.8" text-anchor="middle">if it is a pattern</text><circle class="wf-p wf-p--bd" cx="712" cy="608" r="4"/><circle class="wf-p wf-p--bd" cx="577" cy="472" r="4"/><rect class="wf-pl wf-pl--b" x="476.6" y="530" width="200.9" height="20" rx="10"/><text class="wf-pt wf-pt--b" x="577" y="543.8" text-anchor="middle">feeds every team's steady state</text></svg></div>
+  <figcaption><strong>Four teams sit mostly in the middle column, and that column is where design is
+  absent.</strong> The setup pass is the investment; steady state is the return. The CEO office row is
+  the deliberate exception — no amount of tooling makes a board deck self-serve, so the honest plan
+  reserves desk capacity for it instead of designing a path it will bypass anyway.</figcaption></figure>
+</div>
+
+<div class="block">
+  <div class="eyebrow"><i>3</i><h2>Where nothing verifies the result</h2></div>
+  <p class="lede">The same system seen from the library&rsquo;s side. <strong>One spine</strong> —
+  everything is measured, drawn on the sheet, and passes your review before it reaches the skill.</p>
+  <figure><div class="figframe"><svg id="d3" class="flow" viewBox="0 0 1000 444" role="img" aria-label="One spine. Figma and work built directly in Claude Code are both measured into exports, which are drawn on the review sheet. Nothing enters the skill until it has been reviewed and passed there. The skill is then built into a stamped artifact, and check-drift.sh is the machine check that reads the stamp. Four handoffs are unchecked: Figma to exports, exports to the sheet, built-here to exports, and skills to artifact."><path class="wf-e" d="M180 150 H220"/><path class="wf-e" d="M380 150 H420"/><path class="wf-e wf-e--d" d="M580 150 H620"/><path class="wf-e" d="M780 150 H820"/><path class="wf-e wf-e--d" d="M180 316 H278.0 Q300.0 316 300.0 294 V188"/><path class="wf-e" d="M900.0 188 V278"/><rect class="wf-n" x="20" y="112" width="160" height="76" rx="14"/><text class="wf-x wf-x--title" x="100.0" y="145.5" text-anchor="middle">Figma</text><text class="wf-x wf-x--sub wf-x--sub-c" x="100.0" y="165.0" text-anchor="middle">where you draw</text><rect class="wf-n wf-n--ring-blue" x="220" y="112" width="160" height="76" rx="14"/><text class="wf-x wf-x--title" x="300.0" y="145.5" text-anchor="middle">exports/*.md</text><text class="wf-x wf-x--sub wf-x--sub-c" x="300.0" y="165.0" text-anchor="middle">measured, node-traceable</text><rect class="wf-n wf-n--ring-ink" x="420" y="112" width="160" height="76" rx="14"/><text class="wf-x wf-x--title" x="500.0" y="145.5" text-anchor="middle">review-sheet.html</text><text class="wf-x wf-x--sub wf-x--sub-c" x="500.0" y="165.0" text-anchor="middle">draws only what is measured</text><rect class="wf-n" x="620" y="112" width="160" height="76" rx="14"/><text class="wf-x wf-x--title" x="700.0" y="145.5" text-anchor="middle">skills/</text><text class="wf-x wf-x--sub wf-x--sub-c" x="700.0" y="165.0" text-anchor="middle">what Claude reads</text><rect class="wf-n" x="820" y="112" width="160" height="76" rx="14"/><text class="wf-x wf-x--title" x="900.0" y="145.5" text-anchor="middle">artifact</text><text class="wf-x wf-x--sub wf-x--sub-c" x="900.0" y="165.0" text-anchor="middle">+ gushwork-build stamp</text><rect class="wf-n" x="20" y="278" width="160" height="76" rx="14"/><text class="wf-x wf-x--title" x="100.0" y="311.5" text-anchor="middle">built here</text><text class="wf-x wf-x--sub wf-x--sub-c" x="100.0" y="331.0" text-anchor="middle">straight into Claude Code</text><rect class="wf-n" x="820" y="278" width="160" height="76" rx="14"/><text class="wf-x wf-x--title" x="900.0" y="311.5" text-anchor="middle">check-drift.sh</text><text class="wf-x wf-x--sub wf-x--sub-c" x="900.0" y="331.0" text-anchor="middle">the machine check</text><text class="wf-x wf-x--col" x="100.0" y="28" text-anchor="middle">ORIGIN</text><text class="wf-x wf-x--col" x="300.0" y="28" text-anchor="middle">SOURCE OF TRUTH</text><text class="wf-x wf-x--col" x="500.0" y="28" text-anchor="middle">THE GATE</text><text class="wf-x wf-x--col" x="700.0" y="28" text-anchor="middle">BUILD INPUT</text><text class="wf-x wf-x--col" x="900.0" y="28" text-anchor="middle">OUTPUT</text><circle class="wf-p" cx="180" cy="150" r="4"/><circle class="wf-p" cx="220" cy="150" r="4"/><circle class="wf-ch" cx="200.0" cy="150" r="11"/><text class="wf-cht" x="200.0" y="154" text-anchor="middle">1</text><circle class="wf-p" cx="380" cy="150" r="4"/><circle class="wf-p" cx="420" cy="150" r="4"/><circle class="wf-ch" cx="400.0" cy="150" r="11"/><text class="wf-cht" x="400.0" y="154" text-anchor="middle">2</text><circle class="wf-p wf-p--d" cx="580" cy="150" r="4"/><circle class="wf-p wf-p--d" cx="620" cy="150" r="4"/><circle class="wf-p" cx="780" cy="150" r="4"/><circle class="wf-p" cx="820" cy="150" r="4"/><circle class="wf-ch" cx="800.0" cy="150" r="11"/><text class="wf-cht" x="800.0" y="154" text-anchor="middle">4</text><circle class="wf-p wf-p--d" cx="180" cy="316" r="4"/><circle class="wf-p wf-p--d" cx="300.0" cy="188" r="4"/><circle class="wf-ch" cx="300.0" cy="254" r="11"/><text class="wf-cht" x="300.0" y="258" text-anchor="middle">3</text><text class="wf-x wf-x--edge" x="190" y="336" text-anchor="start">measured the same way</text><circle class="wf-p" cx="900.0" cy="188" r="4"/><circle class="wf-p" cx="900.0" cy="278" r="4"/><rect class="wf-pl" x="852.6" y="223" width="94.7" height="20" rx="10"/><text class="wf-pt" x="900.0" y="236.8" text-anchor="middle">carries stamp</text><text class="wf-x wf-x--edge" x="200.0" y="214" text-anchor="middle">measure</text><text class="wf-x wf-x--edge" x="400.0" y="214" text-anchor="middle">drawn on the sheet</text><text class="wf-x wf-x--edge" x="600.0" y="214" text-anchor="middle">you review and pass</text><text class="wf-x wf-x--edge" x="800.0" y="214" text-anchor="middle">build</text><circle class="wf-ch" cx="29" cy="396" r="9"/><text class="wf-cht wf-cht--s" x="29" y="400" text-anchor="middle">n</text><text class="wf-x wf-x--edge" x="46" y="400" text-anchor="start">unchecked handoff</text><line class="wf-e wf-e--d" x1="20" y1="424" x2="37" y2="424"/><text class="wf-x wf-x--edge" x="46" y="428" text-anchor="start">ruled 15 Sep, mechanism not built yet</text></svg></div>
+  <figcaption>The discipline behind this is already sound — values are read off specific Figma nodes
+  and written with the node id attached, and where a written spec disagrees with a measured node, the
+  measured node wins. What is missing is <strong>closure</strong>: nothing reports the size of the gap,
+  or notices when it grows. <strong>Ruled 15 September:</strong> measured and created, then drawn on
+  the sheet, then into the skill only once you have reviewed and passed it.</figcaption></figure>
+
+  <ol class="gaps">
+    <li><span class="num">1</span><div>
+      <b>Nothing diffs Figma against the measured exports</b>
+      <p>The pull is manual, so a changed value in Figma goes unnoticed until someone re-measures that
+      node. The badge ruling is the live proof: the decision moved light labels to <code>/600</code>,
+      Figma still ships <code>/500</code>, and the system has held both positions for weeks without
+      complaint. <em>Not yet built.</em></p></div></li>
+    <li><span class="num">2</span><div>
+      <b>The gate can only pass what it draws, and it draws part of the library</b>
+      <p>The review sheet now states its own coverage at the top, counted rather than typed —
+      <em>11 of 18 groups rendered, 19 further sets named and not drawn.</em> Under the new routing
+      that is a throughput limit, not a display gap: a set the sheet cannot draw is one you cannot
+      review, and therefore one that cannot enter the skill.</p></div></li>
+    <li><span class="num">3</span><div>
+      <b>Work built here takes the same spine now, but nothing carries it</b>
+      <p><em>Ruled 15 September:</em> anything built directly in Claude Code is measured into
+      <code>exports/*.md</code> like anything else, drawn on the review sheet, and enters the skill only
+      once you have reviewed and passed it. No side door. What the ruling lacks is a mechanism — both
+      steps are manual today, which is why the route is dashed and still numbered.</p></div></li>
+    <li><span class="num">4</span><div>
+      <b>The font rule was absolute in a target that cannot obey it</b>
+      <p><em>Closed.</em> <code>foundation/output-targets.md</code> said never to let a build fall back,
+      and also said to emit a standalone file for mockups — which cannot load a licensed face at all.
+      A rule right half the time gets followed at random. It is now a per-target table, and
+      <code>scripts/check-fonts.sh</code> enforces it row by row.</p></div></li>
+  </ol>
+
+  <div class="note">
+    <b>What runs today</b>
+    <p><code>scripts/_sheet_coverage.py</code> stamps the review sheet&rsquo;s coverage at publish time ·
+    <code>scripts/check-drift.sh --unstamped</code> lists builds carrying no stamp, so absence is the
+    alert · <code>scripts/check-fonts.sh &lt;path&gt; --target &lt;row&gt;</code> enforces the font table.
+    Gaps 1 and 3 remain open.</p>
+  </div>
+
+<p class="wf-foot">How design runs · companion to the written operating model · updated 15 September 2026</p>
+
+  
     </section>
 
   </main>
@@ -558,39 +753,139 @@ body[data-gw-page="design-system"] .sg__main { max-width: none; }
 <script>
 (function () {
   'use strict';
-  var TABS = ['library', 'catalogue', 'review'], loaded = {}, owner = false, known = false;
+  var TABS = ['library', 'catalogue', 'review', 'workflow'], started = {}, owner = false;
+  var LIB = '/library/';
   var me = fetch('/api/auth/me', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : {}; })
-    .then(function (j) { owner = !!(j && j.owner); known = true; }).catch(function () { known = true; });
+    .then(function (j) { owner = !!(j && j.owner); }).catch(function () {});
+  var dataP = null;
+  function data() { return dataP || (dataP = fetch(LIB + 'data.json', { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw new Error('data ' + r.status); return r.json(); })); }
 
-  function frameOf(t) { return document.querySelector('#ds-' + t + ' iframe'); }
-  function sync(f) {
-    try { f.contentDocument.documentElement.setAttribute('data-theme', document.documentElement.getAttribute('data-theme') || 'light'); } catch (e) {}
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+  function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
+  function metric(label, value, note) { return '<div class="ul-metric"><span class="ul-lab">' + esc(label) + '</span><div class="ul-metric__body"><span class="ul-num">' + esc(value) + '</span><span class="ul-note">' + esc(note) + '</span></div></div>'; }
+  function th(t) { return '<div role="columnheader"><span class="ul-th"><span class="ul-th--plain">' + esc(t) + '</span></span></div>'; }
+  function cell(html, cls) { return '<div class="ul-c ' + (cls || '') + '" role="cell">' + html + '</div>'; }
+  function txt(t, cls, title) { return '<div class="ul-c ' + (cls || '') + '" role="cell" title="' + esc(title || t) + '">' + esc(t) + '</div>'; }
+  function link(href, label) { return '<a class="ds-a" href="' + esc(LIB + href) + '">' + esc(label) + '</a>'; }
+  function table(cols, heads, rows, empty) {
+    return '<div class="ul-tbl" role="table" style="--vs-cols:' + cols + '"><div class="ul-row ul-row--h" role="row">' + heads.map(th).join('') + '</div>' +
+      (rows.length ? rows.join('') : '<div class="ul-empty"><div class="ul-empty__copy"><h2>' + esc(empty) + '</h2></div></div>') + '</div>';
   }
-  function open(t) {
-    var f = frameOf(t);
-    if (t === 'review') {
-      /* Review is the owner's: a signed-in admin sees a locked card, not the sheet. */
-      document.getElementById('ds-review-lock').hidden = owner;
-      f.hidden = !owner;
-      if (!owner) return;
+  function row(cells) { return '<div class="ul-row ul-row--d" role="row">' + cells.join('') + '</div>'; }
+  function review(state) { return '<span class="ul-badge' + (state === 'passed' ? ' ul-badge--ok' : state === 'rejected' ? ' ul-badge--bad' : '') + '">' + (state === 'passed' ? 'passed' : state === 'rejected' ? 'rejected' : 'not reviewed') + '</span>'; }
+  function pills(host, items, cur, on) {
+    host.innerHTML = items.map(function (it) { return '<button class="ul-tab" role="tab" data-v="' + esc(it[0]) + '" aria-selected="' + (it[0] === cur) + '">' + esc(it[1]) + '</button>'; }).join('');
+    host.querySelectorAll('.ul-tab').forEach(function (b) { b.addEventListener('click', function () { on(b.getAttribute('data-v')); }); });
+  }
+  function failed(host, msg) { host.innerHTML = '<div class="ul-empty"><div class="ul-empty__copy"><h2>' + esc(msg) + '</h2></div></div>'; }
+
+  /* ---------------- Library ---------------- */
+  var L = { sec: 'web', q: '' };
+  function renderLibrary(d) {
+    var s = d.stats;
+    $('ds-lib-stats').innerHTML =
+      metric('Tokens', String(s.tokens), plural(d.foundations.length, 'foundation group')) + metric('Components', String(s.components), 'across ' + plural(d.surfaces.length, 'surface')) +
+      metric('Recipes', String(s.recipes), 'what to build from') + metric('Passed review', s.passed + ' / ' + s.total, 'foundation groups and components') +
+      metric('Libraries', String(s.libraries), 'foundations plus ' + d.surfaces.length + ' surfaces') + metric('Open gaps', String(s.gaps), 'known gaps in the source');
+    var items = [['foundations', 'Foundations']].concat(d.surfaces.map(function (x) { return [x.key, x.title]; })).concat([['recipes', 'Recipes']]);
+    pills($('ds-lib-tabs'), items, L.sec, function (v) { L.sec = v; renderLibrary(d); });
+    var q = L.q.toLowerCase(), rows = [], title, sub, cols, heads;
+    if (L.sec === 'foundations') {
+      title = 'Foundations'; sub = plural(d.foundations.length, 'group') + ', shared by every surface';
+      cols = 'minmax(220px,2fr) 140px 140px'; heads = ['Group', 'Size', 'Review'];
+      rows = d.foundations.filter(function (f) { return !q || f.title.toLowerCase().indexOf(q) !== -1; })
+        .map(function (f) { return row([cell(link(f.href, f.title)), txt(f.count + ' ' + f.unit), cell(review(f.review))]); });
+    } else if (L.sec === 'recipes') {
+      title = 'Recipes'; sub = 'assemblies, by what you are making';
+      cols = 'minmax(180px,1.2fr) 130px 140px minmax(260px,2.4fr)'; heads = ['Recipe', 'Built from', 'Pinned to', 'For'];
+      rows = d.recipes.filter(function (r) { return !q || (r.title + ' ' + r.what).toLowerCase().indexOf(q) !== -1; })
+        .map(function (r) { return row([cell(link(r.href, r.title)), txt(r.surface), txt(r.pins === '—' ? 'No pin' : r.pins), txt(r.what)]); });
+    } else {
+      var sf = d.surfaces.filter(function (x) { return x.key === L.sec; })[0] || d.surfaces[0];
+      title = sf.title; sub = plural(sf.components.length, 'component') + (sf.what ? '. ' + sf.what : '');
+      cols = 'minmax(200px,1.6fr) 90px 150px minmax(140px,1fr) 140px'; heads = ['Component', 'Version', 'Spec last moved', 'Doc', 'Review'];
+      rows = sf.components.filter(function (c) { return !q || c.name.toLowerCase().indexOf(q) !== -1; })
+        .map(function (c) { return row([cell(link(c.href, c.name)), txt(c.version || '—'), cell(esc(c.changed || '—') + (c.breaking ? ' <span class="ul-badge ul-badge--bad">breaking</span>' : '')), txt(c.doc || '—'), cell(review(c.review))]); });
     }
-    if (!loaded[t]) { loaded[t] = 1; f.addEventListener('load', function () { sync(f); }); f.src = f.getAttribute('data-src'); }
+    $('ds-lib-h').textContent = title; $('ds-lib-q').textContent = sub;
+    $('ds-lib-table').innerHTML = table(cols, heads, rows, q ? 'Nothing matches' : 'Nothing measured yet');
+  }
+
+  /* ---------------- Catalogue ---------------- */
+  var C = { f: 'all', q: '' };
+  var FID = { measured: ['Measured', ' ul-badge--ok'], inventory: ['Inventory', ' ul-badge--warn'], annotated: ['Annotated', ''] };
+  function renderCatalogue(d) {
+    var all = d.catalogue, tot = all.length, spec = all.filter(function (e) { return e.href; }).length;
+    var vr = all.reduce(function (a, e) { return a + (e.variants || 0); }, 0);
+    var n = function (k) { return all.filter(function (e) { return e.fidelity === k; }).length; };
+    $('ds-cat-stats').innerHTML = metric('Components', String(tot), vr.toLocaleString() + ' variants') + metric('With a spec page', String(spec), (tot - spec) + ' still without') +
+      metric('Measured', String(n('measured')), n('inventory') + ' inventory only, ' + n('annotated') + ' annotated only');
+    pills($('ds-cat-tabs'), [['all', 'All'], ['nospec', 'No spec page'], ['measured', 'Measured'], ['inventory', 'Inventory only'], ['annotated', 'Annotated only']], C.f, function (v) { C.f = v; renderCatalogue(d); });
+    var q = C.q.toLowerCase(), by = {}, order = [];
+    all.forEach(function (e) {
+      if (C.f === 'nospec' && e.href) return;
+      if (['measured', 'inventory', 'annotated'].indexOf(C.f) !== -1 && e.fidelity !== C.f) return;
+      if (q && (e.name + ' ' + e.note + ' ' + (e.node || '') + ' ' + e.title).toLowerCase().indexOf(q) === -1) return;
+      if (!by[e.surface]) { by[e.surface] = { title: e.title, rows: [] }; order.push(e.surface); }
+      by[e.surface].rows.push(e);
+    });
+    var cols = 'minmax(220px,2fr) 120px 110px 90px 110px 130px', heads = ['Component', 'Group', 'Node', 'Variants', 'Verified', 'Library'];
+    $('ds-cat-body').innerHTML = order.length ? order.map(function (k) {
+      var g = by[k], rows = g.rows.map(function (e) {
+        var f = e.fidelity ? '<span class="ul-badge' + FID[e.fidelity][1] + '">' + FID[e.fidelity][0] + '</span>' : '<span class="ul-c--none">—</span>';
+        var name = (e.href ? link(e.href, e.name) : '<b style="font-weight:600">' + esc(e.name) + '</b>') + (e.note ? '<div style="font:var(--gw-text-body-12-reg);color:var(--ul-sub);white-space:normal;line-height:1.35">' + esc(e.note) + '</div>' : '');
+        return '<div class="ul-row ul-row--d" role="row" style="height:auto;min-height:56px;padding-top:8px;padding-bottom:8px">' + cell(name, '') + txt(e.group || '') + txt(e.node || '—') + txt(e.variants ? e.variants.toLocaleString() : '—') + cell(f) +
+          cell(e.href ? '<a class="ds-a" href="' + esc(LIB + e.href) + '">Spec page</a>' : '<span class="ul-badge ul-badge--bad">no spec page yet</span>') + '</div>';
+      });
+      return '<section class="ul-sec"><div class="ul-sh"><div class="ul-sh__t"><h2>' + esc(g.title) + '</h2><span class="ul-sh__q">' + plural(g.rows.length, 'component') + '</span></div></div><div class="ul-scroll vs-t">' + table(cols, heads, rows, '') + '</div></section>';
+    }).join('') : '<section class="ul-sec"><div class="ul-empty"><div class="ul-empty__copy"><h2>Nothing matches</h2></div></div></section>';
+  }
+
+  /* ---------------- Review ---------------- */
+  var R = { shown: 25 };
+  function renderReview(d) {
+    var s = d.stats, waiting = d.queue.length;
+    $('ds-rev-stats').innerHTML = metric('Waiting on you', String(waiting), 'foundation groups and components') + metric('Passed', s.passed + ' / ' + s.total, 'let into the skills') + metric('Open gaps', String(s.gaps), 'known gaps in the source');
+    $('ds-rev-q').textContent = plural(waiting, 'item');
+    var rows = d.queue.slice(0, R.shown).map(function (it) {
+      var cmd = 'bash scripts/review-pass.sh ' + it.scope + ' ' + it.key;
+      return row([cell(link(it.href, it.label)), txt(it.scope === 'foundation' ? 'Foundations' : it.scope), cell('<span class="ds-code">' + esc(cmd) + '</span> <button class="ds-copy" type="button" data-cmd="' + esc(cmd) + '">Copy</button>')]);
+    });
+    $('ds-rev-table').innerHTML = table('minmax(200px,1.6fr) 130px minmax(300px,2.4fr)', ['Item', 'Library', 'Pass it with'], rows, 'Nothing is waiting on you');
+    $('ds-rev-more').innerHTML = waiting > R.shown ? '<button class="ul-btn" id="ds-rev-more-btn" type="button">Show 25 more</button>' : '';
+    var mb = $('ds-rev-more-btn'); if (mb) mb.addEventListener('click', function () { R.shown += 25; renderReview(d); });
+    $('ds-rev-table').querySelectorAll('.ds-copy').forEach(function (b) {
+      b.addEventListener('click', function () { try { navigator.clipboard.writeText(b.getAttribute('data-cmd')); b.textContent = 'Copied'; setTimeout(function () { b.textContent = 'Copy'; }, 1200); } catch (e) {} });
+    });
+    $('ds-gap-q').textContent = plural(d.gaps.length, 'gap');
+    $('ds-gaps').innerHTML = d.gaps.map(function (g) { return '<div class="ds-gap"><b>' + esc(g.n) + '</b><span>' + esc(g.text) + '</span></div>'; }).join('') || '<div class="ul-empty"><div class="ul-empty__copy"><h2>No known gaps</h2></div></div>';
+  }
+
+  /* ---------------- tabs ---------------- */
+  function start(name) {
+    if (started[name]) return; started[name] = 1;
+    if (name === 'library') data().then(function (d) {
+      renderLibrary(d); $('ds-lib-find').addEventListener('input', function (e) { L.q = e.target.value; renderLibrary(d); });
+    }).catch(function () { failed($('ds-lib-table'), 'Could not load the library list'); });
+    if (name === 'catalogue') data().then(function (d) {
+      renderCatalogue(d); $('ds-cat-find').addEventListener('input', function (e) { C.q = e.target.value; renderCatalogue(d); });
+    }).catch(function () { failed($('ds-cat-body'), 'Could not load the catalogue'); });
+    if (name === 'review') me.then(function () {
+      $('ds-review-lock').hidden = owner; $('ds-review-app').hidden = !owner;
+      if (owner) data().then(renderReview).catch(function () { failed($('ds-rev-table'), 'Could not load the review queue'); });
+    });
   }
   function show(name, push) {
     if (TABS.indexOf(name) === -1) name = 'library';
-    TABS.forEach(function (t) { document.getElementById('ds-' + t).hidden = t !== name; });
+    TABS.forEach(function (t) { $('ds-' + t).hidden = t !== name; });
     document.querySelectorAll('#ds-tabs .ul-tab').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-tab') === name)); });
     if (push) { try { history.replaceState(null, '', '#' + name); } catch (e) { location.hash = name; } }
-    me.then(function () { document.getElementById('ds-lock').hidden = owner; open(name); });
+    me.then(function () { $('ds-lock').hidden = owner; start(name); });
   }
   document.querySelectorAll('#ds-tabs .ul-tab').forEach(function (b) { b.addEventListener('click', function () { show(b.getAttribute('data-tab'), true); }); });
   window.addEventListener('hashchange', function () { show(location.hash.slice(1), false); });
-  document.getElementById('ds-signin').addEventListener('click', function () {
-    location.href = '/api/auth/login?next=' + encodeURIComponent('/admin/design-system#review');
-  });
-  /* The frames read the theme once, when they load; follow the page when it is switched afterwards. */
-  new MutationObserver(function () { TABS.forEach(function (t) { var f = frameOf(t); if (f) sync(f); }); })
-    .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  $('ds-signin').addEventListener('click', function () { location.href = '/api/auth/login?next=' + encodeURIComponent('/admin/design-system#review'); });
   show(location.hash.slice(1), false);
 })();
 </script>
