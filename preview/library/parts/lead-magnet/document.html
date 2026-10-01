@@ -321,6 +321,20 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
 .lb-h h1{font:var(--gw-text-h4);margin:0}
 .lb-h .lede{font:var(--gw-text-body-16-reg);color:var(--s-body);margin:0;max-width:74ch}
 .lb-row{display:flex;flex-wrap:wrap;gap:var(--gw-space-8);align-items:center}
+.lb-rowfind{width:100%;max-width:360px;height:36px;padding:0 12px;margin:0 0 20px;border:0;border-radius:12px;background:var(--s-field-bg);
+  box-shadow:inset 0 0 0 1px var(--s-field-border);color:var(--s-heading);font:var(--gw-text-body-14-reg)}
+.lb-rowfind::placeholder{color:var(--s-placeholder)}
+.cat-name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px;color:var(--s-heading);font-weight:600}
+a.cat-name{color:var(--gw-color-primary-600);text-decoration:none}
+:root[data-theme="dark"] a.cat-name{color:var(--gw-color-primary-400)}
+.cat-note{display:block;margin-top:2px;font:var(--gw-text-body-12-reg);color:var(--s-body)}
+.cat-link{font:var(--gw-text-body-14-med);color:var(--gw-color-primary-600);text-decoration:none}
+:root[data-theme="dark"] .cat-link{color:var(--gw-color-primary-400)}
+.cat-link:hover{text-decoration:underline}
+.sec>.lb-meta{margin:4px 0 14px}
+.cat-dim{color:var(--s-body)}
+.chip--annotated{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+:root[data-theme="dark"] .chip--annotated{background:var(--gw-color-neutral-800);color:var(--gw-color-neutral-300)}
 .lb-meta{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
          color:var(--gw-color-neutral-400)}
 
@@ -458,6 +472,17 @@ clearance = 752 - max(lows)          # healthy: 15–60pt. Negative: clipped.</c
       var t=f.value.trim().toLowerCase();
       rows.forEach(function(a){
         a.hidden=!!t&&a.getAttribute('data-q').indexOf(t)===-1});
+    });
+  }
+
+  /* Component list filter: hides rows that do not match, and a surface whose rows all went. */
+  var rf=document.getElementById('lb-rows');
+  if(rf){
+    var trs=[].slice.call(document.querySelectorAll('tr[data-q]')), secs=[].slice.call(document.querySelectorAll('section[data-cat]'));
+    rf.addEventListener('input',function(){
+      var t=rf.value.trim().toLowerCase();
+      trs.forEach(function(r){r.hidden=!!t&&r.getAttribute('data-q').indexOf(t)===-1});
+      secs.forEach(function(sc){sc.hidden=!sc.querySelector('tr[data-q]:not([hidden])')});
     });
   }
 

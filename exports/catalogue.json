@@ -1,0 +1,676 @@
+{
+ "_comment": "Source of the Catalogue view in the component library: how far each Figma component has been verified (measured, inventory, annotated) and how many variants it has. `registry` is the matching entry in exports/<surface>/component-registry.json, null when the library has no spec page for it yet. Moved here from preview/catalogue.html, which was hand-written.",
+ "entries": [
+  {
+   "surface": "foundation",
+   "group": "foundation",
+   "name": "tokens.css",
+   "note": "188 custom properties — colour, type, spacing, radii, shadows",
+   "node": null,
+   "variants": 188,
+   "fidelity": "measured",
+   "registry": null,
+   "page": "foundations/color.html"
+  },
+  {
+   "surface": "foundation",
+   "group": "foundation",
+   "name": "Phosphor icons",
+   "note": "harvested to assets/icons",
+   "node": null,
+   "variants": 1248,
+   "fidelity": "measured",
+   "registry": "shared/icons"
+  },
+  {
+   "surface": "foundation",
+   "group": "foundation",
+   "name": "gushwork-logo",
+   "note": "marketing wordmark",
+   "node": "1670:30247",
+   "variants": null,
+   "fidelity": "measured",
+   "registry": "shared/gushwork-logo"
+  },
+  {
+   "surface": "foundation",
+   "group": "foundation",
+   "name": "gushwork-logo-(internal-use)",
+   "note": "32×32 product tile",
+   "node": "2102:13508",
+   "variants": null,
+   "fidelity": "measured",
+   "registry": null
+  },
+  {
+   "surface": "web",
+   "group": "components",
+   "name": "Button",
+   "note": "8 styles × 3 states × 3 sizes × 4 icon placements",
+   "node": "1457:668",
+   "variants": 220,
+   "fidelity": "measured",
+   "registry": "web/button"
+  },
+  {
+   "surface": "web",
+   "group": "components",
+   "name": "badge",
+   "note": "shared with dashboard · 2×6×3×3, complete",
+   "node": "1582:628",
+   "variants": 108,
+   "fidelity": "measured",
+   "registry": "shared/badge"
+  },
+  {
+   "surface": "web",
+   "group": "components",
+   "name": "image",
+   "note": "38 image · 3 solution · 3 problem · 1 create-new",
+   "node": "1815:8655",
+   "variants": 46,
+   "fidelity": "inventory",
+   "registry": "web/image"
+  },
+  {
+   "surface": "web",
+   "group": "components",
+   "name": "input/inline-input",
+   "note": "one field, one CTA",
+   "node": "1584:1579",
+   "variants": 24,
+   "fidelity": "inventory",
+   "registry": "web/inline-input"
+  },
+  {
+   "surface": "web",
+   "group": "components",
+   "name": "agent-icon",
+   "note": "4×4 dot grid, one pattern per agent",
+   "node": "1606:581",
+   "variants": 20,
+   "fidelity": "inventory",
+   "registry": null
+  },
+  {
+   "surface": "web",
+   "group": "components",
+   "name": "Card / Information",
+   "note": "the default content card",
+   "node": "1647:734",
+   "variants": 14,
+   "fidelity": "inventory",
+   "registry": "web/card-information"
+  },
+  {
+   "surface": "web",
+   "group": "components",
+   "name": "input/text-field",
+   "note": "",
+   "node": "1562:705",
+   "variants": 14,
+   "fidelity": "inventory",
+   "registry": "web/input-fields"
+  },
+  {
+   "surface": "web",
+   "group": "components",
+   "name": "input/phone-field",
+   "note": "",
+   "node": "1562:5506",
+   "variants": 14,
+   "fidelity": "inventory",
+   "registry": "web/input-fields"
+  },
+  {
+   "surface": "web",
+   "group": "components",
+   "name": "client/avatar",
+   "note": "squircle, 64×48 at radius 100",
+   "node": "1619:722",
+   "variants": 12,
+   "fidelity": "measured",
+   "registry": "web/client-avatar"
+  },
+  {
+   "surface": "web",
+   "group": "components",
+   "name": "tooltip",
+   "note": "",
+   "node": "1554:348",
+   "variants": 9,
+   "fidelity": "inventory",
+   "registry": null
+  },
+  {
+   "surface": "web",
+   "group": "components",
+   "name": "eyebrow",
+   "note": "Default · Trustpilot",
+   "node": "1516:410",
+   "variants": 6,
+   "fidelity": "inventory",
+   "registry": "web/eyebrow"
+  },
+  {
+   "surface": "web",
+   "group": "components",
+   "name": "Card / Testimonial",
+   "note": "first-party proof",
+   "node": "1647:720",
+   "variants": 5,
+   "fidelity": "inventory",
+   "registry": "web/card-testimonial"
+  },
+  {
+   "surface": "web",
+   "group": "components",
+   "name": "input/ dropdown-options",
+   "note": "note the space after the slash",
+   "node": "1490:3488",
+   "variants": 5,
+   "fidelity": "inventory",
+   "registry": "web/input-fields"
+  },
+  {
+   "surface": "web",
+   "group": "components",
+   "name": "Card / Pricing",
+   "note": "",
+   "node": "1647:743",
+   "variants": 4,
+   "fidelity": "inventory",
+   "registry": null
+  },
+  {
+   "surface": "web",
+   "group": "components",
+   "name": "input/dropdown",
+   "note": "",
+   "node": "1562:5769",
+   "variants": 4,
+   "fidelity": "inventory",
+   "registry": "web/input-fields"
+  },
+  {
+   "surface": "web",
+   "group": "components",
+   "name": "Card / Announcement",
+   "note": "",
+   "node": "1647:738",
+   "variants": 3,
+   "fidelity": "inventory",
+   "registry": null
+  },
+  {
+   "surface": "web",
+   "group": "components",
+   "name": "input/card",
+   "note": "single-select, few options",
+   "node": "1562:5807",
+   "variants": 3,
+   "fidelity": "inventory",
+   "registry": "web/input-fields"
+  },
+  {
+   "surface": "web",
+   "group": "components",
+   "name": "input/checkbox",
+   "note": "multi-select",
+   "node": "1977:4776",
+   "variants": 3,
+   "fidelity": "inventory",
+   "registry": "web/input-fields"
+  },
+  {
+   "surface": "web",
+   "group": "components",
+   "name": "Frame 2147259995",
+   "note": "unnamed set — Figma auto-name shipped",
+   "node": "1553:3350",
+   "variants": 3,
+   "fidelity": "inventory",
+   "registry": null
+  },
+  {
+   "surface": "web",
+   "group": "components",
+   "name": "Card / Review",
+   "note": "third-party — Trustpilot, G2",
+   "node": "1647:726",
+   "variants": 2,
+   "fidelity": "inventory",
+   "registry": "web/card-review"
+  },
+  {
+   "surface": "web",
+   "group": "components",
+   "name": "Card / Case Study and Blog",
+   "note": "no Device property",
+   "node": "1647:746",
+   "variants": 2,
+   "fidelity": "inventory",
+   "registry": "web/card-case-study"
+  },
+  {
+   "surface": "web",
+   "group": "components",
+   "name": "Card / Other",
+   "note": "blank editable",
+   "node": "1647:723",
+   "variants": 2,
+   "fidelity": "inventory",
+   "registry": null
+  },
+  {
+   "surface": "web",
+   "group": "components",
+   "name": "Frame 2147259996",
+   "note": "unnamed set — Figma auto-name shipped",
+   "node": "1553:3351",
+   "variants": 2,
+   "fidelity": "inventory",
+   "registry": null
+  },
+  {
+   "surface": "web",
+   "group": "folds",
+   "name": "fold/ Cards Grid",
+   "note": "Card Style 1–4 × Image × Grid/Single/Stacked",
+   "node": "1790:7329",
+   "variants": 24,
+   "fidelity": "measured",
+   "registry": "web/cards-grid"
+  },
+  {
+   "surface": "web",
+   "group": "folds",
+   "name": "fold/ Hero",
+   "note": "Home · Centered · Split · Form · + Create New",
+   "node": "1731:55983",
+   "variants": 10,
+   "fidelity": "measured",
+   "registry": "web/hero"
+  },
+  {
+   "surface": "web",
+   "group": "folds",
+   "name": "fold/ Testimonial",
+   "note": "Video · Single",
+   "node": "1790:6285",
+   "variants": 4,
+   "fidelity": "measured",
+   "registry": "web/testimonial"
+  },
+  {
+   "surface": "web",
+   "group": "folds",
+   "name": "fold/ FAQs",
+   "note": "5 accordions, up to 10",
+   "node": "1790:7851",
+   "variants": 2,
+   "fidelity": "measured",
+   "registry": "web/faqs"
+  },
+  {
+   "surface": "web",
+   "group": "folds",
+   "name": "fold/ With image",
+   "note": "text one side, image the other",
+   "node": "1793:6561",
+   "variants": 2,
+   "fidelity": "measured",
+   "registry": "web/with-image"
+  },
+  {
+   "surface": "web",
+   "group": "folds",
+   "name": "fold/ Cards Grid (small)",
+   "note": "3 cards, up to 5",
+   "node": "2085:21418",
+   "variants": 2,
+   "fidelity": "measured",
+   "registry": "web/cards-grid-small"
+  },
+  {
+   "surface": "web",
+   "group": "folds",
+   "name": "fold/ Video",
+   "note": "glassmorphic play button",
+   "node": "2085:17304",
+   "variants": 2,
+   "fidelity": "measured",
+   "registry": "web/video"
+  },
+  {
+   "surface": "web",
+   "group": "folds",
+   "name": "fold/Timeline",
+   "note": "dark card, 56px tab staircase",
+   "node": "1809:21318",
+   "variants": 2,
+   "fidelity": "measured",
+   "registry": "web/timeline"
+  },
+  {
+   "surface": "web",
+   "group": "folds",
+   "name": "fold/Comparison Table",
+   "note": "4 columns, 7 rows",
+   "node": "1824:6836",
+   "variants": 2,
+   "fidelity": "measured",
+   "registry": "web/comparison-table"
+  },
+  {
+   "surface": "web",
+   "group": "folds",
+   "name": "fold/AI Agents",
+   "note": "full-bleed marquee, 4 offset rows",
+   "node": "2085:18017",
+   "variants": 2,
+   "fidelity": "measured",
+   "registry": "web/ai-agents"
+  },
+  {
+   "surface": "web",
+   "group": "folds",
+   "name": "fold/ CTA",
+   "note": "wraps the footer CTA",
+   "node": "2085:20750",
+   "variants": 2,
+   "fidelity": "measured",
+   "registry": "web/cta"
+  },
+  {
+   "surface": "web",
+   "group": "folds",
+   "name": "fold/ other",
+   "note": "bare 320px container",
+   "node": "1790:6807",
+   "variants": 2,
+   "fidelity": "measured",
+   "registry": "web/fold-other"
+  },
+  {
+   "surface": "web",
+   "group": "shell and elements",
+   "name": "page-build",
+   "note": "navbar → content slots → footer",
+   "node": "2034:15029",
+   "variants": null,
+   "fidelity": "annotated",
+   "registry": "web/page-build"
+  },
+  {
+   "surface": "web",
+   "group": "shell and elements",
+   "name": "navbar/navbar",
+   "note": "Type inherits from the page",
+   "node": "1951:8085",
+   "variants": null,
+   "fidelity": "annotated",
+   "registry": "web/navbar"
+  },
+  {
+   "surface": "web",
+   "group": "shell and elements",
+   "name": "footer/footer",
+   "note": "",
+   "node": "1720:3801",
+   "variants": 6,
+   "fidelity": "annotated",
+   "registry": "web/footer"
+  },
+  {
+   "surface": "web",
+   "group": "shell and elements",
+   "name": "footer/…/cta",
+   "note": "",
+   "node": "1715:3476",
+   "variants": 16,
+   "fidelity": "annotated",
+   "registry": "web/cta"
+  },
+  {
+   "surface": "web",
+   "group": "shell and elements",
+   "name": "footer/…/cta-image",
+   "note": "",
+   "node": "1712:2684",
+   "variants": 24,
+   "fidelity": "annotated",
+   "registry": null
+  },
+  {
+   "surface": "web",
+   "group": "shell and elements",
+   "name": "footer/…/list-item",
+   "note": "broken component set in Figma",
+   "node": "1672:35328",
+   "variants": null,
+   "fidelity": "annotated",
+   "registry": null
+  },
+  {
+   "surface": "web",
+   "group": "shell and elements",
+   "name": "announcement-banner",
+   "note": "",
+   "node": "1942:9492",
+   "variants": null,
+   "fidelity": "annotated",
+   "registry": null
+  },
+  {
+   "surface": "web",
+   "group": "shell and elements",
+   "name": "fold/fold-element/heading",
+   "note": "800 wide; Cards Grid overrides to 620",
+   "node": "1732:3742",
+   "variants": null,
+   "fidelity": "measured",
+   "registry": null
+  },
+  {
+   "surface": "web",
+   "group": "shell and elements",
+   "name": "fold-elements (13 sets)",
+   "note": "accordion · form · table-row · timeline-tab · progress-bar · client-logo-card · Agent Card · talking-guy · …",
+   "node": null,
+   "variants": null,
+   "fidelity": "annotated",
+   "registry": null
+  },
+  {
+   "surface": "dashboard",
+   "group": "components",
+   "name": "Button",
+   "note": "Primary · Outline · Ghost — never a blue fill",
+   "node": "2203:931",
+   "variants": 108,
+   "fidelity": "measured",
+   "registry": null
+  },
+  {
+   "surface": "dashboard",
+   "group": "components",
+   "name": "Avatar",
+   "note": "generated character; one Admin variant only",
+   "node": "1658:24023",
+   "variants": 16,
+   "fidelity": "measured",
+   "registry": null
+  },
+  {
+   "surface": "dashboard",
+   "group": "components",
+   "name": "dashboard-build",
+   "note": "260 rail + 1164 container",
+   "node": "2140:16479",
+   "variants": null,
+   "fidelity": "measured",
+   "registry": null
+  },
+  {
+   "surface": "dashboard",
+   "group": "components",
+   "name": "section/card-layout",
+   "note": "KPI cards = 1 · 2 · 3",
+   "node": null,
+   "variants": null,
+   "fidelity": "measured",
+   "registry": null
+  },
+  {
+   "surface": "dashboard",
+   "group": "components",
+   "name": "section/header",
+   "note": "sticky, one per page",
+   "node": null,
+   "variants": null,
+   "fidelity": "measured",
+   "registry": "dashboard/section-header"
+  },
+  {
+   "surface": "dashboard",
+   "group": "components",
+   "name": "section/table",
+   "note": "",
+   "node": null,
+   "variants": null,
+   "fidelity": "measured",
+   "registry": null
+  },
+  {
+   "surface": "dashboard",
+   "group": "components",
+   "name": "section/With Dropdown",
+   "note": "",
+   "node": null,
+   "variants": null,
+   "fidelity": "measured",
+   "registry": null
+  },
+  {
+   "surface": "dashboard",
+   "group": "components",
+   "name": "section/progress-bar",
+   "note": "",
+   "node": null,
+   "variants": null,
+   "fidelity": "measured",
+   "registry": "dashboard/progress-bar"
+  },
+  {
+   "surface": "dashboard",
+   "group": "components",
+   "name": "section/Container",
+   "note": "the rules call it section/Other",
+   "node": "2134:14477",
+   "variants": null,
+   "fidelity": "measured",
+   "registry": null
+  },
+  {
+   "surface": "dashboard",
+   "group": "components",
+   "name": "section-element/Graph",
+   "note": "Bar · Line · Grouped Bar",
+   "node": null,
+   "variants": null,
+   "fidelity": "measured",
+   "registry": null
+  },
+  {
+   "surface": "dashboard",
+   "group": "components",
+   "name": "kpi-card",
+   "note": "6 of 18 Mode × Type combinations",
+   "node": null,
+   "variants": 6,
+   "fidelity": "measured",
+   "registry": null
+  },
+  {
+   "surface": "dashboard",
+   "group": "components",
+   "name": "analytics-card",
+   "note": "",
+   "node": null,
+   "variants": null,
+   "fidelity": "measured",
+   "registry": null
+  },
+  {
+   "surface": "dashboard",
+   "group": "components",
+   "name": "table-row",
+   "note": "",
+   "node": null,
+   "variants": null,
+   "fidelity": "measured",
+   "registry": "dashboard/table-row"
+  },
+  {
+   "surface": "dashboard",
+   "group": "components",
+   "name": "list-item",
+   "note": "nav rows; Variant4 is the group header",
+   "node": "2102:13507",
+   "variants": null,
+   "fidelity": "measured",
+   "registry": null
+  },
+  {
+   "surface": "dashboard",
+   "group": "components",
+   "name": "user-card",
+   "note": "pinned below the nav scroller",
+   "node": null,
+   "variants": null,
+   "fidelity": "measured",
+   "registry": null
+  },
+  {
+   "surface": "dashboard",
+   "group": "components",
+   "name": "controls/tab",
+   "note": "",
+   "node": null,
+   "variants": null,
+   "fidelity": "measured",
+   "registry": "dashboard/tab-group"
+  },
+  {
+   "surface": "dashboard",
+   "group": "components",
+   "name": "controls/dropdown",
+   "note": "undocumented Color [Grey, White]",
+   "node": "2152:17853",
+   "variants": 9,
+   "fidelity": "measured",
+   "registry": "dashboard/control"
+  },
+  {
+   "surface": "dashboard",
+   "group": "components",
+   "name": "controls/toggle",
+   "note": "",
+   "node": null,
+   "variants": null,
+   "fidelity": "measured",
+   "registry": "dashboard/icon-toggle-group"
+  },
+  {
+   "surface": "dashboard",
+   "group": "components",
+   "name": "toast",
+   "note": "Error · Warning · Success · Info",
+   "node": "2146:17848",
+   "variants": null,
+   "fidelity": "measured",
+   "registry": "dashboard/toast"
+  }
+ ]
+}
