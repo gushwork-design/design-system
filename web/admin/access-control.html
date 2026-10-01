@@ -18,6 +18,19 @@
    and uncapped they would run to ~1430 on a wide screen. */
 body[data-gw-page="access-control"] .sg__main { grid-column: 1 / -1; max-width: 1000px; gap: var(--gw-space-32); }
 #ac-state:empty { display: none; }
+/* Tabs, like Analytics and Design System: flat text on a full-width hairline with a bar under the open one,
+   sticky at the top of the panel. The header's own rule steps aside so there is one line, not two. */
+body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw-space-8); }
+.ac-tabbar { position: sticky; top: 0; z-index: 6; display: flex; gap: var(--gw-space-24); background: var(--s-panel-bg);
+  margin-top: calc(var(--gw-space-8) * -1); padding-top: var(--gw-space-8); margin-bottom: var(--gw-space-24);
+  box-shadow: inset 0 -1px 0 var(--s-chrome-border); }
+.ac-tab { position: relative; height: 40px; padding: 0 2px; border: 0; background: none; cursor: pointer;
+  font: var(--gw-text-body-14-med); color: var(--s-body); transition: color var(--gw-motion-fast); }
+.ac-tab:hover, .ac-tab[aria-selected="true"] { color: var(--s-heading); }
+.ac-tab[aria-selected="true"]::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2px;
+  border-radius: 2px 2px 0 0; background: var(--s-heading); }
+.ac-tab:focus-visible { outline: var(--gw-focus-ring); outline-offset: 2px; }
+
 /* The cards were touching: this was `.gw-stack-24`, a class shell.css has never
    defined, so the gap it names never existed. */
 #ac-sections { display: flex; flex-direction: column; gap: var(--gw-space-24); }
@@ -324,6 +337,22 @@ body[data-gw-page="access-control"] .sg__main { grid-column: 1 / -1; max-width: 
   .ac-row__del { grid-area: del; }
   .ac-bar { flex-direction: column; align-items: stretch; }
 }
+
+/* With one card on screen at a time the frame is only noise: the tab already names the section, so the card
+   drops its border, shadow, tinted bands and repeated title, and the rows sit straight on the page like the
+   tables in Analytics. What stays is the one-line description, the header row, the rows and the add row. */
+.ac-card { background: none; border: 0; box-shadow: none; border-radius: 0; }
+.ac-card__hd { background: none; border: 0; border-radius: 0; padding: 0 0 var(--gw-space-16); }
+.ac-card__hd h3, .ac-card__n { display: none; }
+.ac-card__body { padding: 0 var(--gw-space-12); }
+.ac-head { background: none; border-radius: 0; box-shadow: none; border-bottom: 1px solid var(--s-chrome-border); }
+.ac-card__ft { background: none; border-radius: 0; border-top: 1px solid var(--s-chrome-border); padding: var(--gw-space-16) var(--gw-space-12) 0; margin-top: var(--gw-space-8); }
+.ac-card__ft .ac-field { background: var(--s-field-bg); }
+/* The owner and admin boxes inside the last tab lose their frames too: two sections divided by a hairline. */
+.ac-lvls { gap: 0; padding-top: 0; }
+.ac-card__body:has(.ac-lvls) { padding: 0; }
+.ac-lvl { background: none; border: 0; border-radius: 0; padding: var(--gw-space-20) 0; }
+.ac-lvl + .ac-lvl { border-top: 1px solid var(--s-chrome-border); }
 </style>
 </head>
 <body data-gw-page="access-control">
@@ -332,16 +361,14 @@ body[data-gw-page="access-control"] .sg__main { grid-column: 1 / -1; max-width: 
 
   <header class="sg__hd">
     <h1>Access Control</h1>
-    <p>Changes apply at the edge within seconds</p>
+    <p>Who can open which page, and who is allowed to decide that. Changes apply at the edge within seconds</p>
   </header>
 
   <main class="sg__main">
 
-    <p>Who can open which page, and who is allowed to decide that. There is no deploy to
-       wait for, and no need for anyone to sign out and back in.</p>
-
     <div id="ac-state"></div>
     <div id="ac-app" hidden>
+      <div class="ac-tabbar" id="ac-tabbar" role="tablist" aria-label="Access control"></div>
       <div id="ac-sections"></div>
       <div id="ac-barmount"></div>
     </div>
@@ -1209,8 +1236,39 @@ body[data-gw-page="access-control"] .sg__main { grid-column: 1 / -1; max-width: 
     mount.appendChild(pagesCard());
     mount.appendChild(groupsCard());
     mount.appendChild(adminsCard());
+    paintTabs();
     paintBar();
   }
+
+  /* The five cards become five tabs, in the order they were already in. A tab's label is its card's own
+     title, so the two cannot drift; the open tab is kept in the address (#pages) and survives a re-render. */
+  var activeTab = '';
+  function paintTabs() {
+    var mount = document.getElementById('ac-sections'), bar = document.getElementById('ac-tabbar');
+    var cards = [].slice.call(mount.children).filter(function (n) { return n.classList && n.classList.contains('ac-card'); });
+    var items = cards.map(function (c) {
+      var h = c.querySelector('h3'), label = (h ? h.textContent : 'Section').trim();
+      return { key: label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''), label: label, el: c };
+    });
+    if (!items.length) { bar.innerHTML = ''; return; }
+    var want = activeTab || location.hash.slice(1);
+    if (!items.some(function (t) { return t.key === want; })) want = items[0].key;
+    activeTab = want;
+    bar.innerHTML = '';
+    items.forEach(function (t) {
+      t.el.hidden = t.key !== want;
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'ac-tab'; b.setAttribute('role', 'tab');
+      b.setAttribute('aria-selected', String(t.key === want)); b.textContent = t.label;
+      b.addEventListener('click', function () {
+        activeTab = t.key;
+        try { history.replaceState(null, '', '#' + t.key); } catch (e) { location.hash = t.key; }
+        paintTabs();
+      });
+      bar.appendChild(b);
+    });
+  }
+  window.addEventListener('hashchange', function () { activeTab = location.hash.slice(1); if (document.getElementById('ac-tabbar')) paintTabs(); });
 
   fetch('/api/access', { credentials: 'same-origin' })
     .then(function (r) { return r.json().then(function (b) { return { ok: r.ok, b: b }; }); })
