@@ -25,6 +25,7 @@
 import { COOKIE, verify, readCookie, sessionSecret, authModes, GATE_ENABLED }
   from './api/_session.js';
 import { loadRules, decide } from './api/_access.js';
+import { recordVisit } from './api/_log-visit.js';
 
 export const config = {
   matcher: ['/internal/:path*', '/admin/:path*', '/library', '/library/:path*']
@@ -162,7 +163,20 @@ async function unfurlStub(request, url) {
   }
 }
 
-export default async function middleware(request) {
+/* A person opening a page, as opposed to the browser fetching a stylesheet or a prefetch. */
+function isPageView(request, url) {
+  if (request.method !== 'GET') return false;
+  if (url.pathname.indexOf('/admin/visits') === 0) return false;
+  const last = url.pathname.split('/').pop() || '';
+  if (last.indexOf('.') !== -1 && !/\.html$/.test(last)) return false;
+  const h = request.headers;
+  if ((h.get('purpose') || h.get('sec-purpose') || '').toLowerCase().indexOf('prefetch') !== -1) return false;
+  const dest = h.get('sec-fetch-dest');
+  if (dest) return dest === 'document' || dest === 'iframe';
+  return (h.get('accept') || '').indexOf('text/html') !== -1;
+}
+
+export default async function middleware(request, context) {
   /* Returning undefined continues to the next handler, which serves the file. */
   if (!GATE_ENABLED) return undefined;
 
@@ -213,6 +227,15 @@ export default async function middleware(request) {
   const verdict = decide(url.pathname, session, rules);
   if (verdict === 'forbid') return forbidden(session.email);
   if (verdict === 'signin') return toSignIn(url);
+
+  /* The owner's visit log (api/_log-visit.js): who opened which page. Pages only — not images,
+     scripts or fetches — and never the visit page itself. Handed to waitUntil so it cannot delay
+     the response. */
+  if (isPageView(request, url)) {
+    const logged = recordVisit({ email: session.email || null, path: url.pathname, kind: 'view' });
+    if (context && typeof context.waitUntil === 'function') context.waitUntil(logged);
+    else await logged;   // no waitUntil in this runtime: a short wait beats a dropped row
+  }
 
   /* Returning nothing continues to the next handler, which serves the file. */
   return undefined;

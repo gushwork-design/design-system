@@ -6,6 +6,7 @@ import {
   COOKIE, MAX_AGE, sign, readCookie, serializeCookie,
   safeNext, redirectUri, missingConfig, isInternal, isAdmin, allowedDomain
 } from '../_session.js';
+import { recordVisit } from '../_log-visit.js';
 
 const STATE_COOKIE = 'gw_oauth_state';
 
@@ -108,6 +109,7 @@ export default async function handler(req, res) {
     exp: Math.floor(Date.now() / 1000) + MAX_AGE
   };
 
+  await recordVisit({ email, path: '/', kind: 'signin', via: 'google' });
   res.setHeader('Set-Cookie', [
     serializeCookie(COOKIE, await sign(payload, process.env.SESSION_SECRET), { maxAge: MAX_AGE }),
     serializeCookie(STATE_COOKIE, '', { maxAge: 0 })

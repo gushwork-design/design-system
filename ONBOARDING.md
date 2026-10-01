@@ -39,6 +39,10 @@ never records your prompts. It exists so we can see whether the design system
 is being used, what for, and who is running an old version. To turn it off, set
 `GW_NO_USAGE_PING=1` in your shell.
 
+Separately from the plugin, the design hub website notes which work email signs in and which of its pages that
+email opens (the page and the time, no IP address or browser details), visible only to the owner. The
+`GW_NO_USAGE_PING` switch does not affect it; it is part of using the site.
+
 ## Then just ask for what you want
 
 > "Build a dashboard for the sales team to see show-ups over the week"

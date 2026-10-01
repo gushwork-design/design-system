@@ -65,6 +65,9 @@ export function defaultRules() {
          is admin-tier at the edge and the OWNER check that really holds is the one in
          api/_usage-log.js, which the data cannot be read without. */
       { path: '/admin/usage-log', access: 'owner', groups: [], people: [] },
+      /* Who signs in and which pages they open. Same reasoning: the real check is the owner test in
+         api/_visits.js, which the data cannot be read without. */
+      { path: '/admin/visits', access: 'owner', groups: [], people: [] },
       /* Ad landers are public on purpose. An ad page's whole job is to be
          pasted into Slack, sent to a client and run as paid media, and a
          social card cannot render from behind the gate: the scraper fetching
