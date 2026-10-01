@@ -687,7 +687,7 @@
 }
 .gw-user__role {
   font: var(--gw-text-button-12);
-  color: var(--s-group-label);
+  color: var(--gw-color-neutral-400);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .gw-user__out {
@@ -902,7 +902,7 @@
 .gw-modal__or {
   display: flex; align-items: center; gap: var(--gw-space-12);
   margin: var(--gw-space-16) 0;
-  font: var(--gw-text-body-12-reg); color: var(--s-group-label);
+  font: var(--gw-text-body-12-reg); color: var(--gw-color-neutral-400);
 }
 .gw-modal__or::before, .gw-modal__or::after {
   content: ""; flex: 1; height: 1px; background: var(--s-card-border);
@@ -940,7 +940,7 @@
 .gw-modal__note {
   margin: var(--gw-space-16) 0 0;
   font: var(--gw-text-body-12-reg);
-  color: var(--s-group-label);
+  color: var(--gw-color-neutral-400);
 }
 
 /* ---------------------------------------------------------------------------
@@ -1396,7 +1396,7 @@
   align-items: center;
   gap: var(--gw-space-12);
   font: var(--gw-text-body-12-reg);
-  color: var(--s-group-label);
+  color: var(--gw-color-neutral-400);
 }
 .gw-login__or::before, .gw-login__or::after {
   content: "";
