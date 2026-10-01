@@ -384,10 +384,10 @@
   background: var(--gw-color-primary-500);
   box-shadow: inset 0 0 0 1px var(--gw-color-primary-600);
 }
-/* `Internal` variant of the component: the chip goes Neutral/black on the
-   pages behind the gate, so the bar itself says which side of it you are on.
+/* Owner pages only (Review Gate, Usage Logs): the chip goes Neutral/black, so the bar says
+   you are somewhere only the owner is. Every other page, gated or not, keeps the blue chip.
    Its outline stays Neutral/800 — Primary/600 is the outline for the blue. */
-.gw-brand__chip--internal {
+.gw-brand__chip--owner {
   background: var(--gw-color-black);
   box-shadow: inset 0 0 0 1px var(--gw-color-neutral-800);
 }
