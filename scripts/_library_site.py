@@ -170,6 +170,20 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
 .lb-h h1{font:var(--gw-text-h4);margin:0}
 .lb-h .lede{font:var(--gw-text-body-16-reg);color:var(--s-body);margin:0;max-width:74ch}
 .lb-row{display:flex;flex-wrap:wrap;gap:var(--gw-space-8);align-items:center}
+.lb-rowfind{width:100%;max-width:360px;height:36px;padding:0 12px;margin:0 0 20px;border:0;border-radius:12px;background:var(--s-field-bg);
+  box-shadow:inset 0 0 0 1px var(--s-field-border);color:var(--s-heading);font:var(--gw-text-body-14-reg)}
+.lb-rowfind::placeholder{color:var(--s-placeholder)}
+.cat-name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px;color:var(--s-heading);font-weight:600}
+a.cat-name{color:var(--gw-color-primary-600);text-decoration:none}
+:root[data-theme="dark"] a.cat-name{color:var(--gw-color-primary-400)}
+.cat-note{display:block;margin-top:2px;font:var(--gw-text-body-12-reg);color:var(--s-body)}
+.cat-link{font:var(--gw-text-body-14-med);color:var(--gw-color-primary-600);text-decoration:none}
+:root[data-theme="dark"] .cat-link{color:var(--gw-color-primary-400)}
+.cat-link:hover{text-decoration:underline}
+.sec>.lb-meta{margin:4px 0 14px}
+.cat-dim{color:var(--s-body)}
+.chip--annotated{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+:root[data-theme="dark"] .chip--annotated{background:var(--gw-color-neutral-800);color:var(--gw-color-neutral-300)}
 .lb-meta{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
          color:var(--gw-color-neutral-400)}
 
@@ -323,6 +337,17 @@ JS = """
       var t=f.value.trim().toLowerCase();
       rows.forEach(function(a){
         a.hidden=!!t&&a.getAttribute('data-q').indexOf(t)===-1});
+    });
+  }
+
+  /* Component list filter: hides rows that do not match, and a surface whose rows all went. */
+  var rf=document.getElementById('lb-rows');
+  if(rf){
+    var trs=[].slice.call(document.querySelectorAll('tr[data-q]')), secs=[].slice.call(document.querySelectorAll('section[data-cat]'));
+    rf.addEventListener('input',function(){
+      var t=rf.value.trim().toLowerCase();
+      trs.forEach(function(r){r.hidden=!!t&&r.getAttribute('data-q').indexOf(t)===-1});
+      secs.forEach(function(sc){sc.hidden=!sc.querySelector('tr[data-q]:not([hidden])')});
     });
   }
 
@@ -1106,6 +1131,8 @@ def build_index(reg, counts, groups_n, ad, gaps):
                     [f"{s} parts", pins if pins != "—" else "no pin"])
                for k, t, s, pins, _ in RECIPES]
 
+    c_card = card("components.html", "list", "All components",
+                  ["Every component, one list", "variants and verification"], big=True)
     stats = [("tokens", counts["tokens"]),
              ("components", counts["components"]),
              ("libraries", len(PARTS) + 1),
@@ -1119,9 +1146,9 @@ def build_index(reg, counts, groups_n, ad, gaps):
             f'<p>Last updated {date.today().strftime("%-d %b %Y")} · generated from '
             f'tokens.css, the registries and the measured Figma</p></div>'
             f'<div class="lb-ban__s">{stat_html}</div></div>'
-            f'<div class="lb-tier"><div class="lb-tier__h"><h2>Foundations</h2>'
-            f'<span>Shared by everything below</span></div>'
-            f'<div class="lb-grid">{f_card}</div></div>'
+            f'<div class="lb-tier"><div class="lb-tier__h"><h2>Start here</h2>'
+            f'<span>The tokens, and every component in one list</span></div>'
+            f'<div class="lb-grid">{f_card}{c_card}</div></div>'
             f'<div class="lb-tier"><div class="lb-tier__h"><h2>Parts</h2>'
             f'<span>Components, by the surface they render on</span></div>'
             f'<div class="lb-grid">{"".join(p_cards)}</div></div>'
@@ -1129,6 +1156,87 @@ def build_index(reg, counts, groups_n, ad, gaps):
             f'<span>Assemblies, by what you are making</span></div>'
             f'<div class="lb-grid">{"".join(r_cards)}</div></div>')
     return Page(path="index", title="", body=body, wide=True)
+
+
+CAT_SURFACES = [("foundation", "Foundation"), ("web", "Web"), ("ad-page", "Ad page"),
+                ("dashboard", "Dashboard"), ("slides", "Slides"),
+                ("lead-magnet", "Lead magnet"), ("shared", "Shared")]
+GROUP_LABEL = {"components": "Components", "folds": "Folds", "shell and elements": "Shell and elements", "foundation": ""}
+FID_LABEL = {"measured": ("measured", "Measured", "Read off the rendered component in Figma."),
+             "inventory": ("transcribed", "Inventory", "Variant matrix and rules only; not read off the render."),
+             "annotated": ("annotated", "Annotated", "From Figma annotations, not verified against the render.")}
+
+
+def build_components(reg, counts):
+    """Every component in one list: the Catalogue's rows (variants, how far each is verified)
+    joined to the registries' spec pages. A row with no `registry` match is in Figma and has no
+    spec page yet, and says so rather than being left out."""
+    cat = json.load(open(os.path.join(ROOT, "exports", "catalogue.json"), encoding="utf-8"))["entries"]
+    seen = {e["registry"] for e in cat if e.get("registry")}
+    rows = {s: [] for s, _ in CAT_SURFACES}
+    for e in cat:
+        rows[e["surface"]].append(dict(e))
+    for skey, block in reg.items():
+        for key in sorted((block or {}).get("components") or {}):
+            if f"{skey}/{key}" not in seen and skey in rows:
+                rows[skey].append({"surface": skey, "group": "", "name": key, "note": "",
+                                   "node": (block["components"][key] or {}).get("node"),
+                                   "variants": None, "fidelity": None, "registry": f"{skey}/{key}"})
+    total = sum(len(v) for v in rows.values())
+    spec = sum(1 for v in rows.values() for e in v if e.get("registry") or e.get("page"))
+    fid = {k: sum(1 for v in rows.values() for e in v if e.get("fidelity") == k)
+           for k in ("measured", "inventory", "annotated")}
+    variants = sum(e["variants"] or 0 for v in rows.values() for e in v)
+
+    sections, rail, toc = [], [("All components", "components.html", True, str(total)), (None, "", False, "")], []
+    for skey, title in CAT_SURFACES:
+        items = rows[skey]
+        if not items:
+            continue
+        trs = []
+        for e in items:
+            name = esc(e["name"])
+            link = e.get("page") or (f'parts/{e["registry"]}.html' if e.get("registry") else "")
+            if link:
+                nm = f'<a class="cat-name" href="{esc(link)}">{name}</a>'
+                page = f'<a class="cat-link" href="{esc(link)}">{"Foundations" if e.get("page") else "Spec page"}</a>'
+            else:
+                nm = f'<span class="cat-name">{name}</span>'
+                page = chip("gap", "no spec page yet", "In Figma, but nothing in the library describes it yet.")
+            note = f'<span class="cat-note">{esc(e["note"])}</span>' if e.get("note") else ""
+            if e.get("fidelity"):
+                c, lab, tip = FID_LABEL[e["fidelity"]]
+                fchip = chip(c, lab, tip)
+            else:
+                fchip = '<span class="cat-dim">—</span>'
+            var = f'{e["variants"]:,}' if e.get("variants") else '<span class="cat-dim">—</span>'
+            node = f'<code>{esc(e["node"])}</code>' if e.get("node") else '<span class="cat-dim">—</span>'
+            q = f'{e["name"]} {e.get("note","")} {e.get("node") or ""} {e.get("group","")} {title}'.lower()
+            trs.append(f'<tr data-q="{esc(q)}"><td>{nm}{note}</td>'
+                       f'<td class="cat-dim">{esc(GROUP_LABEL.get(e.get("group") or "", e.get("group") or ""))}</td><td>{node}</td>'
+                       f'<td>{var}</td><td>{fchip}</td><td>{page}</td></tr>')
+        n_missing = sum(1 for e in items if not (e.get("registry") or e.get("page")))
+        sub = f'{len(items)} components' + (f' · {n_missing} without a spec page' if n_missing else "")
+        sections.append(
+            f'<section class="sec" id="{skey}" data-cat="{skey}"><h2>{esc(title)}</h2>'
+            f'<p class="lb-meta">{esc(sub)}</p>'
+            f'<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Component</th><th>Group</th>'
+            f'<th>Node</th><th>Variants</th><th>Verified</th><th>Library</th></tr></thead><tbody>'
+            + "".join(trs) + "</tbody></table></div></section>")
+        rail.append((title, f"components.html#{skey}", False, str(len(items))))
+        toc.append((2, title, skey))
+
+    chips = (chip("pending", f"{total} components") + chip("pending", f"{variants:,} variants")
+             + chip("passed", f"{spec} with a spec page") + chip("gap", f"{total - spec} without")
+             + chip("measured", f"{fid['measured']} measured") + chip("transcribed", f"{fid['inventory']} inventory only")
+             + chip("annotated", f"{fid['annotated']} annotated only"))
+    body = ('<input class="lb-rowfind" id="lb-rows" type="search" placeholder="Filter components">'
+            + "".join(sections))
+    return Page(path="components", title="All components",
+                lede="Every component in the design system, how many variants it has, how far it has "
+                     "been checked against Figma, and whether the library has a spec page for it.",
+                crumb='<a href="index.html">Library</a> / Components',
+                rail=rail, rail_title=f"Components · {total}", chips=chips, body=body, toc=toc)
 
 
 def build_review(queue, reg, gaps):
@@ -1179,7 +1287,7 @@ def main():
     queue = f_queue + p_queue
     pages = ([build_index(reg, counts, groups_n, ad, gaps)]
              + f_pages + p_pages + r_pages
-             + [build_review(queue, reg, gaps)])
+             + [build_components(reg, counts), build_review(queue, reg, gaps)])
 
     # A clean rebuild: a renamed component must not leave its old page behind, served
     # and wrong, with nothing reporting it.
