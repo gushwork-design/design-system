@@ -26,7 +26,7 @@
 #   /internal/changelog      = changelog-sheet  @gushwork.ai
 #   /admin/review-sheet      = review-sheet     ADMIN_EMAILS only
 #   /admin/catalogue         = catalogue        ADMIN_EMAILS only
-#   /admin/workflow          = workflow          ADMIN_EMAILS only
+#   /admin/workflow          = web/admin/workflow.html (built from Figma 661:5802)  ADMIN_EMAILS only
 #
 # THE SHEETS ARE STILL NEVER EDITED. They are generated, and release-log.sh
 # --check compares what is committed against what the generator produces.
@@ -56,7 +56,6 @@ SHEETS=(
   "preview/changelog-sheet.html|internal/changelog.html"
   "preview/review-sheet.html|admin/review-sheet.html"
   "preview/catalogue.html|admin/catalogue.html"
-  "preview/workflow.html|admin/workflow.html"
 )
 
 # Social card images. A page's og:image must be an absolute URL for crawlers
@@ -295,10 +294,10 @@ done
   for pair in "${SHEETS[@]}"; do
     grep -ohE '(href|src)="(\.\./|/)assets/[^"]+"' "$STAGE/${pair##*|}" 2>/dev/null || true
   done
-  grep -rohE '(href|src)="/assets/[^"]+"' "$STAGE"/*.html "$STAGE"/internal/*.html "$STAGE"/internal/templates/*/index.html 2>/dev/null || true
+  grep -rohE '(href|src)="/assets/[^"]+"' "$STAGE"/*.html "$STAGE"/admin/*.html "$STAGE"/internal/*.html "$STAGE"/internal/templates/*/index.html 2>/dev/null || true
   # CSS url() too — the style guide masks the logo through -webkit-mask to draw
   # the "don't" panel, and those references carry no href= or src= to match.
-  grep -rohE "url\(['\"]?/assets/[^)'\"]+" "$STAGE"/*.html "$STAGE"/internal/*.html "$STAGE"/internal/templates/*/index.html 2>/dev/null \
+  grep -rohE "url\(['\"]?/assets/[^)'\"]+" "$STAGE"/*.html "$STAGE"/admin/*.html "$STAGE"/internal/*.html "$STAGE"/internal/templates/*/index.html 2>/dev/null \
     | sed "s|^url(['\"]\{0,1\}|src=\"|;s|$|\"|" || true
 } | sed 's/.*="//;s/"$//;s|^\.\./||;s|^/||' | sort -u | while read -r a; do
   [ -n "$a" ] || continue
