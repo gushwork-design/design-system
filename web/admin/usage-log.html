@@ -294,6 +294,23 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
 .ul-pair .ul-inner { flex: 1; display: flex; flex-direction: column; }
 .ul-foot { margin: auto 0 0; padding-top: var(--gw-space-12); font: var(--gw-text-body-12-med); color: var(--ul-sub); }
 /* out-of-date people */
+.ul-sh--nw { flex-wrap: nowrap; }
+.ul-sh--nw .ul-sh__t { flex: 1 1 auto; }
+.ul-sh--nw .ul-sh__q { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.ul-link { flex: none; white-space: nowrap; border: 0; background: none; padding: 0; cursor: pointer; font: var(--gw-text-body-14-med); color: var(--ul-sub); transition: color var(--gw-motion-fast); }
+.ul-link:hover { color: var(--ul-value); }
+.ul-link[hidden] { display: none; }
+.ul-big { margin: 0; font: var(--gw-text-body-16-sem); color: var(--ul-value); }
+.ul-dlg { width: min(640px, calc(100vw - 32px)); max-height: min(560px, calc(100vh - 64px)); padding: 0; border: 0; border-radius: var(--gw-radius-16);
+  background: var(--ul-field-bg); color: var(--ul-value); box-shadow: inset 0 0 0 1px var(--ul-hdr-line), var(--gw-shadow-s3); }
+.ul-dlg[open] { display: flex; flex-direction: column; }
+.ul-dlg::backdrop { background: rgba(0, 0, 0, 0.4); }
+.ul-dlg__h { display: flex; align-items: baseline; gap: var(--gw-space-8); padding: var(--gw-space-16) var(--gw-space-16) var(--gw-space-8) var(--gw-space-24); }
+.ul-dlg__h h2 { margin: 0; font: var(--gw-text-body-16-sem); }
+.ul-dlg__x { margin-left: auto; align-self: center; width: 28px; height: 28px; border: 0; border-radius: var(--gw-radius-8); background: none; cursor: pointer;
+  font-size: 20px; line-height: 1; color: var(--ul-sub); }
+.ul-dlg__x:hover { color: var(--ul-value); background: var(--ul-hdr-line); }
+.ul-dlg__b { padding: 0 var(--gw-space-24) var(--gw-space-24); overflow-y: auto; }
 .ul-old { display: flex; flex-direction: column; }
 .ul-old__r { display: grid; grid-template-columns: minmax(0, 1fr) 112px 148px; align-items: center; column-gap: var(--gw-space-16); padding: var(--gw-space-12) 0; }
 .ul-old__r + .ul-old__r { border-top: 1px solid var(--ul-hdr-line); }
@@ -472,9 +489,15 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
 
       <div class="ul-pair">
       <section class="ul-sec" aria-labelledby="ul-h-ver">
-        <div class="ul-sh"><div class="ul-sh__t"><h2 id="ul-h-ver">Out of date</h2><span class="ul-sh__q" id="ul-q-ver"></span></div></div>
+        <div class="ul-sh ul-sh--nw"><div class="ul-sh__t"><h2 id="ul-h-ver">Out of date</h2><span class="ul-sh__q" id="ul-q-ver"></span></div>
+          <button type="button" class="ul-link" id="ul-ver-open" hidden>View details</button></div>
         <div class="ul-inner" id="ul-versions"></div>
       </section>
+      <dialog class="ul-dlg" id="ul-ver-dlg" aria-labelledby="ul-ver-dlg-t">
+        <div class="ul-dlg__h"><h2 id="ul-ver-dlg-t">Out of date</h2><span class="ul-sh__q" id="ul-ver-dlg-q"></span>
+          <button type="button" class="ul-dlg__x" id="ul-ver-close" aria-label="Close">&times;</button></div>
+        <div class="ul-dlg__b" id="ul-ver-dlg-b"></div>
+      </dialog>
 
       <section class="ul-sec" aria-labelledby="ul-h-skills">
         <div class="ul-sh"><div class="ul-sh__t"><h2 id="ul-h-skills">Skills</h2><span class="ul-sh__q" id="ul-q-skills"></span></div></div>
@@ -718,9 +741,9 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
   }
 
   function renderVersions(m) {
-    var host = $('ul-versions');
+    var host = $('ul-versions'); $('ul-ver-open').hidden = true;
     if (S.status === 'loading') { host.innerHTML = '<span class="sk" style="width:100%;height:120px;display:block"></span>'; $('ul-q-ver').textContent = ''; return; }
-    $('ul-q-ver').textContent = m.newest ? 'who used a version older than ' + m.newest + ', ' + PERIOD_NAME[S.period] : PERIOD_NAME[S.period];
+    $('ul-q-ver').textContent = m.newest ? 'older than ' + m.newest + ', ' + PERIOD_NAME[S.period] : PERIOD_NAME[S.period];
     if (!m.newest) { host.innerHTML = '<p class="ul-note-line">No versioned sessions yet.</p>'; return; }
     var who = {}, anon = 0;
     m.cur.forEach(function (r) {
@@ -740,7 +763,7 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
     list.sort(function (a, b) { return (b.behind - a.behind) || (b.gap - a.gap) || (b.last.at - a.last.at); });
     var stale = list.filter(function (w) { return w.behind; }).length;
     if (!list.length && !anon) { host.innerHTML = '<p class="ul-note-line">Everyone who started a session is on ' + esc(m.newest) + '.</p>'; return; }
-    var rows = list.slice(0, 8).map(function (w) {
+    var rows = list.map(function (w) {
       var v = w.last.version || 'Unknown';
       var status = w.behind
         ? '<span class="ul-badge ul-badge--bad">' + (w.gap > 0 && w.gap < 99 ? plural(w.gap, 'release') + ' behind' : 'Behind') + '</span>'
@@ -748,10 +771,13 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
       return '<div class="ul-old__r"><div class="ul-old__who"><b title="' + esc(w.email) + '">' + esc(w.email) + '</b><span>' + (w.behind ? 'Still on ' : 'Now on ') + esc(v) + ' · last seen ' + esc(ago(Date.now() - w.last.at.getTime())) + '</span></div>' +
         '<span class="ul-old__v">' + esc(plural(w.old, 'older session')) + '</span><div class="ul-old__s">' + status + '</div></div>';
     }).join('');
-    host.innerHTML = '<div class="ul-old">' + rows + '</div>' +
-      '<p class="ul-foot">' + (stale ? stale + (stale === 1 ? ' person' : ' people') + ' still behind' : 'No one is behind now') +
-      (list.length > 8 ? ' · ' + (list.length - 8) + ' more not shown' : '') +
-      (anon ? ' · ' + plural(anon, 'session') + ' with no email on an older version' : '') + '.</p>';
+    var head = stale ? stale + (stale === 1 ? ' person' : ' people') + ' still behind' : 'No one is behind now';
+    var sub = anon ? plural(anon, 'session') + ' with no email on an older version' : '';
+    host.innerHTML = '<p class="ul-big">' + head + '</p>' + (sub ? '<p class="ul-foot" style="margin:0;padding-top:var(--gw-space-4)">' + esc(sub) + '</p>' : '');
+    $('ul-ver-dlg-q').textContent = 'on a version older than ' + m.newest + ', ' + PERIOD_NAME[S.period];
+    $('ul-ver-dlg-b').innerHTML = (rows ? '<div class="ul-old">' + rows + '</div>' : '') +
+      '<p class="ul-foot">' + esc(head) + (sub ? ' · ' + esc(sub) : '') + '.</p>';
+    $('ul-ver-open').hidden = !list.length;
   }
   function renderSkills(m) {
     var host = $('ul-skills');
@@ -1238,6 +1264,12 @@ body[data-gw-page="usage-log"] .sg__main > * { min-width: 0; }
       var sel = e.target.closest && e.target.closest('.ul-select select');
       if (sel && (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown' || e.key === 'ArrowUp')) { e.preventDefault(); open(sel); }
     });
+  })();
+  (function () {
+    var dlg = $('ul-ver-dlg');
+    $('ul-ver-open').addEventListener('click', function () { dlg.showModal(); if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); });
+    $('ul-ver-close').addEventListener('click', function () { dlg.close(); });
+    dlg.addEventListener('mousedown', function (e) { if (e.target === dlg) dlg.close(); });
   })();
   setInterval(updated, 10000);
   render(); load();
