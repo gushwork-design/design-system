@@ -694,6 +694,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .rv-note b { color: var(--ul-value); font-weight: 600; }
 .rv-note--q { background: var(--gw-color-yellow-alpha-10); box-shadow: none; }
 .rv-link { all: unset; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; color: var(--ul-value); font-weight: 600; }
+.rv-q--pr { color: var(--ul-cell); text-decoration: underline; text-underline-offset: 3px; }
 .rv-q { margin-left: 6px; font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
 .rv-foot { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-12); padding: var(--gw-space-16) var(--gw-space-24); box-shadow: inset 0 1px 0 var(--ul-hdr-line); }
 .rv-foot--col { flex-direction: column; align-items: stretch; }
@@ -1142,7 +1143,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   }
   function compCard(sf, c) {
     return '<div class="fd-comp" data-id="' + esc(sf.key + '/' + c.name) + '" data-q="' + esc((c.name + ' ' + (c.doc || '')).toLowerCase()) + '">' +
-      '<div class="fd-comp__t"><button type="button" class="ds-a" data-rv="' + esc(sf.key + '/' + c.name) + '" title="Open the review view">' + esc(c.name) + '</button>' + (BYID[sf.key + '/' + c.name] ? badgeOf(eff(BYID[sf.key + '/' + c.name]).state, eff(BYID[sf.key + '/' + c.name]).queued) : review(c.review)) + '</div>' +
+      '<div class="fd-comp__t"><button type="button" class="ds-a" data-rv="' + esc(sf.key + '/' + c.name) + '" title="Open the review view">' + esc(c.name) + '</button>' + (BYID[sf.key + '/' + c.name] ? badgeOf(eff(BYID[sf.key + '/' + c.name]).state, eff(BYID[sf.key + '/' + c.name]).queued, eff(BYID[sf.key + '/' + c.name]).q) : review(c.review)) + '</div>' +
       '<div class="fd-comp__m">v' + esc(c.version || '—') + ' · moved ' + esc(c.changed || '—') + (c.breaking ? ' <span class="ul-badge ul-badge--bad">breaking</span>' : '') + '</div>' +
       (c.doc ? '<a class="fd-comp__d" href="' + esc(docHref(sf.key, c.doc)) + '" target="_blank" rel="noopener" title="Open ' + esc(c.doc) + ' on GitHub">' + esc(String(c.doc).split('/').pop()) + '</a>' : '') + '</div>';
   }
@@ -1176,7 +1177,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       var gks = FD_GROUPS[F.tab] || [];
       main = '<div class="fd-head"><p>' + esc(FD_NOTE[F.tab]) + '</p><div class="fd-rv">' + gks.map(function (k) {
         var it = BYID['foundation/' + k]; if (!it) return '';
-        var e = eff(it); return '<button type="button" class="fd-rv__b" data-rv="foundation/' + esc(k) + '">' + (gks.length > 1 ? esc(it.label) + ' ' : '') + badgeOf(e.state, e.queued) + '</button>';
+        var e = eff(it); return '<button type="button" class="fd-rv__b" data-rv="foundation/' + esc(k) + '">' + (gks.length > 1 ? esc(it.label) + ' ' : '') + badgeOf(e.state, e.queued, e.q) + '</button>';
       }).join('') + '</div></div>' + body;
     } else {
       var sub = subOf(cat), sf = sub.surface ? d.surfaces.filter(function (x) { return x.key === sub.surface; })[0] : null;
@@ -1237,14 +1238,21 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
      on screen, so a decision made on something that has since moved is refused rather than applied. */
   var STATE_LABEL = { pending: 'not reviewed', expired: 'expired', passed: 'passed', rejected: 'rejected', rework: 'in rework' };
   var STATE_CLASS = { passed: ' ul-badge--ok', rejected: ' ul-badge--bad', expired: ' ul-badge--warn', rework: ' ul-badge--warn' };
-  function badgeOf(state, queued) {
-    return '<span class="ul-badge' + (STATE_CLASS[state] || '') + '">' + esc(STATE_LABEL[state] || state) + '</span>' + (queued ? '<span class="rv-q">being recorded</span>' : '');
+  function badgeOf(state, queued, q) {
+    var tail = !queued ? '' : (q && q.pr && q.pr.url
+      ? '<a class="rv-q rv-q--pr" href="' + esc(q.pr.url) + '" target="_blank" rel="noopener" title="Open the pull request on GitHub">in PR #' + esc(q.pr.number) + '</a>'
+      : '<span class="rv-q">being recorded</span>');
+    return '<span class="ul-badge' + (STATE_CLASS[state] || '') + '">' + esc(STATE_LABEL[state] || state) + '</span>' + tail;
   }
   var QSTATE = {}, ITEMS = [], BYID = {}, RV = { filter: 'waiting', list: [], i: 0, open: false, mode: '' };
   function idOf(it) { return it.scope + '/' + it.key; }
   function eff(it) {
     var q = QSTATE[idOf(it)];
-    if (q && q.action && q.action !== 'undo') return { state: q.action === 'pass' ? 'passed' : q.action === 'reject' ? 'rejected' : 'rework', queued: true, q: q };
+    if (q && q.action && q.action !== 'undo') {
+      var want = q.action === 'pass' ? 'passed' : q.action === 'reject' ? 'rejected' : 'rework';
+      if (it.state === want) return { state: it.state, queued: false, q: null };   // the registry has caught up with it
+      return { state: want, queued: true, q: q };
+    }
     return { state: it.state, queued: false, q: null };
   }
   function loadQueued() {
@@ -1275,7 +1283,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     var rows = list.slice(0, RF.shown).map(function (it) {
       var e = eff(it), by = e.queued ? 'You, just now' : (it.by ? it.by + (it.on ? ' · ' + it.on : '') : '—');
       return '<div class="ul-row ul-row--d rv-row" role="row" tabindex="0" data-id="' + esc(idOf(it)) + '">' +
-        cell('<b style="font-weight:600">' + esc(it.label) + '</b>', '') + txt(scopeTitle(it)) + cell(badgeOf(e.state, e.queued)) + txt(by) +
+        cell('<b style="font-weight:600">' + esc(it.label) + '</b>', '') + txt(scopeTitle(it)) + cell(badgeOf(e.state, e.queued, e.q)) + txt(by) +
         cell('<span class="ds-pv rv-go">Review</span>') + '</div>';
     });
     $('ds-rev-table').innerHTML = table('minmax(200px,1.6fr) 130px 190px minmax(140px,1fr) 100px', ['Item', 'Library', 'Status', 'Decided', ''], rows,
@@ -1341,8 +1349,11 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     var gh = it.doc ? 'https://github.com/gushwork-design/design-system/blob/main/' + (function () { var o = it.scope === 'shared' ? (/^v2\//.test(it.doc) ? ['exports', 'dashboard'] : ['foundation']) : ['exports', it.scope]; it.doc.split('/').forEach(function (g) { if (g === '..') o.pop(); else if (g && g !== '.') o.push(g); }); return o.join('/'); })() : '';
     var can = owner, hist = '';
     if (e.queued) {
-      hist = '<div class="rv-note rv-note--q"><b>You ' + (e.q.action === 'pass' ? 'passed' : e.q.action === 'reject' ? 'rejected' : 'sent this back') + ' it just now.</b> It is recorded in the repo at the next Claude session' +
-        (e.q.note ? '. Your note: ' + esc(e.q.note) : '') + '. <button class="rv-link" type="button" id="rv-undo">Undo</button></div>';
+      var did = e.q.action === 'pass' ? 'passed' : e.q.action === 'reject' ? 'rejected' : 'sent this back';
+      hist = '<div class="rv-note rv-note--q"><b>You ' + did + ' it.</b> ' + (e.q.pr && e.q.pr.url
+        ? 'It is in <a class="rv-link" href="' + esc(e.q.pr.url) + '" target="_blank" rel="noopener">pull request #' + esc(e.q.pr.number) + '</a>, and becomes final when someone approves and merges it.'
+        : 'It is recorded in the repo at the next Claude session.') +
+        (e.q.note ? ' Your note: ' + esc(e.q.note) : '') + ' <button class="rv-link" type="button" id="rv-undo">Undo</button></div>';
     } else if (it.by) {
       hist = '<div class="rv-note"><b>' + esc(STATE_LABEL[it.state] === 'expired' ? 'Passed, then the source moved' : (STATE_LABEL[it.state] || '')) + '</b> · ' + esc(it.by) + (it.on ? ', ' + esc(it.on) : '') + (it.note ? '<br>' + esc(it.note) : '') + '</div>';
     }
@@ -1357,7 +1368,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
         '<span class="rv-hint">← → to move · Esc to close</span></div>';
     }
     el.innerHTML = '<header class="rv-h"><div class="rv-h__t"><span class="rv-h__s">' + esc(scopeTitle(it)) + ' · ' + (RV.i + 1) + ' of ' + RV.list.length + '</span><h2>' + esc(it.label) + '</h2></div>' +
-      '<div class="rv-h__r">' + badgeOf(e.state, e.queued) + '<button type="button" class="rv-x" id="rv-prev" aria-label="Previous"' + (RV.i === 0 ? ' disabled' : '') + '>‹</button><button type="button" class="rv-x" id="rv-next" aria-label="Next"' + (RV.i >= RV.list.length - 1 ? ' disabled' : '') + '>›</button><button type="button" class="rv-x" id="rv-close" aria-label="Close">✕</button></div></header>' +
+      '<div class="rv-h__r">' + badgeOf(e.state, e.queued, e.q) + '<button type="button" class="rv-x" id="rv-prev" aria-label="Previous"' + (RV.i === 0 ? ' disabled' : '') + '>‹</button><button type="button" class="rv-x" id="rv-next" aria-label="Next"' + (RV.i >= RV.list.length - 1 ? ' disabled' : '') + '>›</button><button type="button" class="rv-x" id="rv-close" aria-label="Close">✕</button></div></header>' +
       '<div class="rv-body" id="rv-body"><section class="rv-sec"><h3>What it looks like</h3><div id="rv-vis">' + (it.kind === 'foundation' ? '<div class="rv-none"><span>Drawing it…</span></div>' : visualFor(it, null)) + '</div></section>' +
       '<section class="rv-sec"><h3>Details</h3><div class="rv-dl">' + detailRow('Kind', esc(it.kind === 'foundation' ? 'Foundation group' : 'Component')) + detailRow('Version', esc(it.version ? 'v' + it.version : '')) +
       detailRow('Spec last moved', esc(it.changed || '')) + detailRow('Doc', gh ? '<a class="ds-a" href="' + esc(gh) + '" target="_blank" rel="noopener">' + esc(it.doc.split('/').pop()) + '</a>' : '') +
@@ -1388,7 +1399,8 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
         if (action === 'undo') { delete QSTATE[idOf(it)]; toast('Undone.'); RV.mode = ''; renderDrawer(); }
         else {
           QSTATE[idOf(it)] = r.j.decision; RV.mode = '';
-          toast(action === 'pass' ? 'Passed. It is recorded at the next session.' : action === 'rework' ? 'Sent back with your note.' : 'Rejected.');
+          var where = r.j.decision && r.j.decision.pr ? ' In pull request #' + r.j.decision.pr.number + '.' : ' It is recorded at the next session.';
+          toast((action === 'pass' ? 'Passed.' : action === 'rework' ? 'Sent back with your note.' : 'Rejected.') + where + (r.j.githubError ? ' (' + r.j.githubError + ', so it is queued.)' : ''));
           var n = nextWaiting(); if (n >= 0) { RV.i = n; renderDrawer(); } else { renderDrawer(); }
         }
         reviewRefresh();
