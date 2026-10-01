@@ -1674,6 +1674,12 @@
     z-index: 50;
   }
   :root.gw-nav-open .gw-sidebar { transform: translateX(0); }
+  /* The bar stays ABOVE the open menu: it carries the close button, and the menu used to cover it.
+     The menu starts under the bar and drops its own copy of the wordmark, which would sit exactly
+     where the bar's is. */
+  :root.gw-nav-open .gw-topbar { z-index: 60; background: var(--s-page-bg); }
+  .gw-sidebar { padding-top: 76px; }
+  .gw-railtop { display: none; }
   /* The rail is the whole screen on phone, so its bottom block does not need
      to be pushed away from the nav. */
   .gw-sidebar { justify-content: flex-start; }
@@ -1781,6 +1787,19 @@
 .gw-railtop .gw-brand { height: 32px; }
 /* The field fills the rail rather than holding the topbar's measured 400. */
 .gw-railtop .gw-search { width: 100%; }
+
+/* Theme, bell and help for a phone, where the panel bar that normally holds them is not drawn. */
+.gw-navtools { display: none; }
+@media (max-width: 767px) {
+  .gw-navtools {
+    flex: none; display: flex; align-items: center; gap: var(--gw-space-16);
+    padding: var(--gw-space-12) var(--gw-space-20);
+  }
+  /* Down in the drawer, so the menus open upward and from the left edge. */
+  .gw-navtools .gw-theme__menu,
+  .gw-navtools .gw-pop__menu { top: auto; bottom: calc(100% + var(--gw-space-8)); left: 0; right: auto; }
+  .gw-navtools .gw-pop__menu--notif { width: min(280px, calc(100vw - 40px)); }
+}
 
 /* The one padlock, on the group label. 12px so it sits with 10px uppercase type
    rather than over it. */
