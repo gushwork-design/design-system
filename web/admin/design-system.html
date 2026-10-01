@@ -1037,7 +1037,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       var body = { color: fdColor, type: fdType, spacing: fdSpacing, radius: fdRadius, elevation: fdElevation, layout: fdLayout, motion: fdMotion }[F.tab](t);
       var gk = FD_KEY[F.tab], g = gk && (d.foundations || []).filter(function (x) { return x.key === gk; })[0];
       side = FD_TABS.map(function (x) { return [x[0], x[1], count[x[0]], x[0] === F.tab]; });
-      main = '<div class="fd-head"><p>' + esc(FD_NOTE[F.tab]) + '</p><div class="fd-head__r">' + (g ? review(g.review) + ' <a class="ds-a" href="' + esc(LIB + g.href) + '">Standalone page</a>' : '') + '</div></div>' + body;
+      main = '<div class="fd-head"><p>' + esc(FD_NOTE[F.tab]) + '</p><div class="fd-head__r">' + (g ? review(g.review) : '') + '</div></div>' + body;
     } else {
       var sub = subOf(cat), sf = sub.surface ? d.surfaces.filter(function (x) { return x.key === sub.surface; })[0] : null;
       side = cat.subs.length > 1 ? cat.subs.map(function (x) {
