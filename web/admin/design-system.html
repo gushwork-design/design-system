@@ -694,6 +694,11 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 @media (max-width: 767px) { .fd-r { grid-template-columns: 1fr; gap: var(--gw-space-8); } }
 
 .ds-panel[hidden] { display: none; }
+/* The Review tab wraps its content in one more block than the other tabs, and a plain block has no gap: the stat
+   cards sat directly on the table card. It stacks like the panel it lives in. */
+#ds-review-app { display: flex; flex-direction: column; gap: var(--gw-space-24); }
+#ds-review-app[hidden] { display: none; }
+#ds-review-lock[hidden] { display: none; }
 .ds-panel { display: flex; flex-direction: column; gap: var(--gw-space-24); }
 .ds-panel > * { min-width: 0; }
 #ds-workflow { gap: var(--gw-space-48, 48px); }
