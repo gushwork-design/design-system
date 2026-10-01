@@ -493,12 +493,8 @@ body[data-gw-page="analytics"] .sg__main > * { min-width: 0; }
 .sg__main .an-bar .an-tabs .ul-tab:hover { background: none; color: var(--ul-value); }
 .sg__main .an-bar .an-tabs .ul-tab[aria-selected="true"] { background: none; color: var(--ul-value); }
 .sg__main .an-bar .an-tabs .ul-tab[aria-selected="true"]::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; border-radius: 2px 2px 0 0; background: var(--ul-value); }
-.an-panel .ul-bar { justify-content: flex-end; gap: var(--gw-space-12); flex-wrap: nowrap; }
-.an-panel .vs-areas { display: contents; }
-.an-panel #vs-area-tabs { order: 0; margin-right: auto; }
-.an-panel .vs-areas .ul-tabs[aria-label="Period"] { order: 1; }
-.an-panel #vs-bar .ul-refresh { order: 2; }
-@media (max-width: 760px) { .an-panel .ul-bar { flex-wrap: wrap; } .an-panel #vs-area-tabs { margin-right: 0; } }
+/* The period pills (7 days, 30 days, All time) sit on the left of each tab's controls, with Visits' area filter beside them; the refresh icon stays on the right. */
+
 /* One divider, not two: the tab row's hairline is the page header's rule. */
 body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw-space-8); }
 .an-panel { display: flex; flex-direction: column; gap: var(--gw-space-24); }
