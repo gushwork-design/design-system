@@ -155,6 +155,11 @@ def main(out):
     viewer = ('<style>@media screen{body{padding:32px 0}.page{margin:0 auto 32px;'
               'box-shadow:var(--gw-shadow-s3)}}</style>\n')
     write(out, 'lead-magnet', t.replace('</head>', viewer + '</head>', 1))
+    # One-pager: screen-first single page. Its own assets/ sit beside it, so the route needs a base.
+    t = sitepaths((ROOT / 'templates/one-pager/one-pager.html').read_text(encoding='utf-8'), 2)
+    t = t.replace('<meta charset="utf-8">', '<meta charset="utf-8">\n<base href="/internal/templates/one-pager/">', 1)
+    write(out, 'one-pager', t)
+    shutil.copytree(ROOT / 'templates/one-pager/assets', out / 'one-pager' / 'assets', dirs_exist_ok=True)
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
