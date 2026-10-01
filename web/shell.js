@@ -459,6 +459,18 @@
            '</svg>';
   }
 
+  /* What the user card shows: the person's name. Google sends one, but a session can arrive with the
+     address in its place (or with no name at all), and an address in the card reads as a
+     misconfigured account. So when there is no real name, one is made from the address:
+     utsav.singh@gushwork.ai becomes "Utsav Singh". The address stays in the tooltip. */
+  function displayName() {
+    var n = String(session.name || '').trim(), e = String(session.email || '').trim();
+    if (n && n.indexOf('@') === -1 && n.toLowerCase() !== e.toLowerCase()) return n;
+    var local = (e || n).split('@')[0];
+    var words = local.split(/[._\-+]+/).filter(Boolean).map(function (w) { return w.charAt(0).toUpperCase() + w.slice(1); });
+    return words.join(' ') || n || e;
+  }
+
   function footerHTML() {
     /* Nothing to sign in to while the gate is off. */
     if (!session.gate && !session.signedIn) return '';
@@ -471,11 +483,12 @@
        name can change and the mark should not. */
     var level = avatarLevel();
     var avatar = avatarSVG(session.email || session.name, level);
+    var shown = displayName();
     return '<div class="gw-user">' +
         '<span class="gw-user__av">' + avatar + '</span>' +
         '<span class="gw-user__txt">' +
-          '<span class="gw-user__name" title="' + esc(session.name || session.email) + '">' +
-            esc(session.name || session.email) + '</span>' +
+          '<span class="gw-user__name" title="' + esc(session.email || shown) + '">' +
+            esc(shown) + '</span>' +
           '<span class="gw-user__role">' + AVATAR_LEVELS[level].label + '</span>' +
         '</span>' +
         '<button class="gw-user__out" type="button" data-signout aria-label="Sign out">' +
