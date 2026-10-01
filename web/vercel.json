@@ -122,6 +122,10 @@
       "destination": "/api/gw?action=log-output"
     },
     {
+      "source": "/api/visits",
+      "destination": "/api/gw?action=visits"
+    },
+    {
       "source": "/api/usage-log",
       "destination": "/api/gw?action=usage-log"
     },

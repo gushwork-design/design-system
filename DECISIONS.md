@@ -1029,3 +1029,14 @@ outputs are copied. The decision is recorded so it can be revisited.
 **A dependency, and what a copy can hold.** This is the site's first dependency (`@vercel/blob`),
 imported inside the two routes that use it rather than at the top, so a failure there cannot take
 `log-usage` or `usage-log` down. A copy can hold client copy and pricing; owners are the only readers.
+
+
+## R30 — the hub records who signs in and which pages they open, for the owner
+
+Ruled by Utsav, 1 Oct 2026: track who logs in to the design hub and to any staging or tool page, visible to the owner only.
+
+- **What a row holds.** When, the work email on the verified session, the page path, and whether it was a sign-in or a page view. The shared-password door has no identity, so its rows say `(shared password)` instead of guessing a person. No IP address, user agent, referrer or anything typed.
+- **Where it is written.** `middleware.js` (every gated page view: `GET`, a document request, not an image/script/fetch/prefetch, never `/admin/visits` itself) and the two sign-in routes, through `api/_log-visit.js`. The write is handed to `waitUntil` so it cannot slow or break a page; a store outage means a missing row.
+- **How much.** One row per person per page per 30 minutes (an NX key with a TTL), the list trimmed to 5000, about two or three KV commands per new view.
+- **Who reads it.** `/admin/visits`, fed by `api/_visits.js` behind `gw.js` (no new function), owner-checked on every request like the usage log. The public ad landers are not in the matcher and are not recorded.
+- **Disclosure.** ONBOARDING.md says it in the same section as the plugin usage ping. There is deliberately no on-page notice, matching R29.
