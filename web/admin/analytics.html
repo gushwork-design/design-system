@@ -477,17 +477,24 @@ body[data-gw-page="analytics"] .sg__main > * { min-width: 0; }
 /* Page-level tabs: flat text with an underline for the open one, on a full-width hairline (Exa Usage,
    Xero, Laravel Cloud). The period control inside each tab stays the filled segmented pill, aligned to
    the right, so the two controls read as different things. */
-.sg__main > .an-tabs { align-self: stretch; display: flex; gap: var(--gw-space-24); height: auto; padding: 0; border-radius: 0; background: none; box-shadow: inset 0 -1px 0 var(--ul-hdr-line); }
-.sg__main > .an-tabs .ul-tab { position: relative; height: 40px; padding: 0 2px; border-radius: 0; background: none; color: var(--ul-sub); font: var(--gw-text-body-14-med); }
-.sg__main > .an-tabs .ul-tab:hover { background: none; color: var(--ul-value); }
-.sg__main > .an-tabs .ul-tab[aria-selected="true"] { background: none; color: var(--ul-value); }
-.sg__main > .an-tabs .ul-tab[aria-selected="true"]::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; border-radius: 2px 2px 0 0; background: var(--ul-value); }
-.an-panel .ul-bar { justify-content: flex-end; gap: var(--gw-space-12); flex-wrap: nowrap; }
-.an-panel .vs-areas { display: contents; }
-.an-panel #vs-area-tabs { order: 0; margin-right: auto; }
-.an-panel .vs-areas .ul-tabs[aria-label="Period"] { order: 1; }
-.an-panel #vs-bar .ul-refresh { order: 2; }
-@media (max-width: 760px) { .an-panel .ul-bar { flex-wrap: wrap; } .an-panel #vs-area-tabs { margin-right: 0; } }
+.an-bar { position: sticky; top: 0; z-index: 6; background: var(--s-panel-bg); margin-top: calc(var(--gw-space-8) * -1); padding-top: var(--gw-space-8); align-self: stretch; display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-16); box-shadow: inset 0 -1px 0 var(--ul-hdr-line); }
+.sg__main .an-bar > .an-tabs { display: flex; gap: var(--gw-space-24); height: auto; padding: 0; border-radius: 0; background: none; box-shadow: none; }
+/* "Hide my activity": a small switch in the topbar-icon family (no stroke on the label, a filled track when on). */
+.an-me { display: inline-flex; align-items: center; gap: var(--gw-space-8); cursor: pointer; user-select: none; font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.an-me:hover { color: var(--ul-value); }
+.an-me input { position: absolute; opacity: 0; width: 0; height: 0; }
+.an-me__sw { position: relative; width: 28px; height: 16px; border-radius: 999px; background: var(--ul-hdr-line); transition: background var(--gw-motion-fast); }
+.an-me__sw::after { content: ''; position: absolute; left: 2px; top: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--gw-color-white); box-shadow: 0 1px 2px rgba(0, 0, 0, .25); transition: transform var(--gw-motion-fast); }
+.an-me input:checked + .an-me__sw { background: var(--gw-color-primary-500); }
+.an-me input:checked + .an-me__sw::after { transform: translateX(12px); }
+.an-me input:checked ~ .an-me__t { color: var(--ul-value); }
+.an-me input:focus-visible + .an-me__sw { outline: var(--gw-focus-ring); outline-offset: 2px; }
+.sg__main .an-bar .an-tabs .ul-tab { position: relative; height: 40px; padding: 0 2px; border-radius: 0; background: none; color: var(--ul-sub); font: var(--gw-text-body-14-med); }
+.sg__main .an-bar .an-tabs .ul-tab:hover { background: none; color: var(--ul-value); }
+.sg__main .an-bar .an-tabs .ul-tab[aria-selected="true"] { background: none; color: var(--ul-value); }
+.sg__main .an-bar .an-tabs .ul-tab[aria-selected="true"]::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; border-radius: 2px 2px 0 0; background: var(--ul-value); }
+/* The period pills (7 days, 30 days, All time) sit on the left of each tab's controls, with Visits' area filter beside them; the refresh icon stays on the right. */
+
 /* One divider, not two: the tab row's hairline is the page header's rule. */
 body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw-space-8); }
 .an-panel { display: flex; flex-direction: column; gap: var(--gw-space-24); }
@@ -508,10 +515,17 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
 
   <main class="sg__main">
 
-    <div class="ul-tabs an-tabs" id="an-tabs" role="tablist" aria-label="Analytics">
-      <button class="ul-tab" role="tab" data-tab="insights" aria-selected="true">Insights</button>
-      <button class="ul-tab" role="tab" data-tab="usage" aria-selected="false">Usage</button>
-      <button class="ul-tab" role="tab" data-tab="visits" aria-selected="false">Visits</button>
+    <div class="an-bar">
+      <div class="ul-tabs an-tabs" id="an-tabs" role="tablist" aria-label="Analytics">
+        <button class="ul-tab" role="tab" data-tab="insights" aria-selected="true">Insights</button>
+        <button class="ul-tab" role="tab" data-tab="usage" aria-selected="false">Usage</button>
+        <button class="ul-tab" role="tab" data-tab="visits" aria-selected="false">Visits</button>
+      </div>
+      <label class="an-me" id="an-me" title="Leaves your own rows out of every tab">
+        <input type="checkbox" id="an-me-box">
+        <span class="an-me__sw" aria-hidden="true"></span>
+        <span class="an-me__t">Hide my activity</span>
+      </label>
     </div>
 
     <section class="an-panel" id="an-insights" role="tabpanel">
@@ -690,6 +704,16 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
   </main>
 </div>
 
+<script>
+/* Shared by the three tabs: the signed-in owner's own address, and the switch that leaves it out. */
+window.anMe = { on: false, email: '' };
+window.anMe.ready = fetch('/api/auth/me', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : {}; })
+  .then(function (j) { window.anMe.email = String((j && j.email) || '').trim().toLowerCase(); }).catch(function () {});
+window.anHide = function (rows) {
+  return window.anMe.on && window.anMe.email ? rows.filter(function (r) { return String(r.email || '').toLowerCase() !== window.anMe.email; }) : rows;
+};
+window.__anRefilter = {};
+</script>
 <script>
 (function () {
   'use strict';
@@ -990,11 +1014,12 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
     }).then(function (j) {
       if (!j) return;
       if (!j.configured) { S.status = 'unconfigured'; return; }
-      S.usage = parseUsage(j.rows || []); S.outcomes = j.outcomes || {}; S.fetchedAt = Date.now();
-      S.status = S.usage.length ? 'ready' : 'empty';
+      S.usageAll = parseUsage(j.rows || []); S.usage = window.anHide(S.usageAll); S.outcomes = j.outcomes || {}; S.fetchedAt = Date.now();
+      S.status = S.usageAll.length ? 'ready' : 'empty';
       return Promise.all([visits, idx]).then(function (v) {
         var vj = v[0]; S.haveVisits = !!(vj && vj.configured);
         S.visits = ((vj && vj.rows) || []).map(function (r) { var d = new Date(r.at); return isNaN(d.getTime()) ? null : { at: d, email: String(r.email || ''), path: String(r.path || '/'), kind: r.kind === 'signin' ? 'signin' : 'view' }; }).filter(Boolean);
+        S.visitsAll = S.visits; S.visits = window.anHide(S.visitsAll);
         S.index = v[1] || [];
       });
     }).catch(function () { S.status = 'error'; }).then(function () { S.busy = false; $('in-refresh').removeAttribute('aria-busy'); render(); });
@@ -1006,6 +1031,7 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
   setInterval(updated, 10000);
   window.__an = window.__an || {};
   window.__an.insights = function () { render(); load(); };
+  window.__anRefilter.insights = function () { S.usage = window.anHide(S.usageAll || []); S.visits = window.anHide(S.visitsAll || []); render(); };
 })();
 </script>
 <script>
@@ -1670,8 +1696,8 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
     }).then(function (j) {
       if (!j) return;
       if (!j.configured) { S.status = 'unconfigured'; return; }
-      S.outcomes = j.outcomes || {}; S.files = {}; (j.files || []).forEach(function (k) { S.files[k] = 1; }); S.rows = parse(j.rows || []); S.skipped = j.skipped || 0; S.capped = !!j.capped; S.fetchedAt = Date.now();
-      S.status = S.rows.length ? 'ready' : 'empty';
+      S.outcomes = j.outcomes || {}; S.files = {}; (j.files || []).forEach(function (k) { S.files[k] = 1; }); S.rowsAll = parse(j.rows || []); S.rows = window.anHide(S.rowsAll); S.skipped = j.skipped || 0; S.capped = !!j.capped; S.fetchedAt = Date.now();
+      S.status = S.rowsAll.length ? 'ready' : 'empty';
     }).catch(function () { S.status = 'error'; }).then(function () {
       S.busy = false; $('ul-refresh').removeAttribute('aria-busy'); render();
     });
@@ -1774,6 +1800,7 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
   setInterval(updated, 10000);
   window.__an = window.__an || {};
   window.__an.usage = function () { render(); load(); };
+  window.__anRefilter.usage = function () { S.rows = window.anHide(S.rowsAll || []); S.page = 1; render(); };
 })();
 </script>
 <script>
@@ -1936,8 +1963,8 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
     }).then(function (j) {
       if (!j) return;
       if (!j.configured) { S.status = 'unconfigured'; return; }
-      S.rows = parse(j.rows || []); S.fetchedAt = Date.now();
-      S.status = S.rows.length ? 'ready' : 'empty';
+      S.rowsAll = parse(j.rows || []); S.rows = window.anHide(S.rowsAll); S.fetchedAt = Date.now();
+      S.status = S.rowsAll.length ? 'ready' : 'empty';
       return idx.then(function (list) { list.forEach(function (e) { var u = (e.u || '').replace(/\/+$/, '') || '/'; if (!TITLES[u] && e.t) TITLES[u] = e.t; }); });
     }).catch(function () { S.status = 'error'; }).then(function () {
       S.busy = false; $('vs-refresh').removeAttribute('aria-busy'); render();
@@ -1956,6 +1983,7 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
   setInterval(updated, 10000);
   window.__an = window.__an || {};
   window.__an.visits = function () { render(); load(); };
+  window.__anRefilter.visits = function () { S.rows = window.anHide(S.rowsAll || []); S.shown = 25; render(); };
 })();
 </script>
 
@@ -1970,7 +1998,8 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
     document.getElementById('an-sub').textContent = SUB[name];
     if (push) { try { history.replaceState(null, '', '#' + name); } catch (e) { location.hash = name; } }
     /* Each tab loads its data the first time it is opened, not all three on arrival. */
-    if (!started[name] && window.__an && window.__an[name]) { started[name] = 1; window.__an[name](); }
+    /* A tab starts once the owner's address is known, so the first load already honours the switch. */
+    if (!started[name] && window.__an && window.__an[name]) { started[name] = 1; window.anMe.ready.then(function () { window.__an[name](); }); }
   }
   document.querySelectorAll('#an-tabs .ul-tab').forEach(function (b) { b.addEventListener('click', function () { show(b.getAttribute('data-tab'), true); }); });
   window.addEventListener('hashchange', function () { show(location.hash.slice(1), false); });
@@ -1981,6 +2010,17 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
     function sync() { var t = span.textContent.trim(); btn.setAttribute('data-tip', t ? t + ' · click to refresh' : p[1]); }
     new MutationObserver(sync).observe(span, { childList: true, characterData: true, subtree: true });
     sync();
+  });
+  /* Hide my activity. Remembered per browser; off until you turn it on. Switching it re-filters the
+     tabs that have already loaded, with no new request. */
+  var box = document.getElementById('an-me-box'), KEY = 'gw-analytics-hide-me';
+  try { window.anMe.on = localStorage.getItem(KEY) === '1'; } catch (e) {}
+  box.checked = window.anMe.on;
+  window.anMe.ready.then(function () { if (window.anMe.email) document.getElementById('an-me').title = 'Leaves out rows from ' + window.anMe.email; });
+  box.addEventListener('change', function () {
+    window.anMe.on = box.checked;
+    try { localStorage.setItem(KEY, box.checked ? '1' : '0'); } catch (e) {}
+    Object.keys(started).forEach(function (t) { if (window.__anRefilter[t]) window.__anRefilter[t](); });
   });
   show(location.hash.slice(1), false);
 })();
