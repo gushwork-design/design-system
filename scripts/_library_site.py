@@ -130,10 +130,6 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
 @media (max-width:820px){.lb-find{display:none}}
 
 /* ---- three columns ------------------------------------------------------- */
-/* Shown inside a tab of /admin/design-system (a frame named gw-embed): that page already has the title and
-   the theme button, so the library's own bar steps aside and its rails start at the top. */
-.lb-embed .lb-top{display:none}
-.lb-embed .lb-rail,.lb-embed .lb-toc{top:0;max-height:100vh}
 .lb-3{display:grid;grid-template-columns:240px minmax(0,1fr) 212px;align-items:start;
       max-width:1600px;margin:0 auto}
 .lb-rail{position:sticky;top:60px;max-height:calc(100vh - 60px);overflow-y:auto;
@@ -399,12 +395,17 @@ MARK = ('<svg viewBox="0 0 80 80" fill="none" aria-hidden="true">'
         '75.9066 75.9066 80 70.8571 80H32.5161Z" fill="currentColor"/></svg>')
 
 
+# What the pages know, kept as plain data for /library/data.json, which the Design System page reads so it can
+# list the library itself instead of framing these pages. Reset at the start of main().
+META = {"foundations": [], "surfaces": [], "catalogue": []}
+
+
 def chrome(page, extra_css=""):
     d = page.depth
     tokens = up(d) + "foundation/tokens.css"
     # shell.css is loaded for its --s-* surface layer only; its chrome rules are gated.
     shell = up(d) + "shell.css"
-    home = up(d) + "library/index.html"
+    home = "/admin/design-system#library"
     crumb = f'<span class="lb-crumb">{page.crumb}</span>' if page.crumb else ""
     find = ('<input class="lb-find" id="lb-find" type="search" '
             'placeholder="Filter this library">' if page.rail else "")
@@ -445,7 +446,6 @@ def chrome(page, extra_css=""):
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{esc(page.title or "Component Library")} — Gushwork</title>
 <meta name="robots" content="noindex">
-<script>if(window.name==='gw-embed'||/[?&]embed=1(&|$)/.test(location.search))document.documentElement.classList.add('lb-embed')</script>
 <script>try{{var t=localStorage.getItem('gw-theme');if(t!=='dark')t='light';
 document.documentElement.setAttribute('data-theme',t)}}catch(e){{
 document.documentElement.setAttribute('data-theme','light')}}</script>
@@ -735,6 +735,8 @@ def build_foundations(groups, faces, reg, counts):
             n, unit = len(CL.parse_faces(faces)), "faces"
         prov = CL.provenance(g, g.subs[0] if g.subs else CL.Sub("", ""))
         rev = CL.review_of(fblock, key)
+        META["foundations"].append({"key": key, "title": CL.display_title(g), "count": n, "unit": unit,
+                                    "review": rev["state"], "href": f"foundations/{key}.html"})
         counts["rev_" + rev["state"]] = counts.get("rev_" + rev["state"], 0) + 1
         if rev["state"] != "passed":
             queue.append(("foundation", key, CL.display_title(g),
@@ -791,6 +793,11 @@ def build_parts(reg, counts, ad, adv, tok):
         rail = [("Overview", "index.html", False, str(len(names)) if names else "")]
         rail.append((None, "", False, ""))
         rail += [(n, f"{n}.html", False, "") for n in names]
+
+        META["surfaces"].append({"key": skey, "title": stitle, "what": what, "components": [
+            {"name": n, "version": comps[n].get("version", ""), "changed": comps[n].get("changed", ""),
+             "breaking": bool(comps[n].get("breaking")), "doc": comps[n].get("doc", ""),
+             "review": CL.review_of(rblock, n)["state"], "href": f"parts/{skey}/{n}.html"} for n in names]})
 
         # --- surface overview -------------------------------------------------
         rows = []
@@ -1192,6 +1199,13 @@ def build_components(reg, counts):
     fid = {k: sum(1 for v in rows.values() for e in v if e.get("fidelity") == k)
            for k in ("measured", "inventory", "annotated")}
     variants = sum(e["variants"] or 0 for v in rows.values() for e in v)
+    for skey, title in CAT_SURFACES:
+        for e in rows[skey]:
+            META["catalogue"].append({
+                "surface": skey, "title": title, "group": GROUP_LABEL.get(e.get("group") or "", e.get("group") or ""),
+                "name": e["name"], "note": e.get("note") or "", "node": e.get("node"), "variants": e.get("variants"),
+                "fidelity": e.get("fidelity"),
+                "href": e.get("page") or (f'parts/{e["registry"]}.html' if e.get("registry") else "")})
 
     sections, rail, toc = [], [("All components", "components.html", True, str(total)), (None, "", False, "")], []
     for skey, title in CAT_SURFACES:
@@ -1276,6 +1290,7 @@ def build_review(queue, reg, gaps):
 
 
 def main():
+    META["foundations"].clear(); META["surfaces"].clear(); META["catalogue"].clear()
     groups, faces, _ = CL.parse_tokens_css(
         os.path.join(ROOT, "foundation", "tokens.css"))
     reg = CL.load_registries()
@@ -1306,6 +1321,24 @@ def main():
         with open(out, "w", encoding="utf-8") as fh:
             fh.write(chrome(pg, extra))
         written += 1
+
+    # The same facts as plain data, for the Design System page to list natively.
+    data = {
+        "updated": date.today().isoformat(),
+        "stats": {"tokens": counts["tokens"], "components": counts["components"], "libraries": len(PARTS) + 1,
+                  "recipes": len(RECIPES), "passed": counts.get("rev_passed", 0) + counts["comp_passed"],
+                  "total": groups_n + counts["components"], "gaps": len(gaps)},
+        "foundations": META["foundations"],
+        "surfaces": META["surfaces"],
+        "recipes": [{"key": k, "title": t, "surface": sf, "pins": pins, "what": what, "href": f"recipes/{k}.html"}
+                    for k, t, sf, pins, what in RECIPES],
+        "queue": [{"scope": sc, "key": key, "label": label, "href": path + ".html", "count": n, "unit": unit}
+                  for sc, key, label, path, n, unit in queue],
+        "gaps": [{"n": num, "text": text} for num, text in gaps],
+        "catalogue": META["catalogue"],
+    }
+    with open(os.path.join(OUTDIR, "data.json"), "w", encoding="utf-8") as fh:
+        json.dump(data, fh, ensure_ascii=False, separators=(",", ":"))
 
     sys.stderr.write(
         f"  preview/library/ — {written} pages · {groups_n} foundation groups · "

@@ -97,6 +97,11 @@
       "source": "/admin/review",
       "destination": "/admin/design-system#review",
       "permanent": false
+    },
+    {
+      "source": "/admin/workflow",
+      "destination": "/admin/design-system#workflow",
+      "permanent": false
     }
   ],
   "headers": [
