@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design Workflow — Gushwork Design</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="How a design request becomes an asset: the routes for the team, and the one for new work.">
+<script>try{var t=localStorage.getItem('gw-theme');if(t!=='dark')t='light';document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20width%3D%2280%22%20height%3D%2280%22%20rx%3D%2220%22%20fill%3D%22%230d0d0d%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="/foundation/tokens.css">
+<link rel="stylesheet" href="/shell.css">
+<script src="/shell.js" defer></script>
+<style>
+/* /admin/workflow — how a request becomes an asset. Built from the Figma frame "ai-integrated-workflow"
+   (GW-Gushwork-Design Q9L6q38dEj3Qu1JkjiT13y, 661:5802): 1210 x 902 canvas, cards 260 wide at x 310 / 680 / 990,
+   20px radius, S3 shadow, 1.5px connectors. Every position below is the Figma frame's, minus its 120px margin.
+   The canvas is scaled to fit the page by shell code at the bottom; below 760px it becomes a list. */
+body[data-gw-page="workflow"] .sg__main { grid-column: 1 / -1; max-width: 1120px; }
+body[data-gw-page="workflow"] { --wf-bg: var(--gw-color-neutral-50); --wf-card: var(--gw-color-white); --wf-card-line: rgba(1, 1, 9, .1);
+  --wf-ink: var(--gw-color-black); --wf-sub: var(--gw-color-neutral-600); --wf-list: var(--gw-color-neutral-900); --wf-rule: var(--gw-color-neutral-100);
+  --wf-blue: var(--gw-color-primary-500); --wf-green: var(--gw-color-green-500); --wf-shadow: var(--gw-shadow-s3); }
+:root[data-theme="dark"] body[data-gw-page="workflow"] { --wf-bg: var(--gw-color-black); --wf-card: var(--gw-color-neutral-900); --wf-card-line: var(--gw-color-neutral-850);
+  --wf-ink: var(--gw-color-white); --wf-sub: var(--gw-color-neutral-400); --wf-list: var(--gw-color-neutral-200); --wf-rule: var(--gw-color-neutral-850);
+  --wf-blue: var(--gw-color-primary-400); --wf-green: var(--gw-color-green-400); --wf-shadow: none; }
+.wf-frame { position: relative; background: var(--wf-bg); border-radius: var(--gw-radius-20); padding: 32px; overflow: hidden; }
+:root[data-theme="dark"] .wf-frame { box-shadow: inset 0 0 0 1px var(--s-card-border); }
+.wf-stage { position: relative; width: 1210px; height: 902px; transform-origin: 0 0; }
+.wf-svg { position: absolute; inset: 0; overflow: visible; }
+.wf-ln { fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.wf-ln--b { stroke: var(--wf-blue); } .wf-ln--g { stroke: var(--wf-green); } .wf-ln--d { stroke-dasharray: 3 4; }
+.wf-nd { fill: var(--wf-bg); stroke-width: 1.5; } .wf-nd--b { stroke: var(--wf-blue); } .wf-nd--g { stroke: var(--wf-green); }
+.wf-c { position: absolute; background: var(--wf-card); border-radius: var(--gw-radius-20); box-shadow: inset 0 0 0 1px var(--wf-card-line), var(--wf-shadow);
+  color: var(--wf-ink); font-family: var(--gw-font-body); }
+.wf-t { position: absolute; font: 700 15px/normal var(--gw-font-body); white-space: nowrap; color: var(--wf-ink); }
+.wf-d { position: absolute; left: 18px; font: 400 12px/normal var(--gw-font-body); color: var(--wf-sub); white-space: nowrap; }
+.wf-d--w { left: 16px; width: 228px; white-space: normal; line-height: 16px; }
+.wf-ic { position: absolute; left: 18px; top: 14px; width: 26px; height: 26px; border-radius: 9px; overflow: hidden; display: grid; place-items: center; }
+.wf-ic img { display: block; }
+.wf-ic--slack { background: #3f0f3f; } .wf-ic--slack img { width: 22px; height: 22px; object-fit: cover; }
+.wf-ic--img img { width: 26px; height: 26px; }
+.wf-ic--blue { background: var(--gw-color-primary-500); } .wf-ic--black { background: #000; }
+.wf-gl { width: 16px; height: 16px; filter: brightness(0) invert(1); }
+.wf-sym { width: 16px; height: 16px; } .wf-sym--sm { width: 14px; height: 14px; }
+.wf-c .wf-ic--black { top: 16px; }
+.wf-ic--fig { top: 14px; } .wf-ic--fig img { position: absolute; left: 50%; top: 50%; width: 46px; height: 46px; max-width: none; transform: translate(-50%, -50%); object-fit: cover; }
+.wf-ic--bruce { left: 16px; top: 16px; background: var(--gw-color-neutral-900); box-shadow: inset 0 0 0 .5px var(--gw-color-neutral-600); }
+.wf-ic--bruce img { width: 61%; height: auto; }
+.wf-c--pad .wf-t { left: 50px; }
+.wf-av { position: absolute; left: 16px; top: 20px; width: 36px; height: 36px; border-radius: 10px; background: var(--gw-color-primary-500);
+  box-shadow: inset 0 0 0 .5px var(--gw-color-neutral-600); display: grid; place-items: center; }
+.wf-ic--lead { left: 18px; top: 21px; width: 34px; height: 34px; border-radius: 10px; background: var(--gw-color-red-100, #ffe4e6); display: block; position: absolute; }
+.wf-ic--lead img { position: absolute; width: 23px; height: 27px; left: 6px; top: 3px; object-fit: contain; }
+.wf-l { position: absolute; left: 18px; width: 224px; margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--wf-rule); }
+.wf-l li { height: 32px; display: flex; align-items: center; border-bottom: 1px solid var(--wf-rule); font: 400 12px/normal var(--gw-font-body); color: var(--wf-list); white-space: nowrap; }
+.wf-l li:last-child { border-bottom: 0; }
+.wf-fade { position: absolute; left: 0; right: 0; bottom: 0; height: 86px; border-radius: 0 0 20px 20px;
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--wf-card) 0%, transparent), color-mix(in srgb, var(--wf-card) 70%, transparent)); pointer-events: none; }
+.wf-c--out b { position: absolute; left: 48px; top: 50%; transform: translateY(-50%); width: 158px; font: 700 13px/normal var(--gw-font-body); color: var(--wf-ink); }
+.wf-dot { position: absolute; left: 12px; top: 24px; width: 24px; height: 24px; border-radius: 50%; background: var(--gw-color-primary-500); display: grid; place-items: center; }
+.wf-dot--g { background: var(--gw-color-green-500); left: 11.5px; }
+.wf-ck { width: 14px; height: 14px; display: block; }
+.wf-routes { display: none; list-style: none; margin: 0; padding: 0; gap: 12px; flex-direction: column; }
+.wf-routes li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; padding: 14px 16px; border-radius: var(--gw-radius-16); background: var(--s-card-bg); box-shadow: inset 0 0 0 1px var(--s-card-border);
+  font: var(--gw-text-body-14-med); color: var(--s-heading); }
+.wf-routes i { font-style: normal; color: var(--s-body); }
+@media (max-width: 760px) { .wf-frame { display: none; } .wf-routes { display: flex; } }
+</style>
+</head>
+<body data-gw-page="workflow">
+
+<div class="sg">
+
+  <header class="sg__hd">
+    <h1>Design Workflow</h1>
+    <p>How a request becomes an asset: three routes anyone on the team can take, and one for new work that comes to design</p>
+  </header>
+
+  <main class="sg__main">
+<div class="wf-frame" id="wf-frame"><div class="wf-stage" id="wf-stage" role="img" aria-label="Your team reaches design three ways: a request in Slack answered by the Bruce agent, the Claude plugin with the same skills, or a tool app opened directly. New and sophisticated work comes to the design lead, who designs it end to end and hands it straight to dev."><svg class="wf-svg" width="1210" height="902" viewBox="0 0 1210 902" aria-hidden="true"><path class="wf-ln wf-ln--b" d="M250 194 H264 Q276 194 276 182 V76 Q276 64 288 64 H310 M250 194 H264 Q276 194 276 206 V226 Q276 238 288 238 H310 M276 194 V400 Q276 412 288 412 H310 M570 64 H680 M570 238 H680 M570 412 H603 Q615 412 615 424 V518 Q615 530 627 530 H680 M940 68 H990 M940 304 H990 M940 570 H990"/><path class="wf-ln wf-ln--g" d="M119 232 V840 Q119 852 131 852 H310 M583 852 H681 M941 852 H994"/><path class="wf-ln wf-ln--b wf-ln--d" d="M810 131 V156 M810 452 V486"/><circle class="wf-nd wf-nd--b" cx="310" cy="64" r="3.5"/><circle class="wf-nd wf-nd--b" cx="310" cy="238" r="3.5"/><circle class="wf-nd wf-nd--b" cx="310" cy="412" r="3.5"/><circle class="wf-nd wf-nd--b" cx="680" cy="64" r="3.5"/><circle class="wf-nd wf-nd--b" cx="680" cy="238" r="3.5"/><circle class="wf-nd wf-nd--b" cx="680" cy="530" r="3.5"/><circle class="wf-nd wf-nd--b" cx="990" cy="68" r="3.5"/><circle class="wf-nd wf-nd--b" cx="990" cy="304" r="3.5"/><circle class="wf-nd wf-nd--b" cx="990" cy="570" r="3.5"/><circle class="wf-nd wf-nd--g" cx="310" cy="852" r="3.5"/><circle class="wf-nd wf-nd--g" cx="681" cy="852" r="3.5"/><circle class="wf-nd wf-nd--g" cx="994" cy="852" r="3.5"/></svg><div class="wf-c " style="left:0px;top:156px;width:250px;height:76px"><span class="wf-av"><img src="/assets/logo/gushwork-symbol-white.svg" alt="" class="wf-sym"></span><b class="wf-t" style="left:64px;top:18px">Your team</b><span class="wf-d" style="left:64px;top:40px">Marketing, sales, founders</span></div><div class="wf-c " style="left:310px;top:12px;width:260px;height:104px"><span class="wf-ic wf-ic--slack"><img src="/assets/workflow/slack.png" alt=""></span><b class="wf-t" style="left:52px;top:18px">Request in Slack</b><span class="wf-d" style="top:48px">#design-requests or an @mention.</span><span class="wf-d" style="top:66px">Acked instantly, delivered in-thread.</span></div><div class="wf-c " style="left:310px;top:186px;width:260px;height:111px"><span class="wf-ic wf-ic--img"><img src="/assets/workflow/claude.svg" alt=""></span><b class="wf-t" style="left:52px;top:18px">Claude plugin</b><span class="wf-d" style="top:48px">The same skills, installed in their own</span><span class="wf-d" style="top:66px">Claude session. They design or build</span><span class="wf-d" style="top:84px">directly.</span></div><div class="wf-c " style="left:310px;top:360px;width:260px;height:104px"><span class="wf-ic wf-ic--blue"><img src="/assets/icons/fill/toolbox.svg" alt="" class="wf-gl"></span><b class="wf-t" style="left:52px;top:18px">Tool app, opened directly</b><span class="wf-d" style="top:48px">Fill in the brief, get the asset.</span><span class="wf-d" style="top:66px">No agent, no Slack.</span></div><div class="wf-c wf-c--pad" style="left:680px;top:0px;width:260px;height:118px"><span class="wf-ic wf-ic--bruce"><img src="/assets/workflow/bruce.svg" alt=""></span><b class="wf-t" style="left:50px;top:19px">Bruce: AI Design Agent</b><span class="wf-d wf-d--w" style="top:50px">Claude Agent SDK. Plans, acts and observes in a background worker until the asset is done.</span></div><div class="wf-c " style="left:680px;top:156px;width:260px;height:296px"><span class="wf-ic wf-ic--black"><img src="/assets/logo/gushwork-symbol-white.svg" alt="" class="wf-sym wf-sym--sm"></span><b class="wf-t" style="left:54px;top:19px">Skills</b><span class="wf-d" style="top:50px">Design-system governance, read</span><span class="wf-d" style="top:68px">before anything is drawn.</span><ul class="wf-l wf-l--fade" style="top:98px"><li>foundation/</li><li>skill/ gushwork-web</li><li>skill/ gushwork-dashboard</li><li>skill/ gushwork-slides</li><li>skill/ gushwork-ads</li><li>skill/ gushwork-email</li></ul><span class="wf-fade"></span></div><div class="wf-c " style="left:680px;top:486px;width:260px;height:260px"><span class="wf-ic wf-ic--black"><img src="/assets/icons/fill/toolbox.svg" alt="" class="wf-gl"></span><b class="wf-t" style="left:54px;top:19px">Tools</b><span class="wf-d" style="top:50px">Modular apps, each wrapped as a</span><span class="wf-d" style="top:68px">thin tool schema.</span><ul class="wf-l" style="top:98px"><li>Ad generator</li><li>Signature maker</li><li>Slide editor</li><li>One-pager</li><li>Landing page</li></ul></div><div class="wf-c wf-c--out" style="left:990px;top:32px;width:220px;height:72px"><span class="wf-dot"><svg class="wf-ck" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7.4l2.7 2.7L11 4.7" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><b>Asset back in the thread after my approval</b></div><div class="wf-c wf-c--out" style="left:990px;top:268px;width:220px;height:72px"><span class="wf-dot"><svg class="wf-ck" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7.4l2.7 2.7L11 4.7" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><b>Design or product,<br>in-session</b></div><div class="wf-c wf-c--out" style="left:990px;top:534px;width:220px;height:72px"><span class="wf-dot"><svg class="wf-ck" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7.4l2.7 2.7L11 4.7" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><b>Asset out of the app</b></div><div class="wf-c wf-c--g" style="left:310px;top:814px;width:273px;height:76px"><span class="wf-ic wf-ic--lead"><img src="/assets/workflow/memoji.png" alt=""></span><b class="wf-t" style="left:64px;top:18px">New design request to me</b><span class="wf-d" style="left:64px;top:40px">New and sophisticated work</span></div><div class="wf-c wf-c--g" style="left:681px;top:802px;width:260px;height:100px"><span class="wf-ic wf-ic--black wf-ic--fig"><img src="/assets/workflow/figma.png" alt=""></span><b class="wf-t" style="left:52px;top:18px">Designed end to end</b><span class="wf-d" style="top:48px">New surfaces and anything</span><span class="wf-d" style="top:66px">sophisticated. Hands-on, start to finish.</span></div><div class="wf-c wf-c--out wf-c--g" style="left:994px;top:816px;width:216px;height:72px"><span class="wf-dot wf-dot--g"><svg class="wf-ck" viewBox="0 0 14 14" aria-hidden="true"><path d="M5 4L2 7l3 3M9 4l3 3-3 3M7.7 2.8L6.3 11.2" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span><b>Straight to dev</b></div></div></div><ol class="wf-routes"><li><span>Request in Slack</span><i aria-hidden="true">→</i><span>Bruce: AI Design Agent</span><i aria-hidden="true">→</i><span>Asset back in the thread after my approval</span></li><li><span>Claude plugin</span><i aria-hidden="true">→</i><span>Skills</span><i aria-hidden="true">→</i><span>Design or product, in-session</span></li><li><span>Tool app, opened directly</span><i aria-hidden="true">→</i><span>Tools</span><i aria-hidden="true">→</i><span>Asset out of the app</span></li><li><span>New design request to me</span><i aria-hidden="true">→</i><span>Designed end to end</span><i aria-hidden="true">→</i><span>Straight to dev</span></li></ol>
+  </main>
+</div>
+
+<script>
+(function () {
+  var frame = document.getElementById('wf-frame'), stage = document.getElementById('wf-stage');
+  function fit() {
+    var cs = getComputedStyle(frame), inner = frame.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    if (inner <= 0) return;
+    var s = Math.min(1, inner / 1210);
+    stage.style.transform = 'scale(' + s + ')';
+    frame.style.height = (902 * s + parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom)) + 'px';
+  }
+  fit(); window.addEventListener('resize', fit);
+  if (window.ResizeObserver) new ResizeObserver(fit).observe(frame.parentNode);
+})();
+</script>
+</body></html>

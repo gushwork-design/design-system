@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Record and check review passes — step 4 of the chain in preview/workflow.html.
+"""Record and check review passes — step 4 of the chain below.
 
     Figma -> measure -> exports/*.md -> drawn on the page -> YOU PASS -> skills/
 
