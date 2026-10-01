@@ -166,7 +166,7 @@ async function unfurlStub(request, url) {
 /* A person opening a page, as opposed to the browser fetching a stylesheet or a prefetch. */
 function isPageView(request, url) {
   if (request.method !== 'GET') return false;
-  if (url.pathname.indexOf('/admin/visits') === 0) return false;
+  if (url.pathname.indexOf('/admin/analytics') === 0) return false;
   const last = url.pathname.split('/').pop() || '';
   if (last.indexOf('.') !== -1 && !/\.html$/.test(last)) return false;
   const h = request.headers;
@@ -229,7 +229,7 @@ export default async function middleware(request, context) {
   if (verdict === 'signin') return toSignIn(url);
 
   /* The owner's visit log (api/_log-visit.js): who opened which page. Pages only — not images,
-     scripts or fetches — and never the visit page itself. Handed to waitUntil so it cannot delay
+     scripts or fetches — and never the analytics page itself. Handed to waitUntil so it cannot delay
      the response. */
   if (isPageView(request, url)) {
     const logged = recordVisit({ email: session.email || null, path: url.pathname, kind: 'view' });

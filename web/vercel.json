@@ -77,6 +77,21 @@
       "source": "/preview/:path*",
       "destination": "/",
       "permanent": false
+    },
+    {
+      "source": "/admin/usage-log",
+      "destination": "/admin/analytics#usage",
+      "permanent": false
+    },
+    {
+      "source": "/admin/visits",
+      "destination": "/admin/analytics#visits",
+      "permanent": false
+    },
+    {
+      "source": "/admin/insights",
+      "destination": "/admin/analytics#insights",
+      "permanent": false
     }
   ],
   "headers": [

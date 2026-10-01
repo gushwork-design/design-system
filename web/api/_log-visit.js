@@ -1,7 +1,7 @@
 /* ============================================================================
    _log-visit.js — record who signs in to the design hub and which pages they open.
 
-   FOR THE OWNER ONLY, read back by _visits.js and /admin/visits. Nothing here is shown to the
+   FOR THE OWNER ONLY, read back by _visits.js and the Visits tab of /admin/analytics. Nothing here is shown to the
    person it records, and nothing outside the owner check can read it.
 
    WHAT IT STORES. One row per event in the `gw:visits` list: when, who (the work email on the

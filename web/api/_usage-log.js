@@ -2,7 +2,7 @@
    usage-log.js — read the session log back out, for the owner only.
 
    The other half of log-usage.js. That endpoint appends one row per plugin session to the
-   `gw:usage` list; this one returns them to /admin/usage-log. It is a module behind gw.js,
+   `gw:usage` list; this one returns them to the Usage tab of /admin/analytics. It is a module behind gw.js,
    not a route of its own, for the same reason as its neighbours: Hobby allows 12 functions.
 
    OWNER, NOT ADMIN. The rows carry work emails, and the collection notice says "identity +

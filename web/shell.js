@@ -56,6 +56,7 @@
     'question':            'M140,180a12,12,0,1,1-12-12A12,12,0,0,1,140,180ZM128,72c-22.06,0-40,16.15-40,36v4a8,8,0,0,0,16,0v-4c0-11,10.77-20,24-20s24,9,24,20-10.77,20-24,20a8,8,0,0,0-8,8v8a8,8,0,0,0,16,0v-.72c18.24-3.35,32-17.9,32-35.28C168,88.15,150.06,72,128,72Zm104,56A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z',
     'desktop':             'M208,40H48A24,24,0,0,0,24,64V176a24,24,0,0,0,24,24h72v16H96a8,8,0,0,0,0,16h64a8,8,0,0,0,0-16H136V200h72a24,24,0,0,0,24-24V64A24,24,0,0,0,208,40ZM48,56H208a8,8,0,0,1,8,8v80H40V64A8,8,0,0,1,48,56ZM208,184H48a8,8,0,0,1-8-8V160H216v16A8,8,0,0,1,208,184Z',
     'lock-open':           'M208,80H96V56a32,32,0,0,1,32-32c15.37,0,29.2,11,32.16,25.59a8,8,0,0,0,15.68-3.18C171.32,24.15,151.2,8,128,8A48.05,48.05,0,0,0,80,56V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80Zm0,128H48V96H208V208ZM140,152a12,12,0,1,1-12-12A12,12,0,0,1,140,152Z',
+    'chart-line-up':       'M232,208a8,8,0,0,1-8,8H32a8,8,0,0,1-8-8V48a8,8,0,0,1,16,0V156.69l50.34-50.35a8,8,0,0,1,11.32,0L128,132.69,180.69,80H160a8,8,0,0,1,0-16h40a8,8,0,0,1,8,8v40a8,8,0,0,1-16,0V91.31l-58.34,58.35a8,8,0,0,1-11.32,0L96,123.31l-56,56V200H224A8,8,0,0,1,232,208Z',
     'users':               'M117.25,157.92a60,60,0,1,0-66.5,0A95.83,95.83,0,0,0,3.53,195.63a8,8,0,1,0,13.4,8.74,80,80,0,0,1,134.14,0,8,8,0,0,0,13.4-8.74A95.83,95.83,0,0,0,117.25,157.92ZM40,108a44,44,0,1,1,44,44A44.05,44.05,0,0,1,40,108Zm210.14,98.7a8,8,0,0,1-11.07-2.33A79.83,79.83,0,0,0,172,168a8,8,0,0,1,0-16,44,44,0,1,0-16.34-84.87,8,8,0,1,1-5.94-14.85,60,60,0,0,1,55.53,105.64,95.83,95.83,0,0,1,47.22,37.71A8,8,0,0,1,250.14,206.7Z',
     'list':                'M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z'
   };
@@ -173,8 +174,7 @@
     tier: 'admin',
     items: [
       { label: 'Review Gate',  href: '/admin/review-sheet', icon: 'checks' },
-      { label: 'Usage Logs',   href: '/admin/usage-log',    icon: 'list' },
-      { label: 'Visits',       href: '/admin/visits',       icon: 'users' }
+      { label: 'Analytics',    href: '/admin/analytics',    icon: 'chart-line-up' }
     ]
   };
 
@@ -269,9 +269,9 @@
   }
   function isCurrent(href) { return normalise(location.pathname) === normalise(href); }
 
-  /* The logo chip is brand blue everywhere except the two owner pages (Review Gate, Usage Logs),
+  /* The logo chip is brand blue everywhere except the two owner pages (Review Gate, Analytics),
      where it goes black so the bar says you are somewhere only the owner is. Ruled by Utsav, 1 Oct 2026. */
-  var OWNER_PAGE = /^\/admin\/(usage-log|review-sheet)$/.test(normalise(location.pathname));
+  var OWNER_PAGE = /^\/admin\/(analytics|review-sheet)$/.test(normalise(location.pathname));
 
   /* -- markup ------------------------------------------------------------ */
   function topbarHTML() {
