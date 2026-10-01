@@ -59,17 +59,15 @@ export function defaultRules() {
          it is admin, and wins here by being the longer prefix. */
       { path: '/library',  access: 'internal', groups: [], people: [] },
       { path: '/library/review', access: 'admin', groups: [], people: [] },
-      /* The usage log lists who ran a session, which admins have no need to see.
+      /* Analytics (usage log, visits and insights on one page) lists who ran a session and who opened
+         which page, which admins have no need to see. The old /admin/usage-log, /visits and /insights
+         paths redirect here before middleware runs (web/vercel.json).
+         The original note on the usage log, still true of the page as a whole:
          NOTE: like any compiled route, this only fills a hole — once a store holds an
          /admin rule it covers this path and this line is never added, so the page
          is admin-tier at the edge and the OWNER check that really holds is the one in
          api/_usage-log.js, which the data cannot be read without. */
-      { path: '/admin/usage-log', access: 'owner', groups: [], people: [] },
-      /* Who signs in and which pages they open. Same reasoning: the real check is the owner test in
-         api/_visits.js, which the data cannot be read without. */
-      { path: '/admin/visits', access: 'owner', groups: [], people: [] },
-      /* Insights reads the usage log and the visit log, so it is owner for the same reason. */
-      { path: '/admin/insights', access: 'owner', groups: [], people: [] },
+      { path: '/admin/analytics', access: 'owner', groups: [], people: [] },
       /* Ad landers are public on purpose. An ad page's whole job is to be
          pasted into Slack, sent to a client and run as paid media, and a
          social card cannot render from behind the gate: the scraper fetching

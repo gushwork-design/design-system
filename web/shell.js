@@ -174,9 +174,7 @@
     tier: 'admin',
     items: [
       { label: 'Review Gate',  href: '/admin/review-sheet', icon: 'checks' },
-      { label: 'Usage Logs',   href: '/admin/usage-log',    icon: 'list' },
-      { label: 'Visits',       href: '/admin/visits',       icon: 'users' },
-      { label: 'Insights',     href: '/admin/insights',     icon: 'chart-line-up' }
+      { label: 'Analytics',    href: '/admin/analytics',    icon: 'chart-line-up' }
     ]
   };
 
@@ -271,9 +269,9 @@
   }
   function isCurrent(href) { return normalise(location.pathname) === normalise(href); }
 
-  /* The logo chip is brand blue everywhere except the two owner pages (Review Gate, Usage Logs),
+  /* The logo chip is brand blue everywhere except the two owner pages (Review Gate, Analytics),
      where it goes black so the bar says you are somewhere only the owner is. Ruled by Utsav, 1 Oct 2026. */
-  var OWNER_PAGE = /^\/admin\/(usage-log|review-sheet)$/.test(normalise(location.pathname));
+  var OWNER_PAGE = /^\/admin\/(analytics|review-sheet)$/.test(normalise(location.pathname));
 
   /* -- markup ------------------------------------------------------------ */
   function topbarHTML() {
