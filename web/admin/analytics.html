@@ -511,7 +511,7 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
 
   <header class="sg__hd">
     <h1>Analytics</h1>
-    <p id="an-sub">Where the plugin and the hub can be faster and easier to use, worked out from the usage and visit logs</p>
+    <p>How the plugin and the design hub are used, and where they can be faster and easier to use</p>
   </header>
 
   <main class="sg__main">
@@ -1991,12 +1991,11 @@ window.__anRefilter = {};
 <script>
 (function () {
   'use strict';
-  var SUB = {"insights": "Where the plugin and the hub can be faster and easier to use, worked out from the usage and visit logs", "usage": "Who starts a Claude session, which skills they run, what they make and whether it is on-brand. Never the prompts or file contents", "visits": "Who signs in to the design hub and which pages they open. Work email, page and time only, never what they did on it"}, TABS = ['insights', 'usage', 'visits'], started = {};
+  var TABS = ['insights', 'usage', 'visits'], started = {};
   function show(name, push) {
     if (TABS.indexOf(name) === -1) name = 'insights';
     TABS.forEach(function (t) { document.getElementById('an-' + t).hidden = t !== name; });
     document.querySelectorAll('#an-tabs .ul-tab').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-tab') === name)); });
-    document.getElementById('an-sub').textContent = SUB[name];
     if (push) { try { history.replaceState(null, '', '#' + name); } catch (e) { location.hash = name; } }
     /* Each tab loads its data the first time it is opened, not all three on arrival. */
     /* A tab starts once the owner's address is known, so the first load already honours the switch. */
