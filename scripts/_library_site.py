@@ -1305,6 +1305,81 @@ def build_review(queue, reg, gaps):
                 toc=[(2, "Waiting", "waiting"), (2, "Known gaps", "gaps")])
 
 
+# A foundation group has a drawn view in the Design System page when its tokens are the kind that can be
+# drawn: swatches, a type scale, spacing bars, shapes, shadows, widths. The rest are named, not drawn yet.
+FOUNDATION_VIEW = {"color": "color", "typefaces": "type", "type": "type", "spacing": "spacing", "radius": "radius",
+                   "elevation": "elevation", "breakpoint": "layout", "content-width": "layout"}
+
+
+# Components that have no drawing of their own are shown with the family the old review sheet drew them in
+# (web/previews/_families/, lifted by scripts/_extract_previews.py). Web components by name; the dashboard by the
+# doc that describes them. A drawing of its own, web/previews/<surface>/<key>.html, wins over any of this.
+FAMILY = {
+    ("web", "button"): "g-button", ("web", "input-fields"): "g-field", ("web", "inline-input"): "g-field",
+    ("web", "eyebrow"): "g-atoms", ("web", "client-logos"): "g-atoms", ("web", "cta"): "g-cta", ("web", "footer"): "g-cta",
+    ("shared", "badge"): "g-badge",
+}
+for _k in ("ai-agents", "cards-grid", "cards-grid-small", "comparison-table", "faqs", "fold-other", "hero", "testimonial",
+           "timeline", "video", "with-image"):
+    FAMILY[("web", _k)] = "g-folds"
+DASH_FAMILY = {"primitives": "v2-primitives", "controls": "v2-controls", "data-table": "v2-data-table",
+               "cards-and-chrome": "v2-cards", "feedback": "v2-feedback", "toast": "v2-feedback"}
+FAMILY_TITLE = {"g-button": "Button", "g-badge": "Badge", "g-atoms": "Eyebrow and clients", "g-field": "Text field", "g-folds": "Folds",
+                "g-cta": "Closing CTA and footer", "d-comps": "Dashboard components", "v2-primitives": "Dashboard primitives",
+                "v2-controls": "Dashboard controls", "v2-data-table": "Dashboard data table", "v2-cards": "Dashboard cards and chrome",
+                "v2-feedback": "Dashboard feedback"}
+
+
+def family_of(skey, name, doc):
+    fam = FAMILY.get((skey, name))
+    if not fam and skey == "dashboard":
+        stem = os.path.splitext(os.path.basename(doc or ""))[0]
+        fam = DASH_FAMILY.get(stem, "d-comps")
+    if fam and os.path.isfile(os.path.join(ROOT, "web", "previews", "_families", fam + ".html")):
+        return fam
+    return ""
+
+
+def review_items(reg, groups):
+    """Everything reviewable, with its state, who decided and when, and its current fingerprint. The queue above
+    lists only what is waiting; the Review tab needs the whole set to show passed, sent-back and expired too."""
+    out = []
+    fps = CL.group_fingerprints(groups)
+    fblock = (reg.get("shared") or {}).get("foundations") or {}
+    for g in groups:
+        key = CL.foundation_key(g.title)
+        if not key or key not in fps:
+            continue
+        rec = fblock.get(key) or {}
+        rev = CL.review_of(fblock, key)
+        state = "expired" if rev["state"] == "passed" and rec.get("fingerprint") != fps[key] else rev["state"]
+        out.append({"scope": "foundation", "key": key, "label": CL.display_title(g), "kind": "foundation",
+                    "state": state, "by": rev["by"], "on": rev["on"], "note": rev["note"], "fp": fps[key],
+                    "view": FOUNDATION_VIEW.get(key, ""), "href": f"foundations/{key}.html"})
+    for skey, stitle, glyph, what, *_ in PARTS:
+        block = reg.get(skey) or {}
+        comps = block.get("components") or {}
+        rblock = block.get("review") or {}
+        for n in sorted(comps):
+            e = comps[n]
+            rec = rblock.get(n) or {}
+            rev = CL.review_of(rblock, n)
+            fp = CL.component_fingerprint(skey, n, reg)
+            state = "expired" if rev["state"] == "passed" and rec.get("fingerprint") != fp else rev["state"]
+            prev = os.path.join(ROOT, "web", "previews", skey, n + ".html")
+            fam = "" if os.path.isfile(prev) else family_of(skey, n, e.get("doc", ""))
+            # The ad-page folds have a Figma render each; two are filed under a shorter name.
+            stem = {"eyebrow-ad-page": "eyebrow", "footer-with-cta": "footer-cta"}.get(n, n)
+            fig = f"/assets/{skey}/{stem}-desktop.png" if os.path.isfile(os.path.join(ROOT, "assets", skey, stem + "-desktop.png")) else ""
+            out.append({"scope": skey, "key": n, "label": n, "kind": "component", "surface": stitle,
+                        "state": state, "by": rev["by"], "on": rev["on"], "note": rev["note"], "fp": fp,
+                        "version": e.get("version", ""), "changed": e.get("changed", ""), "doc": e.get("doc", ""),
+                        "breaking": bool(e.get("breaking")), "href": f"parts/{skey}/{n}.html",
+                        "preview": f"/previews/{skey}/{n}.html" if os.path.isfile(prev) else (f"/previews/_families/{fam}.html" if fam else ""),
+                        "family": FAMILY_TITLE.get(fam, "") if fam else "", "figma": fig})
+    return out
+
+
 def main():
     META["foundations"].clear(); META["surfaces"].clear(); META["catalogue"].clear()
     groups, faces, _ = CL.parse_tokens_css(
@@ -1338,6 +1413,8 @@ def main():
             fh.write(chrome(pg, extra))
         written += 1
 
+    items = review_items(reg, groups)
+
     # The same facts as plain data, for the Design System page to list natively.
     data = {
         "updated": date.today().isoformat(),
@@ -1350,6 +1427,7 @@ def main():
                     for k, t, sf, pins, what in RECIPES],
         "queue": [{"scope": sc, "key": key, "label": label, "href": path + ".html", "count": n, "unit": unit}
                   for sc, key, label, path, n, unit in queue],
+        "items": items,
         "gaps": [{"n": num, "text": text} for num, text in gaps],
         "catalogue": META["catalogue"],
     }

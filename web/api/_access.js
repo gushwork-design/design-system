@@ -58,6 +58,8 @@ export function defaultRules() {
          — now admin tier, like the rest of the design system admin. The review queue
          under it is admin too, and wins here by being the longer prefix. */
       { path: '/library',  access: 'admin', groups: [], people: [] },
+      /* The drawn previews the review drawer shows, one HTML file per component. Same tier as the library. */
+      { path: '/previews', access: 'admin', groups: [], people: [] },
       /* Moved from the internal tier to admin on 1 Oct 2026, when the library became a tab of
          /admin/design-system next to the Catalogue and the Review Gate. */
       { path: '/library/review', access: 'admin', groups: [], people: [] },

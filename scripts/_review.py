@@ -143,6 +143,8 @@ def report(strict=False):
             if is_stale:
                 stale += 1
                 print(f"  ~ {key:22} passed, but the source has moved since — re-pass it")
+            elif state == "rework":
+                print(f"  ↺ {key:22} sent back for rework")
             else:
                 pend += 1
                 print(f"  · {key:22} {state}")
@@ -164,11 +166,23 @@ def main(argv):
             print(f"{scope}: " + " ".join(sorted(keys_for(scope))))
         return 0
     if len(argv) < 2:
-        sys.exit("usage: review-pass.sh <scope> <key> [--reject] [--note TEXT]")
+        sys.exit("usage: review-pass.sh <scope> <key> [--reject | --rework] [--note TEXT] [--expect FINGERPRINT]")
     scope, key = argv[0], argv[1]
     if scope not in scopes():
         sys.exit(f"unknown scope '{scope}'. One of: {', '.join(scopes())}")
-    state = "rejected" if "--reject" in argv else "passed"
+    # --expect FP: refuse unless the source is still what was on screen when the decision was made. A decision
+    # taken on the site can be applied days later, and a pass on something that moved in between would be a pass
+    # on a thing nobody looked at.
+    if "--expect" in argv:
+        i = argv.index("--expect")
+        want = argv[i + 1] if i + 1 < len(argv) else ""
+        have = keys_for(scope).get(key, "")
+        if want and have and want != have:
+            sys.exit(f"✘ {scope}/{key} has changed since it was decided on ({want} → {have}). Not recorded: look at it again.")
+    # Three outcomes besides pending: passed, rejected (do not use it), and rework (sent back with a note: fix it,
+    # then it is looked at again). Rework keeps the old fingerprint, so the row reads "in rework" until a new
+    # decision replaces it.
+    state = "rejected" if "--reject" in argv else "rework" if "--rework" in argv else "passed"
     note = ""
     if "--note" in argv:
         i = argv.index("--note")

@@ -28,6 +28,7 @@ import tools from './_tools.js';
 import usageLog from './_usage-log.js';
 import logOutput from './_log-output.js';
 import visits from './_visits.js';
+import review from './_review.js';
 
 const ROUTES = {
   'log-usage': logUsage,
@@ -38,6 +39,7 @@ const ROUTES = {
   'usage-log': usageLog,
   'log-output': logOutput,
   'visits': visits,
+  'review': review,
 };
 
 export default async function handler(req, res) {

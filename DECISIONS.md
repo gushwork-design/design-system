@@ -1080,3 +1080,11 @@ Ruled by Utsav, 1 Oct 2026. The single-step Secondary (`#111827`, Figma `Colors/
 
 - **Not changed, on purpose.** The logo files (`assets/logo/*.svg`, the email and ID-card copies) keep their own `#111827`; a logo is not recoloured to match a token, and the wordmark's dark now has no token. The palette downloads (`assets/color/*.clr`, `.ase`, `.pdf`) and the two colour sheets still list it until they are regenerated. `exports/ad-page/variables.json` still records the Figma binding `Colors/Secondary/500-main`, which is now a binding with no token, the same kind of gap as the bare legacy `White`.
 - **The visible change** is `#111827` to `#0d0d0d` on the text and surfaces that used it: barely perceptible, a touch darker.
+
+## R35 — reviewing happens in a drawer in the Design System page, with buttons; the standalone sheets are gone
+Ruled by Utsav, 1 Oct 2026. The Review tab listed 97 commands to copy and the visual review sheet lived on another page, so judging something and recording the decision were two separate trips. The sheets are no longer a destination; the Review tab is an inbox and each item opens in a side drawer with its visual and three buttons.
+
+- **Pass, Rework, Reject.** Rework sends an item back with a note. Reject and Rework need a note. Pass moves on to the next item waiting.
+- **Recorded by the next session, not by the button** (Utsav's choice over an instant site-only record or a button that opens a PR). The button queues the decision with the fingerprint that was on screen; the session records it with `--expect`, so a decision on something that has since changed is refused. Until then the row reads "being recorded", and Undo withdraws it.
+- **A component must have a visual.** The drawer shows its own preview, the family drawing lifted from the old sheet, or its Figma render. 57 of 97 components have one today; `scripts/check-previews.sh` lists the 40 that do not (slides 22, web 10, lead magnet 4, ad-page 2, shared 2) and warns on push.
+- **Standalone sheets.** `/admin/review-sheet`, `/library`, `/library/review` and `/library/components` redirect to the Design System page. The generated `/library/**` pages remain only as the source of `data.json`.
