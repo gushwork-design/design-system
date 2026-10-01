@@ -656,6 +656,80 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .fd-head p { margin: 0; font: var(--gw-text-body-14-reg); color: var(--ul-sub); max-width: 62ch; }
 .fd-head__r { display: flex; align-items: center; gap: var(--gw-space-12); }
 .fd-sec { display: flex; flex-direction: column; gap: var(--gw-space-16); }
+/* ---- Review drawer and inbox. A drawer rather than a page: the list stays where it was, and Pass advances to the
+   next thing waiting, so a long queue is a run of decisions, not a run of page loads. ---- */
+.rv-scrim { position: fixed; inset: 0; z-index: 80; background: rgba(13, 13, 13, .38); }
+.rv { position: fixed; top: 0; right: 0; bottom: 0; z-index: 81; width: min(560px, 100vw); display: flex; flex-direction: column; background: var(--s-panel-bg); outline: 0;
+  box-shadow: inset 1px 0 0 var(--ul-hdr-line), -28px 0 56px -28px rgba(0, 0, 0, .4); }
+.rv[hidden], .rv-scrim[hidden] { display: none; }
+.rv-h { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--gw-space-12); padding: var(--gw-space-20) var(--gw-space-24) var(--gw-space-16); box-shadow: inset 0 -1px 0 var(--ul-hdr-line); }
+.rv-h__t { min-width: 0; }
+.rv-h__s { font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
+.rv-h h2 { margin: 4px 0 0; font: 600 22px/1.2 var(--gw-font-display); color: var(--ul-value); overflow-wrap: anywhere; }
+.rv-h__r { display: flex; align-items: center; gap: var(--gw-space-8); flex: none; }
+.rv-x { all: unset; box-sizing: border-box; cursor: pointer; width: 28px; height: 28px; display: grid; place-items: center; border-radius: var(--gw-radius-8); color: var(--ul-cell); font: 500 16px/1 var(--gw-font-body); }
+.rv-x:hover { background: var(--ul-tab-hover); color: var(--ul-value); }
+.rv-x:disabled { opacity: .3; cursor: default; background: none; }
+.rv-x:focus-visible, .rv-b:focus-visible, .rv-link:focus-visible { outline: var(--gw-focus-ring); outline-offset: 2px; }
+.rv-body { flex: 1; min-height: 0; overflow-y: auto; padding: var(--gw-space-20) var(--gw-space-24); display: flex; flex-direction: column; gap: var(--gw-space-32); }
+.rv-sec { display: flex; flex-direction: column; gap: var(--gw-space-12); }
+.rv-sec > h3 { margin: 0; font: 600 12px/1.3 var(--gw-font-body); letter-spacing: .04em; text-transform: uppercase; color: var(--ul-sub); }
+.rv-fd { display: flex; flex-direction: column; gap: var(--gw-space-24); }
+.rv .fd-r { grid-template-columns: minmax(0, 1fr); gap: var(--gw-space-8); }
+.rv .fd-grid { grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); }
+.rv-frame { width: 100%; height: 380px; border: 0; border-radius: var(--gw-radius-12); background: var(--gw-color-white); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }
+.rv-fig { margin: 0; display: flex; flex-direction: column; gap: var(--gw-space-8); }
+.rv-fig img { width: 100%; height: auto; display: block; border-radius: var(--gw-radius-12); box-shadow: 0 0 0 1px var(--ul-hdr-line); }
+.rv-cap { margin: var(--gw-space-8) 0 0; font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
+.rv-fig figcaption { font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
+.rv-none { display: flex; flex-direction: column; gap: 6px; padding: var(--gw-space-20); border-radius: var(--gw-radius-12); background: var(--ul-hdr-bg); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); font: var(--gw-text-body-13-reg, 400 13px/1.5 var(--gw-font-body)); color: var(--ul-sub); }
+.rv-none b { font: 600 13px/1.3 var(--gw-font-body); color: var(--ul-value); }
+.rv-none code, .rv-d code { font: 500 11.5px/1.4 var(--gw-font-mono, ui-monospace, "SF Mono", Menlo, monospace); color: var(--ul-cell); overflow-wrap: anywhere; }
+.rv-dl { display: flex; flex-direction: column; }
+.rv-d { display: flex; justify-content: space-between; gap: var(--gw-space-16); padding: var(--gw-space-8) 0; box-shadow: inset 0 -1px 0 var(--ul-hdr-line); font: var(--gw-text-body-13-reg, 400 13px/1.5 var(--gw-font-body)); }
+.rv-d:last-child { box-shadow: none; }
+.rv-d span { color: var(--ul-sub); }
+.rv-d b { font-weight: 500; color: var(--ul-value); text-align: right; overflow-wrap: anywhere; }
+.rv-note { padding: var(--gw-space-12) var(--gw-space-16); border-radius: var(--gw-radius-12); background: var(--ul-hdr-bg); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); font: 400 13px/1.5 var(--gw-font-body); color: var(--ul-cell); }
+.rv-note b { color: var(--ul-value); font-weight: 600; }
+.rv-note--q { background: var(--gw-color-yellow-alpha-10); box-shadow: none; }
+.rv-link { all: unset; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; color: var(--ul-value); font-weight: 600; }
+.rv-q { margin-left: 6px; font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
+.rv-foot { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-12); padding: var(--gw-space-16) var(--gw-space-24); box-shadow: inset 0 1px 0 var(--ul-hdr-line); }
+.rv-foot--col { flex-direction: column; align-items: stretch; }
+.rv-acts { display: flex; gap: var(--gw-space-8); }
+.rv-foot--col .rv-acts { justify-content: flex-end; }
+.rv-hint { font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
+.rv-lab { font: 500 13px/1.4 var(--gw-font-body); color: var(--ul-value); }
+.rv-ta { width: 100%; box-sizing: border-box; padding: var(--gw-space-12); border: 0; border-radius: var(--gw-radius-12); resize: vertical; background: var(--ul-field-bg); color: var(--ul-field-fg); font: 400 14px/1.5 var(--gw-font-body); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }
+.rv-ta:focus-visible { outline: var(--gw-focus-ring); outline-offset: 1px; }
+.rv-b { height: 36px; padding: 0 var(--gw-space-16); border: 0; border-radius: var(--gw-radius-12); cursor: pointer; font: var(--gw-text-button-14); transition: background var(--gw-motion-fast); }
+.rv-b:disabled { opacity: .45; cursor: default; }
+.rv-b--pass { background: var(--ul-prim-bg); color: var(--ul-prim-fg); }
+.rv-b--pass:hover:not(:disabled) { background: var(--ul-prim-hover); }
+.rv-b--ghost { background: none; color: var(--ul-ctl-fg); box-shadow: inset 0 0 0 1px var(--ul-ctl-line); }
+.rv-b--ghost:hover:not(:disabled) { background: var(--ul-ctl-hover); }
+.rv-b--warn { background: var(--gw-color-yellow-500); color: var(--gw-color-black); }
+.rv-b--bad { background: var(--gw-color-red-500, #e11d48); color: var(--gw-color-white); }
+.rv-toast { position: fixed; left: 50%; bottom: var(--gw-space-24); z-index: 90; transform: translate(-50%, 12px); padding: var(--gw-space-12) var(--gw-space-16); border-radius: var(--gw-radius-12); background: var(--ul-prim-bg); color: var(--ul-prim-fg); font: 500 13px/1.3 var(--gw-font-body); opacity: 0; pointer-events: none; transition: opacity var(--gw-motion-fast), transform var(--gw-motion-fast); }
+.rv-toast.on { opacity: 1; transform: translate(-50%, 0); }
+.rv-row { cursor: pointer; }
+.rv-frame { height: 440px; }
+/* On a phone the inbox is the item and its status: the library, who decided and the button are in the drawer. */
+@media (max-width: 767px) {
+  #ds-rev-table .ul-tbl { --vs-cols: minmax(0, 1fr) auto; }
+  #ds-rev-table .ul-row > :nth-child(2), #ds-rev-table .ul-row > :nth-child(4), #ds-rev-table .ul-row > :nth-child(5) { display: none; }
+  .rv-h { padding: var(--gw-space-16); } .rv-body { padding: var(--gw-space-16); } .rv-foot { padding: var(--gw-space-12) var(--gw-space-16); }
+  .rv-hint { display: none; }
+}
+.rv-row .rv-go { margin: 0; height: 28px; }
+.fd-comp { cursor: pointer; }
+.fd-comp__t .ds-a { all: unset; cursor: pointer; font: 600 13.5px/1.3 var(--gw-font-body); color: var(--ul-value); overflow-wrap: anywhere; text-align: left; }
+.fd-comp__t .ds-a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.fd-rv { display: flex; flex-wrap: wrap; align-items: center; gap: var(--gw-space-8); }
+.fd-rv__b { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: var(--gw-space-8); height: 32px; padding: 0 var(--gw-space-12); border-radius: var(--gw-radius-10); box-shadow: inset 0 0 0 1px var(--ul-ctl-line); font: var(--gw-text-button-14); color: var(--ul-ctl-fg); }
+.fd-rv__b:hover { background: var(--ul-ctl-hover); }
+.fd-rv__b:focus-visible { outline: var(--gw-focus-ring); outline-offset: 2px; }
 .fd-sec > h3 { margin: 0; display: flex; align-items: baseline; gap: var(--gw-space-8); font: 600 16px/1.3 var(--gw-font-body); color: var(--ul-value); }
 .fd-sec > h3 span { font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
 .fd-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: var(--gw-space-12); }
@@ -753,9 +827,10 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       </div>
       <div id="ds-review-app" hidden>
         <div class="ul-metrics" id="ds-rev-stats"></div>
+        <div class="an-bar ds-cats"><div class="ul-tabs an-tabs" id="ds-rev-tabs" role="tablist" aria-label="Review"></div></div>
         <section class="ul-sec" aria-labelledby="ds-rev-h">
-          <div class="ul-sh"><div class="ul-sh__t"><h2 id="ds-rev-h">Waiting on you</h2><span class="ul-sh__q" id="ds-rev-q"></span></div>
-            <a class="ds-a" href="/admin/review-sheet" style="font-size:13px">Open the visual review sheet</a></div>
+          <div class="ul-sh"><div class="ul-sh__t"><h2 id="ds-rev-h">Inbox</h2><span class="ul-sh__q" id="ds-rev-q"></span></div>
+            <input class="ds-find" id="ds-rev-find" type="search" aria-label="Filter the inbox" placeholder="Filter" autocomplete="off"></div>
           <div class="ul-scroll vs-t" id="ds-rev-table"></div>
           <div class="vs-more" id="ds-rev-more"></div>
         </section>
@@ -879,6 +954,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   var F = { tab: 'color' }, tokP = null;
   function tokens() { return tokP || (tokP = fetch('/foundation/tokens.json', { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw new Error('tokens ' + r.status); return r.json(); })); }
   var FD_TABS = [['color', 'Color'], ['type', 'Typography'], ['spacing', 'Spacing'], ['radius', 'Radius'], ['elevation', 'Elevation'], ['layout', 'Layout'], ['motion', 'Motion and focus']];
+  var FD_GROUPS = { color: ['color'], type: ['typefaces', 'type'], spacing: ['spacing'], radius: ['radius'], elevation: ['elevation'], layout: ['breakpoint', 'content-width'] };
   var FD_KEY = { color: 'color', type: 'type', spacing: 'spacing', radius: 'radius', elevation: 'elevation', layout: 'breakpoint' };
   function resolve(t, v, n) {
     n = n || 0; var m = /^var\(--(gw-[a-z0-9-]+)\)$/.exec(String(v).trim());
@@ -908,13 +984,16 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     }).join('');
   }
   function fam(v) { return /display/.test(v) ? 'Vert Grotesk Display' : /mono/.test(v) ? 'Mono' : 'Inter'; }
-  function fdType(t) {
+  function fdFaces(t) {
     var faces = [['gw-font-display', 'Headings', '600 700'], ['gw-font-body', 'Everything else', '400 500 600']].filter(function (f) { return t[f[0]]; });
-    var h = '<section class="fd-sec"><h3>Typefaces<span>' + plural(faces.length, 'family') + '</span></h3><div class="fd-faces">' + faces.map(function (f) {
+    return '<section class="fd-sec"><h3>Typefaces<span>' + plural(faces.length, 'family') + '</span></h3><div class="fd-faces">' + faces.map(function (f) {
       var name = String(t[f[0]]).split(',')[0].replace(/['"]/g, '').trim();
       return '<div class="fd-face"><div class="fd-face__aa" style="font-family:var(--' + f[0] + ')">Aa</div><div><div class="fd-face__n">' + esc(name) + '</div><div class="fd-face__m">' + esc(f[1]) + ' · weights ' + esc(f[2]) + '</div></div>' +
         '<div class="fd-face__w" style="font-family:var(--' + f[0] + ')"><span style="font-weight:400">Regular</span><span style="font-weight:500">Medium</span><span style="font-weight:600">Semibold</span><span style="font-weight:700">Bold</span></div></div>';
     }).join('') + '</div></section>';
+  }
+  function fdScale(t) {
+    var h = '';
     var ks = keys(t, /^gw-text-/).filter(function (k) { return !/-tracking$/.test(k) && /^\d/.test(String(t[k])); });
     var groups = [['Headings', /^gw-text-h\d/], ['Body', /^gw-text-body-/], ['Buttons', /^gw-text-button-/], ['Other', /./]], used = {};
     groups.forEach(function (g) {
@@ -929,6 +1008,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     });
     return h;
   }
+  function fdType(t) { return fdFaces(t) + fdScale(t); }
   function fdSpacing(t) {
     var ks = keys(t, /^gw-space-/);
     return '<section class="fd-sec"><h3>Scale<span>' + plural(ks.length, 'step') + '</span></h3><div class="fd-list">' + ks.map(function (k) {
@@ -1035,7 +1115,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       return '<div class="fd-tpl"><div class="fd-tpl__img">' + (x.img ? '<img src="/assets/tools/' + esc(x.img) + '" alt="" loading="lazy">' : '<em>No preview yet</em>') + '</div><div class="fd-tpl__b"><b>' + esc(x.name) + '</b><span>' + esc(x.what) + '</span></div>' +
         '<div class="fd-tpl__a">' + (x.preview ? '<a class="ds-pv" href="' + esc(x.preview) + '" target="_blank" rel="noopener">Preview</a>' : '') +
         (x.key && PROMPTS[x.key] ? '<button type="button" class="ds-pv ds-pv--q" data-use="' + esc(x.key) + '">Use with Claude</button>' : '') +
-        (x.recipe ? '<a class="ds-pv ds-pv--q" href="' + esc(x.recipe) + '">Open</a>' : '') + '</div></div>';
+        '</div></div>';
     }).join('') + '</div></section>';
   }
   /* A component's doc is a file in exports/<surface>/ in the repo (some point up and across, like
@@ -1061,8 +1141,8 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     return GROUP[last] || GROUP[stem] || stem.replace(/-/g, ' ').replace(/^./, function (c) { return c.toUpperCase(); });
   }
   function compCard(sf, c) {
-    return '<div class="fd-comp" data-q="' + esc((c.name + ' ' + (c.doc || '')).toLowerCase()) + '">' +
-      '<div class="fd-comp__t"><a class="ds-a" href="' + esc(LIB + c.href) + '" title="Open the spec page">' + esc(c.name) + '</a>' + review(c.review) + '</div>' +
+    return '<div class="fd-comp" data-id="' + esc(sf.key + '/' + c.name) + '" data-q="' + esc((c.name + ' ' + (c.doc || '')).toLowerCase()) + '">' +
+      '<div class="fd-comp__t"><button type="button" class="ds-a" data-rv="' + esc(sf.key + '/' + c.name) + '" title="Open the review view">' + esc(c.name) + '</button>' + (BYID[sf.key + '/' + c.name] ? badgeOf(eff(BYID[sf.key + '/' + c.name]).state, eff(BYID[sf.key + '/' + c.name]).queued) : review(c.review)) + '</div>' +
       '<div class="fd-comp__m">v' + esc(c.version || '—') + ' · moved ' + esc(c.changed || '—') + (c.breaking ? ' <span class="ul-badge ul-badge--bad">breaking</span>' : '') + '</div>' +
       (c.doc ? '<a class="fd-comp__d" href="' + esc(docHref(sf.key, c.doc)) + '" target="_blank" rel="noopener" title="Open ' + esc(c.doc) + ' on GitHub">' + esc(String(c.doc).split('/').pop()) + '</a>' : '') + '</div>';
   }
@@ -1093,7 +1173,11 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       var body = { color: fdColor, type: fdType, spacing: fdSpacing, radius: fdRadius, elevation: fdElevation, layout: fdLayout, motion: fdMotion }[F.tab](t);
       var gk = FD_KEY[F.tab], g = gk && (d.foundations || []).filter(function (x) { return x.key === gk; })[0];
       side = FD_TABS.map(function (x) { return [x[0], x[1], count[x[0]], x[0] === F.tab]; });
-      main = '<div class="fd-head"><p>' + esc(FD_NOTE[F.tab]) + '</p><div class="fd-head__r">' + (g ? review(g.review) : '') + '</div></div>' + body;
+      var gks = FD_GROUPS[F.tab] || [];
+      main = '<div class="fd-head"><p>' + esc(FD_NOTE[F.tab]) + '</p><div class="fd-rv">' + gks.map(function (k) {
+        var it = BYID['foundation/' + k]; if (!it) return '';
+        var e = eff(it); return '<button type="button" class="fd-rv__b" data-rv="foundation/' + esc(k) + '">' + (gks.length > 1 ? esc(it.label) + ' ' : '') + badgeOf(e.state, e.queued) + '</button>';
+      }).join('') + '</div></div>' + body;
     } else {
       var sub = subOf(cat), sf = sub.surface ? d.surfaces.filter(function (x) { return x.key === sub.surface; })[0] : null;
       side = cat.subs.length > 1 ? cat.subs.map(function (x) {
@@ -1115,6 +1199,19 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       host.querySelectorAll('.fd-comp').forEach(function (c) { c.hidden = !!q && c.getAttribute('data-q').indexOf(q) === -1; });
       host.querySelectorAll('.fd-cg').forEach(function (g) { g.hidden = !g.querySelector('.fd-comp:not([hidden])'); });
     });
+    host.querySelectorAll('[data-rv]').forEach(function (b) {
+      b.addEventListener('click', function (ev) {
+        ev.stopPropagation();
+        var ids = Array.prototype.map.call(host.querySelectorAll('.fd-comp[data-id]'), function (c) { return c.getAttribute('data-id'); });
+        openDrawer(b.getAttribute('data-rv'), ids.length ? ids : [b.getAttribute('data-rv')]);
+      });
+    });
+    host.querySelectorAll('.fd-comp[data-id]').forEach(function (c) {
+      c.addEventListener('click', function () {
+        var ids = Array.prototype.map.call(host.querySelectorAll('.fd-comp[data-id]'), function (x) { return x.getAttribute('data-id'); });
+        openDrawer(c.getAttribute('data-id'), ids);
+      });
+    });
     host.querySelectorAll('[data-use]').forEach(function (b) {
       b.addEventListener('click', function () {
         var old = b.textContent;
@@ -1134,33 +1231,184 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   }
 
   /* ---------------- Review ---------------- */
-  var R = { shown: 25 };
+  /* ---------------- Review: the inbox, and a drawer to look at one thing and decide ----------------
+     Pass, Rework and Reject are buttons. They do not edit the repo (a site cannot, and main needs a reviewed PR):
+     they queue the decision (/api/review) and the next Claude session records it with the fingerprint that was
+     on screen, so a decision made on something that has since moved is refused rather than applied. */
+  var STATE_LABEL = { pending: 'not reviewed', expired: 'expired', passed: 'passed', rejected: 'rejected', rework: 'in rework' };
+  var STATE_CLASS = { passed: ' ul-badge--ok', rejected: ' ul-badge--bad', expired: ' ul-badge--warn', rework: ' ul-badge--warn' };
+  function badgeOf(state, queued) {
+    return '<span class="ul-badge' + (STATE_CLASS[state] || '') + '">' + esc(STATE_LABEL[state] || state) + '</span>' + (queued ? '<span class="rv-q">being recorded</span>' : '');
+  }
+  var QSTATE = {}, ITEMS = [], BYID = {}, RV = { filter: 'waiting', list: [], i: 0, open: false, mode: '' };
+  function idOf(it) { return it.scope + '/' + it.key; }
+  function eff(it) {
+    var q = QSTATE[idOf(it)];
+    if (q && q.action && q.action !== 'undo') return { state: q.action === 'pass' ? 'passed' : q.action === 'reject' ? 'rejected' : 'rework', queued: true, q: q };
+    return { state: it.state, queued: false, q: null };
+  }
+  function loadQueued() {
+    return fetch('/api/review', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : { state: {} }; })
+      .then(function (j) { QSTATE = j.state || {}; }).catch(function () { QSTATE = {}; });
+  }
+  function scopeTitle(it) { return it.kind === 'foundation' ? 'Foundations' : it.surface; }
+  var FILTERS = [['waiting', 'Waiting'], ['rework', 'In rework'], ['passed', 'Passed'], ['rejected', 'Rejected']];
+  function inFilter(it, f) {
+    var s = eff(it).state;
+    return f === 'waiting' ? (s === 'pending' || s === 'expired') : s === f;
+  }
+  function toast(msg) {
+    var t = $('rv-toast'); if (!t) { t = document.createElement('div'); t.id = 'rv-toast'; t.className = 'rv-toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
+    t.textContent = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(function () { t.classList.remove('on'); }, 3800);
+  }
+
+  var RF = { q: '', shown: 30 };
   function renderReview(d) {
-    var s = d.stats, waiting = d.queue.length;
-    $('ds-rev-stats').innerHTML = metric('Waiting on you', String(waiting), 'foundation groups and components') + metric('Passed', s.passed + ' / ' + s.total, 'let into the skills') + metric('Open gaps', String(s.gaps), 'known gaps in the source');
-    $('ds-rev-q').textContent = plural(waiting, 'item');
-    var rows = d.queue.slice(0, R.shown).map(function (it) {
-      var cmd = 'bash scripts/review-pass.sh ' + it.scope + ' ' + it.key;
-      return row([cell(link(it.href, it.label)), txt(it.scope === 'foundation' ? 'Foundations' : it.scope), cell('<span class="ds-code">' + esc(cmd) + '</span> <button class="ds-copy" type="button" data-cmd="' + esc(cmd) + '">Copy</button>')]);
+    indexItems(d);
+    var count = function (f) { return ITEMS.filter(function (it) { return inFilter(it, f); }).length; };
+    $('ds-rev-stats').innerHTML = metric('Waiting on you', String(count('waiting')), 'never reviewed, or changed since') + metric('In rework', String(count('rework')), 'sent back with a note') +
+      metric('Passed', String(count('passed')), 'of ' + ITEMS.length + ', let into the skills');
+    pills($('ds-rev-tabs'), FILTERS.map(function (f) { return [f[0], f[1] + ' ' + count(f[0])]; }), RV.filter, function (v) { RV.filter = v; RF.shown = 30; renderReview(d); });
+    var q = RF.q.trim().toLowerCase();
+    var list = ITEMS.filter(function (it) { return inFilter(it, RV.filter) && (!q || (it.label + ' ' + scopeTitle(it)).toLowerCase().indexOf(q) !== -1); });
+    $('ds-rev-q').textContent = plural(list.length, 'item');
+    var rows = list.slice(0, RF.shown).map(function (it) {
+      var e = eff(it), by = e.queued ? 'You, just now' : (it.by ? it.by + (it.on ? ' · ' + it.on : '') : '—');
+      return '<div class="ul-row ul-row--d rv-row" role="row" tabindex="0" data-id="' + esc(idOf(it)) + '">' +
+        cell('<b style="font-weight:600">' + esc(it.label) + '</b>', '') + txt(scopeTitle(it)) + cell(badgeOf(e.state, e.queued)) + txt(by) +
+        cell('<span class="ds-pv rv-go">Review</span>') + '</div>';
     });
-    $('ds-rev-table').innerHTML = table('minmax(200px,1.6fr) 130px minmax(300px,2.4fr)', ['Item', 'Library', 'Pass it with'], rows, 'Nothing is waiting on you');
-    $('ds-rev-more').innerHTML = waiting > R.shown ? '<button class="ul-btn" id="ds-rev-more-btn" type="button">Show 25 more</button>' : '';
-    var mb = $('ds-rev-more-btn'); if (mb) mb.addEventListener('click', function () { R.shown += 25; renderReview(d); });
-    $('ds-rev-table').querySelectorAll('.ds-copy').forEach(function (b) {
-      b.addEventListener('click', function () { try { navigator.clipboard.writeText(b.getAttribute('data-cmd')); b.textContent = 'Copied'; setTimeout(function () { b.textContent = 'Copy'; }, 1200); } catch (e) {} });
+    $('ds-rev-table').innerHTML = table('minmax(200px,1.6fr) 130px 190px minmax(140px,1fr) 100px', ['Item', 'Library', 'Status', 'Decided', ''], rows,
+      RV.filter === 'waiting' ? 'Nothing is waiting on you' : 'Nothing here yet');
+    $('ds-rev-more').innerHTML = list.length > RF.shown ? '<button class="ul-btn" id="ds-rev-more-btn" type="button">Show 30 more</button>' : '';
+    var mb = $('ds-rev-more-btn'); if (mb) mb.addEventListener('click', function () { RF.shown += 30; renderReview(d); });
+    $('ds-rev-table').querySelectorAll('.rv-row').forEach(function (r) {
+      var go = function () { openDrawer(r.getAttribute('data-id'), list.map(idOf)); };
+      r.addEventListener('click', go);
+      r.addEventListener('keydown', function (ev) { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); go(); } });
     });
     $('ds-gap-q').textContent = plural(d.gaps.length, 'gap');
     $('ds-gaps').innerHTML = d.gaps.map(function (g) { return '<div class="ds-gap"><b>' + esc(g.n) + '</b><span>' + esc(g.text) + '</span></div>'; }).join('') || '<div class="ul-empty"><div class="ul-empty__copy"><h2>No known gaps</h2></div></div>';
+    if (RV.open) renderDrawer();
   }
+
+  /* The visual: what the thing looks like, drawn from the same source as the Foundations views. A component
+     shows its preview file, or its Figma render, or says plainly that it has neither yet. */
+  function visualFor(it, t) {
+    if (it.kind === 'foundation') {
+      var draw = { color: fdColor, type: it.key === 'typefaces' ? fdFaces : fdScale, spacing: fdSpacing, radius: fdRadius, elevation: fdElevation, layout: fdLayout }[it.view];
+      if (draw && t) return '<div class="rv-fd">' + draw(t) + '</div>';
+      return '<div class="rv-none"><b>Nothing drawn for this group yet</b><span>Its values are in tokens.css. A drawn view is added the way the others are, in the Foundations library.</span></div>';
+    }
+    if (it.preview) return '<iframe class="rv-frame" src="' + esc(it.preview) + '" title="' + esc(it.label) + ' preview" sandbox="allow-same-origin" loading="lazy"></iframe>' +
+      (it.family ? '<p class="rv-cap">Drawn with the rest of its family: ' + esc(it.family) + '. Scroll the frame to find ' + esc(it.label) + '.</p>' : '');
+    if (it.figma) return '<figure class="rv-fig"><img src="' + esc(it.figma) + '" alt="' + esc(it.label) + ', the Figma render" loading="lazy"><figcaption>Figma render. No drawn preview yet.</figcaption></figure>';
+    return '<div class="rv-none"><b>No visual yet</b><span>Add <code>web/previews/' + esc(it.scope) + '/' + esc(it.key) + '.html</code> and it appears here. <code>bash scripts/check-previews.sh</code> lists what is missing.</span></div>';
+  }
+  function detailRow(k, v) { return v ? '<div class="rv-d"><span>' + esc(k) + '</span><b>' + v + '</b></div>' : ''; }
+  function drawerEl() {
+    var el = $('rv');
+    if (el) return el;
+    document.body.insertAdjacentHTML('beforeend', '<div class="rv-scrim" id="rv-scrim" hidden></div><aside class="rv" id="rv" role="dialog" aria-modal="true" aria-label="Review" hidden></aside>');
+    $('rv-scrim').addEventListener('click', closeDrawer);
+    document.addEventListener('keydown', function (ev) {
+      if (!RV.open) return;
+      var typing = /^(TEXTAREA|INPUT)$/.test((ev.target || {}).tagName || '');
+      if (ev.key === 'Escape') { closeDrawer(); }
+      else if (!typing && (ev.key === 'ArrowRight' || ev.key === 'j')) { step(1); }
+      else if (!typing && (ev.key === 'ArrowLeft' || ev.key === 'k')) { step(-1); }
+    });
+    return $('rv');
+  }
+  function openDrawer(id, list) {
+    if (!BYID[id]) return;
+    RV.list = list && list.length ? list : [id]; RV.i = Math.max(0, RV.list.indexOf(id)); RV.open = true; RV.mode = '';
+    drawerEl(); $('rv').hidden = false; $('rv-scrim').hidden = false; document.documentElement.classList.add('rv-open');
+    renderDrawer(); $('rv').focus();
+  }
+  function closeDrawer() { RV.open = false; if ($('rv')) { $('rv').hidden = true; $('rv-scrim').hidden = true; } document.documentElement.classList.remove('rv-open'); }
+  function step(n) {
+    var i = RV.i + n; if (i < 0 || i >= RV.list.length) return;
+    RV.i = i; RV.mode = ''; renderDrawer();
+  }
+  function nextWaiting() {
+    for (var i = RV.i + 1; i < RV.list.length; i++) { var it = BYID[RV.list[i]]; var s = it && eff(it).state; if (s === 'pending' || s === 'expired') return i; }
+    return -1;
+  }
+  function renderDrawer() {
+    var it = BYID[RV.list[RV.i]]; if (!it) return;
+    var e = eff(it), el = $('rv');
+    var gh = it.doc ? 'https://github.com/gushwork-design/design-system/blob/main/' + (function () { var o = it.scope === 'shared' ? (/^v2\//.test(it.doc) ? ['exports', 'dashboard'] : ['foundation']) : ['exports', it.scope]; it.doc.split('/').forEach(function (g) { if (g === '..') o.pop(); else if (g && g !== '.') o.push(g); }); return o.join('/'); })() : '';
+    var can = owner, hist = '';
+    if (e.queued) {
+      hist = '<div class="rv-note rv-note--q"><b>You ' + (e.q.action === 'pass' ? 'passed' : e.q.action === 'reject' ? 'rejected' : 'sent this back') + ' it just now.</b> It is recorded in the repo at the next Claude session' +
+        (e.q.note ? '. Your note: ' + esc(e.q.note) : '') + '. <button class="rv-link" type="button" id="rv-undo">Undo</button></div>';
+    } else if (it.by) {
+      hist = '<div class="rv-note"><b>' + esc(STATE_LABEL[it.state] === 'expired' ? 'Passed, then the source moved' : (STATE_LABEL[it.state] || '')) + '</b> · ' + esc(it.by) + (it.on ? ', ' + esc(it.on) : '') + (it.note ? '<br>' + esc(it.note) : '') + '</div>';
+    }
+    var foot;
+    if (!can) foot = '<div class="rv-foot"><span class="rv-hint">Only an owner can pass, rework or reject.</span></div>';
+    else if (RV.mode === 'rework' || RV.mode === 'reject') {
+      foot = '<div class="rv-foot rv-foot--col"><label class="rv-lab" for="rv-note">' + (RV.mode === 'rework' ? 'What needs fixing? This goes to the next Claude session as the brief.' : 'Why is this rejected?') + '</label>' +
+        '<textarea id="rv-note" class="rv-ta" rows="4" maxlength="500" placeholder="' + (RV.mode === 'rework' ? 'The labels bind raw white, they should use the neutral-900 token.' : 'It duplicates the card and nothing uses it.') + '"></textarea>' +
+        '<div class="rv-acts"><button type="button" class="rv-b rv-b--ghost" id="rv-cancel">Cancel</button><button type="button" class="rv-b rv-b--' + (RV.mode === 'reject' ? 'bad' : 'warn') + '" id="rv-send" disabled>' + (RV.mode === 'rework' ? 'Send back' : 'Reject') + '</button></div></div>';
+    } else {
+      foot = '<div class="rv-foot"><div class="rv-acts"><button type="button" class="rv-b rv-b--pass" id="rv-pass">Pass</button><button type="button" class="rv-b rv-b--ghost" id="rv-rework">Rework</button><button type="button" class="rv-b rv-b--ghost" id="rv-reject">Reject</button></div>' +
+        '<span class="rv-hint">← → to move · Esc to close</span></div>';
+    }
+    el.innerHTML = '<header class="rv-h"><div class="rv-h__t"><span class="rv-h__s">' + esc(scopeTitle(it)) + ' · ' + (RV.i + 1) + ' of ' + RV.list.length + '</span><h2>' + esc(it.label) + '</h2></div>' +
+      '<div class="rv-h__r">' + badgeOf(e.state, e.queued) + '<button type="button" class="rv-x" id="rv-prev" aria-label="Previous"' + (RV.i === 0 ? ' disabled' : '') + '>‹</button><button type="button" class="rv-x" id="rv-next" aria-label="Next"' + (RV.i >= RV.list.length - 1 ? ' disabled' : '') + '>›</button><button type="button" class="rv-x" id="rv-close" aria-label="Close">✕</button></div></header>' +
+      '<div class="rv-body" id="rv-body"><section class="rv-sec"><h3>What it looks like</h3><div id="rv-vis">' + (it.kind === 'foundation' ? '<div class="rv-none"><span>Drawing it…</span></div>' : visualFor(it, null)) + '</div></section>' +
+      '<section class="rv-sec"><h3>Details</h3><div class="rv-dl">' + detailRow('Kind', esc(it.kind === 'foundation' ? 'Foundation group' : 'Component')) + detailRow('Version', esc(it.version ? 'v' + it.version : '')) +
+      detailRow('Spec last moved', esc(it.changed || '')) + detailRow('Doc', gh ? '<a class="ds-a" href="' + esc(gh) + '" target="_blank" rel="noopener">' + esc(it.doc.split('/').pop()) + '</a>' : '') +
+      detailRow('Fingerprint', '<code>' + esc(it.fp) + '</code>') + '</div>' + hist + '</section></div>' + foot;
+    if (it.kind === 'foundation') tokens().then(function (t) { if (RV.open && BYID[RV.list[RV.i]] === it) $('rv-vis').innerHTML = visualFor(it, t); }).catch(function () {});
+    $('rv-close').addEventListener('click', closeDrawer);
+    $('rv-prev').addEventListener('click', function () { step(-1); });
+    $('rv-next').addEventListener('click', function () { step(1); });
+    var on = function (id, fn) { var b = $(id); if (b) b.addEventListener('click', fn); };
+    on('rv-pass', function () { send(it, 'pass', ''); });
+    on('rv-rework', function () { RV.mode = 'rework'; renderDrawer(); $('rv-note').focus(); });
+    on('rv-reject', function () { RV.mode = 'reject'; renderDrawer(); $('rv-note').focus(); });
+    on('rv-cancel', function () { RV.mode = ''; renderDrawer(); });
+    on('rv-undo', function () { send(it, 'undo', ''); });
+    var ta = $('rv-note');
+    if (ta) {
+      ta.addEventListener('input', function () { $('rv-send').disabled = !ta.value.trim(); });
+      on('rv-send', function () { send(it, RV.mode, ta.value.trim()); });
+    }
+  }
+  function send(it, action, note) {
+    var btns = document.querySelectorAll('#rv .rv-b'); btns.forEach(function (b) { b.disabled = true; });
+    fetch('/api/review', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ scope: it.scope, key: it.key, action: action, note: note, fp: it.fp }) })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (r) {
+        if (!r.ok) { toast(r.j && r.j.error ? r.j.error : 'Could not save that.'); renderDrawer(); return; }
+        if (action === 'undo') { delete QSTATE[idOf(it)]; toast('Undone.'); RV.mode = ''; renderDrawer(); }
+        else {
+          QSTATE[idOf(it)] = r.j.decision; RV.mode = '';
+          toast(action === 'pass' ? 'Passed. It is recorded at the next session.' : action === 'rework' ? 'Sent back with your note.' : 'Rejected.');
+          var n = nextWaiting(); if (n >= 0) { RV.i = n; renderDrawer(); } else { renderDrawer(); }
+        }
+        reviewRefresh();
+      }).catch(function () { toast('Could not reach the site.'); renderDrawer(); });
+  }
+  var reviewData = null, libData = null, libTok = null;
+  function indexItems(d) { ITEMS = d.items || []; BYID = {}; ITEMS.forEach(function (it) { BYID[idOf(it)] = it; }); }
+  function reviewRefresh() { if (reviewData && started.review && !$('ds-review-app').hidden) renderReview(reviewData); if (libData) renderLibrary(libData, libTok); }
 
   /* ---------------- tabs ---------------- */
   function start(name) {
     if (started[name]) return; started[name] = 1;
-    if (name === 'library') Promise.all([data(), tokens(), prompts()]).then(function (r) { renderLibrary(r[0], r[1]); })
+    if (name === 'library') Promise.all([data(), tokens(), prompts(), owner ? loadQueued() : Promise.resolve()]).then(function (r) { libData = r[0]; libTok = r[1]; indexItems(r[0]); renderLibrary(r[0], r[1]); })
       .catch(function () { $('ds-fd').innerHTML = '<div class="ul-empty"><div class="ul-empty__copy"><h2>Could not load the library</h2></div></div>'; });
     if (name === 'review') me.then(function () {
       $('ds-review-lock').hidden = owner; $('ds-review-app').hidden = !owner;
-      if (owner) data().then(renderReview).catch(function () { failed($('ds-rev-table'), 'Could not load the review queue'); });
+      if (owner) Promise.all([data(), loadQueued()]).then(function (r) {
+        reviewData = r[0]; renderReview(r[0]);
+        $('ds-rev-find').addEventListener('input', function (e) { RF.q = e.target.value; RF.shown = 30; renderReview(reviewData); });
+      }).catch(function () { failed($('ds-rev-table'), 'Could not load the review queue'); });
     });
   }
   function show(name, push) {

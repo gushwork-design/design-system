@@ -1311,6 +1311,35 @@ FOUNDATION_VIEW = {"color": "color", "typefaces": "type", "type": "type", "spaci
                    "elevation": "elevation", "breakpoint": "layout", "content-width": "layout"}
 
 
+# Components that have no drawing of their own are shown with the family the old review sheet drew them in
+# (web/previews/_families/, lifted by scripts/_extract_previews.py). Web components by name; the dashboard by the
+# doc that describes them. A drawing of its own, web/previews/<surface>/<key>.html, wins over any of this.
+FAMILY = {
+    ("web", "button"): "g-button", ("web", "input-fields"): "g-field", ("web", "inline-input"): "g-field",
+    ("web", "eyebrow"): "g-atoms", ("web", "client-logos"): "g-atoms", ("web", "cta"): "g-cta", ("web", "footer"): "g-cta",
+    ("shared", "badge"): "g-badge",
+}
+for _k in ("ai-agents", "cards-grid", "cards-grid-small", "comparison-table", "faqs", "fold-other", "hero", "testimonial",
+           "timeline", "video", "with-image"):
+    FAMILY[("web", _k)] = "g-folds"
+DASH_FAMILY = {"primitives": "v2-primitives", "controls": "v2-controls", "data-table": "v2-data-table",
+               "cards-and-chrome": "v2-cards", "feedback": "v2-feedback", "toast": "v2-feedback"}
+FAMILY_TITLE = {"g-button": "Button", "g-badge": "Badge", "g-atoms": "Eyebrow and clients", "g-field": "Text field", "g-folds": "Folds",
+                "g-cta": "Closing CTA and footer", "d-comps": "Dashboard components", "v2-primitives": "Dashboard primitives",
+                "v2-controls": "Dashboard controls", "v2-data-table": "Dashboard data table", "v2-cards": "Dashboard cards and chrome",
+                "v2-feedback": "Dashboard feedback"}
+
+
+def family_of(skey, name, doc):
+    fam = FAMILY.get((skey, name))
+    if not fam and skey == "dashboard":
+        stem = os.path.splitext(os.path.basename(doc or ""))[0]
+        fam = DASH_FAMILY.get(stem, "d-comps")
+    if fam and os.path.isfile(os.path.join(ROOT, "web", "previews", "_families", fam + ".html")):
+        return fam
+    return ""
+
+
 def review_items(reg, groups):
     """Everything reviewable, with its state, who decided and when, and its current fingerprint. The queue above
     lists only what is waiting; the Review tab needs the whole set to show passed, sent-back and expired too."""
@@ -1338,6 +1367,7 @@ def review_items(reg, groups):
             fp = CL.component_fingerprint(skey, n, reg)
             state = "expired" if rev["state"] == "passed" and rec.get("fingerprint") != fp else rev["state"]
             prev = os.path.join(ROOT, "web", "previews", skey, n + ".html")
+            fam = "" if os.path.isfile(prev) else family_of(skey, n, e.get("doc", ""))
             # The ad-page folds have a Figma render each; two are filed under a shorter name.
             stem = {"eyebrow-ad-page": "eyebrow", "footer-with-cta": "footer-cta"}.get(n, n)
             fig = f"/assets/{skey}/{stem}-desktop.png" if os.path.isfile(os.path.join(ROOT, "assets", skey, stem + "-desktop.png")) else ""
@@ -1345,7 +1375,8 @@ def review_items(reg, groups):
                         "state": state, "by": rev["by"], "on": rev["on"], "note": rev["note"], "fp": fp,
                         "version": e.get("version", ""), "changed": e.get("changed", ""), "doc": e.get("doc", ""),
                         "breaking": bool(e.get("breaking")), "href": f"parts/{skey}/{n}.html",
-                        "preview": f"/previews/{skey}/{n}.html" if os.path.isfile(prev) else "", "figma": fig})
+                        "preview": f"/previews/{skey}/{n}.html" if os.path.isfile(prev) else (f"/previews/_families/{fam}.html" if fam else ""),
+                        "family": FAMILY_TITLE.get(fam, "") if fam else "", "figma": fig})
     return out
 
 

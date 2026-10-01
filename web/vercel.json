@@ -99,6 +99,26 @@
       "permanent": false
     },
     {
+      "source": "/admin/review-sheet",
+      "destination": "/admin/design-system#review",
+      "permanent": false
+    },
+    {
+      "source": "/library",
+      "destination": "/admin/design-system#library",
+      "permanent": false
+    },
+    {
+      "source": "/library/review",
+      "destination": "/admin/design-system#review",
+      "permanent": false
+    },
+    {
+      "source": "/library/components",
+      "destination": "/admin/design-system#library",
+      "permanent": false
+    },
+    {
       "source": "/admin/workflow",
       "destination": "/admin/design-system#workflow",
       "permanent": false
