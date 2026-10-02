@@ -190,49 +190,41 @@
                       : '<span>Ctrl</span><span>K</span>';
 
   /* -- theme ---------------------------------------------------------------
-     Two keys, deliberately. `gw-theme` keeps holding a RESOLVED light|dark, so
-     the no-flash script inlined at the top of every page keeps working exactly
-     as it did and none of them need touching. `gw-theme-pref` holds what the
-     person actually chose, which may be `system` — a value that matches no CSS
-     rule and would paint the light palette on a dark machine if it ever
-     reached data-theme. */
-  /* System was dropped 18 Sep 2026 — the site defaults to Light and only ever
-     follows an explicit choice. The resolver still understands 'system' so an
-     existing stored preference does not break; it just resolves to light and is
-     rewritten on the next apply. */
+     System, Light or Dark. With no choice made the site FOLLOWS THE MACHINE (System), and changes with it while it is
+     open. This reverses the 18 Sep 2026 ruling (default Light, System dropped); asked for again by Utsav on 2 Oct 2026.
+
+     Two keys. `gw-theme-choice` is what the person picked and is written ONLY when they pick, so "never chose" can be told
+     from "chose Light": it holds light, dark or system, and absent means system. `gw-theme` holds the RESOLVED light or
+     dark, kept for the pages that read it. The no-flash script inlined in every page reads the choice and asks the
+     machine itself, so first paint and this agree. The older `gw-theme-pref` is no longer read: it was written for
+     everyone on every load while Light was the default, so it could not say who had actually chosen. */
   var THEMES = [
+    { id: 'system', label: 'System', icon: 'desktop' },
     { id: 'light',  label: 'Light',  icon: 'sun' },
     { id: 'dark',   label: 'Dark',   icon: 'moon' }
   ];
-  var PREF_KEY = 'gw-theme-pref', RESOLVED_KEY = 'gw-theme';
+  var CHOICE_KEY = 'gw-theme-choice', RESOLVED_KEY = 'gw-theme';
 
   function themePref() {
     try {
-      var v = localStorage.getItem(PREF_KEY);
-      /* 'system' is no longer offered: anyone holding it lands on light. */
-      if (v === 'light' || v === 'dark') return v;
-      if (v === 'system') return 'light';
-      /* Upgrading from the two-value world: whatever was last resolved is the
-         preference, so nobody's theme flips on the deploy that adds this. */
-      var old = localStorage.getItem(RESOLVED_KEY);
-      if (old === 'dark' || old === 'light') return old;
-      /* Nobody has chosen: Light. This supersedes the 16 Sep "follow the
-         machine" rule. The no-flash script inlined in each page resolves the
-         same way, so first paint and this agree. */
-      return 'light';
-    } catch (e) { return 'light'; }
+      var v = localStorage.getItem(CHOICE_KEY);
+      if (v === 'light' || v === 'dark' || v === 'system') return v;
+    } catch (e) { /* no storage: fall through to the default */ }
+    return 'system';
+  }
+  function machineIsDark() {
+    try { return !!(window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches); } catch (e) { return false; }
   }
   function resolveTheme(pref) {
-    /* 'system' can still arrive from an old stored value; it resolves to light
-       rather than to the machine, which is the point of the change. */
-    return pref === 'dark' ? 'dark' : 'light';
+    return pref === 'dark' ? 'dark' : pref === 'light' ? 'light' : (machineIsDark() ? 'dark' : 'light');
   }
-  function applyTheme(pref) {
+  /* remember = true only when a person picks from the menu. Applying the default must not write a choice. */
+  function applyTheme(pref, remember) {
     var resolved = resolveTheme(pref);
     document.documentElement.setAttribute('data-theme', resolved);
     try {
-      localStorage.setItem(PREF_KEY, pref);
       localStorage.setItem(RESOLVED_KEY, resolved);
+      if (remember) localStorage.setItem(CHOICE_KEY, pref);
     } catch (e) { /* private window — the attribute above still took */ }
   }
 
@@ -1412,7 +1404,7 @@
   }
 
   function setTheme(pref) {
-    applyTheme(pref);
+    applyTheme(pref, true);
     syncThemeControls(pref);
     closeThemeMenus();
   }
@@ -1440,12 +1432,14 @@
 
   function initTheme() {
     var pref = themePref();
-    applyTheme(pref);
+    applyTheme(pref, false);
     syncThemeControls(pref);
-    /* The OS-change and visibility listeners that lived here are gone with the
-       System option: both only acted when the preference was 'system', which
-       themePref() can no longer return. The theme now only ever changes because
-       someone picked it. */
+    /* While the choice is System the page follows the machine as it changes, for example at sunset. */
+    try {
+      var mq = matchMedia('(prefers-color-scheme: dark)');
+      var follow = function () { if (themePref() === 'system') applyTheme('system', false); };
+      if (mq.addEventListener) mq.addEventListener('change', follow); else if (mq.addListener) mq.addListener(follow);
+    } catch (e) { /* an old browser: the theme is whatever it was at load */ }
   }
 
   /* -- modal -------------------------------------------------------------- */
@@ -1917,5 +1911,5 @@
    stylesheets, so the theme is set before first paint. Defaults to light,
    not the OS preference — see scripts/_add_shell.py's THEME_SNIPPET for why:
 
-   <script>try{var t=localStorage.getItem('gw-theme')||'light';document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+   <script>try{var c=localStorage.getItem('gw-theme-choice'),t=c==='dark'||c==='light'?c:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
 */

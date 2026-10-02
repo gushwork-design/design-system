@@ -1095,3 +1095,11 @@ Ruled by Utsav, 1 Oct 2026, after asking why a pass is not simply saved. A pass 
 - **What does not change.** Nothing reaches `main` without another person approving the pull request. The pass carries the fingerprint the owner saw, so a pass on something that has since changed reads "expired".
 - **Cost.** The site holds a token that can write to the repository. It is scoped to this repository's contents and pull requests and nothing else, and it can only write to its own branch; `main` is protected.
 - **Side effect on publishing.** `publish-sheets.sh` regenerates a stale library instead of refusing, since a merged decision changes a registry and nothing else.
+
+## R37 — System is back as a theme, and it is the default
+Ruled by Utsav, 2 Oct 2026, reversing the 18 Sep 2026 ruling (System dropped, default Light). The theme menu offers System, Light and Dark. With no choice made the site follows the machine, and keeps following it while open (at sunset, say). Explicitly picking Light or Dark sticks until System is picked again.
+
+- **A new storage key.** `gw-theme-choice` holds light, dark or system and is written only when someone picks. The old `gw-theme-pref` was written for everyone on every load while Light was the default, so it could not tell "never chose" from "chose Light" and is no longer read. `gw-theme` still holds the resolved light or dark.
+- **Everyone is reset once.** Because the old key cannot be trusted, anyone who had picked Dark before is on System after this deploy. If their machine is light, so is the site, until they pick Dark again.
+- **No flash.** Every page's inline first-paint script reads the choice and asks the machine itself, so System does not paint light first. The library's own toggle follows the same keys; it toggles light and dark, which counts as a choice.
+- **The trigger glyph** shows a monitor for System, a sun for Light, a moon for Dark.
