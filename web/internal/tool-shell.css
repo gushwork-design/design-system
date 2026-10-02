@@ -1078,3 +1078,8 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; appe
   background-repeat: no-repeat !important;
   background-position: center !important;
 }
+
+/* The logo tile is #0D0D0D, the same as the dark panel, so its edge disappears. The hub's
+   own favicon and login tile carry a hairline (Neutral/800); the tile gets the same ring in
+   dark. The tile already clips to radius/8, so the ring follows it. */
+:root[data-theme="dark"] .brand-card .brand-icon { box-shadow: 0 0 0 1px var(--gw-color-neutral-800); }

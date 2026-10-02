@@ -945,6 +945,8 @@ function App() {
                       onPhoto={(url, name) => {
                         setPhotoUrl(url);
                         setPhotoName(name);
+                        // a new photo starts framed to fill the window; grayscale is kept
+                        setPhotoXform((p) => ({ ...p, x: 50, y: 40, zoom: 100 }));
                       }}
                       onClear={() => {
                         setPhotoUrl(null);
@@ -1145,6 +1147,7 @@ function App() {
                     processPhotoFile(f, (url, name) => {
                       setPhotoUrl(url);
                       setPhotoName(name);
+                      setPhotoXform((p) => ({ ...p, x: 50, y: 40, zoom: 100 }));
                     });
                     e.target.value = '';
                   }}

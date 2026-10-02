@@ -1040,6 +1040,9 @@ function App() {
     (url, name) => {
       setPhotoUrl(url);
       setPhotoName(name);
+      // A new photo starts framed to fill the window (Zoom 100, centred, face-height pan) — the
+      // previous photo's zoom / pan no longer applies. Grayscale is a preference and is kept.
+      setPhotoXform((p) => ({ ...p, x: 50, y: 30, zoom: 100 }));
       setPolishedUrl(null);
       setPolishState('idle');
       setPolishProgress(0);
