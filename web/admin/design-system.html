@@ -676,6 +676,14 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .rv-ex:focus-visible { outline: var(--gw-focus-ring); outline-offset: 2px; }
 .rv-ex svg { width: 14px; height: 14px; flex: none; }
 .rv-vis { position: relative; }
+/* The ghost drawn while a picture loads: a group frame with a header and a grid of tiles, the shape of what is coming. */
+.rv-ghost { display: flex; flex-direction: column; border-radius: var(--gw-radius-16, 16px); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); overflow: hidden; }
+.rv-ghost__h { padding: var(--gw-space-12) var(--gw-space-16); box-shadow: inset 0 -1px 0 var(--ul-hdr-line); }
+.rv-ghost__h .sk { width: 120px; height: 14px; }
+.rv-ghost__g { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: var(--gw-space-12); padding: var(--gw-space-12); }
+.rv-ghost__c { display: flex; flex-direction: column; align-items: center; gap: var(--gw-space-8); }
+.rv-ghost__c .sk:first-child { width: 100%; height: 84px; border-radius: var(--gw-radius-12); }
+.rv-ghost__c .sk:last-child { width: 56%; height: 10px; }
 .rv-vis--cap { max-height: 520px; overflow: hidden; }
 .rv-vis--cap::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 120px; pointer-events: none; background: linear-gradient(to bottom, transparent, var(--s-panel-bg)); }
 .rv-h { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--gw-space-12); padding: var(--gw-space-20) var(--gw-space-24) var(--gw-space-16); box-shadow: inset 0 -1px 0 var(--ul-hdr-line); }
@@ -695,7 +703,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .rv .fd-grid { grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); }
 .rv-fig { margin: 0; display: flex; flex-direction: column; gap: var(--gw-space-8); }
 .rv-fig img { width: 100%; height: auto; display: block; border-radius: var(--gw-radius-12); box-shadow: 0 0 0 1px var(--ul-hdr-line); }
-.rv-pv { width: 100%; overflow: hidden; }   /* no frame of its own: each group in the drawing has one */
+.rv-pv { width: 100%; overflow-x: auto; overflow-y: hidden; }   /* no frame of its own: each group in the drawing has one */
 .rv-pv__in { padding: 0; }
 .rv-fig figcaption { font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
 .rv-none { display: flex; flex-direction: column; gap: 6px; padding: var(--gw-space-20); border-radius: var(--gw-radius-12); background: var(--ul-hdr-bg); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); font: var(--gw-text-body-13-reg, 400 13px/1.5 var(--gw-font-body)); color: var(--ul-sub); }
@@ -1411,13 +1419,17 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 
   /* The visual: what the thing looks like, drawn from the same source as the Foundations views. A component
      shows its preview file, or its Figma render, or says plainly that it has neither yet. */
+  function ghost() {
+    var cell = '<div class="rv-ghost__c"><span class="sk"></span><span class="sk"></span></div>';
+    return '<div class="rv-ghost" role="status" aria-label="Drawing it"><div class="rv-ghost__h"><span class="sk"></span></div><div class="rv-ghost__g">' + new Array(7).join(cell) + '</div></div>';
+  }
   function visualFor(it, t) {
     if (it.kind === 'foundation') {
       var draw = { color: fdColor, faces: fdFaces, scale: fdScale, links: fdLinks, spacing: fdSpacing, radius: fdRadius, elevation: fdElevation, content: fdContent, bps: fdBreakpoints, motion: fdMotion, slides: fdSlides }[it.view];
       if (draw && t) return '<div class="rv-fd">' + draw(t) + '</div>';
       return '<div class="rv-none"><b>Nothing drawn for this group yet</b><span>Its values are in tokens.css. A drawn view is added the way the others are, in the Foundations library.</span></div>';
     }
-    if (it.preview) return '<div class="rv-pv-host" data-pv="' + esc(it.preview) + '"><div class="rv-none"><span>Drawing it…</span></div></div>';
+    if (it.preview) return '<div class="rv-pv-host" data-pv="' + esc(it.preview) + '">' + ghost() + '</div>';
     if (it.figma) return '<figure class="rv-fig"><img src="' + esc(it.figma) + '" alt="' + esc(it.label) + ', the Figma render" loading="lazy"><figcaption>Figma render. No drawn preview yet.</figcaption></figure>';
     return '<div class="rv-none"><b>No visual yet</b><span>Add <code>web/previews/' + esc(it.scope) + '/' + esc(it.key) + '.frag</code> and it appears here. <code>bash scripts/check-previews.sh</code> lists what is missing.</span></div>';
   }
@@ -1443,8 +1455,11 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
           if (hi > lo) need = Math.max(need, Math.ceil(hi - lo) + 20 + 4);
         });
         inner.style.setProperty('--cellmin', need + 'px');
-        var w = Math.max(inner.scrollWidth, bw), k = 1;
-        if (w > bw + 1) { k = bw / w; inner.style.width = w + 'px'; }
+        // A fold is drawn inside its own scroller, so its width does not show in inner.scrollWidth: read it from the fold itself.
+        var foldW = 0;
+        root.querySelectorAll('.foldscale').forEach(function (f) { foldW = Math.max(foldW, Math.ceil(f.getBoundingClientRect().width)); });
+        var w = Math.max(inner.scrollWidth, bw, foldW ? foldW + 4 : 0), k = 1;
+        if (w > bw + 1) { k = Math.max(bw / w, 0.7); inner.style.width = w + 'px'; }   // not smaller than 70%: past that, scroll sideways or Expand
         inner.style.transform = k < 1 ? 'scale(' + k + ')' : 'none'; inner.style.transformOrigin = '0 0';
         box.style.height = Math.ceil(inner.offsetHeight * k) + 'px';
         settleVis();
@@ -1529,7 +1544,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     }
     el.innerHTML = '<header class="rv-h"><div class="rv-h__t"><span class="rv-h__s">' + esc(scopeTitle(it)) + ' · ' + (RV.i + 1) + ' of ' + RV.list.length + '</span><h2>' + esc(it.label) + '</h2></div>' +
       '<div class="rv-h__r">' + badgeOf(e.state, e.queued, e.q) + '<button type="button" class="rv-x" id="rv-prev" aria-label="Previous"' + (RV.i === 0 ? ' disabled' : '') + '>‹</button><button type="button" class="rv-x" id="rv-next" aria-label="Next"' + (RV.i >= RV.list.length - 1 ? ' disabled' : '') + '>›</button><button type="button" class="rv-x" id="rv-close" aria-label="Close">✕</button></div></header>' +
-      '<div class="rv-body" id="rv-body"><section class="rv-sec"><div class="rv-sh"><h3>What it looks like</h3><button type="button" class="rv-ex" id="rv-ex" aria-expanded="false" title="Open the drawer out to see everything (E)"></button></div><div class="rv-vis" id="rv-vis">' + (it.kind === 'foundation' ? '<div class="rv-none"><span>Drawing it…</span></div>' : visualFor(it, null)) + '</div></section>' +
+      '<div class="rv-body" id="rv-body"><section class="rv-sec"><div class="rv-sh"><h3>What it looks like</h3><button type="button" class="rv-ex" id="rv-ex" aria-expanded="false" title="Open the drawer out to see everything (E)"></button></div><div class="rv-vis" id="rv-vis">' + (it.kind === 'foundation' ? ghost() : visualFor(it, null)) + '</div></section>' +
       '<section class="rv-sec rv-sec--det"><h3>Details</h3><div class="rv-dl">' + detailRow('Kind', esc(it.kind === 'foundation' ? 'Foundation group' : 'Component')) + detailRow('Version', esc(it.version ? 'v' + it.version : '')) +
       detailRow('Spec last moved', esc(it.changed || '')) + detailRow('Doc', gh ? '<a class="ds-a" href="' + esc(gh) + '" target="_blank" rel="noopener">' + esc(it.doc.split('/').pop()) + '</a>' : '') +
       detailRow('Fingerprint', '<code>' + esc(it.fp) + '</code>') + '</div>' + hist + '</section></div>' + foot;
