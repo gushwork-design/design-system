@@ -743,7 +743,7 @@ window.__anRefilter = {};
 (function () {
   'use strict';
   var ROOT = document.getElementById('an-insights');
-  var ICON = {"arrow-clockwise":"<path d=\"M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z\"/>","lock":"<path d=\"M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Zm-68-56a12,12,0,1,1-12-12A12,12,0,0,1,140,152Z\"/>","warning-circle":"<path d=\"M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z\"/>","magnifying-glass":"<path d=\"M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z\"/>"};
+  var ICON = {"arrow-left":"<path d=\"M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z\"/>","arrow-right":"<path d=\"M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z\"/>","arrow-clockwise":"<path d=\"M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z\"/>","lock":"<path d=\"M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Zm-68-56a12,12,0,1,1-12-12A12,12,0,0,1,140,152Z\"/>","warning-circle":"<path d=\"M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z\"/>","magnifying-glass":"<path d=\"M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z\"/>"};
   function icon(n) { return '<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">' + (ICON[n] || '') + '</svg>'; }
   function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
   function $(id) { return document.getElementById(id); }
@@ -924,6 +924,27 @@ window.__anRefilter = {};
   }
   function row(cells) { return '<div class="ul-row ul-row--d" role="row">' + cells.join('') + '</div>'; }
 
+  /* Ten rows to a page. The pager shows only when there is more than a page, and uses the same markup as the
+     Usage tab's "New people" table (.ul-pg). It sits OUTSIDE the table's scroller so it does not scroll sideways
+     with a wide table. */
+  var PER = 10, PG = {};
+  function paged(hostId, key, cols, heads, items, rowFn, empty) {
+    var host = $(hostId), pages = Math.max(1, Math.ceil(items.length / PER));
+    PG[key] = Math.min(Math.max(1, PG[key] || 1), pages);
+    var from = (PG[key] - 1) * PER;
+    host.innerHTML = table(cols, heads, items.slice(from, from + PER).map(rowFn), empty);
+    var slot = $(hostId + '-pg');
+    if (!slot) { slot = document.createElement('div'); slot.id = hostId + '-pg'; slot.className = 'ul-pg'; host.insertAdjacentElement('afterend', slot); }
+    slot.hidden = items.length <= PER;
+    if (slot.hidden) return;
+    slot.innerHTML = '<div class="ul-pg__l"><span class="ul-pg__t">' + (from + 1) + '–' + Math.min(from + PER, items.length) + ' of ' + items.length + '</span></div>' +
+      '<div class="ul-pg__r"><span class="ul-pg__t">Page ' + PG[key] + ' of ' + pages + '</span>' +
+      '<button class="ul-ib" data-pg="prev" type="button" aria-label="Previous page"' + (PG[key] <= 1 ? ' disabled' : '') + '>' + icon('arrow-left') + '</button>' +
+      '<button class="ul-ib" data-pg="next" type="button" aria-label="Next page"' + (PG[key] >= pages ? ' disabled' : '') + '>' + icon('arrow-right') + '</button></div>';
+    slot.querySelector('[data-pg="prev"]').addEventListener('click', function () { PG[key]--; renderAll(); });
+    slot.querySelector('[data-pg="next"]').addEventListener('click', function () { PG[key]++; renderAll(); });
+  }
+
   function actions(m) {
     var a = [];
     var sk = m.perSkill.filter(function (s) { return s.measured >= 3; });
@@ -978,27 +999,28 @@ window.__anRefilter = {};
       metric('Approved / needs changes', m.appr + ' / ' + m.chg, 'marked by an owner');
 
     $('in-q-skill').textContent = plural(m.perSkill.length, 'skill') + ' run, ' + (S.period === 'all' ? 'all time' : 'last ' + S.period + ' days');
-    $('in-skill').innerHTML = table('minmax(170px,1.6fr) 64px 84px 88px 92px 120px 112px 130px', ['Skill', 'Runs', 'Outputs', 'On-brand', 'Rewritten', 'Needs changes', 'Time to output', 'Tokens to output'],
-      m.perSkill.map(function (s) {
+    if (PG._p !== S.period) PG = { _p: S.period };   /* a new period starts every table on page 1 */
+    paged('in-skill', 'skill', 'minmax(170px,1.6fr) 64px 84px 88px 92px 120px 112px 130px', ['Skill', 'Runs', 'Outputs', 'On-brand', 'Rewritten', 'Needs changes', 'Time to output', 'Tokens to output'],
+      m.perSkill, function (s) {
         return row([cell(s.name, 'ul-c--who'), cell(String(s.runs)), cell(String(s.outs)), cell(pctS(s.on, s.measured)), cell(pctS(s.rework, s.outs)), cell(String(s.chg)), cell(s.med == null ? '—' : dur(s.med)), cell(m.tk.toBySkill[s.name] && m.tk.toBySkill[s.name].length ? fmtTok(median(m.tk.toBySkill[s.name])) : '—')]);
-      }), 'No skill runs in this period');
+      }, 'No skill runs in this period');
 
-    $('in-fail').innerHTML = table('minmax(160px,1.4fr) 80px 90px', ['Check', 'Missed', 'Share'],
-      Object.keys(m.fail).map(function (k) { return row([cell(k, 'ul-c--who'), cell(String(m.fail[k])), cell(pctS(m.fail[k], m.measured.length))]); }), 'Nothing measured yet');
+    paged('in-fail', 'fail', 'minmax(160px,1.4fr) 80px 90px', ['Check', 'Missed', 'Share'],
+      Object.keys(m.fail), function (k) { return row([cell(k, 'ul-c--who'), cell(String(m.fail[k])), cell(pctS(m.fail[k], m.measured.length))]); }, 'Nothing measured yet');
 
     $('in-q-ver').textContent = m.newest ? 'on a plugin older than ' + m.newest : '';
-    $('in-ver').innerHTML = table('minmax(200px,1.6fr) 100px', ['Person', 'On'], m.behind.map(function (b) { return row([cell(b.email, 'ul-c--who'), cell(b.version || 'Unknown')]); }), 'Everyone is on the newest plugin');
+    paged('in-ver', 'ver', 'minmax(200px,1.6fr) 100px', ['Person', 'On'], m.behind, function (b) { return row([cell(b.email, 'ul-c--who'), cell(b.version || 'Unknown')]); }, 'Everyone is on the newest plugin');
 
     var hubDays = m.firstVisit ? Math.max(1, Math.round((Date.now() - m.firstVisit.getTime()) / DAY)) : 0;
     $('in-hub').innerHTML =
       metric('Page views', String(m.vrows.length), S.haveVisits ? (m.firstVisit ? 'recorded since ' + m.firstVisit.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) : 'none recorded yet') : 'visit log unavailable') +
       metric('Pages opened', String(m.top.length), 'of ' + m.allPages.length + ' in the hub') +
       metric('Never opened', String(m.never.length), hubDays && hubDays < 7 ? 'too early to trust, ' + hubDays + (hubDays === 1 ? ' day' : ' days') + ' of data' : 'in this period');
-    $('in-top').innerHTML = table('minmax(180px,2fr) 90px 80px 80px', ['Page', 'Area', 'Views', 'People'],
-      m.top.slice(0, 8).map(function (g) { return row([cell(pageName(g.path), 'ul-c--who', g.path), cell(areaOf(g.path)), cell(String(g.views)), cell(String(Object.keys(g.who).length))]); }), 'No page views recorded');
-    $('in-q-never').textContent = m.never.length > 10 ? 'first 10 of ' + m.never.length : '';
-    $('in-never').innerHTML = table('minmax(180px,2fr) 90px', ['Page', 'Area'],
-      m.never.slice(0, 10).map(function (u) { return row([cell(pageName(u), 'ul-c--who', u), cell(areaOf(u))]); }), m.allPages.length ? 'Every page was opened' : 'No page list available');
+    paged('in-top', 'top', 'minmax(180px,2fr) 90px 80px 80px', ['Page', 'Area', 'Views', 'People'],
+      m.top, function (g) { return row([cell(pageName(g.path), 'ul-c--who', g.path), cell(areaOf(g.path)), cell(String(g.views)), cell(String(Object.keys(g.who).length))]); }, 'No page views recorded');
+    $('in-q-never').textContent = m.never.length ? plural(m.never.length, 'page') : '';
+    paged('in-never', 'never', 'minmax(180px,2fr) 90px', ['Page', 'Area'],
+      m.never, function (u) { return row([cell(pageName(u), 'ul-c--who', u), cell(areaOf(u))]); }, m.allPages.length ? 'Every page was opened' : 'No page list available');
   }
 
   var BLOCK = {
@@ -1101,7 +1123,7 @@ window.__anRefilter = {};
   function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
 
   var S = { status: 'loading', rows: [], period: '30', q: '', ver: '', sortKey: 'at', sortDir: -1,
-            evt: '', view: 'chat', open: {}, outcomes: {}, files: {}, page: 1, per: 25, fetchedAt: 0, busy: false, skipped: 0, capped: false };
+            evt: '', view: 'chat', open: {}, outcomes: {}, files: {}, page: 1, per: 10, fetchedAt: 0, busy: false, skipped: 0, capped: false };
   var DAY = 86400000;
 
   /* ── data ───────────────────────────────────────────────────────────────────────── */
@@ -1893,7 +1915,7 @@ window.__anRefilter = {};
   'use strict';
   var ROOT = document.getElementById('an-visits');
   var API = '/api/visits';
-  var ICON = {"arrow-clockwise":"<path d=\"M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z\"/>","lock":"<path d=\"M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Zm-68-56a12,12,0,1,1-12-12A12,12,0,0,1,140,152Z\"/>","warning-circle":"<path d=\"M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z\"/>","magnifying-glass":"<path d=\"M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z\"/>"};
+  var ICON = {"arrow-left":"<path d=\"M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z\"/>","arrow-right":"<path d=\"M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z\"/>","arrow-clockwise":"<path d=\"M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z\"/>","lock":"<path d=\"M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Zm-68-56a12,12,0,1,1-12-12A12,12,0,0,1,140,152Z\"/>","warning-circle":"<path d=\"M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z\"/>","magnifying-glass":"<path d=\"M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z\"/>"};
   function icon(n) { return '<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">' + (ICON[n] || '') + '</svg>'; }
   /* Rows come from our own endpoint but the path is a request path, so nothing goes into markup unescaped. */
   function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
@@ -1956,6 +1978,27 @@ window.__anRefilter = {};
     return '<div class="ul-tbl" role="table" style="--vs-cols:' + cols + '">' + h +
       (rows.length ? rows.join('') : '<div class="ul-empty"><div class="ul-empty__copy"><h2>' + esc(empty) + '</h2></div></div>') + '</div>';
   }
+
+  /* Ten rows to a page. The pager shows only when there is more than a page, and uses the same markup as the
+     Usage tab's "New people" table (.ul-pg). It sits OUTSIDE the table's scroller so it does not scroll sideways
+     with a wide table. */
+  var PER = 10, PG = {};
+  function paged(hostId, key, cols, heads, items, rowFn, empty) {
+    var host = $(hostId), pages = Math.max(1, Math.ceil(items.length / PER));
+    PG[key] = Math.min(Math.max(1, PG[key] || 1), pages);
+    var from = (PG[key] - 1) * PER;
+    host.innerHTML = table(cols, heads, items.slice(from, from + PER).map(rowFn), empty);
+    var slot = $(hostId + '-pg');
+    if (!slot) { slot = document.createElement('div'); slot.id = hostId + '-pg'; slot.className = 'ul-pg'; host.insertAdjacentElement('afterend', slot); }
+    slot.hidden = items.length <= PER;
+    if (slot.hidden) return;
+    slot.innerHTML = '<div class="ul-pg__l"><span class="ul-pg__t">' + (from + 1) + '–' + Math.min(from + PER, items.length) + ' of ' + items.length + '</span></div>' +
+      '<div class="ul-pg__r"><span class="ul-pg__t">Page ' + PG[key] + ' of ' + pages + '</span>' +
+      '<button class="ul-ib" data-pg="prev" type="button" aria-label="Previous page"' + (PG[key] <= 1 ? ' disabled' : '') + '>' + icon('arrow-left') + '</button>' +
+      '<button class="ul-ib" data-pg="next" type="button" aria-label="Next page"' + (PG[key] >= pages ? ' disabled' : '') + '>' + icon('arrow-right') + '</button></div>';
+    slot.querySelector('[data-pg="prev"]').addEventListener('click', function () { PG[key]--; renderAll(); });
+    slot.querySelector('[data-pg="next"]').addEventListener('click', function () { PG[key]++; renderAll(); });
+  }
   function cell(t, cls, title) { return '<div class="ul-c ' + (cls || '') + '" role="cell" title="' + esc(title || t) + '">' + esc(t) + '</div>'; }
   function who(e) { return e === '(shared password)' ? 'Shared password' : e; }
   /* The person cell, with a New tag for anyone first seen in the last 7 days. */
@@ -1997,28 +2040,28 @@ window.__anRefilter = {};
       metric('Active people', String(plist.length), lastAt ? 'last visit ' + ago(Date.now() - lastAt.getTime()) : 'nothing logged yet');
 
     $('vs-q-people').textContent = (plist.length + (plist.length === 1 ? ' person' : ' people'));
-    $('vs-people').innerHTML = table('minmax(200px,1.6fr) 100px 100px minmax(120px,1fr) minmax(120px,1fr)', ['Person', 'Sign-ins', 'Page views', 'Last seen', 'Opens most'],
-      plist.map(function (p) {
+    if (PG._p !== S.period + '|' + S.area) PG = { _p: S.period + '|' + S.area };   /* a new period or area starts every table on page 1 */
+    paged('vs-people', 'people', 'minmax(200px,1.6fr) 100px 100px minmax(120px,1fr) minmax(120px,1fr)', ['Person', 'Sign-ins', 'Page views', 'Last seen', 'Opens most'],
+      plist, function (p) {
         var top = Object.keys(p.areas).sort(function (a, b) { return p.areas[b] - p.areas[a]; })[0] || '';
         return '<div class="ul-row ul-row--d" role="row">' + whoCell(p.email, isNew(p.email)) + cell(String(p.signins)) + cell(String(p.views)) + cell(ago(Date.now() - p.last.getTime()), '', p.last.toISOString()) + cell(top) + '</div>';
-      }), 'No visits in this view');
+      }, 'No visits in this view');
 
     $('vs-q-pages').textContent = 'most opened, ' + plural(glist.length, 'page');
-    $('vs-pages').innerHTML = table('minmax(220px,2fr) 110px 90px 90px minmax(120px,1fr)', ['Page', 'Area', 'Views', 'People', 'Last opened'],
-      glist.slice(0, 20).map(function (g) {
+    paged('vs-pages', 'pages', 'minmax(220px,2fr) 110px 90px 90px minmax(120px,1fr)', ['Page', 'Area', 'Views', 'People', 'Last opened'],
+      glist, function (g) {
         return '<div class="ul-row ul-row--d" role="row">' + cell(pageName(g.path), 'ul-c--who', g.path) + cell(areaOf(g.path)) + cell(String(g.views)) + cell(String(Object.keys(g.who).length)) + cell(ago(Date.now() - g.last.getTime()), '', g.last.toISOString()) + '</div>';
-      }), 'No pages opened in this view');
+      }, 'No pages opened in this view');
 
     var recent = rows.slice().sort(function (a, b) { return b.at - a.at; });
     $('vs-q-recent').textContent = 'newest first, ' + plural(recent.length, 'event');
-    $('vs-recent').innerHTML = table('160px minmax(180px,1.4fr) minmax(200px,2fr) 110px', ['When', 'Person', 'Page', 'Event'],
-      recent.slice(0, S.shown).map(function (r) {
+    paged('vs-recent', 'recent', '160px minmax(180px,1.4fr) minmax(200px,2fr) 110px', ['When', 'Person', 'Page', 'Event'],
+      recent, function (r) {
         var evt = r.kind === 'signin' ? 'Signed in' + (r.via === 'password' ? ' (password)' : '') : 'Opened';
         return '<div class="ul-row ul-row--d" role="row">' + cell(fmtWhen(r.at), '', r.at.toISOString()) + whoCell(r.email, isNew(r.email)) +
           cell(r.kind === 'signin' ? '—' : pageName(r.path), '', r.path) + cell(evt) + '</div>';
-      }), 'No visits in this view');
-    $('vs-more').innerHTML = recent.length > S.shown ? '<button class="ul-btn" id="vs-more-btn" type="button">Show 25 more</button>' : '';
-    var mb = $('vs-more-btn'); if (mb) mb.addEventListener('click', function () { S.shown += 25; renderAll(); });
+      }, 'No visits in this view');
+    $('vs-more').innerHTML = '';   /* "Show 25 more" is replaced by the pager under the table */
   }
 
   var BLOCK = {
