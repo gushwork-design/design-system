@@ -93,9 +93,9 @@ a = ask('make me a poster');                         ok('a design request says â
 
 /* ---- the creator answer explains the hub to someone who has never heard of it ---- */
 a = ask('who made you');
-ok('the creator answer: names Utsav, says what the hub is, what he approves, who to ask', a.r.text.startsWith('Utsav is my creator.') && a.r.text.includes('design hub (design.gushwork.ai)') && a.r.text.includes('Claude plugin') && a.r.text.includes('the person to ask'), a.r.text);
+ok('the creator answer: names Utsav, says what the hub is, what he approves, who to ask', a.r.text.startsWith('Utsav is my creator, and he built me.') && !/design owner/i.test(a.r.text) && a.r.text.includes('design hub (design.gushwork.ai)') && a.r.text.includes('Claude plugin') && a.r.text.includes('the person to ask'), a.r.text);
 process.env.OWNER_SLACK_ID = 'U0ABC12345';
-ok('with his Slack ID set, he is a real mention', ownerMention() === '<@U0ABC12345>' && compose(understand('who made you', catalog), catalog, '1.1').text.startsWith('<@U0ABC12345> is my creator.'));
+ok('with his Slack ID set, he is a real mention', ownerMention() === '<@U0ABC12345>' && compose(understand('who made you', catalog), catalog, '1.1').text.startsWith('<@U0ABC12345> is my creator, and he built me.'));
 process.env.OWNER_SLACK_ID = 'not-an-id';
 ok('a bad ID falls back to his name', ownerMention() === 'Utsav');
 delete process.env.OWNER_SLACK_ID;

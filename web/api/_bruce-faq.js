@@ -194,7 +194,7 @@ export const FAQ = [
     words: ['utsav', 'singh', 'creator', 'created', 'made', 'maker', 'built', 'builder', 'owner', 'owns', 'who', 'design', 'head', 'boss', 'behind', 'person'],
     strong: ['utsav', 'creator', 'created', 'maker', 'builder'],
     answer: (_L, who = 'Utsav') => [
-      `${who} is my creator. He is Gushwork’s design owner, and he built me.`,
+      `${who} is my creator, and he built me.`,
       'He runs the design hub (design.gushwork.ai), where the team gets the brand files, templates and tools, and he owns the design system behind it. He reviews and approves everything before it reaches the Claude plugin, which is how Claude builds on-brand work.',
       'For access, questions or ideas about design, he is the person to ask.',
     ],
