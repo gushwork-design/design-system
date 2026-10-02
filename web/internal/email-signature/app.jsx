@@ -185,21 +185,24 @@ function PropSegmented({ value, onChange, options }) {
   );
 }
 
+/* A yes/no value is a switch, not a two-tab control (library: controls/toggle, Size=Small 44x24).
+   Tabs stay for choosing between named views; a boolean is a toggle. */
 function PropYesNo({ value, onChange }) {
   return (
-    <PropSegmented
-      value={value ? 'yes' : 'no'}
-      onChange={(v) => onChange(v === 'yes')}
-      options={[
-        { value: 'yes', label: 'Yes' },
-        { value: 'no', label: 'No' },
-      ]}
-    />
+    <button
+      type="button"
+      role="switch"
+      aria-checked={!!value}
+      className={`gw-switch${value ? ' on' : ''}`}
+      onClick={() => onChange(!value)}
+    >
+      <span className="gw-switch__knob" />
+    </button>
   );
 }
 
 /* ── PropDropdown ─────────────────────────────────────────────────
-   Hover-to-open dropdown that matches the Gushwork picker design.
+   Click-to-open dropdown, as on the hub (admin/access-control .ac-dd).
    Closed: pill-shaped chip with the active label + soft chevron.
    Open: a panel below with each option as a row; active row has a
    subtle gray background + a small circle-check icon at the right.
@@ -244,8 +247,6 @@ function PropDropdown({ value, onChange, options }) {
     <div
       ref={rootRef}
       className={`prop-dropdown${open ? ' open' : ''}`}
-      onMouseEnter={() => { cancelClose(); setOpen(true); }}
-      onMouseLeave={scheduleClose}
     >
       <button
         type="button"
@@ -938,7 +939,7 @@ function App() {
               <PropSection title="Photo">
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <PropRow label="Image" align="start">
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%', minWidth: 0 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%', minWidth: 0 }}>
                     <PhotoDropzone
                       photoUrl={photoUrl}
                       photoName={photoName}
@@ -1051,8 +1052,8 @@ function App() {
 
             <PropSection
               title={
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" style={{ color: '#9ca3af', flex: '0 0 auto' }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" style={{ color: 'var(--gw-color-neutral-400)', flex: '0 0 auto' }}>
                     <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.4" />
                     <path d="M8 7.25v3.75M8 5.25v.01" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
                   </svg>
