@@ -281,8 +281,7 @@ function PropDropdown({ value, onChange, options }) {
                 </span>
                 {isActive && (
                   <svg className="prop-dropdown-item-check" width="16" height="16" viewBox="0 0 16 16" aria-hidden>
-                    <circle cx="8" cy="8" r="7" fill="currentColor" />
-                    <path d="M5 8.2L7 10.2L11 6.2" stroke="#fff" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 )}
               </button>

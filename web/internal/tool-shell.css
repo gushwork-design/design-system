@@ -713,7 +713,7 @@ html[data-theme] .preview-content[data-theme] {
   font: var(--gw-text-body-14-med);
   letter-spacing: var(--gw-text-body-14-med-tracking);
 }
-.prop-dropdown-item-check { color: var(--gw-color-primary-500); }
+.prop-dropdown-item-check { color: var(--t-heading); }   /* a plain check in the text colour: white in dark, black in light */
 
 /* Yes / No and every two-way switch — dashboard tab-group + tab-item:
    container 36h radius/12, padding 4, gap 4, neutral/50 + 1px neutral/100;
@@ -972,3 +972,27 @@ html[data-theme] .preview-content[data-theme] {
 .prop-dropdown-trigger,
 .prop-dropdown-trigger:hover,
 .prop-dropdown.open .prop-dropdown-trigger { background: var(--t-field-bg); }
+
+/* ---------------------------------------------------------------------------
+   15. Preview-only affordances.
+   ------------------------------------------------------------------------ */
+/* The banner is #0D0D0D, the same as the dark canvas, so it vanishes. A 1px ring
+   in the dark hairline draws its edge in the preview only; the copied HTML is built
+   separately and is unchanged. */
+:root[data-theme="dark"] .sig-banner > div { box-shadow: 0 0 0 1px var(--gw-color-neutral-800); }
+
+/* No focus rings anywhere in the tools — ruled by Utsav, 2 Oct 2026. This supersedes the
+   dashboard's mandatory focus ring (states.md R1/R2) for these tools; keyboard users get
+   no indicator. Open states (the dropdown's border) are not focus and stay. */
+.app *:focus,
+.app *:focus-visible,
+.t-acts *:focus,
+.t-acts *:focus-visible,
+.floating-toolbar *:focus,
+.floating-toolbar *:focus-visible,
+.panel-reopen:focus,
+.panel-reopen:focus-visible { outline: none !important; }
+.prop-input:focus,
+.prop-textarea:focus,
+.prop-input-prefix:focus-within,
+.float-field:focus-within { box-shadow: var(--gw-shadow-s2); border-color: var(--t-field-border); outline: none; }

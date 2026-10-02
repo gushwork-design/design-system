@@ -341,7 +341,7 @@
 
         {/* banner — registry-driven */}
         {data.showBanner !== false && banner && banner.Render && (
-          <banner.Render data={data} viewport={viewport} />
+          <div className="sig-banner"><banner.Render data={data} viewport={viewport} /></div>
         )}
       </div>
     );
