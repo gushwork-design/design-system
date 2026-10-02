@@ -4,9 +4,7 @@
 <title>faqs — Gushwork</title>
 <meta name="description" content="Web · folds.md">
 <meta name="robots" content="noindex">
-<script>try{var t=localStorage.getItem('gw-theme');if(t!=='dark')t='light';
-document.documentElement.setAttribute('data-theme',t)}catch(e){
-document.documentElement.setAttribute('data-theme','light')}</script>
+<script>try{var c=localStorage.getItem('gw-theme-choice'),t=c==='dark'||c==='light'?c:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20x%3D%221%22%20y%3D%221%22%20width%3D%2278%22%20height%3D%2278%22%20rx%3D%2219%22%20fill%3D%22%230070ff%22%20stroke%3D%22%230061e0%22%20stroke-width%3D%222%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
 <link rel="stylesheet" href="../../../foundation/tokens.css">
 <link rel="stylesheet" href="../../../shell.css">
@@ -618,24 +616,22 @@ a.cat-name{color:var(--gw-color-primary-600);text-decoration:none}
 <div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Finding</th><th>Detail</th></tr></thead><tbody><tr><td><b>Letter-spacing was wrong system-wide</b></td><td>Figma's magnitude is a <b>percent</b>, not px. <code>body-18-med</code> reports <code>-0.2</code> and renders <code>-0.036px</code> at 18px. <code>tokens.css</code> emitted <code>-0.2px</code> — 5–6× too wide on every style. Now emitted in <code>em</code>; <b>fixed</b>.</td></tr><tr><td><b><code>Body/body-18-med</code> does exist</b></td><td>The known-issues list said it was the one ramp step missing its Medium. Figma returns it: Inter Medium 18/1.6, letterSpacing −0.2. That entry was wrong.</td></tr><tr><td><b><code>colors/neutral/white</code> has no token</b></td><td>Used by <code>fold/ CTA</code>. Minor, but it is a real bound variable with nothing in <code>tokens.css</code>.</td></tr><tr><td><b><code>colors/secondary/500-main</code> <code>#111827</code></b></td><td>A whole <b>Secondary</b> collection that <code>tokens.css</code> documents only as a stray legacy <code>gray/900</code>. It is bound by a shipping fold, so it is current, not legacy. Needs pulling properly.</td></tr></tbody></table></div></div></main><div class="lb-toc"><b>On this page</b><a href="#composition-hierarchy-don-t-rebuild-across-levels" class="l3">Composition hierarchy — don't rebuild across levels</a><a href="#pick-the-fold-by-content-and-intent" class="l3">Pick the fold by content and intent</a><a href="#shared-toggles-most-folds-inherit-these" class="l3">Shared toggles — most folds inherit these</a><a href="#per-fold-detail" class="l3">Per-fold detail</a><a href="#fold-hero-1731-55983-10-variants" class="l3">fold/ Hero — 1731:55983 · 10 variants</a><a href="#fold-testimonial-1790-6285-4-variants" class="l3">fold/ Testimonial — 1790:6285 · 4 variants</a><a href="#fold-cards-grid-1790-7329-24-variants" class="l3">fold/ Cards Grid — 1790:7329 · 24 variants</a><a href="#fold-cards-grid-small-2085-21418-2-variants" class="l3">fold/ Cards Grid (small) — 2085:21418 · 2 variants</a><a href="#fold-faqs-1790-7851-2-variants" class="l3">fold/ FAQs — 1790:7851 · 2 variants</a><a href="#fold-with-image-1793-6561-2-variants" class="l3">fold/ With image — 1793:6561 · 2 variants</a><a href="#fold-timeline-1809-21318-2-variants" class="l3">fold/Timeline — 1809:21318 · 2 variants</a><a href="#fold-comparison-table-1824-6836-2-variants" class="l3">fold/Comparison Table — 1824:6836 · 2 variants</a><a href="#fold-video-2085-17304-2-variants" class="l3">fold/ Video — 2085:17304 · 2 variants</a><a href="#fold-ai-agents-2085-18017-2-variants" class="l3">fold/AI Agents — 2085:18017 · 2 variants</a><a href="#fold-cta-2085-20750-2-variants" class="l3">fold/ CTA — 2085:20750 · 2 variants</a><a href="#fold-other-1790-6807-2-variants" class="l3">fold/ other — 1790:6807 · 2 variants</a><a href="#cross-references-reuse-don-t-redefine" class="l3">Cross-references — reuse, don't redefine</a><a href="#cta-copy" class="l3">CTA copy</a><a href="#breakpoints" class="l3">Breakpoints</a><a href="#ladder-violation-to-know-about" class="l3">Ladder violation to know about</a><a href="#never" class="l3">Never</a><a href="#fold-width-is-1240-except-three" class="l3">Fold width is 1240 — except three</a><a href="#measured-frame-heights" class="l3">Measured frame heights</a><a href="#the-container-is-1240-desktop-343-phone" class="l3">The container is 1240 desktop / 343 phone</a></div></div>
 <script>
 (function(){
-  /* Theme: the same two localStorage keys the main site uses, so a choice made there
-     carries here and back. 'system' can still arrive from an older stored value and
-     resolves to light, matching shell.js. */
-  var PREF='gw-theme-pref', RES='gw-theme';
-  function pref(){try{var v=localStorage.getItem(PREF);
-    if(v==='light'||v==='dark')return v;
-    if(v==='system')return 'light';
-    var o=localStorage.getItem(RES);
-    return (o==='dark'||o==='light')?o:'light';}catch(e){return 'light'}}
-  function apply(p){var r=p==='dark'?'dark':'light';
+  /* Theme: the same keys as the main site. `gw-theme-choice` is what the person picked (light, dark or system) and is
+     written only when they pick; no choice means System, which follows the machine. `gw-theme` is the resolved
+     light or dark. This button toggles light and dark, so using it is a choice. */
+  var CH='gw-theme-choice', RES='gw-theme';
+  function pref(){try{var v=localStorage.getItem(CH);return (v==='light'||v==='dark'||v==='system')?v:'system'}catch(e){return 'system'}}
+  function res(p){return p==='dark'?'dark':p==='light'?'light':(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}
+  function apply(p,remember){var r=res(p);
     document.documentElement.setAttribute('data-theme',r);
-    try{localStorage.setItem(PREF,p);localStorage.setItem(RES,r)}catch(e){}
+    try{localStorage.setItem(RES,r);if(remember)localStorage.setItem(CH,p)}catch(e){}
     var b=document.getElementById('lb-theme');
     if(b)b.setAttribute('aria-label',r==='dark'?'Switch to light':'Switch to dark');}
   var btn=document.getElementById('lb-theme');
   if(btn)btn.addEventListener('click',function(){
-    apply(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
-  apply(pref());
+    apply(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark',true)});
+  apply(pref(),false);
+  try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){if(pref()==='system')apply('system',false)})}catch(e){}
 
   /* Rail filter. Narrows the inventory in place — it does not navigate, because the
      rail is a list of siblings and losing your place to search them is worse than

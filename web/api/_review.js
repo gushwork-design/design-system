@@ -14,6 +14,10 @@
                                   withdraw it: a queued row only counts while its `at` is still the
                                   one in this hash.
 
+   With GW_GITHUB_TOKEN set (see _review-github.js) a Pass, Rework or Reject is committed to ONE open pull request
+   (`review/decisions`) by the site itself, and the row carries the pull request's number. Without the token, or if
+   GitHub fails, it falls back to the queue above, so a decision is never lost.
+
    GET   owner  -> { state }                       what is queued or sent back right now
    POST  owner  {scope,key,action,note,fp}         action: pass | reject | rework | undo
                   reject and rework need a note, because the note is the whole point of both.
@@ -24,6 +28,7 @@
 
 import { COOKIE, verify, readCookie, sessionSecret } from './_session.js';
 import { isOwner } from './_access.js';
+import { recordViaGithub, explain } from './_review-github.js';
 
 const LIST_KEY = 'gw:review-decisions';
 const STATE_KEY = 'gw:review-state';
@@ -101,16 +106,42 @@ export default async function handler(req, res) {
   if (!v.ok) return json(res, 400, { error: v.error });
   const { row } = v;
   const field = `${row.scope}/${row.key}`;
+  const token = process.env.GW_GITHUB_TOKEN || '';
+  const today = row.at.slice(0, 10);
   try {
     if (row.action === 'undo') {
+      let note = '';
+      if (token) {
+        // An undo of something that went to GitHub has to come out of the pull request too, or it would merge anyway.
+        const [{ result }] = await redis(cfg, [['HGET', STATE_KEY, field]]);
+        let prev = null;
+        try { prev = result ? JSON.parse(result) : null; } catch { /* none */ }
+        if (prev && prev.via === 'github') {
+          try { await recordViaGithub(token, { scope: row.scope, key: row.key }, email, today, true); }
+          catch { return json(res, 502, { error: 'Could not take it out of the pull request. Nothing was changed.' }); }
+          note = 'reverted in the pull request';
+        }
+      }
       await redis(cfg, [['HDEL', STATE_KEY, field]]);
-      return json(res, 200, { ok: true, undone: field });
+      return json(res, 200, { ok: true, undone: field, note });
     }
-    await redis(cfg, [
-      ['LPUSH', LIST_KEY, JSON.stringify(row)],
-      ['LTRIM', LIST_KEY, '0', String(MAX_LIST - 1)],
-      ['HSET', STATE_KEY, field, JSON.stringify(row)],
-    ]);
-    return json(res, 200, { ok: true, decision: row });
+
+    let githubError = '';
+    if (token && row.fp) {
+      try {
+        const out = await recordViaGithub(token, row, email, today);
+        row.via = 'github'; row.pr = out.pr;
+      } catch (e) { githubError = explain(e); }
+    }
+    row.via = row.via || 'queue';
+    // Recorded in a pull request: only the state is kept, for the page. A rework is ALSO queued, because the next session
+    // needs the note as its brief (it will not record it again; the hook knows `via` is github).
+    const cmds = [['HSET', STATE_KEY, field, JSON.stringify(row)]];
+    if (row.via === 'queue' || row.action === 'rework') {
+      cmds.unshift(['LTRIM', LIST_KEY, '0', String(MAX_LIST - 2)]);
+      cmds.unshift(['LPUSH', LIST_KEY, JSON.stringify(row)]);
+    }
+    await redis(cfg, cmds);
+    return json(res, 200, { ok: true, decision: row, mode: row.via, githubError });
   } catch { return json(res, 502, { error: 'Could not save the decision.' }); }
 }

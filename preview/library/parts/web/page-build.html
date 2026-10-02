@@ -4,9 +4,7 @@
 <title>page-build — Gushwork</title>
 <meta name="description" content="Web · page-shell.md">
 <meta name="robots" content="noindex">
-<script>try{var t=localStorage.getItem('gw-theme');if(t!=='dark')t='light';
-document.documentElement.setAttribute('data-theme',t)}catch(e){
-document.documentElement.setAttribute('data-theme','light')}</script>
+<script>try{var c=localStorage.getItem('gw-theme-choice'),t=c==='dark'||c==='light'?c:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20x%3D%221%22%20y%3D%221%22%20width%3D%2278%22%20height%3D%2278%22%20rx%3D%2219%22%20fill%3D%22%230070ff%22%20stroke%3D%22%230061e0%22%20stroke-width%3D%222%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
 <link rel="stylesheet" href="../../../foundation/tokens.css">
 <link rel="stylesheet" href="../../../shell.css">
@@ -608,24 +606,22 @@ fold/ FAQs</code></pre>
 <p><code>Phone</code> in the footer docs. Set it explicitly rather than relying on a default.</p></div></main><div class="lb-toc"><b>On this page</b><a href="#page-build" class="l3">page-build</a><a href="#fixed-vertical-order-do-not-rearrange" class="l3">Fixed vertical order — do not rearrange</a><a href="#type-is-the-governing-axis" class="l3">Type is the governing axis</a><a href="#blank" class="l3">Blank</a><a href="#slot-properties-10-with-duplicate-names" class="l3">Slot properties — 10, with duplicate names</a><a href="#how-to-choose" class="l3">How to choose</a><a href="#worked-example-compositions" class="l3">Worked example compositions</a><a href="#navbar-navbar" class="l3">navbar/navbar</a><a href="#type" class="l3">Type</a><a href="#appearance-from-design-context-1706-1677-desktop-default-bra" class="l3">Appearance — from design context (1706:1677, Desktop/Default/Brand)</a><a href="#anomaly-platform-and-solutions-use-different-carets" class="l3">Anomaly — Platform and Solutions use different carets</a><a href="#nav-items-fixed-set-don-t-add-ad-hoc" class="l3">Nav items — fixed set, don't add ad hoc</a><a href="#states" class="l3">States</a><a href="#submenu" class="l3">Submenu</a><a href="#styling" class="l3">Styling</a><a href="#footer-footer-a-three-level-nested-system" class="l3">footer/footer — a three-level nested system</a><a href="#footer-footer-set-1720-3801-6-variants" class="l3">footer/footer — set 1720:3801 · 6 variants</a><a href="#footer-footer-elements-cta-set-1715-3476-16-variants" class="l3">footer/footer-elements/cta — set 1715:3476 · 16 variants</a><a href="#footer-footer-elements-cta-image-set-1712-2684-24-variants" class="l3">footer/footer-elements/cta-image — set 1712:2684 · 24 variants</a><a href="#footer-footer-elements-list-item-1672-35328-broken" class="l3">footer/footer-elements/list-item — 1672:35328 · broken</a><a href="#announcement-banner" class="l3">announcement-banner</a><a href="#the-brand-ads-axis-one-decision-four-components" class="l3">The Brand / Ads axis — one decision, four components</a><a href="#source-notes" class="l3">Source notes</a></div></div>
 <script>
 (function(){
-  /* Theme: the same two localStorage keys the main site uses, so a choice made there
-     carries here and back. 'system' can still arrive from an older stored value and
-     resolves to light, matching shell.js. */
-  var PREF='gw-theme-pref', RES='gw-theme';
-  function pref(){try{var v=localStorage.getItem(PREF);
-    if(v==='light'||v==='dark')return v;
-    if(v==='system')return 'light';
-    var o=localStorage.getItem(RES);
-    return (o==='dark'||o==='light')?o:'light';}catch(e){return 'light'}}
-  function apply(p){var r=p==='dark'?'dark':'light';
+  /* Theme: the same keys as the main site. `gw-theme-choice` is what the person picked (light, dark or system) and is
+     written only when they pick; no choice means System, which follows the machine. `gw-theme` is the resolved
+     light or dark. This button toggles light and dark, so using it is a choice. */
+  var CH='gw-theme-choice', RES='gw-theme';
+  function pref(){try{var v=localStorage.getItem(CH);return (v==='light'||v==='dark'||v==='system')?v:'system'}catch(e){return 'system'}}
+  function res(p){return p==='dark'?'dark':p==='light'?'light':(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}
+  function apply(p,remember){var r=res(p);
     document.documentElement.setAttribute('data-theme',r);
-    try{localStorage.setItem(PREF,p);localStorage.setItem(RES,r)}catch(e){}
+    try{localStorage.setItem(RES,r);if(remember)localStorage.setItem(CH,p)}catch(e){}
     var b=document.getElementById('lb-theme');
     if(b)b.setAttribute('aria-label',r==='dark'?'Switch to light':'Switch to dark');}
   var btn=document.getElementById('lb-theme');
   if(btn)btn.addEventListener('click',function(){
-    apply(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
-  apply(pref());
+    apply(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark',true)});
+  apply(pref(),false);
+  try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){if(pref()==='system')apply('system',false)})}catch(e){}
 
   /* Rail filter. Narrows the inventory in place — it does not navigate, because the
      rail is a list of siblings and losing your place to search them is worse than

@@ -1090,3 +1090,18 @@ Ruled by Utsav, 1 Oct 2026. The Review tab listed 97 commands to copy and the vi
 - **Standalone sheets.** `/admin/review-sheet`, `/library`, `/library/review` and `/library/components` redirect to the Design System page. The generated `/library/**` pages remain only as the source of `data.json`.
 
 **The old review sheet is deleted (same day, Utsav's call).** `preview/review-sheet.html`, which held the drawings, was split into one fragment per component (43 of them) and removed along with `_sheet_coverage.py` and the publish step that stamped it. `check-previews.sh` now reports 52 of 97 components with a visual (43 drawings and 9 Figma renders) and 45 without. The 5 dashboard components the sheet only drew as part of a general page (dashboard-switcher, date-range-picker, icon-toggle-group, legend, ring) lost their stand-in and now read "No visual yet" until they get a drawing. `/admin/review-sheet` still redirects to the Review tab.
+
+## R36 — a review button writes a pull request itself, instead of waiting for a Claude session
+Ruled by Utsav, 1 Oct 2026, after asking why a pass is not simply saved. A pass has to end up in the repo's registry (the skills and checks read it there) and `main` needs a reviewed PR, so the site cannot save it directly; it can open the pull request. Pass, Rework and Reject are now commits on one standing pull request, `review/decisions`, made with a fine-grained GitHub token (`GW_GITHUB_TOKEN`, this repository only, Contents and Pull requests). The session-queue path stays as the fallback when the token is missing or GitHub fails.
+
+- **What does not change.** Nothing reaches `main` without another person approving the pull request. The pass carries the fingerprint the owner saw, so a pass on something that has since changed reads "expired".
+- **Cost.** The site holds a token that can write to the repository. It is scoped to this repository's contents and pull requests and nothing else, and it can only write to its own branch; `main` is protected.
+- **Side effect on publishing.** `publish-sheets.sh` regenerates a stale library instead of refusing, since a merged decision changes a registry and nothing else.
+
+## R37 — System is back as a theme, and it is the default
+Ruled by Utsav, 2 Oct 2026, reversing the 18 Sep 2026 ruling (System dropped, default Light). The theme menu offers System, Light and Dark. With no choice made the site follows the machine, and keeps following it while open (at sunset, say). Explicitly picking Light or Dark sticks until System is picked again.
+
+- **A new storage key.** `gw-theme-choice` holds light, dark or system and is written only when someone picks. The old `gw-theme-pref` was written for everyone on every load while Light was the default, so it could not tell "never chose" from "chose Light" and is no longer read. `gw-theme` still holds the resolved light or dark.
+- **Everyone is reset once.** Because the old key cannot be trusted, anyone who had picked Dark before is on System after this deploy. If their machine is light, so is the site, until they pick Dark again.
+- **No flash.** Every page's inline first-paint script reads the choice and asks the machine itself, so System does not paint light first. The library's own toggle follows the same keys; it toggles light and dark, which counts as a choice.
+- **The trigger glyph** shows a monitor for System, a sun for Light, a moon for Dark.
