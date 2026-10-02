@@ -28,7 +28,7 @@
 
 import { COOKIE, verify, readCookie, sessionSecret } from './_session.js';
 import { isOwner } from './_access.js';
-import { recordViaGithub } from './_review-github.js';
+import { recordViaGithub, explain } from './_review-github.js';
 
 const LIST_KEY = 'gw:review-decisions';
 const STATE_KEY = 'gw:review-state';
@@ -131,7 +131,7 @@ export default async function handler(req, res) {
       try {
         const out = await recordViaGithub(token, row, email, today);
         row.via = 'github'; row.pr = out.pr;
-      } catch (e) { githubError = e && e.status ? `GitHub said ${e.status}` : 'GitHub could not be reached'; }
+      } catch (e) { githubError = explain(e); }
     }
     row.via = row.via || 'queue';
     // Recorded in a pull request: only the state is kept, for the page. A rework is ALSO queued, because the next session

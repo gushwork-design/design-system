@@ -31,7 +31,7 @@ globalThis.fetch = async (url, init = {}) => {
     return send(200, out);
   }
   gh.calls.push((init.method || 'GET') + ' ' + new URL(url).pathname);
-  if (gh.fail) return send(500, {});
+  if (gh.fail) return send(gh.fail === 403 ? 403 : 500, gh.fail === 403 ? { message: 'Resource not accessible by personal access token' } : {});
   const p = new URL(url).pathname, m = init.method || 'GET';
   if (p.endsWith('/git/ref/heads/main')) return send(200, { object: { sha: 's' } });
   if (p.includes('/git/ref/heads/review')) return send(200, { object: { sha: 's' } });
@@ -68,7 +68,10 @@ t('undo of a github decision reverts it in the pull request', [r.code, r.json.no
 
 gh.fail = 1; kv.list.length = 0;
 r = await call('POST', d);
-t('GitHub down: falls back to the queue and says why', [r.code, r.json.mode, kv.list.length, r.json.githubError], [200, 'queue', 1, 'GitHub said 500']);
+t('GitHub down: falls back to the queue and says why', [r.code, r.json.mode, kv.list.length, r.json.githubError], [200, 'queue', 1, 'GitHub said 500 (GET /git/ref/heads/main)']);
+gh.fail = 403; kv.list.length = 0;
+r = await call('POST', d);
+t('a 403 says what GitHub said and which call', r.json.githubError, 'GitHub said 403: Resource not accessible by personal access token (GET /git/ref/heads/main)');
 gh.fail = 0;
 
 r = await call('POST', { ...d, fp: '' });
