@@ -207,6 +207,13 @@
       "reviewedBy": "utsav-gushwork",
       "reviewedOn": "2026-10-02",
       "fingerprint": "167ff79e4a942f32"
+    },
+    "card-testimonial": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-02",
+      "fingerprint": "0fd6f219750af8d0",
+      "note": "visual is not added for the review"
     }
   }
 }
