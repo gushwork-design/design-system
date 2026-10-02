@@ -99,5 +99,11 @@ for (const r of defaultRules().routes) {
 t('defaults survive a round-trip through normalise',
   normalise(defaultRules()).routes, defaultRules().routes);
 
+/* The edge gate only runs for paths in middleware.js's matcher, so a rule in _access.js for a path the matcher leaves
+   out does nothing. /previews has a rule; this keeps it in the matcher. */
+import fs from 'node:fs';
+const mw = fs.readFileSync(new URL('../web/middleware.js', import.meta.url), 'utf8');
+t('the middleware matcher covers /previews', /matcher:[^\]]*'\/previews\/:path\*'/.test(mw), true);
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
