@@ -79,6 +79,16 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
 /* The add-a-thing row used to float under the last row inside the body. As a band of
    its own it separates "what exists" from "add one", which is the hierarchy the card
    was missing. */
+.ac-pg { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-8); padding: var(--gw-space-12); }
+.ac-pg__t { font: var(--gw-text-button-14); color: var(--s-body); }
+.ac-pg__r { display: flex; align-items: center; gap: var(--gw-space-8); }
+.ac-pg__b { width: 28px; height: 28px; display: grid; place-items: center; padding: 0; border-radius: var(--gw-radius-8);
+  border: 1px solid var(--s-field-border); background: var(--s-card-bg); color: var(--s-nav-label); cursor: pointer;
+  transition: background var(--gw-motion-fast); }
+.ac-pg__b svg { width: 12px; height: 12px; display: block; }
+.ac-pg__b:hover:not(:disabled) { background: var(--s-nav-hover); }
+.ac-pg__b:disabled { opacity: .4; cursor: not-allowed; }
+.ac-pg[hidden] { display: none; }
 .ac-card__ft {
   display: flex; gap: var(--gw-space-8); flex-wrap: wrap; align-items: center;
   padding: var(--gw-space-16) var(--gw-space-24);
@@ -402,6 +412,8 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
   'use strict';
 
   var ICON = {
+    'arrow-left': 'M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z',
+    'arrow-right': 'M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z',
     trash: 'M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z',
     lock: 'M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Zm-68-56a12,12,0,1,1-12-12A12,12,0,0,1,140,152Z',
     x: 'M208.49,191.51a12,12,0,0,1-17,17L128,145,64.49,208.49a12,12,0,0,1-17-17L111,128,47.51,64.49a12,12,0,0,1,17-17L128,111l63.51-63.52a12,12,0,0,1,17,17L145,128Z',
@@ -505,6 +517,8 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
     );
   }
 
+  /* Ten rules to a page; the pager shows only when there is more than a page. */
+  var ROUTES_PER = 10, routesPage = 1;
   function pagesCard() {
     var card = el(
       '<section class="ac-card">' +
@@ -517,6 +531,7 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
           '<div class="ac-head"><span>Path</span><span>Who can see it</span>' +
             '<span>People &amp; groups</span><span></span></div>' +
           '<div data-rows></div>' +
+          '<div class="ac-pg" data-pg hidden></div>' +
         '</div>' +
         '<div class="ac-card__ft">' +
           '<input class="ac-field" data-newpath placeholder="/internal/new-page" ' +
@@ -529,7 +544,24 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
     );
 
     var rows = card.querySelector('[data-rows]');
-    draft.routes.forEach(function (r, i) { rows.appendChild(routeRow(r, i)); });
+    /* Rows keep their ABSOLUTE index in draft.routes (data-i), so every handler below still edits the right rule. */
+    var pgCount = Math.max(1, Math.ceil(draft.routes.length / ROUTES_PER));
+    routesPage = Math.min(Math.max(1, routesPage), pgCount);
+    var from = (routesPage - 1) * ROUTES_PER;
+    draft.routes.slice(from, from + ROUTES_PER).forEach(function (r, k) { rows.appendChild(routeRow(r, from + k)); });
+    var pg = card.querySelector('[data-pg]');
+    if (draft.routes.length > ROUTES_PER) {
+      pg.hidden = false;
+      pg.innerHTML = '<span class="ac-pg__t">' + (from + 1) + '–' + Math.min(from + ROUTES_PER, draft.routes.length) + ' of ' + draft.routes.length + '</span>' +
+        '<div class="ac-pg__r"><span class="ac-pg__t">Page ' + routesPage + ' of ' + pgCount + '</span>' +
+        '<button class="ac-pg__b" type="button" data-pgnav="prev" aria-label="Previous page"' + (routesPage <= 1 ? ' disabled' : '') + '>' + icon('arrow-left') + '</button>' +
+        '<button class="ac-pg__b" type="button" data-pgnav="next" aria-label="Next page"' + (routesPage >= pgCount ? ' disabled' : '') + '>' + icon('arrow-right') + '</button></div>';
+      pg.addEventListener('click', function (ev) {
+        var b = ev.target.closest('[data-pgnav]'); if (!b || b.disabled) return;
+        routesPage += b.dataset.pgnav === 'next' ? 1 : -1;
+        render();
+      });
+    }
 
     rows.addEventListener('change', function (ev) {
       var row = ev.target.closest('.ac-row'); if (!row) return;
@@ -566,6 +598,8 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
       if (draft.routes.some(function (r) { return r.path === path; })) { input.value = ''; return; }
       draft.routes.push({ path: path, access: 'internal', groups: [], people: [] });
       draft.routes.sort(function (a, b) { return a.path.localeCompare(b.path); });
+      /* show the new rule: jump to the page it landed on */
+      routesPage = Math.floor(draft.routes.findIndex(function (r) { return r.path === path; }) / ROUTES_PER) + 1;
       render();
     });
 
