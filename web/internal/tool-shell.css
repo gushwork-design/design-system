@@ -850,7 +850,7 @@ html[data-theme] .preview-content[data-theme] {
 /* Colour — every value a token */
 .brand-card .brand-link { color: inherit; }
 .dropzone .thumb.empty,
-.dropzone .thumb { background: var(--gw-color-neutral-100); }
+.dropzone .thumb { background-color: var(--gw-color-neutral-100); }   /* colour only: the ID card draws its photo as a background-image */
 .copy-tooltip-text, .copy-tooltip a { color: var(--t-tip-fg); }
 .copy-tooltip svg { color: var(--t-ok); }
 .copy-tooltip a, .email-body .gmail-help-tip-steps a { color: var(--gw-color-primary-200); border-bottom-color: transparent; }
@@ -1021,3 +1021,49 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; appe
    swelled; 8 + 4 = 12. Same rule holds for the menus (12 around 8 items, 4 padding)
    and the tab-group (12 around 8 items, 4 padding), which were already right. */
 .floating-toolbar { border-radius: var(--gw-radius-12); }
+
+.gw-switch:disabled { opacity: .5; cursor: not-allowed; }
+
+/* Read-only fields sit one step off the panel, not on a lighter grey than the inputs. */
+:root[data-theme="dark"] .prop-input[readonly],
+:root[data-theme="dark"] .prop-textarea[readonly],
+:root[data-theme="dark"] .lockable-field .prop-input[readonly],
+:root[data-theme="dark"] .lockable-field .prop-textarea[readonly] { background: var(--gw-color-neutral-900); color: var(--t-label); }
+
+/* Menu items live inside the bar but are not bar buttons: the 32h pill rule must not squash
+   a two-line item (label + hint). */
+.floating-toolbar .split-menu-item,
+.floating-toolbar .tb-pill .split-menu-item {
+  height: auto;
+  min-height: 0;
+  padding: var(--gw-space-8) var(--gw-space-12);
+  gap: var(--gw-space-2);
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  border-radius: var(--gw-radius-8);
+  background: transparent;
+  color: var(--t-heading);
+  font: var(--gw-text-body-14-med);
+}
+.floating-toolbar .split-menu-item:hover { background: var(--t-hover); }
+.floating-toolbar .split-menu-item .item-main { display: flex; align-items: center; gap: var(--gw-space-8); font: var(--gw-text-body-14-med); }
+.floating-toolbar .split-menu-item .item-hint { font: var(--gw-text-body-12-reg); color: var(--t-label); }
+.floating-toolbar .split-menu { padding: var(--gw-space-4); gap: var(--gw-space-2); }
+
+/* The native textarea resize grip is unstyled; the Office field is a fixed block. */
+.prop-textarea { resize: none; }
+
+/* "Need help?" block at the foot of the ID card panel */
+.help-section { background: transparent; border-top: 1px solid var(--t-rule); }
+.help-copy { font: var(--gw-text-body-12-reg); letter-spacing: var(--gw-text-body-12-reg-tracking); color: var(--t-label); }
+.help-name { color: var(--t-heading); font-weight: 600; }
+.help-link { color: var(--t-heading); text-decoration-color: var(--t-border-strong); }
+.help-link:hover { color: var(--t-heading); text-decoration-color: currentColor; }
+.help-slack-btn {
+  height: 32px; padding: 0 var(--gw-space-12); gap: var(--gw-space-8);
+  background: var(--t-card-bg); border: 1px solid var(--t-btn-border); border-radius: var(--gw-radius-8);
+  color: var(--t-heading); font: var(--gw-text-body-12-med); box-shadow: var(--gw-shadow-s2);
+}
+.help-slack-btn:hover { background: var(--t-hover); box-shadow: var(--gw-shadow-s2); border-color: var(--t-btn-border); }
+.help-slack-btn svg { color: inherit; }

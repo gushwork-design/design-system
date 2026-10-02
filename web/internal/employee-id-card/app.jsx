@@ -360,30 +360,23 @@ function PropSlider({ value, onChange, min, max, step = 1, onActiveChange }) {
 
 }
 
-/* PropYesNo — Yes/No segmented control. Used for boolean toggles like
-   "Polish photo". Pass a disabled flag to lock both buttons (e.g. while
-   the model is still processing). */
+/* PropYesNo — a boolean is a switch (library: controls/toggle, X-Small 36x20), not a two-tab
+   control. Used for "Polish photo". `disabled` locks it while the model is processing.
+   yesLabel / noLabel are kept for callers; the switch reads them as its accessible name. */
 function PropYesNo({ value, onChange, disabled = false, yesLabel = 'On', noLabel = 'Off' }) {
   return (
-    <div className="prop-segmented" role="tablist">
-      <button
-        type="button"
-        className={value ? 'active' : ''}
-        onClick={() => !disabled && onChange(true)}
-        disabled={disabled} style={{ textAlign: "left" }}>
-        
-        {yesLabel}
-      </button>
-      <button
-        type="button"
-        className={!value ? 'active' : ''}
-        onClick={() => !disabled && onChange(false)}
-        disabled={disabled} style={{ textAlign: "left" }}>
-        
-        {noLabel}
-      </button>
-    </div>);
-
+    <button
+      type="button"
+      role="switch"
+      aria-checked={!!value}
+      aria-label={value ? yesLabel : noLabel}
+      className={`gw-switch${value ? ' on' : ''}`}
+      disabled={disabled}
+      onClick={() => !disabled && onChange(!value)}
+    >
+      <span className="gw-switch__knob" />
+    </button>
+  );
 }
 
 /* ── photo dropzone ─────────────────────────────────────────────── */
@@ -931,6 +924,15 @@ function openPrintForPdf(frontPng, backPng, docTitle) {
 }
 
 /* ── Main App ───────────────────────────────────────────────────── */
+/* New icon, pending library review: a Phosphor-style sidebar glyph for the panel collapse / reopen. */
+function SidebarIcon() {
+  return (
+    <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
+      <path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM40,56H80V200H40ZM216,200H96V56H216V200Z" />
+    </svg>
+  );
+}
+
 function App() {
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
   const cardTheme = buildCardTheme(t);
@@ -941,6 +943,7 @@ function App() {
   // Photo polish (background removal) — derived display URL is
   // `polishOn && polishedUrl ? polishedUrl : photoUrl`. We keep the
   // original photoUrl untouched so the user can toggle back instantly.
+  const [panelOpen, setPanelOpen] = useState(true); // floating editor panel
   const [polishOn, setPolishOn] = useState(false);
   const [polishedUrl, setPolishedUrl] = useState(null);
   const [polishState, setPolishState] = useState('idle'); // 'idle' | 'loading' | 'error'
@@ -1275,16 +1278,24 @@ For printing, use the PDF and print at 100% scale (standard CR80, 54 × 85.6 mm)
   const emailState = actionKind === 'email' ? exportState : 'idle';
 
   return (
-    <div className="app">
-      {/* ── LEFT: brand card + form card ── */}
-      <div className="left-col">
+    <div className="app" data-panel={panelOpen ? 'open' : 'closed'}>
+      <button type="button" className="panel-reopen" onClick={() => setPanelOpen(true)} aria-label="Open editor panel" title="Open editor panel">
+        <SidebarIcon />
+      </button>
+      {/* ── LEFT: floating editor panel ── */}
+      <div className="left-col" aria-hidden={!panelOpen}>
         <header className="brand-card">
+          <a className="brand-link" href="/internal/tools" title="Back to Tools" aria-label="Back to Tools">
           <svg className="brand-icon" width="32" height="32" viewBox="0 0 160 160" fill="none" aria-hidden>
             <rect width="160" height="160" rx="20" fill="#0D0D0D" />
             <path d="M116.609 44.5634C117.503 42.3606 115.85 40 113.472 40H49.1429C44.0934 40 40 44.0934 40 49.1429V106.778C40 112.018 45.1708 115.683 49.9603 113.557C80.8494 99.8449 104.378 74.7075 116.609 44.5634Z" fill="white" />
             <path d="M72.5161 120C71.4022 120 70.9357 118.553 71.8259 117.884C94.9007 100.527 111.434 75.8047 118.766 48.0522C118.94 47.3915 120 47.5162 120 48.1995V110.857C120 115.907 115.907 120 110.857 120H72.5161Z" fill="white" />
           </svg>
+          </a>
           <h1>Employee ID Card Generator</h1>
+          <button type="button" className="panel-collapse" onClick={() => setPanelOpen(false)} aria-label="Collapse editor panel" title="Collapse editor panel">
+            <SidebarIcon />
+          </button>
         </header>
 
         <aside className="form-card">
