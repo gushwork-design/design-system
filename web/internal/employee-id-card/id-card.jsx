@@ -18,10 +18,10 @@ const CARD_H = 324;
    original Figma look so the card renders correctly with no tweaks. */
 const DEFAULT_THEME = {
   frame: 'rgb(38, 42, 46)',
-  face: 'rgb(241, 242, 243)',
-  faceText: 'rgb(17, 24, 39)',
-  faceMuted: 'rgb(106, 112, 119)',
-  accent: 'rgb(0, 112, 255)',
+  face: '#FFFFFF',                 // print: Full White (CMYK 0 0 0 0)
+  faceText: '#0D0D0D',             // print: Flat Black (CMYK 0 0 0 95)
+  faceMuted: '#6E6E6E',            // Flat Black at a 60% tint
+  accent: '#0072CE',               // print: Brandeis Blue, Pantone 285 C (CMYK 100 45 0 19)
   onFrame: '#FFFFFF',
   onFrameMuted: 'rgba(255, 255, 255, 0.6)',
   divider: 'rgba(255, 255, 255, 0.2)',
@@ -44,7 +44,7 @@ const DEFAULT_THEME = {
 /* The blue Gushwork "G" mark — used at the front bottom-left.
    Lifted exactly from Figma node 35:135 (subpath of the inline svg).
    Accepts a fill color so it can pick up the theme accent. */
-function GwMarkBlue({ color = 'rgb(0, 112, 255)' }) {
+function GwMarkBlue({ color = '#0072CE' }) {
   return (
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ display: 'block' }}>
       <path
@@ -100,7 +100,7 @@ function CardPhoto({ photoUrl, photoXform, showGuides = false }) {
         height: 100,
         overflow: 'hidden',
         borderRadius: 8,
-        backgroundColor: 'rgb(207, 209, 212)'
+        backgroundColor: '#CFCFCF'   /* Flat Black at a 20% tint (print palette) */
       }}>
       
       {photoUrl ?
@@ -205,7 +205,7 @@ function IdCardFront({ data, photoUrl, photoXform, onPickPhoto, showGuides = fal
                   lineHeight: 1.4,
                   letterSpacing: '-0.02em',
                   color: theme.faceMuted
-                }, color: "rgb(38, 42, 46)", fontSize: "10px" }}>
+                }, color: theme.faceText, fontSize: "10px" }}>
               
               {data.title || ''}
             </div>
@@ -334,7 +334,7 @@ function IdCardFront({ data, photoUrl, photoXform, onPickPhoto, showGuides = fal
             height="66"
             rx="4"
             fill="rgba(0, 112, 255, 0.06)"
-            stroke="#0070FF"
+            stroke="#0072CE"
             strokeWidth="0.9"
             opacity="0.95" />
           

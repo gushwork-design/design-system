@@ -32,30 +32,44 @@ const DEFAULTS = {
      • Nameplate  — the display-type voice of the name
    Each maps to a bundle that the card renderer consumes as one theme.
    ───────────────────────────────────────────────────────────────── */
+/* PRINT PALETTE — the card is printed, so its colours come from the brand guidelines' FOR PRINTS
+   column (design hub → Style Guide → Colors), not the FOR SCREENS hex:
+     Brandeis Blue   CMYK 100 45 0 19    Pantone 285 C   → PRINT_BLUE  #0072CE
+     Full White      CMYK 0 0 0 0        Pantone 000 C   → #FFFFFF
+     Flat Black      CMYK 0 0 0 95       Pantone Black 6 C → #0D0D0D
+   A browser can only draw RGB, so these are the sRGB renditions of those print specs (285 C is
+   #0072CE; the CMYK build computes to #0072CF). The old screen blue #0070FF is outside the CMYK
+   gamut and prints duller, which is why it is not used here. PRINT_MUTED is Flat Black at a 60%
+   tint (CMYK 0 0 0 57), the only derived value: the guidelines give no print grey. */
+const PRINT_BLUE = '#0072CE';
+const PRINT_BLUE_TINT = '#CCE3F5';   // 20% tint of the print blue
+const PRINT_BLACK = '#0D0D0D';
+const PRINT_MUTED = '#6E6E6E';
+
 const MOODS = {
   midnight: {
     label: 'Cobalt',
-    frame: '#0061E0', face: 'rgb(241, 242, 243)',
-    faceText: 'rgb(17, 24, 39)', faceMuted: 'rgb(106, 112, 119)',
-    accent: 'rgb(0, 112, 255)', onFrame: '#FFFFFF',
-    onFrameMuted: 'rgba(255, 255, 255, 0.74)', divider: '#3481E6',
-    backBorder: '#3481E6', swatch: ['#0061E0', '#F1F2F3', '#0070FF']
+    frame: PRINT_BLUE, face: '#FFFFFF',
+    faceText: PRINT_BLACK, faceMuted: PRINT_MUTED,
+    accent: PRINT_BLUE, onFrame: '#FFFFFF',
+    onFrameMuted: 'rgba(255, 255, 255, 0.74)', divider: 'rgba(255, 255, 255, 0.3)',
+    backBorder: 'rgba(255, 255, 255, 0.3)', swatch: [PRINT_BLUE, '#FFFFFF', PRINT_BLACK]
   },
   electric: {
     label: 'Electric',
-    frame: '#0070FF', face: '#FFFFFF',
-    faceText: '#0D0D0D', faceMuted: '#535A61',
-    accent: '#0070FF', onFrame: '#FFFFFF',
+    frame: PRINT_BLUE, face: '#FFFFFF',
+    faceText: PRINT_BLACK, faceMuted: PRINT_MUTED,
+    accent: PRINT_BLUE, onFrame: '#FFFFFF',
     onFrameMuted: 'rgba(255, 255, 255, 0.74)', divider: 'rgba(255, 255, 255, 0.3)',
-    backBorder: 'rgba(255, 255, 255, 0.42)', swatch: ['#0070FF', '#FFFFFF', '#CCE2FF']
+    backBorder: 'rgba(255, 255, 255, 0.42)', swatch: [PRINT_BLUE, '#FFFFFF', PRINT_BLUE_TINT]
   },
   ivory: {
     label: 'Ivory',
     frame: '#E7E1D4', face: '#FFFFFF',
     faceText: '#1B1A16', faceMuted: '#6B6555',
-    accent: '#0070FF', onFrame: '#2A2620',
+    accent: PRINT_BLUE, onFrame: '#2A2620',
     onFrameMuted: 'rgba(42, 38, 32, 0.62)', divider: 'rgba(42, 38, 32, 0.14)',
-    backBorder: 'rgba(42, 38, 32, 0.2)', swatch: ['#E7E1D4', '#1B1A16', '#0070FF']
+    backBorder: 'rgba(42, 38, 32, 0.2)', swatch: ['#E7E1D4', '#1B1A16', PRINT_BLUE]
   },
   forest: {
     label: 'Forest',
@@ -1492,7 +1506,7 @@ For printing, use the PDF and print at 100% scale (standard CR80, 54 × 85.6 mm)
       </div>
 
       {/* ── RIGHT: preview surface ── */}
-      <main className="preview-col" style={{ alignItems: "center", padding: "56px 32px 140px" }}>
+      <main className="preview-col" style={{ alignItems: "center" }}>
         <div className="cards-stage">
           <div className="cards-row">
             <CardFrame caption="Front">

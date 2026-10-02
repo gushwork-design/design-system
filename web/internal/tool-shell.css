@@ -122,7 +122,9 @@ body {
 /* The preview owns the whole canvas; padding keeps the artefact clear of the panel. */
 .preview-col {
   min-height: 100vh;
-  padding-left: var(--t-offset);
+  /* the panel's offset PLUS the stylesheet's 32px gutter, so the preview centres in the space
+     right of the panel — the same centre the floating bar uses */
+  padding-left: calc(var(--t-offset) + 32px);
   transition: padding-left 280ms cubic-bezier(.22, 1, .36, 1);
 }
 .preview-col { scrollbar-color: var(--t-scroll) transparent; }
@@ -1067,3 +1069,12 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; appe
 }
 .help-slack-btn:hover { background: var(--t-hover); box-shadow: var(--gw-shadow-s2); border-color: var(--t-btn-border); }
 .help-slack-btn svg { color: inherit; }
+
+/* Uploaded-image thumbnails show the WHOLE image, letterboxed on the neutral tile. They were
+   `cover`, which crops a wide or tall photo to its middle and reads as zoomed in. !important
+   because the banner thumbnail sets background-size inline. */
+.dropzone .thumb:not(.empty) {
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+}
