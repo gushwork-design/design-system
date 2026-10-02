@@ -339,7 +339,7 @@ body {
   position: absolute;
   bottom: calc(100% + 8px);
   left: 0;
-  right: 0;
+  width: 240px;
   z-index: 20;
   background: #111827;
   color: #fff;
@@ -360,7 +360,7 @@ body {
   content: "";
   position: absolute;
   top: 100%;
-  left: 22px;
+  left: 13px;
   border: 5px solid transparent;
   border-top-color: #111827;
 }

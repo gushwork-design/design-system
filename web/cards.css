@@ -71,6 +71,10 @@
   .tl-tabs{display:flex;gap:var(--gw-space-24);margin:0 0 var(--gw-space-32);overflow-x:auto;scrollbar-width:none;
            box-shadow:inset 0 -1px 0 var(--s-chrome-border)}
   .tl-tabs::-webkit-scrollbar{display:none}
+  /* Sticky: the type bar stays at the top of the panel while the cards scroll under it (the scrollport is
+     .gw-scroll). It needs the panel fill so the cards do not show through, and a z-index above the cards,
+     whose hover lift (transform) would otherwise paint over it. Ruled by Utsav, 2 Oct 2026. */
+  .tl-tabs{position:sticky;top:0;z-index:20;background:var(--s-panel-bg)}
   .tl-tab{all:unset;box-sizing:border-box;position:relative;cursor:pointer;flex:none;white-space:nowrap;height:40px;display:inline-flex;align-items:center;gap:6px;
           padding:0 2px;font:var(--gw-text-body-14-med);color:var(--s-body);transition:color var(--gw-motion-fast)}
   .tl-tab i{font:500 12px/1 var(--gw-font-body);font-style:normal;color:var(--s-group-label);font-variant-numeric:tabular-nums}
@@ -189,26 +193,26 @@
   :root[data-theme="dark"] .tl-go:hover, :root[data-theme="dark"] .tuse:hover { border-color: var(--gw-color-neutral-700); }
 
 /* ---------------------------------------------------------------------------
-   Tools page hover — for fun, 2 Oct 2026. Scoped to /internal/tools so the Templates
-   cards, which share .tcard, are untouched. A card lifts on a spring, its mock browser
-   rises and tilts (alternating direction card to card), the three window dots light up
-   like a real window's, and the arrow nudges further. Motion is behind
-   prefers-reduced-motion; the dot colours are not motion and stay.
+   Card hover — for fun, 2 Oct 2026. On /internal/tools and /internal/templates. A card
+   lifts on a spring, its mock browser rises and tilts (alternating direction card to
+   card), and any "Open" arrow nudges further. The three window dots are red, yellow and green
+   at rest, like a real window's, so they are not part of the hover. Motion is behind
+   prefers-reduced-motion. Locked cards do not animate. A Templates card is a <div> holding two buttons, so
+   the press-down squash is limited to the Tools cards, which are links.
    --------------------------------------------------------------------------- */
-body[data-gw-page="tools"] .tcard__bar i { transition: background var(--gw-motion-fast); }
-body[data-gw-page="tools"] a.tcard:not(.tcard--locked):hover .tcard__bar i:nth-child(1) { background: var(--gw-color-red-400); }
-body[data-gw-page="tools"] a.tcard:not(.tcard--locked):hover .tcard__bar i:nth-child(2) { background: var(--gw-color-yellow-400); }
-body[data-gw-page="tools"] a.tcard:not(.tcard--locked):hover .tcard__bar i:nth-child(3) { background: var(--gw-color-green-400); }
+body:is([data-gw-page="tools"], [data-gw-page="templates"]) .tcard__bar i:nth-child(1) { background: var(--gw-color-red-400); }
+body:is([data-gw-page="tools"], [data-gw-page="templates"]) .tcard__bar i:nth-child(2) { background: var(--gw-color-yellow-400); }
+body:is([data-gw-page="tools"], [data-gw-page="templates"]) .tcard__bar i:nth-child(3) { background: var(--gw-color-green-400); }
 
 @media (prefers-reduced-motion: no-preference) {
-  body[data-gw-page="tools"] {
+  body:is([data-gw-page="tools"], [data-gw-page="templates"]) {
     --tl-spring: cubic-bezier(.34, 1.56, .64, 1);   /* overshoots slightly, then settles */
   }
-  body[data-gw-page="tools"] a.tcard:not(.tcard--locked) {
+  body:is([data-gw-page="tools"], [data-gw-page="templates"]) :is(a.tcard, div.tcard--tpl):not(.tcard--locked) {
     transition: transform 360ms var(--tl-spring), border-color var(--gw-motion-fast), box-shadow 360ms ease;
     will-change: transform;
   }
-  body[data-gw-page="tools"] a.tcard:not(.tcard--locked):hover {
+  body:is([data-gw-page="tools"], [data-gw-page="templates"]) :is(a.tcard, div.tcard--tpl):not(.tcard--locked):hover {
     transform: translateY(-6px);
     box-shadow: var(--gw-shadow-s4);
   }
@@ -216,16 +220,16 @@ body[data-gw-page="tools"] a.tcard:not(.tcard--locked):hover .tcard__bar i:nth-c
     transform: translateY(-2px) scale(.985);
     transition-duration: 120ms;
   }
-  body[data-gw-page="tools"] .tcard__dev {
+  body:is([data-gw-page="tools"], [data-gw-page="templates"]) .tcard__dev {
     transition: transform 480ms var(--tl-spring);
     transform-origin: 50% 100%;
   }
-  body[data-gw-page="tools"] a.tcard:not(.tcard--locked):hover .tcard__dev {
+  body:is([data-gw-page="tools"], [data-gw-page="templates"]) :is(a.tcard, div.tcard--tpl):not(.tcard--locked):hover .tcard__dev {
     transform: translateX(-50%) translateY(-10px) rotate(-1.6deg) scale(1.05);
   }
-  body[data-gw-page="tools"] a.tcard:not(.tcard--locked):nth-child(even):hover .tcard__dev {
+  body:is([data-gw-page="tools"], [data-gw-page="templates"]) :is(a.tcard, div.tcard--tpl):not(.tcard--locked):nth-child(even):hover .tcard__dev {
     transform: translateX(-50%) translateY(-10px) rotate(1.6deg) scale(1.05);
   }
-  body[data-gw-page="tools"] .tl-go svg { transition: transform 280ms var(--tl-spring); }
-  body[data-gw-page="tools"] a.tcard:not(.tcard--locked):hover .tl-go svg { transform: translate(4px, -4px); }
+  body:is([data-gw-page="tools"], [data-gw-page="templates"]) .tl-go svg { transition: transform 280ms var(--tl-spring); }
+  body:is([data-gw-page="tools"], [data-gw-page="templates"]) a.tcard:not(.tcard--locked):hover .tl-go svg { transform: translate(4px, -4px); }
 }

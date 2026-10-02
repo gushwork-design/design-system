@@ -375,7 +375,7 @@ function PropSlider({ value, onChange, min, max, step = 1, onActiveChange }) {
 }
 
 /* PropYesNo — a boolean is a switch (library: controls/toggle, X-Small 36x20), not a two-tab
-   control. Used for "Polish photo". `disabled` locks it while the model is processing.
+   control. Used for "Remove background". `disabled` locks it while the model is processing.
    yesLabel / noLabel are kept for callers; the switch reads them as its accessible name. */
 function PropYesNo({ value, onChange, disabled = false, yesLabel = 'On', noLabel = 'Off' }) {
   return (
@@ -1379,40 +1379,37 @@ For printing, use the PDF and print at 100% scale (standard CR80, 54 × 85.6 mm)
                   }} />
                 
               </PropRow>
-              <PropRow label={<span className="polish-label"><span>Polish</span><SparkleIcon size={14} /></span>}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4, width: '100%' }}>
+              <PropRow label="Remove BG">
+                {/* The switch and its progress sit on one line: the percentage reads to the RIGHT of the
+                    toggle while the model runs, not underneath it. */}
+                <div className="polish-line">
                   <div className="polish-tip-wrap">
                     <PropYesNo
                       value={polishOn}
                       onChange={handlePolishToggle}
                       disabled={polishState === 'loading' || !photoUrl || photoUrl === DEFAULT_PHOTO}
-                      yesLabel="On"
-                      noLabel="Off" />
+                      yesLabel="Background removed"
+                      noLabel="Remove background" />
                     <div className="polish-tooltip" role="tooltip">
                       {!photoUrl || photoUrl === DEFAULT_PHOTO ?
-                      'Upload your own photo to use Polish — it removes the background and fits the face to the guide.' :
+                      'Upload your own photo to remove its background and fit the face to the guide.' :
                       'Removes the background and fits the face to the guide. You can fine-tune below.'}
                     </div>
                   </div>
-                  
                   {polishState === 'loading' &&
-                  <div className="polish-status">
+                  <div className="polish-status" role="status" title="The first run downloads a one-time model, about 25MB">
                       <span className="polish-spinner" aria-hidden="true" />
-                      <span>
-                        {polishProgress > 0 && polishProgress < 100 ?
-                      `Processing photo… ${polishProgress}%` :
-                      'Loading model… (one-time, ~25MB)'}
-                      </span>
+                      <span>{polishProgress > 0 && polishProgress < 100 ? `${polishProgress}%` : 'Loading…'}</span>
                     </div>
                   }
                   {polishState === 'error' &&
-                  <div className="polish-status polish-status--error">
-                      Polish failed. Try again or switch back to Off.
+                  <div className="polish-status polish-status--error" role="status" title="Background removal failed. Try again, or switch it off.">
+                      Failed. Try again
                     </div>
                   }
                   {polishState === 'idle' && polishOn && polishedUrl && polishJustDone &&
-                  <div className="polish-status polish-status--ok">
-                      Background removed.
+                  <div className="polish-status polish-status--ok" role="status">
+                      Done
                     </div>
                   }
                 </div>
