@@ -822,8 +822,16 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .ds-panel { display: flex; flex-direction: column; gap: var(--gw-space-24); }
 .ds-panel > * { min-width: 0; }
 #ds-workflow { gap: var(--gw-space-48, 48px); }
-.ds-find { width: 100%; max-width: 280px; height: 36px; padding: 0 12px; border: 0; border-radius: var(--gw-radius-12); background: var(--ul-field-bg); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); color: var(--ul-value); font: var(--gw-text-body-14-reg); }
-.ds-find::placeholder { color: var(--ul-sub); }
+.ds-find { width: 100%; max-width: 320px; height: 36px; display: flex; align-items: center; gap: var(--gw-space-8); padding: var(--gw-space-8) var(--gw-space-12); box-sizing: border-box; border-radius: var(--gw-radius-8); background: var(--s-field-bg); cursor: text; }   /* the top bar's search field: same fill, radius, icon and type */
+:root[data-theme="dark"] .ds-find { box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }
+.ds-find svg { width: 16px; height: 16px; flex: none; color: var(--s-field-icon); }
+.ds-find input { flex: 1; min-width: 0; border: 0; background: none; padding: 0; margin: 0; font: var(--gw-text-button-14); letter-spacing: 0; color: var(--s-nav-label); -webkit-appearance: none; appearance: none; }
+.ds-find input:focus { outline: none; }
+.ds-find:focus-within { outline: var(--gw-focus-ring); outline-offset: var(--gw-focus-offset); }
+.ds-find input::-webkit-search-cancel-button { display: none; }
+.ds-find input::placeholder { color: var(--s-placeholder); }
+.ds-tools-r { display: flex; align-items: center; gap: var(--gw-space-8); min-width: 0; }
+.ds-tools-r .ds-pv { margin: 0; flex: none; }
 .ds-tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--gw-space-12); }
 .ds-a { color: var(--ul-value); text-decoration: none; font-weight: 600; }
 .ds-a:hover { text-decoration: underline; text-underline-offset: 2px; }
@@ -876,7 +884,8 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
         <div class="an-bar ds-cats"><div class="ul-tabs an-tabs" id="ds-rev-tabs" role="tablist" aria-label="Review"></div></div>
         <section class="ul-sec" aria-labelledby="ds-rev-h">
           <div class="ul-sh"><div class="ul-sh__t"><h2 id="ds-rev-h">Inbox</h2><span class="ul-sh__q" id="ds-rev-q"></span></div>
-            <input class="ds-find" id="ds-rev-find" type="search" aria-label="Filter the inbox" placeholder="Filter" autocomplete="off"></div>
+            <div class="ds-tools-r"><button type="button" class="ds-pv" id="ds-gh-check" title="Tests whether the site can open pull requests for your decisions">Check GitHub</button>
+            <label class="ds-find"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M232.49,215.51,185,168a92.12,92.12,0,1,0-17,17l47.53,47.54a12,12,0,0,0,17-17ZM44,112a68,68,0,1,1,68,68A68.07,68.07,0,0,1,44,112Z"/></svg><input id="ds-rev-find" type="search" aria-label="Filter the inbox" placeholder="Filter" autocomplete="off"></label></div></div>
           <div class="ul-scroll vs-t" id="ds-rev-table"></div>
           <div class="vs-more" id="ds-rev-more"></div>
         </section>
@@ -1250,7 +1259,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
         return '<div class="fd-cg">' + (g[0] ? '<h4>' + esc(g[0]) + '<span>' + g[1].length + '</span></h4>' : '') + '<div class="fd-comps">' + g[1].map(function (c) { return compCard(sf, c); }).join('') + '</div></div>';
       }).join('');
     return '<section class="fd-sec"><h3>Components<span>' + plural(cs.length, 'approved component') + (all.length > cs.length ? ', ' + (all.length - cs.length) + ' not yet' : '') + '</span></h3>' +
-      (cs.length > 8 ? '<input class="ds-find" id="ds-comp-find" type="search" aria-label="Filter components" placeholder="Filter components" autocomplete="off">' : '') + '<div id="ds-comps">' + body + '</div></section>';
+      (cs.length > 8 ? '<label class="ds-find"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M232.49,215.51,185,168a92.12,92.12,0,1,0-17,17l47.53,47.54a12,12,0,0,0,17-17ZM44,112a68,68,0,1,1,68,68A68.07,68.07,0,0,1,44,112Z"/></svg><input id="ds-comp-find" type="search" aria-label="Filter components" placeholder="Filter components" autocomplete="off"></label>' : '') + '<div id="ds-comps">' + body + '</div></section>';
   }
   /* THE LIBRARY SHOWS ONLY WHAT HAS BEEN APPROVED (Utsav, 2 Oct 2026). Something is approved when its review state is
      passed and the source has not moved since: pending, in rework, rejected and expired are not shown here, they are in
@@ -1392,9 +1401,9 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     var s = eff(it).state;
     return f === 'waiting' ? (s === 'pending' || s === 'expired') : s === f;
   }
-  function toast(msg) {
+  function toast(msg, ms) {
     var t = $('rv-toast'); if (!t) { t = document.createElement('div'); t.id = 'rv-toast'; t.className = 'rv-toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
-    t.textContent = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(function () { t.classList.remove('on'); }, 3800);
+    t.textContent = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(function () { t.classList.remove('on'); }, ms || 3800);
   }
 
   var RF = { q: '', shown: 30 };
@@ -1608,6 +1617,12 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       $('ds-review-lock').hidden = owner; $('ds-review-app').hidden = !owner;
       if (owner) Promise.all([data(), loadQueued()]).then(function (r) {
         reviewData = r[0]; renderReview(r[0]);
+        $('ds-gh-check').addEventListener('click', function () {
+          var b = this; b.disabled = true; b.textContent = 'Checking…';
+          fetch('/api/review?check=github', { credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (j) {
+            toast(j.github ? j.github.verdict : (j.error || 'Could not run the check.'), 14000);
+          }).catch(function () { toast('Could not reach the site.'); }).then(function () { b.disabled = false; b.textContent = 'Check GitHub'; });
+        });
         $('ds-rev-find').addEventListener('input', function (e) { RF.q = e.target.value; RF.shown = 30; renderReview(reviewData); });
       }).catch(function () { failed($('ds-rev-table'), 'Could not load the review queue'); });
     });
