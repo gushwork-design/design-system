@@ -35,17 +35,27 @@ a = ask('tailwind theme');                           t('tailwind: one file', a.n
 a = ask('design tokens json');                       t('tokens json', a.names, ['tokens.json']);
 a = ask('case study template');                      ok('case study: the prompt in a code block', a.r.text.includes('Use the Gushwork case-study') && a.r.text.includes('```'));
 a = ask('do we have a lead magnet template?');       ok('lead magnet template', a.r.text.includes('lead-magnet'));
-a = ask('templates');                                ok('templates: live ones listed, slides coming soon, no slide prompt', a.r.text.includes('Case study page') && a.r.text.includes('coming soon') && !a.r.text.includes('Use the Gushwork slide-deck'));
-a = ask('slide deck');                               ok('slides: coming soon, no prompt', a.r.text.includes('coming soon') && !a.r.text.includes('```'));
+a = ask('templates');                                ok('templates: live ones listed, slides not ready, no slide prompt', a.r.text.includes('Case study page') && a.r.text.includes('isn’t ready yet') && !a.r.text.includes('Use the Gushwork slide-deck'));
+a = ask('slide deck');                               ok('slides: not ready, no prompt', a.r.text.includes('isn’t ready yet') && !a.r.text.includes('```'));
 a = ask('email signature');                          ok('email signature tool', a.u.parts[0]?.type === 'tools' && a.r.text.includes('Email signature creator'));
 a = ask('id card generator');                        ok('ID card tool', a.u.parts[0]?.type === 'tools' && a.r.text.includes('ID card'));
-a = ask('make me a landing page for our new product'); ok('a design request is declined and pointed at templates, no files', a.u.designRequest && a.r.text.startsWith("I don't make designs") && a.r.text.includes('Ad landing page') && a.r.files.length === 0);
+a = ask('make me a landing page for our new product'); ok('a design request is declined plainly and pointed at templates, no files', a.u.designRequest && /isn’t something I do|don’t design/.test(a.r.text) && a.r.text.includes('Ad landing page') && a.r.files.length === 0);
 a = ask('generate an email signature for me');       ok('"generate an email signature" is the tool, not a refusal', !a.u.designRequest && a.u.parts[0]?.type === 'tools');
 a = ask('how do I install the claude plugin');       ok('plugin question → plugin page', a.r.text.includes('claude-plugin'));
 a = ask('logo and color sheet');                     ok('two things at once', a.names.some((n) => n.endsWith('.pdf')) && a.names.some((n) => n.endsWith('.svg')), JSON.stringify(a.names));
-a = ask('hello');                                    ok('hello → help', a.r.text.includes("I'm Bruce"));
-a = ask('blah blah something else entirely');        ok('unknown → help, no files', a.r.text.includes("I'm Bruce") && a.r.files.length === 0);
-a = ask('');                                         ok('empty → help', a.r.text.includes("I'm Bruce"));
+a = ask('hello');                                    ok('hello → a greeting, not the help text', a.u.greeting && !a.r.text.includes('brand files') && a.r.text.length < 120, a.r.text);
+a = ask('thanks!');                                  ok('thanks → a short reply', a.u.thanks && a.r.text.length < 30, a.r.text);
+a = ask('blah blah something else entirely');        ok('unknown → says it did not catch it, then the help, no files', a.r.text.includes('brand files') && a.r.files.length === 0);
+a = ask('');                                         ok('empty → help', a.r.text.includes('brand files'));
+
+/* ---- the voice: no exclamation marks, no emoji, in anything Bruce writes himself ---- */
+for (const q of ['hey', 'thanks', 'white logo', 'logo and colour sheet', 'fonts', 'tokens', 'templates', 'slide deck', 'email signature', 'make me a poster', 'zzz', 'help']) {
+  const txt = ask(q).r.text;
+  ok(`voice: "${q}" has no exclamation mark and no emoji`, !/!/.test(txt) && !/\p{Extended_Pictographic}/u.test(txt), txt);
+}
+for (let i = 0; i < 12; i++) { const txt = compose(understand('white logo', catalog), catalog, String(i)).text; if (/!|\p{Extended_Pictographic}/u.test(txt)) ok('voice across seeds', false, txt); }
+ok('the wording varies between messages', new Set(Array.from({ length: 12 }, (_, i) => compose(understand('white logo', catalog), catalog, String(i)).text.split('\n')[0])).size > 1);
+ok('the same message always gets the same words', compose(understand('white logo', catalog), catalog, '55.5').text === compose(understand('white logo', catalog), catalog, '55.5').text);
 
 /* ---- pretend Slack and Upstash ---- */
 const calls = [];
@@ -99,11 +109,18 @@ t('a DM question gets the answer with no thread, and all four fonts in one share
 
 calls.length = 0;
 r = await post(dm('do the second one please', 'UOWNER'));
-t('a reviewer\'s DM that is not a question is ticked, not answered', [r.body.concierge, calls.map((c) => c.method)], ['ticked', ['reactions.add']]);
+t('a reviewer\'s DM that is not a question is ticked AND answered in words, so the tick is never a mystery', [r.body.concierge, calls.map((c) => c.method), calls[1].body.text.includes('9pm')], ['ticked', ['reactions.add', 'chat.postMessage'], true]);
+
+calls.length = 0;
+r = await post(dm('hi', 'UOWNER'));
+t('a reviewer saying hi gets a greeting, not a tick', [r.body.concierge, calls.map((c) => c.method)], ['answered', ['chat.postMessage']]);
+calls.length = 0;
+r = await post(dm('thanks', 'UOWNER'));
+t('a reviewer saying thanks gets a reply, not a tick', [r.body.concierge, calls.map((c) => c.method)], ['answered', ['chat.postMessage']]);
 
 calls.length = 0;
 r = await post(dm('do the second one please', 'UASKER'));
-t('the same words from anyone else get the help text', [r.body.concierge, calls[0].method, calls[0].body.text.includes("I'm Bruce")], ['answered', 'chat.postMessage', true]);
+t('the same words from anyone else get the help text', [r.body.concierge, calls[0].method, calls[0].body.text.includes('brand files')], ['answered', 'chat.postMessage', true]);
 
 calls.length = 0;
 r = await post(dm('logo', 'UOWNER'));
