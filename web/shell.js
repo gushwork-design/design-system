@@ -170,7 +170,11 @@
      either form — or both, once Google is configured alongside it. */
   var session = { signedIn: false, admin: false, owner: false, email: null, name: null,
                   picture: null, groups: [], modes: { google: false, password: true },
-                  gate: false };
+                  gate: false,
+                  /* True until /api/auth/me has answered (or failed). While it is true the rail's account
+                     row, the groups only some people see, and the bell are drawn as ghosts, so they do not
+                     pop in and shove their neighbours when the answer lands. */
+                  pending: true };
 
   /* Mac reads ⌘K, everything else Ctrl K. navigator.platform is deprecated but is still the
      only thing that answers this everywhere; userAgentData is Chromium-only, so it is tried
@@ -356,6 +360,14 @@
       : '<a class="gw-navitem" href="' + esc(item.href) + '"' + cur + '>' + inner + '</a>';
   }
 
+  /* A label and two rows, drawn as ghosts: stands in for the groups that only some people get. */
+  function ghostGroupHTML() {
+    return '<div class="gw-navgroup gw-navgroup--ghost" aria-hidden="true">' +
+        '<div class="gw-ghost gw-ghost--label"></div>' +
+        '<div class="gw-ghost gw-ghost--row"></div><div class="gw-ghost gw-ghost--row"></div>' +
+      '</div>';
+  }
+
   function groupHTML(g) {
     /* The padlock is on the LABEL, not on every row — measured 791:4936, where
        "FOR INTERNAL USE" carries one 12px glyph and the three rows beneath carry
@@ -451,6 +463,12 @@
   }
 
   function footerHTML() {
+    if (session.pending) {
+      return '<div class="gw-user gw-user--ghost" aria-hidden="true">' +
+          '<span class="gw-ghost gw-ghost--av"></span>' +
+          '<span class="gw-user__txt"><span class="gw-ghost gw-ghost--l1"></span><span class="gw-ghost gw-ghost--l2"></span></span>' +
+        '</div>';
+    }
     /* Nothing to sign in to while the gate is off. */
     if (!session.gate && !session.signedIn) return '';
     if (!session.signedIn) {
@@ -512,7 +530,7 @@
         '</div>' +
         '<div class="gw-bar__acts">' +
           themeHTML() +
-          (session.signedIn ? notifHTML() : '') +
+          (session.pending ? '<span class="gw-ghost gw-ghost--icon" aria-hidden="true"></span>' : (session.signedIn ? notifHTML() : '')) +
           helpHTML() +
         '</div>' +
       '</div>';
@@ -526,6 +544,8 @@
        so the list grows downward and scrolls; only the user card stays pinned. Owner is a strict
        subset of admin, so it only draws for an owner. */
     var tail = session.admin ? groupHTML(ADMIN_GROUP) : '';
+    /* Until we know who is looking, hold the room an Admin / Owner group would take. */
+    if (session.pending) tail = ghostGroupHTML();
     if (session.owner) tail += groupHTML(OWNER_GROUP);
     return '<aside class="gw-sidebar" id="gw-rail">' +
         railTopHTML() +
@@ -1872,19 +1892,24 @@
     fetch('/api/auth/me', { credentials: 'same-origin' })
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (s) {
-        if (s) {
-          session = s;
-          /* Redraw both: the sidebar for the locks and the ADMIN group, the
-             modal because only now do we know which doors are open. */
-          renderSidebar();
-          renderBar();
-          renderModal();
-        }
+        if (s) session = s;
+        session.pending = false;
+        /* Redraw both: the sidebar for the locks and the ADMIN group, the
+           modal because only now do we know which doors are open. Also on a
+           null answer: the ghosts have to give way to the signed-out state. */
+        renderSidebar();
+        renderBar();
+        renderModal();
         popSignInIfAsked();
       })
       /* No API — stay signed out. The modal keeps its pre-flight guess, which
          on a static preview is the only honest answer. */
-      .catch(popSignInIfAsked);
+      .catch(function () {
+        session.pending = false;
+        renderSidebar();
+        renderBar();
+        popSignInIfAsked();
+      });
 
     /* Popped here and not at mount, because renderModal() above REFUSES to
        rebuild a modal that is already open — it must not wipe a field someone
