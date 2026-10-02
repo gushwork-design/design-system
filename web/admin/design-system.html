@@ -677,10 +677,10 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .rv-fd { display: flex; flex-direction: column; gap: var(--gw-space-24); }
 .rv .fd-r { grid-template-columns: minmax(0, 1fr); gap: var(--gw-space-8); }
 .rv .fd-grid { grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); }
-.rv-frame { width: 100%; height: 380px; border: 0; border-radius: var(--gw-radius-12); background: var(--gw-color-white); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }
 .rv-fig { margin: 0; display: flex; flex-direction: column; gap: var(--gw-space-8); }
 .rv-fig img { width: 100%; height: auto; display: block; border-radius: var(--gw-radius-12); box-shadow: 0 0 0 1px var(--ul-hdr-line); }
-.rv-cap { margin: var(--gw-space-8) 0 0; font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
+.rv-pv { width: 100%; overflow: hidden; border-radius: var(--gw-radius-12); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); background: var(--ul-hdr-bg); }
+.rv-pv__in { padding: 0; }
 .rv-fig figcaption { font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
 .rv-none { display: flex; flex-direction: column; gap: 6px; padding: var(--gw-space-20); border-radius: var(--gw-radius-12); background: var(--ul-hdr-bg); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); font: var(--gw-text-body-13-reg, 400 13px/1.5 var(--gw-font-body)); color: var(--ul-sub); }
 .rv-none b { font: 600 13px/1.3 var(--gw-font-body); color: var(--ul-value); }
@@ -715,7 +715,6 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .rv-toast { position: fixed; left: 50%; bottom: var(--gw-space-24); z-index: 90; transform: translate(-50%, 12px); padding: var(--gw-space-12) var(--gw-space-16); border-radius: var(--gw-radius-12); background: var(--ul-prim-bg); color: var(--ul-prim-fg); font: 500 13px/1.3 var(--gw-font-body); opacity: 0; pointer-events: none; transition: opacity var(--gw-motion-fast), transform var(--gw-motion-fast); }
 .rv-toast.on { opacity: 1; transform: translate(-50%, 0); }
 .rv-row { cursor: pointer; }
-.rv-frame { height: 440px; }
 /* On a phone the inbox is the item and its status: the library, who decided and the button are in the drawer. */
 @media (max-width: 767px) {
   #ds-rev-table .ul-tbl { --vs-cols: minmax(0, 1fr) auto; }
@@ -731,6 +730,26 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .fd-rv__b { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: var(--gw-space-8); height: 32px; padding: 0 var(--gw-space-12); border-radius: var(--gw-radius-10); box-shadow: inset 0 0 0 1px var(--ul-ctl-line); font: var(--gw-text-button-14); color: var(--ul-ctl-fg); }
 .fd-rv__b:hover { background: var(--ul-ctl-hover); }
 .fd-rv__b:focus-visible { outline: var(--gw-focus-ring); outline-offset: 2px; }
+.fd-link { color: var(--gw-color-primary-500); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+:root[data-theme="dark"] .fd-link { color: var(--gw-color-primary-300); }
+.fd-r__s--demo { display: flex; align-items: center; overflow: visible; }
+.fd-demo { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; height: 36px; padding: 0 var(--gw-space-16); border-radius: var(--gw-radius-12); font: var(--gw-text-button-14); background: var(--ul-field-bg); color: var(--ul-value); box-shadow: inset 0 0 0 1px var(--ul-ctl-line); }
+.fd-demo--m { transition: background var(--gw-motion-fast), transform var(--gw-motion-fast), box-shadow var(--gw-motion-fast); }
+.fd-demo--m:hover { background: var(--ul-tab-hover); transform: translateY(-2px); box-shadow: inset 0 0 0 1px var(--ul-ctl-line), var(--gw-shadow-s3); }
+.fd-demo--f { outline: var(--gw-focus-ring); outline-offset: var(--gw-focus-offset); }
+.fd-ruler { display: block; height: 10px; border-radius: 2px; background: var(--gw-color-primary-alpha-40, rgba(0,112,255,.4)); }
+.fd-timer { display: block; width: 100%; max-width: 260px; height: 6px; border-radius: 3px; background: var(--ul-hdr-line); overflow: hidden; }
+.fd-timer i { display: block; height: 100%; background: var(--gw-color-primary-500); animation: fd-fill var(--gw-toast-dismiss, 4000ms) linear infinite; }
+@keyframes fd-fill { from { width: 0; } to { width: 100%; } }
+.fd-slide { position: relative; width: 100%; border-radius: var(--gw-radius-8); background: var(--gw-color-primary-500); overflow: hidden; box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }
+.fd-slide em { position: absolute; font: 500 10.5px/1.2 var(--gw-font-body); font-style: normal; color: rgba(255,255,255,.85); padding: 3px 5px; white-space: nowrap; }
+.fd-slide__card { position: absolute; border: 1.5px solid rgba(255,255,255,.9); border-radius: 4px; background: rgba(255,255,255,.08); }
+.fd-slide__card em { right: 0; bottom: 0; }
+.fd-slide__title { position: absolute; border: 1.5px dashed rgba(255,255,255,.9); width: 38%; height: 12%; border-radius: 3px; }
+.fd-slide__title em { left: 0; top: 0; }
+.fd-slide__cover { position: absolute; border: 1.5px dotted rgba(255,255,255,.7); border-radius: 4px; }
+.fd-slide__cover em { right: 0; top: 0; }
+.fd-ground { height: 120px; border-radius: var(--gw-radius-12); background-color: var(--gw-color-primary-500); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }
 .fd-sec > h3 { margin: 0; display: flex; align-items: baseline; gap: var(--gw-space-8); font: 600 16px/1.3 var(--gw-font-body); color: var(--ul-value); }
 .fd-sec > h3 span { font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
 .fd-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: var(--gw-space-12); }
@@ -907,7 +926,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 
   <div class="note">
     <b>What runs today</b>
-    <p><code>scripts/_sheet_coverage.py</code> stamps the review sheet&rsquo;s coverage at publish time ·
+    <p><code>scripts/check-previews.sh</code> lists the components with no visual in the review drawer ·
     <code>scripts/check-drift.sh --unstamped</code> lists builds carrying no stamp, so absence is the
     alert · <code>scripts/check-fonts.sh &lt;path&gt; --target &lt;row&gt;</code> enforces the font table.
     Gaps 1 and 3 remain open.</p>
@@ -954,8 +973,8 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   /* ---------------- Foundations (native, drawn from /foundation/tokens.json) ---------------- */
   var F = { tab: 'color' }, tokP = null;
   function tokens() { return tokP || (tokP = fetch('/foundation/tokens.json', { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw new Error('tokens ' + r.status); return r.json(); })); }
-  var FD_TABS = [['color', 'Color'], ['type', 'Typography'], ['spacing', 'Spacing'], ['radius', 'Radius'], ['elevation', 'Elevation'], ['layout', 'Layout'], ['motion', 'Motion and focus']];
-  var FD_GROUPS = { color: ['color'], type: ['typefaces', 'type'], spacing: ['spacing'], radius: ['radius'], elevation: ['elevation'], layout: ['breakpoint', 'content-width'] };
+  var FD_TABS = [['color', 'Color'], ['type', 'Typography'], ['spacing', 'Spacing'], ['radius', 'Radius'], ['elevation', 'Elevation'], ['layout', 'Layout'], ['motion', 'Motion and focus'], ['slides', 'Slides']];
+  var FD_GROUPS = { color: ['color'], type: ['typefaces', 'type', 'type-links'], motion: ['ruled'], slides: ['slides'], spacing: ['spacing'], radius: ['radius'], elevation: ['elevation'], layout: ['breakpoint', 'content-width'] };
   var FD_KEY = { color: 'color', type: 'type', spacing: 'spacing', radius: 'radius', elevation: 'elevation', layout: 'breakpoint' };
   function resolve(t, v, n) {
     n = n || 0; var m = /^var\(--(gw-[a-z0-9-]+)\)$/.exec(String(v).trim());
@@ -1009,7 +1028,17 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     });
     return h;
   }
-  function fdType(t) { return fdFaces(t) + fdScale(t); }
+  /* Links: the Body/link-N styles, always paired with body-N of the same size. Drawn as a link, in the real token. */
+  function fdLinks(t) {
+    var ks = keys(t, /^gw-text-link-\d+$/).sort(function (a, b) { return parseInt(a.replace(/\D/g, ''), 10) - parseInt(b.replace(/\D/g, ''), 10); });
+    if (!ks.length) return '';
+    return '<section class="fd-sec"><h3>Links<span>' + plural(ks.length, 'style') + '</span></h3><div class="fd-list">' + ks.map(function (k) {
+      var v = String(t[k]), m = /^(\d+)\s+([\d.]+)px\/([^\s]+)\s+(.*)$/.exec(v), tr = t[k + '-tracking'];
+      var meta = m ? fam(m[4]) + ' · ' + m[1] + ' · ' + m[2] + 'px / ' + m[3] + (tr != null ? ' · tracking ' + tr : '') : v;
+      return '<div class="fd-r"><div class="fd-r__l"><b>' + esc(k.replace('gw-text-', '')) + '</b><span>' + esc(meta) + '</span></div><div class="fd-r__s"><a class="fd-link" style="font:var(--' + k + ');letter-spacing:var(--' + k + '-tracking,0)">Read the case study</a></div></div>';
+    }).join('') + '</div></section>';
+  }
+  function fdType(t) { return fdFaces(t) + fdScale(t) + fdLinks(t); }
   function fdSpacing(t) {
     var ks = keys(t, /^gw-space-/);
     return '<section class="fd-sec"><h3>Scale<span>' + plural(ks.length, 'step') + '</span></h3><div class="fd-list">' + ks.map(function (k) {
@@ -1041,9 +1070,43 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     return '<section class="fd-sec"><h3>Content<span>' + plural(a.length, 'token') + '</span></h3>' + rows(t, a) + '</section>' +
       '<section class="fd-sec"><h3>Breakpoint tokens<span>' + plural(b.length, 'token') + '</span></h3>' + rows(t, b) + '</section>';
   }
+  /* Motion, focus and timing. Ruled by the design owner because Figma has none of them, so each is shown working:
+     hover the chip for the transition, the button wears the focus ring, the bar fills over the toast's lifetime. */
+  function demoRow(name, value, demo) {
+    return '<div class="fd-r"><div class="fd-r__l"><b>' + esc(name) + '</b><span>' + esc(String(value).split('\n')[0]) + '</span></div><div class="fd-r__s fd-r__s--demo">' + demo + '</div></div>';
+  }
   function fdMotion(t) {
-    var a = keys(t, /^gw-(motion|focus|toast)-/);
-    return '<section class="fd-sec"><h3>Motion and focus<span>' + plural(a.length, 'token') + '</span></h3>' + rows(t, a) + '</section>';
+    var h = '<section class="fd-sec"><h3>Motion<span>1 token</span></h3><div class="fd-list">' +
+      (t['gw-motion-fast'] ? demoRow('motion-fast', t['gw-motion-fast'], '<button type="button" class="fd-demo fd-demo--m">Hover me</button>') : '') + '</div></section>';
+    h += '<section class="fd-sec"><h3>Focus<span>2 tokens</span></h3><div class="fd-list">' +
+      (t['gw-focus-ring'] ? demoRow('focus-ring', t['gw-focus-ring'], '<button type="button" class="fd-demo fd-demo--f" tabindex="-1">A focused button</button>') : '') +
+      (t['gw-focus-offset'] ? demoRow('focus-offset', t['gw-focus-offset'], '<span class="fd-ruler" style="width:' + (px(t['gw-focus-offset']) || 2) * 8 + 'px"></span>') : '') + '</div></section>';
+    h += '<section class="fd-sec"><h3>Timing<span>1 token</span></h3><div class="fd-list">' +
+      (t['gw-toast-dismiss'] ? demoRow('toast-dismiss', t['gw-toast-dismiss'], '<span class="fd-timer"><i></i></span>') : '') + '</div></section>';
+    return h;
+  }
+  /* Slides: the 1920 x 1080 frame drawn to scale with its margin, title box and cover inset marked, then the type, the
+     ground lattice and the surfaces, each from its token. */
+  function fdSlides(t) {
+    var W = px(t['gw-slide-w']) || 1920, H = px(t['gw-slide-h']) || 1080, M = px(t['gw-slide-margin']) || 20,
+        TX = px(t['gw-slide-title-x']) || 40, TY = px(t['gw-slide-title-y']) || 38, CI = px(t['gw-slide-cover-inset']) || 40;
+    var pc = function (v, of) { return (v / of * 100).toFixed(3) + '%'; };
+    var h = '<section class="fd-sec"><h3>Frame<span>' + W + ' × ' + H + '</span></h3><div class="fd-slide" style="aspect-ratio:' + W + ' / ' + H + '">' +
+      '<div class="fd-slide__card" style="left:' + pc(M, W) + ';top:' + pc(M, H) + ';right:' + pc(M, W) + ';bottom:' + pc(M, H) + '"><em>content card, ' + M + 'px in from every edge</em></div>' +
+      '<div class="fd-slide__title" style="left:' + pc(TX, W) + ';top:' + pc(TY, H) + '"><em>title box · ' + TX + ' / ' + TY + '</em></div>' +
+      '<div class="fd-slide__cover" style="left:' + pc(CI, W) + ';top:' + pc(CI, H) + ';right:' + pc(CI, W) + ';bottom:' + pc(CI, H) + '"><em>cover inset ' + CI + '</em></div></div>' +
+      rows(t, keys(t, /^gw-slide-(w|h|margin|gap|title-x|title-y|cover-inset)$/)) + '</section>';
+    var tk = ['gw-text-slide-cover', 'gw-text-slide-title', 'gw-text-slide-annotation'].filter(function (k) { return t[k]; });
+    if (tk.length) h += '<section class="fd-sec"><h3>Type<span>' + plural(tk.length, 'style') + ', shown at 40%</span></h3><div class="fd-list">' + tk.map(function (k) {
+      return '<div class="fd-r"><div class="fd-r__l"><b>' + esc(k.replace('gw-text-', '')) + '</b><span>' + esc(String(t[k]).replace(/\s+/g, ' ')) + '</span></div><div class="fd-r__s" style="zoom:.4;font:var(--' + k + ');letter-spacing:var(--' + k + '-tracking,0)">Design that scales</div></div>';
+    }).join('') + '</div></section>';
+    var pitch = px(t['gw-slide-grid-pitch']) || 40, line = px(t['gw-slide-grid-line']) || 1, op = parseFloat(t['gw-slide-grid-opacity']) || .3, k = 0.27;
+    h += '<section class="fd-sec"><h3>Ground<span>40px lattice at 30%, drawn at 27%</span></h3><div class="fd-ground" style="background-size:' + (pitch * k).toFixed(2) + 'px ' + (pitch * k).toFixed(2) + 'px;' +
+      'background-image:linear-gradient(to right,rgba(255,255,255,' + op + ') ' + Math.max(1, line * k).toFixed(2) + 'px,transparent 0),linear-gradient(to bottom,rgba(255,255,255,' + op + ') ' + Math.max(1, line * k).toFixed(2) + 'px,transparent 0)"></div>' +
+      rows(t, keys(t, /^gw-slide-grid-/)) + '</section>';
+    var sv = keys(t, /^gw-slide-(cover-blur|cover-border|card-border)$/);
+    if (sv.length) h += '<section class="fd-sec"><h3>Surfaces<span>' + plural(sv.length, 'token') + '</span></h3>' + rows(t, sv) + '</section>';
+    return h;
   }
   var FD_NOTE = {
     color: 'Every colour in tokens.css. Click a swatch to copy its custom property.',
@@ -1052,7 +1115,8 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     radius: 'Corner radii, drawn at their real size up to 32px.',
     elevation: 'Shadow levels, each applied to a card.',
     layout: 'Content width, margins and the breakpoint tokens.',
-    motion: 'Transition timing, the focus ring and the toast timer.'
+    motion: 'Transition timing, the focus ring and the toast timer, each shown working.',
+    slides: 'The slide frame, its type, its ground and its surfaces.'
   };
   /* ---------------- Library: categories, with sub-categories beside the content ----------------
      Foundations, Web pages (brand pages, ad pages), Slides, Documents (lead magnet, one-pagers), then the
@@ -1169,9 +1233,9 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     if (cat.key === 'foundations') {
       var count = {
         color: keys(t, /^gw-color-/).length, type: keys(t, /^gw-text-/).filter(function (k) { return !/-tracking$/.test(k); }).length + 2, spacing: keys(t, /^gw-space-/).length, radius: keys(t, /^gw-radius-/).length,
-        elevation: keys(t, /^gw-shadow-/).length, layout: keys(t, /^gw-(content|bp)-/).length, motion: keys(t, /^gw-(motion|focus|toast)-/).length
+        elevation: keys(t, /^gw-shadow-/).length, layout: keys(t, /^gw-(content|bp)-/).length, motion: keys(t, /^gw-(motion|focus|toast)-/).length, slides: keys(t, /^gw-(slide|text-slide|font-slide)-/).length
       };
-      var body = { color: fdColor, type: fdType, spacing: fdSpacing, radius: fdRadius, elevation: fdElevation, layout: fdLayout, motion: fdMotion }[F.tab](t);
+      var body = { color: fdColor, type: fdType, spacing: fdSpacing, radius: fdRadius, elevation: fdElevation, layout: fdLayout, motion: fdMotion, slides: fdSlides }[F.tab](t);
       var gk = FD_KEY[F.tab], g = gk && (d.foundations || []).filter(function (x) { return x.key === gk; })[0];
       side = FD_TABS.map(function (x) { return [x[0], x[1], count[x[0]], x[0] === F.tab]; });
       var gks = FD_GROUPS[F.tab] || [];
@@ -1304,14 +1368,37 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
      shows its preview file, or its Figma render, or says plainly that it has neither yet. */
   function visualFor(it, t) {
     if (it.kind === 'foundation') {
-      var draw = { color: fdColor, type: it.key === 'typefaces' ? fdFaces : fdScale, spacing: fdSpacing, radius: fdRadius, elevation: fdElevation, layout: fdLayout }[it.view];
+      var draw = { color: fdColor, faces: fdFaces, scale: fdScale, links: fdLinks, spacing: fdSpacing, radius: fdRadius, elevation: fdElevation, layout: fdLayout, motion: fdMotion, slides: fdSlides }[it.view];
       if (draw && t) return '<div class="rv-fd">' + draw(t) + '</div>';
       return '<div class="rv-none"><b>Nothing drawn for this group yet</b><span>Its values are in tokens.css. A drawn view is added the way the others are, in the Foundations library.</span></div>';
     }
-    if (it.preview) return '<iframe class="rv-frame" src="' + esc(it.preview) + '" title="' + esc(it.label) + ' preview" sandbox="allow-same-origin" loading="lazy"></iframe>' +
-      (it.family ? '<p class="rv-cap">Drawn with the rest of its family: ' + esc(it.family) + '. Scroll the frame to find ' + esc(it.label) + '.</p>' : '');
+    if (it.preview) return '<div class="rv-pv-host" data-pv="' + esc(it.preview) + '"><div class="rv-none"><span>Drawing it…</span></div></div>';
     if (it.figma) return '<figure class="rv-fig"><img src="' + esc(it.figma) + '" alt="' + esc(it.label) + ', the Figma render" loading="lazy"><figcaption>Figma render. No drawn preview yet.</figcaption></figure>';
-    return '<div class="rv-none"><b>No visual yet</b><span>Add <code>web/previews/' + esc(it.scope) + '/' + esc(it.key) + '.html</code> and it appears here. <code>bash scripts/check-previews.sh</code> lists what is missing.</span></div>';
+    return '<div class="rv-none"><b>No visual yet</b><span>Add <code>web/previews/' + esc(it.scope) + '/' + esc(it.key) + '.frag</code> and it appears here. <code>bash scripts/check-previews.sh</code> lists what is missing.</span></div>';
+  }
+  /* A component's drawing is a fragment of HTML. It goes into a shadow root, so its stylesheet cannot touch the page nor the
+     page's touch it, and is scaled down to the drawer's width if it was drawn wider. There is no frame to scroll. */
+  function mountPreview(host, it) {
+    fetch(it.preview, { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); }).then(function (html) {
+      if (!RV.open || BYID[RV.list[RV.i]] !== it) return;
+      host.innerHTML = '<div class="rv-pv"><div class="rv-pv__in"></div></div>';
+      var box = host.firstChild, inner = box.firstChild, root = inner.attachShadow({ mode: 'open' });
+      root.innerHTML = '<link rel="stylesheet" href="/foundation/tokens.css"><link rel="stylesheet" href="/previews/_sheet.css">' + html;
+      var fit = function () {
+        // Lay it out at the drawer's width first: a grid of cells wraps and needs no scaling. Only a drawing that is
+        // wider than that (a 1240 fold) overflows, and it is then laid out at its own width and scaled down to fit.
+        var bw = box.clientWidth;
+        inner.style.cssText = 'width:' + bw + 'px;transform:none';
+        var w = Math.max(inner.scrollWidth, bw), k = 1;
+        if (w > bw + 1) { k = bw / w; inner.style.width = w + 'px'; }
+        inner.style.transform = k < 1 ? 'scale(' + k + ')' : 'none'; inner.style.transformOrigin = '0 0';
+        box.style.height = Math.ceil(inner.offsetHeight * k) + 'px';
+      };
+      var css = root.querySelector('link[href$="_sheet.css"]');
+      if (css) css.addEventListener('load', fit);
+      root.addEventListener('toggle', fit, true);   // a folded set opening changes the height
+      fit(); setTimeout(fit, 250); setTimeout(fit, 900);
+    }).catch(function () { host.innerHTML = '<div class="rv-none"><b>Could not draw it</b><span>The preview file did not load.</span></div>'; });
   }
   function detailRow(k, v) { return v ? '<div class="rv-d"><span>' + esc(k) + '</span><b>' + v + '</b></div>' : ''; }
   function drawerEl() {
@@ -1374,6 +1461,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       detailRow('Spec last moved', esc(it.changed || '')) + detailRow('Doc', gh ? '<a class="ds-a" href="' + esc(gh) + '" target="_blank" rel="noopener">' + esc(it.doc.split('/').pop()) + '</a>' : '') +
       detailRow('Fingerprint', '<code>' + esc(it.fp) + '</code>') + '</div>' + hist + '</section></div>' + foot;
     if (it.kind === 'foundation') tokens().then(function (t) { if (RV.open && BYID[RV.list[RV.i]] === it) $('rv-vis').innerHTML = visualFor(it, t); }).catch(function () {});
+    var pv = el.querySelector('[data-pv]'); if (pv) mountPreview(pv, it);
     $('rv-close').addEventListener('click', closeDrawer);
     $('rv-prev').addEventListener('click', function () { step(-1); });
     $('rv-next').addEventListener('click', function () { step(1); });
