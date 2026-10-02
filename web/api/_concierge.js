@@ -239,7 +239,7 @@ export const HELP = [
   '• templates: ad page, case study, lead magnet, one-pager',
   '• tools: the email signature creator and the ID card generator',
   '• basics: how to sign in, install the Claude plugin, update it, or who to ask',
-  'I don’t design things myself. If you need something made, I’ll hand you the template and the prompt to run with Claude.',
+  'I don’t design things myself yet. If you need something made, I’ll hand you the template and the prompt to run with Claude.',
 ].join('\n');
 
 const link = (path, label) => `<${SITE}${path}|${label}>`;
@@ -291,7 +291,7 @@ export function compose(u, catalog, seedText = '') {
   let files = [];
   let linked = false;
   const pagesDone = new Set();
-  if (u.designRequest) texts.push(pick(['I don’t design things myself, and I’d rather not guess at the brand. What I can do is give you the right starting point to run with Claude.', 'Making designs isn’t something I do. I can hand you the template and the prompt, and Claude can take it from there.'], seed));
+  if (u.designRequest) texts.push(pick(['I don’t design things myself yet, and I’d rather not guess at the brand. What I can do is give you the right starting point to run with Claude.', 'Making designs isn’t something I do yet. I can hand you the template and the prompt, and Claude can take it from there.'], seed));
   const parts = u.designRequest && !u.parts.some((p) => p.type === 'templates')
     ? [...u.parts, { type: 'templates', entries: catalog.filter((x) => x.kind === 'template'), all: true }] : u.parts;
   for (const p of parts) {

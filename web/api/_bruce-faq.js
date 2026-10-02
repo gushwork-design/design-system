@@ -17,9 +17,19 @@ export const FAQ = [
     words: ['design', 'hub', 'site', 'website', 'gushwork', 'what', 'about', 'purpose', 'for', 'used'],
     strong: ['hub', 'website', 'site'],
     answer: (L) => [
-      'design.gushwork.ai is the Gushwork design hub. It is where the team gets the official brand files, the Style Guide, templates, a few small tools, and the Claude plugin that builds on-brand work.',
+      'design.gushwork.ai is the Gushwork design hub, a subdomain just for design. It is not the Gushwork website, which is gushwork.ai.',
+      'It is where the team gets the official brand files, the Style Guide, templates, a few small tools, and the Claude plugin that builds on-brand work.',
       'Everything on it comes from one design system, so what you download here matches what Claude builds.',
       `Ask me “what is on the site” for the map, or start at the ${L('/', 'Overview')}.`,
+    ],
+  },
+  {
+    id: 'homepage',
+    words: ['homepage', 'home', 'main', 'company', 'real', 'actual', 'public', 'website', 'site', 'gushwork', 'pricing', 'product', 'customers', 'demo', 'book', 'marketing', 'blog', 'careers'],
+    strong: ['homepage', 'pricing', 'careers', 'marketing', 'blog'],
+    answer: () => [
+      'This is the design hub, not the Gushwork website. The company website is at <https://gushwork.ai|gushwork.ai>.',
+      'design.gushwork.ai is only for the team’s design work: brand files, the Style Guide, templates, tools and the Claude plugin.',
     ],
   },
   {
@@ -184,20 +194,21 @@ export const FAQ = [
     words: ['bruce', 'you', 'bot', 'assistant', 'who', 'are', 'yourself', 'name', 'about', 'what', 'do', 'can', 'built', 'capable'],
     strong: ['bot', 'assistant', 'yourself'],
     answer: () => [
-      'I’m Bruce, the design hub’s assistant in Slack. I send the brand files, point you to the right template or tool, and answer basic questions about the hub.',
-      'I don’t design things myself. When something needs making, I’ll hand you the template and the prompt to run with Claude.',
+      'I’m Bruce, the design agent for Gushwork. I send the brand files, point you to the right template or tool, and answer basic questions about the hub. I don’t design things myself yet. When something needs making, I’ll hand you the template and the prompt to run with Claude.',
+      'Utsav built me, and designing is the next thing I’ll learn.',
     ],
   },
 ];
 
 /* Phrases that say it better than single words do. A hit is worth 3, enough to answer on its own. */
 const PATTERNS = {
+  homepage: [/(?:main|company|real|actual|public|marketing|corporate)\s+(?:site|website|homepage|home\s*page)/, /where\s+is\s+(?:the\s+)?(?:gushwork\s+)?(?:website|homepage|home\s*page)/, /(?<!design\.)gushwork\.ai/, /is\s+this\s+(?:the\s+)?gushwork\s+(?:website|homepage|site)/, /is\s+this\s+the\s+(?:main|real|actual|company)\s/],
   map: [/what(?:'s| is)?\s+(?:on|in)\s+(?:the\s+)?(?:site|hub|website)/, /what\s+pages/, /\b(?:site|hub)\s+map\b/],
   signin: [/\bsign[\s-]?in\b/, /\blog[\s-]?in\b/, /\bsign[\s-]?up\b(?!\s+(?:ad|page|template))/],
   privacy: [/plugin\s+(?:log|track|record|collect)/, /(?:log|track|record|collect)\w*\s+(?:me|my|what)/, /what\s+(?:does|do)\s+(?:the\s+)?plugin\s+(?:log|track|record)/],
   voice: [/book\s+a\s+(?:demo|call)/, /tone\s+of\s+voice/, /sentence\s+case/],
   'design-system': [/(?:admin|design[\s-]system)\s+page/, /library\s+page/, /review\s+and\s+approval/],
-  bruce: [/who\s+are\s+you/, /what\s+are\s+you/, /are\s+you\s+(?:a\s+)?(?:bot|robot|ai)/, /your\s+name/],
+  bruce: [/who\s+(?:made|built|created)\s+(?:you|bruce)/, /will\s+you\s+(?:design|make)/, /who\s+are\s+you/, /what\s+are\s+you/, /are\s+you\s+(?:a\s+)?(?:bot|robot|ai)/, /your\s+name/],
   contact: [/who\s+(?:owns|runs|maintains)/, /who\s+(?:do|should)\s+i\s+(?:ask|contact|talk)/],
 };
 
@@ -236,5 +247,6 @@ export const EXAMPLES = {
   changelog: ['what changed recently', 'where are the release notes', 'show me the changelog'],
   'design-system': ['what is the library page', 'how does review and approval work', 'what is the design system admin page'],
   'download-all': ['can I get everything in one zip', 'is there a download all bundle'],
-  bruce: ['who are you', 'what are you', 'are you a bot'],
+  bruce: ['who are you', 'what are you', 'are you a bot', 'who made you', 'who built bruce', 'will you design things'],
+  homepage: ['where is the gushwork homepage', 'is this the gushwork website', 'where is the main gushwork.ai site', 'where can I see pricing'],
 };

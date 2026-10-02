@@ -71,13 +71,25 @@ for (const f of FAQ) {
   const text = f.answer((path, label) => `<${SITE}${path}|${label}>`).join('\n');
   ok(`${f.id}: no exclamation mark or emoji`, !/!/.test(text) && !/\p{Extended_Pictographic}/u.test(text), text);
   ok(`${f.id}: not one of the old facts we removed`, !/design@gushwork\.ai/.test(text));
-  const paths = [...text.matchAll(/<https?:\/\/[^/|>]+([^|>]*)\|/g)].map((m) => m[1]);
+  const paths = [...text.matchAll(/<https?:\/\/design\.gushwork\.ai([^|>]*)\|/g)].map((m) => m[1]);
   ok(`${f.id}: every link goes to a page that exists`, paths.every((p) => KNOWN_PATHS.has(p)), JSON.stringify(paths));
 }
 a = ask('how do I sign up');                         ok('"how do I sign up" is about signing in, not the sign-up ad page', a.u.parts[0]?.faq?.id === 'signin');
 a = ask('sign-up ad page template');                 ok('"sign-up ad page template" is still the template', a.u.parts[0]?.type === 'templates');
 a = ask('how do I use claude to build a page');      ok('"how do I use it to build" is an answer, not a design request', !a.u.designRequest);
 a = ask('white logo');                               ok('asking for a file is still a file', a.u.parts[0]?.type === 'assets' && a.r.files.length > 0);
+
+/* ---- who Bruce is, and what the hub is not ---- */
+const who = FAQ.find((f) => f.id === 'bruce').answer(() => '').join(' ');
+ok('Bruce says he is the design agent for Gushwork', who.includes('I’m Bruce, the design agent for Gushwork'), who);
+ok('Bruce says he does not design YET, and that Utsav built him', who.includes('I don’t design things myself yet') && who.includes('Utsav built me'), who);
+a = ask('who are you');                              ok('"who are you" gets that answer', a.u.parts[0]?.faq?.id === 'bruce');
+const about = FAQ.find((f) => f.id === 'about').answer(() => '').join(' ');
+ok('the hub answer says it is a subdomain and not the Gushwork website, which is gushwork.ai', about.includes('subdomain') && about.includes('not the Gushwork website') && about.includes('gushwork.ai'), about);
+a = ask('is this the gushwork website');             ok('"is this the gushwork website" points to gushwork.ai', a.u.parts[0]?.faq?.id === 'homepage' && a.r.text.includes('https://gushwork.ai'), a.r.text);
+a = ask('where is the gushwork homepage');           ok('"where is the homepage" points to gushwork.ai', a.u.parts[0]?.faq?.id === 'homepage');
+a = ask('what is the design hub');                   ok('"what is the design hub" is still the hub answer', a.u.parts[0]?.faq?.id === 'about');
+a = ask('make me a poster');                         ok('a design request says “yet”', /yet/.test(a.r.text), a.r.text);
 
 /* ---- pretend Slack and Upstash ---- */
 const calls = [];
