@@ -629,9 +629,10 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .fd-tpl__img em { display: grid; place-items: center; height: 100%; font: var(--gw-text-body-12-reg); font-style: normal; color: var(--ul-sub); }
 .fd-tpl__a { display: flex; flex-wrap: wrap; gap: var(--gw-space-8); margin: 0 var(--gw-space-4) var(--gw-space-4); }
 .fd-tpl__a .ds-pv { margin: 0; }
-.ds-pv--q { box-shadow: none; color: var(--ul-cell); }
-.ds-pv { align-self: flex-start; display: inline-flex; align-items: center; height: 32px; margin: 0 var(--gw-space-4) var(--gw-space-4); padding: 0 var(--gw-space-12); border-radius: var(--gw-radius-10); box-shadow: inset 0 0 0 1px var(--ul-ctl-line); font: var(--gw-text-button-14); color: var(--ul-ctl-fg); text-decoration: none; transition: background var(--gw-motion-fast); }
+/* A button and a link share this look: Use with Claude is a <button>, so it needs the browser's own fill, border and outline cleared. */
+.ds-pv { box-sizing: border-box; border: 0; background: none; cursor: pointer; align-self: flex-start; display: inline-flex; align-items: center; height: 32px; margin: 0 var(--gw-space-4) var(--gw-space-4); padding: 0 var(--gw-space-12); border-radius: var(--gw-radius-10); box-shadow: inset 0 0 0 1px var(--ul-ctl-line); font: var(--gw-text-button-14); color: var(--ul-ctl-fg); text-decoration: none; transition: background var(--gw-motion-fast); }
 .ds-pv:hover { background: var(--ul-ctl-hover); }
+.ds-pv:focus-visible { outline: var(--gw-focus-ring); outline-offset: 2px; }
 .fd-side { position: sticky; top: 112px; display: flex; flex-direction: column; gap: 2px; }
 .fd-side__i { all: unset; box-sizing: border-box; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-8); height: 36px; padding: 0 var(--gw-space-12); border-radius: var(--gw-radius-10); font: var(--gw-text-body-14-med); color: var(--ul-cell); transition: background var(--gw-motion-fast), color var(--gw-motion-fast); }
 .fd-side__i i { font: 500 12px/1 var(--gw-font-body); font-style: normal; color: var(--ul-sub); font-variant-numeric: tabular-nums; }
