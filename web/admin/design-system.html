@@ -635,8 +635,9 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .fd-side { position: sticky; top: 112px; display: flex; flex-direction: column; gap: 2px; }
 .fd-side__i { all: unset; box-sizing: border-box; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-8); height: 36px; padding: 0 var(--gw-space-12); border-radius: var(--gw-radius-10); font: var(--gw-text-body-14-med); color: var(--ul-cell); transition: background var(--gw-motion-fast), color var(--gw-motion-fast); }
 .fd-side__i i { font: 500 12px/1 var(--gw-font-body); font-style: normal; color: var(--ul-sub); font-variant-numeric: tabular-nums; }
-.fd-side__i:hover { background: var(--ul-tab-hover); color: var(--ul-value); }
+.fd-side__i:hover { background: var(--ul-row-hover); color: var(--ul-value); }   /* lighter than the selected row, so hovering never looks like selecting */
 .fd-side__i[aria-current="true"] { background: var(--ul-tab-hover); color: var(--ul-value); }
+.fd-side__i[aria-current="true"]:hover { background: var(--ul-tab-hover); }
 .fd-side__i[aria-current="true"] i { color: var(--ul-value); }
 .fd-side__i:focus-visible { outline: var(--gw-focus-ring); outline-offset: 2px; }
 @media (max-width: 767px) {
@@ -666,18 +667,16 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
    column, and the details sit beside it rather than under it. */
 .rv { transition: width .22s ease; }
 .rv--wide { width: min(1280px, calc(100vw - 48px)); }
+.rv--wide .rv-sec--det { position: sticky; top: 0; align-self: start; }
 .rv--wide .rv-body { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: var(--gw-space-32); align-content: start; align-items: start; }
 .rv-sh { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-12); }
 .rv-ex { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 var(--gw-space-12); border-radius: var(--gw-radius-8); color: var(--ul-ctl-fg); font: 500 12.5px/1 var(--gw-font-body); box-shadow: inset 0 0 0 1px var(--ul-ctl-line); }
 .rv-ex:hover { background: var(--ul-ctl-hover); }
-.rv-ex:focus-visible, .rv-more:focus-visible { outline: var(--gw-focus-ring); outline-offset: 2px; }
+.rv-ex:focus-visible { outline: var(--gw-focus-ring); outline-offset: 2px; }
 .rv-ex svg { width: 14px; height: 14px; flex: none; }
 .rv-vis { position: relative; }
 .rv-vis--cap { max-height: 520px; overflow: hidden; }
 .rv-vis--cap::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 120px; pointer-events: none; background: linear-gradient(to bottom, transparent, var(--s-panel-bg)); }
-.rv-more { all: unset; box-sizing: border-box; cursor: pointer; align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 var(--gw-space-16); border-radius: var(--gw-radius-12); font: var(--gw-text-button-14); color: var(--ul-ctl-fg); box-shadow: inset 0 0 0 1px var(--ul-ctl-line); }
-.rv-more:hover { background: var(--ul-ctl-hover); }
-.rv-more[hidden] { display: none; }
 .rv-h { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--gw-space-12); padding: var(--gw-space-20) var(--gw-space-24) var(--gw-space-16); box-shadow: inset 0 -1px 0 var(--ul-hdr-line); }
 .rv-h__t { min-width: 0; }
 .rv-h__s { font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
@@ -695,7 +694,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .rv .fd-grid { grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); }
 .rv-fig { margin: 0; display: flex; flex-direction: column; gap: var(--gw-space-8); }
 .rv-fig img { width: 100%; height: auto; display: block; border-radius: var(--gw-radius-12); box-shadow: 0 0 0 1px var(--ul-hdr-line); }
-.rv-pv { width: 100%; overflow: hidden; border-radius: var(--gw-radius-12); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); background: var(--ul-hdr-bg); }
+.rv-pv { width: 100%; overflow: hidden; }   /* no frame of its own: each group in the drawing has one */
 .rv-pv__in { padding: 0; }
 .rv-fig figcaption { font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
 .rv-none { display: flex; flex-direction: column; gap: 6px; padding: var(--gw-space-20); border-radius: var(--gw-radius-12); background: var(--ul-hdr-bg); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); font: var(--gw-text-body-13-reg, 400 13px/1.5 var(--gw-font-body)); color: var(--ul-sub); }
@@ -1434,6 +1433,15 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
         // wider than that (a 1240 fold) overflows, and it is then laid out at its own width and scaled down to fit.
         var bw = box.clientWidth;
         inner.style.cssText = 'width:' + bw + 'px;transform:none';
+        // A cell has to be as wide as the widest thing drawn in it, or that thing is cut off. The drawings fix their own sizes
+        // (a Large button is 166 wide), so the column minimum is read from them rather than guessed.
+        var need = 178;
+        root.querySelectorAll('.stage').forEach(function (st) {
+          var sr = st.getBoundingClientRect(), lo = Infinity, hi = -Infinity;
+          for (var i = 0; i < st.children.length; i++) { var r = st.children[i].getBoundingClientRect(); lo = Math.min(lo, r.left); hi = Math.max(hi, r.right); }
+          if (hi > lo) need = Math.max(need, Math.ceil(hi - lo) + 20 + 4);
+        });
+        inner.style.setProperty('--cellmin', need + 'px');
         var w = Math.max(inner.scrollWidth, bw), k = 1;
         if (w > bw + 1) { k = bw / w; inner.style.width = w + 'px'; }
         inner.style.transform = k < 1 ? 'scale(' + k + ')' : 'none'; inner.style.transformOrigin = '0 0';
@@ -1447,14 +1455,14 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       if (window.ResizeObserver) new ResizeObserver(function () { fit(); }).observe(box);   // expanding the drawer changes the width
     }).catch(function () { host.innerHTML = '<div class="rv-none"><b>Could not draw it</b><span>The preview file did not load.</span></div>'; });
   }
-  /* Expanded or not, everything is drawn. In the narrow drawer a long picture (many variants) is cut short with a fade and a
-     button that opens the drawer out, so the first screen stays a summary and nothing is hidden for good. */
+  /* Expanded or not, everything is drawn. In the narrow drawer a long picture (many variants) is cut short with a fade, and the Expand
+     button in the header opens the drawer out. The first screen stays a summary and nothing is hidden for good. */
   var EXPAND_SVG = '<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M216,48V96a8,8,0,0,1-16,0V67.31l-42.34,42.35a8,8,0,0,1-11.32-11.32L188.69,56H160a8,8,0,0,1,0-16h48A8,8,0,0,1,216,48ZM98.34,146.34,56,188.69V160a8,8,0,0,0-16,0v48a8,8,0,0,0,8,8H96a8,8,0,0,0,0-16H67.31l42.35-42.34a8,8,0,0,0-11.32-11.32Z"/></svg>';
   var COLLAPSE_SVG = '<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M152,104V56a8,8,0,0,1,16,0V84.69l42.34-42.35a8,8,0,0,1,11.32,11.32L179.31,96H208a8,8,0,0,1,0,16H160A8,8,0,0,1,152,104ZM96,152H48a8,8,0,0,0,0,16H76.69L34.34,210.34a8,8,0,0,0,11.32,11.32L88,179.31V208a8,8,0,0,0,16,0V160A8,8,0,0,0,96,152Z"/></svg>';
   function settleVis() {
-    var v = $('rv-vis'), m = $('rv-more'); if (!v) return;
-    v.classList.remove('rv-vis--cap'); if (m) m.hidden = true;
-    if (!RV.wide && !(window.matchMedia && matchMedia('(max-width: 767px)').matches) && v.scrollHeight > 560) { v.classList.add('rv-vis--cap'); if (m) m.hidden = false; }
+    var v = $('rv-vis'); if (!v) return;
+    v.classList.remove('rv-vis--cap');
+    if (!RV.wide && !(window.matchMedia && matchMedia('(max-width: 767px)').matches) && v.scrollHeight > 560) v.classList.add('rv-vis--cap');
   }
   function setWide(on) {
     RV.wide = !!on;
@@ -1481,11 +1489,11 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   }
   function openDrawer(id, list) {
     if (!BYID[id]) return;
-    RV.list = list && list.length ? list : [id]; RV.i = Math.max(0, RV.list.indexOf(id)); RV.open = true; RV.mode = '';
+    RV.list = list && list.length ? list : [id]; RV.i = Math.max(0, RV.list.indexOf(id)); RV.open = true; RV.mode = ''; RV.wide = false;   // a drawer always opens collapsed
     drawerEl(); $('rv').hidden = false; $('rv-scrim').hidden = false; document.documentElement.classList.add('rv-open');
     renderDrawer(); $('rv').focus();
   }
-  function closeDrawer() { RV.open = false; if ($('rv')) { $('rv').hidden = true; $('rv-scrim').hidden = true; } document.documentElement.classList.remove('rv-open'); }
+  function closeDrawer() { RV.open = false; RV.wide = false; if ($('rv')) $('rv').classList.remove('rv--wide'); if ($('rv')) { $('rv').hidden = true; $('rv-scrim').hidden = true; } document.documentElement.classList.remove('rv-open'); }
   function step(n) {
     var i = RV.i + n; if (i < 0 || i >= RV.list.length) return;
     RV.i = i; RV.mode = ''; renderDrawer();
@@ -1520,15 +1528,14 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     }
     el.innerHTML = '<header class="rv-h"><div class="rv-h__t"><span class="rv-h__s">' + esc(scopeTitle(it)) + ' · ' + (RV.i + 1) + ' of ' + RV.list.length + '</span><h2>' + esc(it.label) + '</h2></div>' +
       '<div class="rv-h__r">' + badgeOf(e.state, e.queued, e.q) + '<button type="button" class="rv-x" id="rv-prev" aria-label="Previous"' + (RV.i === 0 ? ' disabled' : '') + '>‹</button><button type="button" class="rv-x" id="rv-next" aria-label="Next"' + (RV.i >= RV.list.length - 1 ? ' disabled' : '') + '>›</button><button type="button" class="rv-x" id="rv-close" aria-label="Close">✕</button></div></header>' +
-      '<div class="rv-body" id="rv-body"><section class="rv-sec"><div class="rv-sh"><h3>What it looks like</h3><button type="button" class="rv-ex" id="rv-ex" aria-expanded="false" title="Open the drawer out to see everything (E)"></button></div><div class="rv-vis" id="rv-vis">' + (it.kind === 'foundation' ? '<div class="rv-none"><span>Drawing it…</span></div>' : visualFor(it, null)) + '</div><button type="button" class="rv-more" id="rv-more" hidden>Expand to see everything</button></section>' +
-      '<section class="rv-sec"><h3>Details</h3><div class="rv-dl">' + detailRow('Kind', esc(it.kind === 'foundation' ? 'Foundation group' : 'Component')) + detailRow('Version', esc(it.version ? 'v' + it.version : '')) +
+      '<div class="rv-body" id="rv-body"><section class="rv-sec"><div class="rv-sh"><h3>What it looks like</h3><button type="button" class="rv-ex" id="rv-ex" aria-expanded="false" title="Open the drawer out to see everything (E)"></button></div><div class="rv-vis" id="rv-vis">' + (it.kind === 'foundation' ? '<div class="rv-none"><span>Drawing it…</span></div>' : visualFor(it, null)) + '</div></section>' +
+      '<section class="rv-sec rv-sec--det"><h3>Details</h3><div class="rv-dl">' + detailRow('Kind', esc(it.kind === 'foundation' ? 'Foundation group' : 'Component')) + detailRow('Version', esc(it.version ? 'v' + it.version : '')) +
       detailRow('Spec last moved', esc(it.changed || '')) + detailRow('Doc', gh ? '<a class="ds-a" href="' + esc(gh) + '" target="_blank" rel="noopener">' + esc(it.doc.split('/').pop()) + '</a>' : '') +
       detailRow('Fingerprint', '<code>' + esc(it.fp) + '</code>') + '</div>' + hist + '</section></div>' + foot;
     if (it.kind === 'foundation') tokens().then(function (t) { if (RV.open && BYID[RV.list[RV.i]] === it) { $('rv-vis').innerHTML = visualFor(it, t); settleVis(); } }).catch(function () {});
     var pv = el.querySelector('[data-pv]'); if (pv) mountPreview(pv, it);
     $('rv-close').addEventListener('click', closeDrawer);
     $('rv-ex').addEventListener('click', function () { setWide(!RV.wide); });
-    $('rv-more').addEventListener('click', function () { setWide(true); });
     setWide(RV.wide);
     $('rv-prev').addEventListener('click', function () { step(-1); });
     $('rv-next').addEventListener('click', function () { step(1); });
