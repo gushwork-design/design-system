@@ -797,3 +797,85 @@ html[data-theme] .preview-content[data-theme] {
   box-shadow: var(--gw-shadow-s2);
 }
 .tb-pill:not([role="tablist"]):not(.toolbar-pill) > button:not(.btn-error):hover { background: var(--t-hover); }
+
+/* ---------------------------------------------------------------------------
+   12. Pattern parity with the library.
+   ------------------------------------------------------------------------ */
+
+/* controls/toggle, Size=Small 44x24: track pad 4, knob 16, travel 20.
+   Off = neutral/200; On = neutral/900 (interaction state, never blue).
+   Dark: On inverts to a white track with a dark knob (R16) — CHOSEN, the library
+   draws no dark toggle. Knob white on --gw-shadow-s2, radius full, --gw-motion-fast. */
+:root, :root[data-theme="light"] {
+  --t-sw-off:  var(--gw-color-neutral-200);
+  --t-sw-on:   var(--gw-color-neutral-900);
+  --t-sw-knob: var(--gw-color-white);
+}
+:root[data-theme="dark"] {
+  --t-sw-off:  var(--gw-color-neutral-700);
+  --t-sw-on:   var(--gw-color-white);
+  --t-sw-knob: var(--gw-color-neutral-900);
+}
+.gw-switch {
+  position: relative;
+  width: 44px; height: 24px; flex: none;
+  padding: 0; border: 0; border-radius: var(--gw-radius-full);
+  background: var(--t-sw-off);
+  cursor: pointer;
+  transition: background var(--gw-motion-fast);
+}
+.gw-switch.on { background: var(--t-sw-on); }
+.gw-switch__knob {
+  position: absolute; top: 4px; left: 4px;
+  width: 16px; height: 16px; border-radius: var(--gw-radius-full);
+  background: var(--t-sw-knob);
+  box-shadow: var(--gw-shadow-s2);
+  transition: transform var(--gw-motion-fast);
+}
+.gw-switch.on .gw-switch__knob { transform: translateX(20px); }
+.gw-switch:focus-visible { outline: var(--gw-focus-ring); outline-offset: var(--gw-focus-offset); }
+:root:not([data-theme="dark"]) .gw-switch.on .gw-switch__knob { background: var(--gw-color-white); }
+
+/* Type — only ramp steps: body-12 / body-14 / body-10. 12.5, 11 and 10.5 are not in the system. */
+.prop-tip, .prop-tip-list, .prop-tip-note { font: var(--gw-text-body-12-reg); }
+.prop-tip strong { font-weight: 600; }
+.prop-row .dropzone .copy .name { font: var(--gw-text-body-12-med); }
+.prop-row .dropzone .copy .hint { font: var(--gw-text-body-10-reg); }
+.dropzone .copy .name { font: var(--gw-text-body-12-med); }
+.dropzone .copy .hint { font: var(--gw-text-body-10-reg); }
+.dropzone .clear { font: var(--gw-text-body-12-med); }
+.prop-label { font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); }
+.prop-input.num { font: var(--gw-text-body-14-reg); }
+
+/* Colour — every value a token */
+.brand-card .brand-link { color: inherit; }
+.dropzone .thumb.empty,
+.dropzone .thumb { background: var(--gw-color-neutral-100); }
+.copy-tooltip-text, .copy-tooltip a { color: var(--t-tip-fg); }
+.copy-tooltip svg { color: var(--t-ok); }
+.copy-tooltip a, .email-body .gmail-help-tip-steps a { color: var(--gw-color-primary-200); border-bottom-color: transparent; }
+.copy-tooltip, .email-body .gmail-help-tip { box-shadow: var(--gw-shadow-s3); }
+.prop-input, .prop-textarea, .prop-input-prefix input { color: var(--t-heading); }
+
+/* Space — gaps on the scale (4/8/12/16), not 6/10/14 */
+.prop-dropdown-trigger { gap: var(--gw-space-8); }
+.prop-row--start .prop-label { padding-top: var(--gw-space-8); }
+.prop-row .dropzone, .dropzone { padding: var(--gw-space-12); gap: var(--gw-space-12); }
+.copy-tooltip { padding: var(--gw-space-8) var(--gw-space-16); }
+.prop-row { gap: var(--gw-space-12); }
+.prop-rows { gap: var(--gw-space-8); }
+.left-col .prop-section { gap: var(--gw-space-12); }
+
+/* Last stragglers from the 2 Oct audit */
+.gw-switch, input[type="file"] { color: inherit; }
+.prop-slider { gap: var(--gw-space-12); }
+.prop-input.num, .prop-slider .prop-input.num { padding: 0 var(--gw-space-8); }
+.copy-tooltip-text, .copy-tooltip a { font: var(--gw-text-body-12-med); }
+.copy-tooltip a { font-weight: 600; }
+.tb-pill button, .prop-dropdown-item-label, .prop-dropdown-item { gap: var(--gw-space-8); }
+.dropzone svg, .prop-row .dropzone svg { color: var(--gw-color-neutral-400); }
+.prop-slider input[type='range'] { color: inherit; }
+.prop-control > div, .prop-control > span { gap: var(--gw-space-8); }
+.prop-tip-list, .field { gap: var(--gw-space-8); }
+.copy-tooltip { gap: var(--gw-space-8); }
+.split-trigger, .gw-banner-placeholder-pill { gap: var(--gw-space-8); }
