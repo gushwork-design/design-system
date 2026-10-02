@@ -16,21 +16,15 @@ import sys
 
 MARKER = "gw-shell-injected"
 
-# Apply a STORED theme choice before first paint, or an explicit dark pick
-# flashes light on every load. Has to be blocking, so it cannot live in
-# shell.js (which is deferred).
+# Apply the theme before first paint, or a dark page flashes light on every load. Has to be blocking, so it cannot
+# live in shell.js (which is deferred).
 #
-# Defaults to 'light' rather than leaving the attribute unset. It used to
-# leave nothing stored unset and let the CSS prefers-color-scheme block
-# decide — deliberately, so the page followed the OS. That meant a
-# first-time visitor on a dark-OS machine got a dark page with no toggle
-# ever touched, which read as "the site is broken" rather than "the site
-# respected your OS". The site now always opens light until someone
-# explicitly picks dark via the toggle; that choice is what persists
-# across visits, not the OS setting.
+# It reads `gw-theme-choice` (written only when someone picks Light, Dark or System). No choice means System, so it asks
+# the machine itself rather than leaving the attribute unset. The site follows the OS by default again (2 Oct 2026); it
+# had been defaulted to Light on 18 Sep because a dark-OS first visit looked broken before there was a toggle. There
+# is a toggle now, with System as one of its three options, so following the OS is the honest default.
 THEME_SNIPPET = (
-    "<script>try{var t=localStorage.getItem('gw-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');"
-    "document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>"
+    "<script>"+"try{var c=localStorage.getItem('gw-theme-choice'),t=c==='dark'||c==='light'?c:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','light')}"+"</script>"
 )
 
 
