@@ -382,6 +382,13 @@ body[data-gw-page="analytics"] .sg__main > * { min-width: 0; }
   font: var(--gw-text-button-12); background: var(--ul-b-no-bg); color: var(--ul-b-no-fg); }
 .ul-badge--ok { background: var(--ul-b-ok-bg); color: var(--ul-b-ok-fg); }
 .ul-badge--bad { background: var(--gw-color-red-alpha-10); color: var(--gw-color-red-600); }
+/* New visitor: first seen in the last 7 days. Primary tint, like the other badges' Alpha/10 fill with a /600 label (/400 in dark). */
+.ul-badge--new { background: var(--gw-color-primary-alpha-10); color: var(--gw-color-primary-600); height: 20px; flex: none; }
+:root[data-theme="dark"] .ul-badge--new { color: var(--gw-color-primary-400); }
+.ul-c--whotag { display: flex; align-items: center; gap: var(--gw-space-8); color: var(--ul-value); min-width: 0; }
+.ul-c--whotag > span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vs-note { margin: var(--gw-space-8) 0 0; font: var(--gw-text-body-12-reg); color: var(--ul-sub); max-width: 70ch; }
+.vs-note[hidden] { display: none; }
 :root[data-theme="dark"] .ul-badge--bad { color: var(--gw-color-red-300); }
 .ul-c--chk { display: flex; align-items: center; gap: var(--gw-space-8); overflow: visible; }
 .ul-c--out a { color: var(--ul-value); text-decoration: underline; text-underline-offset: 2px; }
@@ -693,6 +700,12 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
 
     <div id="vs-app">
       <div class="ul-metrics" id="vs-metrics"></div>
+
+      <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="vs-h-new">
+        <div class="ul-sh"><div class="ul-sh__t"><h2 id="vs-h-new">New people</h2><span class="ul-sh__q" id="vs-q-new"></span></div></div>
+        <div class="ul-scroll vs-t" id="vs-new"></div>
+        <p class="vs-note" id="vs-note" hidden></p>
+      </section>
 
       <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="vs-h-people">
         <div class="ul-sh"><div class="ul-sh__t"><h2 id="vs-h-people">People</h2><span class="ul-sh__q" id="vs-q-people"></span></div></div>
@@ -1885,9 +1898,28 @@ window.__anRefilter = {};
   }
   function cell(t, cls, title) { return '<div class="ul-c ' + (cls || '') + '" role="cell" title="' + esc(title || t) + '">' + esc(t) + '</div>'; }
   function who(e) { return e === '(shared password)' ? 'Shared password' : e; }
+  /* The person cell, with a New tag for anyone first seen in the last 7 days. */
+  function whoCell(e, isNew) {
+    return '<div class="ul-c ul-c--whotag" role="cell" title="' + esc(e) + '"><span>' + esc(who(e)) + '</span>' + (isNew ? '<span class="ul-badge ul-badge--new">New</span>' : '') + '</div>';
+  }
+  /* When each person first appears in the log, and the first page they opened. It reads every row, not just this period,
+     because "new" means the first time we ever saw them. */
+  var NEW_DAYS = 7;
+  function firstSeen() {
+    var first = {};
+    S.rows.forEach(function (r) {
+      if (!r.email) return;
+      var f = first[r.email] || (first[r.email] = { at: r.at, path: '', pathAt: null });
+      if (r.at < f.at) f.at = r.at;
+      if (r.kind === 'view' && (!f.pathAt || r.at < f.pathAt)) { f.pathAt = r.at; f.path = r.path; }
+    });
+    return first;
+  }
 
   function renderAll() {
     var rows = scoped();
+    var first = firstSeen(), cut = S.period === 'all' ? 0 : Date.now() - (+S.period) * DAY, tagCut = Date.now() - NEW_DAYS * DAY;
+    var isNew = function (e) { return !!first[e] && first[e].at.getTime() >= tagCut; };
     var signins = rows.filter(function (r) { return r.kind === 'signin'; });
     var views = rows.filter(function (r) { return r.kind === 'view'; });
     var people = {}, pages = {};
@@ -1909,11 +1941,26 @@ window.__anRefilter = {};
       metric('Page views', String(views.length), plural(glist.length, 'page') + ' opened') +
       metric('Active people', String(plist.length), lastAt ? 'last visit ' + ago(Date.now() - lastAt.getTime()) : 'nothing logged yet');
 
+    var nlist = plist.filter(function (p) { return first[p.email] && first[p.email].at.getTime() >= cut; })
+      .sort(function (a, b) { return first[b.email].at - first[a.email].at; });
+    $('vs-q-new').textContent = S.period === 'all' ? 'everyone, by first visit' : 'first seen in the last ' + S.period + ' days, ' + nlist.length + (nlist.length === 1 ? ' person' : ' people');
+    $('vs-new').innerHTML = table('minmax(200px,1.6fr) minmax(120px,1fr) minmax(200px,1.6fr) 100px', ['Person', 'First seen', 'First opened', 'Page views'],
+      nlist.map(function (p) {
+        var f = first[p.email];
+        return '<div class="ul-row ul-row--d" role="row">' + whoCell(p.email, isNew(p.email)) + cell(ago(Date.now() - f.at.getTime()), '', f.at.toISOString()) +
+          cell(f.path ? pageName(f.path) : '—', '', f.path || '') + cell(String(p.views)) + '</div>';
+      }), 'Nobody new in this view');
+    var logStart = Object.keys(first).reduce(function (m, k) { return !m || first[k].at < m ? first[k].at : m; }, null);
+    var note = $('vs-note');
+    if (S.capped) { note.textContent = 'The log keeps only the newest visits, so someone who has not visited lately may show here as new.'; note.hidden = false; }
+    else if (logStart && logStart.getTime() > cut) { note.textContent = 'Visit logging started on ' + logStart.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) + ', so everyone seen since then counts as new. This gets more useful as history builds.'; note.hidden = false; }
+    else note.hidden = true;
+
     $('vs-q-people').textContent = (plist.length + (plist.length === 1 ? ' person' : ' people'));
     $('vs-people').innerHTML = table('minmax(200px,1.6fr) 100px 100px minmax(120px,1fr) minmax(120px,1fr)', ['Person', 'Sign-ins', 'Page views', 'Last seen', 'Opens most'],
       plist.map(function (p) {
         var top = Object.keys(p.areas).sort(function (a, b) { return p.areas[b] - p.areas[a]; })[0] || '';
-        return '<div class="ul-row ul-row--d" role="row">' + cell(who(p.email), 'ul-c--who', p.email) + cell(String(p.signins)) + cell(String(p.views)) + cell(ago(Date.now() - p.last.getTime()), '', p.last.toISOString()) + cell(top) + '</div>';
+        return '<div class="ul-row ul-row--d" role="row">' + whoCell(p.email, isNew(p.email)) + cell(String(p.signins)) + cell(String(p.views)) + cell(ago(Date.now() - p.last.getTime()), '', p.last.toISOString()) + cell(top) + '</div>';
       }), 'No visits in this view');
 
     $('vs-q-pages').textContent = 'most opened, ' + plural(glist.length, 'page');
@@ -1927,7 +1974,7 @@ window.__anRefilter = {};
     $('vs-recent').innerHTML = table('160px minmax(180px,1.4fr) minmax(200px,2fr) 110px', ['When', 'Person', 'Page', 'Event'],
       recent.slice(0, S.shown).map(function (r) {
         var evt = r.kind === 'signin' ? 'Signed in' + (r.via === 'password' ? ' (password)' : '') : 'Opened';
-        return '<div class="ul-row ul-row--d" role="row">' + cell(fmtWhen(r.at), '', r.at.toISOString()) + cell(who(r.email), 'ul-c--who', r.email) +
+        return '<div class="ul-row ul-row--d" role="row">' + cell(fmtWhen(r.at), '', r.at.toISOString()) + whoCell(r.email, isNew(r.email)) +
           cell(r.kind === 'signin' ? '—' : pageName(r.path), '', r.path) + cell(evt) + '</div>';
       }), 'No visits in this view');
     $('vs-more').innerHTML = recent.length > S.shown ? '<button class="ul-btn" id="vs-more-btn" type="button">Show 25 more</button>' : '';
@@ -1975,7 +2022,7 @@ window.__anRefilter = {};
     }).then(function (j) {
       if (!j) return;
       if (!j.configured) { S.status = 'unconfigured'; return; }
-      S.rowsAll = parse(j.rows || []); S.rows = window.anHide(S.rowsAll); S.fetchedAt = Date.now();
+      S.rowsAll = parse(j.rows || []); S.rows = window.anHide(S.rowsAll); S.capped = !!j.capped; S.fetchedAt = Date.now();
       S.status = S.rowsAll.length ? 'ready' : 'empty';
       return idx.then(function (list) { list.forEach(function (e) { var u = (e.u || '').replace(/\/+$/, '') || '/'; if (!TITLES[u] && e.t) TITLES[u] = e.t; }); });
     }).catch(function () { S.status = 'error'; }).then(function () {
