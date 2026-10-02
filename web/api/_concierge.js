@@ -149,7 +149,7 @@ function pickLogos(catalog, words) {
   let chosen = treatment ? family.filter((x) => x.id.endsWith(treatment)) : family.filter((x) => x.id.endsWith('original'));
   if (treatment && !chosen.length) hints.push(`There is no ${treatment} ${symbols ? 'symbol' : 'logo'}; here is the original.`);
   if (!chosen.length) chosen = family.filter((x) => x.id.endsWith('original'));
-  if (!treatment) hints.push(`Also ask for *white* or *dark*${symbols ? '' : ', or just the *symbol*'}, e.g. "white logo png".`);
+  if (!treatment) hints.push(`Also ask for *white* or *dark*${symbols ? '' : ', or just the *symbol*'}, e.g. “white logo png”.`);
   return { chosen, hints };
 }
 
@@ -158,6 +158,9 @@ export function understand(text, catalog) {
   const format = words.find((w) => FORMATS.has(w));
   const parts = [];
   const anyKey = [...Object.values(KIND_KEYS).flat(), ...TEMPLATE_KEYS, ...TOOL_KEYS];
+  const raw = String(text || '').toLowerCase().replace(/<@[a-z0-9]+>/g, ' ').trim();
+  const greetingOnly = !words.length && /^(hi|hey|hello|yo|sup|hiya|good (morning|afternoon|evening))\b/.test(raw);
+  const thanksOnly = /\b(thanks|thank you|thx|cheers|appreciate)\b/.test(raw);
   const help = !words.length || (has(words, ['help', 'menu', 'options', 'what', 'commands']) && !has(words, anyKey));
 
   if (has(words, KIND_KEYS.logo)) {
@@ -170,7 +173,7 @@ export function understand(text, catalog) {
     if (x) {
       const files = filesFor(x, format);
       const one = has(words, ['1', 'one', 'page', '1page', 'single']) ? files.filter((f) => f.note === 'one page') : files;
-      parts.push({ type: 'assets', picks: [{ entry: x, files: one.length ? one : files }], hints: swatch ? [] : ['Need it as a swatch file for Adobe or macOS? Ask for "swatches".'] });
+      parts.push({ type: 'assets', picks: [{ entry: x, files: one.length ? one : files }], hints: swatch ? [] : ['Need it as a swatch file for Adobe or macOS? Ask for “swatches”.'] });
     }
   }
   if (has(words, KIND_KEYS.font)) {
@@ -179,7 +182,7 @@ export function understand(text, catalog) {
     if (has(words, ['vert', 'grotesk', 'heading', 'headings', 'display'])) files = files.filter((f) => f.path.includes('Vert'));
     else if (has(words, ['inter'])) files = files.filter((f) => f.path.includes('Inter'));
     else if (has(words, ['jakarta'])) files = files.filter((f) => f.path.includes('Jakarta'));
-    parts.push({ type: 'assets', picks: [{ entry: x, files }], hints: files.length === x.files.length ? ['Install the two brand fonts: *Vert Grotesk Display* (headings) and *Inter* (everything else). Plus Jakarta Sans is only for Google Slides exports.'] : [] });
+    parts.push({ type: 'assets', picks: [{ entry: x, files }], hints: files.length === x.files.length ? ['Vert Grotesk Display is for headings and Inter is for everything else. Plus Jakarta Sans is only for Google Slides exports.'] : [] });
   }
   if (has(words, KIND_KEYS.tokens)) {
     const x = catalog.find((c) => c.id === 'tokens');
@@ -209,69 +212,99 @@ export function understand(text, catalog) {
     if (pages.length) parts.push({ type: 'pages', entries: pages.filter((r) => r.s === pages[0].s).map((r) => r.x) });
   }
   const designRequest = has(words, DESIGN_VERBS) && !parts.some((p) => p.type === 'tools' || p.type === 'assets');
-  return { parts, designRequest, help };
+  return { parts, designRequest, help, greeting: greetingOnly, thanks: thanksOnly };
 }
 
 /* ---------------------------------------------------------------- writing the answer */
 
+/* Bruce talks the way the rest of Gushwork writes (foundation/voice.md): plainspoken, short, first person, sentence case,
+   no exclamation marks, no emoji. There is no model here, so the human feel comes from short lines, a few ways of saying
+   the same thing, and answering what was asked before offering more. The pick is seeded by the message, so the same message
+   always gets the same words, and two people asking in a row don't get a copy-paste. */
+const seedOf = (x) => [...String(x || '0')].reduce((n, c) => (n * 31 + c.charCodeAt(0)) >>> 0, 7);
+const pick = (options, seed) => options[seed % options.length];
+
 export const HELP = [
-  "*I'm Bruce.* I hand over Gushwork's brand assets and point you at the right template or tool. Ask me in plain words:",
-  '• *Logos*: "white logo svg", "dark symbol png", "all logos"',
-  '• *Color sheet* or *swatches* (Adobe / macOS)',
-  '• *Fonts* and *design tokens* (CSS, JSON, SCSS, Tailwind)',
-  '• *Templates*: ad page, sign-up ad page, case study, lead magnet, one-pager',
-  '• *Tools*: email signature creator, employee ID card generator',
-  "I don't design anything myself. For that, I'll give you the template and the prompt to use with Claude.",
+  'I can send you the brand files and point you to the right template or tool. Things people ask me for:',
+  '• logos, like “white logo svg” or “dark symbol png”',
+  '• the color sheet, or swatches for Adobe or macOS',
+  '• fonts, and the design tokens (CSS, JSON, SCSS, Tailwind)',
+  '• templates: ad page, case study, lead magnet, one-pager',
+  '• tools: the email signature creator and the ID card generator',
+  'I don’t design things myself. If you need something made, I’ll hand you the template and the prompt to run with Claude.',
 ].join('\n');
 
 const link = (path, label) => `<${SITE}${path}|${label}>`;
 const MAX_FILES = 6;
+const JOIN = (xs) => (xs.length <= 1 ? xs[0] || '' : xs.slice(0, -1).join(', ') + ' and ' + xs[xs.length - 1]);
+const lower = (t) => t.charAt(0).toLowerCase() + t.slice(1);
 
-function templateBlock(entries, all) {
+export function greeting(seed) {
+  return pick(['Hey. What do you need? Logos, the color sheet, fonts, a template — say the word.', 'Hi. Tell me what you’re after and I’ll find it: logos, colours, fonts, templates, tools.', 'Hey there. What can I find for you?'], seed);
+}
+export function thanks(seed) {
+  return pick(['Anytime.', 'Glad it helped.', 'Sure thing.'], seed);
+}
+
+function templateBlock(entries, all, seed) {
   const live = entries.filter((x) => !x.soon), soon = entries.filter((x) => x.soon);
   const lines = [];
   if (!all && live.length === 1) {
     const x = live[0];
-    lines.push(`*${x.title}*: ${x.blurb}`);
+    lines.push(`${pick(['That’s the', 'This is the', 'Here’s the'], seed)} *${x.title}* template. ${x.blurb}`);
     if (x.prompt) {
-      lines.push('Open Claude Code with the Gushwork plugin installed, paste this, and fill in your brief:');
+      lines.push('Open Claude Code with the Gushwork plugin, paste this, and add your brief:');
       lines.push('```' + x.prompt + '```');
     }
-    lines.push(`${link('/internal/templates', 'Templates page')} · ${link('/internal/claude-plugin', 'Set up the Claude plugin')}`);
+    lines.push(`More on the ${link('/internal/templates', 'Templates page')}. If you haven’t set up the plugin yet, ${link('/internal/claude-plugin', 'start here')}.`);
   } else if (live.length) {
-    lines.push('*Templates*, each with a "Use with Claude" button on the page:');
+    lines.push(`We have ${live.length} templates:`);
     for (const x of live) lines.push(`• *${x.title}*: ${x.blurb}`);
-    lines.push(`Say which one you want (e.g. "case study template") and I'll give you its prompt. ${link('/internal/templates', 'Templates page')}`);
+    lines.push(`Tell me which one and I’ll send you the prompt for Claude. They’re all on the ${link('/internal/templates', 'Templates page')} too.`);
   }
-  for (const x of soon) lines.push(`_${x.title}: coming soon. The slides library is being rebuilt, so there is nothing to hand over yet._`);
+  for (const x of soon) lines.push(`${x.title} isn’t ready yet. The slides library is being rebuilt, so there’s nothing to send for now.`);
   return lines.join('\n');
 }
 
-export function compose(u, catalog) {
-  if (!u.parts.length && !u.designRequest) return { text: HELP, files: [] };
+function assetLead(picks, seed) {
+  const names = picks.map((p) => lower(p.entry.title));
+  const what = names.length === 1 ? `the ${names[0]}` : names.length <= 3 ? JOIN(names.map((n) => `the ${n}`)) : `the ${names.length} ${picks[0].entry.kind === 'logo' ? 'logo versions' : 'files'}`;
+  return pick([`Here’s ${what}.`, `Sending ${what} over now.`, `Here you go, ${what}.`], seed);
+}
+
+export function compose(u, catalog, seedText = '') {
+  const seed = seedOf(seedText);
+  if (u.greeting) return { text: greeting(seed), files: [] };
+  if (u.thanks && !u.parts.length) return { text: thanks(seed), files: [] };
+  if (!u.parts.length && !u.designRequest) {
+    return { text: u.help ? HELP : pick(['I’m not sure what you’re after. Here’s what I can help with:\n', 'I didn’t catch that one. Here’s what I can do:\n', 'Not sure I follow. Here’s what I’m good for:\n'], seed) + HELP, files: [] };
+  }
   const texts = [];
   let files = [];
-  if (u.designRequest) texts.push("I don't make designs myself, but I can hand you the starting point.");
+  let linked = false;
+  const pagesDone = new Set();
+  if (u.designRequest) texts.push(pick(['I don’t design things myself, and I’d rather not guess at the brand. What I can do is give you the right starting point to run with Claude.', 'Making designs isn’t something I do. I can hand you the template and the prompt, and Claude can take it from there.'], seed));
   const parts = u.designRequest && !u.parts.some((p) => p.type === 'templates')
     ? [...u.parts, { type: 'templates', entries: catalog.filter((x) => x.kind === 'template'), all: true }] : u.parts;
   for (const p of parts) {
     if (p.type === 'assets') {
-      const lines = [];
-      for (const { entry, files: fs } of p.picks) {
-        lines.push(`*${entry.title}*: ${entry.blurb}`);
-        for (const f of fs) files.push({ path: f.path, title: `${entry.title} (${f.format}, ${f.note})` });
-      }
-      lines.push(...p.hints);
-      if (p.picks[0] && p.picks[0].entry.page) lines.push(`All formats: ${link(p.picks[0].entry.page, 'Downloads page')}`);
+      const lines = [assetLead(p.picks, seed)];
+      if (p.picks[0] && p.picks[0].entry.kind === 'tokens') lines.push('Same tokens the site runs on.');
+      lines.push(...p.hints.map((h) => h));
+      if (p.picks[0] && p.picks[0].entry.page && !pagesDone.has('downloads')) { pagesDone.add('downloads'); lines.push(`Everything else is on the ${link(p.picks[0].entry.page, 'Downloads page')}.`); linked = true; }
+      for (const { entry, files: fs } of p.picks) for (const f of fs) files.push({ path: f.path, title: `${entry.title} (${f.format}, ${f.note})` });
       texts.push(lines.join('\n'));
-    } else if (p.type === 'templates') texts.push(templateBlock(p.entries, p.all));
-    else texts.push(p.entries.map((x) => `*${x.title}*: ${x.blurb} ${link(x.page || '/', 'Open it')}`).join('\n'));
+    } else if (p.type === 'templates') { texts.push(templateBlock(p.entries, p.all, seed)); linked = true; }
+    else {
+      texts.push(p.entries.map((x) => `${pick(['Here’s the', 'That’s the', 'You want the'], seed)} *${x.title}*. ${x.blurb} ${link(x.page || '/', 'Open it')}.`).join('\n'));
+      linked = true;
+    }
   }
   if (files.length > MAX_FILES) {
-    texts.push(`_Sent the first ${MAX_FILES} files. The rest are on the ${link('/downloads', 'Downloads page')}._`);
+    texts.push(`That’s the first ${MAX_FILES}. The rest are on the ${link('/downloads', 'Downloads page')}.`);
     files = files.slice(0, MAX_FILES);
   }
-  texts.push('_Site links open with your Gushwork Google sign-in._');
+  if (linked) texts.push('_Links open with your Gushwork Google sign-in._');
   return { text: texts.join('\n\n'), files };
 }
 
@@ -317,19 +350,23 @@ export async function handleMessage(event, deps) {
   if (!event.user || event.bot_id || (event.subtype && event.subtype !== 'file_share')) return { did: 'ignored' };
   const catalog = buildCatalog(root);
   const u = understand(event.text || '', catalog);
-  const asked = u.parts.length > 0 || u.designRequest;
+  // A greeting, thanks or a plain "what can you do" is conversation, not a reply to the report.
+  const asked = u.parts.length > 0 || u.designRequest || u.greeting || u.thanks || u.help;
   const threadTs = isDm ? event.thread_ts : event.thread_ts || event.ts;
   try {
-    // A reviewer's DM that is not a question is a reply to the nightly report; the 9pm run reads it. Bruce just says he saw it.
+    // A reviewer's DM that is none of those is most likely a reply to the nightly report ("do 2", "skip the focus ring"). The 9pm run
+    // reads it. Bruce says so in words, and ticks it, so nobody has to guess what the tick means.
     if (isDm && owners.has(event.user) && !asked) {
-      try { await slack(token, 'reactions.add', { channel: event.channel, timestamp: event.ts, name: 'white_check_mark' }); return { did: 'ticked' }; }
-      catch { await slack(token, 'chat.postMessage', { channel: event.channel, ...(threadTs ? { thread_ts: threadTs } : {}), text: 'Noted. The 9pm run will pick this up.' }); return { did: 'noted' }; }
+      let ticked = true;
+      try { await slack(token, 'reactions.add', { channel: event.channel, timestamp: event.ts, name: 'white_check_mark' }); } catch { ticked = false; }
+      await slack(token, 'chat.postMessage', { channel: event.channel, ...(threadTs ? { thread_ts: threadTs } : {}), text: 'Got it. I’ll leave that for tonight’s 9pm run, which reads your replies to the report. If you were asking me for a file, say what you need.' });
+      return { did: ticked ? 'ticked' : 'noted' };
     }
-    const reply = compose(u, catalog);
+    const reply = compose(u, catalog, event.ts);
     await slack(token, 'chat.postMessage', { channel: event.channel, ...(threadTs ? { thread_ts: threadTs } : {}), text: reply.text, unfurl_links: false });
     const sent = reply.files.length ? await uploadFiles(token, root, event.channel, threadTs, reply.files) : 0;
     if (sent < reply.files.length) {
-      await slack(token, 'chat.postMessage', { channel: event.channel, ...(threadTs ? { thread_ts: threadTs } : {}), text: `I couldn't attach ${reply.files.length - sent} file(s). They are on the <${SITE}/downloads|Downloads page>.` });
+      await slack(token, 'chat.postMessage', { channel: event.channel, ...(threadTs ? { thread_ts: threadTs } : {}), text: `I couldn’t attach ${reply.files.length - sent === 1 ? 'one of the files' : `${reply.files.length - sent} of the files`}. You’ll find ${reply.files.length - sent === 1 ? 'it' : 'them'} on the <${SITE}/downloads|Downloads page>.` });
     }
     return { did: 'answered', files: sent };
   } catch (e) {
