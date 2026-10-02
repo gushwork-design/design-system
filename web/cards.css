@@ -187,3 +187,45 @@
   :root[data-theme="dark"] .bdg--wip { color: var(--gw-color-yellow-300, var(--gw-color-yellow-500)); }
   :root[data-theme="dark"] .tl-go, :root[data-theme="dark"] .tuse { box-shadow: none; border-color: var(--gw-color-neutral-850); }
   :root[data-theme="dark"] .tl-go:hover, :root[data-theme="dark"] .tuse:hover { border-color: var(--gw-color-neutral-700); }
+
+/* ---------------------------------------------------------------------------
+   Tools page hover — for fun, 2 Oct 2026. Scoped to /internal/tools so the Templates
+   cards, which share .tcard, are untouched. A card lifts on a spring, its mock browser
+   rises and tilts (alternating direction card to card), the three window dots light up
+   like a real window's, and the arrow nudges further. Motion is behind
+   prefers-reduced-motion; the dot colours are not motion and stay.
+   --------------------------------------------------------------------------- */
+body[data-gw-page="tools"] .tcard__bar i { transition: background var(--gw-motion-fast); }
+body[data-gw-page="tools"] a.tcard:not(.tcard--locked):hover .tcard__bar i:nth-child(1) { background: var(--gw-color-red-400); }
+body[data-gw-page="tools"] a.tcard:not(.tcard--locked):hover .tcard__bar i:nth-child(2) { background: var(--gw-color-yellow-400); }
+body[data-gw-page="tools"] a.tcard:not(.tcard--locked):hover .tcard__bar i:nth-child(3) { background: var(--gw-color-green-400); }
+
+@media (prefers-reduced-motion: no-preference) {
+  body[data-gw-page="tools"] {
+    --tl-spring: cubic-bezier(.34, 1.56, .64, 1);   /* overshoots slightly, then settles */
+  }
+  body[data-gw-page="tools"] a.tcard:not(.tcard--locked) {
+    transition: transform 360ms var(--tl-spring), border-color var(--gw-motion-fast), box-shadow 360ms ease;
+    will-change: transform;
+  }
+  body[data-gw-page="tools"] a.tcard:not(.tcard--locked):hover {
+    transform: translateY(-6px);
+    box-shadow: var(--gw-shadow-s4);
+  }
+  body[data-gw-page="tools"] a.tcard:not(.tcard--locked):active {
+    transform: translateY(-2px) scale(.985);
+    transition-duration: 120ms;
+  }
+  body[data-gw-page="tools"] .tcard__dev {
+    transition: transform 480ms var(--tl-spring);
+    transform-origin: 50% 100%;
+  }
+  body[data-gw-page="tools"] a.tcard:not(.tcard--locked):hover .tcard__dev {
+    transform: translateX(-50%) translateY(-10px) rotate(-1.6deg) scale(1.05);
+  }
+  body[data-gw-page="tools"] a.tcard:not(.tcard--locked):nth-child(even):hover .tcard__dev {
+    transform: translateX(-50%) translateY(-10px) rotate(1.6deg) scale(1.05);
+  }
+  body[data-gw-page="tools"] .tl-go svg { transition: transform 280ms var(--tl-spring); }
+  body[data-gw-page="tools"] a.tcard:not(.tcard--locked):hover .tl-go svg { transform: translate(4px, -4px); }
+}
