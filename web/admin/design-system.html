@@ -710,7 +710,10 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .rv-b--pass:hover:not(:disabled) { background: var(--ul-prim-hover); }
 .rv-b--ghost { background: none; color: var(--ul-ctl-fg); box-shadow: inset 0 0 0 1px var(--ul-ctl-line); }
 .rv-b--ghost:hover:not(:disabled) { background: var(--ul-ctl-hover); }
-.rv-b--warn { background: var(--gw-color-yellow-500); color: var(--gw-color-black); }
+/* Send back is the page's primary button (white in dark, black in light), like Pass. It was yellow, which belongs to no
+   button in this system. */
+.rv-b--warn { background: var(--ul-prim-bg); color: var(--ul-prim-fg); }
+.rv-b--warn:hover:not(:disabled) { background: var(--ul-prim-hover); }
 .rv-b--bad { background: var(--gw-color-red-500, #e11d48); color: var(--gw-color-white); }
 .rv-toast { position: fixed; left: 50%; bottom: var(--gw-space-24); z-index: 90; transform: translate(-50%, 12px); padding: var(--gw-space-12) var(--gw-space-16); border-radius: var(--gw-radius-12); background: var(--ul-prim-bg); color: var(--ul-prim-fg); font: 500 13px/1.3 var(--gw-font-body); opacity: 0; pointer-events: none; transition: opacity var(--gw-motion-fast), transform var(--gw-motion-fast); }
 .rv-toast.on { opacity: 1; transform: translate(-50%, 0); }
