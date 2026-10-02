@@ -996,3 +996,28 @@ html[data-theme] .preview-content[data-theme] {
 .prop-textarea:focus,
 .prop-input-prefix:focus-within,
 .float-field:focus-within { box-shadow: var(--gw-shadow-s2); border-color: var(--t-field-border); outline: none; }
+
+/* Number fields: the browser's native spin arrows are unstyled, so they go. The slider beside
+   each one is the stepper, and ArrowUp / ArrowDown still step the value from the keyboard. */
+input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; appearance: none; margin: 0; display: none; }
+
+/* Open and hover borders stay in the neutral family — no blue. A dropdown that is open is
+   not asking for attention, so it only steps up one border strength (it was Primary/500, which
+   read as a focus state). Dark uses neutral/700; the old hover border neutral/300 was far too
+   bright on black. */
+:root, :root[data-theme="light"] { --t-border-strong: var(--gw-color-neutral-300); }
+:root[data-theme="dark"]        { --t-border-strong: var(--gw-color-neutral-700); }
+.prop-input:hover,
+.prop-textarea:hover,
+.prop-input-prefix:hover,
+.float-field:hover,
+.prop-dropdown-trigger:hover,
+.prop-dropdown.open .prop-dropdown-trigger { border-color: var(--t-border-strong); }
+
+/* Concentric corners: outer radius = inner radius + the padding between them.
+   The pill was radius 16 around radius-8 items with 4px padding, so the corner gap
+   swelled; 8 + 4 = 12. Same rule holds for the menus (12 around 8 items, 4 padding)
+   and the tab-group (12 around 8 items, 4 padding), which were already right. */
+.floating-toolbar { border-radius: var(--gw-radius-12); }
