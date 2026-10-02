@@ -28,7 +28,7 @@
 
 import { COOKIE, verify, readCookie, sessionSecret } from './_session.js';
 import { isOwner } from './_access.js';
-import { recordViaGithub, explain } from './_review-github.js';
+import { recordViaGithub, explain, checkGithub } from './_review-github.js';
 
 const LIST_KEY = 'gw:review-decisions';
 const STATE_KEY = 'gw:review-state';
@@ -92,6 +92,11 @@ export default async function handler(req, res) {
   if (!cfg) return json(res, 503, { error: 'The store is not connected.' });
 
   if (req.method === 'GET') {
+    // ?check=github: can the token on this site do what a decision needs? Owner only (the guard above).
+    if (String((req.query && req.query.check) || '') === 'github') {
+      try { return json(res, 200, { github: await checkGithub(process.env.GW_GITHUB_TOKEN || '') }); }
+      catch { return json(res, 502, { error: 'Could not run the check.' }); }
+    }
     try {
       const [{ result }] = await redis(cfg, [['HGETALL', STATE_KEY]]);
       return json(res, 200, { state: parseState(result) });

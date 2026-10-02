@@ -76,6 +76,7 @@ async function gh(token, path, init = {}) {
   if (!r.ok) {
     const e = new Error(`github ${r.status}`);
     e.status = r.status; e.body = body;
+    e.needs = (r.headers && r.headers.get && r.headers.get('x-accepted-github-permissions')) || '';   // what GitHub says this call needs, e.g. contents=write
     e.step = `${(init.method || 'GET').toUpperCase()} ${path.split('?')[0].replace(/^\/repos\/[^/]+\/[^/]+/, '')}`;
     throw e;
   }
@@ -152,4 +153,38 @@ export function explain(e) {
   if (!e.status) return 'GitHub could not be reached';
   const why = e.body && e.body.message ? String(e.body.message).replace(/\s+/g, ' ').slice(0, 140) : '';
   return `GitHub said ${e.status}${why ? ': ' + why : ''}${e.step ? ' (' + e.step + ')' : ''}`;
+}
+
+/* A plain-language check of the connection, for the owner to run when Approve says GitHub refused. It tries, in order: to see the
+   repository, to read main, and to make (then remove) a throwaway branch, which is the exact thing a decision needs first.
+   Returns steps and one verdict sentence; never includes the token. */
+export async function checkGithub(token) {
+  const steps = [];
+  const out = (verdict) => ({ ok: steps.every((x) => x.ok), steps, verdict });
+  if (!token) return out('No token is set. Add GW_GITHUB_TOKEN to the project\'s environment variables and redeploy.');
+  const run = async (name, fn) => {
+    try { const v = await fn(); steps.push({ name, ok: true }); return { v }; }
+    catch (e) { steps.push({ name, ok: false, status: e.status || 0, needs: e.needs || '', why: e.body && e.body.message ? String(e.body.message).slice(0, 120) : '' }); return { e }; }
+  };
+  const seen = await run('See the repository', () => gh(token, repo('')));
+  if (seen.e) {
+    const st = seen.e.status;
+    return out(st === 404 || st === 403
+      ? `The token cannot see ${OWNER}/${REPO}. It was most likely created under your personal account instead of the ${OWNER} organisation, is limited to other repositories, or the organisation has not approved it yet.`
+      : st === 401 ? 'GitHub does not accept the token. It may have expired or been revoked; make a new one.' : 'GitHub could not be reached.');
+  }
+  const main = await run('Read main', () => gh(token, repo(`/git/ref/heads/${BASE}`)));
+  if (main.e) return out('The token can see the repository but not read its contents. Set Contents to "Read and write" on the token.');
+  const name = `review/check-${Date.now().toString(36)}`;
+  const made = await run('Create a branch', () => gh(token, repo('/git/refs'), { method: 'POST', body: JSON.stringify({ ref: `refs/heads/${name}`, sha: main.v.object.sha }) }));
+  if (made.e) {
+    const needs = made.e.needs ? ` GitHub says this needs ${made.e.needs}.` : '';
+    return out(made.e.status === 403
+      ? `The token can read the repository but not change it.${needs} Edit the token: Repository permissions, Contents set to "Read and write" (and Pull requests set to "Read and write"). If the organisation approves tokens, an owner has to approve the change.`
+      : `Creating a branch failed (${made.e.status}).`);
+  }
+  await run('Remove it again', () => gh(token, repo(`/git/refs/heads/${name}`), { method: 'DELETE' }));
+  const prs = await run('Read pull requests', () => gh(token, repo('/pulls?state=open&per_page=1')));
+  if (prs.e) return out('The token can change the repository but not use pull requests. Set Pull requests to "Read and write" on the token.');
+  return out('Connected. Approve will open or update a pull request for the decisions.');
 }

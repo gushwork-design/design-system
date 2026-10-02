@@ -1,7 +1,7 @@
 // Tests for web/api/_review-github.js: the registry edit (pure) and the pull-request flow against a pretend GitHub.
 // Run: node scripts/review-github.test.mjs
 import fs from 'node:fs';
-import { applyDecision, revertDecision, registryTarget, serialize, recordViaGithub } from '../web/api/_review-github.js';
+import { applyDecision, revertDecision, registryTarget, serialize, recordViaGithub, checkGithub } from '../web/api/_review-github.js';
 
 let pass = 0, fail = 0;
 function t(name, got, want) {
@@ -83,6 +83,29 @@ t('a conflicting write is retried once', [out.pr.number, g.commits], [40, 1]);
 g = pretend(baseFiles()); g.conflicts = 2;
 t('twice is an error, not a silent loss', await recordViaGithub('tok', row({}), 'u', 'd').then(() => false, () => true), true);
 t('an unknown component never reaches GitHub for writing', await recordViaGithub('tok', row({ key: 'nope' }), 'u', 'd').then(() => false, () => true), true);
+
+/* ---- the connection check: each way the token can be wrong reads as its own sentence ---- */
+function answers(map) {
+  globalThis.fetch = async (url, init = {}) => {
+    const p = new URL(url).pathname.replace('/repos/gushwork-design/design-system', '') || '/', m = init.method || 'GET';
+    const hit = map[`${m} ${p}`] || map[`${m} *`];
+    const [status, body, hdr] = hit || [200, {}];
+    return { ok: status < 400, status, headers: { get: (k) => (hdr && hdr[k.toLowerCase()]) || null }, text: async () => JSON.stringify(body) };
+  };
+}
+const MAIN = { 'GET /git/ref/heads/main': [200, { object: { sha: 's1' } }] };
+t('no token', (await checkGithub('')).verdict.startsWith('No token'), true);
+answers({ 'GET /': [404, { message: 'Not Found' }] });
+t('a token that cannot see the repository says so', (await checkGithub('t')).verdict.includes('cannot see'), true);
+answers({ 'GET /': [401, { message: 'Bad credentials' }] });
+t('a rejected token says so', (await checkGithub('t')).verdict.includes('does not accept'), true);
+answers({ ...MAIN, 'POST /git/refs': [403, { message: 'Resource not accessible by personal access token' }, { 'x-accepted-github-permissions': 'contents=write' }] });
+let c = await checkGithub('t');
+t('read-only is the reported 403 case, and names the permission GitHub asked for', [c.ok, c.verdict.includes('read the repository but not change it'), c.verdict.includes('contents=write')], [false, true, true]);
+answers({ ...MAIN, 'POST /git/refs': [201, {}], 'DELETE *': [204, {}], 'GET /pulls': [200, []] });
+c = await checkGithub('t');
+t('a working token is connected, and the probe branch is removed', [c.ok, c.verdict.startsWith('Connected')], [true, true]);
+t('the check never contains the token', JSON.stringify(c).includes('"t"'), false);
 
 console.log(`${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
