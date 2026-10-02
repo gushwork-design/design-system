@@ -1123,3 +1123,11 @@ Ruled by Utsav, 2 Oct 2026. `neutral-850` was `#333333`, a pure grey with no hue
 - **What moved with it:** `tokens.css`, `tokens.json`, `tokens.scss`, `tailwind-theme.js`, the four page templates and examples that copy the ramp, the preview and colour sheets, the slide deck builder, and the two docs that quote the hex. Everything that uses the variable follows without edits.
 - **Review:** Colour in the Foundations library re-expires and has to be approved again. The dashboard Primary button doc (`button.md`) quotes the new hex for its hover; the measurement in Figma changes with the variable.
 - **Not changed:** `35` (`#f5f5f5`, pure grey) and `250` (`#bcbec2`, a near-twin of `300`) are also outside the family; flagged for a later ruling.
+
+## R40 — Bruce is one Slack app, and the concierge lives in the site
+Ruled by Utsav, 2 Oct 2026. Bruce does three things and no design work: hands over brand assets (logos, color sheet, swatches, fonts, tokens), points at the right template or tool with its "Use with Claude" prompt, and delivers the nightly design-hub report and ticks Utsav's replies. The earlier agent that generated designs was too expensive and is off.
+
+- **One app.** The existing Slack app "Bruce" also closes the ✅ review loop over HTTP events at `/api/slack-events`. A second app, or Socket Mode, would have split or swallowed those events, so the concierge runs in the same handler (`web/api/_concierge.js`) with no server and no model call.
+- **The assets are bundled with the function** (`vercel.json` `includeFiles`), uploaded into the Slack thread, and every one is checked by `scripts/concierge.test.mjs`. Slides answers "coming soon", matching the Library.
+- **Replies to the report** are read by the nightly cloud run (Slack API), not handled by Bruce; he only ticks them.
+- The manifest is `slack/bruce-app-manifest.yml`.
