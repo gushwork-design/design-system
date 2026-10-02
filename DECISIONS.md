@@ -1107,3 +1107,10 @@ Ruled by Utsav, 2 Oct 2026, reversing the 18 Sep 2026 ruling (System dropped, de
 - **The trigger glyph** shows a monitor for System, a sun for Light, a moon for Dark.
 
 **All eleven foundation groups are drawn (2 Oct 2026).** Type links, the ruled values (motion, focus, timing) and slides had been left as "Nothing drawn for this group yet". Links are drawn as links in each link token; motion shows a hover transition, a focused button and a bar filling over the toast's lifetime; slides shows the 1920 × 1080 frame to scale with its margin, title box and cover inset marked, then its type, ground lattice and surfaces. The Library's Foundations list gained a Slides tab, and Typography now includes the links. 45 of 97 *components* still have no visual (`bash scripts/check-previews.sh`).
+
+## R38 — the Library shows only what has been approved; everything else is in Review
+Ruled by Utsav, 2 Oct 2026. The Library is the system as it stands, so a foundation group or a component appears in it only when its review state is passed and its source has not moved since. Pending, in rework, rejected and expired items are not listed; they are in the Review tab, which is where they are decided. Templates are not reviewed items and still show.
+
+- **What changes on the page.** A foundation tab appears only if at least one of its groups is approved (Typography can show its typefaces and not its type scale); a category lists only its approved components, with "N not yet" beside the count, and says "No component here is approved yet" when it has none. The top tiles count approved against total.
+- **The owner sees one more thing:** a Pass they have just pressed and not yet had recorded, so their own work does not vanish while it waits to be merged. Everyone else sees what the registry holds.
+- **Consequence today:** with few items passed in the registry, the Library is nearly empty until reviews are recorded and merged. That is the gate working, not a fault.

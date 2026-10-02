@@ -710,7 +710,10 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .rv-b--pass:hover:not(:disabled) { background: var(--ul-prim-hover); }
 .rv-b--ghost { background: none; color: var(--ul-ctl-fg); box-shadow: inset 0 0 0 1px var(--ul-ctl-line); }
 .rv-b--ghost:hover:not(:disabled) { background: var(--ul-ctl-hover); }
-.rv-b--warn { background: var(--gw-color-yellow-500); color: var(--gw-color-black); }
+/* Send back is the page's primary button (white in dark, black in light), like Pass. It was yellow, which belongs to no
+   button in this system. */
+.rv-b--warn { background: var(--ul-prim-bg); color: var(--ul-prim-fg); }
+.rv-b--warn:hover:not(:disabled) { background: var(--ul-prim-hover); }
 .rv-b--bad { background: var(--gw-color-red-500, #e11d48); color: var(--gw-color-white); }
 .rv-toast { position: fixed; left: 50%; bottom: var(--gw-space-24); z-index: 90; transform: translate(-50%, 12px); padding: var(--gw-space-12) var(--gw-space-16); border-radius: var(--gw-radius-12); background: var(--ul-prim-bg); color: var(--ul-prim-fg); font: 500 13px/1.3 var(--gw-font-body); opacity: 0; pointer-events: none; transition: opacity var(--gw-motion-fast), transform var(--gw-motion-fast); }
 .rv-toast.on { opacity: 1; transform: translate(-50%, 0); }
@@ -1065,11 +1068,15 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       return '<div class="fd-r"><div class="fd-r__l"><b>' + esc(k.replace('gw-', '')) + '</b><span>--' + esc(k) + '</span></div><div class="fd-r__s" style="font:var(--gw-text-body-14-med)">' + esc(String(t[k]).split('\n')[0]) + '</div></div>';
     }).join('') + '</div>';
   }
-  function fdLayout(t) {
-    var a = keys(t, /^gw-content-/), b = keys(t, /^gw-bp-/);
-    return '<section class="fd-sec"><h3>Content<span>' + plural(a.length, 'token') + '</span></h3>' + rows(t, a) + '</section>' +
-      '<section class="fd-sec"><h3>Breakpoint tokens<span>' + plural(b.length, 'token') + '</span></h3>' + rows(t, b) + '</section>';
+  function fdContent(t) {
+    var a = keys(t, /^gw-content-/);
+    return '<section class="fd-sec"><h3>Content<span>' + plural(a.length, 'token') + '</span></h3>' + rows(t, a) + '</section>';
   }
+  function fdBreakpoints(t) {
+    var b = keys(t, /^gw-bp-/);
+    return '<section class="fd-sec"><h3>Breakpoint tokens<span>' + plural(b.length, 'token') + '</span></h3>' + rows(t, b) + '</section>';
+  }
+  function fdLayout(t) { return fdContent(t) + fdBreakpoints(t); }
   /* Motion, focus and timing. Ruled by the design owner because Figma has none of them, so each is shown working:
      hover the chip for the transition, the button wears the focus ring, the bar fills over the toast's lifetime. */
   function demoRow(name, value, demo) {
@@ -1212,42 +1219,68 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       (c.doc ? '<a class="fd-comp__d" href="' + esc(docHref(sf.key, c.doc)) + '" target="_blank" rel="noopener" title="Open ' + esc(c.doc) + ' on GitHub">' + esc(String(c.doc).split('/').pop()) + '</a>' : '') + '</div>';
   }
   function compTable(sf) {
-    var cs = sf ? sf.components : [], by = {}, order = [];
+    var all = sf ? sf.components : [], cs = all.filter(function (c) { return approved(sf.key, c.name); }), by = {}, order = [];
     cs.forEach(function (c) { var g = groupOf(c.doc); if (!by[g]) { by[g] = []; order.push(g); } by[g].push(c); });
     var flat = order.length > Math.ceil(cs.length / 2);
-    var body = !cs.length ? '<div class="ul-empty"><div class="ul-empty__copy"><h2>Nothing measured yet</h2></div></div>'
+    var body = !cs.length ? emptyLib('component here is', all.length - cs.length)
       : (flat ? [['', cs]] : order.map(function (g) { return [g, by[g]]; })).map(function (g) {
         return '<div class="fd-cg">' + (g[0] ? '<h4>' + esc(g[0]) + '<span>' + g[1].length + '</span></h4>' : '') + '<div class="fd-comps">' + g[1].map(function (c) { return compCard(sf, c); }).join('') + '</div></div>';
       }).join('');
-    return '<section class="fd-sec"><h3>Components<span>' + plural(cs.length, 'component') + '</span></h3>' +
+    return '<section class="fd-sec"><h3>Components<span>' + plural(cs.length, 'approved component') + (all.length > cs.length ? ', ' + (all.length - cs.length) + ' not yet' : '') + '</span></h3>' +
       (cs.length > 8 ? '<input class="ds-find" id="ds-comp-find" type="search" aria-label="Filter components" placeholder="Filter components" autocomplete="off">' : '') + '<div id="ds-comps">' + body + '</div></section>';
+  }
+  /* THE LIBRARY SHOWS ONLY WHAT HAS BEEN APPROVED (Utsav, 2 Oct 2026). Something is approved when its review state is
+     passed and the source has not moved since: pending, in rework, rejected and expired are not shown here, they are in
+     the Review tab. An owner also sees a pass they have just pressed (it is "being recorded"), so their own work does not
+     vanish; everyone else sees only what the registry holds. */
+  function approved(scope, key) { var it = BYID[scope + '/' + key]; return !!it && eff(it).state === 'passed'; }
+  var FD_PARTS = {
+    color: [['color', fdColor]],
+    type: [['typefaces', fdFaces], ['type', fdScale], ['type-links', fdLinks]],
+    spacing: [['spacing', fdSpacing]], radius: [['radius', fdRadius]], elevation: [['elevation', fdElevation]],
+    layout: [['content-width', fdContent], ['breakpoint', fdBreakpoints]],
+    motion: [['ruled', fdMotion]], slides: [['slides', fdSlides]]
+  };
+  function partCount(t, g) {
+    return ({ color: keys(t, /^gw-color-/).length, typefaces: 2, type: keys(t, /^gw-text-(h\d|body-|button-)/).filter(function (k) { return !/-tracking$/.test(k); }).length,
+      'type-links': keys(t, /^gw-text-link-\d+$/).length, spacing: keys(t, /^gw-space-/).length, radius: keys(t, /^gw-radius-/).length, elevation: keys(t, /^gw-shadow-/).length,
+      'content-width': keys(t, /^gw-content-/).length, breakpoint: keys(t, /^gw-bp-/).length, ruled: keys(t, /^gw-(motion|focus|toast)-/).length, slides: keys(t, /^gw-(slide|text-slide|font-slide)-/).length })[g] || 0;
+  }
+  function emptyLib(what, waiting) {
+    return '<div class="ul-empty"><div class="ul-empty__copy"><h2>No ' + esc(what) + ' approved yet</h2>' +
+      (waiting && owner ? '<p>' + waiting + ' waiting on review. They appear here once passed.</p><button type="button" class="ds-pv" id="lib-to-review">Open the Review tab</button>' : '<p>It appears here once it has been reviewed and passed.</p>') + '</div></div>';
   }
   function renderLibrary(d, t) {
     var s = d.stats;
+    var fAll = (d.items || []).filter(function (x) { return x.kind === 'foundation'; }), cAll = (d.items || []).filter(function (x) { return x.kind === 'component'; });
+    var fOk = fAll.filter(function (x) { return approved(x.scope, x.key); }).length, cOk = cAll.filter(function (x) { return approved(x.scope, x.key); }).length;
     $('ds-lib-stats').innerHTML =
-      metric('Tokens', String(s.tokens), plural(d.foundations.length, 'foundation group')) + metric('Components', String(s.components), 'across ' + plural(d.surfaces.length, 'surface')) +
-      metric('Templates', String(Object.keys(PAIR).length ? (s.recipes + Object.keys(TPL).length - Object.keys(PAIR).length) : s.recipes), 'what to build from') + metric('Passed review', s.passed + ' / ' + s.total, 'foundation groups and components') +
-      metric('Libraries', String(s.libraries), 'foundations plus ' + d.surfaces.length + ' surfaces') + metric('Open gaps', String(s.gaps), 'known gaps in the source');
+      metric('Foundations', fOk + ' / ' + fAll.length, 'groups approved') + metric('Components', cOk + ' / ' + cAll.length, 'approved, across ' + plural(d.surfaces.length, 'surface')) +
+      metric('Templates', String(Object.keys(PAIR).length ? (d.stats.recipes + Object.keys(TPL).length - Object.keys(PAIR).length) : d.stats.recipes), 'what to build from');
     pills($('ds-lib-tabs'), CATS.map(function (c) { return [c.key, c.title]; }), L.cat, function (v) { L.cat = v; setHash(); renderLibrary(d, t); });
     var host = $('ds-fd'), cat = CATS.filter(function (c) { return c.key === L.cat; })[0] || CATS[0], side, main;
     if (cat.key === 'foundations') {
-      var count = {
-        color: keys(t, /^gw-color-/).length, type: keys(t, /^gw-text-/).filter(function (k) { return !/-tracking$/.test(k); }).length + 2, spacing: keys(t, /^gw-space-/).length, radius: keys(t, /^gw-radius-/).length,
-        elevation: keys(t, /^gw-shadow-/).length, layout: keys(t, /^gw-(content|bp)-/).length, motion: keys(t, /^gw-(motion|focus|toast)-/).length, slides: keys(t, /^gw-(slide|text-slide|font-slide)-/).length
-      };
-      var body = { color: fdColor, type: fdType, spacing: fdSpacing, radius: fdRadius, elevation: fdElevation, layout: fdLayout, motion: fdMotion, slides: fdSlides }[F.tab](t);
-      var gk = FD_KEY[F.tab], g = gk && (d.foundations || []).filter(function (x) { return x.key === gk; })[0];
-      side = FD_TABS.map(function (x) { return [x[0], x[1], count[x[0]], x[0] === F.tab]; });
-      var gks = FD_GROUPS[F.tab] || [];
-      main = '<div class="fd-head"><p>' + esc(FD_NOTE[F.tab]) + '</p><div class="fd-rv">' + gks.map(function (k) {
-        var it = BYID['foundation/' + k]; if (!it) return '';
-        var e = eff(it); return '<button type="button" class="fd-rv__b" data-rv="foundation/' + esc(k) + '">' + (gks.length > 1 ? esc(it.label) + ' ' : '') + badgeOf(e.state, e.queued, e.q) + '</button>';
-      }).join('') + '</div></div>' + body;
+      var shown = FD_TABS.filter(function (x) { return (FD_PARTS[x[0]] || []).some(function (p) { return approved('foundation', p[0]); }); });
+      var waitingF = fAll.length - fOk;
+      if (!shown.length) { side = null; main = emptyLib('foundation is', waitingF); }
+      else {
+        if (!shown.some(function (x) { return x[0] === F.tab; })) F.tab = shown[0][0];
+        var okParts = FD_PARTS[F.tab].filter(function (p) { return approved('foundation', p[0]); });
+        var body = okParts.map(function (p) { return p[1](t); }).join('');
+        side = shown.map(function (x) {
+          var n = FD_PARTS[x[0]].filter(function (p) { return approved('foundation', p[0]); }).reduce(function (a, p) { return a + partCount(t, p[0]); }, 0);
+          return [x[0], x[1], n, x[0] === F.tab];
+        });
+        main = '<div class="fd-head"><p>' + esc(FD_NOTE[F.tab]) + '</p><div class="fd-rv">' + okParts.map(function (p) {
+          var it = BYID['foundation/' + p[0]]; if (!it || !owner) return '';
+          var e = eff(it); return '<button type="button" class="fd-rv__b" data-rv="foundation/' + esc(p[0]) + '">' + (okParts.length > 1 ? esc(it.label) + ' ' : '') + badgeOf(e.state, e.queued, e.q) + '</button>';
+        }).join('') + '</div></div>' + body;
+      }
     } else {
       var sub = subOf(cat), sf = sub.surface ? d.surfaces.filter(function (x) { return x.key === sub.surface; })[0] : null;
       side = cat.subs.length > 1 ? cat.subs.map(function (x) {
         var sx = x.surface ? d.surfaces.filter(function (y) { return y.key === x.surface; })[0] : null;
-        return [x.key, x.title, (sx ? sx.components.length : 0) + startPoints(d, x).length, x === sub];
+        return [x.key, x.title, (sx ? sx.components.filter(function (c) { return approved(sx.key, c.name); }).length : 0) + startPoints(d, x).length, x === sub];
       }) : null;
       main = '<div class="fd-head"><p>' + esc((sf && sf.what) || (cat.title + ' · ' + sub.title)) + '</p></div>' + tplCards(startPoints(d, sub)) + compTable(sf);
     }
@@ -1258,6 +1291,8 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     host.querySelectorAll('.fd-side__i').forEach(function (b) {
       b.addEventListener('click', function () { var v = b.getAttribute('data-v'); if (cat.key === 'foundations') F.tab = v; else L.sub[cat.key] = v; setHash(); renderLibrary(d, t); });
     });
+    var toRev = $('lib-to-review');
+    if (toRev) toRev.addEventListener('click', function () { show('review', true); });
     var cf = $('ds-comp-find');
     if (cf) cf.addEventListener('input', function () {
       var q = cf.value.trim().toLowerCase();
@@ -1368,7 +1403,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
      shows its preview file, or its Figma render, or says plainly that it has neither yet. */
   function visualFor(it, t) {
     if (it.kind === 'foundation') {
-      var draw = { color: fdColor, faces: fdFaces, scale: fdScale, links: fdLinks, spacing: fdSpacing, radius: fdRadius, elevation: fdElevation, layout: fdLayout, motion: fdMotion, slides: fdSlides }[it.view];
+      var draw = { color: fdColor, faces: fdFaces, scale: fdScale, links: fdLinks, spacing: fdSpacing, radius: fdRadius, elevation: fdElevation, content: fdContent, bps: fdBreakpoints, motion: fdMotion, slides: fdSlides }[it.view];
       if (draw && t) return '<div class="rv-fd">' + draw(t) + '</div>';
       return '<div class="rv-none"><b>Nothing drawn for this group yet</b><span>Its values are in tokens.css. A drawn view is added the way the others are, in the Foundations library.</span></div>';
     }

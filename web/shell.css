@@ -851,6 +851,8 @@
   /* Black, per 763:2599 — this supersedes the 15 Sep Primary/500 + Primary/600
      chip, which was chosen before any drawing existed for this modal. */
   background: var(--gw-color-black);
+  /* The outline the owner pages' logo chip has (Neutral/800), so a black chip on the dark modal still has an edge. */
+  box-shadow: inset 0 0 0 1px var(--gw-color-neutral-800);
 }
 .gw-modal__chip svg { width: 30px; height: 30px; display: block; }
 .gw-modal__title {
@@ -866,6 +868,9 @@
   color: var(--gw-color-primary-500);
 }
 .gw-modal__dest[hidden] { display: none; }
+/* In dark the page name is Primary/400: 500 is too dark against the modal's near-black ground. */
+:root[data-theme="dark"] .gw-modal__dest { color: var(--gw-color-primary-400); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .gw-modal__dest { color: var(--gw-color-primary-400); } }
 .gw-modal__sub {
   margin: 0 0 var(--gw-space-40);
   font: var(--gw-text-body-16-med);

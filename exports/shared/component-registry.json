@@ -46,5 +46,75 @@
       "breaking": false,
       "doc": "shared-components.md"
     }
+  },
+  "foundations": {
+    "spacing": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-10-02",
+      "fingerprint": "bdf4a3823c2385a3"
+    },
+    "radius": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-10-02",
+      "fingerprint": "3177eaa4adab8f1b"
+    },
+    "elevation": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-10-02",
+      "fingerprint": "7a2720d55cc96752"
+    },
+    "type": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-10-02",
+      "fingerprint": "2c183bce48a6a9c5"
+    },
+    "color": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-10-02",
+      "fingerprint": "8d28631d60543a15"
+    },
+    "breakpoint": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-10-02",
+      "fingerprint": "2d4f716c7bdf5a5b"
+    },
+    "typefaces": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-10-02",
+      "fingerprint": "3b716dac88816c6f"
+    },
+    "content-width": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-10-02",
+      "fingerprint": "328bc00afa631ca5"
+    },
+    "type-links": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-10-02",
+      "fingerprint": "9c1e6facfe4c7417"
+    },
+    "ruled": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-10-02",
+      "fingerprint": "cd39f57a0df5d6bd",
+      "note": "remove focus ring, we dont need it"
+    },
+    "slides": {
+      "reviewed": "rejected",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-10-02",
+      "fingerprint": "8f66ae1cf12b554c",
+      "note": "i will new ones"
+    }
   }
 }

@@ -3,17 +3,17 @@
     "Per-component versions for the marketing web surface. The plugin version tells someone the PLUGIN is",
     "stale; this tells them which of the components THEY used actually changed, which is the only",
     "thing that makes them act. Bump a component's version in the same commit that changes its spec",
-    "\u2014 scripts/check-drift.sh reads this file and a build's stamp, and reports the intersection.",
+    "— scripts/check-drift.sh reads this file and a build's stamp, and reports the intersection.",
     "",
     "version = the plugin version in which that component's spec last changed.",
     "breaking = true when a build using it will render WRONG until updated, as opposed to merely",
     "missing an improvement. It is the difference between a red notice and an amber one.",
     "",
-    "Seeded by deriving, for each spec doc, the first release that shipped its last change \u2014 not",
+    "Seeded by deriving, for each spec doc, the first release that shipped its last change — not",
     "by stamping everything at the current version, which would have told every existing build that",
     "all of its components moved at once.",
     "",
-    "Names come from the decision table in skills/gushwork-web/SKILL.md \u2014 the list a build actually",
+    "Names come from the decision table in skills/gushwork-web/SKILL.md — the list a build actually",
     "chooses from. Several share a doc, because the doc is the spec; a fold-level change therefore",
     "moves every fold. That is coarser than the dashboard's per-component granularity and is the",
     "honest starting point. Bump individually from here."
@@ -187,6 +187,26 @@
       "changed": "2026-08-08",
       "breaking": false,
       "doc": "images.md"
+    }
+  },
+  "review": {
+    "button": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-10-02",
+      "fingerprint": "c579bba41b60f7c2"
+    },
+    "card-case-study": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-10-02",
+      "fingerprint": "b079e9e4b1f933f3"
+    },
+    "card-information": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-10-02",
+      "fingerprint": "167ff79e4a942f32"
     }
   }
 }

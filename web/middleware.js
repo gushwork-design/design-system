@@ -28,7 +28,7 @@ import { loadRules, decide } from './api/_access.js';
 import { recordVisit } from './api/_log-visit.js';
 
 export const config = {
-  matcher: ['/internal/:path*', '/admin/:path*', '/library', '/library/:path*']
+  matcher: ['/internal/:path*', '/admin/:path*', '/library', '/library/:path*', '/previews/:path*']
 };
 
 /* ── THE GATE IS ON, 15 Sep 2026 ─────────────────────────────────────────────
@@ -46,6 +46,10 @@ export const config = {
    the ID card tool shipped with its own client-side password REMOVED on the understanding that
    Google auth would replace it. The old note here said to turn this back on BEFORE adding a
    genuinely private page. That page arrived, so it is on.
+
+   /previews is inside it (added 2 Oct 2026): the drawings the review drawer shows. The rule for it in _access.js had no
+   effect while the matcher left it out, so those files were public. The repo is public, so nothing secret was exposed,
+   but the gate should match what the access rules say.
 
    Still deliberately outside the matcher and still public: the per-surface
    component-registry.json files under /exports (written without a glob here, because the

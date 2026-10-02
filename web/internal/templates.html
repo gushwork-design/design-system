@@ -227,6 +227,46 @@
 })();
 </script>
 <script>
+/* Templates are grouped by what they make: web pages, documents, slides. A bar of the groups filters the page, and "All" shows every
+   group under its own heading. The cards stay as written above; this only sorts them into groups and draws the bar, by their
+   address, so a template added to the list lands in "Other" until it is given a group here. */
+(function () {
+  var GROUPS = [
+    ['web', 'Web pages', ['ad-page', 'ad-page-signup', 'case-study']],
+    ['docs', 'Documents', ['lead-magnet', 'one-pager']],
+    ['slides', 'Slides', ['slide-deck']]
+  ];
+  var cards = [].slice.call(document.querySelectorAll('.tl-cards > .tcard'));
+  var host = document.querySelector('.tl-cards');
+  if (!host || !cards.length) return;
+  function slug(c) { return String(c.getAttribute('data-tool') || '').split('/').pop(); }
+  var byKey = {}, known = {};
+  GROUPS.forEach(function (g) { g[2].forEach(function (s) { known[s] = g[0]; }); byKey[g[0]] = []; });
+  byKey.other = [];
+  cards.forEach(function (c) { (byKey[known[slug(c)]] || byKey.other).push(c); });
+  var groups = GROUPS.concat([['other', 'Other', []]]).filter(function (g) { return byKey[g[0]].length; });
+  var wrap = document.createElement('div'); wrap.className = 'tl-groups';
+  groups.forEach(function (g) {
+    var sec = document.createElement('section'); sec.className = 'tl-grp'; sec.setAttribute('data-grp', g[0]);
+    sec.innerHTML = '<h2 class="tl-grp__h">' + g[1] + '<span>' + byKey[g[0]].length + '</span></h2><div class="tl-cards"></div>';
+    var inner = sec.querySelector('.tl-cards'); byKey[g[0]].forEach(function (c) { inner.appendChild(c); });
+    wrap.appendChild(sec);
+  });
+  var bar = document.createElement('div'); bar.className = 'tl-tabs'; bar.setAttribute('role', 'tablist'); bar.setAttribute('aria-label', 'Template type');
+  var tabs = [['all', 'All', cards.length]].concat(groups.map(function (g) { return [g[0], g[1], byKey[g[0]].length]; }));
+  bar.innerHTML = tabs.map(function (t) { return '<button type="button" role="tab" class="tl-tab" data-g="' + t[0] + '">' + t[1] + '<i>' + t[2] + '</i></button>'; }).join('');
+  host.parentNode.insertBefore(bar, host); host.parentNode.insertBefore(wrap, host); host.parentNode.removeChild(host);
+  function show(g, push) {
+    if (!tabs.some(function (t) { return t[0] === g; })) g = 'all';
+    [].forEach.call(wrap.children, function (s) { s.hidden = g !== 'all' && s.getAttribute('data-grp') !== g; s.classList.toggle('tl-grp--solo', g !== 'all'); });
+    [].forEach.call(bar.children, function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-g') === g)); });
+    if (push) { try { history.replaceState(null, '', g === 'all' ? location.pathname : '#' + g); } catch (e) {} }
+  }
+  bar.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('.tl-tab'); if (b) show(b.getAttribute('data-g'), true); });
+  show(location.hash.replace('#', ''), false);
+})();
+</script>
+<script>
 /* Clipboard needs a user gesture and a secure context; both hold here. execCommand is the
    fallback for browsers without the async API, and if BOTH fail the button says so rather
    than claiming success — a button that lies about copying is worse than one that cannot. */
