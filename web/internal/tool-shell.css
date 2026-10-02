@@ -1083,3 +1083,14 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; appe
    own favicon and login tile carry a hairline (Neutral/800); the tile gets the same ring in
    dark. The tile already clips to radius/8, so the ring follows it. */
 :root[data-theme="dark"] .brand-card .brand-icon { box-shadow: 0 0 0 1px var(--gw-color-neutral-800); }
+
+/* Remove background (ID card): the switch and its progress share one line. The progress reads
+   to the right of the toggle — spinner and percentage — instead of stacking underneath. */
+.polish-line { display: flex; align-items: center; gap: var(--gw-space-12); width: 100%; min-width: 0; }
+.polish-tip-wrap { flex: none; }
+.polish-status {
+  display: inline-flex; align-items: center; gap: var(--gw-space-8);
+  font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking);
+  color: var(--t-label); white-space: nowrap; font-variant-numeric: tabular-nums;
+}
+.polish-spinner { border-color: var(--t-rule); border-top-color: var(--t-heading); }
