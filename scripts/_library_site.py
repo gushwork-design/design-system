@@ -1304,7 +1304,7 @@ def build_review(queue, reg, gaps):
 # A foundation group has a drawn view in the Design System page when its tokens are the kind that can be
 # drawn: swatches, a type scale, spacing bars, shapes, shadows, widths. The rest are named, not drawn yet.
 FOUNDATION_VIEW = {"color": "color", "typefaces": "faces", "type": "scale", "type-links": "links", "spacing": "spacing",
-                   "radius": "radius", "elevation": "elevation", "breakpoint": "layout", "content-width": "layout",
+                   "radius": "radius", "elevation": "elevation", "breakpoint": "bps", "content-width": "content",
                    "ruled": "motion", "slides": "slides"}
 
 
