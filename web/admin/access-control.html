@@ -1291,6 +1291,15 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
   }
   window.addEventListener('hashchange', function () { activeTab = location.hash.slice(1); if (document.getElementById('ac-tabbar')) paintTabs(); });
 
+  /* Ghost while the rules load: a tab bar and a stack of rows, so the page is not blank under its title. */
+  (function () {
+    function g(w, h, r) { return '<span class="gw-ghost" style="width:' + w + ';height:' + h + 'px;border-radius:' + (r || 6) + 'px"></span>'; }
+    var rows = '';
+    for (var i = 0; i < 6; i++) rows += '<div style="display:flex;align-items:center;gap:12px;padding:12px 0">' + g('64px', 40, 8) + g((40 + (i * 7) % 30) + '%', 14) + '<span style="flex:1"></span>' + g('120px', 32, 8) + '</div>';
+    document.getElementById('ac-state').innerHTML = '<div role="status" aria-label="Loading the rules">' +
+      '<div style="display:flex;gap:12px;margin-bottom:24px">' + g('88px', 20) + g('72px', 20) + g('104px', 20) + '</div>' + rows + '</div>';
+  })();
+
   fetch('/api/access', { credentials: 'same-origin' })
     .then(function (r) { return r.json().then(function (b) { return { ok: r.ok, b: b }; }); })
     .then(function (out) {
@@ -1318,8 +1327,6 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
         '</span></div>';
     });
 
-  document.getElementById('ac-state').innerHTML =
-    '<p style="font:var(--gw-text-body-14-reg);color:var(--s-nav-label)">Loading the rules…</p>';
 })();
 </script>
 

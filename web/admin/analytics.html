@@ -1016,11 +1016,33 @@ window.__anRefilter = {};
     var act = $('in-act');
     if (act) act.addEventListener('click', function () { if (kind === 'signin') location.href = '/?signin=required&next=' + encodeURIComponent(location.pathname); else load(); });
   }
+
+  /* Loading state: a block per real element, never an empty card (states.md). The Usage tab already
+     did this; Insights and Visits rendered nothing until the answer arrived. */
+  function sk(w, h) { return '<span class="sk" style="width:' + w + ';height:' + h + 'px"></span>'; }
+  function skMetric(label) {
+    return '<div class="ul-metric"><span class="ul-lab">' + esc(label) + '</span><div class="ul-metric__body">' + sk('88px', 34) + sk('110px', 12) + '</div></div>';
+  }
+  function skRows(n) {
+    var w = [92, 78, 86, 70, 82, 64], out = '';
+    for (var i = 0; i < n; i++) out += sk(w[i % w.length] + '%', 14);
+    return '<div style="display:flex;flex-direction:column;gap:14px;padding:16px 20px">' + out + '</div>';
+  }
+  function renderLoading() {
+    ['in-q-act', 'in-q-skill', 'in-q-ver', 'in-q-never'].forEach(function (id) { $(id).textContent = ''; });
+    $('in-act').innerHTML = [90, 76, 64].map(function (w) { return '<li style="display:block">' + sk(w + '%', 14) + '</li>'; }).join('');
+    $('in-speed').innerHTML = ['Skill to first output', 'Skill runs that made something', 'Sessions that re-ran a skill'].map(skMetric).join('');
+    $('in-tokens').innerHTML = ['Tokens per session', 'Tokens to first output', 'Tokens used'].map(skMetric).join('');
+    $('in-review').innerHTML = ['On-brand on the first pass', 'Outputs written more than once', 'Approved / needs changes'].map(skMetric).join('');
+    $('in-hub').innerHTML = ['Page views', 'Pages opened', 'Never opened'].map(skMetric).join('');
+    $('in-skill').innerHTML = skRows(5);
+    ['in-fail', 'in-ver', 'in-top', 'in-never'].forEach(function (id) { $(id).innerHTML = skRows(3); });
+  }
   function render() {
     var blocked = ['forbidden', 'signin', 'unconfigured', 'empty', 'error'].indexOf(S.status) !== -1;
     $('in-blocked').hidden = !blocked; $('in-app').hidden = blocked; $('in-bar').hidden = blocked;
     if (blocked) { renderBlocked(S.status); return; }
-    if (S.status === 'loading') return;
+    if (S.status === 'loading') { renderLoading(); return; }
     renderAll();
     ROOT.querySelectorAll('.ul-tab').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-period') === S.period)); });
     updated();
@@ -2016,11 +2038,29 @@ window.__anRefilter = {};
       if (kind === 'signin') location.href = '/?signin=required&next=' + encodeURIComponent(location.pathname); else load();
     });
   }
+
+  /* Loading state: a block per real element, never an empty card (states.md). The Usage tab already
+     did this; Visits rendered nothing until the answer arrived. */
+  function sk(w, h) { return '<span class="sk" style="width:' + w + ';height:' + h + 'px"></span>'; }
+  function skMetric(label) {
+    return '<div class="ul-metric"><span class="ul-lab">' + esc(label) + '</span><div class="ul-metric__body">' + sk('88px', 34) + sk('110px', 12) + '</div></div>';
+  }
+  function skRows(n) {
+    var w = [92, 78, 86, 70, 82, 64], out = '';
+    for (var i = 0; i < n; i++) out += sk(w[i % w.length] + '%', 14);
+    return '<div style="display:flex;flex-direction:column;gap:14px;padding:16px 20px">' + out + '</div>';
+  }
+  function renderLoading() {
+    ['vs-q-people', 'vs-q-pages', 'vs-q-recent'].forEach(function (id) { var e = $(id); if (e) e.textContent = ''; });
+    $('vs-metrics').innerHTML = ['Sign-ins', 'Page views', 'Active people'].map(skMetric).join('');
+    ['vs-people', 'vs-pages', 'vs-recent'].forEach(function (id) { $(id).innerHTML = skRows(5); });
+    var more = $('vs-more'); if (more) more.innerHTML = '';
+  }
   function render() {
     var blocked = ['forbidden', 'signin', 'unconfigured', 'empty', 'error'].indexOf(S.status) !== -1;
     $('vs-blocked').hidden = !blocked; $('vs-app').hidden = blocked; $('vs-bar').hidden = blocked;
     if (blocked) { renderBlocked(S.status); return; }
-    if (S.status === 'loading') { $('vs-metrics').innerHTML = ''; return; }
+    if (S.status === 'loading') { renderLoading(); return; }
     renderAll();
     ROOT.querySelectorAll('.ul-tab[data-period]').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-period') === S.period)); });
     ROOT.querySelectorAll('.ul-tab[data-area]').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-area') === S.area)); });
