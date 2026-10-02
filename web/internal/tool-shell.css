@@ -1,0 +1,620 @@
+/* ============================================================================
+   tool-shell.css — the one shell worn by every internal tool (email signature
+   creator, employee ID card generator).
+
+   Loaded AFTER each tool's own styles.css, so it re-skins the editor chrome
+   (panel, fields, segmented controls, sliders, dropdowns, the bottom pill)
+   without touching the artefact being made (the signature, the ID card), which
+   keeps its own inline styles on purpose.
+
+   Everything here is a token from /foundation/tokens.css. Where the dashboard
+   spec gives a measured control, the number is its number (36h buttons at
+   radius/12, 32h fields at radius/8). Anything I chose is marked  CHOSEN.
+
+   Pattern: the editor is a FLOATING PANEL — inset from every edge, rounded,
+   shadowed — over a full-bleed canvas, and it collapses so the preview can
+   take the whole screen.
+   ========================================================================= */
+
+/* ---------------------------------------------------------------------------
+   1. Theme aliases. Two blocks, light and dark, both always declared (an alias
+      declared in only one silently keeps the other's value). The attribute is
+      always present: the tools' <head> script writes it from the hub's
+      `gw-theme` key, and the email tool then drives it from its preview toggle.
+   ------------------------------------------------------------------------ */
+:root,
+:root[data-theme="light"] {
+  --t-canvas:        var(--gw-color-neutral-50);
+  --t-panel-bg:      var(--gw-color-white);
+  --t-panel-border:  var(--gw-color-neutral-100);
+  --t-rule:          var(--gw-color-neutral-100);
+  --t-heading:       var(--gw-color-black);
+  --t-text:          var(--gw-color-neutral-900);
+  --t-label:         var(--gw-color-neutral-600);
+  --t-muted:         var(--gw-color-neutral-400);
+  --t-field-bg:      var(--gw-color-neutral-25);
+  --t-field-border:  var(--gw-color-neutral-100);
+  --t-field-hover:   var(--gw-color-neutral-200);
+  --t-field-focus:   var(--gw-color-neutral-900);
+  --t-field-ro:      var(--gw-color-neutral-50);
+  --t-seg-bg:        var(--gw-color-neutral-50);
+  --t-seg-on-bg:     var(--gw-color-white);
+  --t-seg-on-border: var(--gw-color-neutral-200);
+  --t-hover:         var(--gw-color-neutral-50);
+  --t-btn-border:    var(--gw-color-neutral-200);
+  --t-primary-bg:    var(--gw-color-black);
+  --t-primary-fg:    var(--gw-color-white);
+  --t-primary-hover: var(--gw-color-neutral-850);   /* measured: button.md */
+  --t-track:         var(--gw-color-neutral-100);
+  --t-thumb:         var(--gw-color-black);
+  --t-thumb-ring:    var(--gw-color-white);
+  --t-pill-bg:       var(--gw-color-white);
+  --t-danger:        var(--gw-color-red-400);
+  --t-danger-bg:     var(--gw-color-red-25);
+  --t-ok:            var(--gw-color-green-500);
+  --t-link:          var(--gw-color-primary-500);
+  --t-tip-bg:        var(--gw-color-neutral-900);
+  --t-tip-fg:        var(--gw-color-white);
+  --t-note-bg:       var(--gw-color-orange-25);
+  --t-note-border:   var(--gw-color-orange-100);
+  --t-note-fg:       var(--gw-color-neutral-900);
+  --t-scroll:        var(--gw-color-neutral-200);
+  --t-panel-w:       360px;                         /* CHOSEN: unchanged from the old panel */
+  --t-inset:         12px;                          /* CHOSEN: per Utsav, 2 Oct 2026 */
+}
+
+:root[data-theme="dark"] {
+  --t-canvas:        var(--gw-color-black);
+  --t-panel-bg:      var(--gw-color-neutral-900);
+  --t-panel-border:  var(--gw-color-neutral-800);
+  --t-rule:          var(--gw-color-neutral-800);
+  --t-heading:       var(--gw-color-white);
+  --t-text:          var(--gw-color-neutral-50);
+  --t-label:         var(--gw-color-neutral-300);
+  --t-muted:         var(--gw-color-neutral-400);
+  --t-field-bg:      var(--gw-color-black);
+  --t-field-border:  var(--gw-color-neutral-800);
+  --t-field-hover:   var(--gw-color-neutral-700);
+  --t-field-focus:   var(--gw-color-neutral-300);
+  --t-field-ro:      var(--gw-color-neutral-850);
+  --t-seg-bg:        var(--gw-color-black);
+  --t-seg-on-bg:     var(--gw-color-neutral-800);
+  --t-seg-on-border: var(--gw-color-neutral-700);
+  --t-hover:         var(--gw-color-neutral-800);
+  --t-btn-border:    var(--gw-color-neutral-700);
+  --t-primary-bg:    var(--gw-color-white);          /* R16: dark primary is a white fill */
+  --t-primary-fg:    var(--gw-color-neutral-900);
+  --t-primary-hover: var(--gw-color-neutral-100);
+  --t-track:         var(--gw-color-neutral-700);
+  --t-thumb:         var(--gw-color-white);
+  --t-thumb-ring:    var(--gw-color-neutral-900);
+  --t-pill-bg:       var(--gw-color-neutral-900);
+  --t-danger:        var(--gw-color-red-300);
+  --t-danger-bg:     var(--gw-color-red-alpha-10, rgba(255, 90, 90, .10));
+  --t-ok:            var(--gw-color-green-300);
+  --t-link:          var(--gw-color-primary-300);
+  --t-tip-bg:        var(--gw-color-neutral-700);
+  --t-tip-fg:        var(--gw-color-white);
+  --t-note-bg:       var(--gw-color-neutral-800);
+  --t-note-border:   var(--gw-color-neutral-700);
+  --t-note-fg:       var(--gw-color-neutral-50);
+  --t-scroll:        var(--gw-color-neutral-700);
+}
+
+/* ---------------------------------------------------------------------------
+   2. Canvas
+   ------------------------------------------------------------------------ */
+html, body { background: var(--t-canvas); }
+html[data-theme="dark"] body { background: var(--t-canvas); }
+body {
+  font-family: var(--gw-font-body);
+  color: var(--t-text);
+  transition: none;
+}
+.app {
+  display: block;               /* was a 360 + 1fr grid with a 20px gutter */
+  padding: 0;
+  min-height: 100vh;
+  --t-offset: calc(var(--t-panel-w) + var(--t-inset) * 2);
+}
+.app[data-panel="closed"] { --t-offset: 0px; }
+
+/* The preview owns the whole canvas; padding keeps the artefact clear of the panel. */
+.preview-col {
+  min-height: 100vh;
+  padding-left: var(--t-offset);
+  transition: padding-left 280ms cubic-bezier(.22, 1, .36, 1);
+}
+.preview-col { scrollbar-color: var(--t-scroll) transparent; }
+.preview-col::-webkit-scrollbar-thumb,
+.form-card .form::-webkit-scrollbar-thumb { background-color: var(--t-scroll); }
+
+/* ---------------------------------------------------------------------------
+   3. The floating panel
+   ------------------------------------------------------------------------ */
+.left-col {
+  position: fixed;
+  top: var(--t-inset);
+  left: var(--t-inset);
+  bottom: var(--t-inset);
+  width: var(--t-panel-w);
+  /* explicit height: top+bottom alone left the old sticky rule's flex sizing in charge */
+  height: calc(100vh - var(--t-inset) * 2);
+  align-self: auto;
+  z-index: 40;
+  gap: 0;
+  background: var(--t-panel-bg);
+  border: 1px solid var(--t-panel-border);
+  border-radius: var(--gw-radius-20);
+  box-shadow: var(--gw-shadow-s3);
+  overflow: hidden;
+  transition: transform 280ms cubic-bezier(.22, 1, .36, 1), opacity 200ms ease, visibility 0s linear 0s;
+}
+.app[data-panel="closed"] .left-col {
+  transform: translateX(calc(-100% - var(--t-inset) - 8px));
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: transform 280ms cubic-bezier(.22, 1, .36, 1), opacity 200ms ease, visibility 0s linear 280ms;
+}
+
+/* Header: logo tile (links back to the hub) · title · collapse */
+.brand-card {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--t-rule);
+  border-radius: 0;
+  box-shadow: none;
+  padding: 12px 12px 12px 16px;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.brand-card .brand-link {
+  display: block;
+  flex-shrink: 0;
+  border-radius: var(--gw-radius-8);
+  line-height: 0;
+}
+.brand-card .brand-icon,
+.brand-card img { width: 32px; height: 32px; border-radius: var(--gw-radius-8); }
+.brand-card h1 {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--gw-font-display);
+  font-size: 16px;                     /* CHOSEN: 16/100% Semibold, the phone dashboard-title size */
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0;
+  color: var(--t-heading);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.panel-collapse,
+.panel-reopen {
+  font: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;                          /* icon-button Size=28: outlined standalone */
+  height: 28px;
+  padding: 8px;
+  flex-shrink: 0;
+  color: var(--t-label);
+  background: transparent;
+  border: 1px solid var(--t-btn-border);
+  border-radius: var(--gw-radius-8);
+  cursor: pointer;
+  transition: background var(--gw-motion-fast), color var(--gw-motion-fast);
+}
+.panel-collapse svg,
+.panel-reopen svg { width: 12px; height: 12px; display: block; }
+.panel-collapse:hover,
+.panel-reopen:hover { background: var(--t-hover); color: var(--t-heading); }
+.panel-collapse:focus-visible,
+.panel-reopen:focus-visible,
+.brand-card .brand-link:focus-visible { outline: var(--gw-focus-ring); outline-offset: var(--gw-focus-offset); }
+
+/* Reopen: floats where the panel was, only while it is collapsed */
+.panel-reopen {
+  position: fixed;
+  top: var(--t-inset);
+  left: var(--t-inset);
+  z-index: 40;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: var(--gw-radius-12);   /* control Kind=button Size=36 */
+  background: var(--t-panel-bg);
+  box-shadow: var(--gw-shadow-s2);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 200ms ease, visibility 0s linear 200ms, background var(--gw-motion-fast);
+}
+.panel-reopen svg { width: 16px; height: 16px; }
+.app[data-panel="closed"] .panel-reopen {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 200ms ease 120ms, visibility 0s linear 0s, background var(--gw-motion-fast);
+}
+
+/* Form region */
+.form-card {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  flex: 1;
+  min-height: 0;
+}
+.form-card-subtitle { display: none; }      /* "Editor Panel" was a label for a label */
+.form-card .form { scrollbar-color: var(--t-scroll) transparent; }
+
+/* Sections — section-header rows */
+.prop-section { padding: 16px; gap: 12px; }
+.prop-section + .prop-section,
+.prop-section + .prop-collapse > .prop-section,
+.prop-collapse + .prop-section,
+.prop-collapse + .prop-collapse > .prop-section { border-top: 1px solid var(--t-rule); }
+.prop-section-head h3 {
+  font-family: var(--gw-font-display);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--t-heading);
+}
+.prop-rows { gap: 8px; }
+.prop-row { grid-template-columns: 84px 1fr; gap: 12px; min-height: 36px; }
+.prop-label {
+  font-family: var(--gw-font-body);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--t-label);
+}
+
+/* ---------------------------------------------------------------------------
+   4. Fields — input (32h, radius/8, 1px) on Neutral/25
+   ------------------------------------------------------------------------ */
+.prop-input,
+.prop-textarea,
+.prop-dropdown-trigger,
+.prop-input-prefix,
+.float-field {
+  background: var(--t-field-bg);
+  border: 1px solid var(--t-field-border);
+  border-radius: var(--gw-radius-8);
+  color: var(--t-text);
+  font-family: var(--gw-font-body);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.006em;
+}
+.prop-input { padding: 7px 10px; }
+.prop-input::placeholder,
+.prop-textarea::placeholder,
+.prop-input-prefix input::placeholder,
+.float-field input::placeholder { color: var(--t-muted); font-weight: 400; }
+.prop-input:hover,
+.prop-textarea:hover,
+.prop-dropdown-trigger:hover,
+.prop-input-prefix:hover,
+.float-field:hover { background: var(--t-field-bg); border-color: var(--t-field-hover); }
+.prop-input:focus,
+.prop-textarea:focus,
+.prop-input-prefix:focus-within,
+.float-field:focus-within {
+  background: var(--t-field-bg);
+  border-color: var(--t-field-focus);
+  box-shadow: none;
+  outline: var(--gw-focus-ring);
+  outline-offset: 0;
+}
+.prop-dropdown.open .prop-dropdown-trigger { background: var(--t-field-bg); border-color: var(--t-field-focus); }
+.prop-dropdown-trigger { min-height: 36px; color: var(--t-text); }
+.prop-dropdown-caret { color: var(--t-label); }
+.prop-select {
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--gw-color-neutral-600) 50%),
+    linear-gradient(135deg, var(--gw-color-neutral-600) 50%, transparent 50%);
+}
+
+/* inner fields of the ID card's composed inputs sit flat inside the wrapper */
+.prop-input-prefix input,
+.prop-input-prefix .prop-input,
+.prop-input-phone .prop-phone-number { background: transparent; border: 0; box-shadow: none; outline: 0; color: var(--t-text); }
+.prop-input-prefix-tag,
+.prop-input-phone .prop-phone-code { color: var(--t-label); background: transparent; border-color: var(--t-field-border); }
+
+/* read-only / locked */
+.prop-input[readonly],
+.prop-textarea[readonly],
+.lockable-field .prop-input[readonly],
+.lockable-field .prop-textarea[readonly] { background: var(--t-field-ro); color: var(--t-label); }
+.lock-chip {
+  background: var(--t-panel-bg);
+  border-color: var(--t-field-border);
+  color: var(--t-label);
+  border-radius: var(--gw-radius-4);
+}
+.lock-chip:hover { background: var(--t-hover); color: var(--t-heading); }
+
+/* errors */
+.prop-input.is-error,
+.prop-textarea.is-error,
+.prop-input-prefix.is-error,
+.dropzone.is-error,
+.float-field.error { background: var(--t-field-bg); border-color: var(--t-danger); }
+.prop-row--error .prop-label,
+.float-field .error-text,
+.form-error-banner { color: var(--t-danger); }
+.form-error-banner { background: var(--t-danger-bg); border-color: var(--t-danger); border-radius: var(--gw-radius-8); }
+
+/* ---------------------------------------------------------------------------
+   5. Dropdown menu, segmented, slider, dropzone, toggle
+   ------------------------------------------------------------------------ */
+.prop-dropdown-menu {
+  background: var(--t-panel-bg);
+  border: 1px solid var(--t-panel-border);
+  border-radius: var(--gw-radius-12);
+  box-shadow: var(--gw-shadow-s4);
+  padding: 4px;
+}
+.prop-dropdown-item {
+  color: var(--t-text);
+  border-radius: var(--gw-radius-8);
+  font-weight: 500;
+}
+.prop-dropdown-item:hover,
+.prop-dropdown-item.active:hover { background: var(--t-hover); color: var(--t-heading); }
+.prop-dropdown-item.active { color: var(--t-heading); }
+.prop-dropdown-item-check { color: var(--t-heading); }
+
+.prop-segmented,
+.segmented {
+  background: var(--t-seg-bg);
+  border: 1px solid var(--t-field-border);
+  border-radius: var(--gw-radius-10);
+  padding: 2px;
+  gap: 2px;
+}
+.prop-segmented button,
+.segmented button {
+  border: 1px solid transparent;
+  border-radius: var(--gw-radius-8);
+  color: var(--t-label);
+  font-weight: 500;
+}
+.prop-segmented button:hover:not(:disabled),
+.segmented button:hover { color: var(--t-heading); background: transparent; }
+.prop-segmented button.active,
+.segmented button.active {
+  background: var(--t-seg-on-bg);
+  border-color: var(--t-seg-on-border);
+  color: var(--t-heading);
+  box-shadow: var(--gw-shadow-s2);
+  font-weight: 600;
+  margin: 0;
+}
+.prop-segmented button:disabled { opacity: .5; }
+
+.prop-slider input[type='range']::-webkit-slider-runnable-track,
+.slider-row input[type='range']::-webkit-slider-runnable-track { background: var(--t-track); }
+.prop-slider input[type='range']::-webkit-slider-thumb,
+.slider-row input[type='range']::-webkit-slider-thumb {
+  background: var(--t-thumb);
+  border-color: var(--t-thumb-ring);
+  box-shadow: 0 0 0 1px var(--t-field-border), var(--gw-shadow-s2);
+}
+input[type='range']:focus-visible { outline: var(--gw-focus-ring); outline-offset: var(--gw-focus-offset); border-radius: var(--gw-radius-full); }
+
+.dropzone {
+  background: var(--t-field-bg);
+  border: 1px dashed var(--t-field-hover);
+  border-radius: var(--gw-radius-12);
+  color: var(--t-text);
+}
+.dropzone:hover { background: var(--t-hover); border-color: var(--t-label); }
+.dropzone .copy .name { color: var(--t-heading); }
+.dropzone .copy .hint { color: var(--t-label); }
+.dropzone .clear { border-color: var(--t-btn-border); color: var(--t-label); border-radius: var(--gw-radius-4); background: transparent; }
+.dropzone .clear:hover { background: var(--t-hover); color: var(--t-heading); }
+
+.toggle { background: var(--t-track); }
+.toggle.on { background: var(--t-primary-bg); }            /* On is neutral/900, never blue */
+.toggle::after { background: var(--t-panel-bg); }
+
+.prop-tip, .field > label { color: var(--t-label); }
+.prop-tip strong { color: var(--t-heading); }
+.prop-tip a, .prop-tip-link { color: var(--t-link); border-bottom-color: transparent; }
+.prop-tip a:hover, .prop-tip-link:hover { border-bottom-color: currentColor; }
+.prop-tip-note { background: var(--t-note-bg); border-color: var(--t-note-border); color: var(--t-note-fg); border-radius: var(--gw-radius-8); }
+.prop-tip-note strong { color: var(--t-note-fg); }
+.polish-status--ok { color: var(--t-ok); }
+.polish-status--error { color: var(--t-danger); }
+.polish-tooltip, .copy-tooltip, .moon-tooltip-tip, .email-body .gmail-help-tip, .email-tooltip { background: var(--t-tip-bg); color: var(--t-tip-fg); border-radius: var(--gw-radius-8); }
+.polish-tooltip::after, .email-body .gmail-help-tip::after { border-top-color: var(--t-tip-bg); }
+.help-section { border-color: var(--t-rule); }
+.help-name { color: var(--t-heading); }
+.help-link { color: var(--t-link); }
+
+/* ---------------------------------------------------------------------------
+   6. Floating action bar — control Kind=button, 36h, radius/12
+   ------------------------------------------------------------------------ */
+.floating-toolbar {
+  bottom: 24px;
+  left: calc((100vw + var(--t-offset)) / 2);
+  transition: left 280ms cubic-bezier(.22, 1, .36, 1);
+}
+.tb-pill {
+  background: var(--t-pill-bg);
+  border: 1px solid var(--t-panel-border);
+  border-radius: var(--gw-radius-16);
+  box-shadow: var(--gw-shadow-s3);
+  padding: 4px;
+}
+.tb-pill button {
+  height: 36px;
+  padding: 8px 12px;
+  gap: 4px;
+  border: 1px solid transparent;
+  border-radius: var(--gw-radius-12);
+  color: var(--t-text);
+  font-family: var(--gw-font-body);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.006em;
+}
+.tb-pill button:hover { background: var(--t-hover); color: var(--t-heading); }
+.tb-pill button.active { background: var(--t-hover); color: var(--t-heading); border-color: var(--t-btn-border); }
+.tb-pill button.icon-only { padding: 8px 10px; }
+.tb-pill button:focus-visible { outline: var(--gw-focus-ring); outline-offset: var(--gw-focus-offset); }
+.tb-pill .btn-primary,
+.download-pill .btn-primary {
+  background: var(--t-primary-bg);
+  color: var(--t-primary-fg);
+  border-color: transparent;
+}
+.tb-pill .btn-primary:hover,
+.download-pill .btn-primary:hover { background: var(--t-primary-hover); color: var(--t-primary-fg); }
+.tb-pill .btn-primary.copied { background: var(--t-ok); color: var(--gw-color-white); }
+.tb-pill .btn-primary.btn-error,
+.tb-pill > button.btn-error { background: var(--t-danger-bg); color: var(--t-danger); border-color: var(--t-danger); }
+.dl-prompt { color: var(--t-label); font-size: 13px; }
+
+.split-menu,
+.download-menu,
+.email-menu {
+  background: var(--t-panel-bg);
+  border: 1px solid var(--t-panel-border);
+  border-radius: var(--gw-radius-12);
+  box-shadow: var(--gw-shadow-s4);
+}
+.split-menu-item { border-radius: var(--gw-radius-8); color: var(--t-text); }
+.split-menu-item:hover { background: var(--t-hover); }
+.split-menu-item .item-hint, .split-menu-item .item-tag { color: var(--t-label); }
+.dl-section-label { color: var(--t-label); }
+.dl-check:hover { background: var(--t-hover); }
+.dl-divider { background: var(--t-rule); }
+
+/* ---------------------------------------------------------------------------
+   7. Preview stage (the ID card tool's cards sit on this)
+   ------------------------------------------------------------------------ */
+.cards-stage .stage-label,
+.card-frame .card-caption { color: var(--t-label); }
+
+/* ---------------------------------------------------------------------------
+   8. Narrow screens — the panel overlays instead of pushing
+      CHOSEN: below 900px the preview keeps the full width and the panel floats
+      over it, because 360 + a card does not fit.
+   ------------------------------------------------------------------------ */
+@media (max-width: 900px) {
+  .app { --t-offset: 0px; }
+  .app[data-panel="open"] .left-col { box-shadow: var(--gw-shadow-s4); }
+  .floating-toolbar { left: 50%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .left-col, .preview-col, .floating-toolbar, .panel-reopen { transition: none; }
+}
+
+/* ---------------------------------------------------------------------------
+   9. Appearance + Help — the hub's top-right controls (shell.css .gw-iconbtn,
+      .gw-theme__menu, .gw-pop__menu--mini), floating on the canvas.
+      24x24 icon button, 16px glyph, radius/4, 8 gap — measured 795:5462.
+      The inset from the corner is CHOSEN (the hub's bar is 40 in a white panel;
+      on a bare canvas 16 reads as the same margin the floating panel uses).
+   ------------------------------------------------------------------------ */
+.t-acts {
+  position: fixed;
+  top: var(--t-inset);
+  right: var(--t-inset);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: var(--gw-space-8);
+  padding: var(--gw-space-4);
+  border-radius: var(--gw-radius-12);
+}
+.t-pop { position: relative; display: flex; }
+.t-iconbtn {
+  position: relative;
+  width: 24px; height: 24px; flex: none;
+  display: grid; place-items: center;
+  padding: 0; border: 0; border-radius: var(--gw-radius-4);
+  background: none;
+  color: var(--gw-color-neutral-600);
+  cursor: pointer;
+  transition: color var(--gw-motion-fast), background var(--gw-motion-fast);
+}
+:root[data-theme="dark"] .t-iconbtn { color: var(--gw-color-neutral-300); }
+.t-iconbtn svg { width: 16px; height: 16px; display: block; }
+.t-iconbtn:hover,
+.t-iconbtn[aria-expanded="true"] { color: var(--t-heading); background: var(--t-hover); }
+.t-iconbtn:focus-visible { outline: var(--gw-focus-ring); outline-offset: var(--gw-focus-offset); }
+
+/* hover tooltip: white pill, 1px Neutral/200 edge, radius/8, body-14-med */
+.t-iconbtn[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute; top: calc(100% + var(--gw-space-4)); left: 50%;
+  transform: translateX(-50%);
+  padding: var(--gw-space-4) var(--gw-space-8);
+  border: 1px solid var(--gw-color-neutral-200);
+  border-radius: var(--gw-radius-8);
+  background: var(--t-panel-bg); color: var(--t-heading);
+  font: var(--gw-text-body-14-med); letter-spacing: var(--gw-text-body-14-med-tracking);
+  white-space: nowrap; box-shadow: var(--gw-shadow-s2);
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transition: opacity var(--gw-motion-fast), visibility var(--gw-motion-fast);
+  z-index: 70;
+}
+.t-iconbtn[data-tip-end]::after { left: auto; right: 0; transform: none; }
+.t-iconbtn[data-tip]:hover::after,
+.t-iconbtn[data-tip]:focus-visible::after { opacity: 1; visibility: visible; }
+.t-iconbtn[data-tip][aria-expanded="true"]::after { opacity: 0; visibility: hidden; }
+:root[data-theme="dark"] .t-iconbtn[data-tip]::after { border-color: var(--gw-color-neutral-700); }
+
+.t-menu {
+  position: absolute; top: calc(100% + var(--gw-space-8)); right: 0;
+  z-index: 60;
+  min-width: 160px;
+  display: flex; flex-direction: column; gap: var(--gw-space-2);
+  padding: var(--gw-space-4);
+  border-radius: var(--gw-radius-12);
+  background: var(--t-panel-bg);
+  border: 1px solid var(--t-panel-border);
+  box-shadow: var(--gw-shadow-s3);
+}
+.t-menu[hidden] { display: none; }
+.t-menu--help { min-width: 190px; }
+.t-menu__opt,
+.t-menu__row {
+  display: flex; align-items: center; gap: var(--gw-space-8);
+  height: 32px; padding: 0 var(--gw-space-8);
+  border: 0; border-radius: var(--gw-radius-8);
+  background: none; color: var(--t-heading);
+  font: var(--gw-text-button-14); letter-spacing: 0;
+  text-decoration: none; text-align: left; cursor: pointer;
+  transition: background var(--gw-motion-fast);
+}
+.t-menu__opt svg,
+.t-menu__row svg { width: 16px; height: 16px; flex: none; display: block; }
+.t-menu__opt:hover,
+.t-menu__row:hover { background: var(--t-hover); }
+.t-menu__opt[aria-checked="true"] { background: var(--gw-color-neutral-100); }
+:root[data-theme="dark"] .t-menu__opt[aria-checked="true"] { background: var(--gw-color-neutral-600); }
+.t-menu__opt:focus-visible,
+.t-menu__row:focus-visible { outline: var(--gw-focus-ring); outline-offset: -2px; }
+
+/* ---------------------------------------------------------------------------
+   10. The email preview sits straight on the canvas — no container. Its text
+       colours follow the app theme (the bar's sun/moon and Appearance are the
+       same setting), so it reads on Neutral/50 and on black alike.
+   ------------------------------------------------------------------------ */
+.preview-content,
+html[data-theme] .preview-content[data-theme] {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  color: var(--t-text);
+}
+.preview-content[data-theme="dark"] .email-body { color: rgba(229, 231, 235, 0.72); }
