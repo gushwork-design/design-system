@@ -1,7 +1,8 @@
 // Bruce the concierge (web/api/_concierge.js) and how the Slack events handler routes to him.
 // No network and no model: Slack and Upstash are pretended. Run: node scripts/concierge.test.mjs
 import crypto from 'node:crypto';
-import { buildCatalog, missingFiles, understand, compose } from '../web/api/_concierge.js';
+import { buildCatalog, missingFiles, understand, compose, SITE } from '../web/api/_concierge.js';
+import { FAQ, EXAMPLES } from '../web/api/_bruce-faq.js';
 
 process.env.SLACK_SIGNING_SECRET = 'sig-secret';
 process.env.SLACK_BOT_TOKEN = 'xoxb-test';
@@ -56,6 +57,27 @@ for (const q of ['hey', 'thanks', 'white logo', 'logo and colour sheet', 'fonts'
 for (let i = 0; i < 12; i++) { const txt = compose(understand('white logo', catalog), catalog, String(i)).text; if (/!|\p{Extended_Pictographic}/u.test(txt)) ok('voice across seeds', false, txt); }
 ok('the wording varies between messages', new Set(Array.from({ length: 12 }, (_, i) => compose(understand('white logo', catalog), catalog, String(i)).text.split('\n')[0])).size > 1);
 ok('the same message always gets the same words', compose(understand('white logo', catalog), catalog, '55.5').text === compose(understand('white logo', catalog), catalog, '55.5').text);
+
+/* ---- the basic answers about the site ---- */
+const KNOWN_PATHS = new Set(['/', '/style-guide', '/style-guide#logo', '/downloads', '/internal/claude-plugin', '/internal/tools', '/internal/templates', '/internal/changelog', '/internal/staging']);
+ok('every answer has example questions', FAQ.every((f) => (EXAMPLES[f.id] || []).length >= 2));
+for (const f of FAQ) {
+  for (const q of EXAMPLES[f.id] || []) {
+    const u = understand(q, catalog);
+    const got = u.parts[0] && u.parts[0].type === 'faq' ? u.parts[0].faq.id : u.parts[0]?.type || 'none';
+    if (got !== f.id) ok(`"${q}" gets the ${f.id} answer`, false, `got ${got}`);
+    else pass++;
+  }
+  const text = f.answer((path, label) => `<${SITE}${path}|${label}>`).join('\n');
+  ok(`${f.id}: no exclamation mark or emoji`, !/!/.test(text) && !/\p{Extended_Pictographic}/u.test(text), text);
+  ok(`${f.id}: not one of the old facts we removed`, !/design@gushwork\.ai/.test(text));
+  const paths = [...text.matchAll(/<https?:\/\/[^/|>]+([^|>]*)\|/g)].map((m) => m[1]);
+  ok(`${f.id}: every link goes to a page that exists`, paths.every((p) => KNOWN_PATHS.has(p)), JSON.stringify(paths));
+}
+a = ask('how do I sign up');                         ok('"how do I sign up" is about signing in, not the sign-up ad page', a.u.parts[0]?.faq?.id === 'signin');
+a = ask('sign-up ad page template');                 ok('"sign-up ad page template" is still the template', a.u.parts[0]?.type === 'templates');
+a = ask('how do I use claude to build a page');      ok('"how do I use it to build" is an answer, not a design request', !a.u.designRequest);
+a = ask('white logo');                               ok('asking for a file is still a file', a.u.parts[0]?.type === 'assets' && a.r.files.length > 0);
 
 /* ---- pretend Slack and Upstash ---- */
 const calls = [];

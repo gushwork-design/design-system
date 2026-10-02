@@ -20,6 +20,7 @@
 
 import { existsSync, readFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
+import { matchFaq } from './_bruce-faq.js';
 
 export const SITE = (process.env.SITE_BASE || 'https://design.gushwork.ai').replace(/\/$/, '');
 
@@ -199,7 +200,9 @@ export function understand(text, catalog) {
     const hit = tools.filter((x) => words.some((w) => x.words.includes(w)));
     parts.push({ type: 'tools', entries: hit.length ? hit : tools });
   }
-  if (has(words, TEMPLATE_KEYS) && !(toolHit && !has(words, templateWords))) {
+  const templateHits = words.filter((w) => TEMPLATE_KEYS.includes(w));
+  const onlySignup = templateHits.length > 0 && templateHits.every((w) => w === 'signup');   // “how do I sign up” is about signing in
+  if (templateHits.length && !onlySignup && !(toolHit && !has(words, templateWords))) {
     const templates = catalog.filter((x) => x.kind === 'template');
     const generic = has(words, ['template', 'templates']) && !words.some((w) => templates.some((t) => t.words.includes(w) && !['page', 'document', 'sheet'].includes(w)));
     const scored = templates.map((x) => ({ x, s: words.filter((w) => x.words.includes(w) && w !== 'page').length })).filter((r) => r.s > 0).sort((a, b) => b.s - a.s);
@@ -207,11 +210,15 @@ export function understand(text, catalog) {
     const entries = generic || !scored.length ? templates : scored.filter((r) => r.s === best).map((r) => r.x);
     parts.push({ type: 'templates', entries, all: entries.length === templates.length });
   }
+  // Basic questions about the site, the plugin and who to ask. A confident match wins even over a weak keyword hit;
+  // a thin one only answers when nothing else did.
+  const faq = matchFaq(words, raw);
+  if (faq && (faq.score >= 3 || !parts.length)) { parts.length = 0; parts.push({ type: 'faq', faq: faq.faq }); }
   if (!parts.length) {
     const pages = catalog.filter((x) => x.kind === 'page').map((x) => ({ x, s: words.filter((w) => x.words.includes(w)).length })).filter((r) => r.s > 0).sort((a, b) => b.s - a.s);
     if (pages.length) parts.push({ type: 'pages', entries: pages.filter((r) => r.s === pages[0].s).map((r) => r.x) });
   }
-  const designRequest = has(words, DESIGN_VERBS) && !parts.some((p) => p.type === 'tools' || p.type === 'assets');
+  const designRequest = has(words, DESIGN_VERBS) && !parts.some((p) => p.type === 'tools' || p.type === 'assets' || p.type === 'faq');
   return { parts, designRequest, help, greeting: greetingOnly, thanks: thanksOnly };
 }
 
@@ -231,6 +238,7 @@ export const HELP = [
   '• fonts, and the design tokens (CSS, JSON, SCSS, Tailwind)',
   '• templates: ad page, case study, lead magnet, one-pager',
   '• tools: the email signature creator and the ID card generator',
+  '• basics: how to sign in, install the Claude plugin, update it, or who to ask',
   'I don’t design things myself. If you need something made, I’ll hand you the template and the prompt to run with Claude.',
 ].join('\n');
 
@@ -295,6 +303,7 @@ export function compose(u, catalog, seedText = '') {
       for (const { entry, files: fs } of p.picks) for (const f of fs) files.push({ path: f.path, title: `${entry.title} (${f.format}, ${f.note})` });
       texts.push(lines.join('\n'));
     } else if (p.type === 'templates') { texts.push(templateBlock(p.entries, p.all, seed)); linked = true; }
+    else if (p.type === 'faq') { const t = p.faq.answer((path, label) => link(path, label)).join('\n'); texts.push(t); }   // these answers say what needs a sign-in themselves, so no footer
     else {
       texts.push(p.entries.map((x) => `${pick(['Here’s the', 'That’s the', 'You want the'], seed)} *${x.title}*. ${x.blurb} ${link(x.page || '/', 'Open it')}.`).join('\n'));
       linked = true;
