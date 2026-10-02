@@ -65,22 +65,22 @@
 
 :root[data-theme="dark"] {
   --t-canvas:        var(--gw-color-black);
-  --t-panel-bg:      var(--gw-color-neutral-900);
-  --t-panel-border:  var(--gw-color-neutral-800);
-  --t-rule:          var(--gw-color-neutral-800);
-  --t-heading:       var(--gw-color-white);
+  --t-panel-bg:      var(--gw-color-black);          /* live hub: the panel is the same surface as the frame; a hairline draws it */
+  --t-panel-border:  var(--gw-color-neutral-900);
+  --t-rule:          var(--gw-color-neutral-900);
+  --t-heading:       var(--gw-color-neutral-100);    /* live hub: softened from white 1 Oct 2026 */
   --t-text:          var(--gw-color-neutral-50);
-  --t-label:         var(--gw-color-neutral-300);
+  --t-label:         var(--gw-color-neutral-400);
   --t-muted:         var(--gw-color-neutral-400);
   --t-field-bg:      var(--gw-color-black);
-  --t-field-border:  var(--gw-color-neutral-800);
+  --t-field-border:  var(--gw-color-neutral-850);
   --t-field-hover:   var(--gw-color-neutral-700);
   --t-field-focus:   var(--gw-color-neutral-300);
   --t-field-ro:      var(--gw-color-neutral-850);
   --t-seg-bg:        var(--gw-color-black);
   --t-seg-on-bg:     var(--gw-color-neutral-800);
   --t-seg-on-border: var(--gw-color-neutral-700);
-  --t-hover:         var(--gw-color-neutral-800);
+  --t-hover:         color-mix(in srgb, var(--gw-color-neutral-900) 55%, transparent);
   --t-btn-border:    var(--gw-color-neutral-700);
   --t-primary-bg:    var(--gw-color-white);          /* R16: dark primary is a white fill */
   --t-primary-fg:    var(--gw-color-neutral-900);
@@ -88,7 +88,7 @@
   --t-track:         var(--gw-color-neutral-700);
   --t-thumb:         var(--gw-color-white);
   --t-thumb-ring:    var(--gw-color-neutral-900);
-  --t-pill-bg:       var(--gw-color-neutral-900);
+  --t-pill-bg:       var(--gw-color-black);
   --t-danger:        var(--gw-color-red-300);
   --t-danger-bg:     var(--gw-color-red-alpha-10, rgba(255, 90, 90, .10));
   --t-ok:            var(--gw-color-green-300);
@@ -618,3 +618,182 @@ html[data-theme] .preview-content[data-theme] {
   color: var(--t-text);
 }
 .preview-content[data-theme="dark"] .email-body { color: rgba(229, 231, 235, 0.72); }
+
+/* ---------------------------------------------------------------------------
+   11. The hub's control family. Fields and dropdowns follow the hub's own forms
+       (admin/access-control.html .ac-field / .ac-dd); toggles follow the
+       dashboard `tab-group` and `icon-toggle-group` specs. Heights are 36
+       (the dashboard input and button size) where the hub's forms use 40 —
+       CHOSEN, because this panel is dense.
+   ------------------------------------------------------------------------ */
+:root,
+:root[data-theme="light"] {
+  --t-tabs-bg:        var(--gw-color-neutral-50);    /* tab-group fill */
+  --t-tabs-border:    var(--gw-color-neutral-100);   /* tab-group 1px */
+  --t-tab-on-bg:      var(--gw-color-black);         /* tab-item active */
+  --t-tab-on-fg:      var(--gw-color-white);
+  --t-tab-fg:         var(--gw-color-neutral-900);   /* inactive labels are NOT greyed */
+  --t-itg-border:     var(--gw-color-neutral-200);   /* icon-toggle-group 1px */
+  --t-itg-off-icon:   var(--gw-color-neutral-600);
+  --t-field-icon:     var(--gw-color-neutral-600);
+  --t-card-bg:        var(--gw-color-white);
+}
+:root[data-theme="dark"] {
+  --t-tabs-bg:        var(--gw-color-neutral-900);
+  --t-tabs-border:    var(--gw-color-neutral-800);
+  --t-tab-on-bg:      var(--gw-color-white);          /* dark active inverts */
+  --t-tab-on-fg:      var(--gw-color-black);
+  --t-tab-fg:         var(--gw-color-white);
+  --t-itg-border:     var(--gw-color-neutral-700);
+  --t-itg-off-icon:   var(--gw-color-white);
+  --t-field-icon:     var(--gw-color-neutral-300);
+  --t-card-bg:        var(--gw-color-black);
+}
+
+/* Fields — .ac-field: field fill, 1px field border, radius/10, shadow s2, body-14-reg */
+.prop-input,
+.prop-textarea,
+.prop-input-prefix,
+.float-field {
+  min-height: 36px;
+  border-radius: var(--gw-radius-10);
+  background: var(--t-field-bg);
+  border: 1px solid var(--t-field-border);
+  box-shadow: var(--gw-shadow-s2);
+  color: var(--t-heading);
+  font: var(--gw-text-body-14-reg);
+  letter-spacing: var(--gw-text-body-14-reg-tracking);
+}
+.prop-input,
+.prop-textarea { padding: 0 var(--gw-space-12); }
+.prop-textarea { padding-top: var(--gw-space-8); padding-bottom: var(--gw-space-8); }
+.prop-input::placeholder,
+.prop-textarea::placeholder { color: var(--t-muted); }
+.prop-input:hover,
+.prop-textarea:hover,
+.prop-input-prefix:hover,
+.float-field:hover { border-color: var(--gw-color-neutral-300); }
+.prop-input:focus,
+.prop-textarea:focus,
+.prop-input-prefix:focus-within,
+.float-field:focus-within {
+  border-color: var(--t-field-border);
+  box-shadow: var(--gw-shadow-s2);
+  outline: var(--gw-focus-ring);
+  outline-offset: var(--gw-focus-offset);
+}
+.prop-input-prefix input,
+.prop-input-prefix .prop-input,
+.prop-input-phone .prop-phone-number { box-shadow: none; outline: 0; min-height: 0; font: var(--gw-text-body-14-reg); }
+.prop-input[readonly],
+.prop-textarea[readonly],
+.lockable-field .prop-input[readonly],
+.lockable-field .prop-textarea[readonly] { box-shadow: none; }
+
+/* Dropdown — .ac-dd__btn: card fill, radius/10, s2; open border is Primary/500 */
+.prop-dropdown-trigger {
+  min-height: 36px;
+  padding: 0 var(--gw-space-12);
+  background: var(--t-card-bg);
+  border: 1px solid var(--t-field-border);
+  border-radius: var(--gw-radius-10);
+  box-shadow: var(--gw-shadow-s2);
+  color: var(--t-heading);
+  font: var(--gw-text-body-14-reg);
+  letter-spacing: var(--gw-text-body-14-reg-tracking);
+  transition: border-color var(--gw-motion-fast);
+}
+.prop-dropdown-trigger:hover { background: var(--t-card-bg); border-color: var(--gw-color-neutral-300); }
+.prop-dropdown.open .prop-dropdown-trigger { background: var(--t-card-bg); border-color: var(--gw-color-primary-500); }
+.prop-dropdown-trigger:focus-visible { outline: var(--gw-focus-ring); outline-offset: var(--gw-focus-offset); }
+.prop-dropdown-caret { color: var(--t-field-icon); }
+.prop-dropdown-menu { padding: var(--gw-space-4); gap: 0; }
+.prop-dropdown-item {
+  padding: var(--gw-space-8) var(--gw-space-12);
+  font: var(--gw-text-body-14-med);
+  letter-spacing: var(--gw-text-body-14-med-tracking);
+}
+.prop-dropdown-item-check { color: var(--gw-color-primary-500); }
+
+/* Yes / No and every two-way switch — dashboard tab-group + tab-item:
+   container 36h radius/12, padding 4, gap 4, neutral/50 + 1px neutral/100;
+   items 28h radius/8 body-12-med; active is black on white (inverted in dark). */
+.prop-segmented,
+.segmented {
+  height: 36px;
+  padding: var(--gw-space-4);
+  gap: var(--gw-space-4);
+  background: var(--t-tabs-bg);
+  border: 1px solid var(--t-tabs-border);
+  border-radius: var(--gw-radius-12);
+  box-shadow: none;
+}
+.prop-segmented button,
+.segmented button {
+  height: 26px;                           /* 36 - 2x4 padding - 2x1 border: the drawn 28 cannot fit inside a 1px border under border-box */
+  padding: 0 var(--gw-space-12);
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 0;
+  border-radius: var(--gw-radius-8);
+  background: transparent;
+  color: var(--t-tab-fg);
+  font: var(--gw-text-body-12-med);
+  letter-spacing: var(--gw-text-body-12-med-tracking);
+}
+.prop-segmented button:hover:not(:disabled):not(.active),
+.segmented button:hover:not(.active) { background: var(--t-hover); color: var(--t-tab-fg); }
+.prop-segmented button.active,
+.segmented button.active {
+  background: var(--t-tab-on-bg);
+  color: var(--t-tab-on-fg);
+  border: 0;
+  box-shadow: none;
+  font-weight: 500;
+  margin: 0;
+}
+.prop-segmented button:focus-visible,
+.segmented button:focus-visible { outline: var(--gw-focus-ring); outline-offset: var(--gw-focus-offset); }
+
+/* Floating bar — three groups, each a hub control:
+   sun/moon = icon-toggle-group (no fill, 1px neutral/200, 66x36);
+   Desktop/Mobile = tab-group; Download / Copy = control Kind=button 36h radius/12. */
+.tb-pill {
+  gap: var(--gw-space-4);
+  padding: var(--gw-space-4);
+  border-radius: var(--gw-radius-12);
+  box-shadow: var(--gw-shadow-s2);
+}
+.tb-pill[role="tablist"] { background: var(--t-tabs-bg); border: 1px solid var(--t-tabs-border); }
+.tb-pill[aria-label="Preview background"] {
+  background: var(--t-pill-bg);
+  border: 1px solid var(--t-itg-border);
+  gap: var(--gw-space-2);
+}
+.tb-pill[role="tablist"] button {
+  height: 26px; padding: 0 var(--gw-space-12);
+  border: 0; border-radius: var(--gw-radius-8);
+  color: var(--t-tab-fg);
+  font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking);
+}
+.tb-pill[role="tablist"] button:hover:not(.active) { background: var(--t-hover); }
+.tb-pill[role="tablist"] button.active { background: var(--t-tab-on-bg); color: var(--t-tab-on-fg); border: 0; }
+.tb-pill[aria-label="Preview background"] button {
+  width: 28px; height: 28px; padding: 0; justify-content: center;
+  color: var(--t-itg-off-icon);
+}
+.tb-pill[aria-label="Preview background"] button.active { background: var(--t-tab-on-bg); color: var(--t-tab-on-fg); }
+.tb-pill[aria-label="Preview background"] svg { width: 12px; height: 12px; }
+/* the action group carries no container of its own */
+.tb-pill:not([role="tablist"]):not(.toolbar-pill) { background: transparent; border: 0; box-shadow: none; padding: 0; gap: var(--gw-space-8); }
+.tb-pill:not([role="tablist"]):not(.toolbar-pill) > button,
+.tb-pill:not([role="tablist"]):not(.toolbar-pill) .copy-btn-wrap > button {
+  height: 36px; padding: 0 var(--gw-space-12);
+  border-radius: var(--gw-radius-12);
+  font: var(--gw-text-button-14); letter-spacing: 0;
+}
+.tb-pill:not([role="tablist"]):not(.toolbar-pill) > button:not(.btn-error) {
+  background: var(--t-card-bg);
+  border: 1px solid var(--t-btn-border);               /* control Kind=button, Style=outlined */
+  box-shadow: var(--gw-shadow-s2);
+}
+.tb-pill:not([role="tablist"]):not(.toolbar-pill) > button:not(.btn-error):hover { background: var(--t-hover); }
