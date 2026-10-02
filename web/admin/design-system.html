@@ -638,9 +638,9 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .fd-side { position: sticky; top: 112px; display: flex; flex-direction: column; gap: 2px; }
 .fd-side__i { all: unset; box-sizing: border-box; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-8); height: 36px; padding: 0 var(--gw-space-12); border-radius: var(--gw-radius-10); font: var(--gw-text-body-14-med); color: var(--ul-cell); transition: background var(--gw-motion-fast), color var(--gw-motion-fast); }
 .fd-side__i i { font: 500 12px/1 var(--gw-font-body); font-style: normal; color: var(--ul-sub); font-variant-numeric: tabular-nums; }
-.fd-side__i:hover { background: var(--ul-row-hover); color: var(--ul-value); }   /* lighter than the selected row, so hovering never looks like selecting */
-.fd-side__i[aria-current="true"] { background: var(--ul-tab-hover); color: var(--ul-value); }
-.fd-side__i[aria-current="true"]:hover { background: var(--ul-tab-hover); }
+.fd-side__i:hover { background: var(--s-nav-hover); color: var(--ul-value); }   /* the sidebar's own hover and selected fills, so the rail reads as the same family (neutral-850 is a pure grey that sits outside it) */
+.fd-side__i[aria-current="true"] { background: var(--s-nav-sel); color: var(--ul-value); }
+.fd-side__i[aria-current="true"]:hover { background: var(--s-nav-sel); }
 .fd-side__i[aria-current="true"] i { color: var(--ul-value); }
 .fd-side__i:focus-visible { outline: var(--gw-focus-ring); outline-offset: 2px; }
 @media (max-width: 767px) {
