@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="/foundation/tokens.css">
 <link rel="stylesheet" href="/shell.css?v=ghost1">
 <script src="/shell.js?v=ghost1" defer></script>
-<link rel="stylesheet" href="/cards.css?v=5">
+<link rel="stylesheet" href="/cards.css?v=6">
 <body data-gw-page="tools">
 
 <div class="sg">
@@ -37,7 +37,7 @@
           <div class="tcard__b">
             <div class="bdgs">
               <span class="bdg bdg--type">Tool</span>
-              <span class="bdg" data-tool-badge hidden></span>
+              <span class="bdg bdg--ghost" data-tool-badge aria-hidden="true"></span>
               <span class="bdg bdg--on">Active</span>
             </div>
             <div class="tcard__t">
@@ -64,7 +64,7 @@
           <div class="tcard__b">
             <div class="bdgs">
               <span class="bdg bdg--type">Tool</span>
-              <span class="bdg" data-tool-badge hidden></span>
+              <span class="bdg bdg--ghost" data-tool-badge aria-hidden="true"></span>
               <span class="bdg bdg--on">Active</span>
             </div>
             <div class="tcard__t">
@@ -99,7 +99,7 @@
       [].forEach.call(document.querySelectorAll('[data-tool]'), function (card) {
         var info = d.tools[card.getAttribute('data-tool')]; if (!info) return;
         var b = card.querySelector('[data-tool-badge]');
-        if (b) { b.textContent = info.label; b.hidden = false; }
+        if (b) { b.textContent = info.label; b.hidden = false; b.classList.remove('bdg--ghost'); b.removeAttribute('aria-hidden'); }
         if (!info.canOpen) {
           card.classList.add('tcard--locked');
           card.removeAttribute('href');
@@ -109,7 +109,9 @@
         }
       });
     })
-    .catch(function () { /* no live badge is a fine answer */ });
+    .catch(function () { /* no live badge is a fine answer */ })
+    /* whichever way it went, a badge that is still a ghost has nothing to say: drop it */
+    .then(function () { [].forEach.call(document.querySelectorAll('.bdg--ghost'), function (e) { e.hidden = true; }); });
 })();
 </script>
 </body></html>

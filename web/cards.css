@@ -233,3 +233,9 @@ body:is([data-gw-page="tools"], [data-gw-page="templates"]) .tcard__bar i:nth-ch
   body:is([data-gw-page="tools"], [data-gw-page="templates"]) .tl-go svg { transition: transform 280ms var(--tl-spring); }
   body:is([data-gw-page="tools"], [data-gw-page="templates"]) a.tcard:not(.tcard--locked):hover .tl-go svg { transform: translate(4px, -4px); }
 }
+
+/* The access badge is filled in by /api/tools. Until it answers, a ghost chip holds its place so the badge row
+   does not grow when it lands; if there is no answer, the chip is dropped. */
+.bdg--ghost { width: 76px; background: var(--s-ghost); color: transparent; animation: gw-ghost-pulse 1.6s ease-in-out infinite; }
+.bdg--ghost[hidden] { display: none; }
+@media (prefers-reduced-motion: reduce) { .bdg--ghost { animation: none; } }

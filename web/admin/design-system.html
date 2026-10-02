@@ -1608,13 +1608,38 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   function indexItems(d) { ITEMS = d.items || []; BYID = {}; ITEMS.forEach(function (it) { BYID[idOf(it)] = it; }); }
   function reviewRefresh() { if (reviewData && started.review && !$('ds-review-app').hidden) renderReview(reviewData); if (libData) renderLibrary(libData, libTok); }
 
+  /* ---------------- loading (ghost) state ----------------
+     The Library and Review tabs were empty cards until their data arrived. A block per real element
+     instead (states.md: never a 0, never nothing, while data is in flight). */
+  function sk(w, h) { return '<span class="sk" style="width:' + w + ';height:' + h + 'px"></span>'; }
+  function skMetric() {
+    return '<div class="ul-metric">' + sk('72px', 10) + '<div class="ul-metric__body">' + sk('88px', 34) + sk('110px', 12) + '</div></div>';
+  }
+  function skRows(n) {
+    var w = [92, 78, 86, 70, 82, 64], out = '';
+    for (var i = 0; i < n; i++) out += sk(w[i % w.length] + '%', 14);
+    return '<div style="display:flex;flex-direction:column;gap:14px;padding:16px 20px">' + out + '</div>';
+  }
+  function libLoading() {
+    $('ds-lib-stats').innerHTML = skMetric() + skMetric() + skMetric();
+    $('ds-lib-tabs').innerHTML = sk('72px', 28) + sk('96px', 28) + sk('84px', 28);
+    $('ds-fd').innerHTML = '<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">' +
+      [0, 1, 2, 3, 4, 5].map(function () { return '<div style="display:flex;flex-direction:column;gap:12px;padding:8px;border-radius:16px;border:1px solid var(--s-card-border)">' + sk('100%', 160) + sk('60%', 16) + sk('90%', 12) + '</div>'; }).join('') + '</div>';
+  }
+  function revLoading() {
+    $('ds-rev-stats').innerHTML = skMetric() + skMetric() + skMetric();
+    $('ds-rev-table').innerHTML = skRows(6);
+  }
+
   /* ---------------- tabs ---------------- */
   function start(name) {
     if (started[name]) return; started[name] = 1;
+    if (name === 'library') libLoading();
     if (name === 'library') Promise.all([data(), tokens(), prompts(), owner ? loadQueued() : Promise.resolve()]).then(function (r) { libData = r[0]; libTok = r[1]; indexItems(r[0]); renderLibrary(r[0], r[1]); })
       .catch(function () { $('ds-fd').innerHTML = '<div class="ul-empty"><div class="ul-empty__copy"><h2>Could not load the library</h2></div></div>'; });
     if (name === 'review') me.then(function () {
       $('ds-review-lock').hidden = owner; $('ds-review-app').hidden = !owner;
+      if (owner) revLoading();
       if (owner) Promise.all([data(), loadQueued()]).then(function (r) {
         reviewData = r[0]; renderReview(r[0]);
         $('ds-gh-check').addEventListener('click', function () {
