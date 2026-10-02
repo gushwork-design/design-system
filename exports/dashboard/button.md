@@ -114,7 +114,7 @@ values were wrong:
 
 | `Style` | Hover — measured | Node | Was ruled | Delta |
 |---|---|---|---|---|
-| `Primary` | **`--gw-color-neutral-850` `#333333`** | `2203:839` | `neutral-900` `#262a2e` | one step lighter |
+| `Primary` | **`--gw-color-neutral-850` `#2e3338`** | `2203:839` | `neutral-900` `#262a2e` | one step lighter |
 | `Outline` | **`--gw-color-neutral-35` `#f5f5f5`** fill | `2203:875` | `neutral-25` `#f7f8f9` | one step darker |
 | `Ghost` | **`--gw-color-neutral-50` `#f1f2f3`** | `2203:911` | `neutral-25` `#f7f8f9` | two steps darker |
 
