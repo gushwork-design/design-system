@@ -198,5 +198,10 @@
       "source": "/api/tools",
       "destination": "/api/gw?action=tools"
     }
-  ]
+  ],
+  "functions": {
+    "api/gw.js": {
+      "includeFiles": "{assets/logo/**,assets/color/**,fonts/*.ttf,foundation/tokens.*,foundation/tailwind-theme.js,internal/templates.html}"
+    }
+  }
 }

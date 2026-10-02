@@ -30,6 +30,7 @@
    ========================================================================= */
 
 import crypto from 'node:crypto';
+import { handleMessage } from './_concierge.js';
 
 const APPROVE_EMOJI = new Set(['white_check_mark', 'heavy_check_mark', 'ballot_box_with_check']);
 const QUEUE_KEY = 'gw:approvals';
@@ -101,6 +102,27 @@ export default async function handler(req, res) {
   if (!signatureValid(req, raw)) return res.status(401).json({ error: 'bad signature' });
 
   const event = payload.event || {};
+
+  /* BRUCE THE CONCIERGE (see _concierge.js). The same Slack app answers people who @Bruce in a channel or DM him: it hands
+     over brand assets and points at templates and tools. No model is called. Slack redelivers an event it thinks was not
+     acknowledged in 3 seconds, so retries are acknowledged and dropped, and the event id is remembered for an hour. */
+  if (event.type === 'app_mention' || (event.type === 'message' && event.channel_type === 'im')) {
+    if (req.headers['x-slack-retry-num']) return res.status(200).json({ ok: true, ignored: 'retry' });
+    const token = process.env.SLACK_BOT_TOKEN;
+    if (!token) return res.status(200).json({ ok: true, ignored: 'no bot token' });
+    const cfg = store();
+    if (cfg && payload.event_id) {
+      try {
+        const [{ result }] = await redis(cfg, [['SET', `gw:slack:ev:${payload.event_id}`, '1', 'NX', 'EX', '3600']]);
+        if (result !== 'OK') return res.status(200).json({ ok: true, ignored: 'duplicate' });
+      } catch { /* no dedupe is better than no answer */ }
+    }
+    const owners = new Set((process.env.SLACK_REVIEWER_IDS || '').split(',').map((x) => x.trim()).filter(Boolean));
+    const out = await handleMessage(event, { token, root: process.cwd(), owners });
+    if (out.did === 'error') console.warn('[concierge]', out.error);
+    return res.status(200).json({ ok: true, concierge: out.did });
+  }
+
   // Anything that is not an approval reaction is ignored — quietly, and with a 200 so Slack
   // does not retry it. reaction_removed is deliberately not handled: the reverse of a pass
   // is an explicit --reject with a note, not a silently removed emoji.
