@@ -729,10 +729,6 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .fd-comp { cursor: pointer; }
 .fd-comp__t .ds-a { all: unset; cursor: pointer; font: 600 13.5px/1.3 var(--gw-font-body); color: var(--ul-value); overflow-wrap: anywhere; text-align: left; }
 .fd-comp__t .ds-a:hover { text-decoration: underline; text-underline-offset: 3px; }
-.fd-rv { display: flex; flex-wrap: wrap; align-items: center; gap: var(--gw-space-8); }
-.fd-rv__b { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: var(--gw-space-8); height: 32px; padding: 0 var(--gw-space-12); border-radius: var(--gw-radius-10); box-shadow: inset 0 0 0 1px var(--ul-ctl-line); font: var(--gw-text-button-14); color: var(--ul-ctl-fg); }
-.fd-rv__b:hover { background: var(--ul-ctl-hover); }
-.fd-rv__b:focus-visible { outline: var(--gw-focus-ring); outline-offset: 2px; }
 .fd-link { color: var(--gw-color-primary-500); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 :root[data-theme="dark"] .fd-link { color: var(--gw-color-primary-300); }
 .fd-r__s--demo { display: flex; align-items: center; overflow: visible; }
@@ -1214,7 +1210,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   }
   function compCard(sf, c) {
     return '<div class="fd-comp" data-id="' + esc(sf.key + '/' + c.name) + '" data-q="' + esc((c.name + ' ' + (c.doc || '')).toLowerCase()) + '">' +
-      '<div class="fd-comp__t"><button type="button" class="ds-a" data-rv="' + esc(sf.key + '/' + c.name) + '" title="Open the review view">' + esc(c.name) + '</button>' + (BYID[sf.key + '/' + c.name] ? badgeOf(eff(BYID[sf.key + '/' + c.name]).state, eff(BYID[sf.key + '/' + c.name]).queued, eff(BYID[sf.key + '/' + c.name]).q) : review(c.review)) + '</div>' +
+      '<div class="fd-comp__t"><button type="button" class="ds-a" data-rv="' + esc(sf.key + '/' + c.name) + '" title="Open the details">' + esc(c.name) + '</button></div>' +
       '<div class="fd-comp__m">v' + esc(c.version || '—') + ' · moved ' + esc(c.changed || '—') + (c.breaking ? ' <span class="ul-badge ul-badge--bad">breaking</span>' : '') + '</div>' +
       (c.doc ? '<a class="fd-comp__d" href="' + esc(docHref(sf.key, c.doc)) + '" target="_blank" rel="noopener" title="Open ' + esc(c.doc) + ' on GitHub">' + esc(String(c.doc).split('/').pop()) + '</a>' : '') + '</div>';
   }
@@ -1271,10 +1267,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
           var n = FD_PARTS[x[0]].filter(function (p) { return approved('foundation', p[0]); }).reduce(function (a, p) { return a + partCount(t, p[0]); }, 0);
           return [x[0], x[1], n, x[0] === F.tab];
         });
-        main = '<div class="fd-head"><p>' + esc(FD_NOTE[F.tab]) + '</p><div class="fd-rv">' + okParts.map(function (p) {
-          var it = BYID['foundation/' + p[0]]; if (!it || !owner) return '';
-          var e = eff(it); return '<button type="button" class="fd-rv__b" data-rv="foundation/' + esc(p[0]) + '">' + (okParts.length > 1 ? esc(it.label) + ' ' : '') + badgeOf(e.state, e.queued, e.q) + '</button>';
-        }).join('') + '</div></div>' + body;
+        main = '<div class="fd-head"><p>' + esc(FD_NOTE[F.tab]) + '</p></div>' + body;
       }
     } else {
       var sub = subOf(cat), sf = sub.surface ? d.surfaces.filter(function (x) { return x.key === sub.surface; })[0] : null;
