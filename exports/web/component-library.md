@@ -169,7 +169,7 @@ Small, or disabled, resolves to nothing.
 
 Type is `button-14-med` / `button-16-med` / `button-18-med` — one per size, all `lineHeight: 1`.
 Fills and borders come from `Primary/500-main` and `Primary/600` (hover), `Neutral/black`,
-`Neutral/850` `#333333`, `Neutral/35` `#f5f5f5`, `Neutral/50`, `100`, `200`, `250`, `300`,
+`Neutral/850` `#2e3338`, `Neutral/35` `#f5f5f5`, `Neutral/50`, `100`, `200`, `250`, `300`,
 `Alpha/10-black`, `Alpha/10-white`, `Alpha/50-white`, `White`. Elevation is `Shadows/S2` and
 `Shadows/S3`. Spacing is `Spacing/8`.
 

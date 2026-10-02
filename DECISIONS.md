@@ -1114,3 +1114,12 @@ Ruled by Utsav, 2 Oct 2026. The Library is the system as it stands, so a foundat
 - **What changes on the page.** A foundation tab appears only if at least one of its groups is approved (Typography can show its typefaces and not its type scale); a category lists only its approved components, with "N not yet" beside the count, and says "No component here is approved yet" when it has none. The top tiles count approved against total.
 - **The owner sees one more thing:** a Pass they have just pressed and not yet had recorded, so their own work does not vanish while it waits to be merged. Everyone else sees what the registry holds.
 - **Consequence today:** with few items passed in the registry, the Library is nearly empty until reviews are recorded and merged. That is the gate working, not a fault.
+
+## R39 — neutral-850 is retinted to sit inside the grey family
+Ruled by Utsav, 2 Oct 2026. `neutral-850` was `#333333`, a pure grey with no hue, between `800` `#4d545c` and `900` `#262a2e`, which are cool blue-greys. Anywhere it was used next to them (the dark hub's lines and hovers, the dashboard's Primary button hover, slide body copy) it read as off-colour.
+
+- **New value `#2e3338`.** Same lightness as before (20%), with the hue (about 211°) and saturation (about 9–10%) interpolated from 800 and 900, so nothing gets lighter or darker, only less neutral.
+- **Figma is the source and moves first.** The variable `Colors/Neutral/850` in the library file is changed to `#2e3338`; this change in code follows it, so the two never disagree. Until the variable is changed in Figma, do not merge this.
+- **What moved with it:** `tokens.css`, `tokens.json`, `tokens.scss`, `tailwind-theme.js`, the four page templates and examples that copy the ramp, the preview and colour sheets, the slide deck builder, and the two docs that quote the hex. Everything that uses the variable follows without edits.
+- **Review:** Colour in the Foundations library re-expires and has to be approved again. The dashboard Primary button doc (`button.md`) quotes the new hex for its hover; the measurement in Figma changes with the variable.
+- **Not changed:** `35` (`#f5f5f5`, pure grey) and `250` (`#bcbec2`, a near-twin of `300`) are also outside the family; flagged for a later ruling.
