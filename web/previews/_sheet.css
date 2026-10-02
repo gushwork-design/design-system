@@ -212,4 +212,5 @@ box-shadow:0 16px 32px -12px #585c5f1a;transition:background var(--mf)}
 .lgn-b:focus-visible,.lgn-g:focus-visible,.lgn-f:focus-visible{
 outline:2px solid #0070ff66;outline-offset:2px}
 
+.rvp{display:flex;flex-direction:column;gap:16px}
 .rvmore{margin-top:14px}.rvmore>summary{cursor:pointer;font:600 13px/1.4 var(--body,Inter,sans-serif);color:var(--ink2);padding:8px 0}.rvmore[open]>summary{margin-bottom:10px}

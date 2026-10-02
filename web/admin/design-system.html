@@ -656,12 +656,28 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .fd-head p { margin: 0; font: var(--gw-text-body-14-reg); color: var(--ul-sub); max-width: 62ch; }
 .fd-head__r { display: flex; align-items: center; gap: var(--gw-space-12); }
 .fd-sec { display: flex; flex-direction: column; gap: var(--gw-space-16); }
-/* ---- Review drawer and inbox. A drawer rather than a page: the list stays where it was, and Pass advances to the
+/* ---- Review drawer and inbox. A drawer rather than a page: the list stays where it was, and Approve advances to the
    next thing waiting, so a long queue is a run of decisions, not a run of page loads. ---- */
 .rv-scrim { position: fixed; inset: 0; z-index: 80; background: rgba(13, 13, 13, .38); }
 .rv { position: fixed; top: 0; right: 0; bottom: 0; z-index: 81; width: min(560px, 100vw); display: flex; flex-direction: column; background: var(--s-panel-bg); outline: 0;
   box-shadow: inset 1px 0 0 var(--ul-hdr-line), -28px 0 56px -28px rgba(0, 0, 0, .4); }
 .rv[hidden], .rv-scrim[hidden] { display: none; }
+/* Expanded: the drawer opens out to nearly the full window so every variant is on screen at once. The picture takes the wide
+   column, and the details sit beside it rather than under it. */
+.rv { transition: width .22s ease; }
+.rv--wide { width: min(1280px, calc(100vw - 48px)); }
+.rv--wide .rv-body { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: var(--gw-space-32); align-content: start; align-items: start; }
+.rv-sh { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-12); }
+.rv-ex { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 var(--gw-space-12); border-radius: var(--gw-radius-8); color: var(--ul-ctl-fg); font: 500 12.5px/1 var(--gw-font-body); box-shadow: inset 0 0 0 1px var(--ul-ctl-line); }
+.rv-ex:hover { background: var(--ul-ctl-hover); }
+.rv-ex:focus-visible, .rv-more:focus-visible { outline: var(--gw-focus-ring); outline-offset: 2px; }
+.rv-ex svg { width: 14px; height: 14px; flex: none; }
+.rv-vis { position: relative; }
+.rv-vis--cap { max-height: 520px; overflow: hidden; }
+.rv-vis--cap::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 120px; pointer-events: none; background: linear-gradient(to bottom, transparent, var(--s-panel-bg)); }
+.rv-more { all: unset; box-sizing: border-box; cursor: pointer; align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 var(--gw-space-16); border-radius: var(--gw-radius-12); font: var(--gw-text-button-14); color: var(--ul-ctl-fg); box-shadow: inset 0 0 0 1px var(--ul-ctl-line); }
+.rv-more:hover { background: var(--ul-ctl-hover); }
+.rv-more[hidden] { display: none; }
 .rv-h { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--gw-space-12); padding: var(--gw-space-20) var(--gw-space-24) var(--gw-space-16); box-shadow: inset 0 -1px 0 var(--ul-hdr-line); }
 .rv-h__t { min-width: 0; }
 .rv-h__s { font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
@@ -710,7 +726,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .rv-b--pass:hover:not(:disabled) { background: var(--ul-prim-hover); }
 .rv-b--ghost { background: none; color: var(--ul-ctl-fg); box-shadow: inset 0 0 0 1px var(--ul-ctl-line); }
 .rv-b--ghost:hover:not(:disabled) { background: var(--ul-ctl-hover); }
-/* Send back is the page's primary button (white in dark, black in light), like Pass. It was yellow, which belongs to no
+/* Send back is the page's primary button (white in dark, black in light), like Approve. It was yellow, which belongs to no
    button in this system. */
 .rv-b--warn { background: var(--ul-prim-bg); color: var(--ul-prim-fg); }
 .rv-b--warn:hover:not(:disabled) { background: var(--ul-prim-hover); }
@@ -724,6 +740,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   #ds-rev-table .ul-row > :nth-child(2), #ds-rev-table .ul-row > :nth-child(4), #ds-rev-table .ul-row > :nth-child(5) { display: none; }
   .rv-h { padding: var(--gw-space-16); } .rv-body { padding: var(--gw-space-16); } .rv-foot { padding: var(--gw-space-12) var(--gw-space-16); }
   .rv-hint { display: none; }
+  .rv-ex { display: none; } .rv--wide { width: 100vw; }
 }
 .rv-row .rv-go { margin: 0; height: 28px; }
 .fd-comp { cursor: pointer; }
@@ -840,7 +857,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       <div id="ds-review-lock" hidden>
         <div class="ul-sec"><div class="ul-empty">
           <div class="ul-empty__c"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96Zm112,152H48V96H208V208Zm-68-56a12,12,0,1,1-12-12A12,12,0,0,1,140,152Z"/></svg></div>
-          <div class="ul-empty__copy"><h2>Review needs an owner account</h2><p>Passing a component lets it into the skills, so only an owner can open this tab. Sign in with an owner Google account to continue. You will come back here afterwards.</p></div>
+          <div class="ul-empty__copy"><h2>Review needs an owner account</h2><p>Approving a component lets it into the skills, so only an owner can open this tab. Sign in with an owner Google account to continue. You will come back here afterwards.</p></div>
           <button class="ul-btn" id="ds-signin" type="button">Sign in with an owner account</button>
         </div></div>
       </div>
@@ -888,13 +905,13 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 <div class="block">
   <div class="eyebrow"><i>3</i><h2>Where nothing verifies the result</h2></div>
   <p class="lede">The same system seen from the library&rsquo;s side. <strong>One spine</strong> —
-  everything is measured, drawn on the sheet, and passes your review before it reaches the skill.</p>
+  everything is measured, drawn on the sheet, and gets your approval before it reaches the skill.</p>
   <figure><div class="figframe"><svg id="d3" class="flow" viewBox="0 0 1000 444" role="img" aria-label="One spine. Figma and work built directly in Claude Code are both measured into exports, which are drawn on the review sheet. Nothing enters the skill until it has been reviewed and passed there. The skill is then built into a stamped artifact, and check-drift.sh is the machine check that reads the stamp. Four handoffs are unchecked: Figma to exports, exports to the sheet, built-here to exports, and skills to artifact."><path class="wf-e" d="M180 150 H220"/><path class="wf-e" d="M380 150 H420"/><path class="wf-e wf-e--d" d="M580 150 H620"/><path class="wf-e" d="M780 150 H820"/><path class="wf-e wf-e--d" d="M180 316 H278.0 Q300.0 316 300.0 294 V188"/><path class="wf-e" d="M900.0 188 V278"/><rect class="wf-n" x="20" y="112" width="160" height="76" rx="14"/><text class="wf-x wf-x--title" x="100.0" y="145.5" text-anchor="middle">Figma</text><text class="wf-x wf-x--sub wf-x--sub-c" x="100.0" y="165.0" text-anchor="middle">where you draw</text><rect class="wf-n wf-n--ring-blue" x="220" y="112" width="160" height="76" rx="14"/><text class="wf-x wf-x--title" x="300.0" y="145.5" text-anchor="middle">exports/*.md</text><text class="wf-x wf-x--sub wf-x--sub-c" x="300.0" y="165.0" text-anchor="middle">measured, node-traceable</text><rect class="wf-n wf-n--ring-ink" x="420" y="112" width="160" height="76" rx="14"/><text class="wf-x wf-x--title" x="500.0" y="145.5" text-anchor="middle">review-sheet.html</text><text class="wf-x wf-x--sub wf-x--sub-c" x="500.0" y="165.0" text-anchor="middle">draws only what is measured</text><rect class="wf-n" x="620" y="112" width="160" height="76" rx="14"/><text class="wf-x wf-x--title" x="700.0" y="145.5" text-anchor="middle">skills/</text><text class="wf-x wf-x--sub wf-x--sub-c" x="700.0" y="165.0" text-anchor="middle">what Claude reads</text><rect class="wf-n" x="820" y="112" width="160" height="76" rx="14"/><text class="wf-x wf-x--title" x="900.0" y="145.5" text-anchor="middle">artifact</text><text class="wf-x wf-x--sub wf-x--sub-c" x="900.0" y="165.0" text-anchor="middle">+ gushwork-build stamp</text><rect class="wf-n" x="20" y="278" width="160" height="76" rx="14"/><text class="wf-x wf-x--title" x="100.0" y="311.5" text-anchor="middle">built here</text><text class="wf-x wf-x--sub wf-x--sub-c" x="100.0" y="331.0" text-anchor="middle">straight into Claude Code</text><rect class="wf-n" x="820" y="278" width="160" height="76" rx="14"/><text class="wf-x wf-x--title" x="900.0" y="311.5" text-anchor="middle">check-drift.sh</text><text class="wf-x wf-x--sub wf-x--sub-c" x="900.0" y="331.0" text-anchor="middle">the machine check</text><text class="wf-x wf-x--col" x="100.0" y="28" text-anchor="middle">ORIGIN</text><text class="wf-x wf-x--col" x="300.0" y="28" text-anchor="middle">SOURCE OF TRUTH</text><text class="wf-x wf-x--col" x="500.0" y="28" text-anchor="middle">THE GATE</text><text class="wf-x wf-x--col" x="700.0" y="28" text-anchor="middle">BUILD INPUT</text><text class="wf-x wf-x--col" x="900.0" y="28" text-anchor="middle">OUTPUT</text><circle class="wf-p" cx="180" cy="150" r="4"/><circle class="wf-p" cx="220" cy="150" r="4"/><circle class="wf-ch" cx="200.0" cy="150" r="11"/><text class="wf-cht" x="200.0" y="154" text-anchor="middle">1</text><circle class="wf-p" cx="380" cy="150" r="4"/><circle class="wf-p" cx="420" cy="150" r="4"/><circle class="wf-ch" cx="400.0" cy="150" r="11"/><text class="wf-cht" x="400.0" y="154" text-anchor="middle">2</text><circle class="wf-p wf-p--d" cx="580" cy="150" r="4"/><circle class="wf-p wf-p--d" cx="620" cy="150" r="4"/><circle class="wf-p" cx="780" cy="150" r="4"/><circle class="wf-p" cx="820" cy="150" r="4"/><circle class="wf-ch" cx="800.0" cy="150" r="11"/><text class="wf-cht" x="800.0" y="154" text-anchor="middle">4</text><circle class="wf-p wf-p--d" cx="180" cy="316" r="4"/><circle class="wf-p wf-p--d" cx="300.0" cy="188" r="4"/><circle class="wf-ch" cx="300.0" cy="254" r="11"/><text class="wf-cht" x="300.0" y="258" text-anchor="middle">3</text><text class="wf-x wf-x--edge" x="190" y="336" text-anchor="start">measured the same way</text><circle class="wf-p" cx="900.0" cy="188" r="4"/><circle class="wf-p" cx="900.0" cy="278" r="4"/><rect class="wf-pl" x="852.6" y="223" width="94.7" height="20" rx="10"/><text class="wf-pt" x="900.0" y="236.8" text-anchor="middle">carries stamp</text><text class="wf-x wf-x--edge" x="200.0" y="214" text-anchor="middle">measure</text><text class="wf-x wf-x--edge" x="400.0" y="214" text-anchor="middle">drawn on the sheet</text><text class="wf-x wf-x--edge" x="600.0" y="214" text-anchor="middle">you review and pass</text><text class="wf-x wf-x--edge" x="800.0" y="214" text-anchor="middle">build</text><circle class="wf-ch" cx="29" cy="396" r="9"/><text class="wf-cht wf-cht--s" x="29" y="400" text-anchor="middle">n</text><text class="wf-x wf-x--edge" x="46" y="400" text-anchor="start">unchecked handoff</text><line class="wf-e wf-e--d" x1="20" y1="424" x2="37" y2="424"/><text class="wf-x wf-x--edge" x="46" y="428" text-anchor="start">ruled 15 Sep, mechanism not built yet</text></svg></div>
   <figcaption>The discipline behind this is already sound — values are read off specific Figma nodes
   and written with the node id attached, and where a written spec disagrees with a measured node, the
   measured node wins. What is missing is <strong>closure</strong>: nothing reports the size of the gap,
   or notices when it grows. <strong>Ruled 15 September:</strong> measured and created, then drawn on
-  the sheet, then into the skill only once you have reviewed and passed it.</figcaption></figure>
+  the sheet, then into the skill only once you have reviewed and approved it.</figcaption></figure>
 
   <ol class="gaps">
     <li><span class="num">1</span><div>
@@ -913,7 +930,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       <b>Work built here takes the same spine now, but nothing carries it</b>
       <p><em>Ruled 15 September:</em> anything built directly in Claude Code is measured into
       <code>exports/*.md</code> like anything else, drawn on the review sheet, and enters the skill only
-      once you have reviewed and passed it. No side door. What the ruling lacks is a mechanism — both
+      once you have reviewed and approved it. No side door. What the ruling lacks is a mechanism — both
       steps are manual today, which is why the route is dashed and still numbered.</p></div></li>
     <li><span class="num">4</span><div>
       <b>The font rule was absolute in a target that cannot obey it</b>
@@ -962,7 +979,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       (rows.length ? rows.join('') : '<div class="ul-empty"><div class="ul-empty__copy"><h2>' + esc(empty) + '</h2></div></div>') + '</div>';
   }
   function row(cells) { return '<div class="ul-row ul-row--d" role="row">' + cells.join('') + '</div>'; }
-  function review(state) { return '<span class="ul-badge' + (state === 'passed' ? ' ul-badge--ok' : state === 'rejected' ? ' ul-badge--bad' : '') + '">' + (state === 'passed' ? 'passed' : state === 'rejected' ? 'rejected' : 'not reviewed') + '</span>'; }
+  function review(state) { return '<span class="ul-badge' + (state === 'passed' ? ' ul-badge--ok' : state === 'rejected' ? ' ul-badge--bad' : '') + '">' + (state === 'passed' ? 'approved' : state === 'rejected' ? 'rejected' : 'not reviewed') + '</span>'; }
   function pills(host, items, cur, on) {
     host.innerHTML = items.map(function (it) { return '<button class="ul-tab" role="tab" data-v="' + esc(it[0]) + '" aria-selected="' + (it[0] === cur) + '">' + esc(it[1]) + '</button>'; }).join('');
     host.querySelectorAll('.ul-tab').forEach(function (b) { b.addEventListener('click', function () { on(b.getAttribute('data-v')); }); });
@@ -1227,7 +1244,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   }
   /* THE LIBRARY SHOWS ONLY WHAT HAS BEEN APPROVED (Utsav, 2 Oct 2026). Something is approved when its review state is
      passed and the source has not moved since: pending, in rework, rejected and expired are not shown here, they are in
-     the Review tab. An owner also sees a pass they have just pressed (it is "being recorded"), so their own work does not
+     the Review tab. An owner also sees an approval they have just pressed (it is "being recorded"), so their own work does not
      vanish; everyone else sees only what the registry holds. */
   function approved(scope, key) { var it = BYID[scope + '/' + key]; return !!it && eff(it).state === 'passed'; }
   var FD_PARTS = {
@@ -1244,7 +1261,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   }
   function emptyLib(what, waiting) {
     return '<div class="ul-empty"><div class="ul-empty__copy"><h2>No ' + esc(what) + ' approved yet</h2>' +
-      (waiting && owner ? '<p>' + waiting + ' waiting on review. They appear here once passed.</p><button type="button" class="ds-pv" id="lib-to-review">Open the Review tab</button>' : '<p>It appears here once it has been reviewed and passed.</p>') + '</div></div>';
+      (waiting && owner ? '<p>' + waiting + ' waiting on review. They appear here once approved.</p><button type="button" class="ds-pv" id="lib-to-review">Open the Review tab</button>' : '<p>It appears here once it has been reviewed and approved.</p>') + '</div></div>';
   }
   function renderLibrary(d, t) {
     var s = d.stats;
@@ -1325,10 +1342,10 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 
   /* ---------------- Review ---------------- */
   /* ---------------- Review: the inbox, and a drawer to look at one thing and decide ----------------
-     Pass, Rework and Reject are buttons. They do not edit the repo (a site cannot, and main needs a reviewed PR):
+     Approve, Rework and Reject are buttons. They do not edit the repo (a site cannot, and main needs a reviewed PR):
      they queue the decision (/api/review) and the next Claude session records it with the fingerprint that was
      on screen, so a decision made on something that has since moved is refused rather than applied. */
-  var STATE_LABEL = { pending: 'not reviewed', expired: 'expired', passed: 'passed', rejected: 'rejected', rework: 'in rework' };
+  var STATE_LABEL = { pending: 'not reviewed', expired: 'expired', passed: 'approved', rejected: 'rejected', rework: 'in rework' };
   var STATE_CLASS = { passed: ' ul-badge--ok', rejected: ' ul-badge--bad', expired: ' ul-badge--warn', rework: ' ul-badge--warn' };
   function badgeOf(state, queued, q) {
     var tail = !queued ? '' : (q && q.pr && q.pr.url
@@ -1336,7 +1353,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       : '<span class="rv-q">being recorded</span>');
     return '<span class="ul-badge' + (STATE_CLASS[state] || '') + '">' + esc(STATE_LABEL[state] || state) + '</span>' + tail;
   }
-  var QSTATE = {}, ITEMS = [], BYID = {}, RV = { filter: 'waiting', list: [], i: 0, open: false, mode: '' };
+  var QSTATE = {}, ITEMS = [], BYID = {}, RV = { filter: 'waiting', list: [], i: 0, open: false, mode: '', wide: false };
   function idOf(it) { return it.scope + '/' + it.key; }
   function eff(it) {
     var q = QSTATE[idOf(it)];
@@ -1352,7 +1369,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       .then(function (j) { QSTATE = j.state || {}; }).catch(function () { QSTATE = {}; });
   }
   function scopeTitle(it) { return it.kind === 'foundation' ? 'Foundations' : it.surface; }
-  var FILTERS = [['waiting', 'Waiting'], ['rework', 'In rework'], ['passed', 'Passed'], ['rejected', 'Rejected']];
+  var FILTERS = [['waiting', 'Waiting'], ['rework', 'In rework'], ['passed', 'Approved'], ['rejected', 'Rejected']];
   function inFilter(it, f) {
     var s = eff(it).state;
     return f === 'waiting' ? (s === 'pending' || s === 'expired') : s === f;
@@ -1367,7 +1384,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     indexItems(d);
     var count = function (f) { return ITEMS.filter(function (it) { return inFilter(it, f); }).length; };
     $('ds-rev-stats').innerHTML = metric('Waiting on you', String(count('waiting')), 'never reviewed, or changed since') + metric('In rework', String(count('rework')), 'sent back with a note') +
-      metric('Passed', String(count('passed')), 'of ' + ITEMS.length + ', let into the skills');
+      metric('Approved', String(count('passed')), 'of ' + ITEMS.length + ', let into the skills');
     pills($('ds-rev-tabs'), FILTERS.map(function (f) { return [f[0], f[1] + ' ' + count(f[0])]; }), RV.filter, function (v) { RV.filter = v; RF.shown = 30; renderReview(d); });
     var q = RF.q.trim().toLowerCase();
     var list = ITEMS.filter(function (it) { return inFilter(it, RV.filter) && (!q || (it.label + ' ' + scopeTitle(it)).toLowerCase().indexOf(q) !== -1); });
@@ -1421,12 +1438,30 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
         if (w > bw + 1) { k = bw / w; inner.style.width = w + 'px'; }
         inner.style.transform = k < 1 ? 'scale(' + k + ')' : 'none'; inner.style.transformOrigin = '0 0';
         box.style.height = Math.ceil(inner.offsetHeight * k) + 'px';
+        settleVis();
       };
       var css = root.querySelector('link[href$="_sheet.css"]');
       if (css) css.addEventListener('load', fit);
       root.addEventListener('toggle', fit, true);   // a folded set opening changes the height
       fit(); setTimeout(fit, 250); setTimeout(fit, 900);
+      if (window.ResizeObserver) new ResizeObserver(function () { fit(); }).observe(box);   // expanding the drawer changes the width
     }).catch(function () { host.innerHTML = '<div class="rv-none"><b>Could not draw it</b><span>The preview file did not load.</span></div>'; });
+  }
+  /* Expanded or not, everything is drawn. In the narrow drawer a long picture (many variants) is cut short with a fade and a
+     button that opens the drawer out, so the first screen stays a summary and nothing is hidden for good. */
+  var EXPAND_SVG = '<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M216,48V96a8,8,0,0,1-16,0V67.31l-42.34,42.35a8,8,0,0,1-11.32-11.32L188.69,56H160a8,8,0,0,1,0-16h48A8,8,0,0,1,216,48ZM98.34,146.34,56,188.69V160a8,8,0,0,0-16,0v48a8,8,0,0,0,8,8H96a8,8,0,0,0,0-16H67.31l42.35-42.34a8,8,0,0,0-11.32-11.32Z"/></svg>';
+  var COLLAPSE_SVG = '<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M152,104V56a8,8,0,0,1,16,0V84.69l42.34-42.35a8,8,0,0,1,11.32,11.32L179.31,96H208a8,8,0,0,1,0,16H160A8,8,0,0,1,152,104ZM96,152H48a8,8,0,0,0,0,16H76.69L34.34,210.34a8,8,0,0,0,11.32,11.32L88,179.31V208a8,8,0,0,0,16,0V160A8,8,0,0,0,96,152Z"/></svg>';
+  function settleVis() {
+    var v = $('rv-vis'), m = $('rv-more'); if (!v) return;
+    v.classList.remove('rv-vis--cap'); if (m) m.hidden = true;
+    if (!RV.wide && !(window.matchMedia && matchMedia('(max-width: 767px)').matches) && v.scrollHeight > 560) { v.classList.add('rv-vis--cap'); if (m) m.hidden = false; }
+  }
+  function setWide(on) {
+    RV.wide = !!on;
+    var el = $('rv'), b = $('rv-ex'); if (!el) return;
+    el.classList.toggle('rv--wide', RV.wide);
+    if (b) { b.innerHTML = (RV.wide ? COLLAPSE_SVG + 'Collapse' : EXPAND_SVG + 'Expand'); b.setAttribute('aria-expanded', String(RV.wide)); }
+    settleVis(); [260, 700].forEach(function (t) { setTimeout(settleVis, t); });
   }
   function detailRow(k, v) { return v ? '<div class="rv-d"><span>' + esc(k) + '</span><b>' + v + '</b></div>' : ''; }
   function drawerEl() {
@@ -1438,6 +1473,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       if (!RV.open) return;
       var typing = /^(TEXTAREA|INPUT)$/.test((ev.target || {}).tagName || '');
       if (ev.key === 'Escape') { closeDrawer(); }
+      else if (!typing && ev.key === 'e') { setWide(!RV.wide); }
       else if (!typing && (ev.key === 'ArrowRight' || ev.key === 'j')) { step(1); }
       else if (!typing && (ev.key === 'ArrowLeft' || ev.key === 'k')) { step(-1); }
     });
@@ -1464,33 +1500,36 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     var gh = it.doc ? 'https://github.com/gushwork-design/design-system/blob/main/' + (function () { var o = it.scope === 'shared' ? (/^v2\//.test(it.doc) ? ['exports', 'dashboard'] : ['foundation']) : ['exports', it.scope]; it.doc.split('/').forEach(function (g) { if (g === '..') o.pop(); else if (g && g !== '.') o.push(g); }); return o.join('/'); })() : '';
     var can = owner, hist = '';
     if (e.queued) {
-      var did = e.q.action === 'pass' ? 'passed' : e.q.action === 'reject' ? 'rejected' : 'sent this back';
+      var did = e.q.action === 'pass' ? 'approved' : e.q.action === 'reject' ? 'rejected' : 'sent this back';
       hist = '<div class="rv-note rv-note--q"><b>You ' + did + ' it.</b> ' + (e.q.pr && e.q.pr.url
         ? 'It is in <a class="rv-link" href="' + esc(e.q.pr.url) + '" target="_blank" rel="noopener">pull request #' + esc(e.q.pr.number) + '</a>, and becomes final when someone approves and merges it.'
         : 'It is recorded in the repo at the next Claude session.') +
         (e.q.note ? ' Your note: ' + esc(e.q.note) : '') + ' <button class="rv-link" type="button" id="rv-undo">Undo</button></div>';
     } else if (it.by) {
-      hist = '<div class="rv-note"><b>' + esc(STATE_LABEL[it.state] === 'expired' ? 'Passed, then the source moved' : (STATE_LABEL[it.state] || '')) + '</b> · ' + esc(it.by) + (it.on ? ', ' + esc(it.on) : '') + (it.note ? '<br>' + esc(it.note) : '') + '</div>';
+      hist = '<div class="rv-note"><b>' + esc(STATE_LABEL[it.state] === 'expired' ? 'Approved, then the source moved' : (STATE_LABEL[it.state] || '')) + '</b> · ' + esc(it.by) + (it.on ? ', ' + esc(it.on) : '') + (it.note ? '<br>' + esc(it.note) : '') + '</div>';
     }
     var foot;
-    if (!can) foot = '<div class="rv-foot"><span class="rv-hint">Only an owner can pass, rework or reject.</span></div>';
+    if (!can) foot = '<div class="rv-foot"><span class="rv-hint">Only an owner can approve, rework or reject.</span></div>';
     else if (RV.mode === 'rework' || RV.mode === 'reject') {
       foot = '<div class="rv-foot rv-foot--col"><label class="rv-lab" for="rv-note">' + (RV.mode === 'rework' ? 'What needs fixing? This goes to the next Claude session as the brief.' : 'Why is this rejected?') + '</label>' +
         '<textarea id="rv-note" class="rv-ta" rows="4" maxlength="500" placeholder="' + (RV.mode === 'rework' ? 'The labels bind raw white, they should use the neutral-900 token.' : 'It duplicates the card and nothing uses it.') + '"></textarea>' +
         '<div class="rv-acts"><button type="button" class="rv-b rv-b--ghost" id="rv-cancel">Cancel</button><button type="button" class="rv-b rv-b--' + (RV.mode === 'reject' ? 'bad' : 'warn') + '" id="rv-send" disabled>' + (RV.mode === 'rework' ? 'Send back' : 'Reject') + '</button></div></div>';
     } else {
-      foot = '<div class="rv-foot"><div class="rv-acts"><button type="button" class="rv-b rv-b--pass" id="rv-pass">Pass</button><button type="button" class="rv-b rv-b--ghost" id="rv-rework">Rework</button><button type="button" class="rv-b rv-b--ghost" id="rv-reject">Reject</button></div>' +
-        '<span class="rv-hint">← → to move · Esc to close</span></div>';
+      foot = '<div class="rv-foot"><div class="rv-acts"><button type="button" class="rv-b rv-b--pass" id="rv-pass">Approve</button><button type="button" class="rv-b rv-b--ghost" id="rv-rework">Rework</button><button type="button" class="rv-b rv-b--ghost" id="rv-reject">Reject</button></div>' +
+        '<span class="rv-hint">← → to move · E to expand · Esc to close</span></div>';
     }
     el.innerHTML = '<header class="rv-h"><div class="rv-h__t"><span class="rv-h__s">' + esc(scopeTitle(it)) + ' · ' + (RV.i + 1) + ' of ' + RV.list.length + '</span><h2>' + esc(it.label) + '</h2></div>' +
       '<div class="rv-h__r">' + badgeOf(e.state, e.queued, e.q) + '<button type="button" class="rv-x" id="rv-prev" aria-label="Previous"' + (RV.i === 0 ? ' disabled' : '') + '>‹</button><button type="button" class="rv-x" id="rv-next" aria-label="Next"' + (RV.i >= RV.list.length - 1 ? ' disabled' : '') + '>›</button><button type="button" class="rv-x" id="rv-close" aria-label="Close">✕</button></div></header>' +
-      '<div class="rv-body" id="rv-body"><section class="rv-sec"><h3>What it looks like</h3><div id="rv-vis">' + (it.kind === 'foundation' ? '<div class="rv-none"><span>Drawing it…</span></div>' : visualFor(it, null)) + '</div></section>' +
+      '<div class="rv-body" id="rv-body"><section class="rv-sec"><div class="rv-sh"><h3>What it looks like</h3><button type="button" class="rv-ex" id="rv-ex" aria-expanded="false" title="Open the drawer out to see everything (E)"></button></div><div class="rv-vis" id="rv-vis">' + (it.kind === 'foundation' ? '<div class="rv-none"><span>Drawing it…</span></div>' : visualFor(it, null)) + '</div><button type="button" class="rv-more" id="rv-more" hidden>Expand to see everything</button></section>' +
       '<section class="rv-sec"><h3>Details</h3><div class="rv-dl">' + detailRow('Kind', esc(it.kind === 'foundation' ? 'Foundation group' : 'Component')) + detailRow('Version', esc(it.version ? 'v' + it.version : '')) +
       detailRow('Spec last moved', esc(it.changed || '')) + detailRow('Doc', gh ? '<a class="ds-a" href="' + esc(gh) + '" target="_blank" rel="noopener">' + esc(it.doc.split('/').pop()) + '</a>' : '') +
       detailRow('Fingerprint', '<code>' + esc(it.fp) + '</code>') + '</div>' + hist + '</section></div>' + foot;
-    if (it.kind === 'foundation') tokens().then(function (t) { if (RV.open && BYID[RV.list[RV.i]] === it) $('rv-vis').innerHTML = visualFor(it, t); }).catch(function () {});
+    if (it.kind === 'foundation') tokens().then(function (t) { if (RV.open && BYID[RV.list[RV.i]] === it) { $('rv-vis').innerHTML = visualFor(it, t); settleVis(); } }).catch(function () {});
     var pv = el.querySelector('[data-pv]'); if (pv) mountPreview(pv, it);
     $('rv-close').addEventListener('click', closeDrawer);
+    $('rv-ex').addEventListener('click', function () { setWide(!RV.wide); });
+    $('rv-more').addEventListener('click', function () { setWide(true); });
+    setWide(RV.wide);
     $('rv-prev').addEventListener('click', function () { step(-1); });
     $('rv-next').addEventListener('click', function () { step(1); });
     var on = function (id, fn) { var b = $(id); if (b) b.addEventListener('click', fn); };
@@ -1516,7 +1555,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
         else {
           QSTATE[idOf(it)] = r.j.decision; RV.mode = '';
           var where = r.j.decision && r.j.decision.pr ? ' In pull request #' + r.j.decision.pr.number + '.' : ' It is recorded at the next session.';
-          toast((action === 'pass' ? 'Passed.' : action === 'rework' ? 'Sent back with your note.' : 'Rejected.') + where + (r.j.githubError ? ' (' + r.j.githubError + ', so it is queued.)' : ''));
+          toast((action === 'pass' ? 'Approved.' : action === 'rework' ? 'Sent back with your note.' : 'Rejected.') + where + (r.j.githubError ? ' (' + r.j.githubError + ', so it is queued.)' : ''));
           var n = nextWaiting(); if (n >= 0) { RV.i = n; renderDrawer(); } else { renderDrawer(); }
         }
         reviewRefresh();
