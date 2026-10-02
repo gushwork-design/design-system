@@ -46,6 +46,28 @@ case "${1:-}" in
   *) echo "unknown flag: $1" >&2; exit 2 ;;
 esac
 
+# A PRODUCTION PUBLISH SHIPS WHATEVER THIS CHECKOUT HOLDS. On 2 Oct 2026 it was run from a checkout sitting on an old
+# branch with uncommitted edits, and three deploys in a row put the old site (and an old Slack handler) over the live one.
+# So production publishes only from a clean copy of origin/main, exactly. Preview and dry runs are not affected. The escape
+# hatch is deliberate and loud: GW_PUBLISH_ANYWAY=1.
+if [ "$MODE" = prod ] && [ "${GW_PUBLISH_ANYWAY:-}" != 1 ]; then
+  if ! git fetch -q origin main 2>/dev/null; then
+    echo "Could not fetch origin/main to check this checkout. Publish refused (set GW_PUBLISH_ANYWAY=1 to override)." >&2
+    exit 1
+  fi
+  here="$(git rev-parse HEAD)"; main="$(git rev-parse origin/main)"
+  if [ "$here" != "$main" ] || [ -n "$(git status --porcelain)" ]; then
+    echo "Publish refused: this checkout is not a clean copy of origin/main." >&2
+    echo "  branch:   $(git branch --show-current || true)" >&2
+    echo "  HEAD:     ${here:0:9}   origin/main: ${main:0:9}" >&2
+    [ -n "$(git status --porcelain)" ] && echo "  and it has uncommitted changes" >&2
+    echo "Make a clean one and publish from there:" >&2
+    echo "  git fetch && git worktree add --detach /tmp/gw-publish origin/main && cd /tmp/gw-publish && bash scripts/publish-sheets.sh" >&2
+    exit 1
+  fi
+fi
+[ "${GW_PUBLISH_GUARD_ONLY:-}" = 1 ] && { echo "guard passed"; exit 0; }
+
 # Sheets that go up, and where they land. "<repo path>|<staged path>".
 # The staged paths are one directory deep, exactly like preview/ was, so the
 # sheets' own ../foundation/tokens.css links keep resolving.
