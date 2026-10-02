@@ -387,8 +387,7 @@ body[data-gw-page="analytics"] .sg__main > * { min-width: 0; }
 :root[data-theme="dark"] .ul-badge--new { color: var(--gw-color-primary-400); }
 .ul-c--whotag { display: flex; align-items: center; gap: var(--gw-space-8); color: var(--ul-value); min-width: 0; }
 .ul-c--whotag > span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.vs-note { margin: var(--gw-space-8) 0 0; font: var(--gw-text-body-12-reg); color: var(--ul-sub); max-width: 70ch; }
-.vs-note[hidden] { display: none; }
+.vs-note { margin: var(--gw-space-12) 0 0; font: var(--gw-text-body-12-reg); color: var(--ul-sub); max-width: 70ch; }
 :root[data-theme="dark"] .ul-badge--bad { color: var(--gw-color-red-300); }
 .ul-c--chk { display: flex; align-items: center; gap: var(--gw-space-8); overflow: visible; }
 .ul-c--out a { color: var(--ul-value); text-decoration: underline; text-underline-offset: 2px; }
@@ -653,6 +652,12 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
       </section>
       </div>
 
+      <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="ul-h-new">
+        <div class="ul-sh"><div class="ul-sh__t"><h2 id="ul-h-new">New users</h2><span class="ul-sh__q" id="ul-q-new"></span></div></div>
+        <div class="ul-scroll vs-t" id="ul-new"></div>
+        <p class="vs-note" id="ul-new-note" hidden></p>
+      </section>
+
       <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="ul-h-out">
         <div class="ul-sh"><div class="ul-sh__t"><h2 id="ul-h-out">Outputs</h2><span class="ul-sh__q" id="ul-q-out"></span></div></div>
         <div class="ul-inner"><div class="ul-metrics" id="ul-out-metrics" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr))"></div></div>
@@ -700,12 +705,6 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
 
     <div id="vs-app">
       <div class="ul-metrics" id="vs-metrics"></div>
-
-      <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="vs-h-new">
-        <div class="ul-sh"><div class="ul-sh__t"><h2 id="vs-h-new">New people</h2><span class="ul-sh__q" id="vs-q-new"></span></div></div>
-        <div class="ul-scroll vs-t" id="vs-new"></div>
-        <p class="vs-note" id="vs-note" hidden></p>
-      </section>
 
       <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="vs-h-people">
         <div class="ul-sh"><div class="ul-sh__t"><h2 id="vs-h-people">People</h2><span class="ul-sh__q" id="vs-q-people"></span></div></div>
@@ -1317,6 +1316,32 @@ window.__anRefilter = {};
       '<p class="ul-foot">' + esc(head) + (sub ? ' · ' + esc(sub) : '') + '.</p>';
     $('ul-ver-open').hidden = !list.length;
   }
+  /* New users: people whose first logged event of any kind falls in the chosen period (everyone, for All time). The first
+     time we ever saw someone is read from every row, so a regular who was quiet last month is not listed. */
+  function renderNew(m) {
+    var host = $('ul-new'), note = $('ul-new-note');
+    if (S.status === 'loading') { host.innerHTML = '<span class="sk" style="width:100%;height:120px;display:block"></span>'; $('ul-q-new').textContent = ''; note.hidden = true; return; }
+    var cut = S.period === 'all' ? 0 : Date.now() - (+S.period) * DAY, by = {}, logStart = null;
+    m.all.slice().sort(function (a, b) { return a.at - b.at; }).forEach(function (r) {
+      if (!logStart) logStart = r.at;
+      if (!r.email) return;
+      var u = by[r.email] || (by[r.email] = { email: r.email, first: r.at, version: '', skill: '', sess: 0 });
+      if (isSess(r)) { u.sess++; if (!u.version && r.version) u.version = r.version; }
+      if (r.event === 'skill' && r.skill && !u.skill) u.skill = r.skill.replace(/^.*:/, '');
+    });
+    var list = Object.keys(by).map(function (k) { return by[k]; }).filter(function (u) { return u.first.getTime() >= cut; }).sort(function (a, b) { return b.first - a.first; });
+    $('ul-q-new').textContent = S.period === 'all' ? 'everyone, by first session' : 'first seen in the ' + PERIOD_NAME[S.period] + ', ' + list.length + (list.length === 1 ? ' person' : ' people');
+    var th = function (t) { return '<div role="columnheader"><span class="ul-th"><span class="ul-th--plain">' + esc(t) + '</span></span></div>'; };
+    var c = function (t, cls, title) { return '<div class="ul-c ' + (cls || '') + '" role="cell" title="' + esc(title || t) + '">' + esc(t) + '</div>'; };
+    host.innerHTML = '<div class="ul-tbl" role="table" style="--vs-cols:minmax(200px,1.6fr) minmax(120px,1fr) 110px 100px minmax(140px,1fr)"><div class="ul-row ul-row--h" role="row">' +
+      ['Person', 'First seen', 'Started on', 'Sessions', 'First skill'].map(th).join('') + '</div>' +
+      (list.length ? list.map(function (u) {
+        return '<div class="ul-row ul-row--d" role="row">' + c(u.email, 'ul-c--who') + c(ago(Date.now() - u.first.getTime()), '', u.first.toISOString()) + c(u.version || '—') + c(String(u.sess)) + c(u.skill || '—') + '</div>';
+      }).join('') : '<div class="ul-empty"><div class="ul-empty__copy"><h2>Nobody new in this period</h2></div></div>') + '</div>';
+    if (S.capped) { note.textContent = 'The log keeps only the newest events, so someone who has not used the plugin lately may show here as new.'; note.hidden = false; }
+    else if (logStart && logStart.getTime() > cut) { note.textContent = 'Usage logging started on ' + logStart.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) + ', so everyone seen since then counts as new. This gets more useful as history builds.'; note.hidden = false; }
+    else note.hidden = true;
+  }
   function renderSkills(m) {
     var host = $('ul-skills');
     if (S.status === 'loading') { host.innerHTML = '<span class="sk" style="width:100%;height:96px;display:block"></span>'; $('ul-q-skills').textContent = ''; return; }
@@ -1699,7 +1724,7 @@ window.__anRefilter = {};
     $('ul-bar').hidden = blocked;
     if (blocked) { renderBlocked(S.status); updated(); return; }
     var m = compute();
-    renderCards(m); renderChart(m); renderVersions(m); renderSkills(m); renderOutputs(m);
+    renderCards(m); renderChart(m); renderVersions(m); renderSkills(m); renderNew(m); renderOutputs(m);
     if (S.status === 'ready') renderVerFilter(m);
     renderLog(m); updated();
     ROOT.querySelectorAll('.ul-tab').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-period') === S.period)); });
@@ -1902,24 +1927,19 @@ window.__anRefilter = {};
   function whoCell(e, isNew) {
     return '<div class="ul-c ul-c--whotag" role="cell" title="' + esc(e) + '"><span>' + esc(who(e)) + '</span>' + (isNew ? '<span class="ul-badge ul-badge--new">New</span>' : '') + '</div>';
   }
-  /* When each person first appears in the log, and the first page they opened. It reads every row, not just this period,
-     because "new" means the first time we ever saw them. */
+  /* A person is New for a week after the first time we ever logged them. It reads every row, not just this period, so a
+     regular is not called new because they were quiet last month. */
   var NEW_DAYS = 7;
   function firstSeen() {
     var first = {};
-    S.rows.forEach(function (r) {
-      if (!r.email) return;
-      var f = first[r.email] || (first[r.email] = { at: r.at, path: '', pathAt: null });
-      if (r.at < f.at) f.at = r.at;
-      if (r.kind === 'view' && (!f.pathAt || r.at < f.pathAt)) { f.pathAt = r.at; f.path = r.path; }
-    });
+    S.rows.forEach(function (r) { if (r.email && (!first[r.email] || r.at < first[r.email])) first[r.email] = r.at; });
     return first;
   }
 
   function renderAll() {
     var rows = scoped();
-    var first = firstSeen(), cut = S.period === 'all' ? 0 : Date.now() - (+S.period) * DAY, tagCut = Date.now() - NEW_DAYS * DAY;
-    var isNew = function (e) { return !!first[e] && first[e].at.getTime() >= tagCut; };
+    var first = firstSeen(), tagCut = Date.now() - NEW_DAYS * DAY;
+    var isNew = function (e) { return !!first[e] && first[e].getTime() >= tagCut; };
     var signins = rows.filter(function (r) { return r.kind === 'signin'; });
     var views = rows.filter(function (r) { return r.kind === 'view'; });
     var people = {}, pages = {};
@@ -1940,21 +1960,6 @@ window.__anRefilter = {};
       metric('Sign-ins', String(signins.length), (function (n) { return n + (n === 1 ? ' person' : ' people'); })(Object.keys(signins.reduce(function (o, r) { o[r.email] = 1; return o; }, {})).length) + ' signed in') +
       metric('Page views', String(views.length), plural(glist.length, 'page') + ' opened') +
       metric('Active people', String(plist.length), lastAt ? 'last visit ' + ago(Date.now() - lastAt.getTime()) : 'nothing logged yet');
-
-    var nlist = plist.filter(function (p) { return first[p.email] && first[p.email].at.getTime() >= cut; })
-      .sort(function (a, b) { return first[b.email].at - first[a.email].at; });
-    $('vs-q-new').textContent = S.period === 'all' ? 'everyone, by first visit' : 'first seen in the last ' + S.period + ' days, ' + nlist.length + (nlist.length === 1 ? ' person' : ' people');
-    $('vs-new').innerHTML = table('minmax(200px,1.6fr) minmax(120px,1fr) minmax(200px,1.6fr) 100px', ['Person', 'First seen', 'First opened', 'Page views'],
-      nlist.map(function (p) {
-        var f = first[p.email];
-        return '<div class="ul-row ul-row--d" role="row">' + whoCell(p.email, isNew(p.email)) + cell(ago(Date.now() - f.at.getTime()), '', f.at.toISOString()) +
-          cell(f.path ? pageName(f.path) : '—', '', f.path || '') + cell(String(p.views)) + '</div>';
-      }), 'Nobody new in this view');
-    var logStart = Object.keys(first).reduce(function (m, k) { return !m || first[k].at < m ? first[k].at : m; }, null);
-    var note = $('vs-note');
-    if (S.capped) { note.textContent = 'The log keeps only the newest visits, so someone who has not visited lately may show here as new.'; note.hidden = false; }
-    else if (logStart && logStart.getTime() > cut) { note.textContent = 'Visit logging started on ' + logStart.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) + ', so everyone seen since then counts as new. This gets more useful as history builds.'; note.hidden = false; }
-    else note.hidden = true;
 
     $('vs-q-people').textContent = (plist.length + (plist.length === 1 ? ' person' : ' people'));
     $('vs-people').innerHTML = table('minmax(200px,1.6fr) 100px 100px minmax(120px,1fr) minmax(120px,1fr)', ['Person', 'Sign-ins', 'Page views', 'Last seen', 'Opens most'],
@@ -2022,7 +2027,7 @@ window.__anRefilter = {};
     }).then(function (j) {
       if (!j) return;
       if (!j.configured) { S.status = 'unconfigured'; return; }
-      S.rowsAll = parse(j.rows || []); S.rows = window.anHide(S.rowsAll); S.capped = !!j.capped; S.fetchedAt = Date.now();
+      S.rowsAll = parse(j.rows || []); S.rows = window.anHide(S.rowsAll); S.fetchedAt = Date.now();
       S.status = S.rowsAll.length ? 'ready' : 'empty';
       return idx.then(function (list) { list.forEach(function (e) { var u = (e.u || '').replace(/\/+$/, '') || '/'; if (!TITLES[u] && e.t) TITLES[u] = e.t; }); });
     }).catch(function () { S.status = 'error'; }).then(function () {
