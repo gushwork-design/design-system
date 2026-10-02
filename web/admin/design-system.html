@@ -457,6 +457,8 @@ body[data-gw-page="design-system"] .sg__main > * { min-width: 0; }
 .ul-empty__c { width: 40px; height: 40px; border-radius: var(--gw-radius-full); background: var(--ul-circle); color: var(--ul-circle-fg); display: grid; place-items: center; }
 .ul-empty__c svg { width: 16px; height: 16px; }
 .ul-empty__copy { display: flex; flex-direction: column; gap: var(--gw-space-8); }
+.ul-empty__copy { align-items: center; text-align: center; }
+.ul-empty__copy .ds-pv { align-self: center; margin: var(--gw-space-8) 0 0; }   /* the button sits centred under the text, not at the left edge */
 .ul-empty h2 { margin: 0; font: var(--gw-text-body-16-sem); color: var(--ul-value); }
 .ul-empty p { margin: 0; font: var(--gw-text-body-12-med); color: var(--ul-sub); }
 .ul-note-line { margin: 0; font: var(--gw-text-body-12-med); color: var(--ul-sub); }
@@ -1162,7 +1164,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     { key: 'web', title: 'Web pages', subs: [
       { key: 'brand', title: 'Brand pages', surface: 'web', recipes: ['brand-page', 'case-study'], templates: ['case-study'] },
       { key: 'ads', title: 'Ad pages', surface: 'ad-page', recipes: ['ad-landing-page'], templates: ['ad-page', 'ad-page-signup'] }] },
-    { key: 'slides', title: 'Slides', subs: [{ key: 'deck', title: 'Slide deck', surface: 'slides', recipes: ['sales-deck'], templates: ['slide-deck'] }] },
+    { key: 'slides', title: 'Slides', soon: true, subs: [{ key: 'deck', title: 'Slide deck', surface: 'slides', recipes: ['sales-deck'], templates: ['slide-deck'] }] },
     { key: 'docs', title: 'Documents', subs: [
       { key: 'lead', title: 'Lead magnet', surface: 'lead-magnet', recipes: ['lead-magnet-doc'], templates: ['lead-magnet'] },
       { key: 'onepager', title: 'One-pagers', surface: null, recipes: [], templates: ['one-pager'] }] },
@@ -1274,10 +1276,12 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   function renderLibrary(d, t) {
     var s = d.stats;
     var fAll = (d.items || []).filter(function (x) { return x.kind === 'foundation'; }), cAll = (d.items || []).filter(function (x) { return x.kind === 'component'; });
+    var hidden = {}; CATS.forEach(function (c) { if (c.soon) c.subs.forEach(function (x) { if (x.surface) hidden[x.surface] = 1; }); });
+    cAll = cAll.filter(function (x) { return !hidden[x.scope]; });   // a category that is coming soon is left out of the counts
     var fOk = fAll.filter(function (x) { return approved(x.scope, x.key); }).length, cOk = cAll.filter(function (x) { return approved(x.scope, x.key); }).length;
     $('ds-lib-stats').innerHTML =
       metric('Foundations', fOk + ' / ' + fAll.length, 'groups approved') + metric('Components', cOk + ' / ' + cAll.length, 'approved, across ' + plural(d.surfaces.length, 'surface')) +
-      metric('Templates', String(Object.keys(PAIR).length ? (d.stats.recipes + Object.keys(TPL).length - Object.keys(PAIR).length) : d.stats.recipes), 'what to build from');
+      metric('Templates', String((Object.keys(PAIR).length ? (d.stats.recipes + Object.keys(TPL).length - Object.keys(PAIR).length) : d.stats.recipes) - CATS.reduce(function (n, c) { return n + (c.soon ? c.subs.reduce(function (m, x) { return m + startPoints(d, x).length; }, 0) : 0); }, 0)), 'what to build from');
     pills($('ds-lib-tabs'), CATS.map(function (c) { return [c.key, c.title]; }), L.cat, function (v) { L.cat = v; setHash(); renderLibrary(d, t); });
     var host = $('ds-fd'), cat = CATS.filter(function (c) { return c.key === L.cat; })[0] || CATS[0], side, main;
     if (cat.key === 'foundations') {
@@ -1295,12 +1299,18 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
         main = '<div class="fd-head"><p>' + esc(FD_NOTE[F.tab]) + '</p></div>' + body;
       }
     } else {
+      if (cat.soon) {
+        // Not finished yet: the tab stays, so people know it is coming, and nothing under it is shown.
+        side = null;
+        main = '<div class="ul-empty"><div class="ul-empty__copy"><h2>' + esc(cat.title) + ' are coming soon</h2><p>The ' + esc(cat.title.toLowerCase()) + ' library is not finished yet. It will be added here, in a better way, soon.</p></div></div>';
+      } else {
       var sub = subOf(cat), sf = sub.surface ? d.surfaces.filter(function (x) { return x.key === sub.surface; })[0] : null;
       side = cat.subs.length > 1 ? cat.subs.map(function (x) {
         var sx = x.surface ? d.surfaces.filter(function (y) { return y.key === x.surface; })[0] : null;
         return [x.key, x.title, (sx ? sx.components.filter(function (c) { return approved(sx.key, c.name); }).length : 0) + startPoints(d, x).length, x === sub];
       }) : null;
       main = '<div class="fd-head"><p>' + esc((sf && sf.what) || (cat.title + ' · ' + sub.title)) + '</p></div>' + tplCards(startPoints(d, sub)) + compTable(sf);
+      }
     }
     host.setAttribute('data-solo', side ? '0' : '1');
     host.innerHTML = (side ? '<nav class="fd-side" aria-label="' + esc(cat.title) + '">' + side.map(function (x) {
@@ -1458,7 +1468,8 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
         // A fold is drawn inside its own scroller, so its width does not show in inner.scrollWidth: read it from the fold itself.
         var foldW = 0;
         root.querySelectorAll('.foldscale').forEach(function (f) { foldW = Math.max(foldW, Math.ceil(f.getBoundingClientRect().width)); });
-        var w = Math.max(inner.scrollWidth, bw, foldW ? foldW + 4 : 0), k = 1;
+        // A group is a clipped frame too, so a single wide cell (a 615px card) is read from the column it needs: its tile, plus the grid's padding and the frame's border.
+        var w = Math.max(inner.scrollWidth, bw, foldW ? foldW + 4 : 0, need > 178 ? need + 26 : 0), k = 1;
         if (w > bw + 1) { k = Math.max(bw / w, 0.7); inner.style.width = w + 'px'; }   // not smaller than 70%: past that, scroll sideways or Expand
         inner.style.transform = k < 1 ? 'scale(' + k + ')' : 'none'; inner.style.transformOrigin = '0 0';
         box.style.height = Math.ceil(inner.offsetHeight * k) + 'px';
