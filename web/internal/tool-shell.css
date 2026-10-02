@@ -571,7 +571,7 @@ input[type='range']:focus-visible { outline: var(--gw-focus-ring); outline-offse
 .t-iconbtn[data-tip]:hover::after,
 .t-iconbtn[data-tip]:focus-visible::after { opacity: 1; visibility: visible; }
 .t-iconbtn[data-tip][aria-expanded="true"]::after { opacity: 0; visibility: hidden; }
-:root[data-theme="dark"] .t-iconbtn[data-tip]::after { border-color: var(--gw-color-neutral-700); }
+:root[data-theme="dark"] .t-iconbtn[data-tip]::after { border-color: var(--gw-color-neutral-850); background: var(--gw-color-neutral-900); }   /* live hub */
 
 .t-menu {
   position: absolute; top: calc(100% + var(--gw-space-8)); right: 0;
@@ -600,8 +600,8 @@ input[type='range']:focus-visible { outline: var(--gw-focus-ring); outline-offse
 .t-menu__row svg { width: 16px; height: 16px; flex: none; display: block; }
 .t-menu__opt:hover,
 .t-menu__row:hover { background: var(--t-hover); }
-.t-menu__opt[aria-checked="true"] { background: var(--gw-color-neutral-100); }
-:root[data-theme="dark"] .t-menu__opt[aria-checked="true"] { background: var(--gw-color-neutral-600); }
+.t-menu__opt.is-on { background: var(--gw-color-neutral-100); }   /* live hub: --s-nav-sel */
+:root[data-theme="dark"] .t-menu__opt.is-on { background: var(--gw-color-neutral-900); }   /* live hub dark: --s-nav-sel */
 .t-menu__opt:focus-visible,
 .t-menu__row:focus-visible { outline: var(--gw-focus-ring); outline-offset: -2px; }
 
@@ -802,7 +802,7 @@ html[data-theme] .preview-content[data-theme] {
    12. Pattern parity with the library.
    ------------------------------------------------------------------------ */
 
-/* controls/toggle, Size=Small 44x24: track pad 4, knob 16, travel 20.
+/* controls/toggle, Size=X-Small 36x20 (the library's size for dense rows and toolbars): track pad 4, knob 12, travel 16.
    Off = neutral/200; On = neutral/900 (interaction state, never blue).
    Dark: On inverts to a white track with a dark knob (R16) — CHOSEN, the library
    draws no dark toggle. Knob white on --gw-shadow-s2, radius full, --gw-motion-fast. */
@@ -818,7 +818,7 @@ html[data-theme] .preview-content[data-theme] {
 }
 .gw-switch {
   position: relative;
-  width: 44px; height: 24px; flex: none;
+  width: 36px; height: 20px; flex: none;
   padding: 0; border: 0; border-radius: var(--gw-radius-full);
   background: var(--t-sw-off);
   cursor: pointer;
@@ -827,12 +827,12 @@ html[data-theme] .preview-content[data-theme] {
 .gw-switch.on { background: var(--t-sw-on); }
 .gw-switch__knob {
   position: absolute; top: 4px; left: 4px;
-  width: 16px; height: 16px; border-radius: var(--gw-radius-full);
+  width: 12px; height: 12px; border-radius: var(--gw-radius-full);
   background: var(--t-sw-knob);
   box-shadow: var(--gw-shadow-s2);
   transition: transform var(--gw-motion-fast);
 }
-.gw-switch.on .gw-switch__knob { transform: translateX(20px); }
+.gw-switch.on .gw-switch__knob { transform: translateX(16px); }
 .gw-switch:focus-visible { outline: var(--gw-focus-ring); outline-offset: var(--gw-focus-offset); }
 :root:not([data-theme="dark"]) .gw-switch.on .gw-switch__knob { background: var(--gw-color-white); }
 
@@ -879,3 +879,96 @@ html[data-theme] .preview-content[data-theme] {
 .prop-tip-list, .field { gap: var(--gw-space-8); }
 .copy-tooltip { gap: var(--gw-space-8); }
 .split-trigger, .gw-banner-placeholder-pill { gap: var(--gw-space-8); }
+
+/* ---------------------------------------------------------------------------
+   13. Floating bar = ONE pill. Reference: Framer's canvas toolbar (Mobbin) — a single
+       rounded container, every control the same height, a subtle fill for the
+       current view, and one strong control (the primary action) at the end.
+       Inside the pill: 32h items, radius/8, body-14-med, 16px icons, groups
+       separated by a 1px hairline. CHOSEN: 32h items in a 40h pill (the dashboard
+       control sizes are 28/32/36; 32 sits between the tab-item and the 36 button).
+       The current view is neutral/100 (dark neutral/800), not the black of a
+       stand-alone tab-group — inside a pill the black is reserved for the primary.
+   ------------------------------------------------------------------------ */
+.floating-toolbar {
+  align-items: center;
+  gap: var(--gw-space-4);
+  padding: var(--gw-space-4);
+  background: var(--t-card-bg);
+  border: 1px solid var(--t-panel-border);
+  border-radius: var(--gw-radius-16);
+  box-shadow: var(--gw-shadow-s3);
+}
+.floating-toolbar .tb-pill,
+.floating-toolbar .tb-pill[role="tablist"],
+.floating-toolbar .tb-pill:not([role="tablist"]):not(.toolbar-pill) {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  gap: var(--gw-space-4);
+  align-items: center;
+}
+.floating-toolbar .tb-pill + .tb-pill {
+  margin-left: var(--gw-space-4);
+  padding-left: var(--gw-space-8);
+  border-left: 1px solid var(--t-rule);
+  border-radius: 0;
+}
+.floating-toolbar .tb-pill button,
+.floating-toolbar .tb-pill .copy-btn-wrap > button,
+.floating-toolbar .tb-pill:not([role="tablist"]):not(.toolbar-pill) > button {
+  height: 32px;
+  padding: 0 var(--gw-space-12);
+  gap: var(--gw-space-8);
+  border: 0;
+  border-radius: var(--gw-radius-8);
+  background: transparent;
+  box-shadow: none;
+  color: var(--t-text);
+  font: var(--gw-text-body-14-med);
+  letter-spacing: var(--gw-text-body-14-med-tracking);
+}
+.floating-toolbar .tb-pill button svg { width: 16px; height: 16px; flex: none; }
+.floating-toolbar .tb-pill button:hover:not(.btn-primary):not(.btn-error),
+.floating-toolbar .tb-pill[role="tablist"] button:hover:not(.active) { background: var(--t-hover); color: var(--t-heading); }
+/* current view: the subtle fill */
+.floating-toolbar .tb-pill[role="tablist"] button.active {
+  background: var(--gw-color-neutral-100);
+  color: var(--t-heading);
+}
+:root[data-theme="dark"] .floating-toolbar .tb-pill[role="tablist"] button.active { background: var(--gw-color-neutral-900); }
+/* the one strong control */
+.floating-toolbar .tb-pill .btn-primary {
+  background: var(--t-primary-bg);
+  color: var(--t-primary-fg);
+}
+.floating-toolbar .tb-pill .btn-primary:hover { background: var(--t-primary-hover); color: var(--t-primary-fg); }
+.floating-toolbar .tb-pill .btn-primary.copied { background: var(--t-ok); color: var(--gw-color-white); }
+.floating-toolbar .tb-pill button.btn-error,
+.floating-toolbar .tb-pill .btn-primary.btn-error { background: var(--t-danger-bg); color: var(--t-danger); }
+/* specificity: the earlier 36h button rules out-rank the pill rules above */
+.floating-toolbar .tb-pill:not([role="tablist"]):not(.toolbar-pill) .copy-btn-wrap > button,
+.floating-toolbar .tb-pill:not([role="tablist"]):not(.toolbar-pill) > button {
+  height: 32px; border-radius: var(--gw-radius-8); padding: 0 var(--gw-space-12);
+  font: var(--gw-text-body-14-med); letter-spacing: var(--gw-text-body-14-med-tracking);
+  border: 0; box-shadow: none;
+}
+.floating-toolbar .tb-pill:not([role="tablist"]):not(.toolbar-pill) > button:not(.btn-error):not(.btn-primary) { background: transparent; }
+.floating-toolbar .tb-pill:not([role="tablist"]):not(.toolbar-pill) > button:not(.btn-error):not(.btn-primary):hover { background: var(--t-hover); }
+.floating-toolbar .tb-pill:not([role="tablist"]):not(.toolbar-pill) .copy-btn-wrap > button.btn-primary { background: var(--t-primary-bg); color: var(--t-primary-fg); }
+.floating-toolbar .tb-pill:not([role="tablist"]):not(.toolbar-pill) .copy-btn-wrap > button.btn-primary:hover { background: var(--t-primary-hover); }
+.floating-toolbar .tb-pill:not([role="tablist"]):not(.toolbar-pill) .copy-btn-wrap > button.btn-primary.copied { background: var(--t-ok); color: var(--gw-color-white); }
+.floating-toolbar .tb-pill:not([role="tablist"]):not(.toolbar-pill) .copy-btn-wrap > button.btn-error { background: var(--t-danger-bg); color: var(--t-danger); }
+
+/* ---------------------------------------------------------------------------
+   14. One field family. The hub's own forms draw a select on the card fill and a text
+       field on the field fill, which reads as two different controls side by side in a
+       dense panel. Here the select takes the field fill so the column reads as one.
+       CHOSEN — the dashboard `select` spec has both an outlined (white) and a filled
+       (neutral/25) style; this is the filled one.
+   ------------------------------------------------------------------------ */
+.prop-dropdown-trigger,
+.prop-dropdown-trigger:hover,
+.prop-dropdown.open .prop-dropdown-trigger { background: var(--t-field-bg); }
