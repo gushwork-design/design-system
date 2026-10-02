@@ -1,7 +1,7 @@
 // Bruce the concierge (web/api/_concierge.js) and how the Slack events handler routes to him.
 // No network and no model: Slack and Upstash are pretended. Run: node scripts/concierge.test.mjs
 import crypto from 'node:crypto';
-import { buildCatalog, missingFiles, understand, compose, SITE } from '../web/api/_concierge.js';
+import { buildCatalog, missingFiles, understand, compose, SITE, ownerMention } from '../web/api/_concierge.js';
 import { FAQ, EXAMPLES } from '../web/api/_bruce-faq.js';
 
 process.env.SLACK_SIGNING_SECRET = 'sig-secret';
@@ -90,6 +90,15 @@ a = ask('is this the gushwork website');             ok('"is this the gushwork w
 a = ask('where is the gushwork homepage');           ok('"where is the homepage" points to gushwork.ai', a.u.parts[0]?.faq?.id === 'homepage');
 a = ask('what is the design hub');                   ok('"what is the design hub" is still the hub answer', a.u.parts[0]?.faq?.id === 'about');
 a = ask('make me a poster');                         ok('a design request says “yet”', /yet/.test(a.r.text), a.r.text);
+
+/* ---- the creator answer explains the hub to someone who has never heard of it ---- */
+a = ask('who made you');
+ok('the creator answer: names Utsav, says what the hub is, what he approves, who to ask', a.r.text.startsWith('Utsav is my creator.') && a.r.text.includes('design hub (design.gushwork.ai)') && a.r.text.includes('Claude plugin') && a.r.text.includes('the person to ask'), a.r.text);
+process.env.OWNER_SLACK_ID = 'U0ABC12345';
+ok('with his Slack ID set, he is a real mention', ownerMention() === '<@U0ABC12345>' && compose(understand('who made you', catalog), catalog, '1.1').text.startsWith('<@U0ABC12345> is my creator.'));
+process.env.OWNER_SLACK_ID = 'not-an-id';
+ok('a bad ID falls back to his name', ownerMention() === 'Utsav');
+delete process.env.OWNER_SLACK_ID;
 
 /* ---- pretend Slack and Upstash ---- */
 const calls = [];

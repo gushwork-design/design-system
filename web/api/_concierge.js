@@ -231,6 +231,13 @@ export function understand(text, catalog) {
 const seedOf = (x) => [...String(x || '0')].reduce((n, c) => (n * 31 + c.charCodeAt(0)) >>> 0, 7);
 const pick = (options, seed) => options[seed % options.length];
 
+/* Utsav, as a Slack mention when the site knows his Slack ID (OWNER_SLACK_ID), otherwise just his name. The ID is
+   configuration, not code: this repo is public. */
+export function ownerMention() {
+  const id = (process.env.OWNER_SLACK_ID || '').trim();
+  return /^[UW][A-Z0-9]{6,}$/.test(id) ? `<@${id}>` : 'Utsav';
+}
+
 export const HELP = [
   'I can send you the brand files and point you to the right template or tool. Things people ask me for:',
   '• logos, like “white logo svg” or “dark symbol png”',
@@ -303,7 +310,7 @@ export function compose(u, catalog, seedText = '') {
       for (const { entry, files: fs } of p.picks) for (const f of fs) files.push({ path: f.path, title: `${entry.title} (${f.format}, ${f.note})` });
       texts.push(lines.join('\n'));
     } else if (p.type === 'templates') { texts.push(templateBlock(p.entries, p.all, seed)); linked = true; }
-    else if (p.type === 'faq') { const t = p.faq.answer((path, label) => link(path, label)).join('\n'); texts.push(t); }   // these answers say what needs a sign-in themselves, so no footer
+    else if (p.type === 'faq') { const t = p.faq.answer((path, label) => link(path, label), ownerMention()).join('\n'); texts.push(t); }   // these answers say what needs a sign-in themselves, so no footer
     else {
       texts.push(p.entries.map((x) => `${pick(['Here’s the', 'That’s the', 'You want the'], seed)} *${x.title}*. ${x.blurb} ${link(x.page || '/', 'Open it')}.`).join('\n'));
       linked = true;
