@@ -190,6 +190,24 @@ export const FAQ = [
     answer: (L) => [`The ${L('/downloads', 'Downloads page')} has a “Download all” button that gives you everything in one zip: the logos, color sheet, fonts and tokens.`],
   },
   {
+    id: 'utsav',
+    words: ['utsav', 'singh', 'creator', 'created', 'made', 'maker', 'built', 'builder', 'owner', 'owns', 'who', 'design', 'head', 'boss', 'behind', 'person'],
+    strong: ['utsav', 'creator', 'created', 'maker', 'builder'],
+    answer: () => [
+      'Utsav Singh is Gushwork’s design owner. He owns the design system and this hub, reviews and approves everything before it reaches the Claude plugin, and he built me.',
+      'For access, questions or ideas about design, he is the person to ask.',
+    ],
+  },
+  {
+    id: 'why-bruce',
+    words: ['why', 'purpose', 'exist', 'exists', 'point', 'reason', 'bruce', 'needed', 'useful', 'for', 'goal', 'idea', 'behind'],
+    strong: ['purpose', 'exist', 'exists', 'reason', 'goal'],
+    answer: () => [
+      'Design should not be the bottleneck. Utsav built me so the team can get brand files, templates and answers straight away, without waiting on the design desk.',
+      'Over time I’ll take on small, well-defined design jobs too, always inside the design system so the work stays on brand. Right now I hand over files and point you to the right template.',
+    ],
+  },
+  {
     id: 'bruce',
     words: ['bruce', 'you', 'bot', 'assistant', 'who', 'are', 'yourself', 'name', 'about', 'what', 'do', 'can', 'built', 'capable'],
     strong: ['bot', 'assistant', 'yourself'],
@@ -208,7 +226,9 @@ const PATTERNS = {
   privacy: [/plugin\s+(?:log|track|record|collect)/, /(?:log|track|record|collect)\w*\s+(?:me|my|what)/, /what\s+(?:does|do)\s+(?:the\s+)?plugin\s+(?:log|track|record)/],
   voice: [/book\s+a\s+(?:demo|call)/, /tone\s+of\s+voice/, /sentence\s+case/],
   'design-system': [/(?:admin|design[\s-]system)\s+page/, /library\s+page/, /review\s+and\s+approval/],
-  bruce: [/who\s+(?:made|built|created)\s+(?:you|bruce)/, /will\s+you\s+(?:design|make)/, /who\s+are\s+you/, /what\s+are\s+you/, /are\s+you\s+(?:a\s+)?(?:bot|robot|ai)/, /your\s+name/],
+  utsav: [/who\s+is\s+utsav/, /about\s+utsav/, /who\s+(?:made|built|created|owns|runs|designed)\s+(?:you|bruce|this|the\s+(?:hub|site|design\s+system))/, /who\s+is\s+(?:your|the)\s+(?:creator|owner|maker)/, /design\s+owner/],
+  'why-bruce': [/why\s+(?:do|did)\s+you\s+exist/, /why\s+(?:was|were)\s+(?:you|bruce)\s+(?:made|built|created)/, /what\s+(?:are\s+you|is\s+bruce)\s+for/, /your\s+purpose/, /why\s+(?:do\s+we\s+have\s+)?bruce/, /why\s+are\s+you\s+here/],
+  bruce: [/will\s+you\s+(?:design|make)/, /who\s+are\s+you/, /what\s+are\s+you(?!\s+for)/, /are\s+you\s+(?:a\s+)?(?:bot|robot|ai)/, /your\s+name/],
   contact: [/who\s+(?:owns|runs|maintains)/, /who\s+(?:do|should)\s+i\s+(?:ask|contact|talk)/],
 };
 
@@ -247,6 +267,8 @@ export const EXAMPLES = {
   changelog: ['what changed recently', 'where are the release notes', 'show me the changelog'],
   'design-system': ['what is the library page', 'how does review and approval work', 'what is the design system admin page'],
   'download-all': ['can I get everything in one zip', 'is there a download all bundle'],
-  bruce: ['who are you', 'what are you', 'are you a bot', 'who made you', 'who built bruce', 'will you design things'],
+  bruce: ['who are you', 'what are you', 'are you a bot', 'will you design things'],
+  utsav: ['who is utsav', 'who made you', 'who built bruce', 'tell me about utsav', 'who is the design owner'],
+  'why-bruce': ['why do you exist', 'why was bruce made', 'what are you for', 'what is your purpose'],
   homepage: ['where is the gushwork homepage', 'is this the gushwork website', 'where is the main gushwork.ai site', 'where can I see pricing'],
 };
