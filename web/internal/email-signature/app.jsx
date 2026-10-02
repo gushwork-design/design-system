@@ -703,10 +703,9 @@ function App() {
   const [photoUrl, setPhotoUrl] = useState(() => window.GW_ASSETS?.defaultPhoto || null);
   const [photoName, setPhotoName] = useState(() => (window.GW_ASSETS?.defaultPhoto ? 'Default photo' : ''));
   const [photoXform, setPhotoXform] = useState({ x: 50, y: 40, zoom: 100, grayscale: false });
-  // One theme for the whole tool: the hub's Appearance setting. The bar's sun/moon writes it,
-  // and anything else that changes it (the Appearance menu) flows back in via the observer below.
+  // One theme for the whole tool: the hub's Appearance setting (tool-chrome.js). It writes data-theme on <html>;
+  // the observer below keeps the preview in step with it.
   const [theme, setThemeState] = useState(() => (document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light'));
-  const setTheme = (t) => { setThemeState(t); if (window.gwSetTheme) window.gwSetTheme(t); else document.documentElement.dataset.theme = t; };
   useEffect(() => {
     const obs = new MutationObserver(() => setThemeState(document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light'));
     obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
@@ -1163,31 +1162,6 @@ function App() {
 
       {/* ── floating bottom toolbar ── */}
       <div className="floating-toolbar">
-        <div className="tb-pill" role="tablist" aria-label="Preview background">
-          <button
-            className={`icon-only ${theme === 'light' ? 'active' : ''}`}
-            onClick={() => setTheme('light')}
-            type="button"
-            title="Light background"
-            aria-label="Light"
-          >
-            <SunIcon />
-          </button>
-          <span className="moon-tooltip">
-            <button
-              className={`icon-only ${theme === 'dark' ? 'active' : ''}`}
-              onClick={() => setTheme('dark')}
-              type="button"
-              aria-label="Dark"
-            >
-              <MoonIcon />
-            </button>
-            <span className="moon-tooltip-tip" role="tooltip">
-              In dark mode — signature may render differently on some devices.
-            </span>
-          </span>
-        </div>
-
         <div className="tb-pill" role="tablist" aria-label="Viewport">
           <button
             className={viewport === 'desktop' ? 'active' : ''}
