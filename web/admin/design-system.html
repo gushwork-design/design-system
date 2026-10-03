@@ -825,6 +825,8 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 @media (max-width: 767px) { .fd-r { grid-template-columns: 1fr; gap: var(--gw-space-8); } }
 
 .ds-panel[hidden] { display: none; }
+/* What the Library is for, above its category bar. Plain text, the width of the descriptions inside it. */
+.ds-lead { margin: 0 0 var(--gw-space-20); max-width: 72ch; font: var(--gw-text-body-14-reg); color: var(--ul-sub); }
 /* The Review tab wraps its content in one more block than the other tabs, and a plain block has no gap: the stat
    cards sat directly on the table card. It stacks like the panel it lives in. */
 #ds-review-app { display: flex; flex-direction: column; gap: var(--gw-space-24); }
@@ -877,6 +879,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     </div>
 
     <section class="ds-panel" id="ds-library" role="tabpanel">
+      <p class="ds-lead">Library shows everything approved for building Gushwork pages, decks, dashboards and ads: the foundations (colour, type, spacing, radius), the components, and the templates to start from. Click a swatch to copy its token, open a component to see it up close, or use a template with Claude.</p>
       <div class="an-bar ds-cats"><div class="ul-tabs an-tabs" id="ds-lib-tabs" role="tablist" aria-label="Library"></div></div>
       <div class="fd" id="ds-fd"></div>
     </section>
@@ -1434,6 +1437,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     { get: function (it) { return it.label; }, dir: 1 },
     { get: function (it) { return scopeTitle(it); }, dir: 1 },
     { get: function (it) { return STATE_RANK[eff(it).state]; }, dir: 1 },
+    { get: function (it) { return it.changed || null; }, dir: 1 },   // Requested: the longest-waiting first, as it is a queue
     { get: function (it) { return eff(it).queued ? '9999-12-31' : (it.on || null); }, dir: -1 },
     null
   ];
@@ -1461,11 +1465,12 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     var rows = list.slice(0, RF.shown).map(function (it) {
       var e = eff(it), by = e.queued ? 'You, just now' : (it.by ? it.by + (it.on ? ' · ' + it.on : '') : '—');
       return '<div class="ul-row ul-row--d rv-row" role="row" tabindex="0" data-id="' + esc(idOf(it)) + '">' +
-        cell('<b style="font-weight:600">' + esc(it.label) + '</b>', '') + txt(scopeTitle(it)) + cell(badgeOf(e.state, e.queued, e.q)) + txt(by) +
+        cell('<b style="font-weight:600">' + esc(it.label) + '</b>', '') + txt(scopeTitle(it)) + cell(badgeOf(e.state, e.queued, e.q)) +
+        txt(it.changed || '—', it.changed ? '' : 'ul-c--none', it.changed ? 'Came up for review on this date: the day its spec last moved' : 'No date recorded') + txt(by) +
         cell('<span class="ds-pv rv-go">Review</span>') + '</div>';
     });
-    var revHeads = ['Item', 'Library', 'Status', 'Decided', ''].map(function (h, i) { return REV_SORT[i] ? { html: sortTh('rev', i, h) } : h; });
-    $('ds-rev-table').innerHTML = table('minmax(200px,1.6fr) 130px 190px minmax(140px,1fr) 100px', revHeads, rows,
+    var revHeads = ['Item', 'Library', 'Status', 'Requested', 'Decided', ''].map(function (h, i) { return REV_SORT[i] ? { html: sortTh('rev', i, h) } : h; });
+    $('ds-rev-table').innerHTML = table('minmax(170px,1.3fr) 110px 140px 110px minmax(210px,1.2fr) 90px', revHeads, rows,
       RV.filter === 'waiting' ? 'Nothing is waiting on you' : 'Nothing here yet');
     [].forEach.call($('ds-rev-table').querySelectorAll('[data-sort-i]'), function (b) {
       b.addEventListener('click', function () {
