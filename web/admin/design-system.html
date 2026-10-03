@@ -517,7 +517,7 @@ body[data-gw-page="design-system"] .sg__main > * { min-width: 0; }
 /* The period pills (7 days, 30 days, All time) sit on the left of each tab's controls, with Visits' area filter beside them; the refresh icon stays on the right. */
 
 /* One divider, not two: the tab row's hairline is the page header's rule. */
-body[data-gw-page="design-system"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw-space-8); }
+/* The header keeps its rule here, as Templates, Tools and the Style Guide do (Analytics and Access Control drop it). */
 .an-panel { display: flex; flex-direction: column; gap: var(--gw-space-24); }
 .an-panel > * { min-width: 0; }
 .an-panel[hidden] { display: none; }
@@ -836,6 +836,8 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 
 .ds-panel[hidden] { display: none; }
 /* What the Library is for, above its category bar. Plain text, the width of the descriptions inside it. */
+/* What the Design System is and how it is managed: the page's opening paragraph, set like the Style Guide's, Templates' and Tools'. */
+.ds-intro { margin: 0; max-width: 780px; font: var(--gw-text-body-16-reg); letter-spacing: var(--gw-text-body-16-reg-tracking); color: var(--s-body); }
 .ds-lead { margin: 0 0 var(--gw-space-20); max-width: 72ch; font: var(--gw-text-body-14-reg); color: var(--ul-sub); }
 /* The Review tab wraps its content in one more block than the other tabs, and a plain block has no gap: the stat
    cards sat directly on the table card. It stacks like the panel it lives in. */
@@ -875,10 +877,13 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 
   <header class="sg__hd">
     <h1>Design System</h1>
-    <p>The foundations and component library, the review gate and how design runs</p>
+    <p>Last updated 3rd Oct, 2026</p>
   </header>
 
   <main class="sg__main">
+
+    <!-- What this page is and how it is managed, under the header rule as the other pages open. -->
+    <p class="ds-intro">The Design System is where Gushwork&rsquo;s design decisions are kept: the foundations, the components and the templates that pages, decks, dashboards and ads are built from. It is managed here too. New and changed items wait in Review until the owner approves, reworks or rejects them, and only what is approved reaches the Library and the skills. Workflow explains how a design request is routed.</p>
 
     <div class="an-bar">
       <div class="ul-tabs an-tabs" id="ds-tabs" role="tablist" aria-label="Design system">
@@ -889,7 +894,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     </div>
 
     <section class="ds-panel" id="ds-library" role="tabpanel">
-      <p class="ds-lead">Library shows everything approved for building Gushwork pages, decks, dashboards and ads: the foundations (colour, type, spacing, radius), the components, and the templates to start from. Click a swatch to copy its token, open a component to see it up close, or use a template with Claude.</p>
+      <p class="ds-lead">Library shows everything approved for building Gushwork pages, decks, dashboards and ads: the foundations (colour, type, spacing, radius), the components, and the templates to start from.</p>
       <div class="an-bar ds-cats"><div class="ul-tabs an-tabs" id="ds-lib-tabs" role="tablist" aria-label="Library"></div></div>
       <div class="fd" id="ds-fd"></div>
     </section>
