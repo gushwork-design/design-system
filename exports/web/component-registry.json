@@ -265,6 +265,12 @@
       "reviewedOn": "2026-10-03",
       "fingerprint": "04dafbc834af9518",
       "note": "phone version missing"
+    },
+    "eyebrow": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-03",
+      "fingerprint": "57f49b7dccafc6be"
     }
   }
 }
