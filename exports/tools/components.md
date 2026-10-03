@@ -70,5 +70,5 @@ How a tool shows a job that takes time, such as removing a photo background.
 | Done | check, "Done" |
 | Failed | warning icon, "Failed. Try again" |
 
-The progress sits **beside** the control it belongs to, to the left of its switch, never beneath it
+The progress sits **beside** the control it belongs to, to the right of its switch on the same line (switch first, then the status), never to its left and never beneath it
 and never as an unlabelled wait.
