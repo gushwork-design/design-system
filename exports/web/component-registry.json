@@ -291,6 +291,13 @@
       "reviewedOn": "2026-10-03",
       "fingerprint": "be3c8593cbc7e201",
       "note": "this one is messed up - https://www.figma.com/design/VKcb4fgVyOHKfQonMgN772/Gush-Design-System-v2.0?node-id=1951-8109&t=2sN2OJ41r7XNQyh2-11\ncheck the figma and add all variants; this is not footer but image variations for the CTA folds which use images, it comes in blue and black."
+    },
+    "form": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-03",
+      "fingerprint": "0777a79984b4e83a",
+      "note": "flags are missing here"
     }
   }
 }
