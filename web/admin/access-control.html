@@ -148,9 +148,12 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
   margin: 0 calc(var(--gw-space-12) * -1);
   padding: var(--gw-space-8) var(--gw-space-12);
   border-bottom: 1px solid var(--s-card-border);
-  font: var(--gw-text-body-10-sem); letter-spacing: .06em; text-transform: uppercase;
-  color: var(--s-group-label);
+  /* The same header as every other table on the admin pages (the .ul-th of Review and Analytics, v2/data-table.md): 12 medium,
+     uppercase, no tracking, Neutral/700 (Neutral/100 in dark). It was a 10 semibold with .06em tracking in the group-label grey. */
+  font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); text-transform: uppercase;
+  color: var(--gw-color-neutral-700);
 }
+:root[data-theme="dark"] .ac-head { color: var(--gw-color-neutral-100); }
 
 .ac-field, .ac-select {
   width: 100%; box-sizing: border-box; min-height: 40px;
@@ -367,7 +370,9 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
 .ac-tool { gap: var(--gw-space-16); }
 .ac-row, .ac-head { grid-template-columns: minmax(280px, 1.5fr) 232px minmax(0, 1.2fr) 44px; }
 .ac-tool__pv { width: 72px; }
-.ac-head { padding: 0 var(--gw-space-12) var(--gw-space-12); }
+/* 44 tall, the shared header row, with the label centred in it. */
+.ac-head { padding: 0 var(--gw-space-12); height: 44px; align-items: center; border-bottom-color: var(--gw-color-neutral-100); }
+:root[data-theme="dark"] .ac-head { border-bottom-color: var(--gw-color-neutral-900); }
 /* The owner and admin boxes inside the last tab lose their frames too: two sections divided by a hairline. */
 .ac-lvls { gap: 0; padding-top: 0; }
 .ac-card__body:has(.ac-lvls) { padding: 0; }
