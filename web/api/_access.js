@@ -54,17 +54,16 @@ export function defaultRules() {
       { path: '/admin',    access: 'admin',    groups: [], people: [] },
       { path: '/internal', access: 'internal', groups: [], people: [] },
       /* The component library. Its own surface rather than a page under
-         /internal, because it renders its own chrome instead of the site shell
-         — now admin tier, like the rest of the design system admin. The review queue
-         under it is admin too, and wins here by being the longer prefix. */
-      { path: '/library',  access: 'admin', groups: [], people: [] },
-      /* The drawn previews the review drawer shows, one HTML file per component. Same tier as the library. */
-      { path: '/previews', access: 'admin', groups: [], people: [] },
-      /* Moved from the internal tier to admin on 1 Oct 2026, when the library became a tab of
-         /admin/design-system next to the Catalogue and the Review Gate. */
+         /internal, because it renders its own chrome instead of the site shell.
+         Internal tier again since 3 Oct 2026: the Design System page moved into
+         the internal section so that everyone internal can use the Library tab.
+         The review queue under it stays admin, and wins here by being the longer prefix. */
+      { path: '/library',  access: 'internal', groups: [], people: [] },
+      /* The drawn previews the Library's drawer shows, one HTML file per component. Same tier as the library. */
+      { path: '/previews', access: 'internal', groups: [], people: [] },
       { path: '/library/review', access: 'admin', groups: [], people: [] },
       /* The review sheet is where a component is passed into skills/, so it is the owner's, and the
-         Review tab of /admin/design-system asks for an owner account before it opens it. */
+         Review tab of /internal/design-system shows admins what is waiting; only the owner can act on it. */
       { path: '/admin/review-sheet', access: 'owner', groups: [], people: [] },
       /* Analytics (usage log, visits and insights on one page) lists who ran a session and who opened
          which page, which admins have no need to see. The old /admin/usage-log, /visits and /insights

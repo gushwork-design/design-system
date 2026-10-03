@@ -107,7 +107,11 @@
         { label: 'Claude Plugin', href: '/internal/claude-plugin', icon: 'sparkle' },
         { label: 'Tools',         href: '/internal/tools',         icon: 'toolbox' },
         { label: 'Templates',     href: '/internal/templates',     icon: 'squares-four' },
-        { label: 'Change Log',    href: '/internal/changelog',     icon: 'stack-overflow-logo' }
+        { label: 'Change Log',    href: '/internal/changelog',     icon: 'stack-overflow-logo' },
+        /* The Component Library, the Catalogue and the Review Gate are one page with three tabs. It moved from Admin to
+           this group on 3 Oct 2026 so that everyone internal can use the Library; the Review and Workflow tabs inside it
+           show an "admin access required" alert to anyone who is not an admin. */
+        { label: 'Design System', href: '/internal/design-system', icon: 'shapes' }
       ]
     },
     /* Staging is drawn as its own group in 683:5282 because it is a GTM
@@ -144,12 +148,7 @@
     label: 'Admin',
     tier: 'admin',
     items: [
-      { label: 'Access Control', href: '/admin/access-control', icon: 'gear' },
-      /* The Component Library, the Catalogue and the Review Gate are one page with three tabs
-         (/admin/design-system), the same way Analytics holds the usage log, visits and insights.
-         The Review tab asks for an owner account; the other two are for admins. The design workflow is
-         a fourth tab. Ruled by Utsav, 1 Oct 2026. */
-      { label: 'Design System', href: '/admin/design-system', icon: 'shapes' }
+      { label: 'Access Control', href: '/admin/access-control', icon: 'gear' }
     ]
   };
 

@@ -4,6 +4,11 @@
   "trailingSlash": false,
   "redirects": [
     {
+      "source": "/admin/design-system",
+      "destination": "/internal/design-system",
+      "permanent": false
+    },
+    {
       "source": "/admin/ad-page-sheet",
       "destination": "/library/recipes/ad-landing-page",
       "permanent": false
@@ -45,22 +50,22 @@
     },
     {
       "source": "/preview/review-sheet",
-      "destination": "/admin/design-system#review",
+      "destination": "/internal/design-system#review",
       "permanent": false
     },
     {
       "source": "/preview/review-sheet.html",
-      "destination": "/admin/design-system#review",
+      "destination": "/internal/design-system#review",
       "permanent": false
     },
     {
       "source": "/preview/catalogue",
-      "destination": "/admin/design-system#library",
+      "destination": "/internal/design-system#library",
       "permanent": false
     },
     {
       "source": "/preview/catalogue.html",
-      "destination": "/admin/design-system#library",
+      "destination": "/internal/design-system#library",
       "permanent": false
     },
     {
@@ -85,42 +90,42 @@
     },
     {
       "source": "/admin/component-library",
-      "destination": "/admin/design-system#library",
+      "destination": "/internal/design-system#library",
       "permanent": false
     },
     {
       "source": "/admin/catalogue",
-      "destination": "/admin/design-system#library",
+      "destination": "/internal/design-system#library",
       "permanent": false
     },
     {
       "source": "/admin/review",
-      "destination": "/admin/design-system#review",
+      "destination": "/internal/design-system#review",
       "permanent": false
     },
     {
       "source": "/admin/review-sheet",
-      "destination": "/admin/design-system#review",
+      "destination": "/internal/design-system#review",
       "permanent": false
     },
     {
       "source": "/library",
-      "destination": "/admin/design-system#library",
+      "destination": "/internal/design-system#library",
       "permanent": false
     },
     {
       "source": "/library/review",
-      "destination": "/admin/design-system#review",
+      "destination": "/internal/design-system#review",
       "permanent": false
     },
     {
       "source": "/library/components",
-      "destination": "/admin/design-system#library",
+      "destination": "/internal/design-system#library",
       "permanent": false
     },
     {
       "source": "/admin/workflow",
-      "destination": "/admin/design-system#workflow",
+      "destination": "/internal/design-system#workflow",
       "permanent": false
     }
   ],
