@@ -657,6 +657,8 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .ds-panel .ul-tabs { max-width: 100%; overflow-x: auto; scrollbar-width: none; }
 .ds-panel .ul-tabs::-webkit-scrollbar { display: none; }
 .ds-panel .ul-tab { white-space: nowrap; flex: none; }
+.fd-top { display: flex; flex-direction: column; gap: var(--gw-space-8); }
+.fd-title { margin: 0; font: 600 24px/1.2 var(--gw-font-display); color: var(--ul-value); }
 .fd-head p { margin: 0; font: var(--gw-text-body-14-reg); color: var(--ul-sub); max-width: 62ch; }
 .fd-head__r { display: flex; align-items: center; gap: var(--gw-space-12); }
 .fd-sec { display: flex; flex-direction: column; gap: var(--gw-space-16); }
@@ -994,7 +996,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 
   function $(id) { return document.getElementById(id); }
   function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
-  function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
+  function plural(n, w) { return n + ' ' + (n === 1 ? w : w.replace(/([^aeiou])y$/, '$1ie') + 's'); }   // family → families
   function metric(label, value, note) { return '<div class="ul-metric"><span class="ul-lab">' + esc(label) + '</span><div class="ul-metric__body"><span class="ul-num">' + esc(value) + '</span><span class="ul-note">' + esc(note) + '</span></div></div>'; }
   function th(t) { return '<div role="columnheader"><span class="ul-th"><span class="ul-th--plain">' + esc(t) + '</span></span></div>'; }
   function cell(html, cls) { return '<div class="ul-c ' + (cls || '') + '" role="cell">' + html + '</div>'; }
@@ -1312,7 +1314,8 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
           var n = FD_PARTS[x[0]].filter(function (p) { return approved('foundation', p[0]); }).reduce(function (a, p) { return a + partCount(t, p[0]); }, 0);
           return [x[0], x[1], n, x[0] === F.tab];
         });
-        main = '<div class="fd-head"><p>' + esc(FD_NOTE[F.tab]) + '</p></div>' + body;
+        var ftitle = FD_TABS.filter(function (x) { return x[0] === F.tab; })[0];
+        main = '<div class="fd-top"><h2 class="fd-title">' + esc(ftitle ? ftitle[1] : 'Foundations') + '</h2><div class="fd-head"><p>' + esc(FD_NOTE[F.tab]) + '</p></div></div>' + body;
       }
     } else {
       if (cat.soon) {
@@ -1325,7 +1328,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
         var sx = x.surface ? d.surfaces.filter(function (y) { return y.key === x.surface; })[0] : null;
         return [x.key, x.title, (sx ? sx.components.filter(function (c) { return approved(sx.key, c.name); }).length : 0) + startPoints(d, x).length, x === sub];
       }) : null;
-      main = '<div class="fd-head"><p>' + esc((sf && sf.what) || (cat.title + ' · ' + sub.title)) + '</p></div>' + tplCards(startPoints(d, sub)) + compTable(sf);
+      main = '<div class="fd-top"><h2 class="fd-title">' + esc(cat.subs.length > 1 ? sub.title : cat.title) + '</h2><div class="fd-head"><p>' + esc((sf && sf.what) || (cat.title + ' · ' + sub.title)) + '</p></div></div>' + tplCards(startPoints(d, sub)) + compTable(sf);
       }
     }
     host.setAttribute('data-solo', side ? '0' : '1');
