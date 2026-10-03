@@ -362,9 +362,10 @@ These sit above the individual component rules.
   pressed state. **Before filling anything blue, ask which of the two it is.** Full rule in
   `controls.md`.
 - **Every interactive element has hover and focus; nothing else does.** Values are ruled per
-  component. The focus ring is mandatory — no component in Figma defines one, so without it
-  keyboard users get nothing. Anything non-interactive gets no hover, cursor or ring. See
-  `states.md`.
+  component. The focus ring is mandatory but keyboard only (R41) — on `:focus-visible`, never
+  `:focus` — and no component in Figma defines one, so without it keyboard users get nothing.
+  Text fields take their own edge instead of the ring. Anything non-interactive gets no hover,
+  cursor or ring. See `states.md`.
 - **1440 is the minimum dashboard width.** Below it, scale the shell — never reflow, shrink or
   clip. See `build-rules.md`.
 - **`section/header` is sticky** at the top of every page unless explicitly asked
@@ -416,7 +417,7 @@ cost a review round. **They are ruled. Follow the file.**
 | Toast auto-dismiss | **4s**, resets on a new toast, clears on manual dismiss | `toast.md` |
 | Toast message length | must fit the **276px** column — ~32 characters. Never widen the 360 | `toast.md` |
 | Blue vs black | blue = data/status, black = interaction state | `controls.md` |
-| Focus states | `--gw-focus-ring` on `:focus-visible`, everywhere. Mandatory | `states.md` |
+| Focus states | `--gw-focus-ring` on `:focus-visible` only, never `:focus`; text fields show their edge instead (R41). Mandatory | `states.md` |
 | `Button` hover fills | **MEASURED, not ruled** — Primary `neutral/850`, Outline `neutral/35`, Ghost `neutral/50`. The three hand-ruled values were all wrong | `button.md` |
 | Other hover fills | ruled per control; hover moves ONE step toward the element's selected state | `controls.md`, `section-elements.md` |
 | Text fields | a **shared atom**, used by both surfaces. **No hover state** — `State=Hover` ≡ `Default` | `foundation/text-field.md`, **R1 R2** |

@@ -1655,7 +1655,7 @@ h1,h2,h3{{margin:0;font-weight:inherit}}
  border-radius:{tok('--gw-radius-8')};background:var(--s-inset);
  box-shadow:inset 0 0 0 1px var(--b-strong);
  font:{tok('--gw-text-button-14')};color:var(--t-body)}}
-.dp-field:focus{{outline:2px solid {tok('--gw-color-primary-500')};outline-offset:1px}}
+.dp-field:focus{{outline:none;box-shadow:inset 0 0 0 1px {tok('--gw-color-neutral-400')}}}
 .dp-field[aria-invalid="true"]{{box-shadow:inset 0 0 0 1px {tok('--gw-color-red-400')};
  color:{tok('--gw-color-red-500')}}}
 .dp-to{{font:{tok('--gw-text-body-12-med')};letter-spacing:var(--gw-text-body-12-med-tracking);

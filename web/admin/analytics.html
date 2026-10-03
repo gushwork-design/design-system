@@ -163,8 +163,9 @@ body[data-gw-page="analytics"] .sg__main > * { min-width: 0; }
     --ul-disabled:   var(--gw-color-neutral-600);
 }
 
-/* Focus. No v2 component defines one; --gw-focus-ring on :focus-visible is mandatory (states.md). */
-.ul-scope :is(button, a, input, select, [tabindex]):focus-visible {
+/* Focus. No v2 component defines one. The ring is keyboard-only, on :focus-visible (R41, states.md). Text fields are
+   not in this list: a browser counts a click into one as keyboard focus, so they show their own edge instead. */
+.ul-scope :is(button, a, select, [tabindex]):focus-visible {
   outline: var(--gw-focus-ring);
   outline-offset: var(--gw-focus-offset);
 }
@@ -284,7 +285,7 @@ body[data-gw-page="analytics"] .sg__main > * { min-width: 0; }
   border: 0; border-radius: var(--gw-radius-8); background: var(--ul-field-bg); color: var(--ul-field-fg);
   box-shadow: inset 0 0 0 1px var(--ul-field-line); font: var(--gw-text-button-14); }
 .ul-input input::placeholder { color: var(--ul-field-ph); }
-.ul-input input:focus { box-shadow: inset 0 0 0 1px var(--gw-color-black); }
+.ul-input input:focus { outline: none; box-shadow: inset 0 0 0 1px var(--gw-color-black); }
 :root[data-theme="dark"] .ul-input input:focus { box-shadow: inset 0 0 0 1px var(--gw-color-white); }
 .ul-select { position: relative; display: inline-block; }
 .ul-select select { appearance: none; -webkit-appearance: none; height: 36px; padding: 0 calc(var(--gw-space-12) + 16px) 0 var(--gw-space-12);

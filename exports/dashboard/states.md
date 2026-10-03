@@ -4,7 +4,7 @@
 >
 > | Ruling | Status |
 > |---|---|
-> | **Focus** — `--gw-focus-ring` on `:focus-visible`, mandatory everywhere | **CURRENT and unchanged.** No v2 component defines a focus ring; this ruling is the only thing that gives keyboard users anything |
+> | **Focus** — `--gw-focus-ring` on `:focus-visible`, mandatory everywhere | **CURRENT, narrowed by R41 (3 Oct 2026):** keyboard only, and text fields show their own edge instead of the ring. No v2 component defines a focus ring; this ruling is the only thing that gives keyboard users anything |
 > | **Empty** — "compose from `section/Container`" | **Superseded** — there is now a real `empty-state` component. [`v2/feedback.md`](v2/feedback.md) |
 > | **Loading** — ruled per surface | **Partly superseded** — a `skeleton` component now exists for in-place table and card loading. The whole-screen `Loading & fetching data…` + progress bar pattern here is still current |
 > | **Hover** — "moves ONE step toward the selected state" | **CURRENT.** v2 defines hover only on `table-row` (`neutral/25`); for every other component this ruling is still how you derive it |
@@ -28,18 +28,25 @@ Ruled by Utsav, 7 Aug 2026. **Unavailable** ruled by Utsav, 28 Aug 2026.
 happened to do, which on a restyled `<button>` is often nothing at all.
 
 ```css
-:is(button, a, [tabindex], input, select, textarea):focus-visible {
+:is(button, a, [tabindex], select, summary):focus-visible {
   outline: var(--gw-focus-ring);
   outline-offset: var(--gw-focus-offset);
   border-radius: var(--gw-radius-4);
 }
 ```
 
+**Keyboard only (R41).** The ring shows when something is reached by keyboard and never after a
+click. **Text fields (`input`, `textarea`) are not in that list on purpose:** a browser treats a
+click into a text field as keyboard focus, so the ring would show on every click. A text field
+shows its own edge instead (the dashboard `input`'s 1px black `focus` border, or `neutral/400` on
+the hub), which is also visible when it is reached by keyboard.
+
 - `--gw-focus-ring` and `--gw-focus-offset` are in `foundation/tokens.css`. They compose from
   `--gw-color-primary-alpha-40` and introduce no new colour.
-- **`:focus-visible`, not `:focus`** — a mouse click should not leave a ring behind.
+- **`:focus-visible`, not `:focus`** — a mouse click should not leave a ring behind. A rule that puts the ring on `:focus` is a bug.
 - **Never `outline: none` without a replacement.** This is the one rule in this file that is an
-  accessibility requirement rather than a preference.
+  accessibility requirement rather than a preference. For a text field the replacement is its
+  edge, as above.
 - Blue is correct here. A focus ring is a **signal**, not a control state — see the
   data-vs-control-state rule in `controls.md`.
 

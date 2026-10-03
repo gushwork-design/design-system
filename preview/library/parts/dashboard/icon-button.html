@@ -55,7 +55,7 @@
          padding:var(--gw-space-8) var(--gw-space-12);font:var(--gw-text-body-14-reg);
          color:var(--s-heading)}
 .cl-find::placeholder{color:var(--s-placeholder)}
-.cl-find:focus{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.cl-find:focus{outline:none;border-color:var(--gw-color-neutral-400)}
 .cl-filter{display:flex;gap:var(--gw-space-4);flex-wrap:wrap}
 .cl-f{font:var(--gw-text-body-12-med);color:var(--s-body);background:transparent;
       border:1px solid var(--s-field-border);border-radius:var(--gw-radius-full);
@@ -271,7 +271,7 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
          border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
          padding:0 var(--gw-space-12);font:var(--gw-text-body-14-reg);color:var(--s-heading)}
 .lb-find::placeholder{color:var(--s-placeholder)}
-.lb-find:focus{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.lb-find:focus{outline:none;border-color:var(--gw-color-neutral-400)}
 .lb-tbtn{width:36px;height:36px;display:grid;place-items:center;background:transparent;
          border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
          color:var(--s-body);cursor:pointer;flex:none}
@@ -504,7 +504,7 @@ a.cat-name{color:var(--gw-color-primary-600);text-decoration:none}
 <p><b>240 × 36</b>, <code>radius/8</code>, <code>py-8 px-12</code>, gap <code>spacing/8</code>, fill <code>neutral/white</code>, 1px <code>neutral/400</code>. Label <code>button-14-med</code>, and it grows.</p>
 <div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>State</th><th>Border</th><th>Text</th><th>Extra</th></tr></thead><tbody><tr><td><code>placeholder</code></td><td>1px <code>neutral/400</code></td><td><code>neutral/400</code></td><td>—</td></tr><tr><td><code>filled</code></td><td>1px <code>neutral/400</code></td><td><code>neutral/900</code></td><td>—</td></tr><tr><td><code>focus</code></td><td>1px <b><code>neutral/black</code></b></td><td><code>neutral/900</code></td><td>1 × 16 caret, <code>neutral/black</code></td></tr></tbody></table></div>
 <p><code>Type=search</code> prepends <code>MagnifyingGlass</code> 16 Weight=Regular, <code>neutral/400</code>.</p>
-<p>⚠ The <code>focus</code> border here is a <b>fill treatment, not the focus ring.</b> <code>--gw-focus-ring</code> on <code>:focus-visible</code> is still mandatory and additive — see <code>states.md</code>, ruling <b>R1/R2</b>.</p>
+<p>⚠ The <code>focus</code> border here is a <b>fill treatment, not the focus ring</b> — and since R41 (3 Oct 2026) it is the field's whole focus state: a text field takes no ring, because a click into it counts as keyboard focus. See <code>states.md</code>.</p>
 <p>⚠ <b><code>foundation/text-field.md</code> is the shared 14-variant text field used by both surfaces, and it remains authoritative for forms.</b> This component is the dashboard's dense inline field — a table toolbar search, a filter box. If you are building a form, use the shared atom.</p>
 <p><b>Dark is DERIVED, not measured</b> — the dark screen contains no input. Taken from the measured dark select: <code>neutral/800</code> fill + 1px <code>neutral/600</code>, white value, <code>neutral/400</code> placeholder, focus border <code>neutral/white</code>.</p></div></main><div class="lb-toc"><b>On this page</b><a href="#control-one-component-four-jobs" class="l3">control — one component, four jobs</a><a href="#geometry-shared-by-button-and-select" class="l3">Geometry — shared by button and select</a><a href="#kind-button" class="l3">Kind=button</a><a href="#kind-select" class="l3">Kind=select</a><a href="#kind-nav" class="l3">Kind=nav</a><a href="#kind-user" class="l3">Kind=user</a><a href="#icon-button" class="l3">icon-button</a><a href="#tab-item" class="l3">tab-item</a><a href="#tab-group" class="l3">tab-group</a><a href="#icon-toggle-group" class="l3">icon-toggle-group</a><a href="#input" class="l3">input</a></div></div>
 <script>

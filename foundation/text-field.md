@@ -120,9 +120,11 @@ linear loop, and stop it entirely under `prefers-reduced-motion`.
 a design difference). The field is `w-full` inside its own wrapper, so it takes the width it is
 given. The login screen gives it 460.
 
-**Focus is mandatory and is not in Figma.** Nothing in these 14 variants draws a focus ring.
-Apply `--gw-focus-ring` on `:focus-visible` as `exports/dashboard/states.md` requires — a
-restyled input otherwise leaves keyboard users with nothing, since the fill does not move either.
+**Focus is mandatory and is not in Figma.** Nothing in these 14 variants draws a focus ring, and
+since R41 (3 Oct 2026) a text field does not get one: a browser counts a click into a text field as
+keyboard focus, so a ring would show on every click. Show the field's own edge instead — a 1px
+`neutral/400` border, or black in the dashboard — so the field never goes without a visible
+focus state, whether it is reached by click or by keyboard. `exports/dashboard/states.md` has the rule.
 
 **`Selected` is not `:focus`.** `Selected` is the *design* state for "focused and empty". Once
 there is a value, the field is `Filled` whether or not it still has focus. Map them by content,

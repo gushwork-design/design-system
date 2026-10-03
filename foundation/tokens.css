@@ -661,7 +661,12 @@
      keyboard user got whatever the browser did.
 
      Composed from existing tokens; introduces no new colour. Applies to every
-     focusable element on both surfaces. */
+     focusable element on both surfaces.
+
+     Keyboard only (R41, 3 Oct 2026): use it on :focus-visible, never on :focus,
+     so a click leaves nothing behind. Text fields do not take it: a browser
+     counts a click into one as keyboard focus, so a field shows its own edge
+     (a 1px Neutral/400, or black in the dashboard) instead. */
   --gw-focus-ring: 2px solid var(--gw-color-primary-alpha-40);
   --gw-focus-offset: 2px;
 

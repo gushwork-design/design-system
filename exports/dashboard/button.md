@@ -126,8 +126,8 @@ than the guess, every time.** Two more corrections that fall out of the same rea
 - `Ghost` and `Outline` do **not** share a hover value. The ruling assumed they did.
 
 Transition with `--gw-motion-fast`. Focus follows `exports/dashboard/states.md` — a
-`--gw-focus-ring` on `:focus-visible`, which is **required**, because a restyled `<button>`
-otherwise gives keyboard users nothing.
+`--gw-focus-ring` on `:focus-visible` (keyboard only, never `:focus`), which is **required**,
+because a restyled `<button>` otherwise gives keyboard users nothing.
 
 > The lesson is the one already in `CONTRIBUTING.md`: *a value you ruled is a value you did not
 > read.* Ruling is for what Figma genuinely leaves blank. Check that it is blank first.

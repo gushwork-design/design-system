@@ -1131,3 +1131,12 @@ Ruled by Utsav, 2 Oct 2026. Bruce does three things and no design work: hands ov
 - **The assets are bundled with the function** (`vercel.json` `includeFiles`), uploaded into the Slack thread, and every one is checked by `scripts/concierge.test.mjs`. Slides answers "coming soon", matching the Library.
 - **Replies to the report** are read by the nightly cloud run (Slack API), not handled by Bruce; he only ticks them.
 - The manifest is `slack/bruce-app-manifest.yml`.
+
+## R41 — the focus ring is keyboard only, and a text field shows its edge instead
+Ruled by Utsav, 3 Oct 2026. He sent the "Ruled" group back for rework on 2 Oct with the note "remove focus ring, we dont need it", and chose "keyboard only" over removing it altogether. This narrows the 7 Aug 2026 focus ruling; it does not delete it.
+
+- **The ring is for keyboard focus only.** `--gw-focus-ring` goes on `:focus-visible`, never `:focus`, so a click leaves nothing behind. Buttons, links, tabs, rows, selects and anything with a `tabindex` keep it.
+- **Text fields do not take the ring.** A browser counts a click into a `<input>` or `<textarea>` as keyboard focus, so the ring would show on every click. A field shows its own edge instead, which is also visible when it is reached by keyboard: a 1px `neutral/400` on the hub and library, the dashboard `input`'s black `focus` border on dashboard pages.
+- **`outline: none` still needs a replacement.** For a text field the replacement is its edge. This stays the one accessibility requirement in the focus rule.
+- **What moved:** the ring is off text fields on the dashboard pages (`analytics.html`, `design-system.html`) and the login modal field; the search fields on the Library pages and the GTM command center preview had it on `:focus` and now show an edge. The tools and the Access Control page already worked this way (30 Sep). The token values and the ring itself are unchanged, so every keyboard ring is as it was.
+- **Review:** the "Ruled" group (motion, focus, timing) stays in rework until Utsav approves it again; nothing here approves it.

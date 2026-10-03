@@ -939,8 +939,9 @@
   font: var(--gw-text-body-14-reg);
 }
 .gw-modal__input::placeholder { color: var(--s-placeholder); }
+/* A text field shows its edge, not the ring: a click into one counts as keyboard focus, so a ring would show on a click (R41). */
 .gw-modal__input:focus-visible {
-  outline: var(--gw-focus-ring); outline-offset: var(--gw-focus-offset);
+  outline: none; border-color: var(--gw-color-neutral-400);
 }
 .gw-modal__err {
   margin: 0;

@@ -121,7 +121,7 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
          border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
          padding:0 var(--gw-space-12);font:var(--gw-text-body-14-reg);color:var(--s-heading)}
 .lb-find::placeholder{color:var(--s-placeholder)}
-.lb-find:focus{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.lb-find:focus{outline:none;border-color:var(--gw-color-neutral-400)}
 .lb-tbtn{width:36px;height:36px;display:grid;place-items:center;background:transparent;
          border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
          color:var(--s-body);cursor:pointer;flex:none}

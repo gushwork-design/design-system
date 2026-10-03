@@ -163,8 +163,9 @@ body[data-gw-page="design-system"] .sg__main > * { min-width: 0; }
     --ul-disabled:   var(--gw-color-neutral-600);
 }
 
-/* Focus. No v2 component defines one; --gw-focus-ring on :focus-visible is mandatory (states.md). */
-.ul-scope :is(button, a, input, select, [tabindex]):focus-visible {
+/* Focus. No v2 component defines one. The ring is keyboard-only, on :focus-visible (R41, states.md). Text fields are
+   not in this list: a browser counts a click into one as keyboard focus, so they show their own edge instead. */
+.ul-scope :is(button, a, select, [tabindex]):focus-visible {
   outline: var(--gw-focus-ring);
   outline-offset: var(--gw-focus-offset);
 }
@@ -284,7 +285,7 @@ body[data-gw-page="design-system"] .sg__main > * { min-width: 0; }
   border: 0; border-radius: var(--gw-radius-8); background: var(--ul-field-bg); color: var(--ul-field-fg);
   box-shadow: inset 0 0 0 1px var(--ul-field-line); font: var(--gw-text-button-14); }
 .ul-input input::placeholder { color: var(--ul-field-ph); }
-.ul-input input:focus { box-shadow: inset 0 0 0 1px var(--gw-color-black); }
+.ul-input input:focus { outline: none; box-shadow: inset 0 0 0 1px var(--gw-color-black); }
 :root[data-theme="dark"] .ul-input input:focus { box-shadow: inset 0 0 0 1px var(--gw-color-white); }
 .ul-select { position: relative; display: inline-block; }
 .ul-select select { appearance: none; -webkit-appearance: none; height: 36px; padding: 0 calc(var(--gw-space-12) + 16px) 0 var(--gw-space-12);
@@ -736,7 +737,8 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .rv-hint { font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
 .rv-lab { font: 500 13px/1.4 var(--gw-font-body); color: var(--ul-value); }
 .rv-ta { width: 100%; box-sizing: border-box; padding: var(--gw-space-12); border: 0; border-radius: var(--gw-radius-12); resize: vertical; background: var(--ul-field-bg); color: var(--ul-field-fg); font: 400 14px/1.5 var(--gw-font-body); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }
-.rv-ta:focus-visible { outline: var(--gw-focus-ring); outline-offset: 1px; }
+.rv-ta:focus-visible { outline: none; box-shadow: inset 0 0 0 1px var(--gw-color-black); }   /* the edge, not the ring (R41) */
+:root[data-theme="dark"] .rv-ta:focus-visible { box-shadow: inset 0 0 0 1px var(--gw-color-white); }
 .rv-b { height: 36px; padding: 0 var(--gw-space-16); border: 0; border-radius: var(--gw-radius-12); cursor: pointer; font: var(--gw-text-button-14); transition: background var(--gw-motion-fast); }
 .rv-b:disabled { opacity: .45; cursor: default; }
 .rv-b--pass { background: var(--ul-prim-bg); color: var(--ul-prim-fg); }
