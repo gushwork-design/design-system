@@ -372,6 +372,8 @@ body[data-gw-page="design-system"] .sg__main > * { min-width: 0; }
 .ul-th { display: inline-flex; align-items: center; gap: var(--gw-space-4); justify-self: start; padding: 0; border: 0; background: none;
   font: var(--gw-text-body-12-med); color: var(--ul-hdr-fg); text-transform: uppercase; cursor: pointer; }
 .ul-th svg { width: 12px; height: 12px; color: var(--ul-icon); }
+.ul-th:hover svg { color: var(--ul-hdr-fg); }
+.ul-th[data-on] svg { color: var(--gw-color-primary-500); }   /* the sorted column: the library's active sort glyph */
 .ul-th span.ul-th--plain { cursor: default; }
 .ul-c { font: var(--gw-text-body-12-med); color: var(--ul-cell); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ul-c--who { color: var(--ul-value); }
@@ -998,7 +1000,9 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
   function plural(n, w) { return n + ' ' + (n === 1 ? w : w.replace(/([^aeiou])y$/, '$1ie') + 's'); }   // family → families
   function metric(label, value, note) { return '<div class="ul-metric"><span class="ul-lab">' + esc(label) + '</span><div class="ul-metric__body"><span class="ul-num">' + esc(value) + '</span><span class="ul-note">' + esc(note) + '</span></div></div>'; }
-  function th(t) { return '<div role="columnheader"><span class="ul-th"><span class="ul-th--plain">' + esc(t) + '</span></span></div>'; }
+  function th(t) { return t && typeof t === 'object' ? t.html : '<div role="columnheader"><span class="ul-th"><span class="ul-th--plain">' + esc(t) + '</span></span></div>'; }
+  var SORT_ICON = {"arrows-down-up": "M117.66,170.34a8,8,0,0,1,0,11.32l-32,32a8,8,0,0,1-11.32,0l-32-32a8,8,0,0,1,11.32-11.32L72,188.69V48a8,8,0,0,1,16,0V188.69l18.34-18.35A8,8,0,0,1,117.66,170.34Zm96-96-32-32a8,8,0,0,0-11.32,0l-32,32a8,8,0,0,0,11.32,11.32L168,67.31V208a8,8,0,0,0,16,0V67.31l18.34,18.35a8,8,0,0,0,11.32-11.32Z", "arrow-up": "M205.66,117.66a8,8,0,0,1-11.32,0L136,59.31V216a8,8,0,0,1-16,0V59.31L61.66,117.66a8,8,0,0,1-11.32-11.32l72-72a8,8,0,0,1,11.32,0l72,72A8,8,0,0,1,205.66,117.66Z", "arrow-down": "M205.66,149.66l-72,72a8,8,0,0,1-11.32,0l-72-72a8,8,0,0,1,11.32-11.32L120,196.69V40a8,8,0,0,1,16,0V196.69l58.34-58.35a8,8,0,0,1,11.32,11.32Z"};
+  function icon(n) { return '<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="' + SORT_ICON[n] + '"/></svg>'; }
   function cell(html, cls) { return '<div class="ul-c ' + (cls || '') + '" role="cell">' + html + '</div>'; }
   function txt(t, cls, title) { return '<div class="ul-c ' + (cls || '') + '" role="cell" title="' + esc(title || t) + '">' + esc(t) + '</div>'; }
   function link(href, label) { return '<a class="ds-a" href="' + esc(LIB + href) + '">' + esc(label) + '</a>'; }
@@ -1407,6 +1411,38 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       .then(function (j) { QSTATE = j.state || {}; }).catch(function () { QSTATE = {}; });
   }
   function scopeTitle(it) { return it.kind === 'foundation' ? 'Foundations' : it.surface; }
+
+  /* Sorting. A column header is a button; the first click leads with the useful end of the column (biggest, newest or A to Z,
+     lowest where lower is better), the second reverses it. Empty values stay last either way, and ties keep the order they were in. */
+  var SORT = {};
+  function sortItems(items, defs, st) {
+    if (!st || !defs[st.i]) return items;
+    var get = defs[st.i].get;
+    return items.map(function (x, n) { return { x: x, n: n, v: get(x) }; }).sort(function (a, b) {
+      var an = a.v == null || a.v === '', bn = b.v == null || b.v === '';
+      if (an || bn) return an && bn ? a.n - b.n : an ? 1 : -1;
+      var c = typeof a.v === 'string' ? a.v.localeCompare(b.v, undefined, { sensitivity: 'base', numeric: true }) : a.v - b.v;
+      return c * st.dir || a.n - b.n;
+    }).map(function (o) { return o.x; });
+  }
+  function sortTh(key, i, label) {
+    var st = SORT[key], on = st && st.i === i;
+    return '<div role="columnheader" aria-sort="' + (on ? (st.dir < 0 ? 'descending' : 'ascending') : 'none') + '">' +
+      '<button class="ul-th" type="button" data-sort-i="' + i + '"' + (on ? ' data-on' : '') + '>' + esc(label) + icon(on ? (st.dir < 0 ? 'arrow-down' : 'arrow-up') : 'arrows-down-up') + '</button></div>';
+  }
+  function sortNote(key, heads, dflt) {
+    var st = SORT[key];
+    return st ? 'by ' + String(heads[st.i]).toLowerCase() + ', ' + (st.dir < 0 ? 'descending' : 'ascending') : dflt;
+  }
+  /* The Review inbox: first click on Status puts what is waiting for you first; Decided leads with the newest. */
+  var STATE_RANK = { pending: 0, expired: 0, rework: 1, rejected: 2, passed: 3 };
+  var REV_SORT = [
+    { get: function (it) { return it.label; }, dir: 1 },
+    { get: function (it) { return scopeTitle(it); }, dir: 1 },
+    { get: function (it) { return STATE_RANK[eff(it).state]; }, dir: 1 },
+    { get: function (it) { return eff(it).queued ? '9999-12-31' : (it.on || null); }, dir: -1 },
+    null
+  ];
   var FILTERS = [['waiting', 'Waiting'], ['rework', 'In rework'], ['passed', 'Approved'], ['rejected', 'Rejected']];
   function inFilter(it, f) {
     var s = eff(it).state;
@@ -1426,6 +1462,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     pills($('ds-rev-tabs'), FILTERS.map(function (f) { return [f[0], f[1] + ' ' + count(f[0])]; }), RV.filter, function (v) { RV.filter = v; RF.shown = 30; renderReview(d); });
     var q = RF.q.trim().toLowerCase();
     var list = ITEMS.filter(function (it) { return inFilter(it, RV.filter) && (!q || (it.label + ' ' + scopeTitle(it)).toLowerCase().indexOf(q) !== -1); });
+    list = sortItems(list, REV_SORT, SORT.rev);   // the drawer steps through this same order
     $('ds-rev-q').textContent = plural(list.length, 'item');
     var rows = list.slice(0, RF.shown).map(function (it) {
       var e = eff(it), by = e.queued ? 'You, just now' : (it.by ? it.by + (it.on ? ' · ' + it.on : '') : '—');
@@ -1433,8 +1470,16 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
         cell('<b style="font-weight:600">' + esc(it.label) + '</b>', '') + txt(scopeTitle(it)) + cell(badgeOf(e.state, e.queued, e.q)) + txt(by) +
         cell('<span class="ds-pv rv-go">Review</span>') + '</div>';
     });
-    $('ds-rev-table').innerHTML = table('minmax(200px,1.6fr) 130px 190px minmax(140px,1fr) 100px', ['Item', 'Library', 'Status', 'Decided', ''], rows,
+    var revHeads = ['Item', 'Library', 'Status', 'Decided', ''].map(function (h, i) { return REV_SORT[i] ? { html: sortTh('rev', i, h) } : h; });
+    $('ds-rev-table').innerHTML = table('minmax(200px,1.6fr) 130px 190px minmax(140px,1fr) 100px', revHeads, rows,
       RV.filter === 'waiting' ? 'Nothing is waiting on you' : 'Nothing here yet');
+    [].forEach.call($('ds-rev-table').querySelectorAll('[data-sort-i]'), function (b) {
+      b.addEventListener('click', function () {
+        var i = +b.getAttribute('data-sort-i'), cur = SORT.rev;
+        SORT.rev = cur && cur.i === i ? { i: i, dir: -cur.dir } : { i: i, dir: REV_SORT[i].dir };
+        RF.shown = 30; renderReview(d);
+      });
+    });
     $('ds-rev-more').innerHTML = list.length > RF.shown ? '<button class="ul-btn" id="ds-rev-more-btn" type="button">Show 30 more</button>' : '';
     var mb = $('ds-rev-more-btn'); if (mb) mb.addEventListener('click', function () { RF.shown += 30; renderReview(d); });
     $('ds-rev-table').querySelectorAll('.rv-row').forEach(function (r) {
