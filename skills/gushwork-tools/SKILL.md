@@ -22,21 +22,39 @@ Announce at the start: **"Using the Gushwork tools skill — v1.58.0, updated 3 
 | a downloadable PDF behind an ad | `gushwork-lead-magnet` |
 | a hub tool, or a change to the email signature or ID card tool | this skill |
 
-## Before you build: how big is this tool?
+## Before you build: size it, then shape it
 
 The shell was drawn for **small, single-purpose tools**: one panel of controls, one artefact, one or
 two outputs. Before you write anything, and again whenever the request pulls against the shell
-(a second page, accounts, saved work, a list, a dashboard-like view), **ask the owner, as options in
-one call**:
+(a second page, accounts, saved work, a list, a dashboard-like view), **ask the owner, as options**.
+Four questions fit one `AskUserQuestion` call; the second round follows the answers.
+
+**Round 1: size and shape.** Infer what you can from the request and offer your reading as the first option.
 
 | Ask | Options | What the answer decides |
 |---|---|---|
-| **Is this a mini tool for a light use case, or will it grow heavy integrations and use cases?** | `Mini tool` — one job, no sign-in, nothing saved · `Light, with one integration` — one external service or one saved list · `Heavy` — several integrations, accounts, many use cases | `Mini tool`: build it here, on the shell, as a hub tool. `Light, with one integration`: still a hub tool, but name the integration and who can reach it (Access Control) before building. `Heavy`: stop. The shell may not hold it, and it may belong on `gushwork-dashboard` or its own app. Say so in one line and let the owner decide |
-| **Who is it for?** | `Anyone on the team` · `One team or a few people` · `The owner only` | the access rule, and whether the card says it is restricted |
-| **Will it get more outputs or modes later?** | `No, it stays one job` · `Probably a second output` | whether the panel is one group of fields or tabs from the start |
+| **Is this a mini tool for a light use case, or will it have heavy integrations and many use cases?** | `Mini tool` — one job, no sign-in, nothing saved · `Light, with one integration` — one external service or one saved list · `Heavy` — several integrations, accounts, many use cases | `Mini tool`: build it here, on the shell. `Light, with one integration`: still a hub tool, but name the integration and who can reach it before building. `Heavy`: stop. The shell may not hold it, and it may belong on `gushwork-dashboard` or its own app. Say so in one line and let the owner decide |
+| **What is the one job: what goes in, and what comes out?** | in: `Typed fields` · `An upload (image, file)` · `A pasted list or CSV` · `A link or an account` — out: `A preview only` · `Something to copy` · `A file to download` · `Something sent elsewhere` | the panel's controls, the artefact on the canvas, and which actions the pill carries |
+| **Does it keep anything?** | `Nothing, it resets` · `Remembers on this device` · `Saves a list others can see` | whether it needs storage and sign-in at all, and whether it is still a mini tool |
+| **Who is it for?** | `Anyone on the team` · `One team or a few people` · `The owner only` | the access rule, and whether its card says it is restricted |
 
-Skip a question the request already answers. Do not decide "heavy" or "mini" yourself. A tool that
-quietly grows past the shell is the usual way a hub tool ends up rebuilt, so the question comes first.
+**Round 2: functionality, once the shape is known.** Ask only what the answers left open:
+
+- **Options and modes.** Which fields are essential, which are optional, and are there presets or
+  templates to pick from? Does it ever need a second output or mode (then tabs from the start, not later)?
+- **Defaults and examples.** What does it show before anyone types (sample content, never an empty
+  canvas), and what is the default for each control?
+- **The result.** What exactly is copied or downloaded (format, size, file name)? Does it need a
+  light and a dark version, a mobile view, a print version?
+- **Edge cases.** What if the upload is huge or the wrong type, a field is empty, or the job fails?
+  The failure copy is yours to draft, the behaviour is theirs to choose.
+- **Later.** Anything they already know will come (a second tool that shares a piece), so it is built once.
+
+Skip a question the request already answers, and drop round 2 for a small change ("add a field").
+Do not decide "heavy" or "mini" yourself, and do not guess a tool's functionality from its name.
+A tool that quietly grows past the shell is the usual way a hub tool ends up rebuilt, so the questions
+come first. State your read in two or three lines before building: the job, the panel's groups in order,
+the outputs, who can reach it.
 
 ## Read these first, in this order
 
@@ -187,5 +205,5 @@ Say in a few lines what you checked and what you chose:
 - The card, `_tools.js`, Access Control and the staging path all agree.
 - Anything off-system that was asked for is named in one line.
 - Anything new is registered under Tools and visible in Design System → Review (R43).
-- The size question was asked (mini, light with one integration, or heavy), and the answer is
-  written in the hand-over.
+- The size and shape questions were asked (mini, light with one integration, or heavy; the job, its
+  input and output, what it keeps, who it is for), and the answers are written in the hand-over.
