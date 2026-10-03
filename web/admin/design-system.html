@@ -877,7 +877,6 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     </div>
 
     <section class="ds-panel" id="ds-library" role="tabpanel">
-      <div class="ul-metrics" id="ds-lib-stats"></div>
       <div class="an-bar ds-cats"><div class="ul-tabs an-tabs" id="ds-lib-tabs" role="tablist" aria-label="Library"></div></div>
       <div class="fd" id="ds-fd"></div>
     </section>
@@ -886,11 +885,12 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       <div id="ds-review-lock" hidden>
         <div class="ul-sec"><div class="ul-empty">
           <div class="ul-empty__c"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96Zm112,152H48V96H208V208Zm-68-56a12,12,0,1,1-12-12A12,12,0,0,1,140,152Z"/></svg></div>
-          <div class="ul-empty__copy"><h2>Review needs an owner account</h2><p>Approving a component lets it into the skills, so only an owner can open this tab. Sign in with an owner Google account to continue. You will come back here afterwards.</p></div>
-          <button class="ul-btn" id="ds-signin" type="button">Sign in with an owner account</button>
+          <div class="ul-empty__copy"><h2>Review needs an admin account</h2><p>Approving a component lets it into the skills. Admins can see what is in review and the owner decides. Sign in with an admin Google account to continue. You will come back here afterwards.</p></div>
+          <button class="ul-btn" id="ds-signin" type="button">Sign in with an admin account</button>
         </div></div>
       </div>
       <div id="ds-review-app" hidden>
+        <div class="rv-note" id="ds-rev-ro" role="note" hidden><b>Only the owner can approve, rework or reject.</b> You can look at everything that is in review, and open any item to see what it looks like.</div>
         <div class="ul-metrics" id="ds-rev-stats"></div>
         <div class="an-bar ds-cats"><div class="ul-tabs an-tabs" id="ds-rev-tabs" role="tablist" aria-label="Review"></div></div>
         <section class="ul-sec" aria-labelledby="ds-rev-h">
@@ -989,10 +989,10 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 <script>
 (function () {
   'use strict';
-  var TABS = ['library', 'review', 'workflow'], started = {}, owner = false;
+  var TABS = ['library', 'review', 'workflow'], started = {}, owner = false, admin = false;
   var LIB = '/library/';
   var me = fetch('/api/auth/me', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : {}; })
-    .then(function (j) { owner = !!(j && j.owner); }).catch(function () {});
+    .then(function (j) { owner = !!(j && j.owner); admin = owner || !!(j && j.admin); }).catch(function () {});
   var dataP = null;
   function data() { return dataP || (dataP = fetch(LIB + 'data.json', { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw new Error('data ' + r.status); return r.json(); })); }
 
@@ -1267,11 +1267,11 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     var all = sf ? sf.components : [], cs = all.filter(function (c) { return approved(sf.key, c.name); }), by = {}, order = [];
     cs.forEach(function (c) { var g = groupOf(c.doc); if (!by[g]) { by[g] = []; order.push(g); } by[g].push(c); });
     var flat = order.length > Math.ceil(cs.length / 2);
-    var body = !cs.length ? emptyLib('component here is', all.length - cs.length)
+    var body = !cs.length ? emptyLib()
       : (flat ? [['', cs]] : order.map(function (g) { return [g, by[g]]; })).map(function (g) {
         return '<div class="fd-cg">' + (g[0] ? '<h4>' + esc(g[0]) + '<span>' + g[1].length + '</span></h4>' : '') + '<div class="fd-comps">' + g[1].map(function (c) { return compCard(sf, c); }).join('') + '</div></div>';
       }).join('');
-    return '<section class="fd-sec"><h3>Components<span>' + plural(cs.length, 'approved component') + (all.length > cs.length ? ', ' + (all.length - cs.length) + ' not yet' : '') + '</span></h3>' +
+    return '<section class="fd-sec"><h3>Components<span>' + plural(cs.length, 'component') + '</span></h3>' +
       (cs.length > 8 ? '<label class="ds-find"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M232.49,215.51,185,168a92.12,92.12,0,1,0-17,17l47.53,47.54a12,12,0,0,0,17-17ZM44,112a68,68,0,1,1,68,68A68.07,68.07,0,0,1,44,112Z"/></svg><input id="ds-comp-find" type="search" aria-label="Filter components" placeholder="Filter components" autocomplete="off"></label>' : '') + '<div id="ds-comps">' + body + '</div></section>';
   }
   /* THE LIBRARY SHOWS ONLY WHAT HAS BEEN APPROVED (Utsav, 2 Oct 2026). Something is approved when its review state is
@@ -1293,25 +1293,21 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   }
   /* The one-line description of a tab, as a section like Templates or Typefaces: same heading, same size. */
   function descSec(text) { return '<section class="fd-sec"><h3>Description</h3><div class="fd-head"><p>' + esc(text) + '</p></div></section>'; }
-  function emptyLib(what, waiting) {
-    return '<div class="ul-empty"><div class="ul-empty__copy"><h2>No ' + esc(what) + ' approved yet</h2>' +
-      (waiting && owner ? '<p>' + waiting + ' waiting on review. They appear here once approved.</p><button type="button" class="ds-pv" id="lib-to-review">Open the Review tab</button>' : '<p>It appears here once it has been reviewed and approved.</p>') + '</div></div>';
+  /* What a visitor sees when a group has nothing in it. No review language: the Library is for people using the system,
+     and what is waiting on approval is in the Review tab. */
+  function emptyLib() {
+    return '<div class="ul-empty"><div class="ul-empty__copy"><h2>Nothing here yet</h2><p>This is being worked on. It will appear here when it is ready.</p></div></div>';
   }
   function renderLibrary(d, t) {
     var s = d.stats;
     var fAll = (d.items || []).filter(function (x) { return x.kind === 'foundation'; }), cAll = (d.items || []).filter(function (x) { return x.kind === 'component'; });
     var hidden = {}; CATS.forEach(function (c) { if (c.soon) c.subs.forEach(function (x) { if (x.surface) hidden[x.surface] = 1; }); });
     cAll = cAll.filter(function (x) { return !hidden[x.scope]; });   // a category that is coming soon is left out of the counts
-    var fOk = fAll.filter(function (x) { return approved(x.scope, x.key); }).length, cOk = cAll.filter(function (x) { return approved(x.scope, x.key); }).length;
-    $('ds-lib-stats').innerHTML =
-      metric('Foundations', fOk + ' / ' + fAll.length, 'groups approved') + metric('Components', cOk + ' / ' + cAll.length, 'approved, across ' + plural(d.surfaces.length, 'surface')) +
-      metric('Templates', String((Object.keys(PAIR).length ? (d.stats.recipes + Object.keys(TPL).length - Object.keys(PAIR).length) : d.stats.recipes) - CATS.reduce(function (n, c) { return n + (c.soon ? c.subs.reduce(function (m, x) { return m + startPoints(d, x).length; }, 0) : 0); }, 0)), 'what to build from');
     pills($('ds-lib-tabs'), CATS.map(function (c) { return [c.key, c.title]; }), L.cat, function (v) { L.cat = v; setHash(); renderLibrary(d, t); });
     var host = $('ds-fd'), cat = CATS.filter(function (c) { return c.key === L.cat; })[0] || CATS[0], side, main;
     if (cat.key === 'foundations') {
       var shown = FD_TABS.filter(function (x) { return (FD_PARTS[x[0]] || []).some(function (p) { return approved('foundation', p[0]); }); });
-      var waitingF = fAll.length - fOk;
-      if (!shown.length) { side = null; main = emptyLib('foundation is', waitingF); }
+      if (!shown.length) { side = null; main = emptyLib(); }
       else {
         if (!shown.some(function (x) { return x[0] === F.tab; })) F.tab = shown[0][0];
         var okParts = FD_PARTS[F.tab].filter(function (p) { return approved('foundation', p[0]); });
@@ -1343,8 +1339,6 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     host.querySelectorAll('.fd-side__i').forEach(function (b) {
       b.addEventListener('click', function () { var v = b.getAttribute('data-v'); if (cat.key === 'foundations') F.tab = v; else L.sub[cat.key] = v; setHash(); renderLibrary(d, t); });
     });
-    var toRev = $('lib-to-review');
-    if (toRev) toRev.addEventListener('click', function () { show('review', true); });
     var cf = $('ds-comp-find');
     if (cf) cf.addEventListener('input', function () {
       var q = cf.value.trim().toLowerCase();
@@ -1688,7 +1682,6 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     return '<div style="display:flex;flex-direction:column;gap:14px;padding:16px 20px">' + out + '</div>';
   }
   function libLoading() {
-    $('ds-lib-stats').innerHTML = skMetric() + skMetric() + skMetric();
     $('ds-lib-tabs').innerHTML = sk('72px', 28) + sk('96px', 28) + sk('84px', 28);
     $('ds-fd').innerHTML = '<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">' +
       [0, 1, 2, 3, 4, 5].map(function () { return '<div style="display:flex;flex-direction:column;gap:12px;padding:8px;border-radius:16px;border:1px solid var(--s-card-border)">' + sk('100%', 160) + sk('60%', 16) + sk('90%', 12) + '</div>'; }).join('') + '</div>';
@@ -1705,11 +1698,14 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     if (name === 'library') Promise.all([data(), tokens(), prompts(), owner ? loadQueued() : Promise.resolve()]).then(function (r) { libData = r[0]; libTok = r[1]; indexItems(r[0]); renderLibrary(r[0], r[1]); })
       .catch(function () { $('ds-fd').innerHTML = '<div class="ul-empty"><div class="ul-empty__copy"><h2>Could not load the library</h2></div></div>'; });
     if (name === 'review') me.then(function () {
-      $('ds-review-lock').hidden = owner; $('ds-review-app').hidden = !owner;
-      if (owner) revLoading();
-      if (owner) Promise.all([data(), loadQueued()]).then(function (r) {
+      /* Admins can look at everything here. Only the owner can act, and the page says so. */
+      $('ds-review-lock').hidden = admin; $('ds-review-app').hidden = !admin;
+      if (!admin) return;
+      $('ds-rev-ro').hidden = owner; $('ds-gh-check').hidden = !owner;
+      revLoading();
+      Promise.all([data(), owner ? loadQueued() : Promise.resolve()]).then(function (r) {
         reviewData = r[0]; renderReview(r[0]);
-        $('ds-gh-check').addEventListener('click', function () {
+        if (owner) $('ds-gh-check').addEventListener('click', function () {
           var b = this; b.disabled = true; b.textContent = 'Checking…';
           fetch('/api/review?check=github', { credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (j) {
             toast(j.github ? j.github.verdict : (j.error || 'Could not run the check.'), 14000);
@@ -1738,9 +1734,9 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   document.querySelectorAll('#ds-tabs .ul-tab').forEach(function (b) { b.addEventListener('click', function () { show(b.getAttribute('data-tab'), true); }); });
   window.addEventListener('hashchange', function () { show(location.hash.slice(1), false); });
   $('ds-signin').addEventListener('click', function () { location.href = '/api/auth/login?next=' + encodeURIComponent('/admin/design-system#review'); });
-  /* Review is for the owner: the tab does not exist for anyone else. Someone who opens #review anyway
-     (a bookmark, an old link) still gets the owner sign-in card rather than the sheet. */
-  me.then(function () { $('ds-tab-review').hidden = !owner; });
+  /* Review is shown to admins, read-only; only the owner can approve, rework or reject. Someone who is not an admin does not get
+     the tab, and opening #review anyway (a bookmark, an old link) gets the sign-in card rather than the sheet. */
+  me.then(function () { $('ds-tab-review').hidden = !admin; });
   show(location.hash.slice(1), false);
 })();
 </script>
