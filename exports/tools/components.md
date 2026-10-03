@@ -23,7 +23,7 @@ The floating, collapsible panel a tool keeps its controls in.
 | Border | 1px `--t-panel-border` |
 | Light fill | white |
 | Dark fill | black, hairline `neutral/900` |
-| Header | 32 icon tile, title in Vert Grotesk Display, collapse button right |
+| Header | the 32 Gushwork logo (radius 8; a 1px `neutral/800` ring in dark) as a link back to Tools, the tool's name in Vert Grotesk Display 16, collapse button right; padding 12 12 12 16, a hairline beneath |
 | Collapse button | 24 square, radius 4, 12 icon |
 | Reopen button | 36 square, radius 12, 16 icon; shown only when the panel is collapsed |
 
