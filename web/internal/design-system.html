@@ -837,6 +837,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .ds-panel[hidden] { display: none; }
 /* Review and Workflow are for admins. A locked panel shows only its alert: the content stays hidden until the page knows the visitor is an admin. */
 .ds-gate[hidden] { display: none; }
+.ds-gate .ul-empty__c { border-radius: var(--gw-radius-12); }   /* a rounded square, not the circle the other empty states use */
 #ds-workflow.ds-locked > :not(.ds-gate) { display: none !important; }   /* the workflow blocks set their own display, so this has to win */
 /* What the Library is for, above its category bar. Plain text, the width of the descriptions inside it. */
 /* What the Design System is and how it is managed: the page's opening paragraph, set like the Style Guide's, Templates' and Tools'. */
