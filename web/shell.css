@@ -733,7 +733,9 @@
   cursor: pointer;
   transition: background var(--gw-motion-fast);
 }
-.gw-signin:hover { background: var(--s-nav-hover); }
+/* White with a dark label in both themes, so the hover stays light too. --s-nav-hover goes
+   translucent dark in dark mode and would bury the dark label. */
+.gw-signin:hover { background: var(--gw-color-neutral-50); }
 .gw-signin svg { width: 16px; height: 16px; display: block; }
 .gw-signin:focus-visible { outline: var(--gw-focus-ring); outline-offset: var(--gw-focus-offset); }
 
