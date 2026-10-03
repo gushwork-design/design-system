@@ -397,7 +397,8 @@
 .is-on .gv__step{animation:gv-step 2800ms ease-in-out infinite;
                  animation-delay:calc(500ms + var(--i) * 140ms)}
 /* rising columns: outlined cells, bottom first, left to right */
-.gv__rise{fill:none;stroke:var(--gv-cell);stroke-width:2;opacity:0;
+/* cells sit exactly on the grid, so neighbours share one edge instead of two */
+.gv__rise{fill:color-mix(in srgb,var(--gv-cell) 22%,transparent);stroke:var(--gv-cell);stroke-width:1.5;opacity:0;
           transform-box:fill-box;transform-origin:center}
 .is-prev .gv__rise{opacity:1}
 .is-on .gv__rise{animation:gv-rise 520ms cubic-bezier(.2,.9,.3,1.2) both;
@@ -1248,7 +1249,7 @@
     } else {
       w.cols.forEach(function (h, ci) {
         for (var k = 0; k < h; k++) {
-          var q = el('rect', { 'class': 'gv__rise', x: (COLS - w.cols.length + ci) * P + 1, y: (ROWS - 1 - k) * P + 1, width: P - 2, height: P - 2 }, cells);
+          var q = el('rect', { 'class': 'gv__rise', x: (COLS - w.cols.length + ci) * P, y: (ROWS - 1 - k) * P, width: P, height: P }, cells);
           q.style.setProperty('--c', ci);
           q.style.setProperty('--k', k);
         }
