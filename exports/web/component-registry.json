@@ -318,6 +318,13 @@
       "reviewedOn": "2026-10-03",
       "fingerprint": "fe97f49c83c5cb3f",
       "note": "loader is moving weirdly"
+    },
+    "input-fields": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-03",
+      "fingerprint": "80b08df71d582951",
+      "note": "loader movement is wrong, and check if its a duplicte"
     }
   }
 }
