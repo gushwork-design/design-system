@@ -1,0 +1,252 @@
+<!doctype html>
+<!-- gushwork-build:{"pluginVersion":"1.57.0","surface":"brand","createdBy":"utsav.singh@gushwork.ai","createdAt":"2026-10-01"} -->
+<!-- Nugget introduction sheet. Hero is the Figma frame 59:897 (AI-Agent---Nugget) as drawn.
+     Everything below the hero photo is a LAYOUT PASS: copy and structure only, no motion,
+     no og card, no favicon yet. Agent tiles use the concept images from the Figma file; role labels are best guesses.
+     Images come from Figma section 65:972, in img/ -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<base href="/internal/staging/nugget/">
+<title>Meet Nugget | Gushwork</title>
+<meta name="description" content="Nugget is the teammate who hands you the work: one character, every Gushwork agent.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="/foundation/tokens.css">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background:var(--gw-color-neutral-900);
+  color:var(--gw-color-white);
+  font:var(--gw-text-body-16-reg);
+  letter-spacing:var(--gw-text-body-16-reg-tracking);
+  -webkit-font-smoothing:antialiased;
+}
+img{display:block;max-width:100%}
+h1,h2,h3,p{margin:0}
+h1{font:var(--gw-text-h1);letter-spacing:var(--gw-text-h1-tracking)}
+h2{font:var(--gw-text-h2);letter-spacing:var(--gw-text-h2-tracking)}
+h3{font:var(--gw-text-h4);letter-spacing:var(--gw-text-h4-tracking)}
+
+.wrap{width:100%;max-width:1240px;margin:0 auto;padding:0 var(--gw-space-24)}
+
+/* nav */
+.nav{padding-top:20px}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;height:32px}
+.nav img.logo{height:24px;width:auto}
+.btn-ghost{
+  display:inline-flex;align-items:center;gap:8px;padding:8px 12px;
+  border:2px solid var(--gw-color-neutral-alpha-10-white);
+  background:var(--gw-color-neutral-alpha-10-black);
+  border-radius:var(--gw-radius-8);
+  color:var(--gw-color-white);font:var(--gw-text-button-14);text-decoration:none;
+  backdrop-filter:blur(2px);
+}
+.btn-ghost img{width:16px;height:16px}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;height:48px;padding:12px 20px;
+  background:var(--gw-color-primary-500);color:var(--gw-color-white);
+  border-radius:var(--gw-radius-8);text-decoration:none;
+  font:var(--gw-text-body-16-med);letter-spacing:var(--gw-text-body-16-med-tracking);
+}
+.btn img{width:18px;height:18px}
+
+/* hero */
+.hero{display:flex;flex-direction:column;align-items:center;text-align:center;
+  padding:88px var(--gw-space-24) 0;max-width:736px;margin:0 auto}
+.chip{width:120px;height:80px;border-radius:var(--gw-radius-full);overflow:hidden;
+  background:var(--gw-color-primary-300);position:relative;margin-bottom:32px}
+.chip img{position:absolute;left:50%;top:0;width:96px;height:96px;transform:translateX(-50%);object-fit:cover}
+.hero .btn{margin-top:56px;width:420px;max-width:100%}
+
+.photo{margin:160px 16px 0;height:680px;border-radius:var(--gw-radius-20);overflow:hidden;position:relative}
+.photo img{position:absolute;left:0;top:-6.17%;width:100%;height:117.86%;max-width:none;object-fit:cover}
+
+/* sections */
+section{padding:160px 0 0}
+.eyebrow{font:var(--gw-text-body-14-med);color:var(--gw-color-primary-300);margin-bottom:16px}
+.lead{font:var(--gw-text-body-18-reg);color:var(--gw-color-neutral-200);margin-top:24px;max-width:560px}
+.muted{color:var(--gw-color-neutral-300)}
+
+.who{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+
+/* image crops of the hero photo: --x/--y/--w are the source rect in a 1672x941 image */
+.crop{position:relative;overflow:hidden;background:var(--gw-color-neutral-850)}
+.crop img{position:absolute;max-width:none;height:auto;
+  width:calc(1672 / var(--w) * 100%);
+  left:calc(var(--x) / var(--w) * -100%);
+  top:calc(var(--y) / var(--h) * -100%)}
+
+.look h3{margin-top:24px}
+.head{max-width:720px}
+
+/* agents row */
+.base{display:flex;align-items:center;gap:24px;margin-top:64px;padding:24px;border-radius:var(--gw-radius-20);
+  background:var(--gw-color-neutral-850)}
+.base .chip{margin:0;flex:none}
+.base p{color:var(--gw-color-neutral-200);max-width:640px}
+.agents{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:16px}
+.agent h3{font:var(--gw-text-body-18-sem)}
+
+/* close */
+.close{display:flex;flex-direction:column;align-items:center;text-align:center;padding:160px 24px 120px}
+.close h2{max-width:720px}
+.close .btn{margin-top:40px}
+footer{border-top:1px solid var(--gw-color-neutral-alpha-10-white);padding:32px 0}
+footer .wrap{display:flex;justify-content:space-between;align-items:center;font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-400)}
+footer img{height:20px;width:auto}
+
+@media (max-width:900px){
+  h1{font-size:40px}h2{font-size:36px}
+  .hero{padding-top:64px}
+  .photo{height:360px;margin-top:96px}
+  section{padding-top:96px}
+  .who{grid-template-columns:1fr;gap:40px}
+  .looks{grid-template-columns:1fr}
+  .agents{grid-template-columns:repeat(2,1fr)}
+  .base{flex-direction:column;align-items:flex-start}
+  .close{padding-top:96px}
+}
+
+/* tiles */
+.tile{border-radius:var(--gw-radius-16);overflow:hidden;background:var(--gw-color-white)}
+.tile img{width:100%;aspect-ratio:1/1;object-fit:cover}
+.who img{border-radius:var(--gw-radius-20);width:100%}
+.looks{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:64px}
+.look h3{margin-top:20px}
+.agents{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:64px}
+.wide{margin-top:48px!important}
+.agent h3{font:var(--gw-text-body-18-sem);margin-top:16px}
+.wide{margin-top:24px;border-radius:var(--gw-radius-20);overflow:hidden}
+.wide img{width:100%;height:auto}
+
+/* agent rail: 480x520 cards, 24 gap, bleeds off both edges, Develop centred on load */
+.agents-sec{padding:160px 0 0}
+.agents-h{font:var(--gw-text-h3);letter-spacing:var(--gw-text-h3-tracking);text-align:center;max-width:470px;margin:0 auto 80px}
+.rail{overflow-x:auto;scrollbar-width:none;cursor:grab;user-select:none;-webkit-user-select:none}
+.rail.drag{cursor:grabbing}
+.track{display:flex;gap:24px;width:max-content;padding:0 12px}
+.rail::-webkit-scrollbar{display:none}
+.card{flex:none;width:480px;height:520px;position:relative;overflow:hidden;  background:var(--gw-color-neutral-800);border-radius:var(--gw-radius-16)}
+.card .txt{position:absolute;left:32px;top:32px;width:416px;display:flex;flex-direction:column;gap:12px}
+.card h3{font:var(--gw-text-h6);line-height:1.4;color:var(--gw-color-white)}
+.card p{font:var(--gw-text-body-16-reg);letter-spacing:var(--gw-text-body-16-reg-tracking);color:var(--gw-color-neutral-alpha-80-white)}
+.card img.shot{left:16px;top:168px;width:448px;height:336px;object-fit:cover;border-radius:var(--gw-radius-12)}
+.card.light{background:var(--gw-color-neutral-25)}
+.card.light h3{color:var(--gw-color-black)}
+.card.light p{color:var(--gw-color-neutral-600)}
+.card.light img{left:30px;top:150px;width:420px;height:420px;-webkit-mask-image:radial-gradient(closest-side,#000 80%,transparent 100%);mask-image:radial-gradient(closest-side,#000 80%,transparent 100%)}
+.card img{position:absolute;left:var(--l);top:var(--t);width:var(--s);height:var(--s);max-width:none}
+@media (max-width:900px){.agents-sec{padding-top:96px}.card{width:320px;height:440px}.card .txt{width:256px}
+  .card img{left:50%;top:auto;bottom:-24px;width:300px;height:300px;transform:translateX(-50%)}
+  }
+
+/* folds under the rail */
+.fold{padding:160px 0 0}
+.fold h2.center{text-align:center}
+.system{display:grid;grid-template-columns:1fr 1.2fr;gap:80px;align-items:center}
+.steps3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.steps3 figure{margin:0}
+.steps3 figcaption{margin-top:12px;font:var(--gw-text-body-16-med);color:var(--gw-color-neutral-300)}
+.how{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:64px}
+.how article{position:relative;overflow:hidden;min-height:440px;padding:32px;border-radius:var(--gw-radius-16);background:var(--gw-color-neutral-800)}
+.how .n{display:inline-flex;width:40px;height:40px;align-items:center;justify-content:center;border-radius:var(--gw-radius-full);
+  background:var(--gw-color-primary-500);font:var(--gw-text-body-16-sem)}
+.how h3{font:var(--gw-text-h6);line-height:1.4;margin-top:20px}
+.how p{margin-top:12px;color:var(--gw-color-neutral-alpha-80-white)}
+.how img{position:absolute;right:-8px;bottom:-12px;width:260px;height:260px}
+.split{display:grid;grid-template-columns:1.2fr 1fr;gap:80px;align-items:center}
+.split img.big{width:100%;border-radius:var(--gw-radius-20)}
+.faq{display:grid;grid-template-columns:1fr 1.6fr;gap:80px}
+.faq details{border-top:1px solid var(--gw-color-neutral-alpha-20-white);padding:24px 0}
+.faq details:last-child{border-bottom:1px solid var(--gw-color-neutral-alpha-20-white)}
+.faq summary{font:var(--gw-text-h6);cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:16px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";color:var(--gw-color-neutral-400)}
+.faq details[open] summary::after{content:"\2212"}
+.faq details p{margin-top:12px;color:var(--gw-color-neutral-200);max-width:560px}
+@media (max-width:900px){.fold{padding-top:96px}.system,.split,.faq{grid-template-columns:1fr;gap:40px}.how{grid-template-columns:1fr}.steps3{grid-template-columns:1fr 1fr 1fr}}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <img class="logo" src="/assets/logo/gushwork-logo-white.svg" alt="Gushwork">
+    <a class="btn-ghost" href="#get">Get Nuggets <img src="arrow-right.svg" alt=""></a>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <div class="chip"><img src="nugget-avatar.png" alt=""></div>
+    <h1>Meet Nugget, AI that can do whatever you need</h1>
+    <a class="btn" href="#get">Get Nuggets for Your Business <img src="arrow-up-right.svg" alt=""></a>
+  </div>
+
+  <div class="photo"><img src="nugget-hero.png" alt="Nugget, a cream felted character in a denim bucket hat, carrying a coffee cup across a sunlit café"></div>
+
+  <section class="agents-sec">
+    <h2 class="agents-h">Nuggets do whatever needs to be done</h2>
+    <div class="rail" id="rail"><div class="track" id="track">
+      <article class="card" style="--l:68px;--t:161px;--s:407px"><div class="txt"><h3>Finance</h3><p>Keeps spend, invoices and reporting in order, so you always know where the money went.</p></div><img src="img/cut/finance.png" alt=""></article>
+      <article class="card" style="--l:68px;--t:161px;--s:407px"><div class="txt"><h3>Research</h3><p>Finds what your buyers search for and who already ranks, then turns it into a plan you can act on.</p></div><img src="img/cut/research.png" alt=""></article>
+      <article class="card" style="--l:72px;--t:164px;--s:417px"><div class="txt"><h3>Scout</h3><p>Watches for new markets, rivals and openings early, so you hear about them before they matter.</p></div><img src="img/cut/scout.png" alt=""></article>
+      <article class="card" id="mid" style="--l:68px;--t:166px;--s:407px"><div class="txt"><h3>Develop</h3><p>Ships the site changes and fixes you ask for, and tells you what changed when it is done.</p></div><img src="img/cut/develop.png" alt=""></article>
+      <article class="card" style="--l:47px;--t:140px;--s:428px"><div class="txt"><h3>Paid Ads</h3><p>Builds and tunes your ad campaigns across the platforms your buyers use, and reports what worked.</p></div><img src="img/cut/paid-ads.png" alt=""></article>
+      <article class="card" style="--l:68px;--t:161px;--s:407px"><div class="txt"><h3>Remember</h3><p>Keeps every brief, brand rule and past result, so the next job starts where the last one ended.</p></div><img src="img/cut/remember.png" alt=""></article>
+    </div></div>
+  </section>
+
+  <section class="fold">
+    <div class="wrap faq">
+      <h2>Questions</h2>
+      <div>
+        <details open><summary>What is Nugget?</summary><p>Nugget is the face of Gushwork&rsquo;s AI team. One character stands in for every agent.</p></details>
+        <details><summary>Is Nugget one agent or many?</summary><p>Many. Each agent is the same Nugget in a different outfit, holding the one thing that agent delivers.</p></details>
+        <details><summary>Why does he change his hat?</summary><p>The hat tells you which job he is on. The face and the body never change.</p></details>
+        <details><summary>How do I get Nuggets for my business?</summary><p>Use the button at the top of the page and we will take it from there.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <div class="close" id="get">
+    <h2>Put Nugget to work<br>on your business</h2>
+    <a class="btn" href="#get">Get Nuggets for Your Business <img src="arrow-up-right.svg" alt=""></a>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <img src="/assets/logo/gushwork-logo-white.svg" alt="Gushwork">
+    <span>Nugget is a Gushwork AI agent</span>
+  </div>
+</footer>
+<script>
+// infinite rail: three copies of the set, jump by one set-width when the edge is near.
+// Slow drift runs until the pointer, a touch or the wheel takes over; drag works with a mouse.
+(function(){
+  var rail=document.getElementById('rail'),track=document.getElementById('track'); if(!rail||!track)return;
+  var set=[].slice.call(track.children);
+  for(var n=0;n<2;n++)set.forEach(function(c){var k=c.cloneNode(true);k.removeAttribute('id');k.setAttribute('aria-hidden','true');track.appendChild(k)});
+  var gap=24,setW=0,paused=false,reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function measure(){setW=set.length*(set[0].offsetWidth+gap)}
+  function center(){var m=document.getElementById('mid');rail.scrollLeft=setW+m.offsetLeft-(rail.clientWidth-m.offsetWidth)/2}
+  function wrap(){if(rail.scrollLeft<setW*0.5)rail.scrollLeft+=setW;else if(rail.scrollLeft>setW*1.5)rail.scrollLeft-=setW}
+  measure();center();addEventListener('resize',function(){var f=rail.scrollLeft/setW;measure();rail.scrollLeft=f*setW});
+  rail.addEventListener('scroll',wrap,{passive:true});
+  var resume;function hold(){paused=true;clearTimeout(resume);resume=setTimeout(function(){paused=false},2500)}
+  ['wheel','touchstart','touchmove','keydown'].forEach(function(e){rail.addEventListener(e,hold,{passive:true})});
+  rail.addEventListener('mouseenter',function(){paused=true});rail.addEventListener('mouseleave',function(){paused=false});
+  var down=false,sx=0,sl=0;
+  rail.addEventListener('pointerdown',function(e){if(e.pointerType!=='mouse')return;down=true;sx=e.clientX;sl=rail.scrollLeft;rail.classList.add('drag')});
+  addEventListener('pointermove',function(e){if(down)rail.scrollLeft=sl-(e.clientX-sx)});
+  addEventListener('pointerup',function(){down=false;rail.classList.remove('drag')});
+  rail.addEventListener('dragstart',function(e){e.preventDefault()});
+  if(!reduce)(function tick(){if(!paused&&!down)rail.scrollLeft+=0.5;requestAnimationFrame(tick)})();
+})();
+</script>
+</body>
+</html>
