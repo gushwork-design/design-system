@@ -251,6 +251,13 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-03",
       "fingerprint": "234e3bb223dc486f"
+    },
+    "comparison-table": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-03",
+      "fingerprint": "61d5d5f0fc5879ba",
+      "note": "dont write gushwork use Gushwork logo there, then optimize and add phone version too, check from similar pattern in the templates and sync"
     }
   }
 }
