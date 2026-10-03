@@ -278,6 +278,12 @@
       "reviewedOn": "2026-10-03",
       "fingerprint": "55d6a416efcd91b2",
       "note": "check for uopdated design in the templates and fix this; phone version is also missing"
+    },
+    "fold-other": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-03",
+      "fingerprint": "276ce8fa0099fa31"
     }
   }
 }
