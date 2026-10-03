@@ -50,19 +50,19 @@
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-03",
-      "fingerprint": "7d0ac8507830bf39"
+      "fingerprint": "ad9eeae602e97245"
     },
     "tool-chrome": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-03",
-      "fingerprint": "cef71d1f01d993e2"
+      "fingerprint": "7f407d6e06a13df6"
     },
     "tool-panel": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-03",
-      "fingerprint": "f450f444aee8a64c"
+      "fingerprint": "adf1ad4279241008"
     },
     "tool-progress": {
       "reviewed": "rework",
