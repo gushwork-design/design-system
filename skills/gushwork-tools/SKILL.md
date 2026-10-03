@@ -22,6 +22,22 @@ Announce at the start: **"Using the Gushwork tools skill — v1.58.0, updated 3 
 | a downloadable PDF behind an ad | `gushwork-lead-magnet` |
 | a hub tool, or a change to the email signature or ID card tool | this skill |
 
+## Before you build: how big is this tool?
+
+The shell was drawn for **small, single-purpose tools**: one panel of controls, one artefact, one or
+two outputs. Before you write anything, and again whenever the request pulls against the shell
+(a second page, accounts, saved work, a list, a dashboard-like view), **ask the owner, as options in
+one call**:
+
+| Ask | Options | What the answer decides |
+|---|---|---|
+| **Is this a mini tool for a light use case, or will it grow heavy integrations and use cases?** | `Mini tool` — one job, no sign-in, nothing saved · `Light, with one integration` — one external service or one saved list · `Heavy` — several integrations, accounts, many use cases | `Mini tool`: build it here, on the shell, as a hub tool. `Light, with one integration`: still a hub tool, but name the integration and who can reach it (Access Control) before building. `Heavy`: stop. The shell may not hold it, and it may belong on `gushwork-dashboard` or its own app. Say so in one line and let the owner decide |
+| **Who is it for?** | `Anyone on the team` · `One team or a few people` · `The owner only` | the access rule, and whether the card says it is restricted |
+| **Will it get more outputs or modes later?** | `No, it stays one job` · `Probably a second output` | whether the panel is one group of fields or tabs from the start |
+
+Skip a question the request already answers. Do not decide "heavy" or "mini" yourself. A tool that
+quietly grows past the shell is the usual way a hub tool ends up rebuilt, so the question comes first.
+
 ## Read these first, in this order
 
 1. `web/internal/tool-shell.css` — the whole shell. **Its comments carry the numbers and the reasons**
@@ -143,6 +159,17 @@ Eyeballing has approved off-scale values here before. Before you hand it over:
 - A third typeface sits in the signature preview (Plus Jakarta Sans). It is in the artefact, not the
   chrome, and is an open call for the owner; do not copy it into a new tool.
 
+## New pieces go to the design hub for review
+
+R43: anything this skill builds that the library does not have is registered for review, not shipped
+quietly. The tool shell's own four pieces already are: **`tool-panel`**, **`tool-action-pill`**,
+**`tool-chrome`** and **`tool-progress`**, under the **Tools** surface (`exports/tools/`, drawings in
+`web/previews/tools/`, Library category *Tools*). When a new tool needs a piece that is not one of
+those or the library's own controls (a second kind of panel, a table, a new overlay), follow
+`foundation/new-component-notice.md` section 0a: registry entry as pending, a drawing, a line in
+`exports/tools/components.md`, then `bash scripts/library-site.sh`. The owner approves it in Design
+System → Review. Do not register a control the library already has.
+
 ## Ask before choosing
 
 The shell leaves a few calls open. Put them to the owner **as a question with options**, one
@@ -159,3 +186,6 @@ Say in a few lines what you checked and what you chose:
 - The ghost shows, the panel collapses, the narrow case works.
 - The card, `_tools.js`, Access Control and the staging path all agree.
 - Anything off-system that was asked for is named in one line.
+- Anything new is registered under Tools and visible in Design System → Review (R43).
+- The size question was asked (mini, light with one integration, or heavy), and the answer is
+  written in the hand-over.

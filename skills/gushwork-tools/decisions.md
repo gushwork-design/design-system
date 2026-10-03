@@ -79,6 +79,11 @@ The email signature creator and the employee ID card generator were redesigned i
 26. **The Tools page opens with a description**: what tools are, that more will come, that some are
     limited to a team or to people. It names the two as examples and does not list them.
 
+27. **Ask the size question before building a tool, and whenever a request conflicts with the shell.**
+    Is this a mini tool for a light use case, or will it have heavy integrations and many use cases?
+    Utsav, 3 Oct 2026. The shell is drawn for small single-purpose tools; a heavy one may belong
+    elsewhere, and the owner decides, not the builder.
+
 ## Left open (the owner's call)
 
 - **A third typeface in the signature preview** (Plus Jakarta Sans). In the artefact, not the chrome.

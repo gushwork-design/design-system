@@ -31,7 +31,9 @@ rule = (
     "skill when there is one (gushwork-web, gushwork-dashboard, gushwork-tools, gushwork-slides, gushwork-lead-magnet). "
     "For everything else that carries the brand, invoke the gushwork-brand skill BEFORE writing any "
     "code or markup. If the user explicitly asks for an off-brand look, do it and say in one line that "
-    "it is off-system."
+    "it is off-system. Anything you create that the library does not already have must also be registered "
+    "for review on the design hub (the surface's component-registry.json plus a drawn preview; see "
+    "foundation/new-component-notice.md section 0a), never shipped silently."
 )
 print(json.dumps({"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": rule}}))
 PY
