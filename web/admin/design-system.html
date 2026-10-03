@@ -994,7 +994,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 
   function $(id) { return document.getElementById(id); }
   function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
-  function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
+  function plural(n, w) { return n + ' ' + (n === 1 ? w : w.replace(/([^aeiou])y$/, '$1ie') + 's'); }   // family → families
   function metric(label, value, note) { return '<div class="ul-metric"><span class="ul-lab">' + esc(label) + '</span><div class="ul-metric__body"><span class="ul-num">' + esc(value) + '</span><span class="ul-note">' + esc(note) + '</span></div></div>'; }
   function th(t) { return '<div role="columnheader"><span class="ul-th"><span class="ul-th--plain">' + esc(t) + '</span></span></div>'; }
   function cell(html, cls) { return '<div class="ul-c ' + (cls || '') + '" role="cell">' + html + '</div>'; }
@@ -1285,6 +1285,8 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       'type-links': keys(t, /^gw-text-link-\d+$/).length, spacing: keys(t, /^gw-space-/).length, radius: keys(t, /^gw-radius-/).length, elevation: keys(t, /^gw-shadow-/).length,
       'content-width': keys(t, /^gw-content-/).length, breakpoint: keys(t, /^gw-bp-/).length, ruled: keys(t, /^gw-(motion|focus|toast)-/).length, slides: keys(t, /^gw-(slide|text-slide|font-slide)-/).length })[g] || 0;
   }
+  /* The one-line description of a tab, as a section like Templates or Typefaces: same heading, same size. */
+  function descSec(text) { return '<section class="fd-sec"><h3>Description</h3><div class="fd-head"><p>' + esc(text) + '</p></div></section>'; }
   function emptyLib(what, waiting) {
     return '<div class="ul-empty"><div class="ul-empty__copy"><h2>No ' + esc(what) + ' approved yet</h2>' +
       (waiting && owner ? '<p>' + waiting + ' waiting on review. They appear here once approved.</p><button type="button" class="ds-pv" id="lib-to-review">Open the Review tab</button>' : '<p>It appears here once it has been reviewed and approved.</p>') + '</div></div>';
@@ -1312,7 +1314,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
           var n = FD_PARTS[x[0]].filter(function (p) { return approved('foundation', p[0]); }).reduce(function (a, p) { return a + partCount(t, p[0]); }, 0);
           return [x[0], x[1], n, x[0] === F.tab];
         });
-        main = '<div class="fd-head"><p>' + esc(FD_NOTE[F.tab]) + '</p></div>' + body;
+        main = descSec(FD_NOTE[F.tab]) + body;
       }
     } else {
       if (cat.soon) {
@@ -1325,7 +1327,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
         var sx = x.surface ? d.surfaces.filter(function (y) { return y.key === x.surface; })[0] : null;
         return [x.key, x.title, (sx ? sx.components.filter(function (c) { return approved(sx.key, c.name); }).length : 0) + startPoints(d, x).length, x === sub];
       }) : null;
-      main = '<div class="fd-head"><p>' + esc((sf && sf.what) || (cat.title + ' · ' + sub.title)) + '</p></div>' + tplCards(startPoints(d, sub)) + compTable(sf);
+      main = descSec((sf && sf.what) || (cat.title + ' · ' + sub.title)) + tplCards(startPoints(d, sub)) + compTable(sf);
       }
     }
     host.setAttribute('data-solo', side ? '0' : '1');
