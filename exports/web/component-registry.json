@@ -298,6 +298,12 @@
       "reviewedOn": "2026-10-03",
       "fingerprint": "0777a79984b4e83a",
       "note": "flags are missing here"
+    },
+    "hero": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-03",
+      "fingerprint": "f2c4006add28e3b9"
     }
   }
 }
