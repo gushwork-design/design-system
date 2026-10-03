@@ -705,7 +705,14 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .rv .fd-grid { grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); }
 .rv-fig { margin: 0; display: flex; flex-direction: column; gap: var(--gw-space-8); }
 .rv-fig img { width: 100%; height: auto; display: block; border-radius: var(--gw-radius-12); box-shadow: 0 0 0 1px var(--ul-hdr-line); }
-.rv-pv { width: 100%; overflow-x: auto; overflow-y: hidden; }   /* no frame of its own: each group in the drawing has one */
+.rv-pv { width: 100%; overflow-x: auto; overflow-y: hidden; }
+/* The drawing is laid out hidden, beside the ghost, and swapped in once its stylesheets and fonts are in and it has been
+   measured. Swapping it in at once showed it unstyled and at the wrong size for as long as the sheet took to arrive. */
+.rv-pv-host { position: relative; }
+.rv-pv--wait { position: absolute; left: 0; right: 0; top: 0; visibility: hidden; pointer-events: none; }
+.rv-pv--in { animation: rv-pv-in .16s ease-out both; }
+@keyframes rv-pv-in { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .rv-pv--in { animation: none; } }   /* no frame of its own: each group in the drawing has one */
 .rv-pv__in { padding: 0; }
 .rv-fig figcaption { font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
 .rv-none { display: flex; flex-direction: column; gap: 6px; padding: var(--gw-space-20); border-radius: var(--gw-radius-12); background: var(--ul-hdr-bg); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); font: var(--gw-text-body-13-reg, 400 13px/1.5 var(--gw-font-body)); color: var(--ul-sub); }
@@ -1457,8 +1464,10 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   function mountPreview(host, it) {
     fetch(it.preview, { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); }).then(function (html) {
       if (!RV.open || BYID[RV.list[RV.i]] !== it) return;
-      host.innerHTML = '<div class="rv-pv"><div class="rv-pv__in"></div></div>';
-      var box = host.firstChild, inner = box.firstChild, root = inner.attachShadow({ mode: 'open' });
+      var box = document.createElement('div'); box.className = 'rv-pv rv-pv--wait';
+      box.innerHTML = '<div class="rv-pv__in"></div>';
+      host.appendChild(box);   // the ghost stays until this is ready; it is laid out now, but not shown
+      var inner = box.firstChild, root = inner.attachShadow({ mode: 'open' });
       root.innerHTML = '<link rel="stylesheet" href="/foundation/tokens.css"><link rel="stylesheet" href="/previews/_sheet.css">' + html;
       var fit = function () {
         // Lay it out at the drawer's width first: a grid of cells wraps and needs no scaling. Only a drawing that is
@@ -1484,11 +1493,20 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
         box.style.height = Math.ceil(inner.offsetHeight * k) + 'px';
         settleVis();
       };
-      var css = root.querySelector('link[href$="_sheet.css"]');
-      if (css) css.addEventListener('load', fit);
       root.addEventListener('toggle', fit, true);   // a folded set opening changes the height
-      fit(); setTimeout(fit, 250); setTimeout(fit, 900);
-      if (window.ResizeObserver) new ResizeObserver(function () { fit(); }).observe(box);   // expanding the drawer changes the width
+      var sheetsIn = Promise.all([].map.call(root.querySelectorAll('link[rel="stylesheet"]'), function (l) {
+        return new Promise(function (done) { if (l.sheet) return done(); l.addEventListener('load', done); l.addEventListener('error', done); });
+      }));
+      var fontsIn = document.fonts && document.fonts.ready ? Promise.race([document.fonts.ready, new Promise(function (d) { setTimeout(d, 600); })]) : Promise.resolve();
+      Promise.race([Promise.all([sheetsIn, fontsIn]), new Promise(function (d) { setTimeout(d, 3000); })]).then(function () {
+        if (!RV.open || BYID[RV.list[RV.i]] !== it || !host.contains(box)) return;
+        fit();                                                  // measured while still hidden
+        var g = host.querySelector('.rv-ghost'); if (g) g.remove();
+        box.classList.remove('rv-pv--wait'); box.classList.add('rv-pv--in');
+        fit(); settleVis();
+        setTimeout(fit, 250); setTimeout(fit, 900);             // late images and fonts: the height is corrected, not re-drawn
+        if (window.ResizeObserver) new ResizeObserver(function () { fit(); }).observe(box);   // expanding the drawer changes the width
+      });
     }).catch(function () { host.innerHTML = '<div class="rv-none"><b>Could not draw it</b><span>The preview file did not load.</span></div>'; });
   }
   /* Expanded or not, everything is drawn. In the narrow drawer a long picture (many variants) is cut short with a fade, and the Expand
