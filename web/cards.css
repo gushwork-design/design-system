@@ -239,3 +239,7 @@ body:is([data-gw-page="tools"], [data-gw-page="templates"]) .tcard__bar i:nth-ch
 .bdg--ghost { width: 76px; background: var(--s-ghost); color: transparent; animation: gw-ghost-pulse 1.6s ease-in-out infinite; }
 .bdg--ghost[hidden] { display: none; }
 @media (prefers-reduced-motion: reduce) { .bdg--ghost { animation: none; } }
+
+/* What the Templates page is for, between the title and the date line. 16 regular in the body colour, not the 14 medium
+   Neutral/400 of the date, so the two do not read as one line of metadata. */
+body[data-gw-page="templates"] .sg__hd > p.sg__desc { font: var(--gw-text-body-16-reg); letter-spacing: var(--gw-text-body-16-reg-tracking); color: var(--s-body); max-width: 62ch; }
