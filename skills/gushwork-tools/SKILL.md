@@ -72,8 +72,13 @@ rule the web templates follow.
 ## What every tool is
 
 - **A floating, collapsible panel on the left** (360 wide, 12 in from every edge, radius 20, black
-  in dark like the hub's panel) that holds every control. A header with the tool's name and a
-  collapse icon; a reopen button when it is collapsed. Below 900px it overlays the preview.
+  in dark like the hub's panel) that holds every control. A header with the **Gushwork logo tile**,
+  the tool's name and a collapse icon; a reopen button when it is collapsed. Below 900px it overlays
+  the preview.
+- **The header mark is always the Gushwork logo (R44).** Copy the SVG from the ID card's `.brand-card`:
+  the symbol on Flat Black at 32px, radius 8, a link back to `/internal/tools`, with a 1px neutral/800
+  ring in dark. Never a per-tool icon, a generic icon in a coloured tile, or the coloured symbol, and
+  the same in any drawing, mock or card that shows a tool's panel.
 - **A full-bleed canvas** with the thing being made on it, centred in the space to the right of the
   panel. No white container box around the artefact.
 - **One floating pill at the bottom** for the actions: views on the left, Download (outlined) and
@@ -200,6 +205,7 @@ are already flagged as new). Anything you chose rather than measured goes in the
 Say in a few lines what you checked and what you chose:
 
 - Tokens only, in both themes, the chrome measured against them.
+- The panel header wears the real Gushwork logo tile, linked back to Tools (R44).
 - The controls are the family above; nothing new drawn.
 - The ghost shows, the panel collapses, the narrow case works.
 - The card, `_tools.js`, Access Control and the staging path all agree.

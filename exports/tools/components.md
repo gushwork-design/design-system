@@ -27,6 +27,12 @@ The floating, collapsible panel a tool keeps its controls in.
 | Collapse button | 24 square, radius 4, 12 icon |
 | Reopen button | 36 square, radius 12, 16 icon; shown only when the panel is collapsed |
 
+**Rules (R44).** The header mark is always the Gushwork logo tile, the same SVG the tools carry in
+`.brand-card`, linked back to Tools. Never a per-tool icon or a stand-in, in the tool or in any drawing
+of it.
+
+---
+
 ## tool-action-pill
 
 One floating pill for a tool's actions, centred over the free canvas, 24 from the bottom.

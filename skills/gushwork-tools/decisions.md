@@ -86,6 +86,11 @@ The email signature creator and the employee ID card generator were redesigned i
     and functionality questions in a second message). The shell is drawn for small single-purpose
     tools; a heavy one may belong elsewhere, and the owner decides, not the builder.
 
+28. **The panel header wears the Gushwork logo, never a stand-in.** The `tool-panel` drawing in Review
+    used a blue pencil tile; Utsav, 3 Oct 2026: "use gushwork logo as in email sig and the other tool".
+    The black logo tile at 32px, a link to Tools, with a neutral/800 ring in dark, the same on every
+    tool and in every drawing of one. R44.
+
 ## Left open (the owner's call)
 
 - **A third typeface in the signature preview** (Plus Jakarta Sans). In the artefact, not the chrome.
