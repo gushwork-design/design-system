@@ -35,7 +35,7 @@ def block(needs_tokens: bool) -> str:
     # written entirely in --gw-* variables, so those sheets need it now.
     if needs_tokens:
         lines.append('<link rel="stylesheet" href="/foundation/tokens.css">')
-    lines.append('<link rel="stylesheet" href="/shell.css?v=ghost1">')
+    lines.append('<link rel="stylesheet" href="/shell.css?v=ghost2">')
     lines.append('<script src="/shell.js?v=ghost1" defer></script>')
     return "\n".join(lines)
 
