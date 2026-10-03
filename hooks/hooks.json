@@ -23,7 +23,7 @@
     "someone else's machine. It must never be the reason a session feels slow.",
     "",
     "brand-rule.sh is the floor under the skills. A skill loads only when the request matches its",
-    "description, and the four surface skills each name a specific deliverable, so a game, a poster",
+    "description, and the five surface skills each name a specific deliverable, so a game, a poster",
     "or a one-off that merely carries the Gushwork name loaded nothing and came back with the wrong",
     "logo, font and blue (30 Sep 2026). This hands Claude the standing rule at the start of every",
     "session, independent of the request, and points at the gushwork-brand skill for the detail. Its",
