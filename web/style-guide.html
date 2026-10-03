@@ -468,14 +468,54 @@
    except the right shape's bottom-right, which sweeps at 136.125 — the curve
    that echoes the mark. None of those sit on the radius scale: they are artwork
    proportions, not UI radii, which is exactly why they are hard-coded here. */
-.sg-shapes{position:relative;overflow:hidden;height:386px;
-           border-radius:var(--gw-radius-20);
-           background:var(--gw-color-neutral-100)}
-.sg-shapes__a,.sg-shapes__b{position:absolute;top:72px;height:242px;
-                            background:var(--gw-color-neutral-400)}
-.sg-shapes__a{left:-55px;width:522px;border-radius:15.125px}
-.sg-shapes__b{left:476.075px;width:211.75px;
-              border-radius:15.125px 15.125px 136.125px 15.125px}
+/* Shape studies, redrawn as the two places the curve is used in the library.
+   The swept corner is the logo abstracted: one rounded shape with its bottom-right
+   corner opened. Image card = Card / Case Study and Blog, whose image takes the
+   sweep (12 12 80 12, measured on the Hover state). UI card = Card / Information,
+   Mobile, Image=With, Style 1 (343 wide, radius 12, pad 12, title 22/500, body
+   16/24), with the library image `traffic-trend` (610 x 346) in the slot and the
+   card's own bottom-right corner swept. Both are fluid in a 2-up, so they run 360
+   rather than the library's 384 and 343. The stage is white with a Neutral/100 hairline, as the
+   library's specimen stages are: the information card's Neutral/100 border would vanish on
+   a Neutral/100 ground. It is artwork, so it stays light in both themes. The sweep opens when the card first scrolls in
+   (a judgement call, not drawn); with no script or reduced motion it just rests open. */
+.shp{--body:var(--gw-font-body);--display:var(--gw-font-display);
+     --shp-sweep:80px;display:grid;grid-template-columns:1fr 1fr;gap:var(--gw-space-20);
+     align-items:start;padding:var(--gw-space-24);border-radius:var(--gw-radius-20);
+     background:var(--gw-color-white);box-shadow:inset 0 0 0 1px var(--gw-color-neutral-100)}
+.shp.is-pre{--shp-sweep:12px}
+.shp__fig{margin:0;display:flex;flex-direction:column;gap:var(--gw-space-12);min-width:0}
+.shp__cap{font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-600)}
+.shp__cap b{font-weight:600;color:var(--gw-color-neutral-900)}
+.shp-case{display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.shp-case__img{position:relative;aspect-ratio:384/200;overflow:hidden;
+               background:var(--gw-color-neutral-300);
+               border-radius:12px 12px var(--shp-sweep) 12px;
+               transition:border-radius 900ms cubic-bezier(.2,.8,.2,1)}
+.shp-case__img::before{content:'';position:absolute;inset:0;background:#0000004d}
+.shp-case__logo{position:absolute;left:50%;top:50%;width:129px;height:64px;
+                transform:translate(-50%,-50%);display:grid;place-items:center;
+                border:1.5px dashed #fffc;border-radius:8px;
+                font:var(--gw-text-body-12-med);color:var(--gw-color-white)}
+.shp-case__body{padding:var(--gw-space-8);display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.shp-case__meta{display:flex;align-items:center;gap:var(--gw-space-12);
+                font:var(--gw-text-body-12-med);line-height:1;color:var(--gw-color-primary-500)}
+.shp-case__meta i{width:4px;height:4px;border-radius:50%;background:currentColor}
+.shp-case__h{margin:0;font-family:var(--body);font-weight:600;font-size:20px;line-height:1.4;
+             letter-spacing:-.12px;color:var(--gw-color-black)}
+.shp-info{display:flex;flex-direction:column;gap:var(--gw-space-12);overflow:hidden;
+          background:var(--gw-color-neutral-25);border:1px solid var(--gw-color-neutral-100);
+          border-radius:12px 12px var(--shp-sweep) 12px;
+          transition:border-radius 900ms cubic-bezier(.2,.8,.2,1)}
+.shp-info__head{padding:var(--gw-space-12);display:flex;flex-direction:column;gap:var(--gw-space-16)}
+.shp-info__row{display:flex;align-items:center;justify-content:space-between;gap:var(--gw-space-12)}
+.shp-info__t{font-family:var(--display);font-weight:500;font-size:22px;line-height:1.4;color:var(--gw-color-black)}
+.shp-info__row svg{width:20px;height:20px;flex:none;color:var(--gw-color-neutral-900)}
+.shp-info__p{margin:0;font:var(--gw-text-body-16-reg);letter-spacing:var(--gw-text-body-16-reg-tracking);color:var(--gw-color-neutral-800)}
+.shp-info__img{position:relative;aspect-ratio:610/346;overflow:hidden;background:var(--gw-color-neutral-50)}
+.shp-info__img > div{position:absolute;left:0;top:0;transform-origin:0 0;transform:scale(var(--k,.58))}
+@media (max-width:700px){.shp{grid-template-columns:1fr}}
+@media (prefers-reduced-motion: reduce){.shp-case__img,.shp-info{transition:none}}
 
 
 /* Specimen surfaces. Neutral/100 on a Neutral/25 page is the measured light
@@ -881,14 +921,33 @@
              which is why that one ships as an exported vector rather than CSS. The
              filled cells carry the meaning: step them diagonally for movement, or
              stack them into rising columns for growth.</p>
-          <div class="sg-shapes">
-            <span class="sg-shapes__a"></span>
-            <span class="sg-shapes__b"></span>
+          <div class="shp" data-shp>
+            <figure class="shp__fig">
+              <div class="shp-case">
+                <div class="shp-case__img"><span class="shp-case__logo">client logo</span></div>
+                <div class="shp-case__body">
+                  <div class="shp-case__meta"><span>Industry or segment</span><i></i><span>Country</span></div>
+                  <p class="shp-case__h">A customer headline that leads with the result and how long it took</p>
+                </div>
+              </div>
+              <figcaption class="shp__cap"><b>Image card.</b> The case-study card, whose image takes the sweep.</figcaption>
+            </figure>
+            <figure class="shp__fig">
+              <div class="shp-info">
+                <div class="shp-info__head">
+                  <div class="shp-info__row"><span class="shp-info__t">Traffic from AI sources</span>
+                    <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M200,64V168a8,8,0,0,1-16,0V83.31L69.66,197.66a8,8,0,0,1-11.32-11.32L172.69,72H88a8,8,0,0,1,0-16H192A8,8,0,0,1,200,64Z"/></svg></div>
+                  <p class="shp-info__p">Which AI models send visitors to your pages, and how that moves over time.</p>
+                </div>
+                <div class="shp-info__img" data-shp-img role="img" aria-label="A traffic trend chart from the image library"><div style="width:610px;height:346px;background:#f1f2f3;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:20px 32px;box-sizing:border-box;flex:none"><div style="width:499.869px;border-radius:10.986px;overflow:hidden;display:flex;flex-direction:column;filter:drop-shadow(0 14.648px 14.648px rgba(88,92,95,.1));flex:none"><div style="width:100%;background:#fff;border-bottom:.652px solid #e7e8e9;display:flex;gap:2.607px;align-items:center;padding:7.822px 13.036px;box-sizing:border-box;flex:none"><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1.304px"><p style="margin:0;font-family:var(--body);font-weight:500;font-size:11.732px;line-height:1.6;letter-spacing:-.0235px;color:#0d0d0d;white-space:nowrap">Trend of Traffic from AI Sources</p><p style="margin:0;font-family:var(--body);font-weight:400;font-size:8.473px;line-height:1.4;letter-spacing:-.0508px;color:#878b94">Comparison of visitor traffic across AI models, for the selected time period</p></div><div style="width:104.288px;flex:none;background:#fff;border:.652px solid #e7e8e9;border-radius:5.214px;box-shadow:0 .652px 1.304px 0 rgba(0,0,0,.05);overflow:hidden;box-sizing:border-box"><div style="display:flex;align-items:center;justify-content:space-between;padding:5.214px 6.518px 5.214px 7.822px;border-left:.652px solid #e7e8e9"><p style="margin:0;font-family:var(--body);font-weight:500;font-size:9.125px;line-height:13.036px;letter-spacing:-.0183px;color:#0d0d0d;white-space:nowrap">All AI Models</p><div style="position:relative;width:13.036px;height:13.036px;flex:none"><svg viewBox="0 0 13.036 13.036" preserveAspectRatio="none" fill="none" style="display:block;overflow:visible;position:absolute;inset:0;width:100%;height:100%"><g id="i19xChevron down"><path id="i19xIcon" d="M10.3202 4.8885L6.51801 8.69067L2.71584 4.8885" stroke="#6A7077" stroke-width="0.814751" stroke-linecap="round" stroke-linejoin="round"/></g></svg></div></div></div></div><div style="width:100%;height:231.926px;background:#fff;filter:drop-shadow(0 1.304px 1.304px rgba(27,28,29,.04));display:flex;flex-direction:column;gap:10.986px;justify-content:center;padding:10.986px 14.648px;box-sizing:border-box;flex:none"><div style="flex:1;min-height:0;display:flex;flex-direction:column;gap:10.429px"><div style="display:flex;gap:3.911px;align-items:flex-end"><p style="margin:0;font-family:var(--display);font-weight:700;font-size:21.972px;line-height:1.4;letter-spacing:-.1318px;color:#0d0d0d;white-space:nowrap">6.8K</p><div style="display:flex;gap:2.607px;align-items:flex-end;padding-bottom:5.214px"><div style="display:flex;gap:1.304px;align-items:center"><div style="position:relative;width:9.125px;height:9.125px"><svg viewBox="0 0 9.12521 9.12521" preserveAspectRatio="none" fill="none" style="display:block;overflow:visible;position:absolute;inset:0;width:100%;height:100%"><g id="i25xArrow up"><path id="i25xIcon" fill-rule="evenodd" clip-rule="evenodd" d="M1.50242 4.42897C1.32424 4.25079 1.32424 3.9619 1.50242 3.78372L4.23998 1.04616C4.41816 0.867976 4.70705 0.867976 4.88523 1.04616L7.62279 3.78372C7.80097 3.9619 7.80097 4.25079 7.62279 4.42897C7.44461 4.60715 7.15572 4.60715 6.97754 4.42897L5.01887 2.47029L5.01887 7.75643C5.01887 8.00841 4.81459 8.21269 4.56261 8.21269C4.31062 8.21269 4.10634 8.00841 4.10634 7.75643L4.10634 2.47029L2.14767 4.42897C1.96949 4.60715 1.6806 4.60715 1.50242 4.42897Z" fill="#22C55E"/></g></svg></div><p style="margin:0;font-family:var(--body);font-weight:500;font-size:9.125px;line-height:13.036px;letter-spacing:-.0548px;color:#22c55e">6%</p></div><p style="margin:0;font-family:var(--body);font-weight:400;font-size:9.125px;line-height:13.036px;letter-spacing:-.0548px;color:#878b94;white-space:nowrap">vs last week</p></div></div><div style="flex:1;min-height:0;display:flex;gap:15.643px"><div style="display:flex;flex-direction:column;justify-content:space-between;padding-bottom:26.072px"><p style="margin:0;font-family:var(--body);font-size:7.822px;line-height:10.429px;color:#878b94;white-space:nowrap">7K</p><p style="margin:0;font-family:var(--body);font-size:7.822px;line-height:10.429px;color:#878b94;white-space:nowrap">5K</p><p style="margin:0;font-family:var(--body);font-size:7.822px;line-height:10.429px;color:#878b94;white-space:nowrap">3K</p><p style="margin:0;font-family:var(--body);font-size:7.822px;line-height:10.429px;color:#878b94;white-space:nowrap">1K</p></div><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:10.986px"><div style="position:relative;flex:1 1 0;min-height:0;overflow:hidden;width:100%"><div style="position:absolute;left:.13px;top:4.31px;width:441.277px;height:128.172px"><svg viewBox="0 0 441.277 128.823" preserveAspectRatio="none" fill="none" style="display:block;overflow:visible;position:absolute;inset:0;width:100%;height:100%"><g id="i20xFrame 2147225353"><line id="i20xLine 279" x1="3.14028e-05" y1="0.3259" x2="441.277" y2="0.3259" stroke="#F1F2F3" stroke-width="0.651801"/><line id="i20xLine 280" y1="21.6879" x2="441.277" y2="21.6879" stroke="#F1F2F3" stroke-width="0.651801"/><line id="i20xLine 281" y1="43.0498" x2="441.277" y2="43.0498" stroke="#F1F2F3" stroke-width="0.651801"/><line id="i20xLine 282" y1="64.4117" x2="441.277" y2="64.4117" stroke="#F1F2F3" stroke-width="0.651801"/><line id="i20xLine 283" y1="85.7737" x2="441.277" y2="85.7737" stroke="#F1F2F3" stroke-width="0.651801"/><line id="i20xLine 284" y1="107.136" x2="441.277" y2="107.136" stroke="#F1F2F3" stroke-width="0.651801"/><line id="i20xLine 285" y1="128.498" x2="441.277" y2="128.498" stroke="#F1F2F3" stroke-width="0.651801"/></g></svg></div><div style="position:absolute;left:-10.85px;bottom:-1.03px;width:452.263px;height:130.918px;display:flex;align-items:center;justify-content:center"><div style="flex:none;transform:rotate(90deg);position:relative;width:130.918px;height:452.263px"><svg viewBox="0 0 130.918 452.915" preserveAspectRatio="none" fill="none" style="display:block;overflow:visible;position:absolute;inset:0;width:100%;height:100%"><g id="i21xFrame 2147225354"><line id="i21xLine 279" y1="0.3259" x2="130.918" y2="0.3259" stroke="#F1F2F3" stroke-width="0.651801"/><line id="i21xLine 280" x1="1.03848e-05" y1="50.5774" x2="130.918" y2="50.5774" stroke="#F1F2F3" stroke-width="0.651801"/><line id="i21xLine 281" x1="1.25524e-05" y1="100.829" x2="130.918" y2="100.829" stroke="#F1F2F3" stroke-width="0.651801"/><line id="i21xLine 282" x1="1.472e-05" y1="151.08" x2="130.918" y2="151.08" stroke="#F1F2F3" stroke-width="0.651801"/><line id="i21xLine 285" x1="1.68876e-05" y1="201.332" x2="130.918" y2="201.332" stroke="#F1F2F3" stroke-width="0.651801"/><line id="i21xLine 286" x1="1.90552e-05" y1="251.583" x2="130.918" y2="251.583" stroke="#F1F2F3" stroke-width="0.651801"/><line id="i21xLine 287" x1="2.12227e-05" y1="301.834" x2="130.918" y2="301.834" stroke="#F1F2F3" stroke-width="0.651801"/><line id="i21xLine 288" x1="2.33903e-05" y1="352.086" x2="130.918" y2="352.086" stroke="#F1F2F3" stroke-width="0.651801"/><line id="i21xLine 283" x1="2.55579e-05" y1="402.337" x2="130.918" y2="402.337" stroke="#F1F2F3" stroke-width="0.651801"/><line id="i21xLine 284" x1="2.77255e-05" y1="452.589" x2="130.918" y2="452.589" stroke="#F1F2F3" stroke-width="0.651801"/></g></svg></div></div><div style="position:absolute;left:0.13px;bottom:-1.03px;width:443.108px;height:98.875px"><svg viewBox="0 0 444.023 98.8753" preserveAspectRatio="none" fill="none" style="display:block;overflow:visible;position:absolute;inset:0;width:100%;height:100%"><g id="i22xFrame 2147259560"><path id="i22xVector" d="M0.915748 71.4099L74.4619 50.2616L148.008 64.3605L221.554 29.1133L295.1 43.2121L368.646 0.915513L442.192 29.1133" stroke="#73EB2E" stroke-width="1.83102" stroke-linecap="round" stroke-linejoin="round"/><path id="i22xVector_2" d="M2.74677 70.6252L76.2929 49.4376L149.839 63.5627L223.385 28.2501L296.931 42.3751L370.477 1.64378e-06L444.023 28.2501V98.8753H2.74677V70.6252Z" fill="#73EB2E" fill-opacity="0.08"/></g></svg></div><div style="position:absolute;left:0.13px;bottom:-1.03px;width:443.108px;height:129.087px"><svg viewBox="0 0 443.108 129.087" preserveAspectRatio="none" fill="none" style="display:block;overflow:visible;position:absolute;inset:0;width:100%;height:100%"><g id="i23xFrame 2147225352" clip-path="url(#i23xclip0_0_6)"><path id="i23xVector 78" d="M49.9276 68.2056L-3.14028e-05 82.8538V129.545H443.108V52.1841H396.3L352.614 82.8538L308.303 76.9029L267.113 107.115L223.426 112.608L178.491 89.7201L137.301 96.1287L49.9276 68.2056Z" fill="#0070FF" fill-opacity="0.1"/><path id="i23xVector 77" d="M-3.14028e-05 83.7693L49.9276 69.1211L137.301 97.0442L178.491 90.6356L223.426 113.523L267.113 108.03L308.303 77.8185L352.614 83.7693L396.3 53.0996H443.108" stroke="#0070FF" stroke-width="2.74653"/></g><defs><clipPath id="i23xclip0_0_6"><rect width="443.108" height="129.087" fill="white"/></clipPath></defs></svg></div><div style="position:absolute;left:.13px;bottom:-1.03px;width:443.108px;height:42.114px;display:flex;align-items:center;justify-content:center"><div style="flex:none;transform:scaleY(-1) rotate(180deg);position:relative;width:443.108px;height:42.114px"><svg viewBox="0 0 444.939 42.1135" preserveAspectRatio="none" fill="none" style="display:block;overflow:visible;position:absolute;inset:0;width:100%;height:100%"><g id="i24xFrame 2147259559"><path id="i24xVector" d="M0.915639 10.9861L74.7669 22.2774L148.618 20.1412L222.469 33.5687L296.321 31.4325L370.172 35.7049L444.023 33.5687" stroke="#FFA626" stroke-width="1.83102" stroke-linecap="round" stroke-linejoin="round"/><path id="i24xVector_2" d="M0.915639 10.9861L74.7669 22.2774L148.618 20.1412L222.469 33.5687L296.321 31.4325L370.172 35.7049L444.023 33.5687V42.1135H0.915639L0.915639 10.9861Z" fill="#FFA626" fill-opacity="0.08"/></g></svg></div></div></div><div style="display:flex;justify-content:space-between;width:100%"><p style="margin:0;font-family:var(--body);font-size:7.822px;line-height:10.429px;color:#878b94">SEP</p><p style="margin:0;font-family:var(--body);font-size:7.822px;line-height:10.429px;color:#878b94">OCT</p><p style="margin:0;font-family:var(--body);font-size:7.822px;line-height:10.429px;color:#878b94">NOV</p><p style="margin:0;font-family:var(--body);font-size:7.822px;line-height:10.429px;color:#878b94">DEC</p><p style="margin:0;font-family:var(--body);font-size:7.822px;line-height:10.429px;color:#878b94">JAN</p><p style="margin:0;font-family:var(--body);font-size:7.822px;line-height:10.429px;color:#878b94">FEB</p></div></div></div></div><div style="display:flex;gap:10.547px;align-items:center;justify-content:center;padding-left:24.609px"><div style="display:flex;gap:3.259px;align-items:center"><span style="width:7.822px;height:7.822px;border-radius:13px;background:#22c55e;display:block"></span><p style="margin:0;font-family:var(--body);font-weight:500;font-size:7.822px;line-height:1.4;color:#535a61;white-space:nowrap">ChatGPT</p></div><div style="display:flex;gap:3.259px;align-items:center"><span style="width:7.822px;height:7.822px;border-radius:13px;background:#338cff;display:block"></span><p style="margin:0;font-family:var(--body);font-weight:500;font-size:7.822px;line-height:1.4;color:#535a61;white-space:nowrap">Gemini</p></div><div style="display:flex;gap:3.259px;align-items:center"><span style="width:7.822px;height:7.822px;border-radius:13px;background:#ffa626;display:block"></span><p style="margin:0;font-family:var(--body);font-weight:500;font-size:7.822px;line-height:1.4;color:#535a61;white-space:nowrap">Others</p></div></div></div></div></div></div>
+              </div>
+              <figcaption class="shp__cap"><b>UI card.</b> An information card carrying a product image, its corner swept.</figcaption>
+            </figure>
           </div>
-          <p>The shape studies pair a plain rounded slab with one whose bottom-right
-             corner sweeps open &mdash; that curve is our logo, abstracted. The shape
-             works as a placeholder that holds an image, as a graphic element on its
-             own, or as the block a layout is built from.</p>
+          <p>The shape pairs a plain rounded slab with one whose bottom-right corner
+             sweeps open &mdash; that curve is our logo, abstracted. It holds an image,
+             as the case-study card&rsquo;s does, or a product UI, as an information
+             card&rsquo;s does, and it works as the block a layout is built from.</p>
         </div>
       </section>
 
@@ -1344,6 +1403,26 @@
   }, 100);
 
   show(0, true);
+})();
+
+/* Shape studies: scale the library image to the card, and open the sweep once, the first
+   time the cards scroll into view. */
+(function () {
+  'use strict';
+  var host = document.querySelector('[data-shp]');
+  if (!host) return;
+  var box = host.querySelector('[data-shp-img]');
+  function fit() { box.style.setProperty('--k', (box.clientWidth / 610).toFixed(4)); }
+  fit();
+  if ('ResizeObserver' in window) new ResizeObserver(fit).observe(box); else window.addEventListener('resize', fit);
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
+  host.classList.add('is-pre');
+  var io = new IntersectionObserver(function (es) {
+    if (!es[0].isIntersecting) return;
+    io.disconnect();
+    requestAnimationFrame(function () { host.classList.remove('is-pre'); });
+  }, { threshold: 0.35 });
+  io.observe(host);
 })();
 </script>
 </body></html>
