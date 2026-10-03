@@ -418,7 +418,7 @@ def chrome(page, extra_css=""):
     tokens = up(d) + "foundation/tokens.css"
     # shell.css is loaded for its --s-* surface layer only; its chrome rules are gated.
     shell = up(d) + "shell.css"
-    home = "/admin/design-system#library"
+    home = "/internal/design-system#library"
     crumb = f'<span class="lb-crumb">{page.crumb}</span>' if page.crumb else ""
     find = ('<input class="lb-find" id="lb-find" type="search" '
             'placeholder="Filter this library" aria-label="Filter this library">' if page.rail else "")

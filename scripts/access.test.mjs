@@ -71,8 +71,8 @@ t('non-addresses are filtered out of the admin list', normalise({ routes: [{ pat
    usage log, and the one public ad lander. This used to assert just the first two and went stale
    as routes were added; it now names them all so adding one is a deliberate edit here. */
 t('the compiled fallback routes and their tiers', defaultRules().routes.map(r => r.access),
-  ['admin', 'internal', 'admin', 'admin', 'admin', 'owner', 'owner', 'public']);
-t('previews: an ordinary teammate is kept out', decide('/previews/web/button.html', S('sam@gushwork.ai'), normalise(defaultRules())), 'forbid');
+  ['admin', 'internal', 'internal', 'internal', 'admin', 'owner', 'owner', 'public']);   // /library and /previews became internal on 3 Oct 2026
+t('previews: an ordinary teammate is let in (internal tier since 3 Oct 2026)', decide('/previews/web/button.html', S('sam@gushwork.ai'), normalise(defaultRules())), 'allow');
 
 /* The usage log lists who ran a session. It is the owner tier, so an admin who is not an
    owner is kept out, while the owner is let in. Uses the COMPILED rules, which is what a
@@ -83,8 +83,10 @@ t('analytics: an admin who is not an owner is forbidden',
 t('review sheet: an admin who is not an owner is forbidden',
   decide('/admin/review-sheet', S('priya@gushwork.ai'), { ...compiled, admins: ['priya@gushwork.ai'] }), 'forbid');
 t('review sheet: an owner is let in', decide('/admin/review-sheet', S('utsav.singh@gushwork.ai'), compiled), 'allow');
-t('library: an ordinary teammate is kept out', decide('/library', S('sam@gushwork.ai'), compiled), 'forbid');
+t('library: an ordinary teammate is let in (internal tier since 3 Oct 2026)', decide('/library', S('sam@gushwork.ai'), compiled), 'allow');
 t('library: an admin is let in', decide('/library', S('priya@gushwork.ai'), { ...compiled, admins: ['priya@gushwork.ai'] }), 'allow');
+t('library review queue: an ordinary teammate is kept out', decide('/library/review', S('sam@gushwork.ai'), compiled), 'forbid');
+t('library review queue: an admin is let in', decide('/library/review', S('priya@gushwork.ai'), { ...compiled, admins: ['priya@gushwork.ai'] }), 'allow');
 t('analytics: an owner is let in', decide('/admin/analytics', S('utsav.singh@gushwork.ai'), compiled), 'allow');
 
 /* The unconfigured path — no Edge Config store — is what every deployment

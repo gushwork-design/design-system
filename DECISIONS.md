@@ -1140,3 +1140,13 @@ Ruled by Utsav, 3 Oct 2026. He sent the "Ruled" group back for rework on 2 Oct w
 - **`outline: none` still needs a replacement.** For a text field the replacement is its edge. This stays the one accessibility requirement in the focus rule.
 - **What moved:** the ring is off text fields on the dashboard pages (`analytics.html`, `design-system.html`) and the login modal field; the search fields on the Library pages and the GTM command center preview had it on `:focus` and now show an edge. The tools and the Access Control page already worked this way (30 Sep). The token values and the ring itself are unchanged, so every keyboard ring is as it was.
 - **Review:** the "Ruled" group (motion, focus, timing) stays in rework until Utsav approves it again; nothing here approves it.
+
+## R42 — the Design System moves to For Internal Use; Review and Workflow ask for an admin
+Ruled by Utsav, 3 Oct 2026. The Library is for everyone who uses the system, so the Design System page moves out of Admin into **For Internal Use** and opens to everyone internal. Its Review and Workflow tabs stay where they are but show no content to anyone who is not an admin, only an "Admin access required" alert.
+
+- **New home: `/internal/design-system`.** `/admin/design-system` redirects to it (and so do the old `/preview/review-sheet` and `/preview/catalogue` redirects, straight, in `web/vercel.json`). The nav entry moved from the Admin group to For Internal Use in `shell.js`.
+- **Tiers.** `/library` and `/previews` (the Library's data and drawings) go from admin to internal in `_access.js`, so the Library tab works for any @gushwork.ai account. `/library/review` stays admin. `access.test.mjs` is updated to match.
+- **Review tab.** Admins see it read-only; only the owner acts. Anyone else gets the alert. The tab always shows in the row.
+- **Workflow tab.** Admins see it; anyone else gets the alert, and the content is not drawn.
+- **What this is not.** The alert is a courtesy, not a lock: the Workflow drawing is part of the page's HTML and `/library/data.json` (which includes items that are not approved yet) is readable by anyone internal, because the Library tab needs it. Nothing in either is secret. If either ever should be, it moves to its own path under the admin tier.
+- **If a config store holds rules.** The tier changes above are the *defaults*. A store that already has explicit `/library` or `/previews` rules overrides them: change those two to Internal in Access Control → Pages.
