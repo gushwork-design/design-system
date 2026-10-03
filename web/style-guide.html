@@ -376,9 +376,12 @@
    one grey, Neutral/50) — Utsav's call, 3 Oct 2026; the near-white tile is dropped. Colours are the exported card's fills, bound to tokens.
    The motion is a judgement call, not drawn in Figma: 6s per colourway, an 800ms
    wipe between them, 700ms line draw, 140ms between stepping cells. */
-.gv{display:flex;flex-direction:column;gap:var(--gw-space-16)}
+.gv{display:block}
 .gv__stage{position:relative;aspect-ratio:760/480;overflow:hidden;isolation:isolate;
            border-radius:var(--gw-radius-20);background:var(--gw-color-neutral-100)}
+/* a hairline so the Flat Black ground keeps an edge on a near-black page */
+.gv__stage::after{content:'';position:absolute;inset:0;z-index:6;pointer-events:none;
+                  border-radius:inherit;box-shadow:inset 0 0 0 1px var(--s-card-border)}
 .gv__scene{position:absolute;inset:0;visibility:hidden;z-index:0;
            background:var(--gv-bg)}
 .gv__scene.is-on,.gv__scene.is-prev{visibility:visible}
@@ -408,21 +411,29 @@
 @keyframes gv-step{0%{opacity:0}10%{opacity:1}35%{opacity:.4}60%,100%{opacity:0}}
 @keyframes gv-rise{from{opacity:0;transform:translateY(18px) scale(.6)}to{opacity:1;transform:none}}
 
-.gv__bar{display:flex;align-items:center;justify-content:space-between;gap:var(--gw-space-12)}
-.gv__tabs{display:flex;gap:var(--gw-space-4);padding:var(--gw-space-4);
-          border-radius:var(--gw-radius-12);background:var(--s-toc-btn-bg);
-          overflow-x:auto;scrollbar-width:none}
+/* The controls and the caption are part of the artwork, not content under it: they
+   float on the stage the way the logo card's tab pill floats on its card, 12 in from
+   the edge. They stay light in both themes because the stage is artwork, and the
+   artwork does not follow the page theme. */
+.gv__ui{position:absolute;inset:var(--gw-space-12);z-index:5;pointer-events:none}
+.gv__ui > *{pointer-events:auto}
+.gv__bar{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;
+         justify-content:space-between;gap:var(--gw-space-12);pointer-events:none}
+.gv__bar > *{pointer-events:auto}
+.gv__tabs{display:flex;gap:var(--gw-space-4);padding:var(--gw-space-4);min-width:0;
+          border-radius:var(--gw-radius-12);background:var(--gw-color-neutral-50);
+          overflow-x:auto;scrollbar-width:none;box-shadow:var(--gw-shadow-s2)}
 .gv__tabs::-webkit-scrollbar{display:none}
 .gv__tab{position:relative;flex:none;border:0;cursor:pointer;overflow:hidden;
          display:flex;align-items:center;gap:var(--gw-space-8);
          padding:0 var(--gw-space-12);height:28px;border-radius:var(--gw-radius-8);
          background:none;font:var(--gw-text-button-12);line-height:16px;
-         color:var(--s-body)}
-.gv__tab:hover{color:var(--s-heading)}
-.gv__tab[aria-selected="true"]{background:var(--s-heading);color:var(--s-panel-bg)}
+         color:var(--gw-color-neutral-700)}
+.gv__tab:hover{color:var(--gw-color-black)}
+.gv__tab[aria-selected="true"]{background:var(--gw-color-black);color:var(--gw-color-white)}
 .gv__dot{width:10px;height:10px;border-radius:50%;flex:none;
-         box-shadow:inset 0 0 0 1px var(--s-toc-btn-border);background:var(--d)}
-.gv__tab[aria-selected="true"] .gv__dot{box-shadow:inset 0 0 0 1px var(--s-panel-bg)}
+         box-shadow:inset 0 0 0 1px var(--gw-color-neutral-300);background:var(--d)}
+.gv__tab[aria-selected="true"] .gv__dot{box-shadow:inset 0 0 0 1px var(--gw-color-neutral-600)}
 .gv__prog{position:absolute;left:0;bottom:0;height:2px;width:100%;
           background:var(--gw-color-primary-400);transform:scaleX(0);transform-origin:left;
           display:none}
@@ -431,25 +442,30 @@
 .gv[data-user-paused] .gv__prog,.gv[data-offscreen] .gv__prog{animation-play-state:paused}
 @keyframes gv-prog{to{transform:scaleX(1)}}
 .gv__pp{flex:none;display:grid;place-items:center;width:36px;height:36px;border:0;cursor:pointer;
-        border-radius:var(--gw-radius-12);background:var(--s-toc-btn-bg);
-        color:var(--s-heading)}
-.gv__pp:hover{background:var(--s-nav-sel)}
+        border-radius:var(--gw-radius-12);background:var(--gw-color-neutral-50);
+        color:var(--gw-color-neutral-900);box-shadow:var(--gw-shadow-s2)}
+.gv__pp:hover{background:var(--gw-color-neutral-100)}
 .gv__pp svg{width:16px;height:16px;display:block}
 .gv__pp .gv__play{display:none}
 .gv[data-user-paused] .gv__pp .gv__play{display:block}
 .gv[data-user-paused] .gv__pp .gv__pause{display:none}
-.gv__cap{display:grid;grid-template-columns:1fr auto;gap:var(--gw-space-24);align-items:start}
-.gv__cap > *{animation:gv-fade 420ms ease both}
-.gv__name{margin:0 0 var(--gw-space-4);font:var(--gw-text-body-16-med);font-weight:600;color:var(--s-heading)}
-.gv__why{margin:0;max-width:44ch}
-.gv__toks{display:grid;gap:var(--gw-space-8);margin:0;padding:0;list-style:none;
-          font:var(--gw-text-body-14-med);color:var(--s-body)}
+/* caption: a name card top-left, the three tokens top-right */
+.gv__cap{position:absolute;left:0;right:0;top:0;display:flex;justify-content:space-between;
+         align-items:flex-start;gap:var(--gw-space-12);pointer-events:none}
+.gv__cap > *{pointer-events:auto;animation:gv-fade 420ms ease both;
+             border-radius:var(--gw-radius-12);background:var(--gw-color-neutral-25);
+             box-shadow:var(--gw-shadow-s2)}
+.gv__info{padding:var(--gw-space-12) var(--gw-space-16);max-width:min(300px,60%)}
+.gv__name{margin:0 0 var(--gw-space-4);font:var(--gw-text-body-14-med);font-weight:600;color:var(--gw-color-black)}
+.gv__why{margin:0;font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-700)}
+.gv__toks{display:grid;gap:var(--gw-space-8);margin:0;padding:var(--gw-space-12) var(--gw-space-16);list-style:none;
+          font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-700)}
 .gv__toks li{display:flex;align-items:center;gap:var(--gw-space-8);white-space:nowrap}
-.gv__toks i{width:14px;height:14px;border-radius:4px;flex:none;
-            box-shadow:inset 0 0 0 1px var(--s-toc-btn-border);background:var(--c)}
-.gv__toks b{font-weight:500;color:var(--s-group-label);min-width:3.2em}
+.gv__toks i{width:12px;height:12px;border-radius:4px;flex:none;
+            box-shadow:inset 0 0 0 1px var(--gw-color-neutral-300);background:var(--c)}
+.gv__toks b{font-weight:500;color:var(--gw-color-neutral-400);min-width:3.2em}
 @keyframes gv-fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-@media (max-width:640px){.gv__cap{grid-template-columns:1fr}}
+@media (max-width:640px){.gv__toks,.gv__why{display:none}.gv__info{padding:var(--gw-space-8) var(--gw-space-12)}.gv__name{margin:0}}
 @media (prefers-reduced-motion: reduce){
   .gv__scene.is-wipe,.is-on .gv__ln,.is-on .gv__rise,.gv__cap > *{animation:none}
   .is-on .gv__step{animation:none;opacity:1}
@@ -860,15 +876,17 @@
                  aria-label="The grid, shown one colourway at a time: Flat Black, Primary and Neutral/50.">
               <noscript><img class="sg-ve" src="/assets/visual-elements/grid-colourways.svg"
                    width="760" height="480" alt="The grid in colourways, including Flat Black and Primary."></noscript>
+              <div class="gv__ui">
+                <div class="gv__bar">
+                <div class="gv__tabs" role="tablist" aria-label="Grid colourway" data-gv-tabs></div>
+                <button class="gv__pp" type="button" data-gv-pp aria-label="Pause the animation">
+                  <svg class="gv__pause" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M216,48V208a16,16,0,0,1-16,16H160a16,16,0,0,1-16-16V48a16,16,0,0,1,16-16h40A16,16,0,0,1,216,48ZM96,32H56A16,16,0,0,0,40,48V208a16,16,0,0,0,16,16H96a16,16,0,0,0,16-16V48A16,16,0,0,0,96,32Z"/></svg>
+                  <svg class="gv__play" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.32,229.65a16,16,0,0,1-16.2.3A15.86,15.86,0,0,1,64,216.13V39.87a15.86,15.86,0,0,1,8.12-13.82,16,16,0,0,1,16.2.3L232.4,114.49A15.74,15.74,0,0,1,240,128Z"/></svg>
+                </button>
+              </div>
+              <div class="gv__cap" aria-live="polite" data-gv-cap></div>
+              </div>
             </div>
-            <div class="gv__bar">
-              <div class="gv__tabs" role="tablist" aria-label="Grid colourway" data-gv-tabs></div>
-              <button class="gv__pp" type="button" data-gv-pp aria-label="Pause the animation">
-                <svg class="gv__pause" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M216,48V208a16,16,0,0,1-16,16H160a16,16,0,0,1-16-16V48a16,16,0,0,1,16-16h40A16,16,0,0,1,216,48ZM96,32H56A16,16,0,0,0,40,48V208a16,16,0,0,0,16,16H96a16,16,0,0,0,16-16V48A16,16,0,0,0,96,32Z"/></svg>
-                <svg class="gv__play" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.32,229.65a16,16,0,0,1-16.2.3A15.86,15.86,0,0,1,64,216.13V39.87a15.86,15.86,0,0,1,8.12-13.82,16,16,0,0,1,16.2.3L232.4,114.49A15.74,15.74,0,0,1,240,128Z"/></svg>
-              </button>
-            </div>
-            <div class="gv__cap" aria-live="polite" data-gv-cap></div>
           </div>
           <p>The grid is the brand&rsquo;s visual element, and it runs in three
              colourways &mdash; Flat Black, Primary and Neutral/50. The
@@ -1211,7 +1229,7 @@
   /* the cells that carry the meaning, as [col,row]. Steps run corner to corner;
      columns are heights, bottom-anchored, from col 6 to the right edge. */
   var STAIR_A = [[8,1],[9,1],[9,2],[10,2],[10,3],[11,3],[11,4],[12,4],[12,5],[13,5]];
-  var STAIR_B = [[15,1],[14,1],[14,2],[13,2],[13,3],[12,3],[12,4],[11,4],[11,5],[10,5]];
+  var STAIR_B = [[13,1],[12,1],[12,2],[11,2],[11,3],[10,3],[10,4],[9,4],[9,5],[8,5]];
   var HEIGHTS = [1,2,3,5,4,6,5,4,6,5,7,4,3];
 
   var WAYS = [
@@ -1284,7 +1302,7 @@
 
   function caption(w) {
     capEl.innerHTML =
-      '<div><h3 class="gv__name">' + w.name + '</h3><p class="gv__why">' + w.why + '</p></div>' +
+      '<div class="gv__info"><h3 class="gv__name">' + w.name + '</h3><p class="gv__why">' + w.why + '</p></div>' +
       '<ul class="gv__toks">' + w.toks.map(function (t) {
         return '<li><i style="--c:var(' + t[2] + ')"></i><b>' + t[0] + '</b>' + t[1] + '</li>';
       }).join('') + '</ul>';
