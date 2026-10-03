@@ -365,6 +365,97 @@
    instead. Figma's canvas rect and page-background rect were stripped from it;
    they sit behind the card and would paint a hard rectangle on any surface. */
 .sg-ve{display:block;width:100%;height:auto;border-radius:var(--gw-radius-20)}
+
+/* -- the grid, one colourway at a time -------------------------------------
+   Replaces the static export (assets/visual-elements/grid-colourways.svg, kept
+   as the no-script fallback). The four tiles of that card are shown one by one,
+   each drawn in and then doing what its filled cells mean: stepping diagonally
+   for movement, stacking into rising columns for growth.
+   Cell pitch is 40, the same as .gw-hero; the stage is 760x480 like the card,
+   so 19 x 12 cells. Colours are the exported card's fills, bound to tokens.
+   The motion is a judgement call, not drawn in Figma: 6s per colourway, an 800ms
+   wipe between them, 700ms line draw, 140ms between stepping cells. */
+.gv{display:flex;flex-direction:column;gap:var(--gw-space-16)}
+.gv__stage{position:relative;aspect-ratio:760/480;overflow:hidden;isolation:isolate;
+           border-radius:var(--gw-radius-20);background:var(--gw-color-neutral-100)}
+.gv__scene{position:absolute;inset:0;visibility:hidden;z-index:0;
+           background:var(--gv-bg)}
+.gv__scene.is-on,.gv__scene.is-prev{visibility:visible}
+.gv__scene.is-prev{z-index:1}
+.gv__scene.is-on{z-index:2}
+.gv__scene.is-wipe{animation:gv-wipe 800ms cubic-bezier(.65,0,.35,1) both}
+.gv__scene svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.gv__scene[data-way="black"]  {--gv-bg:var(--gw-color-black);      --gv-line:var(--gw-color-neutral-900);--gv-cell:var(--gw-color-neutral-900)}
+.gv__scene[data-way="primary"]{--gv-bg:var(--gw-color-primary-500); --gv-line:var(--gw-color-primary-400);--gv-cell:var(--gw-color-primary-400)}
+.gv__scene[data-way="n50"]    {--gv-bg:var(--gw-color-neutral-50);  --gv-line:var(--gw-color-neutral-100);--gv-cell:var(--gw-color-neutral-200)}
+.gv__scene[data-way="n25"]    {--gv-bg:var(--gw-color-neutral-25); --gv-line:var(--gw-color-neutral-100);--gv-cell:var(--gw-color-neutral-100)}
+.gv__ln{fill:none;stroke:var(--gv-line);stroke-width:1;stroke-dasharray:1;stroke-dashoffset:0}
+.is-on .gv__ln{animation:gv-draw 700ms cubic-bezier(.3,0,.2,1) both;
+               animation-delay:calc(var(--i) * 22ms)}
+/* stepping cells: a wave of fill travelling down the staircase */
+.gv__step{fill:var(--gv-cell);opacity:0}
+.is-on .gv__step{animation:gv-step 2800ms ease-in-out infinite;
+                 animation-delay:calc(500ms + var(--i) * 140ms)}
+/* rising columns: outlined cells, bottom first, left to right */
+.gv__rise{fill:none;stroke:var(--gv-cell);stroke-width:2;opacity:0;
+          transform-box:fill-box;transform-origin:center}
+.is-prev .gv__rise{opacity:1}
+.is-on .gv__rise{animation:gv-rise 520ms cubic-bezier(.2,.9,.3,1.2) both;
+                 animation-delay:calc(450ms + var(--c) * 70ms + var(--k) * 55ms)}
+@keyframes gv-wipe{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes gv-draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes gv-step{0%{opacity:0}10%{opacity:1}35%{opacity:.4}60%,100%{opacity:0}}
+@keyframes gv-rise{from{opacity:0;transform:translateY(18px) scale(.6)}to{opacity:1;transform:none}}
+
+.gv__bar{display:flex;align-items:center;justify-content:space-between;gap:var(--gw-space-12)}
+.gv__tabs{display:flex;gap:var(--gw-space-4);padding:var(--gw-space-4);
+          border-radius:var(--gw-radius-12);background:var(--gw-color-neutral-50);
+          overflow-x:auto;scrollbar-width:none}
+.gv__tabs::-webkit-scrollbar{display:none}
+.gv__tab{position:relative;flex:none;border:0;cursor:pointer;overflow:hidden;
+         display:flex;align-items:center;gap:var(--gw-space-8);
+         padding:0 var(--gw-space-12);height:28px;border-radius:var(--gw-radius-8);
+         background:none;font:var(--gw-text-button-12);line-height:16px;
+         color:var(--gw-color-neutral-700)}
+.gv__tab:hover{color:var(--gw-color-black)}
+.gv__tab[aria-selected="true"]{background:var(--gw-color-black);color:var(--gw-color-white)}
+.gv__dot{width:10px;height:10px;border-radius:50%;flex:none;
+         box-shadow:inset 0 0 0 1px var(--gw-color-neutral-300);background:var(--d)}
+.gv__tab[aria-selected="true"] .gv__dot{box-shadow:inset 0 0 0 1px var(--gw-color-neutral-600)}
+.gv__prog{position:absolute;left:0;bottom:0;height:2px;width:100%;
+          background:var(--gw-color-primary-400);transform:scaleX(0);transform-origin:left;
+          display:none}
+.gv__tab[aria-selected="true"] .gv__prog{display:block;
+          animation:gv-prog var(--gv-dur,6000ms) linear forwards}
+.gv[data-user-paused] .gv__prog,.gv[data-offscreen] .gv__prog{animation-play-state:paused}
+@keyframes gv-prog{to{transform:scaleX(1)}}
+.gv__pp{flex:none;display:grid;place-items:center;width:36px;height:36px;border:0;cursor:pointer;
+        border-radius:var(--gw-radius-12);background:var(--gw-color-neutral-50);
+        color:var(--gw-color-neutral-900)}
+.gv__pp:hover{background:var(--gw-color-neutral-100)}
+.gv__pp svg{width:16px;height:16px;display:block}
+.gv__pp .gv__play{display:none}
+.gv[data-user-paused] .gv__pp .gv__play{display:block}
+.gv[data-user-paused] .gv__pp .gv__pause{display:none}
+.gv__cap{display:grid;grid-template-columns:1fr auto;gap:var(--gw-space-24);align-items:start}
+.gv__cap > *{animation:gv-fade 420ms ease both}
+.gv__name{margin:0 0 var(--gw-space-4);font:var(--gw-text-body-16-med);font-weight:600;color:var(--gw-color-black)}
+.gv__why{margin:0;max-width:44ch}
+.gv__toks{display:grid;gap:var(--gw-space-8);margin:0;padding:0;list-style:none;
+          font:var(--gw-text-body-14-med);color:var(--gw-color-neutral-700)}
+.gv__toks li{display:flex;align-items:center;gap:var(--gw-space-8);white-space:nowrap}
+.gv__toks i{width:14px;height:14px;border-radius:4px;flex:none;
+            box-shadow:inset 0 0 0 1px var(--gw-color-neutral-300);background:var(--c)}
+.gv__toks b{font-weight:500;color:var(--gw-color-neutral-400);min-width:3.2em}
+@keyframes gv-fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (max-width:640px){.gv__cap{grid-template-columns:1fr}}
+@media (prefers-reduced-motion: reduce){
+  .gv__scene.is-wipe,.is-on .gv__ln,.is-on .gv__rise,.gv__cap > *{animation:none}
+  .is-on .gv__step{animation:none;opacity:1}
+  .gv__rise{opacity:1}
+  .gv__prog{display:none !important}
+  .gv__pp{display:none}
+}
 /* The shape studies (599:4385) ARE rebuilt, because the exported SVG handed over
    exact geometry: card 760x386 at radius 20 in Neutral/100; both shapes 242 tall
    from y=72 in Neutral/400; the left one 522 wide starting at x=-55, so it runs
@@ -763,12 +854,23 @@
                this export and cannot be: it is a Figma WIDGET, not a vector layer, so
                the exporter has nothing to emit for it. If the cursor is meant to be
                part of the artwork it needs redrawing as a vector. -->
-          <img class="sg-ve" src="/assets/visual-elements/grid-colourways.svg"
-               width="760" height="480" alt="The grid in four colourways: Flat Black,
-               Primary blue with cells stacked into rising columns, Neutral/25, and
-               near-white.">
+          <div class="gv" data-gv>
+            <div class="gv__stage" data-gv-stage role="img"
+                 aria-label="The grid, shown one colourway at a time: Flat Black, Primary, Neutral/50 and Neutral/25.">
+              <noscript><img class="sg-ve" src="/assets/visual-elements/grid-colourways.svg"
+                   width="760" height="480" alt="The grid in four colourways."></noscript>
+            </div>
+            <div class="gv__bar">
+              <div class="gv__tabs" role="tablist" aria-label="Grid colourway" data-gv-tabs></div>
+              <button class="gv__pp" type="button" data-gv-pp aria-label="Pause the animation">
+                <svg class="gv__pause" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M216,48V208a16,16,0,0,1-16,16H160a16,16,0,0,1-16-16V48a16,16,0,0,1,16-16h40A16,16,0,0,1,216,48ZM96,32H56A16,16,0,0,0,40,48V208a16,16,0,0,0,16,16H96a16,16,0,0,0,16-16V48A16,16,0,0,0,96,32Z"/></svg>
+                <svg class="gv__play" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.32,229.65a16,16,0,0,1-16.2.3A15.86,15.86,0,0,1,64,216.13V39.87a15.86,15.86,0,0,1,8.12-13.82,16,16,0,0,1,16.2.3L232.4,114.49A15.74,15.74,0,0,1,240,128Z"/></svg>
+              </button>
+            </div>
+            <div class="gv__cap" aria-live="polite" data-gv-cap></div>
+          </div>
           <p>The grid is the brand&rsquo;s visual element, and it runs in four
-             colourways &mdash; Flat Black, Primary, Neutral/25 and near-white. The
+             colourways &mdash; Flat Black, Primary, Neutral/50 and Neutral/25. The
              construction holds everywhere: square cells, a one-pixel line, a few cells
              filled to break the regularity. The pitch does not: it is set per surface,
              so the page hero runs 40px cells in Primary/600 while the OG card runs
@@ -1087,6 +1189,159 @@
      scroll spy. It moved there on 29 Sep 2026 because each page had its own
      copy listening on `window`, and the window stopped scrolling when the
      content panel became its own scrollport. */
+})();
+
+/* The grid, one colourway at a time. Scenes are built here rather than typed out:
+   19 x 12 cells at a 40 pitch, so the stage is the 760 x 480 of the exported card.
+   Advance is driven by the progress bar's own animationend, so pausing the bar
+   pauses the sequence and nothing needs a timer. */
+(function () {
+  'use strict';
+  var host = document.querySelector('[data-gv]');
+  if (!host) return;
+  var stage = host.querySelector('[data-gv-stage]');
+  var tabsEl = host.querySelector('[data-gv-tabs]');
+  var capEl = host.querySelector('[data-gv-cap]');
+  var pp = host.querySelector('[data-gv-pp]');
+  var NS = 'http://www.w3.org/2000/svg', COLS = 19, ROWS = 12, P = 40;
+  var still = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var DUR = 6000;
+
+  /* the cells that carry the meaning, as [col,row]. Steps run corner to corner;
+     columns are heights, bottom-anchored, from col 6 to the right edge. */
+  var STAIR_A = [[8,1],[9,1],[9,2],[10,2],[10,3],[11,3],[11,4],[12,4],[12,5],[13,5]];
+  var STAIR_B = [[15,1],[14,1],[14,2],[13,2],[13,3],[12,3],[12,4],[11,4],[11,5],[10,5]];
+  var STAIR_C = [[4,5],[5,5],[5,6],[6,6],[6,7],[7,7],[7,8],[8,8],[8,9],[9,9]];
+  var HEIGHTS = [1,2,3,5,4,6,5,4,6,5,7,4,3];
+
+  var WAYS = [
+    { id: 'black',   name: 'Flat Black', why: 'The filled cells step diagonally, for movement.',
+      kind: 'step', cells: STAIR_A,
+      toks: [['Ground','Black','--gw-color-black'],['Line','Neutral/900','--gw-color-neutral-900'],['Cells','Neutral/900','--gw-color-neutral-900']] },
+    { id: 'primary', name: 'Primary', why: 'The cells stack into rising columns, for growth.',
+      kind: 'rise', cols: HEIGHTS,
+      toks: [['Ground','Primary/500','--gw-color-primary-500'],['Line','Primary/400','--gw-color-primary-400'],['Cells','Primary/400','--gw-color-primary-400']] },
+    { id: 'n50',     name: 'Neutral/50', why: 'The filled cells step diagonally, for movement.',
+      kind: 'step', cells: STAIR_B,
+      toks: [['Ground','Neutral/50','--gw-color-neutral-50'],['Line','Neutral/100','--gw-color-neutral-100'],['Cells','Neutral/200','--gw-color-neutral-200']] },
+    { id: 'n25',     name: 'Neutral/25', why: 'The filled cells step diagonally, for movement.',
+      kind: 'step', cells: STAIR_C,
+      toks: [['Ground','Neutral/25','--gw-color-neutral-25'],['Line','Neutral/100','--gw-color-neutral-100'],['Cells','Neutral/100','--gw-color-neutral-100']] }
+  ];
+
+  function el(tag, attrs, parent) {
+    var n = document.createElementNS(NS, tag);
+    for (var k in attrs) n.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(n);
+    return n;
+  }
+
+  function scene(w) {
+    var div = document.createElement('div');
+    div.className = 'gv__scene';
+    div.setAttribute('data-way', w.id);
+    var svg = el('svg', { viewBox: '0 0 ' + COLS * P + ' ' + ROWS * P, preserveAspectRatio: 'xMidYMid slice', 'aria-hidden': 'true' }, div);
+    var i = 0, c, r;
+    /* cells go under the lines, as in the card */
+    var cells = el('g', {}, svg);
+    if (w.kind === 'step') {
+      w.cells.forEach(function (rc, n) {
+        var q = el('rect', { 'class': 'gv__step', x: rc[0] * P, y: rc[1] * P, width: P, height: P }, cells);
+        q.style.setProperty('--i', n);
+      });
+    } else {
+      w.cols.forEach(function (h, ci) {
+        for (var k = 0; k < h; k++) {
+          var q = el('rect', { 'class': 'gv__rise', x: (COLS - w.cols.length + ci) * P + 1, y: (ROWS - 1 - k) * P + 1, width: P - 2, height: P - 2 }, cells);
+          q.style.setProperty('--c', ci);
+          q.style.setProperty('--k', k);
+        }
+      });
+    }
+    var lines = el('g', {}, svg);
+    for (c = 1; c < COLS; c++) { var v = el('path', { 'class': 'gv__ln', d: 'M' + c * P + ' 0V' + ROWS * P, pathLength: 1 }, lines); v.style.setProperty('--i', i++); }
+    for (r = 1; r < ROWS; r++) { var h = el('path', { 'class': 'gv__ln', d: 'M0 ' + r * P + 'H' + COLS * P, pathLength: 1 }, lines); h.style.setProperty('--i', i++); }
+    stage.appendChild(div);
+    return div;
+  }
+
+  var scenes = [], tabs = [], cur = -1, wipeTimer = 0;
+
+  WAYS.forEach(function (w, i) {
+    scenes.push(scene(w));
+    var b = document.createElement('button');
+    b.className = 'gv__tab'; b.type = 'button'; b.setAttribute('role', 'tab');
+    b.setAttribute('aria-selected', 'false'); b.tabIndex = -1; b.id = 'gv-tab-' + w.id;
+    b.innerHTML = '<span class="gv__dot" style="--d:var(' + w.toks[0][2] + ')"></span>' + w.name + '<span class="gv__prog"></span>';
+    b.addEventListener('click', function () { show(i, true); });
+    b.addEventListener('keydown', function (e) {
+      var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (!d) return;
+      e.preventDefault();
+      var n = (i + d + WAYS.length) % WAYS.length;
+      show(n, true); tabs[n].focus();
+    });
+    b.querySelector('.gv__prog').addEventListener('animationend', function () { show((cur + 1) % WAYS.length, false); });
+    tabsEl.appendChild(b); tabs.push(b);
+  });
+
+  function caption(w) {
+    capEl.innerHTML =
+      '<div><h3 class="gv__name">' + w.name + '</h3><p class="gv__why">' + w.why + '</p></div>' +
+      '<ul class="gv__toks">' + w.toks.map(function (t) {
+        return '<li><i style="--c:var(' + t[2] + ')"></i><b>' + t[0] + '</b>' + t[1] + '</li>';
+      }).join('') + '</ul>';
+  }
+
+  function show(i, byUser) {
+    if (i === cur && !byUser) return;
+    var prev = cur;
+    cur = i;
+    clearTimeout(wipeTimer);
+    scenes.forEach(function (s, n) {
+      if (n === i) return;
+      s.classList.remove('is-wipe');
+      if (n === prev) s.classList.add('is-prev'); else s.classList.remove('is-prev');
+      s.classList.remove('is-on');
+    });
+    var s = scenes[i];
+    s.classList.remove('is-prev', 'is-on', 'is-wipe');
+    void s.offsetWidth;                       /* restart the draw and the cells */
+    s.classList.add('is-on');
+    if (prev > -1 && !still.matches) s.classList.add('is-wipe');
+    wipeTimer = setTimeout(function () {
+      scenes.forEach(function (x) { x.classList.remove('is-prev'); });
+    }, 900);
+    tabs.forEach(function (b, n) {
+      var on = n === i;
+      b.setAttribute('aria-selected', on ? 'true' : 'false');
+      b.tabIndex = on ? 0 : -1;
+      var bar = b.querySelector('.gv__prog');
+      bar.style.animation = 'none';
+      if (on) { void bar.offsetWidth; bar.style.animation = ''; }
+    });
+    /* on a phone the tab row scrolls: keep the live one in view without moving the page */
+    var t = tabs[i], box = tabsEl;
+    if (t.offsetLeft < box.scrollLeft || t.offsetLeft + t.offsetWidth > box.scrollLeft + box.clientWidth) {
+      box.scrollTo({ left: t.offsetLeft - 4, behavior: still.matches ? 'auto' : 'smooth' });
+    }
+    caption(WAYS[i]);
+  }
+
+  pp.addEventListener('click', function () {
+    var on = host.hasAttribute('data-user-paused');
+    if (on) host.removeAttribute('data-user-paused'); else host.setAttribute('data-user-paused', '');
+    pp.setAttribute('aria-label', on ? 'Pause the animation' : 'Play the animation');
+  });
+
+  /* off screen, the sequence waits where it is */
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (es) {
+      if (es[0].isIntersecting) host.removeAttribute('data-offscreen'); else host.setAttribute('data-offscreen', '');
+    }, { threshold: 0.25 }).observe(stage);
+  }
+
+  show(0, true);
 })();
 </script>
 </body></html>
