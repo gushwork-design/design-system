@@ -70,5 +70,5 @@ How a tool shows a job that takes time, such as removing a photo background.
 | Done | check, "Done" |
 | Failed | warning icon, "Failed. Try again" |
 
-The progress sits **beside** the control it belongs to, to the right of its switch on the same line (switch first, then the status), never to its left and never beneath it
+The progress sits **beside** the control it belongs to, to the right of its switch on the same line (switch first, then the status), never to its left and never beneath it. **The switch holds one place in every state**: the label takes a fixed column, the switch sits at the start of the control column, and the status trails it, so it never moves when the status appears, changes width or goes. This is how the ID card's `.polish-line` is laid out (an 84px label column, the switch first, then the status)
 and never as an unlabelled wait.

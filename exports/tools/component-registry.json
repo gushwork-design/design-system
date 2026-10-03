@@ -50,26 +50,26 @@
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-03",
-      "fingerprint": "ad9eeae602e97245"
+      "fingerprint": "85521fb93d5af10a"
     },
     "tool-chrome": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-03",
-      "fingerprint": "7f407d6e06a13df6"
+      "fingerprint": "bce2da83c0a86532"
     },
     "tool-panel": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-03",
-      "fingerprint": "adf1ad4279241008"
+      "fingerprint": "164d29d3b37fd3a0"
     },
     "tool-progress": {
       "reviewed": "rework",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-03",
-      "fingerprint": "8357c1ddaf485d63",
-      "note": "the loading and percentage or anything should be on the right, keeping on left might break the build"
+      "fingerprint": "4ab105f8e8e031e7",
+      "note": "make sure the toggle doesnt change its place in diff states"
     }
   }
 }

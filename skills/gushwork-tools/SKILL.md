@@ -131,7 +131,8 @@ Use these, and do not draw a new one. Sizes are in `tool-shell.css`.
 - **A dark tile that matches the dark panel needs a ring.** The logo tile gets a 1px Neutral/800 ring
   in dark; the signature banner gets a ring in the preview only, never in the copied HTML.
 - **Work that takes time says so beside the control**: a spinner and a percentage to the right of
-  the switch, then Done or "Failed. Try again". Never beneath it, and never an unlabelled wait.
+  the switch, then Done or "Failed. Try again". The switch never moves between states, so give the
+  status the space after it. Never beneath the control, and never an unlabelled wait.
 
 ## Loading
 
