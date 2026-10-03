@@ -239,6 +239,12 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-03",
       "fingerprint": "08ab2271717bae2a"
+    },
+    "case-study-page": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-03",
+      "fingerprint": "d758df8540c334b3"
     }
   }
 }
