@@ -311,6 +311,13 @@
       "reviewedOn": "2026-10-03",
       "fingerprint": "1e6ecc00f757b676",
       "note": "we will need to add more, remind me what this was on next session"
+    },
+    "inline-input": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-03",
+      "fingerprint": "fe97f49c83c5cb3f",
+      "note": "loader is moving weirdly"
     }
   }
 }
