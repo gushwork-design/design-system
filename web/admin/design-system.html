@@ -1377,7 +1377,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     host.querySelectorAll('[data-use]').forEach(function (b) {
       b.addEventListener('click', function () {
         var old = b.textContent;
-        try { navigator.clipboard.writeText(PROMPTS[b.getAttribute('data-use')]); b.textContent = 'Copied'; setTimeout(function () { b.textContent = old; }, 1200); } catch (e) {}
+        try { navigator.clipboard.writeText(PROMPTS[b.getAttribute('data-use')]); b.textContent = 'Copied, paste in Claude'; setTimeout(function () { b.textContent = old; }, 3000); } catch (e) {}
       });
     });
     host.querySelectorAll('.fd-sw').forEach(function (b) {

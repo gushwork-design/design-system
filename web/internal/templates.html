@@ -283,7 +283,7 @@
     setTimeout(function () {
       btn.textContent = original;
       btn.removeAttribute('data-done');
-    }, 2000);
+    }, 3000);   /* long enough to read "Copied, paste in Claude" */
   }
   function legacy(text) {
     try {
@@ -305,11 +305,11 @@
     var text = btn.getAttribute('data-prompt') || '';
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(
-        function () { flash(btn, 'Copied'); },
-        function () { flash(btn, legacy(text) ? 'Copied' : 'Copy failed'); }
+        function () { flash(btn, 'Copied, paste in Claude'); },
+        function () { flash(btn, legacy(text) ? 'Copied, paste in Claude' : 'Copy failed'); }
       );
     } else {
-      flash(btn, legacy(text) ? 'Copied' : 'Copy failed');
+      flash(btn, legacy(text) ? 'Copied, paste in Claude' : 'Copy failed');
     }
   });
 })();
