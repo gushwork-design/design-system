@@ -384,7 +384,7 @@ CSS = """
          padding:var(--gw-space-8) var(--gw-space-12);font:var(--gw-text-body-14-reg);
          color:var(--s-heading)}
 .cl-find::placeholder{color:var(--s-placeholder)}
-.cl-find:focus{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.cl-find:focus{outline:none;border-color:var(--gw-color-neutral-400)}
 .cl-filter{display:flex;gap:var(--gw-space-4);flex-wrap:wrap}
 .cl-f{font:var(--gw-text-body-12-med);color:var(--s-body);background:transparent;
       border:1px solid var(--s-field-border);border-radius:var(--gw-radius-full);

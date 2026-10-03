@@ -233,8 +233,9 @@ Label `button-14-med`, and it grows.
 
 `Type=search` prepends `MagnifyingGlass` 16 Weight=Regular, `neutral/400`.
 
-⚠ The `focus` border here is a **fill treatment, not the focus ring.** `--gw-focus-ring` on
-`:focus-visible` is still mandatory and additive — see `states.md`, ruling **R1/R2**.
+⚠ The `focus` border here is a **fill treatment, not the focus ring** — and since R41 (3 Oct 2026)
+it is the field's whole focus state: a text field takes no ring, because a click into it counts as
+keyboard focus. See `states.md`.
 
 ⚠ **`foundation/text-field.md` is the shared 14-variant text field used by both surfaces, and it
 remains authoritative for forms.** This component is the dashboard's dense inline field — a table
