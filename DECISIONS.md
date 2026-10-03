@@ -1150,3 +1150,21 @@ Ruled by Utsav, 3 Oct 2026. The Library is for everyone who uses the system, so 
 - **Workflow tab.** Admins see it; anyone else gets the alert, and the content is not drawn.
 - **What this is not.** The alert is a courtesy, not a lock: the Workflow drawing is part of the page's HTML and `/library/data.json` (which includes items that are not approved yet) is readable by anyone internal, because the Library tab needs it. Nothing in either is secret. If either ever should be, it moves to its own path under the admin tier.
 - **If a config store holds rules.** The tier changes above are the *defaults*. A store that already has explicit `/library` or `/previews` rules overrides them: change those two to Internal in Access Control → Pages.
+
+## R43 — anything new goes to the design hub for review, and a tool is sized before it is built
+Ruled by Utsav, 3 Oct 2026, while the tools skill was being written. Two rules, one ruling.
+
+- **New pieces are registered, not shipped silently.** When a piece of work creates something the library does not have (a component, a pattern, a new way a measured one is used), it is registered in that surface's `exports/<surface>/component-registry.json` as pending, with a drawn preview at `web/previews/<surface>/<name>.frag` and a spec in the surface's doc. It then appears in **Design System → Review**, where the owner approves or reworks it, and the Library lists it once approved (R38). A new surface gets its own registry and its own Library category. Only what is **new** is registered: the library's own switch, field, button and the rest are not registered again by the tool or page that uses them.
+- **The notice file still goes with it** (`foundation/new-component-notice.md`). Registering is what makes it reviewable; the notice is what says why it was built.
+- **A tool is sized and shaped before it is built.** Before a hub tool is started, and again whenever a request pulls against the tool shell, the owner is asked as options: is it a **mini tool for a light use case**, **light with one integration**, or **heavy**, with several integrations and many use cases? Then its shape: the one job and its input and output, what it keeps, who it is for, and afterwards its options, defaults, result and edge cases. Heavy is not built on the shell by default; it may belong on the dashboard surface or its own app, and the owner decides. See `skills/gushwork-tools`.
+- **First use.** The tool shell's four new pieces are the first surface registered this way: `tool-panel`, `tool-action-pill`, `tool-chrome`, `tool-progress`, under a new **Tools** surface (`exports/tools/`).
+
+## R44 — a tool's panel header wears the Gushwork logo, never a stand-in
+Ruled by Utsav, 3 Oct 2026, on seeing the `tool-panel` drawing in Review with a blue pencil tile where the tools have the logo ("use gushwork logo as in email sig and the other tool").
+
+- **The mark is the Gushwork logo tile**: the 160×160 symbol on Flat Black `#0D0D0D` (`rx` 20, drawn at 32px with `--gw-radius-8`), the same SVG the email signature creator and the employee ID card generator carry in `.brand-card`. It is the product-chrome tile, not the marketing lockup (`foundation/shared-components.md`).
+- **Every tool has the same mark.** Never a per-tool icon, a generic icon in a coloured tile, or the coloured symbol. The tool's name is what tells tools apart.
+- **It is a link back to Tools** (`/internal/tools`, `title` and `aria-label` "Back to Tools"), with the tool's name beside it in Vert Grotesk Display 16 Semibold, in a header padded 12 12 12 16 with a hairline beneath.
+- **In dark it takes a 1px `neutral/800` ring**, because a black tile on a black panel disappears otherwise.
+- **Drawings of the shell follow the same rule.** A library preview of a tool's panel, a mock, or a card for the Tools page draws the real SVG from the tools, never a placeholder. A drawing that shows the wrong mark is rejected in Review, not approved with a note.
+- **Where it lives.** `tool-panel` in `exports/tools/components.md`; `skills/gushwork-tools` (What every tool is, decision 28).

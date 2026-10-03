@@ -497,6 +497,8 @@ PARTS = [
     ("slides", "Slides", "stack-overflow-logo", "Sales and discovery decks, 1920×1080."),
     ("lead-magnet", "Lead magnet", "download-simple",
      "The downloadable PDF behind an ad lander."),
+    ("tools", "Tools", "wrench",
+     "The shell the hub's small internal tools share. Only what the library did not already have."),
     ("shared", "Shared", "check-circle",
      "Held once and merged into every surface, so a change is reported once."),
     ("ads", "Ad creatives", "toolbox",
@@ -1184,7 +1186,7 @@ def build_index(reg, counts, groups_n, ad, gaps):
 
 CAT_SURFACES = [("foundation", "Foundation"), ("web", "Web"), ("ad-page", "Ad page"),
                 ("dashboard", "Dashboard"), ("slides", "Slides"),
-                ("lead-magnet", "Lead magnet"), ("shared", "Shared")]
+                ("lead-magnet", "Lead magnet"), ("tools", "Tools"), ("shared", "Shared")]
 GROUP_LABEL = {"components": "Components", "folds": "Folds", "shell and elements": "Shell and elements", "foundation": ""}
 FID_LABEL = {"measured": ("measured", "Measured", "Read off the rendered component in Figma."),
              "inventory": ("transcribed", "Inventory", "Variant matrix and rules only; not read off the render."),

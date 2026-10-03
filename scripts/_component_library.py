@@ -298,7 +298,7 @@ PROV_RULE = {
 # 4. Review state — READ from the registry, never inferred
 # ---------------------------------------------------------------------------
 
-SURFACES = ["shared", "web", "dashboard", "lead-magnet", "slides", "ad-page"]
+SURFACES = ["shared", "web", "dashboard", "lead-magnet", "slides", "ad-page", "tools"]
 
 
 def load_registries():
@@ -860,6 +860,8 @@ USE_CASES = [
     ("lead-magnet", "Lead magnets", "The downloadable PDF behind an ad lander — covers, "
                                     "interiors, closers.", "gushwork-lead-magnet"),
     ("slides", "Slide decks", "Sales and discovery decks, 1920×1080.", "gushwork-slides"),
+    ("tools", "Hub tools", "The small internal tools on the design hub, like the email "
+                           "signature creator and the ID card generator.", "gushwork-tools"),
     ("shared", "Shared", "Held once and merged into every surface, so a change is "
                          "reported once rather than per surface.",
      "foundation/shared-components.md"),
@@ -1030,6 +1032,9 @@ PARTS = [
     ("slides", "Slides", "Sales and discovery decks, 1920×1080.", "skills/gushwork-slides"),
     ("lead-magnet", "Lead magnet", "The downloadable PDF behind an ad lander.",
      "skills/gushwork-lead-magnet"),
+    ("tools", "Tools", "The shell the hub's small internal tools share: a floating panel, "
+                       "one action pill, the hub's menus, progress beside a control.",
+     "skills/gushwork-tools"),
     ("shared", "Shared", "Held once and merged into every surface, so a change is "
                          "reported once rather than per surface.",
      "foundation/shared-components.md"),
