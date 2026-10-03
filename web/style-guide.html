@@ -368,11 +368,12 @@
 
 /* -- the grid, one colourway at a time -------------------------------------
    Replaces the static export (assets/visual-elements/grid-colourways.svg, kept
-   as the no-script fallback). The four tiles of that card are shown one by one,
+   as the no-script fallback). The tiles of that card are shown one by one,
    each drawn in and then doing what its filled cells mean: stepping diagonally
    for movement, stacking into rising columns for growth.
    Cell pitch is 40, the same as .gw-hero; the stage is 760x480 like the card,
-   so 19 x 12 cells. Colours are the exported card's fills, bound to tokens.
+   so 19 x 12 cells. Three of the card's four tiles are shown (Flat Black, Primary and
+   one grey, Neutral/50) — Utsav's call, 3 Oct 2026; the near-white tile is dropped. Colours are the exported card's fills, bound to tokens.
    The motion is a judgement call, not drawn in Figma: 6s per colourway, an 800ms
    wipe between them, 700ms line draw, 140ms between stepping cells. */
 .gv{display:flex;flex-direction:column;gap:var(--gw-space-16)}
@@ -388,7 +389,6 @@
 .gv__scene[data-way="black"]  {--gv-bg:var(--gw-color-black);      --gv-line:var(--gw-color-neutral-900);--gv-cell:var(--gw-color-neutral-900)}
 .gv__scene[data-way="primary"]{--gv-bg:var(--gw-color-primary-500); --gv-line:var(--gw-color-primary-400);--gv-cell:var(--gw-color-primary-400)}
 .gv__scene[data-way="n50"]    {--gv-bg:var(--gw-color-neutral-50);  --gv-line:var(--gw-color-neutral-100);--gv-cell:var(--gw-color-neutral-200)}
-.gv__scene[data-way="n25"]    {--gv-bg:var(--gw-color-neutral-25); --gv-line:var(--gw-color-neutral-100);--gv-cell:var(--gw-color-neutral-100)}
 .gv__ln{fill:none;stroke:var(--gv-line);stroke-width:1;stroke-dasharray:1;stroke-dashoffset:0}
 .is-on .gv__ln{animation:gv-draw 700ms cubic-bezier(.3,0,.2,1) both;
                animation-delay:calc(var(--i) * 22ms)}
@@ -856,9 +856,9 @@
                part of the artwork it needs redrawing as a vector. -->
           <div class="gv" data-gv>
             <div class="gv__stage" data-gv-stage role="img"
-                 aria-label="The grid, shown one colourway at a time: Flat Black, Primary, Neutral/50 and Neutral/25.">
+                 aria-label="The grid, shown one colourway at a time: Flat Black, Primary and Neutral/50.">
               <noscript><img class="sg-ve" src="/assets/visual-elements/grid-colourways.svg"
-                   width="760" height="480" alt="The grid in four colourways."></noscript>
+                   width="760" height="480" alt="The grid in colourways, including Flat Black and Primary."></noscript>
             </div>
             <div class="gv__bar">
               <div class="gv__tabs" role="tablist" aria-label="Grid colourway" data-gv-tabs></div>
@@ -869,8 +869,8 @@
             </div>
             <div class="gv__cap" aria-live="polite" data-gv-cap></div>
           </div>
-          <p>The grid is the brand&rsquo;s visual element, and it runs in four
-             colourways &mdash; Flat Black, Primary, Neutral/50 and Neutral/25. The
+          <p>The grid is the brand&rsquo;s visual element, and it runs in three
+             colourways &mdash; Flat Black, Primary and Neutral/50. The
              construction holds everywhere: square cells, a one-pixel line, a few cells
              filled to break the regularity. The pitch does not: it is set per surface,
              so the page hero runs 40px cells in Primary/600 while the OG card runs
@@ -1211,7 +1211,6 @@
      columns are heights, bottom-anchored, from col 6 to the right edge. */
   var STAIR_A = [[8,1],[9,1],[9,2],[10,2],[10,3],[11,3],[11,4],[12,4],[12,5],[13,5]];
   var STAIR_B = [[15,1],[14,1],[14,2],[13,2],[13,3],[12,3],[12,4],[11,4],[11,5],[10,5]];
-  var STAIR_C = [[4,5],[5,5],[5,6],[6,6],[6,7],[7,7],[7,8],[8,8],[8,9],[9,9]];
   var HEIGHTS = [1,2,3,5,4,6,5,4,6,5,7,4,3];
 
   var WAYS = [
@@ -1223,10 +1222,7 @@
       toks: [['Ground','Primary/500','--gw-color-primary-500'],['Line','Primary/400','--gw-color-primary-400'],['Cells','Primary/400','--gw-color-primary-400']] },
     { id: 'n50',     name: 'Neutral/50', why: 'The filled cells step diagonally, for movement.',
       kind: 'step', cells: STAIR_B,
-      toks: [['Ground','Neutral/50','--gw-color-neutral-50'],['Line','Neutral/100','--gw-color-neutral-100'],['Cells','Neutral/200','--gw-color-neutral-200']] },
-    { id: 'n25',     name: 'Neutral/25', why: 'The filled cells step diagonally, for movement.',
-      kind: 'step', cells: STAIR_C,
-      toks: [['Ground','Neutral/25','--gw-color-neutral-25'],['Line','Neutral/100','--gw-color-neutral-100'],['Cells','Neutral/100','--gw-color-neutral-100']] }
+      toks: [['Ground','Neutral/50','--gw-color-neutral-50'],['Line','Neutral/100','--gw-color-neutral-100'],['Cells','Neutral/200','--gw-color-neutral-200']] }
   ];
 
   function el(tag, attrs, parent) {
