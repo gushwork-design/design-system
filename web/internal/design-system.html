@@ -1250,8 +1250,8 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   }
   /* THE LIBRARY SHOWS ONLY WHAT HAS BEEN APPROVED (Utsav, 2 Oct 2026). Something is approved when its review state is
      passed and the source has not moved since: pending, in rework, rejected and expired are not shown here, they are in
-     the Review tab. An owner also sees an approval they have just pressed (it is "being recorded"), so their own work does not
-     vanish; everyone else sees only what the registry holds. */
+     the Review tab. A decision already committed to main is live for everyone at once, before the next publish (R46). An owner also
+     sees one that is still being written down, so their own work does not vanish. */
   function approved(scope, key) { var it = BYID[scope + '/' + key]; return !!it && eff(it).state === 'passed'; }
   var FD_PARTS = {
     color: [['color', fdColor]],
@@ -1360,7 +1360,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   function badgeOf(state, queued, q) {
     var tail = !queued ? '' : (q && q.pr && q.pr.url
       ? '<a class="rv-q rv-q--pr" href="' + esc(q.pr.url) + '" target="_blank" rel="noopener" title="Open the pull request on GitHub">in PR #' + esc(q.pr.number) + '</a>'
-      : '<span class="rv-q">being recorded</span>');
+      : '<span class="rv-q">' + (q && q.via === 'main' ? 'on main, live' : 'being recorded') + '</span>');
     return '<span class="ul-badge' + (STATE_CLASS[state] || '') + '">' + esc(STATE_LABEL[state] || state) + '</span>' + tail;
   }
   var QSTATE = {}, ITEMS = [], BYID = {}, RV = { filter: 'waiting', list: [], i: 0, open: false, mode: '', wide: false };
@@ -1369,6 +1369,8 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     var q = QSTATE[idOf(it)];
     if (q && q.action && q.action !== 'undo') {
       var want = q.action === 'pass' ? 'passed' : q.action === 'reject' ? 'rejected' : 'rework';
+      // The source has moved since this decision was made: the published data was built after that, so its state is the truth.
+      if (q.fp && it.fp && q.fp !== it.fp) return { state: it.state, queued: false, q: null };
       if (it.state === want) return { state: it.state, queued: false, q: null };   // the registry has caught up with it
       return { state: want, queued: true, q: q };
     }
@@ -1376,7 +1378,12 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   }
   function loadQueued() {
     return fetch('/api/review', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : { state: {} }; })
-      .then(function (j) { QSTATE = j.state || {}; }).catch(function () { QSTATE = {}; });
+      .then(function (j) {
+        QSTATE = j.state || {};
+        // Everyone sees a decision that is already on main (live before the next publish). Only the owner also sees one that is
+        // still being written down, so their own work does not vanish.
+        if (!owner) Object.keys(QSTATE).forEach(function (k) { if (QSTATE[k].via !== 'main') delete QSTATE[k]; });
+      }).catch(function () { QSTATE = {}; });
   }
   function scopeTitle(it) { return it.kind === 'foundation' ? 'Foundations' : it.surface; }
 
@@ -1594,6 +1601,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       var did = e.q.action === 'pass' ? 'approved' : e.q.action === 'reject' ? 'rejected' : 'sent this back';
       hist = '<div class="rv-note rv-note--q"><b>You ' + did + ' it.</b> ' + (e.q.pr && e.q.pr.url
         ? 'It is in <a class="rv-link" href="' + esc(e.q.pr.url) + '" target="_blank" rel="noopener">pull request #' + esc(e.q.pr.number) + '</a>, and becomes final when someone approves and merges it.'
+        : e.q.via === 'main' ? 'It is recorded on main and live here now. The published pages catch up at the next publish.'
         : 'It is recorded in the repo at the next Claude session.') +
         (e.q.note ? ' Your note: ' + esc(e.q.note) : '') + ' <button class="rv-link" type="button" id="rv-undo">Undo</button></div>';
     } else if (it.by) {
@@ -1644,7 +1652,9 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
         if (action === 'undo') { delete QSTATE[idOf(it)]; toast('Undone.'); RV.mode = ''; renderDrawer(); }
         else {
           QSTATE[idOf(it)] = r.j.decision; RV.mode = '';
-          var where = r.j.decision && r.j.decision.pr ? ' In pull request #' + r.j.decision.pr.number + '.' : ' It is recorded at the next session.';
+          var dec = r.j.decision || {};
+          var where = dec.via === 'main' ? ' Recorded on main.' : dec.pr ? ' In pull request #' + dec.pr.number + '.' : ' It is recorded at the next session.';
+          if (action === 'rework') where += r.j.routine && r.j.routine.fired ? ' The rework routine has started.' : ' It will be picked up tonight.';
           toast((action === 'pass' ? 'Approved.' : action === 'rework' ? 'Sent back with your note.' : 'Rejected.') + where + (r.j.githubError ? ' (' + r.j.githubError + ', so it is queued.)' : ''));
           var n = nextWaiting(); if (n >= 0) { RV.i = n; renderDrawer(); } else { renderDrawer(); }
         }
@@ -1697,7 +1707,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   function start(name) {
     if (started[name]) return; started[name] = 1;
     if (name === 'library') libLoading();
-    if (name === 'library') Promise.all([data(), tokens(), prompts(), owner ? loadQueued() : Promise.resolve()]).then(function (r) { libData = r[0]; libTok = r[1]; indexItems(r[0]); renderLibrary(r[0], r[1]); })
+    if (name === 'library') Promise.all([data(), tokens(), prompts(), loadQueued()]).then(function (r) { libData = r[0]; libTok = r[1]; indexItems(r[0]); renderLibrary(r[0], r[1]); })
       .catch(function () { $('ds-fd').innerHTML = '<div class="ul-empty"><div class="ul-empty__copy"><h2>Could not load the library</h2></div></div>'; });
     if (name === 'review') me.then(function () {
       /* Admins can look at everything here. Only the owner can act, and the page says so. */
@@ -1706,7 +1716,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       if (!admin) return;
       $('ds-rev-ro').hidden = owner; $('ds-gh-check').hidden = !owner;
       revLoading();
-      Promise.all([data(), owner ? loadQueued() : Promise.resolve()]).then(function (r) {
+      Promise.all([data(), loadQueued()]).then(function (r) {
         reviewData = r[0]; renderReview(r[0]);
         if (owner) $('ds-gh-check').addEventListener('click', function () {
           var b = this; b.disabled = true; b.textContent = 'Checking…';

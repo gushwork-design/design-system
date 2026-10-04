@@ -74,7 +74,7 @@ for d in decisions:
     sc, k, act, note, fp = d["scope"], d["key"], d.get("action"), d.get("note") or "", d.get("fp") or ""
     # Decided on the site and already written to the review pull request by the site itself (via github): there is
     # nothing for this session to record. Only a REWORK still matters here, because its note is the brief.
-    if d.get("via") == "github":
+    if d.get("via") in ("github", "main"):
         if act == "rework":
             rework.append((sc, k, note))
         continue

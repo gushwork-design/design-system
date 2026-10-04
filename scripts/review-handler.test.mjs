@@ -14,9 +14,10 @@ function t(name, got, want) {
 
 /* pretend Upstash (pipeline) */
 const kv = { list: [], hash: {} };
-const gh = { fail: 0, calls: [], files: { 'exports/web/component-registry.json': { components: { button: {} } } }, prOpen: false };
+const gh = { fail: 0, allowMain: false, puts: [], calls: [], files: { 'exports/web/component-registry.json': { components: { button: {} } } }, prOpen: false };
 globalThis.fetch = async (url, init = {}) => {
   const send = (code, body) => ({ ok: code < 300, status: code, json: async () => body, text: async () => JSON.stringify(body) });
+  if (String(url).startsWith('https://trigger.test')) { gh.trigger = { url: String(url), init }; return send(200, {}); }
   if (String(url).startsWith('https://kv.test')) {
     const cmds = JSON.parse(init.body), out = [];
     for (const c of cmds) {
@@ -38,7 +39,11 @@ globalThis.fetch = async (url, init = {}) => {
   if (p.endsWith('/pulls') && m === 'GET') return send(200, gh.prOpen ? [{ number: 9 }] : []);
   if (p.endsWith('/pulls') && m === 'POST') { gh.prOpen = true; return send(201, { number: 9, html_url: 'https://github.com/x/pull/9' }); }
   if (p.includes('/contents/') && m === 'GET') return send(200, { sha: 'b', content: Buffer.from(JSON.stringify(gh.files['exports/web/component-registry.json'])).toString('base64') });
-  if (p.includes('/contents/') && m === 'PUT') return send(200, {});
+  if (p.includes('/contents/') && m === 'PUT') {
+    const b = JSON.parse(init.body); gh.puts.push(b);
+    if (b.branch === 'main' && !gh.allowMain) return send(422, { message: 'Repository rule violations found' });   // main is protected until the account may bypass
+    return send(200, { commit: { sha: 'c' + gh.puts.length } });
+  }
   return send(200, {});
 };
 
@@ -73,6 +78,38 @@ gh.fail = 403; kv.list.length = 0;
 r = await call('POST', d);
 t('a 403 says what GitHub said and which call', r.json.githubError, 'GitHub said 403: Resource not accessible by personal access token (GET /git/ref/heads/main)');
 gh.fail = 0;
+
+/* ---- straight to main, once the account may bypass the rule ---- */
+gh.allowMain = true; kv.list.length = 0; kv.hash = {}; gh.puts.length = 0; gh.calls.length = 0;
+r = await call('POST', d);
+t('main open: a pass is committed straight to main, no pull request', [r.json.mode, r.json.decision.pr, gh.puts.length, gh.puts[0].branch, gh.calls.some((c) => c.includes('/pulls'))], ['main', undefined, 1, 'main', false]);
+t('and not queued for a session', kv.list.length, 0);
+r = await call('POST', { ...d, action: 'undo' });
+t('undo of a main decision is a commit that restores the record', [r.code, r.json.note, gh.puts.length, gh.puts[1].message.startsWith('Review: undo web/button'), Object.keys(kv.hash).length], [200, 'undone on main', 2, true, 0]);
+
+delete process.env.GW_REWORK_TRIGGER_URL; delete process.env.GW_REWORK_TRIGGER_TOKEN; delete gh.trigger;
+r = await call('POST', { ...d, action: 'rework', note: 'move the switch' });
+t('a rework on main is also queued as the brief, and no routine is fired when none is set', [r.json.mode, kv.list.length, r.json.routine.fired, gh.trigger], ['main', 1, false, undefined]);
+process.env.GW_REWORK_TRIGGER_URL = 'https://trigger.test/fire'; process.env.GW_REWORK_TRIGGER_TOKEN = 'rt';
+r = await call('POST', { ...d, action: 'rework', note: 'move the switch' });
+t('with a trigger set, a rework fires the routine with the note', [r.json.routine.fired, gh.trigger.init.headers.authorization, JSON.parse(gh.trigger.init.body).text.includes('move the switch'), JSON.parse(gh.trigger.init.body).text.includes('web/button')], [true, 'Bearer rt', true, true]);
+delete gh.trigger;
+await call('POST', d);
+t('a pass never fires it', gh.trigger, undefined);
+gh.allowMain = false; delete process.env.GW_REWORK_TRIGGER_URL; delete process.env.GW_REWORK_TRIGGER_TOKEN;
+
+/* ---- who can read the decisions ---- */
+kv.hash = { 'web/button': JSON.stringify({ action: 'rework', note: 'private note', by: 'utsav.singh@gushwork.ai', fp: 'abcdef0123456789', at: 'now', via: 'main', prev: null }) };
+const other = COOKIE + '=' + await sign({ email: 'ana@gushwork.ai', exp: Math.floor(Date.now() / 1000) + 600 }, 'test-secret');
+r = await call('GET', undefined, { cookie: other });
+t('a signed-in teammate can read the decisions, without the note or who made them', [r.code, r.json.state['web/button']], [200, { action: 'rework', at: 'now', fp: 'abcdef0123456789', via: 'main' }]);
+r = await call('GET');
+t('the owner still gets the whole row', r.json.state['web/button'].note, 'private note');
+r = await call('POST', d, { cookie: other });
+t('a teammate still cannot decide', r.code, 403);
+r = await call('GET', undefined, { cookie: '' });
+t('signed out is refused', r.code, 401);
+kv.hash = {};
 
 r = await call('POST', { ...d, fp: '' });
 t('no fingerprint: queued, never a blind pass', r.json.mode, 'queue');
