@@ -1,7 +1,7 @@
 // Tests for web/api/_review-github.js: the registry edit (pure) and the pull-request flow against a pretend GitHub.
 // Run: node scripts/review-github.test.mjs
 import fs from 'node:fs';
-import { applyDecision, revertDecision, registryTarget, serialize, recordViaGithub, checkGithub } from '../web/api/_review-github.js';
+import { applyDecision, revertDecision, restoreRecord, recordDirect, registryTarget, serialize, recordViaGithub, checkGithub } from '../web/api/_review-github.js';
 
 let pass = 0, fail = 0;
 function t(name, got, want) {
@@ -26,6 +26,9 @@ t('a decision with no fingerprint is refused', throws(() => applyDecision(reg(),
 t('undo restores what main had', revertDecision({ components: {}, review: { button: { reviewed: 'passed' } } }, 'web', 'button', { review: { button: { reviewed: 'rework' } } }).review.button.reviewed, 'rework');
 t('undo removes it when main had none', revertDecision({ components: {}, review: { button: { reviewed: 'passed' } } }, 'web', 'button', { components: {} }), { components: {} });
 t('undo leaves another item alone', Object.keys(revertDecision({ review: { a: { r: 1 }, b: { r: 2 } } }, 'web', 'a', { review: { b: { r: 2 } } }).review), ['b']);
+
+t('restore puts the earlier record back', restoreRecord({ review: { button: { reviewed: 'passed' } } }, 'web', 'button', { reviewed: 'rework' }).review.button.reviewed, 'rework');
+t('restore removes it, and an emptied block, when there was no record', restoreRecord({ components: {}, review: { button: { reviewed: 'passed' } } }, 'web', 'button', null), { components: {} });
 
 /* ---- a real registry still round-trips byte for byte, so a diff shows only the decision ---- */
 const real = JSON.parse(fs.readFileSync('exports/ad-page/component-registry.json', 'utf8'));
@@ -83,6 +86,18 @@ t('a conflicting write is retried once', [out.pr.number, g.commits], [40, 1]);
 g = pretend(baseFiles()); g.conflicts = 2;
 t('twice is an error, not a silent loss', await recordViaGithub('tok', row({}), 'u', 'd').then(() => false, () => true), true);
 t('an unknown component never reaches GitHub for writing', await recordViaGithub('tok', row({ key: 'nope' }), 'u', 'd').then(() => false, () => true), true);
+
+/* ---- straight to main ---- */
+g = pretend(baseFiles());
+out = await recordDirect('tok', row({ key: 'hero', action: 'pass' }), 'utsav', '2026-10-04');
+t('a direct decision is one commit on main, with no pull request and no branch', [g.commits, g.prs.length, Object.keys(g.refs)], [1, 0, ['main']]);
+t('it records the pass and hands back what was there before', [g.trees.main[FILE].review.hero.reviewed, out.prev.reviewed], ['passed', 'rework']);
+await recordDirect('tok', row({ key: 'hero' }), 'utsav', '2026-10-04', true, out.prev);
+t('undo puts the earlier record back', [g.trees.main[FILE].review.hero.reviewed, g.trees.main[FILE].review.hero.note], ['rework', 'n']);
+g = pretend(baseFiles()); g.conflicts = 1;
+t('a moved main is retried once', (await recordDirect('tok', row({}), 'u', 'd')).prev, null);
+g = pretend(baseFiles()); g.conflicts = 2;
+t('twice is an error, so the caller can fall back to the pull request', await recordDirect('tok', row({}), 'u', 'd').then(() => false, () => true), true);
 
 /* ---- the connection check: each way the token can be wrong reads as its own sentence ---- */
 function answers(map) {

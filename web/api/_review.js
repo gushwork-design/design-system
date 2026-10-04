@@ -18,6 +18,12 @@
    (`review/decisions`) by the site itself, and the row carries the pull request's number. Without the token, or if
    GitHub fails, it falls back to the queue above, so a decision is never lost.
 
+   STRAIGHT TO MAIN, THEN A ROUTINE (R46). With the token, a decision is committed straight to main (see _review-github.js),
+   falling back to the pull request if main refuses it. A rework also fires the rework routine (GW_REWORK_TRIGGER_URL and
+   GW_REWORK_TRIGGER_TOKEN: a routine's API trigger), which reads the note, fixes the drawing and opens a pull request; it never
+   merges or publishes. If the trigger is not set or fails, the nightly run picks the rework up anyway.
+
+   GET   signed in -> { state }                    what has been decided and not yet published; an owner also gets notes and who
    GET   owner  -> { state }                       what is queued or sent back right now
    POST  owner  {scope,key,action,note,fp}         action: pass | reject | rework | undo
                   reject and rework need a note, because the note is the whole point of both.
@@ -28,7 +34,7 @@
 
 import { COOKIE, verify, readCookie, sessionSecret } from './_session.js';
 import { isOwner } from './_access.js';
-import { recordViaGithub, explain, checkGithub } from './_review-github.js';
+import { recordViaGithub, recordDirect, explain, checkGithub } from './_review-github.js';
 
 const LIST_KEY = 'gw:review-decisions';
 const STATE_KEY = 'gw:review-state';
@@ -55,6 +61,34 @@ function json(res, status, body) {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
   res.setHeader('Cache-Control', 'no-store, private');
   res.status(status).end(JSON.stringify(body));
+}
+
+/* Any signed-in session: the page reads the decisions to show an approval live before the next publish. */
+async function signedInEmail(req, res) {
+  const session = await verify(readCookie(req.headers.cookie, COOKIE), sessionSecret());
+  if (!session || !session.email) { json(res, 401, { error: 'Not signed in.' }); return ''; }
+  return String(session.email);
+}
+
+/* What a reader who is not the owner may see of a decision: the item, the action, when, and the fingerprint it was made against. */
+export function publicState(state) {
+  const out = {};
+  for (const [k, r] of Object.entries(state || {})) out[k] = { action: r.action, at: r.at, fp: r.fp, via: r.via };
+  return out;
+}
+
+/* Fire the rework routine. Never throws: a rework is already recorded, and the nightly run is the fallback. */
+export async function fireRework(row, env = process.env, f = fetch) {
+  const url = env.GW_REWORK_TRIGGER_URL || '', token = env.GW_REWORK_TRIGGER_TOKEN || '';
+  if (!url || !token) return { fired: false, why: 'not set' };
+  try {
+    const r = await f(url, {
+      method: 'POST',
+      headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json', 'anthropic-beta': 'experimental-cc-routine-2026-04-01', 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({ text: `Rework ${row.scope}/${row.key}. Utsav's note: ${row.note}\nThe fingerprint he reviewed: ${row.fp}.` }),
+    });
+    return r.ok ? { fired: true } : { fired: false, why: `status ${r.status}` };
+  } catch { return { fired: false, why: 'unreachable' }; }
 }
 
 async function ownerEmail(req, res) {
@@ -86,8 +120,10 @@ export function checkDecision(body, email, now = new Date()) {
 }
 
 export default async function handler(req, res) {
-  const email = await ownerEmail(req, res);
+  const plainRead = req.method === 'GET' && !(req.query && req.query.check);
+  const email = plainRead ? await signedInEmail(req, res) : await ownerEmail(req, res);
   if (!email) return;
+  const owner = isOwner(email);
   const cfg = store();
   if (!cfg) return json(res, 503, { error: 'The store is not connected.' });
 
@@ -99,7 +135,8 @@ export default async function handler(req, res) {
     }
     try {
       const [{ result }] = await redis(cfg, [['HGETALL', STATE_KEY]]);
-      return json(res, 200, { state: parseState(result) });
+      const state = parseState(result);
+      return json(res, 200, { state: owner ? state : publicState(state) });
     } catch { return json(res, 502, { error: 'Could not read.' }); }
   }
   if (req.method !== 'POST') return json(res, 405, { error: 'GET or POST only' });
@@ -121,7 +158,12 @@ export default async function handler(req, res) {
         const [{ result }] = await redis(cfg, [['HGET', STATE_KEY, field]]);
         let prev = null;
         try { prev = result ? JSON.parse(result) : null; } catch { /* none */ }
-        if (prev && prev.via === 'github') {
+        if (prev && prev.via === 'main') {
+          // Committed straight to main, so the undo is a commit that puts the record back as it was.
+          try { await recordDirect(token, { scope: row.scope, key: row.key }, email, today, true, prev.prev || null); }
+          catch { return json(res, 502, { error: 'Could not undo it on main. Nothing was changed.' }); }
+          note = 'undone on main';
+        } else if (prev && prev.via === 'github') {
           try { await recordViaGithub(token, { scope: row.scope, key: row.key }, email, today, true); }
           catch { return json(res, 502, { error: 'Could not take it out of the pull request. Nothing was changed.' }); }
           note = 'reverted in the pull request';
@@ -134,9 +176,15 @@ export default async function handler(req, res) {
     let githubError = '';
     if (token && row.fp) {
       try {
-        const out = await recordViaGithub(token, row, email, today);
-        row.via = 'github'; row.pr = out.pr;
-      } catch (e) { githubError = explain(e); }
+        const out = await recordDirect(token, row, email, today);
+        row.via = 'main'; row.prev = out.prev; row.commit = out.sha;
+      } catch {
+        // Main refused it (it is protected until the account may bypass the rule), so it goes to the pull request instead.
+        try {
+          const out = await recordViaGithub(token, row, email, today);
+          row.via = 'github'; row.pr = out.pr;
+        } catch (e) { githubError = explain(e); }
+      }
     }
     row.via = row.via || 'queue';
     // Recorded in a pull request: only the state is kept, for the page. A rework is ALSO queued, because the next session
@@ -147,6 +195,7 @@ export default async function handler(req, res) {
       cmds.unshift(['LPUSH', LIST_KEY, JSON.stringify(row)]);
     }
     await redis(cfg, cmds);
-    return json(res, 200, { ok: true, decision: row, mode: row.via, githubError });
+    const routine = row.action === 'rework' ? await fireRework(row) : null;
+    return json(res, 200, { ok: true, decision: row, mode: row.via, githubError, routine });
   } catch { return json(res, 502, { error: 'Could not save the decision.' }); }
 }
