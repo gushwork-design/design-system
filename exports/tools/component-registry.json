@@ -65,11 +65,10 @@
       "fingerprint": "164d29d3b37fd3a0"
     },
     "tool-progress": {
-      "reviewed": "rework",
+      "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
-      "reviewedOn": "2026-10-03",
-      "fingerprint": "4ab105f8e8e031e7",
-      "note": "make sure the toggle doesnt change its place in diff states"
+      "reviewedOn": "2026-10-04",
+      "fingerprint": "54ff5b7b0ed38420"
     }
   }
 }
