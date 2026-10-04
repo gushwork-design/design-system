@@ -1184,3 +1184,12 @@ Ruled by Utsav, 4 Oct 2026, after asking for approve and reject to work without 
 - **A rework starts a routine.** Sending an item back POSTs to the rework routine's API trigger (`GW_REWORK_TRIGGER_URL`, `GW_REWORK_TRIGGER_TOKEN`) with the item, the note and the fingerprint. The routine ("Design hub rework", created 4 Oct 2026) fixes the item, **opens a pull request and stops**: it never merges, publishes or decides, and it may not edit `exports/**` or any registry, so a fix that needs a spec change comes back under "Needs your call". If the trigger is unset or fails, the nightly run picks the rework up, as before. The nightly run now skips an item the library marks `redone`.
 - **Back to Waiting is automatic once the fix is published.** The fix changes the item's fingerprint, so after the pull request is merged and the site published the item reads `redone` (R45).
 - **Not built.** Deploy on merge. A publish is still a separate act, so a rework's fix reaches the hub only when someone merges and publishes.
+
+## R47 — a Review decision is staged, and applies when the owner presses Save
+Ruled by Utsav, 4 Oct 2026: "add a save option, once anything approved, rejected or sent to rework, then take the relevant action".
+
+- **Marking is not applying.** Approve, Rework and Reject (and the keys A, R, X) now stage a decision: the item moves to its tab with a `not saved` tag, the drawer moves on to the next item, and nothing is sent. The drafts live in this browser (`localStorage`, key `gw-review-drafts`), so a reload keeps them. The Library, main and the routine do not change.
+- **Save applies them all.** A bar at the top of Review ("3 not saved · 2 to approve, 1 to send back") and a `Save N` button in the drawer header. ⌘/Ctrl+S saves from anywhere on the Review tab. Save sends the decisions one after another: each is a commit on main (R46), and each rework starts the rework routine. A decision that fails stays staged and the toast says why; the rest still go.
+- **Discard or Undo throws a draft away.** Nothing was sent, so there is nothing to revert. Undo on a saved decision still reverts it (a commit that restores the earlier record).
+- **A draft goes stale if the item changes.** When the Review data loads, a draft for an item whose source has moved since it was marked is dropped, because it no longer describes what is on screen.
+- **Counts.** The tab counts include staged decisions, since the rows move; the `not saved` tag and the bar say which are not applied yet.
