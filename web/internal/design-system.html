@@ -747,6 +747,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .rv-acts { display: flex; gap: var(--gw-space-8); }
 .rv-foot--col .rv-acts { justify-content: flex-end; }
 .rv-hint { font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
+.rv-hint kbd { font: inherit; font-weight: 500; color: var(--ul-value); }
 .rv-lab { font: 500 13px/1.4 var(--gw-font-body); color: var(--ul-value); }
 .rv-ta { width: 100%; box-sizing: border-box; padding: var(--gw-space-12); border: 0; border-radius: var(--gw-radius-12); resize: vertical; background: var(--ul-field-bg); color: var(--ul-field-fg); font: 400 14px/1.5 var(--gw-font-body); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }
 .rv-ta:focus-visible { outline: none; box-shadow: inset 0 0 0 1px var(--gw-color-black); }   /* the edge, not the ring (R41) */
@@ -1354,7 +1355,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
      Approve, Rework and Reject are buttons. They do not edit the repo (a site cannot, and main needs a reviewed PR):
      they queue the decision (/api/review) and the next Claude session records it with the fingerprint that was
      on screen, so a decision made on something that has since moved is refused rather than applied. */
-  var STATE_LABEL = { pending: 'not reviewed', expired: 'expired', passed: 'approved', rejected: 'rejected', rework: 'in rework' };
+  var STATE_LABEL = { pending: 'not reviewed', expired: 'expired', redone: 'redone', passed: 'approved', rejected: 'rejected', rework: 'in rework' };
   var STATE_CLASS = { passed: ' ul-badge--ok', rejected: ' ul-badge--bad', expired: ' ul-badge--warn', rework: ' ul-badge--warn' };
   function badgeOf(state, queued, q) {
     var tail = !queued ? '' : (q && q.pr && q.pr.url
@@ -1402,7 +1403,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     return st ? 'by ' + String(heads[st.i]).toLowerCase() + ', ' + (st.dir < 0 ? 'descending' : 'ascending') : dflt;
   }
   /* The Review inbox: first click on Status puts what is waiting for you first; Decided leads with the newest. */
-  var STATE_RANK = { pending: 0, expired: 0, rework: 1, rejected: 2, passed: 3 };
+  var STATE_RANK = { pending: 0, expired: 0, redone: 0, rework: 1, rejected: 2, passed: 3 };
   var REV_SORT = [
     { get: function (it) { return it.label; }, dir: 1 },
     { get: function (it) { return scopeTitle(it); }, dir: 1 },
@@ -1414,7 +1415,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   var FILTERS = [['waiting', 'Waiting'], ['rework', 'In rework'], ['passed', 'Approved'], ['rejected', 'Rejected']];
   function inFilter(it, f) {
     var s = eff(it).state;
-    return f === 'waiting' ? (s === 'pending' || s === 'expired') : s === f;
+    return f === 'waiting' ? (s === 'pending' || s === 'expired' || s === 'redone') : s === f;
   }
   function toast(msg, ms) {
     var t = $('rv-toast'); if (!t) { t = document.createElement('div'); t.id = 'rv-toast'; t.className = 'rv-toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
@@ -1425,7 +1426,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   function renderReview(d) {
     indexItems(d);
     var count = function (f) { return ITEMS.filter(function (it) { return inFilter(it, f); }).length; };
-    $('ds-rev-stats').innerHTML = metric('Waiting on you', String(count('waiting')), 'never reviewed, or changed since') + metric('In rework', String(count('rework')), 'sent back with a note') +
+    $('ds-rev-stats').innerHTML = metric('Waiting on you', String(count('waiting')), 'never reviewed, redone, or changed since') + metric('In rework', String(count('rework')), 'sent back with a note') +
       metric('Approved', String(count('passed')), 'of ' + ITEMS.length + ', let into the skills');
     pills($('ds-rev-tabs'), FILTERS.map(function (f) { return [f[0], f[1] + ' ' + count(f[0])]; }), RV.filter, function (v) { RV.filter = v; RF.shown = 30; renderReview(d); });
     var q = RF.q.trim().toLowerCase();
@@ -1552,7 +1553,17 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     document.addEventListener('keydown', function (ev) {
       if (!RV.open) return;
       var typing = /^(TEXTAREA|INPUT)$/.test((ev.target || {}).tagName || '');
-      if (ev.key === 'Escape') { closeDrawer(); }
+      var mod = ev.metaKey || ev.ctrlKey || ev.altKey;
+      var press = function (id) { var b = $(id); if (b && !b.disabled) { ev.preventDefault(); b.click(); return true; } return false; };
+      /* The note box: Cmd or Ctrl + Enter sends it, Escape backs out of the note before it closes the drawer. */
+      if (typing && (ev.metaKey || ev.ctrlKey) && ev.key === 'Enter') { press('rv-send'); return; }
+      if (ev.key === 'Escape') { if (RV.mode && press('rv-cancel')) return; closeDrawer(); }
+      /* The decisions, owner only (the buttons are not drawn for anyone else, and not while one is queued). A, R, X and U
+         are plain letters, so a held Cmd, Ctrl or Alt (reload, find) is left alone. */
+      else if (!typing && !mod && ev.key.toLowerCase() === 'a') { press('rv-pass'); }
+      else if (!typing && !mod && ev.key.toLowerCase() === 'r') { press('rv-rework'); }
+      else if (!typing && !mod && ev.key.toLowerCase() === 'x') { press('rv-reject'); }
+      else if (!typing && !mod && ev.key.toLowerCase() === 'u') { press('rv-undo'); }
       else if (!typing && ev.key === 'e') { setWide(!RV.wide); }
       else if (!typing && (ev.key === 'ArrowRight' || ev.key === 'j')) { step(1); }
       else if (!typing && (ev.key === 'ArrowLeft' || ev.key === 'k')) { step(-1); }
@@ -1571,7 +1582,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     RV.i = i; RV.mode = ''; renderDrawer();
   }
   function nextWaiting() {
-    for (var i = RV.i + 1; i < RV.list.length; i++) { var it = BYID[RV.list[i]]; var s = it && eff(it).state; if (s === 'pending' || s === 'expired') return i; }
+    for (var i = RV.i + 1; i < RV.list.length; i++) { var it = BYID[RV.list[i]]; var s = it && eff(it).state; if (s === 'pending' || s === 'expired' || s === 'redone') return i; }
     return -1;
   }
   function renderDrawer() {
@@ -1586,17 +1597,17 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
         : 'It is recorded in the repo at the next Claude session.') +
         (e.q.note ? ' Your note: ' + esc(e.q.note) : '') + ' <button class="rv-link" type="button" id="rv-undo">Undo</button></div>';
     } else if (it.by) {
-      hist = '<div class="rv-note"><b>' + esc(STATE_LABEL[it.state] === 'expired' ? 'Approved, then the source moved' : (STATE_LABEL[it.state] || '')) + '</b> · ' + esc(it.by) + (it.on ? ', ' + esc(it.on) : '') + (it.note ? '<br>' + esc(it.note) : '') + '</div>';
+      hist = '<div class="rv-note"><b>' + esc(it.state === 'expired' ? 'Approved, then the source moved' : it.state === 'redone' ? 'Redone since you sent it back' : (STATE_LABEL[it.state] || '')) + '</b> · ' + esc(it.by) + (it.on ? ', ' + esc(it.on) : '') + (it.note ? '<br>' + esc(it.note) : '') + '</div>';
     }
     var foot;
     if (!can) foot = '<div class="rv-foot"><span class="rv-hint">Only an owner can approve, rework or reject.</span></div>';
     else if (RV.mode === 'rework' || RV.mode === 'reject') {
       foot = '<div class="rv-foot rv-foot--col"><label class="rv-lab" for="rv-note">' + (RV.mode === 'rework' ? 'What needs fixing? This goes to the next Claude session as the brief.' : 'Why is this rejected?') + '</label>' +
         '<textarea id="rv-note" class="rv-ta" rows="4" maxlength="500" placeholder="' + (RV.mode === 'rework' ? 'The labels bind raw white, they should use the neutral-900 token.' : 'It duplicates the card and nothing uses it.') + '"></textarea>' +
-        '<div class="rv-acts"><button type="button" class="rv-b rv-b--ghost" id="rv-cancel">Cancel</button><button type="button" class="rv-b rv-b--' + (RV.mode === 'reject' ? 'bad' : 'warn') + '" id="rv-send" disabled>' + (RV.mode === 'rework' ? 'Send back' : 'Reject') + '</button></div></div>';
+        '<div class="rv-acts"><button type="button" class="rv-b rv-b--ghost" id="rv-cancel">Cancel</button><button type="button" class="rv-b rv-b--' + (RV.mode === 'reject' ? 'bad' : 'warn') + '" id="rv-send" disabled>' + (RV.mode === 'rework' ? 'Send back' : 'Reject') + '</button></div><span class="rv-hint"><kbd>\u2318</kbd> <kbd>\u21b5</kbd> send · <kbd>Esc</kbd> cancel</span></div>';
     } else {
       foot = '<div class="rv-foot"><div class="rv-acts"><button type="button" class="rv-b rv-b--pass" id="rv-pass">Approve</button><button type="button" class="rv-b rv-b--ghost" id="rv-rework">Rework</button><button type="button" class="rv-b rv-b--ghost" id="rv-reject">Reject</button></div>' +
-        '<span class="rv-hint">← → to move · E to expand · Esc to close</span></div>';
+        '<span class="rv-hint"><kbd>A</kbd> approve · <kbd>R</kbd> rework · <kbd>X</kbd> reject · <kbd>←</kbd> <kbd>→</kbd> move · <kbd>E</kbd> expand · <kbd>Esc</kbd> close</span></div>';
     }
     el.innerHTML = '<header class="rv-h"><div class="rv-h__t"><span class="rv-h__s">' + esc(scopeTitle(it)) + ' · ' + (RV.i + 1) + ' of ' + RV.list.length + '</span><h2>' + esc(it.label) + '</h2></div>' +
       '<div class="rv-h__r">' + badgeOf(e.state, e.queued, e.q) + '<button type="button" class="rv-x" id="rv-prev" aria-label="Previous"' + (RV.i === 0 ? ' disabled' : '') + '>‹</button><button type="button" class="rv-x" id="rv-next" aria-label="Next"' + (RV.i >= RV.list.length - 1 ? ' disabled' : '') + '>›</button><button type="button" class="rv-x" id="rv-close" aria-label="Close">✕</button></div></header>' +

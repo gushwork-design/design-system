@@ -1168,3 +1168,9 @@ Ruled by Utsav, 3 Oct 2026, on seeing the `tool-panel` drawing in Review with a 
 - **In dark it takes a 1px `neutral/800` ring**, because a black tile on a black panel disappears otherwise.
 - **Drawings of the shell follow the same rule.** A library preview of a tool's panel, a mock, or a card for the Tools page draws the real SVG from the tools, never a placeholder. A drawing that shows the wrong mark is rejected in Review, not approved with a note.
 - **Where it lives.** `tool-panel` in `exports/tools/components.md`; `skills/gushwork-tools` (What every tool is, decision 28).
+
+## R45 — a reworked item goes back to Waiting tagged "redone", and the Review drawer has keys
+Ruled by Utsav, 4 Oct 2026.
+
+- **Redone.** An item sent back for rework whose source has changed since the note was written reads **redone** and is listed under **Waiting**, with a `redone` tag and the original note in the drawer. It is derived, not stored: the rework record keeps the fingerprint the owner was looking at, and a different current fingerprint means someone has had a go at it. The registry still says `rework` until the owner decides again, and a new decision replaces it. A rework with no stored fingerprint cannot be compared and stays in **In rework**. An unrelated edit to a shared doc (such as `exports/tools/components.md`) moves the fingerprint too, the same way it expires a pass.
+- **Keys in the Review drawer.** **A** approve, **R** rework (opens the note), **X** reject (opens the note), **U** undo a queued decision, **⌘/Ctrl + Enter** sends the note, **Esc** backs out of the note first and closes the drawer second, **← → / J K** move, **E** expands. Letters are ignored while typing and with ⌘, Ctrl or Alt held, so reload and find still work. Owner only, because the buttons are not drawn for anyone else.
