@@ -983,11 +983,10 @@
       "previewFingerprint": "925b0b188bdebbbd"
     },
     "heatmap": {
-      "reviewed": "rework",
+      "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "35a8abbe59b33c7f",
-      "note": "make black and white focus state with thinner outline",
+      "fingerprint": "426b5bdfef1df913",
       "previewFingerprint": "d4b296433e79deb6"
     },
     "histogram": {
