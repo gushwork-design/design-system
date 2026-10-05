@@ -130,6 +130,13 @@
       "reviewedOn": "2026-10-05",
       "fingerprint": "75be20cb0cd7ded6",
       "previewFingerprint": "6a39042b464a8c22"
+    },
+    "icons": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "ed9bec54a421e055",
+      "previewFingerprint": "66f825ae74d41323"
     }
   }
 }
