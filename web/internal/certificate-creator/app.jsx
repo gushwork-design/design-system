@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────
-   Award certificate generator — the panel, the preview, the bar.
+   Certificate Creator — the panel, the preview, the bar.
    Built on /internal/tool-shell.css (gushwork-tools, v2.0.0). The
    shell's controls only: fields, the click-open dropdown, the X-Small
    switch, the one floating pill.
@@ -32,8 +32,13 @@ function slug(s) {
 const DATA_KEYS = ['preset', 'name', 'nameOwnLine', 'headline', 'before', 'award', 'after', 'period', 'signature', 'signedBy'];
 function pick(d) { const o = {}; DATA_KEYS.forEach((k) => { o[k] = d[k]; }); return o; }
 function same(a, b) { return DATA_KEYS.every((k) => (a[k] || '') === (b[k] || '')); }
-function encodeData(d) {
-  const bytes = new TextEncoder().encode(JSON.stringify(pick(d)));
+function pagesOf(it) {
+  const list = it && Array.isArray(it.pages) && it.pages.length ? it.pages : [(it && it.data) || {}];
+  return list.map((p) => ({ ...fromPreset(PRESETS[0]), ...p }));
+}
+function pagesSame(a, b) { return a.length === b.length && a.every((p, i) => same(p, b[i])); }
+function encodeData(pages) {
+  const bytes = new TextEncoder().encode(JSON.stringify({ pages: pages.map(pick) }));
   let bin = ''; bytes.forEach((b) => { bin += String.fromCharCode(b); });
   return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
@@ -41,9 +46,8 @@ function decodeData(str) {
   try {
     const bin = atob(str.replace(/-/g, '+').replace(/_/g, '/'));
     const raw = JSON.parse(new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0))));
-    const out = {};
-    DATA_KEYS.forEach((k) => { out[k] = k === 'nameOwnLine' ? raw[k] === true : String(raw[k] || ''); });
-    return out;
+    const one = (r) => { const out = {}; DATA_KEYS.forEach((k) => { out[k] = k === 'nameOwnLine' ? r[k] === true : String(r[k] || ''); }); return out; };
+    return (Array.isArray(raw.pages) ? raw.pages : [raw]).slice(0, 50).map(one);
   } catch { return null; }
 }
 /* Routes live in the #fragment: none = the Files home; #file=<id> (or the older #saved=<id>) a
@@ -51,7 +55,7 @@ function decodeData(str) {
 function readHash() {
   const raw = location.hash.slice(1);
   const h = new URLSearchParams(raw);
-  return { saved: h.get('file') || h.get('saved') || '', c: h.get('c') || '', isNew: raw === 'new' };
+  return { saved: h.get('file') || h.get('saved') || '', c: h.get('c') || '', isNew: raw === 'new' || raw.startsWith('new='), template: h.get('new') || '' };
 }
 function routeOf() {
   const h = readHash();
@@ -276,6 +280,24 @@ function GridIcon() {
 function ListIcon() {
   return (<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z" /></svg>);
 }
+function DotsIcon() {
+  return (<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M140,128a12,12,0,1,1-12-12A12,12,0,0,1,140,128Zm56-12a12,12,0,1,0,12,12A12,12,0,0,0,196,116ZM60,116a12,12,0,1,0,12,12A12,12,0,0,0,60,116Z" /></svg>);
+}
+function CopyIcon() {
+  return (<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M216,32H88a8,8,0,0,0-8,8V80H40a8,8,0,0,0-8,8V216a8,8,0,0,0,8,8H168a8,8,0,0,0,8-8V176h40a8,8,0,0,0,8-8V40A8,8,0,0,0,216,32ZM160,208H48V96H160Zm48-48H176V88a8,8,0,0,0-8-8H96V48H208Z" /></svg>);
+}
+function SearchIcon() {
+  return (<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z" /></svg>);
+}
+function DotsVIcon() {
+  return (<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M140,128a12,12,0,1,1-12-12A12,12,0,0,1,140,128ZM128,72a12,12,0,1,0-12-12A12,12,0,0,0,128,72Zm0,112a12,12,0,1,0,12,12A12,12,0,0,0,128,184Z" /></svg>);
+}
+function OpenIcon() {
+  return (<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M224,104a8,8,0,0,1-16,0V59.32l-66.33,66.34a8,8,0,0,1-11.32-11.32L196.68,48H152a8,8,0,0,1,0-16h64a8,8,0,0,1,8,8Zm-40,24a8,8,0,0,0-8,8v72H48V80h72a8,8,0,0,0,0-16H48A16,16,0,0,0,32,80V208a16,16,0,0,0,16,16H176a16,16,0,0,0,16-16V136A8,8,0,0,0,184,128Z" /></svg>);
+}
+function LockIcon() {
+  return (<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z" /></svg>);
+}
 function CheckIcon() {
   return (
     <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
@@ -440,11 +462,40 @@ function ConfirmDelete({ item, onCancel, onConfirm }) {
   );
 }
 
-/* ── Files home: every certificate file this person can see, Canva-style (Utsav, 5 Oct 2026) ── */
-function FilesHome({ saved, me, logoSvg, onOpen, onNew, onShare, onDelete }) {
-  const [tab, setTab] = useState('all');
+/* ── Files home, after Google Docs' home (Utsav, 5 Oct 2026): search on top, a band to start a new
+   certificate from blank or a template, then recent certificates with owner filter, sort and
+   grid / list. Templates are the presets today; more template families can join the band. ── */
+function CardMenu({ it, onOpen, onShare, onCopy, onDelete }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!open) return undefined;
+    const onDoc = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    const onKey = (e) => { if (e.key === 'Escape') setOpen(false); };
+    document.addEventListener('mousedown', onDoc); document.addEventListener('keydown', onKey);
+    return () => { document.removeEventListener('mousedown', onDoc); document.removeEventListener('keydown', onKey); };
+  }, [open]);
+  const manage = it.can && it.can.manage;
+  return (
+    <span className="r-menu-wrap card-menu" ref={ref} onClick={(e) => e.stopPropagation()}>
+      <button type="button" className="saved-del card-menu__btn" onClick={() => setOpen((v) => !v)} aria-haspopup="menu" aria-expanded={open} aria-label={`More for ${titleOf(it)}`} title="More"><DotsVIcon /></button>
+      {open && (
+        <span className="r-menu" role="menu">
+          <button type="button" role="menuitem" className="r-menu__item" onClick={() => { setOpen(false); onOpen(it); }}><OpenIcon /> Open</button>
+          <button type="button" role="menuitem" className="r-menu__item" onClick={() => { setOpen(false); onCopy(it); }}><CopyIcon /> Make a copy</button>
+          {manage && <button type="button" role="menuitem" className="r-menu__item" onClick={() => { setOpen(false); onShare(it); }}><UsersIcon /> Manage access</button>}
+          {manage && <span className="r-menu__rule" />}
+          {manage && <button type="button" role="menuitem" className="r-menu__item r-menu__item--danger" onClick={() => { setOpen(false); onDelete(it); }}><TrashIcon /> Delete</button>}
+        </span>
+      )}
+    </span>
+  );
+}
+
+function FilesHome({ saved, me, logoSvg, onOpen, onNew, onShare, onDelete, onCopy }) {
+  const [owner, setOwner] = useState('anyone');
   const [q, setQ] = useState('');
-  const [limit, setLimit] = useState(24);
+  const [limit, setLimit] = useState(30);
   const [sort, setSort] = useState('newest');
   const [layout, setLayout] = useState(() => { try { return localStorage.getItem('gw-cert-layout') || 'grid'; } catch { return 'grid'; } });
   const pickLayout = (l) => { setLayout(l); try { localStorage.setItem('gw-cert-layout', l); } catch { /* a convenience only */ } };
@@ -452,133 +503,150 @@ function FilesHome({ saved, me, logoSvg, onOpen, onNew, onShare, onDelete }) {
     newest: (a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)),
     oldest: (a, b) => String(a.updatedAt).localeCompare(String(b.updatedAt)),
     az: (a, b) => titleOf(a).localeCompare(titleOf(b)),
-    za: (a, b) => titleOf(b).localeCompare(titleOf(a)),
   };
   const items = saved.items.filter((it) => {
-    if (tab === 'mine' && it.savedBy !== me) return false;
-    if (tab === 'shared' && it.savedBy === me) return false;
+    if (owner === 'me' && it.savedBy !== me) return false;
+    if (owner === 'others' && it.savedBy === me) return false;
     const t = q.trim().toLowerCase();
-    return !t || [titleOf(it), it.data.name, awardLine(it.data), who(it.savedBy), who(it.updatedBy), it.savedBy].join(' ').toLowerCase().includes(t);
+    return !t || [titleOf(it), ...(it.pages || [it.data]).map((p) => `${p.name} ${awardLine(p)}`), who(it.savedBy), who(it.updatedBy), it.savedBy].join(' ').toLowerCase().includes(t);
   }).sort(SORTS[sort]);
-  const counts = {
-    all: saved.items.length,
-    mine: saved.items.filter((it) => it.savedBy === me).length,
-    shared: saved.items.filter((it) => it.savedBy !== me).length,
-  };
+  const blank = { ...fromPreset(PRESETS[0]), name: '', headline: '', before: '', award: '', after: '' };
+  const shared = (it) => (it.access && ((it.access.people || []).length || it.access.general === 'tool')) && it.savedBy !== me;
+  const sub = (it) => `${(it.pages || []).length > 1 ? `${it.pages.length} pages · ` : ''}${ago(it.updatedAt)}`;
+
   return (
     <div className="home">
-      <header className="home-bar">
+      <header className="home-top">
         <a className="brand-link" href="/internal/tools" title="Back to Tools" aria-label="Back to Tools">
           <svg className="brand-icon" width="32" height="32" viewBox="0 0 160 160" fill="none" aria-hidden>
-            <rect width="160" height="160" rx="20" fill="#0D0D0D" />
+            <rect className="brand-icon__bg" width="160" height="160" rx="20" fill="#0070FF" />
             <path d="M116.609 44.5634C117.503 42.3606 115.85 40 113.472 40H49.1429C44.0934 40 40 44.0934 40 49.1429V106.778C40 112.018 45.1708 115.683 49.9603 113.557C80.8494 99.8449 104.378 74.7075 116.609 44.5634Z" fill="white" />
             <path d="M72.5161 120C71.4022 120 70.9357 118.553 71.8259 117.884C94.9007 100.527 111.434 75.8047 118.766 48.0522C118.94 47.3915 120 47.5162 120 48.1995V110.857C120 115.907 115.907 120 110.857 120H72.5161Z" fill="white" />
           </svg>
         </a>
-        <h1>Award certificates</h1>
-        <button type="button" className="r-btn r-btn--primary" onClick={onNew}><PlusIcon /> New certificate</button>
+        <h1>Certificate Creator</h1>
+        <label className="home-search">
+          <SearchIcon />
+          <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search certificates, people, awards" aria-label="Search" />
+        </label>
       </header>
 
-      <div className="home-tools">
-        <div className="prop-segmented home-tabs" role="tablist">
-          {[['all', 'All'], ['mine', 'Mine'], ['shared', 'Shared with me']].map(([k, l]) => (
-            <button key={k} type="button" role="tab" aria-selected={tab === k} className={tab === k ? 'active' : ''} onClick={() => setTab(k)}>
-              {l}{saved.state === 'ready' ? ` · ${counts[k]}` : ''}
+      <section className="home-band" aria-labelledby="start-h">
+        <div className="home-wrap">
+          <h2 id="start-h" className="home-h">Start a new certificate</h2>
+          <div className="tpl-row">
+            <button type="button" className="tpl" onClick={() => onNew('blank')}>
+              <span className="tpl-thumb tpl-thumb--blank"><span className="tpl-sheet"><Certificate data={blank} logoSvg={logoSvg} /></span><span className="tpl-plus"><PlusIcon /></span></span>
+              <span className="tpl-name">Blank certificate</span>
+              <span className="tpl-sub">Award layout</span>
             </button>
-          ))}
-        </div>
-        <div className="home-right">
-          <input className="prop-input home-search" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by name, award or person" />
-          <div className="home-sort">
-            <PropDropdown value={sort} onChange={setSort} options={[
-              { value: 'newest', label: 'Newest edited' }, { value: 'oldest', label: 'Oldest edited' },
-              { value: 'az', label: 'Name, A to Z' }, { value: 'za', label: 'Name, Z to A' },
-            ]} />
-          </div>
-          <div className="prop-segmented home-layout" role="tablist" aria-label="Layout">
-            <button type="button" role="tab" aria-selected={layout === 'grid'} className={layout === 'grid' ? 'active' : ''} onClick={() => pickLayout('grid')} aria-label="Grid" title="Grid"><GridIcon /></button>
-            <button type="button" role="tab" aria-selected={layout === 'list'} className={layout === 'list' ? 'active' : ''} onClick={() => pickLayout('list')} aria-label="List" title="List"><ListIcon /></button>
-          </div>
-        </div>
-      </div>
-
-      {saved.state === 'loading' && <p className="prop-tip home-note">Loading certificates…</p>}
-      {saved.state === 'error' && <p className="prop-tip saved-error home-note">{saved.error}</p>}
-      {saved.state === 'ready' && items.length === 0 && (
-        <div className="home-empty">
-          <p className="saved-name">{saved.items.length ? 'Nothing matches' : 'No certificates yet'}</p>
-          <p className="prop-tip">{saved.items.length ? 'Try another tab or search.' : 'Make the first one. Files you create, or that others share with you, show up here.'}</p>
-          {!saved.items.length && <button type="button" className="r-btn r-btn--primary" onClick={onNew}><PlusIcon /> New certificate</button>}
-        </div>
-      )}
-
-      {layout === 'list' && items.length > 0 && (
-        <table className="file-table">
-          <thead><tr><th>Name</th><th>People</th><th>Access</th><th>Edited</th><th><span className="gw-sr">Actions</span></th></tr></thead>
-          <tbody>
-            {items.slice(0, limit).map((it) => (
-              <tr key={it.id} onClick={() => onOpen(it)}>
-                <td>
-                  <span className="file-row-name">
-                    <span className="file-mini" aria-hidden><span className="file-mini__sheet"><Certificate data={it.data} logoSvg={logoSvg} /></span></span>
-                    <span className="acc-who"><span className="saved-name file-title">{titleOf(it)}</span><span className="saved-meta">{awardLine(it.data) || 'No award'}</span></span>
-                  </span>
-                </td>
-                <td><Avatars it={it} /></td>
-                <td><span className="saved-meta">{it.access && it.access.general === 'restricted' ? 'Restricted' : 'Everyone with the tool'}{it.can && !it.can.edit ? ' · View only' : ''}</span></td>
-                <td><span className="saved-meta">{ago(it.updatedAt)} · {who(it.updatedBy)}</span></td>
-                <td className="file-row-acts" onClick={(e) => e.stopPropagation()}>
-                  {it.can && it.can.manage && (
-                    <>
-                      <button type="button" className="saved-del" onClick={() => onShare(it)} aria-label={`Share ${titleOf(it)}`} title="Share"><UsersIcon /></button>
-                      <button type="button" className="saved-del" onClick={() => onDelete(it)} aria-label={`Delete ${titleOf(it)}`} title="Delete"><TrashIcon /></button>
-                    </>
-                  )}
-                </td>
-              </tr>
+            {PRESETS.map((p) => (
+              <button key={p.id} type="button" className="tpl" onClick={() => onNew(p.id)}>
+                <span className="tpl-thumb"><span className="tpl-sheet"><Certificate data={fromPreset(p)} logoSvg={logoSvg} /></span></span>
+                <span className="tpl-name">{p.label}</span>
+                <span className="tpl-sub">Award</span>
+              </button>
             ))}
-          </tbody>
-        </table>
-      )}
+          </div>
+        </div>
+      </section>
 
-      {layout === 'grid' && <ul className="file-grid">
-        {items.slice(0, limit).map((it) => (
-          <li key={it.id} className="file-card">
-            <button type="button" className="file-open" onClick={() => onOpen(it)} aria-label={`Open ${titleOf(it)}`}>
-              <span className="file-thumb" aria-hidden>
-                <span className="file-thumb__sheet"><Certificate data={it.data} logoSvg={logoSvg} /></span>
-              </span>
-              <span className="file-info">
-                <span className="saved-name file-title">{titleOf(it)}</span>
-                <span className="file-meta-row">
-                  <span className="saved-meta">Edited {ago(it.updatedAt)} · {who(it.updatedBy)}</span>
-                  <Avatars it={it} />
-                </span>
-              </span>
+      <section className="home-wrap home-recent" aria-labelledby="recent-h">
+        <div className="home-recent__bar">
+          <h2 id="recent-h" className="home-h">Recent certificates</h2>
+          <div className="home-right">
+            <div className="home-sort home-owner">
+              <PropDropdown value={owner} onChange={setOwner} options={[
+                { value: 'anyone', label: 'Owned by anyone' }, { value: 'me', label: 'Owned by me' }, { value: 'others', label: 'Not owned by me' },
+              ]} />
+            </div>
+            <div className="home-sort">
+              <PropDropdown value={sort} onChange={setSort} options={[
+                { value: 'newest', label: 'Last edited' }, { value: 'oldest', label: 'Oldest first' }, { value: 'az', label: 'Name, A to Z' },
+              ]} />
+            </div>
+            <button type="button" className="t-modal__close home-layout-btn" onClick={() => pickLayout(layout === 'grid' ? 'list' : 'grid')}
+              aria-label={layout === 'grid' ? 'List view' : 'Grid view'} title={layout === 'grid' ? 'List view' : 'Grid view'}>
+              {layout === 'grid' ? <ListIcon /> : <GridIcon />}
             </button>
-            <span className="file-tags">
-              {it.access && it.access.general === 'restricted' && <span className="saved-tag">Restricted</span>}
-              {it.can && !it.can.edit && <span className="saved-tag">View only</span>}
-            </span>
-            {it.can && it.can.manage && (
-              <span className="file-acts">
-                <button type="button" className="saved-del" onClick={() => onShare(it)} aria-label={`Share ${titleOf(it)}`} title="Share"><UsersIcon /></button>
-                <button type="button" className="saved-del" onClick={() => onDelete(it)} aria-label={`Delete ${titleOf(it)}`} title="Delete"><TrashIcon /></button>
-              </span>
-            )}
-          </li>
-        ))}
-      </ul>}
-      {items.length > limit && (
-        <div className="home-more"><button type="button" className="r-btn" onClick={() => setLimit((n) => n + 24)}>Show more</button></div>
-      )}
+          </div>
+        </div>
+
+        {saved.state === 'loading' && <p className="prop-tip home-note">Loading certificates…</p>}
+        {saved.state === 'error' && <p className="prop-tip saved-error home-note">{saved.error}</p>}
+        {saved.state === 'ready' && items.length === 0 && (
+          <div className="home-empty">
+            <p className="home-empty__t">{saved.items.length ? 'Nothing matches' : 'No certificates yet'}</p>
+            <p className="prop-tip">{saved.items.length ? 'Try another search or owner.' : 'Select a blank certificate or choose a template above to get started.'}</p>
+          </div>
+        )}
+
+        {layout === 'list' && items.length > 0 && (
+          <table className="file-table">
+            <thead><tr><th>Name</th><th>Owner</th><th>Last edited</th><th><span className="gw-sr">Actions</span></th></tr></thead>
+            <tbody>
+              {items.slice(0, limit).map((it) => (
+                <tr key={it.id} onClick={() => onOpen(it)}>
+                  <td>
+                    <span className="file-row-name">
+                      <span className="file-mini" aria-hidden><span className="file-mini__sheet"><Certificate data={it.data} logoSvg={logoSvg} /></span></span>
+                      <span className="acc-who"><span className="saved-name file-title">{titleOf(it)}</span><span className="saved-meta">{(it.pages || []).length > 1 ? `${it.pages.length} pages · ` : ''}{awardLine(it.data) || 'No award'}</span></span>
+                    </span>
+                  </td>
+                  <td><span className="saved-meta">{it.savedBy === me ? 'me' : who(it.savedBy)}{it.access && it.access.general === 'restricted' ? ' · Restricted' : ''}</span></td>
+                  <td><span className="saved-meta">{ago(it.updatedAt)} · {who(it.updatedBy)}</span></td>
+                  <td className="file-row-acts"><CardMenu it={it} onOpen={onOpen} onShare={onShare} onCopy={onCopy} onDelete={onDelete} /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+
+        {layout === 'grid' && (
+          <ul className="file-grid">
+            {items.slice(0, limit).map((it) => (
+              <li key={it.id} className="file-card" onClick={() => onOpen(it)}>
+                <button type="button" className="file-open" onClick={(e) => { e.stopPropagation(); onOpen(it); }} aria-label={`Open ${titleOf(it)}`}>
+                  <span className="file-thumb" aria-hidden><span className="file-thumb__sheet"><Certificate data={it.data} logoSvg={logoSvg} /></span></span>
+                </button>
+                <span className="file-info">
+                  <span className="saved-name file-title">{titleOf(it)}</span>
+                  <span className="file-meta-row">
+                    <span className="file-meta">
+                      {shared(it) && <UsersIcon />}
+                      {it.access && it.access.general === 'restricted' && <LockIcon />}
+                      <span className="saved-meta">{sub(it)}</span>
+                    </span>
+                    <CardMenu it={it} onOpen={onOpen} onShare={onShare} onCopy={onCopy} onDelete={onDelete} />
+                  </span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+        {items.length > limit && (
+          <div className="home-more"><button type="button" className="r-btn" onClick={() => setLimit((n) => n + 30)}>Show more</button></div>
+        )}
+      </section>
     </div>
   );
 }
 
 /* ── app ──────────────────────────────────────────────────────── */
 function App() {
-  const [data, setData] = useState(() => fromPreset(PRESETS[0]));
+  // a file is a set of pages, each a certificate; the editor works on one at a time
+  const [pages, setPages] = useState(() => [fromPreset(PRESETS[0])]);
+  const [active, setActive] = useState(0);
+  const activeRef = useRef(0);
+  activeRef.current = Math.min(active, pages.length - 1);
+  const data = pages[activeRef.current];
+  const setData = (upd) => setPages((ps) => ps.map((p, i) => (i === activeRef.current ? (typeof upd === 'function' ? upd(p) : upd) : p)));
+  const [fileMenu, setFileMenu] = useState(false);
+  const [dl, setDl] = useState({ type: 'pdf', which: 'all', picked: [], dpi: 300 });
+  const [dropPage, setDropPage] = useState(null);   // a page waiting on its delete confirm
+  const dragFrom = useRef(null);
+  const exportRefs = useRef([]);
+  const fileMenuRef = useRef(null);
   const [panelOpen, setPanelOpen] = useState(true);
   const [logoSvg, setLogoSvg] = useState('');
   const [scale, setScale] = useState(0.8);
@@ -638,14 +706,19 @@ function App() {
     setClash(null); setLinkError(''); setTouched(false);
     if (h.saved) {
       const it = items.find((x) => x.id === h.saved);
-      if (it) { setData(fromPreset(PRESETS[0])); setData((prev) => ({ ...prev, ...it.data })); setCurrent(it); setFileTitle(it.title || ''); }
+      if (it) { setPages(pagesOf(it)); setActive(0); setCurrent(it); setFileTitle(it.title || ''); }
       else { setCurrent(null); setLinkError('That certificate was deleted, or it is not shared with you. Ask its owner for access.'); }
     } else if (h.c) {
       const d = decodeData(h.c);
       setCurrent(null); setFileTitle('');
-      if (d) setData((prev) => ({ ...prev, ...d }));
+      if (d && d.length) { setPages(d.map((x) => ({ ...fromPreset(PRESETS[0]), ...x }))); setActive(0); }
     } else if (h.isNew) {
-      setCurrent(null); setFileTitle(''); setData(fromPreset(PRESETS[0]));
+      // #new=<template>: a preset, or blank (the award layout with its text cleared)
+      const tpl = PRESETS.find((x) => x.id === h.template);
+      const first = tpl ? fromPreset(tpl) : h.template === 'blank'
+        ? { ...fromPreset(PRESETS[0]), preset: 'custom', name: '', headline: '', before: '', award: '', after: '' }
+        : fromPreset(PRESETS[0]);
+      setCurrent(null); setFileTitle(''); setPages([first]); setActive(0);
     } else {
       setCurrent(null);
     }
@@ -667,7 +740,7 @@ function App() {
     const fit = () => {
       const cs = getComputedStyle(el);
       const w = el.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-      const h = window.innerHeight - 56 - 112;
+      const h = window.innerHeight - 48 - 168;   // the page strip sits under the sheet
       setScale(Math.max(0.3, Math.min(w / CERT.W, h / CERT.H, 1.2)));
     };
     fit();
@@ -704,37 +777,79 @@ function App() {
     if (p) { setTouched(true); setData((d) => fromPreset(p, d)); }
   };
 
-  const filename = ['gushwork-certificate', slug(data.name), slug(data.period)].filter(Boolean).join('-');
+  // named after the file when it has a name, else the one recipient, else the set
+  const filename = fileTitle.trim()
+    ? ['gushwork', slug(fileTitle)].join('-')
+    : pages.length > 1
+      ? ['gushwork-certificates', slug(pages[0].period)].filter(Boolean).join('-')
+      : ['gushwork-certificate', slug(data.name), slug(data.period)].filter(Boolean).join('-');
   const title = [data.name, awardLine(data)].filter(Boolean).join(', ');
 
-  const run = useCallback(async (kind) => {
-    setMenuOpen(false);
-    if (!certRef.current || job.state === 'working') return;
+  // downloads read the off-screen sheets (one per page, never editable, never scaled)
+  const chosen = () => {
+    if (dl.which === 'this') return [activeRef.current];
+    if (dl.which === 'pick') return dl.picked.filter((i) => i < pages.length).sort((a, b) => a - b);
+    return pages.map((_, i) => i);
+  };
+  const run = async () => {
+    const kind = dl.type;
+    if (job.state === 'working') return;
+    const idx = chosen();
+    if (!idx.length) { setJob({ kind, state: 'err' }); setTimeout(() => setJob({ kind: null, state: 'idle' }), 2400); return; }
     setJob({ kind, state: 'working' });
     if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
-    certRef.current.setAttribute('data-exporting', '');
     try {
-      const opts = { filename, title, logoSvg };
-      if (kind === 'pdf') await CertExport.exportPdf(certRef.current, opts);
-      if (kind === 'jpg') await CertExport.exportJpg(certRef.current, opts);
-      if (kind === 'psd') await CertExport.exportPsd(certRef.current, opts);
+      await new Promise((r) => requestAnimationFrame(() => r()));
+      const els = idx.map((i) => exportRefs.current[i]).filter(Boolean);
+      const opts = { filename, title: fileTitle || title, logoSvg, dpi: dl.dpi, numbers: idx.map((i) => i + 1) };
+      if (kind === 'pdf') await CertExport.exportPdf(els, opts);
+      if (kind === 'jpg') await CertExport.exportJpg(els, opts);
+      if (kind === 'psd') await CertExport.exportPsd(els, opts);
       setJob({ kind, state: 'ok' });
     } catch (e) {
       console.error(e);
       setJob({ kind, state: 'err' });
     }
-    if (certRef.current) certRef.current.removeAttribute('data-exporting');
     setTimeout(() => setJob((j) => (j.kind === kind ? { kind: null, state: 'idle' } : j)), 2400);
-  }, [filename, title, logoSvg, job.state]);
+  };
 
-  const dirty = !current || !same(current.data, data) || (fileTitle || '') !== (current.title || '');
+  // pages: add (from the default template, keeping the period and signatory), duplicate, delete, reorder
+  const addPage = () => { setTouched(true); const at = activeRef.current + 1; setPages((ps) => [...ps.slice(0, at), fromPreset(PRESETS[0], ps[activeRef.current]), ...ps.slice(at)]); setActive(at); };
+  const duplicatePage = (i) => { setTouched(true); setPages((ps) => [...ps.slice(0, i + 1), { ...ps[i] }, ...ps.slice(i + 1)]); setActive(i + 1); };
+  const deletePage = (i) => {
+    setTouched(true);
+    setPages((ps) => (ps.length > 1 ? ps.filter((_, j) => j !== i) : ps));
+    setActive((a) => Math.max(0, a > i ? a - 1 : Math.min(a, pages.length - 2)));
+    setDropPage(null);
+  };
+  const movePage = (from, to) => {
+    if (from === to || from == null) return;
+    setTouched(true);
+    setPages((ps) => { const next = ps.slice(); const [m] = next.splice(from, 1); next.splice(to, 0, m); return next; });
+    setActive(to);
+  };
+  useEffect(() => {
+    if (!fileMenu) return undefined;
+    const onDoc = (e) => { if (fileMenuRef.current && !fileMenuRef.current.contains(e.target)) setFileMenu(false); };
+    const onKey = (e) => { if (e.key === 'Escape') setFileMenu(false); };
+    document.addEventListener('mousedown', onDoc); document.addEventListener('keydown', onKey);
+    return () => { document.removeEventListener('mousedown', onDoc); document.removeEventListener('keydown', onKey); };
+  }, [fileMenu]);
+  const duplicateFile = () => {
+    setFileMenu(false);
+    setCurrent(null); setTouched(true);
+    setFileTitle(`Copy of ${titleOf({ title: fileTitle, data: pages[0] })}`);
+    history.replaceState(null, '', '#new');
+  };
+
+  const dirty = !current || !pagesSame(pagesOf(current), pages) || (fileTitle || '') !== (current.title || '');
   const unsaved = current ? dirty : touched;
 
   const save = async (force) => {
     if (saveState === 'working') return;
     setSaveState('working'); setSaveError('');
     try {
-      const j = await api('POST', { id: current ? current.id : undefined, data: pick(data), title: fileTitle, base: current ? current.updatedAt : undefined, force: !!force });
+      const j = await api('POST', { id: current ? current.id : undefined, pages: pages.map(pick), title: fileTitle, base: current ? current.updatedAt : undefined, force: !!force });
       setCurrent(j.item); setClash(null); setTouched(false);
       itemsRef.current = [j.item, ...itemsRef.current.filter((x) => x.id !== j.item.id)];
       history.replaceState(null, '', '#file=' + j.item.id);
@@ -748,7 +863,7 @@ function App() {
   };
 
   const share = async () => {
-    const hash = current && !dirty ? 'file=' + current.id : 'c=' + encodeData(data);
+    const hash = current && !dirty ? 'file=' + current.id : 'c=' + encodeData(pages);
     const url = location.origin + location.pathname + '#' + hash;
     try { await navigator.clipboard.writeText(url); setShareState('ok'); } catch { setShareState('err'); }
     setTimeout(() => setShareState('idle'), 2400);
@@ -761,11 +876,17 @@ function App() {
     if (view === 'editor' && unsaved && canEdit) setLeaveTo(() => doIt); else doIt();
   };
   const openItem = (it) => go('file=' + it.id);
-  const startNew = () => go('new');
+  const startNew = (template) => go(typeof template === 'string' ? 'new=' + template : 'new');
+  const copyFile = async (it) => {
+    try {
+      await api('POST', { title: `Copy of ${titleOf(it)}`, pages: pagesOf(it).map(pick) });
+      await loadList();
+    } catch (e) { setSaved((st) => ({ ...st, error: e.message })); }
+  };
   const toFiles = () => go('');
   const loadTheirs = () => {
     if (!clash) return;
-    setData((prev) => ({ ...prev, ...clash.data })); setCurrent(clash); setFileTitle(clash.title || ''); setClash(null);
+    setPages(pagesOf(clash)); setActive(0); setCurrent(clash); setFileTitle(clash.title || ''); setClash(null);
     setSaved((st) => ({ ...st, items: st.items.map((x) => (x.id === clash.id ? clash : x)) }));
   };
   // delete happens only from the confirm's own Delete button
@@ -824,7 +945,7 @@ function App() {
   if (view === 'home') {
     return (
       <div className="app app--home">
-        <FilesHome saved={saved} me={me} logoSvg={logoSvg} onOpen={openItem} onNew={startNew}
+        <FilesHome saved={saved} me={me} logoSvg={logoSvg} onOpen={openItem} onNew={startNew} onCopy={copyFile}
           onShare={(it) => setAccessItem(it)} onDelete={(it) => setConfirmItem(it)} />
         {dialogs}
       </div>
@@ -837,12 +958,12 @@ function App() {
       <div className="panel-mini" aria-hidden={panelOpen}>
         <a className="brand-link" href="/internal/tools" title="Back to Tools" aria-label="Back to Tools" tabIndex={panelOpen ? -1 : 0}>
           <svg className="brand-icon" width="32" height="32" viewBox="0 0 160 160" fill="none" aria-hidden>
-            <rect width="160" height="160" rx="20" fill="#0D0D0D" />
+            <rect className="brand-icon__bg" width="160" height="160" rx="20" fill="#0070FF" />
             <path d="M116.609 44.5634C117.503 42.3606 115.85 40 113.472 40H49.1429C44.0934 40 40 44.0934 40 49.1429V106.778C40 112.018 45.1708 115.683 49.9603 113.557C80.8494 99.8449 104.378 74.7075 116.609 44.5634Z" fill="white" />
             <path d="M72.5161 120C71.4022 120 70.9357 118.553 71.8259 117.884C94.9007 100.527 111.434 75.8047 118.766 48.0522C118.94 47.3915 120 47.5162 120 48.1995V110.857C120 115.907 115.907 120 110.857 120H72.5161Z" fill="white" />
           </svg>
         </a>
-        <span className="panel-mini__name">Award certificate</span>
+        <span className="panel-mini__name">Certificate Creator</span>
         <button type="button" className="panel-reopen" onClick={() => setPanelOpen(true)} aria-label="Open editor panel" title="Open editor panel" tabIndex={panelOpen ? -1 : 0}>
           <SidebarIcon />
         </button>
@@ -852,12 +973,12 @@ function App() {
         <header className="brand-card">
           <a className="brand-link" href="/internal/tools" title="Back to Tools" aria-label="Back to Tools">
             <svg className="brand-icon" width="32" height="32" viewBox="0 0 160 160" fill="none" aria-hidden>
-              <rect width="160" height="160" rx="20" fill="#0D0D0D" />
+              <rect className="brand-icon__bg" width="160" height="160" rx="20" fill="#0070FF" />
               <path d="M116.609 44.5634C117.503 42.3606 115.85 40 113.472 40H49.1429C44.0934 40 40 44.0934 40 49.1429V106.778C40 112.018 45.1708 115.683 49.9603 113.557C80.8494 99.8449 104.378 74.7075 116.609 44.5634Z" fill="white" />
               <path d="M72.5161 120C71.4022 120 70.9357 118.553 71.8259 117.884C94.9007 100.527 111.434 75.8047 118.766 48.0522C118.94 47.3915 120 47.5162 120 48.1995V110.857C120 115.907 115.907 120 110.857 120H72.5161Z" fill="white" />
             </svg>
           </a>
-          <h1>Award certificate</h1>
+          <h1>Certificate Creator</h1>
           <button type="button" className="panel-collapse" onClick={() => setPanelOpen(false)} aria-label="Collapse editor panel" title="Collapse editor panel">
             <SidebarIcon />
           </button>
@@ -911,17 +1032,31 @@ function App() {
       <div className="right-col" ref={savedRef} aria-hidden={!panelOpen}>
         <header className="right-head">
           <button type="button" className="saved-new right-back" onClick={toFiles}><ArrowLeftIcon /> All files</button>
-          <h2>Save and share</h2>
-          <button type="button" className="saved-new" onClick={startNew}>New</button>
+          <div className="r-menu-wrap" ref={fileMenuRef}>
+            <button type="button" className="t-modal__close r-more" onClick={() => setFileMenu((v) => !v)} aria-haspopup="menu" aria-expanded={fileMenu} aria-label="More" title="More"><DotsIcon /></button>
+            {fileMenu && (
+              <div className="r-menu" role="menu">
+                <button type="button" role="menuitem" className="r-menu__item" onClick={() => { setFileMenu(false); startNew(); }}><PlusIcon /> New certificate</button>
+                <button type="button" role="menuitem" className="r-menu__item" onClick={duplicateFile}><CopyIcon /> Make a copy</button>
+                {canManage && <button type="button" role="menuitem" className="r-menu__item" onClick={() => { setFileMenu(false); setAccessItem(current); }}><UsersIcon /> Manage access</button>}
+                {canManage && <div className="r-menu__rule" />}
+                {canManage && <button type="button" role="menuitem" className="r-menu__item r-menu__item--danger" onClick={() => { setFileMenu(false); setConfirmItem(current); }}><TrashIcon /> Delete file</button>}
+              </div>
+            )}
+          </div>
         </header>
 
         <section className="prop-section">
-          <header className="prop-section-head"><h3>This certificate</h3></header>
           <label className="file-name">
             <span className="acc-label">File name</span>
-            <input className="prop-input" type="text" value={fileTitle} placeholder={defaultTitle(data)} maxLength={120}
+            <input className="prop-input" type="text" value={fileTitle} placeholder={defaultTitle(pages[0])} maxLength={120}
               readOnly={!canEdit} onChange={(e) => { setTouched(true); setFileTitle(e.target.value); }} />
           </label>
+          <p className="file-status">
+            {!current ? 'Not saved yet'
+              : !canEdit ? `View only · owned by ${who(current.savedBy)}`
+              : `${dirty ? 'Unsaved changes' : 'Saved'} · edited by ${who(current.updatedBy)}, ${whenTime(current.updatedAt)} · ${current.access && current.access.general === 'restricted' ? 'Restricted' : 'Everyone can ' + ((current.access && current.access.role) || 'edit')}`}
+          </p>
           {clash && (
             <div className="clash" role="alert">
               <p><strong>{who(clash.updatedBy)} saved a newer version</strong> at {whenTime(clash.updatedAt)}, after you opened this file.</p>
@@ -929,28 +1064,11 @@ function App() {
                 <button type="button" className="r-btn" onClick={loadTheirs}>Load theirs</button>
                 <button type="button" className="r-btn r-btn--danger" onClick={() => save(true)}>Keep mine</button>
               </div>
-              <p className="prop-tip">Load theirs drops your changes. Keep mine replaces theirs.</p>
             </div>
           )}
-          <div className="this-card">
-            <span className="saved-meta">{data.name || 'No name'} · {awardLine(data) || 'No award'}</span>
-            <dl className="this-meta">
-              {current ? (
-                <>
-                  <div><dt>Created</dt><dd>{who(current.savedBy)}, {when(current.savedAt)}</dd></div>
-                  <div><dt>Last edited</dt><dd>{who(current.updatedBy)}, {whenTime(current.updatedAt)}</dd></div>
-                  <div><dt>Status</dt><dd>{!canEdit ? 'View only' : dirty ? 'Unsaved changes' : 'Saved'}</dd></div>
-                  <div><dt>Access</dt><dd title={accessLine(current.access)}>{accessLine(current.access)}</dd></div>
-                </>
-              ) : (
-                <div><dt>Status</dt><dd>Not saved yet</dd></div>
-              )}
-            </dl>
-          </div>
           <div className="right-actions">
-            <button type="button" className="r-btn r-btn--primary" onClick={() => save()}
-              disabled={saveState === 'working' || (current && !dirty) || saved.state === 'error' || !canEdit}
-              title={!canEdit ? 'You can view this certificate. Ask its owner for edit access.' : undefined}>
+            <button type="button" className="r-btn" onClick={() => save()}
+              disabled={saveState === 'working' || (current && !dirty) || saved.state === 'error' || !canEdit}>
               {saveState === 'ok' && !dirty ? <CheckIcon /> : <SaveIcon />}
               {saveState === 'working' ? 'Saving…' : saveState === 'ok' && !dirty ? 'Saved' : saveState === 'err' ? 'Failed. Try again' : !canEdit ? 'View only' : current ? (dirty ? 'Save changes' : 'Saved') : 'Save'}
             </button>
@@ -960,101 +1078,109 @@ function App() {
             </button>
           </div>
           {saveState === 'err' && <p className="prop-tip saved-error">{saveError}</p>}
-          <p className="prop-tip">{current && !dirty
-            ? (current.access && current.access.general === 'restricted'
-              ? 'The link opens this certificate only for the people who have access to it.'
-              : 'The link opens this saved certificate for anyone with access to the tool.')
-            : 'Unsaved, the link carries the details in it. Save first to share the copy everyone edits.'}</p>
-          {canManage && (
-            <div className="right-actions">
-              <button type="button" className="r-btn" onClick={() => setAccessItem(current)}><UsersIcon /> Manage access</button>
-              <button type="button" className="r-btn r-btn--danger-quiet" onClick={() => setConfirmItem(current)}><TrashIcon /> Delete</button>
-            </div>
-          )}
-          {current && !canManage && <p className="prop-tip">Owned by {who(current.savedBy)}. Only they can change who has access or delete it.</p>}
           {linkError && <p className="prop-tip saved-error">{linkError}</p>}
         </section>
 
-        <section className="prop-section saved-section">
-          <header className="prop-section-head saved-head">
-            <h3>Recent files</h3>
-          </header>
-          {saved.state === 'loading' && <p className="prop-tip">Loading the saved list…</p>}
-          {saved.state === 'error' && <p className="prop-tip saved-error">{saved.error}</p>}
-          {saved.state === 'ready' && saved.items.length === 0 && (
-            <p className="prop-tip">Nothing saved yet. Save a certificate and everyone with access to this tool sees it here.</p>
+        <section className="prop-section dl-section">
+          <header className="prop-section-head"><h3>Download</h3></header>
+          <div className="dl-field">
+            <span className="acc-label">File type</span>
+            <PropDropdown value={dl.type} onChange={(v) => setDl((d) => ({ ...d, type: v }))} options={[
+              { value: 'pdf', label: 'PDF, A4 vector (print)' },
+              { value: 'jpg', label: 'JPG image' },
+              { value: 'psd', label: 'PSD, layered' },
+            ]} />
+          </div>
+          {dl.type === 'jpg' && (
+            <div className="dl-field">
+              <span className="acc-label">Quality</span>
+              <div className="prop-segmented acc-general" role="tablist">
+                <button type="button" role="tab" aria-selected={dl.dpi === 300} className={dl.dpi === 300 ? 'active' : ''} onClick={() => setDl((d) => ({ ...d, dpi: 300 }))}>Print, 300 dpi</button>
+                <button type="button" role="tab" aria-selected={dl.dpi === 150} className={dl.dpi === 150 ? 'active' : ''} onClick={() => setDl((d) => ({ ...d, dpi: 150 }))}>Screen, 150 dpi</button>
+              </div>
+            </div>
           )}
-          {saved.state === 'ready' && saved.items.length > 5 && (
-            <input className="prop-input" type="search" value={filter} onChange={(e) => setFilter(e.target.value)} placeholder="Search by name, award or person" />
-          )}
-          {saved.state === 'ready' && shown.length > 0 && (
-            <ul className="saved-list">
-              {shown.slice(0, 8).map((it) => (
-                <li key={it.id} className={`saved-row${current && current.id === it.id ? ' is-on' : ''}`}>
-                  <button type="button" className="saved-open" onClick={() => openItem(it)}>
-                    <span className="saved-name">{titleOf(it)}{it.access && it.access.general === 'restricted' && <span className="saved-tag">Restricted</span>}{it.can && !it.can.edit && <span className="saved-tag">View only</span>}</span>
-                    <span className="saved-meta">{rowMeta(it)}</span>
-                  </button>
-                  {(!it.can || it.can.manage) && (
-                    <button type="button" className="saved-del" onClick={() => setConfirmItem(it)} aria-label={`Delete ${it.data.name || 'certificate'}`} title="Delete">
-                      <TrashIcon />
-                    </button>
-                  )}
-                </li>
+          <div className="dl-field">
+            <span className="acc-label">Pages</span>
+            <div className="prop-segmented dl-which" role="tablist">
+              {[['all', `All (${pages.length})`], ['this', `This page (${activeRef.current + 1})`], ['pick', 'Choose']].map(([k, l]) => (
+                <button key={k} type="button" role="tab" aria-selected={dl.which === k} className={dl.which === k ? 'active' : ''}
+                  onClick={() => setDl((d) => ({ ...d, which: k, picked: k === 'pick' && !d.picked.length ? pages.map((_, i) => i) : d.picked }))}>{l}</button>
               ))}
-            </ul>
-          )}
-          {saved.state === 'ready' && saved.error && <p className="prop-tip saved-error">{saved.error}</p>}
+            </div>
+            {dl.which === 'pick' && (
+              <div className="dl-pick">
+                {pages.map((p, i) => {
+                  const on = dl.picked.includes(i);
+                  return (
+                    <button key={i} type="button" className={`dl-chip${on ? ' is-on' : ''}`} aria-pressed={on}
+                      onClick={() => setDl((d) => ({ ...d, picked: on ? d.picked.filter((x) => x !== i) : [...d.picked, i] }))}>
+                      {i + 1}<span className="dl-chip__name">{p.name || 'Untitled'}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+          <p className="prop-tip">{dl.type === 'pdf' ? 'One A4 file with every chosen page, sharp at any size.'
+            : dl.type === 'jpg' ? `${dl.dpi === 300 ? '2480 × 3508' : '1240 × 1754'} per page. More than one page arrives as a zip.`
+            : 'One layered 300 dpi file per page. More than one page arrives as a zip.'}</p>
+          <button type="button" className={`r-btn r-btn--primary dl-go${job.state === 'err' ? ' is-error' : ''}`} onClick={run} disabled={job.state === 'working'}>
+            {job.state === 'ok' ? <CheckIcon /> : <DownloadIcon />}
+            {job.state === 'working' ? 'Preparing…' : job.state === 'ok' ? 'Downloaded' : job.state === 'err' ? (chosen().length ? 'Failed. Try again' : 'Choose a page') : 'Download'}
+          </button>
         </section>
       </div>
 
       {dialogs}
+      {dropPage != null && (
+        <Modal open size="sm" onClose={() => setDropPage(null)} title={`Delete page ${dropPage + 1}?`}
+          desc={`${pages[dropPage] && pages[dropPage].name ? pages[dropPage].name + "'s certificate" : 'This page'} is removed from the file when you save.`}
+          initialFocus=".t-cancel"
+          foot={<>
+            <button type="button" className="r-btn t-cancel" onClick={() => setDropPage(null)}>Cancel</button>
+            <button type="button" className="r-btn r-btn--danger" onClick={() => deletePage(dropPage)}>Delete page</button>
+          </>} />
+      )}
 
       <main className="preview-col" ref={stageRef}>
         <div className="cert-stage">
           <div className="cert-scale-wrap" style={{ width: CERT.W * scale, height: CERT.H * scale }}>
             <div className="cert-scale" style={{ transform: `scale(${scale})` }}>
-              <Certificate data={data} logoSvg={logoSvg} certRef={certRef} onEdit={canEdit ? onEdit : undefined} />
+              <Certificate key={activeRef.current} data={data} logoSvg={logoSvg} certRef={certRef} onEdit={canEdit ? onEdit : undefined} />
             </div>
           </div>
-          <p className={`cert-caption${overflow ? ' is-warn' : ''}`}>
-            {overflow ? 'The text runs past the panel. Shorten the headline or the citation.' : 'A4 · 210 × 297 mm'}
-          </p>
+          {overflow && <p className="cert-caption is-warn">The text runs past the panel. Shorten the headline or the citation.</p>}
         </div>
       </main>
 
-      <div className="floating-toolbar">
-        <div className="tb-pill">
-          <div className="split-button" ref={menuRef}>
-            <button type="button" className={moreState === 'err' ? 'btn-error' : ''}
-              onClick={() => setMenuOpen((v) => !v)} aria-haspopup="menu" aria-expanded={menuOpen}
-              disabled={job.state === 'working'}>
-              {moreState === 'ok' ? <CheckIcon /> : <DownloadIcon />}
-              {moreState === 'idle' ? 'Download' : label(job.kind, 'Download')}
-              <CaretIcon />
+      {/* the page strip, after Canva's: numbered pages, drag to reorder, + to add */}
+      <nav className="page-strip" aria-label="Pages">
+        {pages.map((p, i) => (
+          <div key={i} className={`page-tile${i === activeRef.current ? ' is-on' : ''}`}
+            draggable={canEdit} onDragStart={() => { dragFrom.current = i; }} onDragOver={(e) => e.preventDefault()}
+            onDrop={() => { movePage(dragFrom.current, i); dragFrom.current = null; }}>
+            <button type="button" className="page-tile__open" onClick={() => setActive(i)} aria-label={`Page ${i + 1}${p.name ? ', ' + p.name : ''}`} aria-current={i === activeRef.current}>
+              <span className="page-tile__sheet" aria-hidden><Certificate data={p} logoSvg={logoSvg} /></span>
             </button>
-            {menuOpen && (
-              <div className="split-menu" role="menu">
-                <button type="button" className="split-menu-item" role="menuitem" onClick={() => run('jpg')}>
-                  <span className="item-main">JPG, 300 dpi</span>
-                  <span className="item-hint">2480 × 3508, for print kiosks and sharing</span>
-                </button>
-                <button type="button" className="split-menu-item" role="menuitem" onClick={() => run('psd')}>
-                  <span className="item-main">PSD, layered</span>
-                  <span className="item-hint">One image layer per part, 300 dpi</span>
-                </button>
-              </div>
+            <span className="page-tile__no">{i + 1}</span>
+            {canEdit && i === activeRef.current && (
+              <span className="page-tile__acts">
+                <button type="button" className="saved-del" onClick={() => duplicatePage(i)} aria-label={`Duplicate page ${i + 1}`} title="Duplicate"><CopyIcon /></button>
+                {pages.length > 1 && <button type="button" className="saved-del" onClick={() => setDropPage(i)} aria-label={`Delete page ${i + 1}`} title="Delete page"><TrashIcon /></button>}
+              </span>
             )}
           </div>
-          <div className="copy-btn-wrap">
-          <button type="button"
-            className={`btn-primary${stateOf('pdf') === 'ok' ? ' copied' : ''}${stateOf('pdf') === 'err' ? ' btn-error' : ''}`}
-            onClick={() => run('pdf')} disabled={job.state === 'working'}>
-            {stateOf('pdf') === 'ok' ? <CheckIcon /> : <DownloadIcon />}
-            {label('pdf', 'Download PDF')}
-          </button>
-          </div>
-        </div>
+        ))}
+        {canEdit && pages.length < 50 && (
+          <button type="button" className="page-add" onClick={addPage} aria-label="Add a page" title="Add a page"><PlusIcon /></button>
+        )}
+        <span className="page-count">{activeRef.current + 1} / {pages.length} · A4</span>
+      </nav>
+
+      {/* off-screen, full-size copies of every page: what the downloads read */}
+      <div className="export-stage" aria-hidden>
+        {pages.map((p, i) => <Certificate key={i} data={p} logoSvg={logoSvg} certRef={(el) => { exportRefs.current[i] = el; }} />)}
       </div>
     </div>
   );

@@ -2,21 +2,21 @@
    Print exports for the award certificate: PDF (A4, vector), JPG
    (300 dpi) and PSD (one raster layer per part, 300 dpi).
 
-   PDF   pdf-lib + fontkit. Everything is drawn as vectors: the frame, the
+   PDF   pdf-lib + fontkit, one file with every chosen page. Everything is drawn as vectors: the frame, the
          panel, the 20 px grid, the logo paths and the text, as glyph outlines
          shaped by fontkit (kerning and the signature's joined forms), over an
          invisible text layer in the embedded fonts so it stays searchable. Word positions are
          read off the live preview, so the PDF breaks lines exactly where
          the preview does. The blue is #0072CE in RGB, the same as the JPG
          and PSD: as CMYK 100 45 0 19 it previewed a dull navy on screen.
-   JPG   html-to-image at 300/72, resampled to exactly 2480 × 3508, with
+   JPG   per page (a zip past one), 300 or 150 dpi; html-to-image at dpi/72, resampled to exactly 2480 × 3508, with
          300 dpi written into the JFIF header so print dialogs size it A4.
    PSD   ag-psd. Each data-layer of the certificate is captured on its own
          (the rest hidden) and cropped to its bounds; the composite is the
          same image as the JPG.
    ───────────────────────────────────────────────────────────────── */
 (function () {
-  const BASE = '/internal/award-certificate/assets/fonts/';
+  const BASE = '/internal/certificate-creator/assets/fonts/';
   const FONT_FILES = {
     display: BASE + 'VertGroteskDisplay-Bold.ttf',
     body: BASE + 'Inter-Regular.ttf',
@@ -75,12 +75,11 @@
   }
 
   /* ── PDF ──────────────────────────────────────────────────────── */
-  async function exportPdf(certEl, opts) {
-    const { PDFDocument, rgb } = window.PDFLib;
-    const C = window.CERT;
-    const W = C.W, H = C.H;
+  /* One file, every page (pages arrive as their rendered sheets, in order). */
+  async function exportPdf(certEls, opts) {
+    const { PDFDocument } = window.PDFLib;
+    const els = Array.isArray(certEls) ? certEls : [certEls];
     await document.fonts.ready;
-
     const doc = await PDFDocument.create();
     doc.registerFontkit(window.fontkit);
     const fonts = {};
@@ -90,6 +89,19 @@
       // full embed: pdf-lib's subsetter drops glyphs from these cuts (seen 5 Oct 2026)
       fonts[key] = await doc.embedFont(await fontBytes(key), { subset: false });
     }
+    for (const el of els) drawPage(doc, fonts, shapers, el, opts);
+    doc.setTitle(opts.title || 'Gushwork certificate');
+    doc.setAuthor('Gushwork');
+    doc.setCreator('Gushwork design hub · Certificate Creator');
+    doc.setProducer('pdf-lib');
+    const bytes = await doc.save();
+    save(new Blob([bytes], { type: 'application/pdf' }), opts.filename + '.pdf');
+  }
+
+  function drawPage(doc, fonts, shapers, certEl, opts) {
+    const { rgb } = window.PDFLib;
+    const C = window.CERT;
+    const W = C.W, H = C.H;
     const page = doc.addPage([W, H]);
     const blueRgb = hexRgb(C.blue);
     const BLUE = rgb(blueRgb[0] / 255, blueRgb[1] / 255, blueRgb[2] / 255);   // #0072CE; cmyk(1, .45, 0, .19) previews navy
@@ -208,13 +220,6 @@
     // exact A4
     page.setSize(A4_PT.w, A4_PT.h);
     page.scaleContent(A4_PT.w / W, A4_PT.h / H);
-
-    doc.setTitle(opts.title || 'Gushwork award certificate');
-    doc.setAuthor('Gushwork');
-    doc.setCreator('Gushwork design hub · award certificate');
-    doc.setProducer('pdf-lib');
-    const bytes = await doc.save();
-    save(new Blob([bytes], { type: 'application/pdf' }), opts.filename + '.pdf');
   }
 
   /* ── Raster capture ───────────────────────────────────────────── */
@@ -224,24 +229,37 @@
     return fontCssPromise;
   }
 
-  async function capture(certEl) {
+  async function capture(certEl, dpi = DPI) {
     await document.fonts.ready;
     const fontEmbedCSS = await fontCss(certEl);
     const raw = await window.htmlToImage.toCanvas(certEl, {
-      pixelRatio: DPI / 72,
+      pixelRatio: dpi / 72,
       width: window.CERT.W,
       height: window.CERT.H,
       fontEmbedCSS,
       cacheBust: false,
     });
+    const px = sizeAt(dpi);
     const out = document.createElement('canvas');
-    out.width = A4_PX.w;
-    out.height = A4_PX.h;
+    out.width = px.w;
+    out.height = px.h;
     const ctx = out.getContext('2d');
     ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(raw, 0, 0, A4_PX.w, A4_PX.h);
+    ctx.drawImage(raw, 0, 0, px.w, px.h);
     return out;
   }
+
+  /* A4 in pixels at a resolution: 2480 × 3508 at 300, 1240 × 1754 at 150 */
+  function sizeAt(dpi) { return { w: Math.round((210 / 25.4) * dpi), h: Math.round((297 / 25.4) * dpi) }; }
+
+  /* Several files leave as one zip, named page by page */
+  async function deliver(files, filename) {
+    if (files.length === 1) { save(files[0].blob, files[0].name); return; }
+    const zip = new window.JSZip();
+    files.forEach((f) => zip.file(f.name, f.blob));
+    save(await zip.generateAsync({ type: 'blob' }), filename + '.zip');
+  }
+  const pageName = (opts, i, n, ext) => (n > 1 ? `${opts.filename}-page-${(opts.numbers && opts.numbers[i]) || i + 1}.${ext}` : `${opts.filename}.${ext}`);
 
   /* Canvas JPEGs say 72 or 96 dpi; write 300 into the JFIF APP0 so a print
      dialog sizes the file as A4. Adds an APP0 if the encoder left one out. */
@@ -262,15 +280,29 @@
     return out;
   }
 
-  async function exportJpg(certEl, opts) {
-    const canvas = await capture(certEl);
-    const blob = await new Promise((res) => canvas.toBlob(res, 'image/jpeg', 0.95));
-    const bytes = withDpi(await blob.arrayBuffer(), DPI);
-    save(new Blob([bytes], { type: 'image/jpeg' }), opts.filename + '.jpg');
+  async function exportJpg(certEls, opts) {
+    const els = Array.isArray(certEls) ? certEls : [certEls];
+    const dpi = opts.dpi || DPI;
+    const files = [];
+    for (let i = 0; i < els.length; i++) {
+      const canvas = await capture(els[i], dpi);
+      const blob = await new Promise((res) => canvas.toBlob(res, 'image/jpeg', 0.95));
+      files.push({ name: pageName(opts, i, els.length, 'jpg'), blob: new Blob([withDpi(await blob.arrayBuffer(), dpi)], { type: 'image/jpeg' }) });
+    }
+    await deliver(files, opts.filename);
   }
 
   /* ── PSD ──────────────────────────────────────────────────────── */
-  async function exportPsd(certEl, opts) {
+  async function exportPsd(certEls, opts) {
+    const els = Array.isArray(certEls) ? certEls : [certEls];
+    const files = [];
+    for (let i = 0; i < els.length; i++) {
+      files.push({ name: pageName(opts, i, els.length, 'psd'), blob: await psdOf(els[i]) });
+    }
+    await deliver(files, opts.filename);
+  }
+
+  async function psdOf(certEl) {
     const composite = await capture(certEl);
     const ratio = A4_PX.w / window.CERT.W;
     const k = scaleOf(certEl);
@@ -315,7 +347,7 @@
       },
     };
     const buf = window.agPsd.writePsd(psd, { generateThumbnail: false });
-    save(new Blob([buf], { type: 'image/vnd.adobe.photoshop' }), opts.filename + '.psd');
+    return new Blob([buf], { type: 'image/vnd.adobe.photoshop' });
   }
 
   window.CertExport = { exportPdf, exportJpg, exportPsd, LAYERS };

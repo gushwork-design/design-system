@@ -248,7 +248,7 @@ body {
 }
 .panel-mini .brand-link { display: block; flex-shrink: 0; border-radius: var(--gw-radius-8); line-height: 0; color: inherit; }
 .panel-mini .brand-icon { width: 32px; height: 32px; border-radius: var(--gw-radius-8); display: block; }
-:root[data-theme="dark"] .panel-mini .brand-icon { box-shadow: 0 0 0 1px var(--gw-color-neutral-800); }
+
 .panel-mini__name {
   min-width: 0;
   font-family: var(--gw-font-display);
@@ -1126,10 +1126,11 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; appe
   background-position: center !important;
 }
 
-/* The logo tile is #0D0D0D, the same as the dark panel, so its edge disappears. The hub's
-   own favicon and login tile carry a hairline (Neutral/800); the tile gets the same ring in
-   dark. The tile already clips to radius/8, so the ring follows it. */
-:root[data-theme="dark"] .brand-card .brand-icon { box-shadow: 0 0 0 1px var(--gw-color-neutral-800); }
+/* The logo tile is brand blue on every tool (Utsav, 5 Oct 2026; it was Flat Black with a ring in
+   dark). The fill comes from the token, so the tile and the hub's blue cannot drift apart; the
+   SVG's own fill is the same value, for a tool that loads before the tokens. Blue reads on both
+   the white and the black panel, so the dark-theme ring is gone. */
+.brand-icon__bg { fill: var(--gw-color-primary-500); }
 
 /* Remove background (ID card): the switch and its progress share one line. The progress reads
    to the right of the toggle — spinner and percentage — instead of stacking underneath. */

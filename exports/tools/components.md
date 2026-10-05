@@ -23,7 +23,7 @@ The floating, collapsible panel a tool keeps its controls in.
 | Border | 1px `--t-panel-border` |
 | Light fill | white |
 | Dark fill | black, hairline `neutral/900` |
-| Header | the 32 Gushwork logo (radius 8; a 1px `neutral/800` ring in dark) as a link back to Tools, the tool's name in Vert Grotesk Display 16, collapse button right; padding 12 12 12 16, a hairline beneath |
+| Header | the 32 Gushwork logo on **Brand Blue** (`--gw-color-primary-500`, radius 8; blue since 5 Oct 2026) as a link back to Tools, the tool's name in Vert Grotesk Display 16, collapse button right; padding 12 12 12 16, a hairline beneath |
 | Collapse button | 24 square, radius 4, 12 icon |
 | Collapsed | the panel folds to its own header, `.panel-mini`: the logo tile (linked to Tools), the tool's name and the reopen button (28, outlined), floating where the panel was, inset 12; padding 12 12 12 16, gap 12, radius 20 (8 + 12), the panel's fill, border and `s3`. Utsav, 5 Oct 2026: the tool keeps its logo and name while the preview has the screen |
 
@@ -77,12 +77,23 @@ and never as an unlabelled wait.
 
 ## tool-saved-list
 
-A **Save and share panel on the right**, a full-height mirror of the editor panel (Utsav, 5 Oct
-2026). First used by the award certificate generator (`web/internal/award-certificate/`), where HR's
-saved certificates are shared through `/api/certificates`. **New, pending review.**
+The **right panel of a file-keeping tool** (Save, share, download), a full-height mirror of the
+editor panel. First used by Certificate Creator (`web/internal/certificate-creator/`). Simplified
+5 Oct 2026 (Utsav): only the file and its download show; everything else sits behind ⋯. **New, pending review.**
 
 | Property | Value |
 |---|---|
+| Panel | a second `tool-panel` on the right: inset 12, 360 wide, radius 20, full height; the preview centres between the panels; both collapse together |
+| Header | "All files" (28, outlined, back arrow) left; a 28 ⋯ button right opening the file menu |
+| File menu | the hub menu shape (radius 12, padding 4, 32 rows, `s3`): New certificate, Make a copy, Manage access, a hairline, Delete file in the danger colour. Owner-only rows hide for others |
+| File | File name (a field), then one status line in `body-12-reg` `--t-label`: "Saved · edited by Utsav, 22:29 · Everyone can edit" (or Not saved yet, or View only · owned by …); a clash notice when someone saved first (Load theirs, Keep mine) |
+| Actions | Save and Copy link, side by side, outlined (36, radius 12) |
+| Download | a section: File type (dropdown: PDF A4 vector, JPG, PSD layered), Quality for JPG (Print 300 dpi / Screen 150 dpi), Pages (All · This page · Choose, then page chips), one line on what arrives, and Download (36, black; white in dark, full width) |
+| Share dialog / delete | the library modal and confirm dialog, unchanged |
+
+Source: `web/internal/certificate-creator/styles.css`, the "Right panel, simplified" block.
+
+---|---|
 | Panel | a second `tool-panel` on the right: inset 12, 360 wide, radius 20, the same border and shadow, full height; the preview and the action pill centre between the two panels; Appearance and Help move left of it; both collapse together |
 | Header | "Save and share" in the panel title style (Vert 16 semibold), the same 57 row and hairline as the editor; "New certificate" (28, outlined) right while an item is open |
 | This certificate | a card on `--t-field-bg` with a `--t-field-border` hairline, radius 12: name, award, then Created (who, date), Last edited (who, date and time), Status (Saved, Unsaved changes, Not saved yet) |
@@ -93,23 +104,38 @@ saved certificates are shared through `/api/certificates`. **New, pending review
 | Delete | never on one click: opens the library's **confirm dialog** (sm 400, alertdialog): the title names it ("Delete Ajith's certificate?"), a sentence on the consequence, the lost item listed, Cancel focused by default, then "Delete certificate" (red label and edge, no fill) |
 | Saved list | rows: name (`body-14-med`) with a Restricted or View only tag (20 tall pill), award, "Saved by who, date", and "Edited by who, date" when it was edited; padding 4, radius 12; current on the field fill; hover neutral; search past 5 items |
 
-Source: `web/internal/award-certificate/styles.css`, the "Save and share" block.
+Source: `web/internal/certificate-creator/styles.css`, the "Save and share" block.
 
 ---
 
 ## tool-files-home
 
-A tool's **Files page**, for tools whose work is kept and shared as files (first: the award
-certificate generator, Utsav, 5 Oct 2026). After Canva's projects page (Mobbin). **New, pending review.**
+A file-keeping tool's **home**, after Google Docs' home (Utsav, 5 Oct 2026). **New, pending review.**
 
 | Property | Value |
 |---|---|
-| Page | max 1200, padding 16, the tool canvas; the hub's Appearance and Help top-right |
-| Bar | the 32 logo tile linked to Tools, the page title in `h6`, the primary "New certificate" (36, black; white in dark) |
-| Tools row | a tab-group (All, Mine, Shared with me, each with a count), search (320), sort dropdown (Newest edited, Oldest edited, Name A to Z, Z to A), a grid / list switch (remembered on the device) |
-| Grid card | radius 16, the panel fill and border; a 300 tall thumbnail well on the field fill with the live file at 0.32; title (`body-14-med`, one line), "Edited 2 min ago · Priya" and the people avatars on one line; Restricted / View only tags top-left; Share and Delete icon buttons top-right on hover for the owner |
-| List | a table in the same card shape: a 36 wide live thumbnail, title and award, People (24 avatars, overlapping by 4), Access, Edited, the owner's actions on hover |
-| Avatars | 24 circles on the field fill with a 2px ring in the panel colour, the first letter of the first name; "+n" past three |
-| States | loading, empty (dashed 16 radius well, a line and New certificate), nothing matches |
+| Top | the 32 blue logo tile linked to Tools, the tool's name (Vert 16 semibold), a 44 tall pill search (field fill, radius full, max 720) centred |
+| Template band | full width on the panel fill with hairlines: "Start a new certificate" (`body-16-sem`), then tiles 144 wide: a 144 × 204 live thumbnail (radius 8, hover: heading-colour edge and `s3`), the name (`body-14-med`) and the family (`body-12-reg`). The first tile is Blank (the layout faded, a blue + on a white disc). Future template families join this row |
+| Recent | "Recent certificates", then Owned by (anyone / me / not me), sort (Last edited, Oldest first, Name A to Z) and one grid / list toggle (36 icon button) |
+| Card | radius 16, the panel fill and border; a 240 tall well with the live file at 0.25; the title; one meta line: shared or lock icon, "3 pages · 2 min ago", and a ⋮ menu (Open, Make a copy, Manage access, Delete) |
+| List | a table: a mini live thumbnail, title, page count and award; Owner; Last edited; the ⋮ menu |
+| Empty | "No certificates yet" and "Select a blank certificate or choose a template above to get started" |
 
-Source: `web/internal/award-certificate/` (`FilesHome` in app.jsx, the "Files home" blocks in styles.css).
+Source: `web/internal/certificate-creator/` (`FilesHome` and `CardMenu` in app.jsx, "Files home v2" in styles.css).
+
+---
+
+## tool-page-strip
+
+The **page strip** under the sheet when a file has pages, after Canva's (Mobbin). **New, pending review.**
+
+| Property | Value |
+|---|---|
+| Place | fixed 12 above the bottom, between the two panels, centred, scrolling sideways past the width |
+| Page | a 72 × 102 live thumbnail (radius 4, `s2`) in a 2px frame (radius 8): clear, `--t-border-strong` on hover, `--t-heading` when current; the page number in a small panel-coloured tag bottom-left |
+| Current page | Duplicate and Delete as 24 icon buttons on its top-right corner; Delete asks first (the confirm dialog, sm) |
+| Add | a 76 × 106 dashed tile with a + ; a new page takes the default template and keeps the period and the signatory |
+| Order | drag a page onto another to move it |
+| Count | "2 / 4 · A4" in `body-12-med` `--t-label` |
+
+Source: `web/internal/certificate-creator/` (the page strip in app.jsx, "Page strip" in styles.css).

@@ -95,6 +95,15 @@ The email signature creator and the employee ID card generator were redesigned i
     component change" (Utsav, 5 Oct 2026). The bare 36 reopen button became `.panel-mini`: the logo
     tile, the tool's name and the reopen button, in the panel's own surface, on every tool.
 
+30. **The logo tile is brand blue on every tool.** "Keep the gushwork logo frame blue in all tools
+    (component change in library)" (Utsav, 5 Oct 2026). The tile's fill is `--gw-color-primary-500`
+    through `.brand-icon__bg`; the dark-theme ring went with the black.
+31. **A tool's work can be a file of pages.** Certificate Creator (renamed from the award
+    certificate generator) keeps certificates as files, each a set of pages, made from a template
+    band and opened from a Files home after Google Docs. The page strip sits under the sheet after
+    Canva's; downloads live in the right panel (PDF, JPG, PSD; all, this or chosen pages; quality);
+    the file's other actions sit behind ⋯ so Delete is not loud (Utsav, 5 Oct 2026).
+
 ## Left open (the owner's call)
 
 - **A third typeface in the signature preview** (Plus Jakarta Sans). In the artefact, not the chrome.

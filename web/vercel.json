@@ -4,13 +4,23 @@
   "trailingSlash": false,
   "redirects": [
     {
+      "source": "/internal/award-certificate",
+      "destination": "/internal/certificate-creator",
+      "permanent": false
+    },
+    {
+      "source": "/internal/award-certificate/",
+      "destination": "/internal/certificate-creator",
+      "permanent": false
+    },
+    {
       "source": "/internal/staging/award-certificate",
-      "destination": "/internal/award-certificate",
+      "destination": "/internal/certificate-creator",
       "permanent": false
     },
     {
       "source": "/internal/staging/award-certificate/",
-      "destination": "/internal/award-certificate",
+      "destination": "/internal/certificate-creator",
       "permanent": false
     },
     {
