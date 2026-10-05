@@ -764,7 +764,6 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .rv-tab:hover { color: var(--ul-value); }
 .rv-tab.is-on { color: var(--ul-value); box-shadow: inset 0 -2px 0 var(--ul-value); }
 .rv-tab:focus-visible { outline: var(--gw-focus-ring); outline-offset: 2px; border-radius: var(--gw-radius-4); }
-.rv-tabs .rv-tabs__gh { margin-left: auto; font: 500 12.5px/1.4 var(--gw-font-body); color: var(--ul-sub); }
 .rv-tl { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--gw-space-16); }
 .rv-cm__m { min-width: 0; }
 .rv-cm__h { margin-bottom: 4px; }
@@ -1857,7 +1856,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     var tabs = '<div class="rv-tabs" role="tablist">' +
       '<button type="button" role="tab" class="rv-tab' + (tab === 'comments' ? ' is-on' : '') + '" aria-selected="' + (tab === 'comments') + '" data-tab="comments">Comments' + (cms.length ? ' <span>' + cms.length + '</span>' : '') + '</button>' +
       '<button type="button" role="tab" class="rv-tab' + (tab === 'all' ? ' is-on' : '') + '" aria-selected="' + (tab === 'all') + '" data-tab="all">All activity' + (nAll ? ' <span>' + nAll + '</span>' : '') + '</button>' +
-      (t.url ? '<a class="rv-link rv-tabs__gh" href="' + esc(t.url) + '" target="_blank" rel="noopener">On GitHub</a>' : '') + '</div>';
+      '</div>';   // no "On GitHub" link: the drawer holds the whole thread (Utsav, 5 Oct 2026)
     box.innerHTML = tabs +
       (html ? '<ol class="rv-tl">' + html + '</ol>' : '<p class="rv-th__empty">' + (tab === 'comments' ? 'No comments yet. Your send-back note starts the thread, and Alfred replies after every rework.' : 'Nothing has happened to this item yet.') + '</p>') +
       (t.error && tab === 'comments' ? '<p class="rv-th__empty">' + esc(t.error) + '</p>' : '') + (talk ? reply : '');
