@@ -1063,7 +1063,8 @@
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "8f731a8d392e3da4"
+      "fingerprint": "14bfd5da4325c549",
+      "previewFingerprint": "96a4187e7957d485"
     },
     "metric-strip": {
       "reviewed": "passed",
