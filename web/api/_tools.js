@@ -15,7 +15,7 @@ import { COOKIE, verify, readCookie, sessionSecret } from './_session.js';
 import { loadRules, ruleFor, decide, describeAccess } from './_access.js';
 
 const TOOLS = [
-  '/internal/email-signature', '/internal/employee-id-card',
+  '/internal/email-signature', '/internal/employee-id-card', '/internal/award-certificate',
   /* The five templates. Each is the preview page under /internal/templates/, so a rule set on
      one gates that preview, and a rule on /internal/templates gates the list and all five. */
   '/internal/templates/ad-page', '/internal/templates/ad-page-signup', '/internal/templates/case-study',

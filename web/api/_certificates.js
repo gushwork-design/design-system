@@ -22,7 +22,7 @@ import { loadRules, decide } from './_access.js';
 
 const KEY = 'gw:certs';
 const MAX_ITEMS = 1000;
-/* Staging today; the live path is listed now so moving the tool needs no change here. */
+/* Live at /internal/award-certificate since 5 Oct 2026; the old staging path stays so a rule set on it still counts. */
 const TOOL_PATHS = ['/internal/staging/award-certificate', '/internal/award-certificate'];
 const FIELDS = {
   preset: 40, name: 80, headline: 200, before: 400, award: 120, after: 400,
