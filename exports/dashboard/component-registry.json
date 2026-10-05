@@ -488,6 +488,12 @@
       "breaking": false,
       "doc": "inputs.md"
     },
+    "shortcut-key": {
+      "version": "2.0.0",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "actions.md"
+    },
     "sidebar": {
       "version": "2.0.0",
       "changed": "2026-10-03",
