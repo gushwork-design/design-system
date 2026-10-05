@@ -1286,6 +1286,7 @@
   .gd-fbuilder__none { margin: 0; font: var(--gw-text-body-12-reg); color: var(--gd-text-muted); }
   .gd-fbuilder__foot { display: flex; align-items: center; gap: var(--gw-space-8); }
   .gd-fbuilder__foot > .gd-fbuilder__sp { flex: 1 1 auto; }
+  .gd-fbuilder__foot > .gd-btn--ghost:first-child { margin-left: calc(var(--gw-space-12) * -1); }   /* the ghost button's own 12px padding no longer pushes "Add filter" in from the Where / And labels */
 
   /* ===================================================== saved-views ===== */
   .gd-views { display: flex; align-items: center; gap: var(--gw-space-4); flex-wrap: wrap; padding: 0 var(--gw-space-12); }
