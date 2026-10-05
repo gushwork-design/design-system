@@ -385,6 +385,8 @@ body[data-gw-page="analytics"] .sg__main > * { min-width: 0; }
   font: var(--gw-text-button-12); background: var(--ul-b-no-bg); color: var(--ul-b-no-fg); }
 .ul-badge--ok { background: var(--ul-b-ok-bg); color: var(--ul-b-ok-fg); }
 .ul-badge--bad { background: var(--gw-color-red-alpha-10); color: var(--gw-color-red-600); }
+.ul-badge--warn { background: var(--gw-color-yellow-alpha-10); color: var(--gw-color-yellow-600); }
+:root[data-theme="dark"] .ul-badge--warn { color: var(--gw-color-yellow-300); }
 /* New visitor: first seen in the last 7 days. Primary tint, like the other badges' Alpha/10 fill with a /600 label (/400 in dark). */
 .ul-badge--new { background: var(--gw-color-primary-alpha-10); color: var(--gw-color-primary-600); height: 20px; flex: none; }
 :root[data-theme="dark"] .ul-badge--new { color: var(--gw-color-primary-400); }
@@ -541,6 +543,7 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
         <button class="ul-tab" role="tab" data-tab="insights" aria-selected="true">Insights</button>
         <button class="ul-tab" role="tab" data-tab="usage" aria-selected="false">Usage</button>
         <button class="ul-tab" role="tab" data-tab="visits" aria-selected="false">Visits</button>
+        <button class="ul-tab" role="tab" data-tab="bruce" aria-selected="false">Bruce</button>
       </div>
       <label class="an-me" id="an-me" title="Leaves your own rows out of every tab">
         <input type="checkbox" id="an-me-box">
@@ -724,6 +727,42 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
         <div class="ul-sh"><div class="ul-sh__t"><h2 id="vs-h-recent">Recent</h2><span class="ul-sh__q" id="vs-q-recent"></span></div></div>
         <div class="ul-scroll vs-t" id="vs-recent"></div>
         <div class="vs-more" id="vs-more"></div>
+      </section>
+    </div>
+
+  </section>
+
+    <!-- Bruce (R55 addendum, 5 Oct 2026): every turn Bruce was asked for in Slack, who asked, and what it cost in runs. -->
+    <section class="an-panel" id="an-bruce" role="tabpanel" hidden>
+
+    <div class="ul-bar" id="br-bar">
+      <div class="vs-areas">
+        <div class="ul-tabs" role="tablist" aria-label="Period">
+          <button class="ul-tab" role="tab" data-period="7"  aria-selected="false">7 days</button>
+          <button class="ul-tab" role="tab" data-period="30" aria-selected="true">30 days</button>
+          <button class="ul-tab" role="tab" data-period="all" aria-selected="false">All time</button>
+        </div>
+      </div>
+      <div class="ul-refresh">
+        <span class="ul-refresh__t" id="br-updated" aria-live="polite"></span>
+        <button class="gw-iconbtn" id="br-refresh" type="button" aria-label="Refresh" data-tip="Refresh" data-tip-end></button>
+      </div>
+    </div>
+
+    <div id="br-blocked" hidden></div>
+
+    <div id="br-app">
+      <div class="ul-metrics" id="br-metrics"></div>
+
+      <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="br-h-people">
+        <div class="ul-sh"><div class="ul-sh__t"><h2 id="br-h-people">People</h2><span class="ul-sh__q" id="br-q-people"></span></div></div>
+        <div class="ul-scroll vs-t" id="br-people"></div>
+      </section>
+
+      <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="br-h-recent">
+        <div class="ul-sh"><div class="ul-sh__t"><h2 id="br-h-recent">Recent</h2><span class="ul-sh__q" id="br-q-recent"></span></div></div>
+        <div class="ul-scroll vs-t" id="br-recent"></div>
+        <div class="vs-more" id="br-more"></div>
       </section>
     </div>
 
@@ -2237,9 +2276,143 @@ window.__anRefilter = {};
 </script>
 
 <script>
+/* Bruce. Reads /api/bruce-memory?log=1 (owner only): one row per turn Bruce was asked for in Slack. A "run" spent one
+   cloud session on Utsav's account; "capped" is an ask refused at the daily cap; "to Alfred" is a reply passed to an
+   item's thread; "failed" is a run that did not start. People are Slack display names, not emails, so the Hide-my-
+   activity switch hides the owner's Slack id instead. */
 (function () {
   'use strict';
-  var TABS = ['insights', 'usage', 'visits'], started = {};
+  var ROOT = document.getElementById('an-bruce');
+  var API = '/api/bruce-memory?log=1';
+  var ICON = { 'arrow-clockwise': '<path d="M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z"/>' };
+  function icon(n) { return '<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">' + (ICON[n] || '') + '</svg>'; }
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+  function $(id) { return document.getElementById(id); }
+  function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
+  var DAY = 86400000;
+  function ago(ms) {
+    var s = Math.max(0, Math.round(ms / 1000));
+    if (s < 60) return s + 's ago';
+    var m = Math.round(s / 60); if (m < 60) return m + ' min ago';
+    var h = Math.round(m / 60); if (h < 48) return h + ' h ago';
+    return Math.round(h / 24) + ' days ago';
+  }
+  function fmtWhen(d) { return d.toLocaleString(undefined, { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }); }
+  var KIND = { run: 'Run', capped: 'Capped', 'to-alfred': 'To Alfred', failed: 'Failed' };
+  var S = { status: 'loading', rows: [], rowsAll: [], period: '30', page: 1, per: 25, busy: false, fetchedAt: 0, owner: '', cap: 3 };
+  var ICON_NAV = { 'arrow-left': '<path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"/>',
+    'arrow-right': '<path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/>' };
+  function navIcon(n) { return '<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">' + ICON_NAV[n] + '</svg>'; }
+
+  function parse(raw) {
+    var out = [];
+    raw.forEach(function (r) {
+      var d = new Date(r.at); if (isNaN(d.getTime())) return;
+      out.push({ at: d, user: String(r.user || ''), name: String(r.name || r.user || ''), role: r.role === 'owner' ? 'owner' : 'teammate',
+        kind: KIND[r.kind] ? r.kind : 'run', thread: !!r.thread, text: String(r.text || '') });
+    });
+    return out;
+  }
+  function hideMe(rows) { return window.anMe.on && S.owner ? rows.filter(function (r) { return r.user !== S.owner; }) : rows; }
+  function scoped() {
+    var cut = S.period === 'all' ? 0 : Date.now() - (+S.period) * DAY;
+    return S.rows.filter(function (r) { return r.at.getTime() >= cut; });
+  }
+  function metric(label, value, note) {
+    return '<div class="ul-metric"><span class="ul-lab">' + esc(label) + '</span><div class="ul-metric__body"><span class="ul-num">' + esc(value) +
+      '</span><span class="ul-note">' + esc(note) + '</span></div></div>';
+  }
+  function th(t) { return '<div role="columnheader"><span class="ul-th"><span class="ul-th--plain">' + esc(t) + '</span></span></div>'; }
+  function cell(t, cls, title) { return '<div class="ul-c ' + (cls || '') + '" role="cell" title="' + esc(title || t) + '">' + esc(t) + '</div>'; }
+  function who(r) { return '<div class="ul-c ul-c--whotag" role="cell" title="' + esc(r.user) + '"><span>' + esc(r.name) + '</span>' + (r.role === 'owner' ? '<span class="ul-badge">Owner</span>' : '') + '</div>'; }
+  function kindCell(k) { var cls = k === 'capped' ? ' ul-badge--warn' : k === 'failed' ? ' ul-badge--bad' : k === 'run' ? ' ul-badge--ok' : ''; return '<div class="ul-c" role="cell"><span class="ul-badge' + cls + '">' + esc(KIND[k]) + '</span></div>'; }
+  function table(cols, heads, rows, empty) {
+    return '<div class="ul-tbl" role="table" style="--vs-cols:' + cols + '"><div class="ul-row ul-row--h" role="row">' + heads.map(th).join('') + '</div>' +
+      (rows.length ? rows.join('') : '<div class="ul-empty"><div class="ul-empty__copy"><h2>' + esc(empty) + '</h2></div></div>') + '</div>';
+  }
+
+  function renderAll() {
+    var rows = scoped();
+    var runs = rows.filter(function (r) { return r.kind === 'run'; });
+    var capped = rows.filter(function (r) { return r.kind === 'capped'; });
+    var people = {};
+    rows.forEach(function (r) {
+      var p = people[r.user] || (people[r.user] = { user: r.user, name: r.name, role: r.role, runs: 0, capped: 0, last: r.at });
+      if (r.kind === 'run') p.runs++; if (r.kind === 'capped') p.capped++; if (r.at > p.last) p.last = r.at;
+    });
+    var plist = Object.keys(people).map(function (k) { return people[k]; }).sort(function (a, b) { return b.runs - a.runs || b.last - a.last; });
+    var today = new Date().toISOString().slice(0, 10);
+    var todayRuns = S.rows.filter(function (r) { return r.kind === 'run' && r.at.toISOString().slice(0, 10) === today; }).length;
+    var lastAt = rows.length ? rows.reduce(function (m, r) { return r.at > m ? r.at : m; }, rows[0].at) : null;
+    $('br-metrics').innerHTML =
+      metric('Runs', String(runs.length), 'each one a cloud session on your account, ' + todayRuns + ' today') +
+      metric('People', String(plist.length), lastAt ? 'last ask ' + ago(Date.now() - lastAt.getTime()) : 'nobody has asked yet') +
+      metric('Hit the cap', String(capped.length), capped.length ? (function (n) { return n + (n === 1 ? ' person' : ' people'); })(Object.keys(capped.reduce(function (o, r) { o[r.user] = 1; return o; }, {})).length) + ' asked past ' + S.cap + ' a day' : 'the cap is ' + S.cap + ' a day each');
+
+    $('br-q-people').textContent = plist.length + (plist.length === 1 ? ' person' : ' people') + ', most runs first';
+    $('br-people').innerHTML = table('minmax(200px,1.6fr) 90px 110px minmax(120px,1fr)', ['Person', 'Runs', 'Hit the cap', 'Last ask'],
+      plist.map(function (p) { return '<div class="ul-row ul-row--d" role="row">' + who(p) + cell(String(p.runs)) + cell(p.capped ? String(p.capped) : '—') + cell(ago(Date.now() - p.last.getTime()), '', p.last.toISOString()) + '</div>'; }),
+      'Nobody has asked Bruce in this period');
+
+    var recent = rows.slice().sort(function (a, b) { return b.at - a.at; });
+    var pages = Math.max(1, Math.ceil(recent.length / S.per)); S.page = Math.min(S.page, pages);
+    $('br-q-recent').textContent = 'newest first, ' + plural(recent.length, 'turn');
+    $('br-recent').innerHTML = table('150px minmax(160px,1.2fr) 100px minmax(260px,3fr)', ['When', 'Person', 'Kind', 'What they asked'],
+      recent.slice((S.page - 1) * S.per, S.page * S.per).map(function (r) {
+        return '<div class="ul-row ul-row--d" role="row">' + cell(fmtWhen(r.at), '', r.at.toISOString()) + who(r) + kindCell(r.kind) +
+          cell((r.thread ? '\u21b3 ' : '') + (r.text || '\u2014'), '', r.text) + '</div>';
+      }), 'Nothing in this period');
+    /* The same pager as the Usage log: page count and two arrow buttons, outside the table's scroller. */
+    $('br-more').innerHTML = pages > 1 ? '<div class="ul-pg" style="width:100%"><div class="ul-pg__l"><span class="ul-pg__t">' + S.per + ' per page</span></div>' +
+      '<div class="ul-pg__r"><span class="ul-pg__t">Page ' + S.page + ' of ' + pages + '</span>' +
+      '<button class="ul-ib" id="br-prev" type="button" aria-label="Previous page"' + (S.page <= 1 ? ' disabled' : '') + '>' + navIcon('arrow-left') + '</button>' +
+      '<button class="ul-ib" id="br-next" type="button" aria-label="Next page"' + (S.page >= pages ? ' disabled' : '') + '>' + navIcon('arrow-right') + '</button></div></div>' : '';
+    var pv = $('br-prev'), nx = $('br-next');
+    if (pv) pv.addEventListener('click', function () { S.page--; renderAll(); });
+    if (nx) nx.addEventListener('click', function () { S.page++; renderAll(); });
+  }
+  function renderBlocked(kind) {
+    var copy = { signin: ['Sign in to see this', 'Bruce\u2019s log is for the owner.'], forbidden: ['Owners only', 'Bruce\u2019s log shows who asked him what. Only an owner can see it.'],
+      unconfigured: ['No store connected', 'The site has no KV store, so nothing is logged yet.'], error: ['Could not load the log', 'Try again in a moment.'] }[kind];
+    $('br-blocked').innerHTML = '<div class="ul-empty"><div class="ul-empty__copy"><h2>' + esc(copy[0]) + '</h2><p>' + esc(copy[1]) + '</p></div></div>';
+    $('br-blocked').hidden = false; $('br-app').hidden = true;
+  }
+  function render() {
+    if (S.status === 'ready' || S.status === 'empty' || S.status === 'loading') { $('br-blocked').hidden = true; $('br-app').hidden = false; renderAll(); }
+    else renderBlocked(S.status);
+    ROOT.querySelectorAll('.ul-tab[data-period]').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-period') === S.period)); });
+    updated();
+  }
+  function updated() { $('br-updated').textContent = S.fetchedAt ? 'Updated ' + ago(Date.now() - S.fetchedAt) : ''; }
+  function load() {
+    if (S.busy) return; S.busy = true; $('br-refresh').setAttribute('aria-busy', 'true');
+    fetch(API, { credentials: 'same-origin', cache: 'no-store' }).then(function (r) {
+      if (r.status === 401) { S.status = 'signin'; return null; }
+      if (r.status === 403) { S.status = 'forbidden'; return null; }
+      if (!r.ok) throw new Error('http ' + r.status);
+      return r.json();
+    }).then(function (j) {
+      if (!j) return;
+      if (!j.configured) { S.status = 'unconfigured'; return; }
+      S.owner = String(j.owner || ''); S.cap = Number(j.cap) || 3;
+      S.rowsAll = parse(j.rows || []); S.rows = hideMe(S.rowsAll); S.fetchedAt = Date.now();
+      S.status = S.rowsAll.length ? 'ready' : 'empty';
+    }).catch(function () { S.status = 'error'; }).then(function () { S.busy = false; $('br-refresh').removeAttribute('aria-busy'); render(); });
+  }
+  $('br-refresh').innerHTML = icon('arrow-clockwise');
+  ROOT.querySelectorAll('.ul-tab[data-period]').forEach(function (b) { b.addEventListener('click', function () { S.period = b.getAttribute('data-period'); S.page = 1; render(); }); });
+  $('br-refresh').addEventListener('click', load);
+  setInterval(updated, 10000);
+  window.__an = window.__an || {};
+  window.__an.bruce = function () { render(); load(); };
+  window.__anRefilter.bruce = function () { S.rows = hideMe(S.rowsAll || []); S.page = 1; render(); };
+})();
+</script>
+
+<script>
+(function () {
+  'use strict';
+  var TABS = ['insights', 'usage', 'visits', 'bruce'], started = {};
   function show(name, push) {
     if (TABS.indexOf(name) === -1) name = 'insights';
     TABS.forEach(function (t) { document.getElementById('an-' + t).hidden = t !== name; });
@@ -2252,7 +2425,7 @@ window.__anRefilter = {};
   document.querySelectorAll('#an-tabs .ul-tab').forEach(function (b) { b.addEventListener('click', function () { show(b.getAttribute('data-tab'), true); }); });
   window.addEventListener('hashchange', function () { show(location.hash.slice(1), false); });
   /* The panels write "Updated 5 min ago" into a hidden span; the refresh button shows it as its tooltip. */
-  [['ul', 'Refresh the log'], ['vs', 'Refresh'], ['in', 'Refresh']].forEach(function (p) {
+  [['ul', 'Refresh the log'], ['vs', 'Refresh'], ['in', 'Refresh'], ['br', 'Refresh']].forEach(function (p) {
     var span = document.getElementById(p[0] + '-updated'), btn = document.getElementById(p[0] + '-refresh');
     if (!span || !btn) return;
     function sync() { var t = span.textContent.trim(); btn.setAttribute('data-tip', t ? t + ' · click to refresh' : p[1]); }

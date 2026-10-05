@@ -11,14 +11,23 @@
    expiry, signed with the site's session secret, good for a few hours, and only for that one person's notes. Nothing in
    it can read or write anyone else's.
 
+   THE LOG (Utsav, 5 Oct 2026: "create a log for Bruce in the Analytics too"). Every run Bruce is asked for, and every
+   ask that hit the cap, is one row in `gw:bruce:log`: when, who (Slack id and display name), their role, what kind of
+   turn it was, and the first line of what they asked. The owner reads it on /admin/analytics#bruce, with the same
+   session check as the usage log. Slack display names are looked up once and kept in `gw:slack:names`.
+
    THE CAP. Everyone may DM Bruce (Utsav: "let's open it for all people"), every run spends his account, so each person
    other than him gets BRUCE_DAILY_CAP runs a day (default 3, his call). The count is per person per day, kept here too.
    ========================================================================= */
 
 import crypto from 'node:crypto';
-import { sessionSecret } from './_session.js';
+import { sessionSecret, COOKIE, verify, readCookie } from './_session.js';
+import { isOwner } from './_access.js';
 
 const MAX_NOTES = 30;
+const LOG_KEY = 'gw:bruce:log';
+const MAX_LOG = 3000;
+const NAMES_KEY = 'gw:slack:names';
 const TOKEN_HOURS = 6;
 
 function store() {
@@ -83,8 +92,56 @@ export async function takeRun(user, { uncapped = false, f = fetch, now = new Dat
   return { allowed: true, used: used + 1, cap };
 }
 
+/* ---- the run log ---- */
+/* A person's Slack display name, looked up once with the bot token and kept. Falls back to the id. */
+export async function slackName(token, user, f = fetch) {
+  const cfg = store();
+  if (cfg) {
+    try { const [{ result }] = await redis(cfg, [['HGET', NAMES_KEY, user]], f); if (result) return String(result); } catch { /* look it up */ }
+  }
+  let name = '';
+  if (token) {
+    try {
+      const r = await f(`https://slack.com/api/users.info?user=${encodeURIComponent(user)}`, { headers: { authorization: `Bearer ${token}` } });
+      const j = await r.json();
+      const u = j && j.ok && j.user;
+      name = u ? String((u.profile && (u.profile.display_name || u.profile.real_name)) || u.real_name || u.name || '') : '';
+    } catch { /* fall back to the id */ }
+  }
+  if (name && cfg) { try { await redis(cfg, [['HSET', NAMES_KEY, user, name]], f); } catch { /* fine */ } }
+  return name || user;
+}
+
+/* One row per turn Bruce was asked for. `kind`: run (a Bruce run started), capped (refused at the daily cap),
+   to-alfred (a reply passed to Alfred's thread), failed (the trigger did not fire). Never throws. */
+export async function logRun(row, f = fetch) {
+  const cfg = store(); if (!cfg) return false;
+  const r = { at: new Date().toISOString(), user: String(row.user || ''), name: String(row.name || row.user || ''), role: row.role === 'owner' ? 'owner' : 'teammate',
+    kind: String(row.kind || 'run'), thread: row.thread ? 1 : 0, text: String(row.text || '').replace(/\s+/g, ' ').trim().slice(0, 200), used: Number(row.used) || 0 };
+  try { await redis(cfg, [['LPUSH', LOG_KEY, JSON.stringify(r)], ['LTRIM', LOG_KEY, '0', String(MAX_LOG - 1)]], f); return true; } catch { return false; }
+}
+
+export async function readLog(f = fetch) {
+  const cfg = store(); if (!cfg) return null;
+  const [{ result }] = await redis(cfg, [['LRANGE', LOG_KEY, '0', String(MAX_LOG - 1)]], f);
+  const rows = [];
+  for (const raw of result || []) { try { const o = JSON.parse(raw); if (o && o.at) rows.push(o); } catch { /* skip */ } }
+  return rows;
+}
+
 /* ---- the endpoint: GET reads the caller's notes, POST { notes: [...] } adds to them. Bearer = the per-run token. ---- */
 export default async function handler(req, res) {
+  // ?log=1: the owner's view of every Bruce turn, for /admin/analytics#bruce. Session cookie, owner only, like the usage log.
+  if (req.method === 'GET' && req.query && req.query.log) {
+    const session = await verify(readCookie(req.headers.cookie, COOKIE), sessionSecret());
+    if (!session || !session.email) return res.status(401).json({ error: 'Not signed in.' });
+    if (!isOwner(session.email)) return res.status(403).json({ error: 'Owners only.' });
+    try {
+      const rows = await readLog();
+      if (rows === null) return res.status(200).json({ configured: false, rows: [] });
+      return res.status(200).json({ configured: true, rows, owner: String(process.env.OWNER_SLACK_ID || ''), cap: dailyCap() });
+    } catch { return res.status(502).json({ error: 'Could not read the log.' }); }
+  }
   const token = String(req.headers.authorization || '').replace(/^Bearer\s+/i, '');
   const user = readToken(token);
   if (!user) return res.status(401).json({ error: 'bad or expired token' });

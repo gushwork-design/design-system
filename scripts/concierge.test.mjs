@@ -154,7 +154,8 @@ t('a DM question gets the answer with no thread, and all four fonts in one share
 
 calls.length = 0;
 r = await post(dm('do the second one please', 'UOWNER'));
-t('end to end: a DM that is not a file ask gets 👀 and starts Bruce (open to everyone since 5 Oct 2026)', [r.body.concierge, calls.map((c) => c.method)], ['bruce', ['reactions.add', 'FIRE']]);
+const routing = function () { return calls.map((c) => c.method).filter((m) => m.indexOf('users.info') !== 0); };   /* the log's name lookup is not routing */
+t('end to end: a DM that is not a file ask gets 👀, starts Bruce and is logged (open to everyone since 5 Oct 2026)', [r.body.concierge, routing(), calls.some((c) => c.method.indexOf('users.info') === 0)], ['bruce', ['reactions.add', 'FIRE'], true]);
 
 /* ---- Bruce for Utsav: his DMs start the routine; nobody else's do ---- */
 {
@@ -180,7 +181,8 @@ t('end to end: a DM that is not a file ask gets 👀 and starts Bruce (open to e
   t('no trigger configured: Bruce says so in the thread', [o.did, calls.at(-1).method, calls.at(-1).body.thread_ts], ['bruce-failed', 'chat.postMessage', '300.3']);
   ok('greetings stay with the concierge', forBruce(understand('hi', catalog)) === false);
   // Open to everyone, with a daily cap for everyone but the owner, and memory handed to the run.
-  const runs = {}; const mem = {
+  const logged = [];
+  const runs = {}; const mem = { logRun: async (r) => { logged.push(r); return true; }, slackName: async (t, u) => 'Name of ' + u,
     takeRun: async (u, { uncapped }) => { runs[u] = (runs[u] || 0) + 1; return uncapped ? { allowed: true, used: 0, cap: 3 } : { allowed: runs[u] <= 2, used: runs[u], cap: 2 }; },
     readNotes: async (u) => (u === 'UUTSAV' ? ['2026-10-05: prefers the original logo colour'] : []), mintToken: (u) => `tok-${u}` };
   const open = { ...deps, bruceUsers: new Set(), ownerId: 'UUTSAV', memory: mem, fire: async (ev, e, f, extra) => { fired.push({ u: ev.user, ...extra }); return { fired: true }; } };
@@ -194,6 +196,8 @@ t('end to end: a DM that is not a file ask gets 👀 and starts Bruce (open to e
   fired.length = 0;
   for (let i = 0; i < 4; i++) await handleMessage(ev('check ' + i, 'UUTSAV'), open);
   t('the owner is never capped, and his notes ride along', [fired.length, fired[0].owner, fired[0].notes], [4, true, ['2026-10-05: prefers the original logo colour']]);
+  t('every turn is logged: runs, the capped ask, with names and roles', [logged.length, logged[0].kind, logged[0].name, logged[0].role, logged[2].kind, logged[3].role, logged[3].kind],
+    [7, 'run', 'Name of UTEAM', 'teammate', 'capped', 'owner', 'run']);
   // A reply under an Alfred ping goes to Alfred; any other thread reply goes to Bruce.
   const sent = [];
   const pingDeps = { ...deps, findPing: async (tok, ch, ts) => (ts === '400.4' ? { issue: 7, scope: 'web', key: 'timeline' } : null), toAlfred: async (p, text) => { sent.push([p.issue, text]); return { ok: true, fired: true }; } };
@@ -220,10 +224,10 @@ t('a reviewer saying thanks gets a reply, not a tick', [r.body.concierge, calls.
 
 calls.length = 0;
 r = await post(dm('do the second one please', 'UASKER'));
-t('the same words from a teammate also start Bruce, as a teammate', [r.body.concierge, calls.at(-1).method, calls.at(-1).body.text.includes('role: teammate')], ['bruce', 'FIRE', true]);
+t('the same words from a teammate also start Bruce, as a teammate', [r.body.concierge, routing().at(-1), calls.find((c) => c.method === 'FIRE').body.text.includes('role: teammate')], ['bruce', 'FIRE', true]);
 calls.length = 0;
 r = await post(dm('what can you do', 'UASKER'));
-t('"what can you do" stays with the concierge, so a help question never spends a run', [r.body.concierge, calls[0].method, calls[0].body.text.includes('brand files')], ['answered', 'chat.postMessage', true]);
+t('"what can you do" stays with the concierge, so a help question never spends a run', [r.body.concierge, routing()[0], (calls.find((c) => c.method === 'chat.postMessage') || { body: {} }).body.text.includes('brand files')], ['answered', 'chat.postMessage', true]);
 
 calls.length = 0;
 r = await post(dm('logo', 'UOWNER'));
