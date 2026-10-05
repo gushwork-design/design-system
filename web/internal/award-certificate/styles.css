@@ -168,17 +168,19 @@ html:has(script[src*="award-certificate/app.jsx"]) #root:empty::after {
 .saved-error { color: var(--t-danger); }
 .tb-pill button:disabled:not(.btn-primary) { cursor: default; color: var(--t-label); }
 
-/* ── Saved: its own panel, bottom right (Utsav, 5 Oct 2026) ──
-   A second tool-panel: the same inset, width, radius, border and shadow, pinned to the bottom-right
-   corner and sized by its list (at most 40% of the screen, then it scrolls). The preview and the
-   bar centre between the two panels, so the sheet is never under it. Both panels collapse together. */
+/* ── Save and share: a full-height panel on the right (Utsav, 5 Oct 2026) ──
+   A mirror of the editor panel: the same inset, width, radius, border and shadow. The preview and
+   the action pill centre between the two panels, and the hub's Appearance and Help move left of it.
+   Both panels collapse together. */
 .app { --t-offset-r: calc(var(--t-panel-w) + var(--t-inset) * 2); }
 .app[data-panel="closed"] { --t-offset-r: 0px; }
 .app .preview-col { padding-right: calc(var(--t-offset-r) + 32px); transition: padding 280ms cubic-bezier(.22, 1, .36, 1); }
 .app .floating-toolbar { left: calc((100vw + var(--t-offset) - var(--t-offset-r)) / 2); }
-.saved-panel {
-  position: fixed; right: var(--t-inset); bottom: var(--t-inset); z-index: 40;
-  width: var(--t-panel-w); max-height: 40vh;
+html[data-tool-panel="open"] .t-acts { right: calc(var(--t-panel-w) + var(--t-inset) * 2); }
+
+.right-col {
+  position: fixed; top: var(--t-inset); right: var(--t-inset); bottom: var(--t-inset); z-index: 40;
+  width: var(--t-panel-w);
   display: flex; flex-direction: column; overflow: hidden;
   background: var(--t-panel-bg);
   border: 1px solid var(--t-panel-border);
@@ -186,16 +188,80 @@ html:has(script[src*="award-certificate/app.jsx"]) #root:empty::after {
   box-shadow: var(--gw-shadow-s3);
   transition: transform 280ms cubic-bezier(.22, 1, .36, 1), opacity 200ms ease, visibility 0s linear 0s;
 }
-.saved-panel .saved-section { min-height: 0; flex: 1 1 auto; }
-.saved-panel .saved-list { max-height: none; flex: 1 1 auto; min-height: 0; }
-.app[data-panel="closed"] .saved-panel {
+.app[data-panel="closed"] .right-col {
   transform: translateX(calc(100% + var(--t-inset) + 8px));
   opacity: 0; visibility: hidden; pointer-events: none;
   transition: transform 280ms cubic-bezier(.22, 1, .36, 1), opacity 200ms ease, visibility 0s linear 280ms;
 }
+/* header: the same 57 tall row as the editor's (32 tile + 12 + 12, hairline beneath) */
+.right-head {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-12);
+  min-height: 57px; padding: var(--gw-space-12) var(--gw-space-12) var(--gw-space-12) var(--gw-space-16);
+  border-bottom: 1px solid var(--t-rule); flex-shrink: 0;
+}
+.right-head h2 {
+  margin: 0; font-family: var(--gw-font-display); font-size: 16px; font-weight: 600; line-height: 1.2;   /* CHOSEN: the panel title size, as .brand-card h1 */
+  color: var(--t-heading);
+}
+.right-col .prop-section + .prop-section { border-top: 1px solid var(--t-rule); }
+.right-col .saved-section { flex: 1 1 auto; min-height: 0; }
+.right-col .saved-list { max-height: none; flex: 1 1 auto; min-height: 0; }
+
+/* this certificate: a card on the field fill */
+.this-card {
+  display: flex; flex-direction: column; gap: var(--gw-space-2);
+  padding: var(--gw-space-12); background: var(--t-field-bg);
+  border: 1px solid var(--t-field-border); border-radius: var(--gw-radius-12);
+}
+.this-meta { margin: var(--gw-space-8) 0 0; display: flex; flex-direction: column; gap: var(--gw-space-4); }
+.this-meta div { display: flex; gap: var(--gw-space-8); }
+.this-meta dt { width: 84px; flex: none; font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); color: var(--t-label); }
+.this-meta dd { margin: 0; min-width: 0; font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); color: var(--t-heading); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* buttons: control Kind=button 36h radius 12; primary black (white in dark), the rest outlined */
+.right-actions { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gw-space-8); }
+.r-btn {
+  height: 36px; padding: 0 var(--gw-space-12);
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--gw-space-8);
+  background: var(--t-card-bg); border: 1px solid var(--t-btn-border); border-radius: var(--gw-radius-12);
+  box-shadow: var(--gw-shadow-s2);
+  color: var(--t-heading); font: var(--gw-text-body-14-med); letter-spacing: var(--gw-text-body-14-med-tracking);
+  white-space: nowrap; cursor: pointer; transition: background var(--gw-motion-fast);
+}
+.r-btn svg { width: 16px; height: 16px; flex: none; }
+.r-btn:hover:not(:disabled) { background: var(--t-hover); }
+.r-btn--primary { background: var(--t-primary-bg); color: var(--t-primary-fg); border-color: transparent; }
+.r-btn--primary:hover:not(:disabled) { background: var(--t-primary-hover); }
+.r-btn:disabled { cursor: default; opacity: .5; }
+.r-btn--danger { background: var(--t-danger-bg); color: var(--t-danger); border-color: var(--t-danger); box-shadow: none; }
+.r-btn--danger:hover { background: var(--t-danger-bg); }
+.r-btn.is-error { color: var(--t-danger); border-color: var(--t-danger); }
+
+.r-link-danger {
+  align-self: flex-start; display: inline-flex; align-items: center; gap: var(--gw-space-8);
+  height: 28px; padding: 0 var(--gw-space-8); margin-left: calc(var(--gw-space-8) * -1);
+  background: transparent; border: 0; border-radius: var(--gw-radius-8);
+  color: var(--t-danger); font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); cursor: pointer;
+}
+.r-link-danger svg { width: 16px; height: 16px; }
+.r-link-danger:hover { background: var(--t-danger-bg); }
+
+/* the confirm: asks in words, two explicit buttons, nothing deletes on one click */
+.del-confirm {
+  display: flex; flex-direction: column; gap: var(--gw-space-12);
+  padding: var(--gw-space-12); background: var(--t-danger-bg);
+  border: 1px solid var(--t-danger); border-radius: var(--gw-radius-12);
+}
+.del-confirm p { margin: 0; font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); color: var(--t-heading); }
+.del-confirm__acts { display: flex; justify-content: flex-end; gap: var(--gw-space-8); }
+.del-confirm__acts .r-btn { height: 32px; border-radius: var(--gw-radius-8); }
+.del-confirm--row { flex: 1; min-width: 0; padding: var(--gw-space-8); border-radius: var(--gw-radius-8); }
+.saved-row.is-confirming { padding: 0; }
+
 @media (max-width: 900px) {
   .app { --t-offset-r: 0px; }
   .app .floating-toolbar { left: 50%; }
-  .app[data-panel="open"] .saved-panel { box-shadow: var(--gw-shadow-s4); }
+  html[data-tool-panel="open"] .t-acts { right: var(--t-inset); }
+  .app[data-panel="open"] .right-col { box-shadow: var(--gw-shadow-s4); top: auto; max-height: 50vh; }
 }
-@media (prefers-reduced-motion: reduce) { .saved-panel, .app .preview-col { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .right-col, .app .preview-col { transition: none; } }

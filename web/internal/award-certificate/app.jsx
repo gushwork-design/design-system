@@ -53,6 +53,9 @@ function readHash() {
 function when(iso) {
   try { return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); } catch { return ''; }
 }
+function whenTime(iso) {
+  try { return new Date(iso).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); } catch { return ''; }
+}
 function who(email) { return String(email || '').split('@')[0] || 'someone'; }
 
 async function api(method, body, query = '') {
@@ -224,6 +227,9 @@ function App() {
       .catch(() => setLogoSvg(''));
   }, []);
 
+  // the hub's Appearance and Help sit left of the right panel while it is open
+  useEffect(() => { document.documentElement.setAttribute('data-tool-panel', panelOpen ? 'open' : 'closed'); }, [panelOpen]);
+
   // the shared saved list, then whatever the link points at
   const loadList = useCallback(async () => {
     try {
@@ -343,8 +349,8 @@ function App() {
     setData((d) => fromPreset(PRESETS[0], d));
     history.replaceState(null, '', location.pathname);
   };
+  // delete happens only from the confirm's own Delete button
   const remove = async (it) => {
-    if (confirmDelete !== it.id) { setConfirmDelete(it.id); return; }
     setConfirmDelete('');
     try {
       await api('DELETE', null, '?id=' + it.id);
@@ -355,7 +361,7 @@ function App() {
     }
   };
   const q = filter.trim().toLowerCase();
-  const shown = saved.items.filter((it) => !q || [it.data.name, awardLine(it.data), it.savedBy].join(' ').toLowerCase().includes(q));
+  const shown = saved.items.filter((it) => !q || [it.data.name, awardLine(it.data), it.savedBy, it.updatedBy].join(' ').toLowerCase().includes(q));
 
   const stateOf = (kind) => (job.kind === kind ? job.state : 'idle');
   const label = (kind, idle) => {
@@ -438,39 +444,100 @@ function App() {
         </aside>
       </div>
 
-      <div className="saved-panel" ref={savedRef} aria-hidden={!panelOpen}>
+      <div className="right-col" ref={savedRef} aria-hidden={!panelOpen}>
+        <header className="right-head">
+          <h2>Save and share</h2>
+          {current && <button type="button" className="saved-new" onClick={startNew}>New certificate</button>}
+        </header>
+
+        <section className="prop-section">
+          <header className="prop-section-head"><h3>This certificate</h3></header>
+          <div className="this-card">
+            <span className="saved-name">{data.name || 'Untitled'}</span>
+            <span className="saved-meta">{awardLine(data) || 'No award'}</span>
+            <dl className="this-meta">
+              {current ? (
+                <>
+                  <div><dt>Created</dt><dd>{who(current.savedBy)}, {when(current.savedAt)}</dd></div>
+                  <div><dt>Last edited</dt><dd>{who(current.updatedBy)}, {whenTime(current.updatedAt)}</dd></div>
+                  <div><dt>Status</dt><dd>{dirty ? 'Unsaved changes' : 'Saved'}</dd></div>
+                </>
+              ) : (
+                <div><dt>Status</dt><dd>Not saved yet</dd></div>
+              )}
+            </dl>
+          </div>
+          <div className="right-actions">
+            <button type="button" className="r-btn r-btn--primary" onClick={save}
+              disabled={saveState === 'working' || (current && !dirty) || saved.state === 'error'}>
+              {saveState === 'ok' && !dirty ? <CheckIcon /> : <SaveIcon />}
+              {saveState === 'working' ? 'Saving…' : saveState === 'ok' && !dirty ? 'Saved' : saveState === 'err' ? 'Failed. Try again' : current ? (dirty ? 'Save changes' : 'Saved') : 'Save'}
+            </button>
+            <button type="button" className={`r-btn${shareState === 'err' ? ' is-error' : ''}`} onClick={share}>
+              {shareState === 'ok' ? <CheckIcon /> : <LinkIcon />}
+              {shareState === 'ok' ? 'Link copied' : shareState === 'err' ? 'Could not copy' : 'Copy link'}
+            </button>
+          </div>
+          {saveState === 'err' && <p className="prop-tip saved-error">{saveError}</p>}
+          <p className="prop-tip">{current && !dirty
+            ? 'The link opens this saved certificate for anyone with access to the tool.'
+            : 'Unsaved, the link carries the details in it. Save first to share the copy everyone edits.'}</p>
+          {current && (confirmDelete === current.id ? (
+            <div className="del-confirm" role="alertdialog" aria-label="Confirm delete">
+              <p>Delete {current.data.name || 'this certificate'}'s certificate? It is removed for everyone, and this cannot be undone.</p>
+              <div className="del-confirm__acts">
+                <button type="button" className="r-btn" onClick={() => setConfirmDelete('')}>Cancel</button>
+                <button type="button" className="r-btn r-btn--danger" onClick={() => remove(current)}>Delete</button>
+              </div>
+            </div>
+          ) : (
+            <button type="button" className="r-link-danger" onClick={() => setConfirmDelete(current.id)}><TrashIcon /> Delete this certificate</button>
+          ))}
+        </section>
+
         <section className="prop-section saved-section">
-            <header className="prop-section-head saved-head">
-              <h3>Saved</h3>
-              {current && <button type="button" className="saved-new" onClick={startNew}>New certificate</button>}
-            </header>
-            {saved.state === 'loading' && <p className="prop-tip">Loading the saved list…</p>}
-            {saved.state === 'error' && <p className="prop-tip saved-error">{saved.error}</p>}
-            {saved.state === 'ready' && saved.items.length === 0 && (
-              <p className="prop-tip">Nothing saved yet. Save a certificate and everyone with access to this tool sees it here.</p>
-            )}
-            {saved.state === 'ready' && saved.items.length > 5 && (
-              <input className="prop-input" type="search" value={filter} onChange={(e) => setFilter(e.target.value)} placeholder="Search by name or award" />
-            )}
-            {saved.state === 'ready' && shown.length > 0 && (
-              <ul className="saved-list">
-                {shown.map((it) => (
-                  <li key={it.id} className={`saved-row${current && current.id === it.id ? ' is-on' : ''}`}>
-                    <button type="button" className="saved-open" onClick={() => openItem(it)}>
-                      <span className="saved-name">{it.data.name || 'Untitled'}</span>
-                      <span className="saved-meta">{awardLine(it.data) || 'No award'} · {who(it.updatedBy)}, {when(it.updatedAt)}</span>
-                    </button>
-                    <button type="button" className={`saved-del${confirmDelete === it.id ? ' is-confirm' : ''}`}
-                      onClick={() => remove(it)} aria-label={confirmDelete === it.id ? 'Confirm delete' : 'Delete'}
-                      title={confirmDelete === it.id ? 'Click again to delete' : 'Delete'}>
-                      {confirmDelete === it.id ? 'Delete' : <TrashIcon />}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-            {saved.state === 'ready' && saved.error && <p className="prop-tip saved-error">{saved.error}</p>}
-          </section>
+          <header className="prop-section-head saved-head">
+            <h3>Saved{saved.state === 'ready' && saved.items.length ? ` · ${saved.items.length}` : ''}</h3>
+          </header>
+          {saved.state === 'loading' && <p className="prop-tip">Loading the saved list…</p>}
+          {saved.state === 'error' && <p className="prop-tip saved-error">{saved.error}</p>}
+          {saved.state === 'ready' && saved.items.length === 0 && (
+            <p className="prop-tip">Nothing saved yet. Save a certificate and everyone with access to this tool sees it here.</p>
+          )}
+          {saved.state === 'ready' && saved.items.length > 5 && (
+            <input className="prop-input" type="search" value={filter} onChange={(e) => setFilter(e.target.value)} placeholder="Search by name, award or person" />
+          )}
+          {saved.state === 'ready' && shown.length > 0 && (
+            <ul className="saved-list">
+              {shown.map((it) => (
+                <li key={it.id} className={`saved-row${current && current.id === it.id ? ' is-on' : ''}${confirmDelete === it.id ? ' is-confirming' : ''}`}>
+                  {confirmDelete === it.id && !(current && current.id === it.id) ? (
+                    <div className="del-confirm del-confirm--row" role="alertdialog" aria-label="Confirm delete">
+                      <p>Delete {it.data.name || 'this certificate'}'s certificate for everyone?</p>
+                      <div className="del-confirm__acts">
+                        <button type="button" className="r-btn" onClick={() => setConfirmDelete('')}>Cancel</button>
+                        <button type="button" className="r-btn r-btn--danger" onClick={() => remove(it)}>Delete</button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <button type="button" className="saved-open" onClick={() => openItem(it)}>
+                        <span className="saved-name">{it.data.name || 'Untitled'}</span>
+                        <span className="saved-meta">{awardLine(it.data) || 'No award'}</span>
+                        <span className="saved-meta">Saved by {who(it.savedBy)}, {when(it.savedAt)}</span>
+                        {(it.updatedAt !== it.savedAt) && <span className="saved-meta">Edited by {who(it.updatedBy)}, {when(it.updatedAt)}</span>}
+                      </button>
+                      <button type="button" className="saved-del" onClick={() => setConfirmDelete(it.id)} aria-label="Delete" title="Delete">
+                        <TrashIcon />
+                      </button>
+                    </>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+          {saved.state === 'ready' && saved.error && <p className="prop-tip saved-error">{saved.error}</p>}
+        </section>
       </div>
 
       <main className="preview-col" ref={stageRef}>
@@ -487,17 +554,6 @@ function App() {
       </main>
 
       <div className="floating-toolbar">
-        <div className="tb-pill">
-          <button type="button" onClick={share} className={shareState === 'err' ? 'btn-error' : ''}>
-            {shareState === 'ok' ? <CheckIcon /> : <LinkIcon />}
-            {shareState === 'ok' ? 'Link copied' : shareState === 'err' ? 'Could not copy' : 'Share'}
-          </button>
-          <button type="button" onClick={save} disabled={saveState === 'working' || (current && !dirty)}
-            className={saveState === 'err' ? 'btn-error' : ''} title={saveState === 'err' ? saveError : (current ? 'Save changes to the shared list' : 'Save to the shared list')}>
-            {saveState === 'ok' && !dirty ? <CheckIcon /> : <SaveIcon />}
-            {saveState === 'working' ? 'Saving…' : saveState === 'ok' && !dirty ? 'Saved' : saveState === 'err' ? 'Failed. Try again' : current ? (dirty ? 'Save changes' : 'Saved') : 'Save'}
-          </button>
-        </div>
         <div className="tb-pill">
           <div className="split-button" ref={menuRef}>
             <button type="button" className={moreState === 'err' ? 'btn-error' : ''}
