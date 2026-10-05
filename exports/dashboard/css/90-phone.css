@@ -1,0 +1,178 @@
+/* ============================================================================
+   Gushwork dashboard — 90 phone layer
+   One place for what a component does at 767 and below, where the component's own sheet has no phone rule or
+   its rule stopped short. Added 6 Oct 2026 after the analytics mockup broke on a phone: a data table cut off
+   at its second column, a pill toggle running off the edge, half-width cards, and sticky bars that ate the screen.
+
+   Pattern references (Mobbin): Stripe and Linear for a record list that becomes one card per row, Mixpanel and
+   Amplitude for a range bar that scrolls inside itself, Revolut and Monzo for a modal that rises as a sheet.
+
+   Viewport media query, not the shell's container query: a table, a modal or a toggle row has to behave on a
+   phone whether or not it sits inside .gd-app. The shell's own phone rules stay in 10-shell.css.
+   Specificity is deliberately above the component sheets, so nothing here needs !important except where a sheet
+   sets the value inline (a table's minimum width) or pins a sticky column.
+   ============================================================================ */
+
+@media (max-width: 767px) {
+  .gd {
+    /* ---- shell: sticky bars give the screen back --------------------------------------------- */
+    .gd-page__filters { position: static; margin: 0; padding: 0; }                 /* range and group-by scroll away with the page */
+
+    /* ---- segmented control and range bar ------------------------------------------------------ */
+    .gd-seg { display: flex; width: 100%; overflow-x: auto; scrollbar-width: none; }
+    .gd-seg::-webkit-scrollbar { display: none; }
+    .gd-seg__item { flex: 1 0 auto; padding: 0 var(--gw-space-8); }
+    .gd-seg--auto, .gd-page-header__actions .gd-seg { width: auto; }               /* density switch beside Export stays its own size */
+    .gd-tabs--pill { overflow-x: auto; scrollbar-width: none; }
+    .gd-tabs--pill .gd-tabs__tab { flex: none; }
+    .gd-rangebar { min-width: 0; max-width: 100%; flex-direction: column; align-items: stretch; gap: var(--gw-space-12); }
+    .gd-rangebar__grp { flex-wrap: wrap; min-width: 0; max-width: 100%; }
+    .gd-rangebar__grp--end { margin-left: 0; justify-content: space-between; }
+    .gd-rangebar .gd-seg { width: 100%; min-width: 0; }
+    .gd-rangebar__grp > .gd-select { flex: 1 1 0; min-width: 0; }                  /* group by and compare share a row */
+
+    /* ---- toggle and setting rows --------------------------------------------------------------- */
+    .gd-toggle { min-height: 44px; }                                                /* a 44 tall hit area around the 24 tall track */
+    .gd-toggle:has(.gd-toggle__label, .gd-toggle__text) { justify-content: space-between; width: 100%; }
+    .gd-setting { flex-direction: column; align-items: stretch; }
+    .gd-setting:has(> .gd-setting__control .gd-toggle:only-child) { flex-direction: row; align-items: center; justify-content: space-between; }
+
+    /* ---- stat card: the sparkline drops under the figure, the name may take two lines -------- */
+    .gd-stat-card__row { flex-direction: column; align-items: flex-start; }
+    .gd-stat-card__spark { flex: none; width: 100%; max-width: 120px; min-width: 0; }
+    .gd-stat-card__name { white-space: normal; text-overflow: clip; }
+
+    /* ---- toolbar, saved views, pager ----------------------------------------------------------- */
+    .gd-card--flush > .gd-card__body:has(> :is(.gd-views, .gd-tbar, .gd-tview)) { padding-inline: 0; padding-bottom: 0; }   /* the table runs edge to edge in its card; bars keep the card's own gutter */
+    .gd-card--flush .gd-views, .gd-card--flush .gd-tbar, .gd-card--flush .gd-chips { padding-inline: var(--gd-card-pad); }
+    .gd-tbar { display: flex; flex-wrap: wrap; gap: var(--gw-space-8); }                      /* groups dissolve: search on its own line, then buttons two to a row */
+    .gd-tbar__g { display: contents; }
+    .gd-tbar__search { flex: 1 1 100%; }
+    .gd-tbar__search input { width: 100%; }
+    .gd-tbar > .gd-btn, .gd-tbar__g > .gd-btn, .gd-tbar__g > .gd-pop, .gd-tbar__g > .gd-seg, .gd-tbar__g > .gd-tabs--pill { flex: 1 1 calc(50% - var(--gw-space-4)); min-width: 0; }
+    .gd-tbar .gd-btn, .gd-tbar__g > .gd-pop > .gd-btn { width: 100%; justify-content: center; }
+    .gd-tbar__g > .gd-pop { display: flex; }
+    .gd-views { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: var(--gw-space-4); }
+    .gd-views::-webkit-scrollbar { display: none; }
+    .gd-views > * { flex: none; }
+    .gd-chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+    .gd-chip { flex: none; }
+    .gd-pager { justify-content: space-between; }
+    .gd-pager__l { flex: 1 1 auto; justify-content: space-between; }
+    .gd-pager__l > .gd-pager__t:nth-of-type(2) { display: none; }                  /* "Items per page" label; the menu keeps its aria-label */
+    .gd-fbuilder { position: fixed; z-index: 90; left: var(--gw-space-8); right: var(--gw-space-8); bottom: var(--gw-space-8); top: auto; width: auto; max-height: calc(100dvh - 96px); overflow-y: auto; }
+    .gd-fbuilder--static { position: static; max-height: none; }
+    .gd-fbuilder__row { grid-template-columns: 44px minmax(0, 1.4fr) minmax(0, 1fr) 36px; row-gap: var(--gw-space-8); }   /* Where | field | x, then operator and value on the next line */
+    .gd-fbuilder__row > :nth-child(1) { grid-column: 1; grid-row: 1; }
+    .gd-fbuilder__row > :nth-child(2) { grid-column: 2 / 4; grid-row: 1; }
+    .gd-fbuilder__row > :nth-child(5) { grid-column: 4; grid-row: 1; }
+    .gd-fbuilder__row > :nth-child(3) { grid-column: 2; grid-row: 2; }
+    .gd-fbuilder__row > :nth-child(4) { grid-column: 3 / 5; grid-row: 2; }
+    .gd-fbuilder__foot { flex-wrap: wrap; }
+    .gd-fbuilder__foot > .gd-btn--primary { flex: 1 1 100%; justify-content: center; }
+
+    /* ---- data table: one card per row ---------------------------------------------------------- */
+    .gd-table-wrap { max-height: none; }
+    .gd-table:not([data-gd-phone="scroll"], :has(.gd-table__cell--heat, .gd-table__row--head2)) {
+      min-width: 0 !important;
+      .gd-table__row--head {
+        position: static; display: flex; align-items: center; gap: var(--gw-space-8); height: auto; padding: var(--gw-space-8) var(--gd-cell-px);
+        overflow-x: auto; scrollbar-width: none; background: var(--gd-card-bg);
+      }
+      .gd-table__row--head::-webkit-scrollbar { display: none; }
+      .gd-table__row--head::before { content: "Sort"; flex: none; font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
+      .gd-table__th { flex: none; height: 32px; padding: 0 var(--gw-space-12); border-radius: var(--gw-radius-8); box-shadow: inset 0 0 0 1px var(--gd-border-strong); text-transform: none; position: static !important; }
+      .gd-table__th:not(:has(.gd-table__sort), .gd-table__cell--check) { display: none; }
+      .gd-table__th.gd-table__cell--check { padding: 0 var(--gw-space-8); }
+      .gd-table__th--num { justify-content: flex-start; }
+      .gd-table__th[aria-sort="ascending"], .gd-table__th[aria-sort="descending"] { box-shadow: inset 0 0 0 1px var(--gd-border-focus); }
+      .gd-table__sort { height: 30px; }
+
+      .gd-table__row:not(.gd-table__row--head) {
+        position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gw-space-8) var(--gw-space-16); align-items: start;
+        height: auto; padding: var(--gw-space-12) var(--gd-cell-px);
+      }
+      .gd-table__row--total { background-color: var(--gd-sunken-bg); }
+      .gd-table__row--pin-bottom, .gd-table__row--pin-top { position: static; }
+      .gd-table__row:not(.gd-table__row--head) > .gd-table__cell, .gd-table__row:not(.gd-table__row--head) > :first-child {
+        position: static !important; box-shadow: none !important; background: none !important;
+      }
+      .gd-table__cell {
+        display: flex; flex-direction: column; align-items: flex-start; gap: var(--gw-space-2); min-width: 0; padding: 0;
+        overflow: visible; white-space: normal; overflow-wrap: anywhere; text-align: left;
+        font: var(--gw-text-body-14-med); letter-spacing: var(--gw-text-body-14-med-tracking); color: var(--gd-text);
+      }
+      .gd-table__cell[data-label]::before { content: attr(data-label); font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); color: var(--gd-text-muted); }
+      .gd-table__cell--flex { flex-flow: row wrap; align-items: center; }
+      .gd-table__cell--flex[data-label]::before { flex: 0 0 100%; }
+      .gd-table__cell--num { text-align: left; }
+      .gd-table__cell--strong { grid-column: 1 / -1; font: var(--gw-text-body-14-sem); letter-spacing: var(--gw-text-body-14-sem-tracking); color: var(--gd-text); }
+      .gd-table__cell--strong[data-label]::before { display: none; }
+      .gd-table__row:not(.gd-table__row--head) > .gd-table__cell--check { position: absolute !important; top: 0; right: 0; left: auto !important; width: 48px; height: 48px; display: grid; place-items: center; }
+      .gd-table__cell--actions::before { display: none; }
+      .gd-table__cell--actions { grid-column: 1 / -1; flex-direction: row; justify-content: flex-end; margin: calc(var(--gw-space-8) * -1) calc(var(--gd-cell-px) * -.5) calc(var(--gw-space-8) * -1) 0; }
+      .gd-table__cell--rank { color: var(--gd-text-muted); }
+      .gd-table__cell:empty { display: none; }
+      .gd-table__prog, .gd-table__trunc { width: 100%; }
+      .gd-table__spark { width: 96px; }
+      .gd-table__detail { padding-inline: var(--gd-cell-px); }
+      .gd-table__tree { padding-left: calc(var(--lvl, 0) * var(--gw-space-12)); }
+    }
+    .gd-table:not([data-gd-phone="scroll"], :has(.gd-table__cell--heat, .gd-table__row--head2)):has(.gd-table__cell--check) .gd-table__cell--strong { padding-right: 40px; }
+
+    /* a table that has to stay wide (heat map, grouped headers) scrolls inside its frame; the first column stays put */
+    .gd-table-wrap { overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
+
+    /* ---- small tables: funnel and legend ------------------------------------------------------- */
+    .gd-funnel__table :is(th, td), .gd-ltable :is(th, td) { padding: 0 var(--gw-space-8); }
+    .gd-funnel__table tbody :is(th, td):first-child, .gd-ltable tbody :is(th, td):first-child { white-space: normal; overflow-wrap: anywhere; }
+    .gd-ltable { table-layout: auto; }
+
+    /* ---- widget grid and query builder, for a frame that is not inside the shell ---------------- */
+    .gd-widget-grid__item, .gd-widget-grid__item[data-size] { grid-column: span 12; }
+    .gd-widget-grid__item[data-size="s"] { grid-column: span 6; }
+    .gd-widget-grid[data-editing="true"] .gd-widget-grid__stage { grid-template-columns: minmax(0, 1fr); }
+    .gd-widget-grid__bar { flex-wrap: wrap; }
+    .gd-widget-grid__banner { flex-direction: column; align-items: stretch; }
+    .gd-qb__foot { flex-wrap: wrap; }
+    .gd-qb__foot .gd-qb__run { margin-left: 0; flex: 1 1 100%; justify-content: center; }
+
+    /* ---- funnel: the label gets its own line, the bar and figures sit under it ----------------- */
+    .gd-funnel__row { grid-template-columns: minmax(0, 1fr) auto auto; row-gap: var(--gw-space-4); }
+    .gd-funnel__row > .gd-funnel__label { grid-column: 1 / -1; white-space: normal; overflow: visible; }
+
+    /* ---- log viewer: time, level and service on one line, the message under it. The select variant keeps its scroll ---- */
+    .gd-logs:not(.gd-logs--select) { --gd-logs-min: 0px; --gd-log-cols: 4px auto auto minmax(0, 1fr); }
+    .gd-logs:not(.gd-logs--select) .gd-logs__head { display: none; }
+    .gd-logs:not(.gd-logs--select) .gd-logs__row { column-gap: var(--gw-space-8); row-gap: 0; height: auto; min-height: var(--gd-log-h); padding-block: var(--gw-space-4); align-items: center; content-visibility: visible; }
+    .gd-logs:not(.gd-logs--select) .gd-logs__row::before { grid-row: 1 / 3; }
+    .gd-logs:not(.gd-logs--select) .gd-logs__c--msg { grid-column: 2 / -1; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .gd-logs:not(.gd-logs--select) .gd-logs__detail { min-width: 0; padding-left: var(--gw-space-16); }
+    .gd-logs__kv { grid-template-columns: minmax(0, 1fr); }
+
+    /* ---- rows and lists ------------------------------------------------------------------------ */
+    .gd-incident-row { grid-template-columns: 20px minmax(0, 1fr); row-gap: var(--gw-space-4); padding-block: var(--gw-space-8); }
+    .gd-incident-row > :nth-child(n+3) { grid-column: 2; justify-self: start; text-align: left; }
+    .gd-incident-row__duration, .gd-incident-row__time { text-align: left; }
+    .gd-metric-strip { scroll-snap-type: x mandatory; scroll-padding-inline: 0; }
+    .gd-metric-strip__item { flex: 0 0 max(144px, 44%); scroll-snap-align: start; }
+    .gd-board { scroll-snap-type: x mandatory; scroll-padding-inline: var(--gd-gap); }
+    .gd-board__col { flex-basis: min(85%, 320px); scroll-snap-align: start; }
+    .gd-donut { flex-direction: column; align-items: stretch; }
+    .gd-donut__legend { flex: none; min-width: 0; }
+    .gd-tip { max-width: min(280px, calc(100vw - 32px)); }
+
+    /* ---- menus, modals, sheets ----------------------------------------------------------------- */
+    .gd-menu { max-width: calc(100vw - 32px); min-width: min(180px, calc(100vw - 32px)); }
+    .gd-menu__item { min-height: 44px; }                                            /* a thumb, not a pointer */
+    .gd-modal { margin: auto 0 0; width: 100vw; max-width: 100vw; max-height: 92dvh; border-radius: var(--gw-radius-16) var(--gw-radius-16) 0 0; border-inline: 0; border-bottom: 0; }
+    .gd-modal__foot { flex-direction: column-reverse; align-items: stretch; padding-bottom: calc(var(--gd-card-pad) + env(safe-area-inset-bottom, 0px)); }
+    .gd-modal__foot > .gd-btn, .gd-modal__foot form > .gd-btn { width: 100%; justify-content: center; }
+    .gd-drawer, .gd-drawer[data-size="wide"] { width: 100vw; border-left: 0; }
+    .gd-drawer__foot { flex-direction: column-reverse; align-items: stretch; }
+    .gd-drawer__acts { flex-direction: column-reverse; align-items: stretch; }
+    .gd-toast { font: var(--gw-text-body-14-med); }
+    .gd-bulk { width: auto; }
+    .gd-unsaved, .gd-ubar { flex-wrap: wrap; }
+  }
+}

@@ -414,7 +414,7 @@
   .gd-page-header__title { font-size: 32px; }
   .gd-page-header__actions { width: 100%; }
   .gd-grid > [class*="gd-span-"] { grid-column: span 12 !important; }
-  .gd-grid > :is(.gd-span-1, .gd-span-2, .gd-span-3, .gd-span-4, .gd-span-5, .gd-span-6) { grid-column: span 6 !important; }
+  .gd-grid > :is(.gd-span-1, .gd-span-2, .gd-span-3) { grid-column: span 6 !important; }   /* a stat tile pairs up; a chart, table or card (span 4 and wider) takes the full width */
   .gd-page__split { grid-template-columns: minmax(0, 1fr); }
   .gd-page__split > .gd-subnav { position: static; flex-direction: row; overflow-x: auto; scrollbar-width: none; }
   .gd-page__split > .gd-subnav .gd-subnav__item { width: auto; flex: none; white-space: nowrap; }

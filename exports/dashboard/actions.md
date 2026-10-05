@@ -53,6 +53,8 @@ Variants: `--danger` (red label), `aria-checked="true"` (check mark and weight, 
 
 Behaviour (JS): `data-gd-menu` on the trigger opens the menu with that id or the next sibling; the menu is placed `position:fixed` under the trigger, clamped to the viewport, and flips up when below-space is short. Esc closes and refocuses, ArrowUp/Down/Home/End move focus, type-ahead jumps, Tab closes, outside press, scroll and resize close. Checkable items flip `aria-checked`; every activation emits `gd:menu {item,value,checked}`; `data-gd-keep` keeps it open. Layering: z-index 60 (popover). Provenance: extracted `shell.css:1910-1937` (`.gw-pop`), `analytics.html:344-352` (`.ul-menu`), `access-control.html:283-308` (`.ac-dd`). The hub's blue check is dropped: selection is ink.
 
+**Phone.** Rows are 44 tall and the menu is never wider than the screen minus 32.
+
 ## Segmented control
 
 **Use** to set a value of the same data, usually a view: table / board / list, line / bar / table. **Not** to switch page sections (tabs) or for more than about seven options (select).
@@ -65,6 +67,8 @@ Selected is a soft fill (`--gd-selected-bg`) inside an edged track, which is wha
 
 **Chart type switcher** is this component with icons and labels (Line, Bar, Table); there is no separate component. Provenance: NEW, not in the hub; reference Mobbin Linear and Mixpanel view switchers; pending library review.
 
+**Phone.** The control spans its row and every option shares the width; if there are too many to fit it scrolls inside itself. Inside the page header's action row it keeps its own size.
+
 ## Tabs pill
 
 **Use** for in-page view switching (Insights / Usage / Visits, or a period). **Not** for page-level sections (tabs underline) or for setting a value (segmented control).
@@ -74,6 +78,8 @@ Anatomy: `.gd-tabs.gd-tabs--pill[role=tablist]` > `.gd-tabs__tab[role=tab][aria-
 <div class="gd-tabs gd-tabs--pill" role="tablist" aria-label="Analytics"><button class="gd-tabs__tab" role="tab" aria-selected="true" tabindex="0">Insights</button>…</div>
 ```
 Track `--gd-track-bg` with a 1px inset edge so 28px tabs still fit; selected is ink fill (white text, inverts in dark); hover `--gd-track-hover`; disabled `aria-disabled`. Compact density tightens padding so the track is 28px. Behaviour: click and arrows activate (automatic activation), toggles `hidden` on `aria-controls` panels, emits `gd:tab {tab,value}`; tablists inside `[data-gd-metric-strip]` are skipped. Provenance: extracted `analytics.html:177-181` (`.ul-tabs`, `.ul-tab`).
+
+**Phone.** The pill row scrolls inside itself rather than overflowing the page.
 
 ## Tabs underline
 

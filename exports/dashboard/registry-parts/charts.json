@@ -30,8 +30,8 @@
     "doc": "charts.md"
   },
   "donut-chart": {
-    "version": "2.0.0",
-    "changed": "2026-10-03",
+    "version": "2.0.1",
+    "changed": "2026-10-05",
     "breaking": false,
     "doc": "charts.md"
   },
@@ -54,8 +54,8 @@
     "doc": "charts.md"
   },
   "funnel": {
-    "version": "2.0.0",
-    "changed": "2026-10-03",
+    "version": "2.0.1",
+    "changed": "2026-10-05",
     "breaking": false,
     "doc": "charts.md"
   },
@@ -66,8 +66,8 @@
     "doc": "charts.md"
   },
   "legend-table": {
-    "version": "2.0.0",
-    "changed": "2026-10-03",
+    "version": "2.0.1",
+    "changed": "2026-10-05",
     "breaking": false,
     "doc": "charts.md"
   },

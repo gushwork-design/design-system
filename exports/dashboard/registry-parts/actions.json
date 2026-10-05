@@ -18,8 +18,8 @@
     "doc": "actions.md"
   },
   "menu": {
-    "version": "2.0.0",
-    "changed": "2026-10-03",
+    "version": "2.0.1",
+    "changed": "2026-10-05",
     "breaking": false,
     "doc": "actions.md"
   },
@@ -30,8 +30,8 @@
     "doc": "actions.md"
   },
   "segmented-control": {
-    "version": "2.0.0",
-    "changed": "2026-10-03",
+    "version": "2.0.1",
+    "changed": "2026-10-05",
     "breaking": false,
     "doc": "actions.md"
   },
@@ -48,8 +48,8 @@
     "doc": "actions.md"
   },
   "tabs-pill": {
-    "version": "2.0.0",
-    "changed": "2026-10-03",
+    "version": "2.0.1",
+    "changed": "2026-10-05",
     "breaking": false,
     "doc": "actions.md"
   },

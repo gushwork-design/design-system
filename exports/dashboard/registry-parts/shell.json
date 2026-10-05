@@ -30,8 +30,8 @@
     "doc": "shell.md"
   },
   "page-layout": {
-    "version": "2.0.0",
-    "changed": "2026-10-03",
+    "version": "2.0.1",
+    "changed": "2026-10-05",
     "breaking": false,
     "doc": "shell.md"
   },
@@ -42,8 +42,8 @@
     "doc": "shell.md"
   },
   "widget-grid": {
-    "version": "2.0.0",
-    "changed": "2026-10-03",
+    "version": "2.0.1",
+    "changed": "2026-10-05",
     "breaking": false,
     "doc": "shell.md"
   },

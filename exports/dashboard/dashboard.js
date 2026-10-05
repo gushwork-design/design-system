@@ -1421,8 +1421,22 @@ window.GD = window.GD || {};
   });
   document.addEventListener('click', (e) => { const c = e.target.closest('[data-gd-hist-clear]'); if (c) clearRange(c.closest('[data-gd-hist]')); });
 
+  /* ------------------------------------------------ phone: cells carry their column name --
+     At 767 and below a data table reads as one card per row (90-phone.css), so each cell needs its column name beside it.
+     Copied from the header cell at the same position; a cell that already has data-label keeps it. Idempotent. */
+  function labelCells(t) {
+    const heads = $$('.gd-table__row--head', t), head = heads[heads.length - 1]; if (!head) return;
+    const nameOf = (h) => { if (h.matches('.gd-table__cell--check')) return ''; const c = (h.querySelector('.gd-table__sort') || h).cloneNode(true); $$('.gd-sr, svg', c).forEach((x) => x.remove()); return c.textContent.replace(/\s+/g, ' ').trim(); };
+    const names = [...head.children].map(nameOf);
+    $$('.gd-table__row:not(.gd-table__row--head)', t).forEach((r) => [...r.children].forEach((c, i) => {
+      if (!c.classList.contains('gd-table__cell') || c.hasAttribute('data-label') || !names[i]) return;
+      c.setAttribute('data-label', names[i]);
+    }));
+  }
+
   /* ------------------------------------------------------------------ init -- */
   T.init = (root = document) => {
+    $$('.gd-table', root).forEach(labelCells);
     $$('.gd-table', root).forEach((t) => { if (sels(t).length) syncSelection(t); });
     $$('[data-gd-colmenu]', root).forEach(applyColumns);
     $$('[data-gd-pager][data-gd-for]', root).forEach((pg) => { const t = $(pg.dataset.gdFor); if (t) refresh(t); });
