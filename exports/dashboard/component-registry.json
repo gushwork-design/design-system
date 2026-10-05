@@ -1056,7 +1056,8 @@
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "f9faeb9f06b0e1cb"
+      "fingerprint": "76e8356ea0b507ff",
+      "previewFingerprint": "5e71b06b18d9f49d"
     },
     "log-viewer": {
       "reviewed": "passed",
