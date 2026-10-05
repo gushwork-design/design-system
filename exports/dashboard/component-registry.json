@@ -724,6 +724,12 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "012d8c69aac7755f"
+    },
+    "area-chart": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "fff1a8b227418209"
     }
   }
 }
