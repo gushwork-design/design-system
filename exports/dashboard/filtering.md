@@ -78,7 +78,7 @@ Chips sit in a `.gd-chips` container (`data-gd-chips`) that also holds `Clear fi
 
 The first row's lead is "Where", the rest "And". Field types are `text` (contains, does not contain, is, is not), `number` (is, is not, greater than, less than, numeric input) and `enum` (is, is not, value becomes a select of `values`). Changing the field rebuilds the operator and value controls. The popover is raised, 12px radius, `gd-menu`'s shadow and edge, and sits on the popover layer (z 60) placed by `GD.actions.place`. The 560px width collapses to the viewport.
 
-**States.** Field: rest, focus (1px edge), invalid (`aria-invalid`, red edge, on an empty value). Row remove: rest, hover. Apply is the primary button; Clear filters is a link button; Add filter is ghost.
+**States.** Field: rest, focus (1px edge), invalid (`aria-invalid`, red edge, on an empty value). Row remove: rest, hover. Apply is the primary button; Clear filters is a link button; Add filter is ghost and is pulled left by its own padding so its icon lines up with the Where / And labels.
 
 **Behaviour.** Add filter appends a row and focuses its value. Remove deletes a row. Apply validates (an empty value marks the field invalid and focuses it, nothing is applied), then replaces the chips with the rows, closes the popover and fires `gd:filters`. Clear filters empties rows and chips immediately and fires `gd:filters`. Esc closes and returns focus to the trigger; an outside press closes without applying. It is its own popover controller (`data-gd-pop`) rather than a `gd-menu`, because arrow keys must move inside selects and fields.
 
