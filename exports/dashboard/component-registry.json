@@ -1449,6 +1449,14 @@
       "fingerprint": "6b0643eeed002b76",
       "note": "save this in templates",
       "previewFingerprint": "410329c2eabe53a0"
+    },
+    "shortcut-key": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "b9fffa5c4c2a5753",
+      "previewFingerprint": "af29bdadc7ae7958",
+      "note": "colors are not going well, delete should be red colors, approve dark mode - color of A tag seems weird, it can be like Rework light mode button"
     }
   }
 }
