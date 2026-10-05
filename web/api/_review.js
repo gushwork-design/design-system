@@ -285,7 +285,7 @@ export default async function handler(req, res) {
     await redis(cfg, cmds);
     // A send-back opens (or continues) the item's thread with the note, so Alfred's answer has somewhere to go.
     if (row.action === 'rework' && token) {
-      try { row.thread = await threadNumber(cfg, token, row.scope, row.key, true); await postComment(token, row.thread, ownerComment(row.note, row.refs)); }
+      try { row.thread = await threadNumber(cfg, token, row.scope, row.key, true); await postComment(token, row.thread, ownerComment(row.note, row.refs, 'rework')); }
       catch { row.threadError = 'Could not post the note to the thread (the GitHub token needs Issues read and write).'; }
     }
     const routine = row.action === 'rework' ? await fireRework(row) : null;

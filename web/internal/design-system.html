@@ -755,6 +755,37 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .rv-cm__h time { font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
 .rv-cm__b { margin-top: 2px; font: 400 13px/1.55 var(--gw-font-body); color: var(--ul-cell); white-space: pre-wrap; overflow-wrap: anywhere; }
 .rv-cm__tag { font: 500 11px/1 var(--gw-font-body); padding: 3px 6px; border-radius: var(--gw-radius-4); background: var(--gw-color-yellow-alpha-10); color: var(--gw-color-yellow-500); }
+.rv-cm__tag--note { background: var(--ul-hdr-bg); color: var(--ul-sub); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }
+.rv-cm__tag--reject { background: var(--gw-color-red-alpha-10, rgba(239,68,68,.1)); color: var(--gw-color-red-500); }
+.rv-cm .rv-refs { margin-top: var(--gw-space-8); }
+.rv-tl { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--gw-space-16); }
+.rv-cm__m { min-width: 0; }
+.rv-cm__h { margin-bottom: 4px; }
+.rv-cm__tag--ai { background: var(--gw-color-primary-alpha-10, rgba(47,107,255,.12)); color: var(--gw-color-primary-500); }
+.rv-card { padding: var(--gw-space-12) var(--gw-space-16); border-radius: var(--gw-radius-12); background: var(--ul-hdr-bg); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }
+.rv-card .rv-cm__b { margin: 0; }
+.rv-cm.is-waiting .rv-cm__b { color: var(--ul-value); }
+.rv-opts { display: flex; flex-direction: column; align-items: flex-start; gap: var(--gw-space-8); margin-top: var(--gw-space-12); }
+.rv-opt { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; gap: var(--gw-space-8); min-height: 32px; padding: 6px var(--gw-space-12) 6px 6px; border-radius: var(--gw-radius-8); box-shadow: inset 0 0 0 1px var(--ul-ctl-line); color: var(--ul-value); font: 500 13px/1.35 var(--gw-font-body); }
+.rv-opt span { width: 20px; height: 20px; flex: none; display: grid; place-items: center; border-radius: var(--gw-radius-4); background: var(--ul-hdr-bg); color: var(--ul-sub); font: 600 11px/1 var(--gw-font-body); }
+.rv-opt:hover { background: var(--ul-ctl-hover); }
+.rv-opt:focus-visible { outline: var(--gw-focus-ring); outline-offset: 2px; }
+.rv-ev { display: flex; align-items: center; gap: var(--gw-space-12); padding-left: 8px; font: 400 12.5px/1.4 var(--gw-font-body); color: var(--ul-sub); }
+.rv-ev b { font-weight: 600; color: var(--ul-cell); }
+.rv-ev--more { padding-left: 36px; }
+.rv-ev--more .rv-link { all: unset; cursor: pointer; font: 500 12.5px/1.4 var(--gw-font-body); color: var(--ul-sub); text-decoration: underline; text-underline-offset: 3px; }
+.rv-ev--more .rv-link:hover { color: var(--ul-value); }
+.rv-ev time { color: var(--ul-sub); }
+.rv-ev__d { width: 8px; height: 8px; flex: none; border-radius: 50%; background: var(--ul-sub); margin-right: 8px; }
+.rv-ev--ok .rv-ev__d { background: var(--gw-color-green-500); }
+.rv-ev--ship .rv-ev__d { background: var(--gw-color-primary-500); }
+.rv-ev--move .rv-ev__d { background: transparent; box-shadow: inset 0 0 0 1.5px var(--ul-sub); }
+.rv-cmp { margin-top: var(--gw-space-20); border-radius: var(--gw-radius-12); background: var(--ul-field-bg); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }
+.rv-cmp:focus-within { box-shadow: inset 0 0 0 1px var(--gw-color-black); }
+:root[data-theme="dark"] .rv-cmp:focus-within { box-shadow: inset 0 0 0 1px var(--gw-color-white); }
+.rv-cmp textarea { all: unset; box-sizing: border-box; display: block; width: 100%; min-height: 56px; padding: var(--gw-space-12) var(--gw-space-16) 0; color: var(--ul-field-fg); font: 400 14px/1.5 var(--gw-font-body); white-space: pre-wrap; }
+.rv-cmp textarea::placeholder { color: var(--ul-sub); }
+.rv-cmp__bar { display: flex; justify-content: space-between; align-items: center; gap: var(--gw-space-12); padding: var(--gw-space-8) var(--gw-space-8) var(--gw-space-8) var(--gw-space-16); }
 .rv-th__empty { font: 400 13px/1.5 var(--gw-font-body); color: var(--ul-sub); }
 .rv-rp { margin-top: var(--gw-space-16); display: grid; gap: var(--gw-space-8); }
 .rv-rp .rv-ta { min-height: 64px; }
@@ -1747,24 +1778,81 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     return esc(t).replace(/(https?:\/\/[^\s<]+)/g, '<a class="rv-link" href="$1" target="_blank" rel="noopener">$1</a>')
       .replace(/(^|[\s(])#(\d{1,6})\b/g, '$1<a class="rv-link" href="https://github.com/gushwork-design/design-system/pull/$2" target="_blank" rel="noopener">#$2</a>');
   }
+  /* One list, oldest first: the send-back and reject notes (from the item's history, so notes from before threads existed show
+     too), then everything in the GitHub thread. A note the thread already holds is shown once. Reference files in a thread
+     comment are lifted out of its text and drawn as thumbnails. */
+  function mergedComments(it, thread) {
+    var GH = /\n*Reference files:\n((?:- \[[^\]]*\]\(https:\/\/github\.com\/[^)]+\)\n?)+)\s*$/;
+    var out = thread.map(function (c) {
+      var m = GH.exec(c.body || ''), refs = [];
+      if (m) m[1].replace(/\/blob\/main\/([^)]+)\)/g, function (_, p) { refs.push(p); });
+      return { at: c.at, who: c.who, by: c.by, kind: c.kind, blocked: c.blocked, body: m ? c.body.slice(0, m.index).trim() : c.body, refs: refs };
+    });
+    var have = out.filter(function (c) { return c.kind; }).map(function (c) { return c.body.trim(); });
+    var latest = (it.activity || []).filter(function (a) { return a.what === 'sent back' || a.what === 'rejected'; })[0];
+    (it.activity || []).forEach(function (a) {
+      if ((a.what !== 'sent back' && a.what !== 'rejected') || !a.note || have.indexOf(a.note.trim()) >= 0) return;
+      out.push({ at: a.at, who: 'owner', kind: a.what === 'rejected' ? 'reject' : 'rework', body: a.note, refs: a === latest ? (it.refs || []) : [] });
+    });
+    return out.sort(function (a, b) { return tms(a.at) - tms(b.at); });
+  }
+  /* The timeline (5 Oct 2026, after Mobbin refs: Plain's agent tag and composer, Asana's inline events, Relevance AI's brief
+     card). Oldest first: send-back notes as cards, Alfred's comments tagged "AI agent", replies, and the item's fixes and
+     approvals as quiet one-line events, so the Activity list is folded in here once an item has a conversation. When
+     Alfred is waiting with numbered options, each option is a chip that fills the reply. */
+  function timeline(it, cms) {
+    var ev = (it.activity || []).filter(function (a) { return a.what !== 'sent back' && a.what !== 'rejected'; }).map(function (a) {
+      return { at: a.at, ev: true, what: a.what, pr: a.pr, by: a.by };
+    });
+    return cms.concat(ev).sort(function (a, b) { return tms(a.at) - tms(b.at); });
+  }
+  function prLink(n) { return '<a class="rv-link" href="https://github.com/gushwork-design/design-system/pull/' + n + '" target="_blank" rel="noopener">#' + n + '</a>'; }
   function paintThread(it) {
     var box = $('rv-th'); if (!box || BYID[RV.list[RV.i]] !== it) return;
-    var t = THREADS[idOf(it)], cms = (t && t.comments) || [];
+    var t = THREADS[idOf(it)], cms = mergedComments(it, (t && t.comments) || []);
     var live = it.state === 'rework' || it.state === 'redone' || cms.length;
-    if (!t || !live) { box.innerHTML = t && t.error && live ? '<h3>Comments</h3><p class="rv-th__empty">' + esc(t.error) + '</p>' : ''; return; }
-    var last = cms[cms.length - 1];
-    var list = cms.length ? '<ol>' + cms.map(function (c) {
+    if (!live) { box.innerHTML = ''; return; }
+    t = t || {};   // the notes draw at once; the thread joins them when it arrives
+    var rows = timeline(it, cms), lastCm = cms[cms.length - 1];
+    // Updates from before the conversation started fold into one row, so the thread opens on the first note.
+    var lead = 0; while (lead < rows.length && rows[lead].ev) lead++;
+    if (lead === rows.length) lead = 0;
+    var early = RV.early && RV.early[idOf(it)];
+    var html = (lead > 1 && !early ? '<li class="rv-ev rv-ev--more"><button type="button" class="rv-link" id="rv-early">Show ' + lead + ' earlier updates</button></li>' : '') +
+      rows.slice(lead > 1 && !early ? lead : 0).map(function (c) {
+      if (c.ev) {
+        var txt = c.what === 'approved' ? '<b>' + esc(personName(c.by).split(' ')[0] || 'Utsav') + '</b> approved it'
+          : c.what === 'fixed and published' ? '<b>Alfred</b> fixed and published ' + prLink(c.pr)
+          : (c.what === 'spec moved' ? 'Spec moved' : 'Drawing moved') + (c.pr ? ' in ' + prLink(c.pr) : '');
+        return '<li class="rv-ev rv-ev--' + (c.what === 'approved' ? 'ok' : c.what === 'fixed and published' ? 'ship' : 'move') + '"><span class="rv-ev__d" aria-hidden="true"></span><span>' + txt + ' · <time datetime="' + esc(c.at) + '">' + esc(fmtWhen(c.at)) + '</time></span></li>';
+      }
       var who = c.who === 'alfred' ? 'Alfred' : c.who === 'owner' ? 'Utsav' : (c.by || 'Someone');
-      var tag = c === last && c.blocked ? '<span class="rv-cm__tag">Waiting on you</span>' : '';
-      return '<li class="rv-cm rv-cm--' + esc(c.who) + '"><span class="rv-cm__a" aria-hidden="true">' + esc(who.charAt(0)) + '</span><div><div class="rv-cm__h"><b>' + esc(who) + '</b><time datetime="' + esc(c.at) + '">' + esc(fmtWhen(c.at)) + '</time>' + tag + '</div><div class="rv-cm__b">' + linkify(c.body) + '</div></div></li>';
-    }).join('') + '</ol>' : '<p class="rv-th__empty">No comments yet. Alfred posts here after every rework: what he fixed, or what stopped him.</p>';
-    var reply = owner ? '<div class="rv-rp"><label class="rv-lab" for="rv-reply">Reply to Alfred</label><textarea id="rv-reply" class="rv-ta" rows="2" maxlength="2000" placeholder="Answer his question, or say what to do next."></textarea>' +
-      '<div class="rv-rp__f"><span class="rv-hint--sm">He starts again with your reply and the whole thread.</span><button type="button" class="rv-b rv-b--ghost rv-b--sm" id="rv-reply-send" disabled>Send<kbd aria-hidden="true">\u2318\u21b5</kbd></button></div></div>' : '';
-    box.innerHTML = '<h3>Comments' + (t.url ? '<a class="rv-link" href="' + esc(t.url) + '" target="_blank" rel="noopener">On GitHub</a>' : '') + '</h3>' + list + reply;
+      var waiting = c === lastCm && c.blocked;
+      var tags = (c.who === 'alfred' ? '<span class="rv-cm__tag rv-cm__tag--ai">AI agent</span>' : '') +
+        (c.kind === 'rework' ? '<span class="rv-cm__tag rv-cm__tag--note">Rework note</span>' : c.kind === 'reject' ? '<span class="rv-cm__tag rv-cm__tag--reject">Reject note</span>' : '') +
+        (waiting ? '<span class="rv-cm__tag">Waiting on you</span>' : '');
+      var files = c.refs && c.refs.length ? '<div class="rv-refs">' + attHtml(c.refs.map(function (r) { var href = r.replace(/^web\//, '/'); return { name: r.split('/').pop(), type: /\.(png|jpe?g|webp|gif)$/.test(r) ? 'image/x' : '', url: href, href: href }; }), false) + '</div>' : '';
+      var opts = [];
+      var body = (c.body || '').split('\n').filter(function (ln) {
+        var m = waiting && /^\s*(\d+)[.)]\s+(.+)$/.exec(ln); if (m) { opts.push({ n: m[1], t: m[2] }); return false; } return true;
+      }).join('\n').trim();
+      var chips = opts.length ? '<div class="rv-opts">' + opts.map(function (o) { return '<button type="button" class="rv-opt" data-opt="' + esc('Go with ' + o.n + ': ' + o.t) + '"><span>' + esc(o.n) + '</span>' + esc(o.t) + '</button>'; }).join('') + '</div>' : '';
+      var inner = (body ? '<div class="rv-cm__b">' + linkify(body) + '</div>' : '') + chips + files;
+      return '<li class="rv-cm rv-cm--' + esc(c.who) + (waiting ? ' is-waiting' : '') + '"><span class="rv-cm__a" aria-hidden="true">' + esc(who.charAt(0)) + '</span><div class="rv-cm__m"><div class="rv-cm__h"><b>' + esc(who) + '</b>' + tags + '<time datetime="' + esc(c.at) + '">' + esc(fmtWhen(c.at)) + '</time></div>' +
+        (c.kind ? '<div class="rv-card">' + inner + '</div>' : inner) + '</div></li>';
+    }).join('');
+    var reply = owner ? '<div class="rv-cmp"><textarea id="rv-reply" rows="2" maxlength="2000" aria-label="Reply to Alfred" placeholder="Reply to Alfred: answer his question, or say what to do next"></textarea>' +
+      '<div class="rv-cmp__bar"><span class="rv-hint--sm">He starts again with your reply and the whole thread</span><button type="button" class="rv-b rv-b--pass rv-b--sm" id="rv-reply-send" disabled>Send<kbd aria-hidden="true">⌘↵</kbd></button></div></div>' : '';
+    box.innerHTML = '<h3>Comments' + (t.url ? '<a class="rv-link" href="' + esc(t.url) + '" target="_blank" rel="noopener">On GitHub</a>' : '') + '</h3>' +
+      (html ? '<ol class="rv-tl">' + html + '</ol>' : '<p class="rv-th__empty">No comments yet. Your send-back note starts the thread, and Alfred replies after every rework.</p>') +
+      (t.error ? '<p class="rv-th__empty">' + esc(t.error) + '</p>' : '') + reply;
+    var more = $('rv-early'); if (more) more.addEventListener('click', function () { RV.early = RV.early || {}; RV.early[idOf(it)] = true; paintThread(it); });
     var ta = $('rv-reply'), send = $('rv-reply-send');
     if (!ta) return;
     ta.value = REPLY[idOf(it)] || ''; send.disabled = !ta.value.trim();
-    ta.addEventListener('input', function () { REPLY[idOf(it)] = ta.value; send.disabled = !ta.value.trim(); });
+    var sync = function () { REPLY[idOf(it)] = ta.value; send.disabled = !ta.value.trim(); };
+    ta.addEventListener('input', sync);
+    box.querySelectorAll('[data-opt]').forEach(function (b) { b.addEventListener('click', function () { ta.value = b.getAttribute('data-opt'); sync(); ta.focus(); }); });
     ta.addEventListener('keydown', function (ev) { if ((ev.metaKey || ev.ctrlKey) && ev.key === 'Enter') { ev.preventDefault(); ev.stopPropagation(); if (!send.disabled) send.click(); } });
     send.addEventListener('click', function () {
       var text = ta.value.trim(); if (!text) return;
@@ -1775,7 +1863,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
           if (!r.ok) { toast((r.j && r.j.error) || 'Could not send.'); send.disabled = false; send.removeAttribute('aria-busy'); return; }
           REPLY[idOf(it)] = '';
           var th = THREADS[idOf(it)] || { comments: [] }; th.comments = (th.comments || []).concat(r.j.comment); th.number = r.j.number;
-          th.url = th.url || 'https://github.com/gushwork-design/design-system/issues/' + r.j.number; THREADS[idOf(it)] = th;
+          th.url = th.url || 'https://github.com/gushwork-design/design-system/issues/' + r.j.number; th.error = ''; THREADS[idOf(it)] = th;
           toast(r.j.routine && r.j.routine.fired ? 'Sent. Alfred is on it.' : 'Posted, but Alfred did not start' + (r.j.routine && r.j.routine.why ? ': ' + r.j.routine.why : '') + '.');
           paintThread(it);
         }).catch(function () { toast('Could not reach the site.'); send.disabled = false; send.removeAttribute('aria-busy'); });
@@ -1783,7 +1871,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   }
   function loadThread(it) {
     paintThread(it);
-    if (!(it.state === 'rework' || it.state === 'redone' || THREADS[idOf(it)] || it.activity && it.activity.some(function (a) { return a.what === 'sent back'; }))) return;
+    if (!(it.state === 'rework' || it.state === 'redone' || THREADS[idOf(it)] || it.activity && it.activity.some(function (a) { return a.what === 'sent back' || a.what === 'rejected'; }))) return;
     fetch('/api/review?thread=' + encodeURIComponent(it.scope + '/' + it.key), { credentials: 'same-origin', cache: 'no-store' })
       .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
       .then(function (r) { THREADS[idOf(it)] = r.ok ? r.j : { comments: [], error: (r.j && r.j.error) || 'Could not load the comments.' }; paintThread(it); })
@@ -1875,12 +1963,13 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
         : e.q.via === 'main' ? 'It is recorded on main and live here now. The published pages catch up at the next publish.'
         : 'It is recorded in the repo at the next Claude session.') +
         (e.q.note ? ' Your note: ' + esc(e.q.note) : '') + ' <button class="rv-link" type="button" id="rv-undo">Undo</button></div>';
-    } else if (it.by) {
+    } else if (it.by && !(it.state === 'rework' || it.state === 'redone' || it.state === 'rejected')) {   // a send-back's or reject's note is the first comment now
       hist = '<div class="rv-note"><b>' + esc(it.state === 'expired' ? 'Approved, then the source moved' : it.state === 'redone' ? 'Redone since you sent it back' : (STATE_LABEL[it.state] || '')) + '</b> · ' + esc(personName(it.by)) + (it.on ? ', ' + esc(fmtWhen(it.at || it.on)) : '') + (it.note ? '<br>' + esc(it.note) : '') +
         (it.refs && it.refs.length ? '<div class="rv-refs">' + attHtml(it.refs.map(function (r) { var href = r.replace(/^web\//, '/'); return { name: r.split('/').pop(), type: /\.(png|jpe?g|webp|gif)$/.test(r) ? 'image/x' : '', url: href, href: href }; }), false) + '</div>' : '') + '</div>';
     }
     var acts = it.activity || [];
-    var actHtml = acts.length ? '<div class="rv-act"><h3>Activity</h3><ol>' + acts.map(function (a) {
+    var talk = it.state === 'rework' || it.state === 'redone' || acts.some(function (a) { return a.what === 'sent back' || a.what === 'rejected'; });
+    var actHtml = acts.length && !talk ? '<div class="rv-act"><h3>Activity</h3><ol>' + acts.map(function (a) {
       var moved = a.what === 'spec moved' || a.what === 'drawing moved';
       var cls = a.what === 'approved' ? 'is-ok' : a.what === 'sent back' ? 'is-warn' : a.what === 'rejected' ? 'is-bad' : moved ? 'is-move' : 'is-ship';
       var when = fmtWhen(a.at);
