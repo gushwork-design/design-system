@@ -1420,6 +1420,69 @@ def source_moved(it):
     return None
 
 
+def requested_times(items):
+    """When each item came up for review, to the minute (5 Oct 2026, Utsav: "show time in requested"). The registry's
+    `changed` is only a day, so walk main's own history (first parent, so a merge counts at the time it landed) for each surface's registry and docs, oldest first, and keep the
+    last one that moved the item's own spec fingerprint; a published fix (Activity) that is newer wins, since that is when
+    a reworked item came back. Only files a commit changed are re-read, and a fingerprint is computed once per (entry,
+    doc) pair, so this costs seconds, not minutes. No git means no times, not an error."""
+    blobs, fps = {}, {}
+    def blob(sha):
+        if sha not in blobs:
+            blobs[sha] = _git("cat-file", "-p", sha) if sha and set(sha) != {"0"} else ""
+        return blobs[sha]
+    by_surface = {}
+    for it in items:
+        if it["scope"] != "foundation":
+            by_surface.setdefault(it["scope"], []).append(it)
+    for scope, its in by_surface.items():
+        rp = f"exports/{scope}/component-registry.json"
+        base = os.path.dirname(CL.component_doc_path(scope, {"doc": "x"}))
+        try:
+            out = _git("log", "--reverse", "--first-parent", "-m", "--raw", "--no-abbrev", "--no-renames", "-n", "400", "--format=%x1e%cI", "--", rp, base)
+        except Exception:
+            continue
+        cur, comps, reg_sha = {}, {}, None
+        last = {it["key"]: (None, "") for it in its}
+        for rec in out.split("\x1e")[1:]:
+            lines = rec.strip().splitlines()
+            at, moved = lines[0].strip(), False
+            for ln in lines[1:]:
+                m = re.match(r"^:\S+ \S+ \S+ (\S+) \S+\t(.+)$", ln)
+                if m:
+                    cur[m.group(2)] = m.group(1); moved = True
+            if not moved:
+                continue
+            if cur.get(rp) != reg_sha:
+                reg_sha = cur.get(rp)
+                try:
+                    comps = json.loads(blob(reg_sha) or "{}").get("components") or {}
+                except ValueError:
+                    comps = {}
+            for it in its:
+                ent = comps.get(it["key"])
+                if not ent:
+                    continue
+                dp = CL.component_doc_path(scope, ent)
+                ck = (it["key"], json.dumps(ent, sort_keys=True), cur.get(dp))
+                if ck not in fps:
+                    fps[ck] = CL.spec_fingerprint(it["key"], ent, blob(cur.get(dp)))
+                if fps[ck] != last[it["key"]][0]:
+                    last[it["key"]] = (fps[ck], at)
+        for it in its:
+            fixed = next((a["at"] for a in it.get("activity") or [] if a["what"] == "fixed and published"), "")
+            at = last[it["key"]][1]
+            it["requestedAt"] = max(at, fixed, key=lambda v: _iso_ts(v)) if (at or fixed) else ""
+
+
+def _iso_ts(v):
+    try:
+        from datetime import datetime
+        return datetime.fromisoformat(v.replace("Z", "+00:00")).timestamp()
+    except Exception:
+        return 0
+
+
 def review_activity(items, limit=8):
     """Each item's history for the review drawer's Activity list (R54 addendum, 5 Oct 2026), read from git, so it
     costs nothing to keep: every decision the page saves is a commit "Review: <action> <scope>/<key> — <note>",
@@ -1540,6 +1603,7 @@ def main():
 
     items = review_items(reg, groups)
     review_activity(items)
+    requested_times(items)
 
     # The same facts as plain data, for the Design System page to list natively.
     data = {

@@ -1573,13 +1573,13 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     var d = (it.activity || []).filter(function (a) { return a.what === 'approved' || a.what === 'sent back' || a.what === 'rejected'; })[0];
     return Math.max(tms(d && d.at), tms(it.at), tms(it.on));
   }
-  function lastAt(it) { return Math.max(decidedAt(it), tms((it.activity || [])[0] && it.activity[0].at), tms(it.changed)); }
+  function lastAt(it) { return Math.max(decidedAt(it), tms((it.activity || [])[0] && it.activity[0].at), tms(it.requestedAt || it.changed)); }
   var STATE_RANK = { pending: 0, expired: 0, redone: 0, rework: 1, rejected: 2, passed: 3 };
   var REV_SORT = [
     { get: function (it) { return it.label; }, dir: 1 },
     { get: function (it) { return scopeTitle(it); }, dir: 1 },
     { get: function (it) { return STATE_RANK[eff(it).state]; }, dir: 1 },
-    { get: function (it) { return it.changed || null; }, dir: 1 },   // Requested: the longest-waiting first, as it is a queue
+    { get: function (it) { return tms(it.requestedAt || it.changed) || null; }, dir: -1 },   // Requested: newest first (5 Oct 2026, Utsav: "sort by latest first")
     { get: function (it) { return eff(it).queued ? Infinity : (decidedAt(it) || lastAt(it) || null); }, dir: -1 },   // never decided: when it came up
     null
   ];
@@ -1611,14 +1611,14 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     list = sortItems(list, REV_SORT, SORT.rev);   // the drawer steps through this same order
     $('ds-rev-q').textContent = plural(list.length, 'item');
     var rows = list.slice(0, RF.shown).map(function (it) {
-      var e = eff(it), by = e.queued ? 'You, just now' : (it.by ? personName(it.by) : '—');
+      var e = eff(it), by = e.queued ? 'You, just now' : (it.by ? personName(it.by).split(' ')[0] : '—');   // first name only: the column is narrow and the drawer has the full one
       return '<div class="ul-row ul-row--d rv-row" role="row" tabindex="0" data-id="' + esc(idOf(it)) + '">' +
         cell('<b style="font-weight:600">' + esc(it.label) + '</b>', '') + txt(scopeTitle(it)) + cell(badgeOf(e.state, e.queued, e.q)) +
-        txt(fmtWhen(it.changed) || '—', it.changed ? '' : 'ul-c--none', it.changed ? 'Came up for review on this date: the day its spec last moved' : 'No date recorded') + txt(by) +
+        txt(fmtWhen(it.requestedAt || it.changed) || '—', it.changed ? '' : 'ul-c--none', it.changed ? 'When it came up for review: its spec last moved on main, or a fix for it was published' : 'No date recorded') + txt(by) +
         cell('<span class="ds-pv rv-go">Review</span>') + '</div>';
     });
     var revHeads = ['Item', 'Library', 'Status', 'Requested', 'Decided', ''].map(function (h, i) { return REV_SORT[i] ? { html: sortTh('rev', i, h) } : h; });
-    $('ds-rev-table').innerHTML = table('minmax(170px,1.3fr) 110px 140px 110px minmax(210px,1.2fr) 90px', revHeads, rows,
+    $('ds-rev-table').innerHTML = table('minmax(170px,1.4fr) 110px 140px 170px minmax(120px,1fr) 90px', revHeads, rows,
       RV.filter === 'waiting' ? 'Nothing is waiting on you' : 'Nothing here yet');
     [].forEach.call($('ds-rev-table').querySelectorAll('[data-sort-i]'), function (b) {
       b.addEventListener('click', function () {
