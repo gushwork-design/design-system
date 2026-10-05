@@ -304,6 +304,14 @@
       "reviewedOn": "2026-10-05",
       "fingerprint": "9176bb841fa18c0d",
       "previewFingerprint": "6866305f326ac1f4"
+    },
+    "page-build": {
+      "reviewed": "rejected",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "4536b249e9d40501",
+      "previewFingerprint": "40fae7f4376402ca",
+      "note": "new footer design being used"
     }
   }
 }
