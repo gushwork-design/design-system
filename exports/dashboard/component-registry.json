@@ -1074,12 +1074,11 @@
       "previewFingerprint": "5a50738636c22de2"
     },
     "modal": {
-      "reviewed": "rework",
+      "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "393968a8d5c27df5",
-      "note": "no need of outline on \"Q4 pipeline\" frame",
-      "previewFingerprint": "7e6612c7d8c21105"
+      "previewFingerprint": "9be07fee528d9e9e"
     },
     "multi-select": {
       "reviewed": "rework",
