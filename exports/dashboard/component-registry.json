@@ -1458,11 +1458,12 @@
       "previewFingerprint": "4834659d12a9c468"
     },
     "analytics-overview-template": {
-      "reviewed": "passed",
+      "reviewed": "rejected",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "316f6bc9455675c0",
-      "previewFingerprint": "410329c2eabe53a0"
+      "fingerprint": "bf45f626c9b12ab2",
+      "previewFingerprint": "410329c2eabe53a0",
+      "note": "may use later"
     },
     "shortcut-key": {
       "reviewed": "passed",
