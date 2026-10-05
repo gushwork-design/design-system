@@ -1253,7 +1253,10 @@
       "reviewedOn": "2026-10-05",
       "fingerprint": "be4a7521b7fae397",
       "previewFingerprint": "82425e7198c83636",
-      "note": "dark mode is fine, but in light mode, the text should be in black and whote bg and thin outline gray, similar to hover mode for notification/ appearnace in design hub website"
+      "note": "it should look something like this in light mode",
+      "refs": [
+        "web/previews/dashboard/refs/sidebar-collapsed/20261005-140146-1-screenshot-2026-10-05-at-7-31-17-pm.png"
+      ]
     },
     "sign-in-modal": {
       "reviewed": "passed",
