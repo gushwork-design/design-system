@@ -734,15 +734,15 @@
 .gd .gd-period__t{ font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
 
 /* --- info hint: dotted label + (i) trigger; the definition is a data-tip bubble ----- */
-.gd .gd-hint{ display: inline-flex; align-items: center; gap: var(--gw-space-4); vertical-align: baseline; }
-.gd .gd-hint__label{ text-decoration: underline dotted; text-decoration-color: var(--gd-text-muted); text-underline-offset: 4px; text-decoration-thickness: 1px; }
+.gd .gd-hint{ position: relative; display: inline-flex; align-items: center; gap: var(--gw-space-4); vertical-align: baseline; }   /* the bubble anchors to the whole hint */
+.gd .gd-hint__label{ text-decoration: none; }   /* the (i) is the only cue, no underline */
 .gd .gd-hint__btn{
-  position: relative; display: inline-grid; place-items: center; flex: none; width: 16px; height: 16px; padding: 0;
+  display: inline-grid; place-items: center; flex: none; width: 16px; height: 16px; padding: 0;
   border: 0; border-radius: 50%; background: none; color: var(--gd-text-muted); cursor: help; transition: color var(--gw-motion-fast);
 }
 .gd .gd-hint__btn svg{ width: 14px; height: 14px; display: block; }
 .gd .gd-hint__btn:hover, .gd .gd-hint__btn.is-hover{ color: var(--gd-text); }
-.gd .gd-hint__btn[data-tip]::after{ width: max-content; max-width: 240px; white-space: normal; padding: var(--gw-space-8) var(--gw-space-12); font: var(--gw-text-body-12-reg); }
+.gd .gd-hint__btn[data-tip]::after{ left: 50%; transform: translateX(-50%); width: max-content; max-width: 240px; white-space: normal; padding: var(--gw-space-8) var(--gw-space-12); font: var(--gw-text-body-12-reg); }   /* centred under the label and glyph together */
 
 /* ==== 30-inputs.css ==== */
 /* ============================================================================
