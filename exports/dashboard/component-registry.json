@@ -689,12 +689,11 @@
       "fingerprint": "c2b9465fd117f126"
     },
     "build-notice": {
-      "reviewed": "rework",
+      "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "3d5c1b1d04885a37",
-      "note": "1. cant we add update now as primary button and remind later as secondary option. - once they click on update now, we can open claude code directly and give them a bash or something so that they can update their tool/ product on their own instatntly and remind later will ping them again as they open it again",
-      "previewFingerprint": "34d249a0b9f983c3"
+      "fingerprint": "7f2f753ffb6739be",
+      "previewFingerprint": "93b43e2da6e261fc"
     },
     "access-denied-screen": {
       "reviewed": "passed",
