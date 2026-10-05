@@ -39,8 +39,9 @@ Short, stable facts so a fresh session can pick up cold. Update as we go. No sec
 - 2026-10-05: `mods/design-hub` v0.2 adds `/hub` (memory + threads pane) and `/thread <title>: <task>` (parallel subagent threads, one JSON file each under `.claude/hub/threads/`, see `.claude/hub/README.md`). Load locally with `claude --plugin-dir mods/design-hub`; it draws only in terminal and Desktop, not cloud sessions. Not part of the plugin. Not yet run end to end.
 
 ## Open draft PRs from this project (Utsav merges)
-- #191 Add CLAUDE.md. #194 Draw: slides/title-bar.
-- Pending Utsav's call: redo #91 on the new path (web/internal/design-system.html); close #19 (main has a rebuilt lander); fix scripts/_library_site.py on Python 3.11.
+- #191 Add CLAUDE.md (+ the memory file). #194 Draw: slides/title-bar. #196 Fix library build on Python 3.11.
+- Closed 2026-10-05 at Utsav's yes: #19 (superseded; branch ad-page/ai-services-lander kept).
+- #91 is obsolete: ruling R34 deleted secondary-500, so there is nothing to hide. Closing it is Utsav's call.
 
 ## Merged through this project
 - (none yet)
