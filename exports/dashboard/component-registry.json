@@ -883,11 +883,10 @@
       "previewFingerprint": "f375b58be3a59172"
     },
     "delta-pill": {
-      "reviewed": "rework",
+      "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "0a6858018d88036b",
-      "note": "spacing tag and text is missing, we can keep 4 px gap",
+      "fingerprint": "20b993d9e62b9d58",
       "previewFingerprint": "6069893e410ef30d"
     },
     "detail-view": {
