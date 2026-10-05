@@ -326,8 +326,8 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "b011f54c631f2238",
-      "previewFingerprint": "1f588013fe5168c4",
-      "note": "the blue is the hover state and the tooltip will be in the hove state too, the white ones are default state"
+      "previewFingerprint": "e618b315c2cf7d65",
+      "note": "1. hover mode should be in all the white blocks and add subtle animation\n2. add mobile version for this too"
     },
     "video": {
       "reviewed": "passed",
