@@ -187,6 +187,9 @@ t('a reviewer\'s DM that is not a question is ticked AND answered in words, so t
   o = await handleMessage(ev('and the other one?', 'UUTSAV', { thread_ts: '500.5', ts: '501.1' }), pingDeps);
   t('a reply in any other thread is for Bruce', [o.did, sent.length], ['bruce', 1]);
   calls.length = 0;
+  o = await handleMessage(ev('the logo should be in original color', 'UUTSAV', { thread_ts: '500.5', ts: '502.1' }), pingDeps);
+  t('a follow-up in a Bruce thread that names a logo still goes to Bruce, not the file concierge', [o.did, calls.map((c) => c.method)], ['bruce', ['reactions.add']]);
+  calls.length = 0;
   o = await handleMessage(ev('do it', 'UUTSAV', { thread_ts: '400.4', ts: '402.1' }), { ...pingDeps, toAlfred: async () => ({ ok: false, why: 'the site has no GitHub token' }) });
   t('if it cannot reach Alfred it says so', [o.did, calls.at(-1).body.text.includes('no GitHub token')], ['to-alfred-failed', true]);
 }
