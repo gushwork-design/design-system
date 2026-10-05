@@ -269,6 +269,13 @@
       "reviewedOn": "2026-10-05",
       "fingerprint": "276ce8fa0099fa31",
       "previewFingerprint": "668202067994ec2b"
+    },
+    "hero": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "f2c4006add28e3b9",
+      "previewFingerprint": "4570415d8697da77"
     }
   }
 }
