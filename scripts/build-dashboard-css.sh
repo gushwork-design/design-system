@@ -5,6 +5,7 @@
 #   exports/dashboard/js/NN-*.js              -> exports/dashboard/dashboard.js
 #   exports/dashboard/registry-parts/*.json   -> exports/dashboard/component-registry.json
 #   skills/gushwork-dashboard/templates/analytics-overview/ -> web/previews/dashboard/pages/ (the review drawer's copy)
+#                                                          -> templates/analytics-overview/ (the templates folder's copy)
 #
 # Edit the PARTIALS, never the built files: the next run overwrites them. Partials are joined in
 # filename order, so the number prefix is the cascade order (00 base, 10 shell, 20 actions, ...).
@@ -23,6 +24,13 @@ TPL=skills/gushwork-dashboard/templates/analytics-overview/analytics-overview.ht
 page_preview() {  # $1 = output file
   mkdir -p "$(dirname "$1")"
   perl -pe 's#\.\./\.\./\.\./\.\./foundation/#/foundation/#g; s#\.\./\.\./\.\./\.\./exports/#/exports/#g; s#"registry":"https://[^"]*"#"registry":""#' "$TPL" > "$1"
+}
+# The same template, shipped beside the other documents and pages in templates/ (templates/<name>/ is where a person
+# looks first). The skill's copy is the source; this one is generated from it with the links re-based two levels
+# deep (templates/analytics-overview/ -> the repo root), so the two cannot drift. The README beside it is hand-written.
+templates_copy() {  # $1 = output file
+  mkdir -p "$(dirname "$1")"
+  perl -pe 's#\.\./\.\./\.\./\.\./foundation/#../../foundation/#g; s#\.\./\.\./\.\./\.\./exports/#../../exports/#g' "$TPL" > "$1"
 }
 build() {  # $1 = output dir to write into
   local out="$1"; mkdir -p "$out"
@@ -69,8 +77,12 @@ case "${1:-}" in
     page_preview "$tmp/page.html"
     cmp -s "$tmp/page.html" web/previews/dashboard/pages/analytics-overview.html \
       || { echo "web/previews/dashboard/pages/analytics-overview.html is out of date — run: bash scripts/build-dashboard-css.sh" >&2; exit 1; }
+    templates_copy "$tmp/tpl.html"
+    cmp -s "$tmp/tpl.html" templates/analytics-overview/analytics-overview.html \
+      || { echo "templates/analytics-overview/analytics-overview.html is out of date — run: bash scripts/build-dashboard-css.sh" >&2; exit 1; }
     echo "$D built files are current." ;;
   "") build "$D"; page_preview web/previews/dashboard/pages/analytics-overview.html
+      templates_copy templates/analytics-overview/analytics-overview.html
       echo "built $D/dashboard.css, dashboard.js, component-registry.json, and the template preview" ;;
   *) echo "usage: $0 [--check]" >&2; exit 2 ;;
 esac
