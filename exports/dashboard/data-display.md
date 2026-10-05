@@ -46,7 +46,7 @@ Rules that apply to the whole set: a figure that can change carries `gd-num` (ta
 
 **Purpose.** The change in a figure against a comparison, as arrow and value. Use on KPI cards and in table cells. Class is `.gd-delta`.
 
-**Anatomy.** `.gd-delta.gd-delta--good|--bad|--neutral` > `__arrow[data-dir=up|down|flat]` + `__value`; optional `.gd-delta__vs` ("vs last 30 days") placed after it. **Direction and tone are independent:** `data-dir` is what happened, the modifier is whether that is good. Cost per lead down 3.2% is `data-dir="down"` with `--good`.
+**Anatomy.** `.gd-delta.gd-delta--good|--bad|--neutral` > `__arrow[data-dir=up|down|flat]` + `__value`; optional `.gd-delta__vs` ("vs last 30 days") placed after it, 4px (`--gw-space-4`) from the pill. **Direction and tone are independent:** `data-dir` is what happened, the modifier is whether that is good. Cost per lead down 3.2% is `data-dir="down"` with `--good`.
 
 **Variants.** Default 20h (KPI card); `--sm` 16h at 12px (table cell, fits compact rows); `--arrow` arrow only, with the figure beside it or in `gd-sr` text; `--ghost` no tint, coloured text only for dense tables.
 

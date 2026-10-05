@@ -95,6 +95,7 @@
 .gd-delta__arrow { width: 8px; height: 7px; flex: none; background: currentColor; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
 .gd-delta__arrow[data-dir="down"] { clip-path: polygon(0 0, 100% 0, 50% 100%); }
 .gd-delta__arrow[data-dir="flat"] { height: 2px; clip-path: none; border-radius: 1px; }
+.gd-delta + .gd-delta__vs { margin-left: var(--gw-space-4); }                                   /* 4px between the pill and its comparison text */
 .gd-delta__vs { font: var(--gw-text-body-12-reg); letter-spacing: var(--gw-text-body-12-reg-tracking); color: var(--gd-text-muted); white-space: nowrap; }
 .gd-delta--sm { height: 16px; padding: 0 var(--gw-space-4); font-size: 12px; line-height: 16px; gap: var(--gw-space-2); }  /* table cell: fits the compact row */
 .gd-delta--sm .gd-delta__arrow { width: 7px; height: 6px; }
