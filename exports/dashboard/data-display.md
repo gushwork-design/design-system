@@ -8,7 +8,7 @@ Rules that apply to the whole set: a figure that can change carries `gd-num` (ta
 
 **Purpose.** The container for a section of a screen: a chart, a table, a form group. Use it to group related content under one title. Do not nest a card inside a card; use a bordered well or the key value list inside.
 
-**Anatomy.** `.gd-card` > `.gd-card__head` (`__titles` > `__title`, `__desc`; `__actions`), `.gd-card__body`, optional `.gd-card__foot`.
+**Anatomy.** `.gd-card` > `.gd-card__head` (`__titles` > `__title`, `__desc`; `__actions`), `.gd-card__body`, optional `.gd-card__foot`. `__actions` sit at the top right of the head (inside the card padding, in compact too); they drop under the title only when the card is too narrow for both.
 ```html
 <section class="gd-card"><div class="gd-card__head"><div class="gd-card__titles"><h3 class="gd-card__title">Lead sources</h3><p class="gd-card__desc">Last 30 days</p></div><div class="gd-card__actions">…</div></div><div class="gd-card__body">…</div></section>
 ```
