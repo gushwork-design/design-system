@@ -342,6 +342,14 @@
       "reviewedOn": "2026-10-05",
       "fingerprint": "9a1a325ce008f724",
       "previewFingerprint": "c67baf26ce5ecb69"
+    },
+    "footer": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "4f3074b5c817a033",
+      "previewFingerprint": "3121dbde5129459f",
+      "note": "wrong design"
     }
   }
 }
