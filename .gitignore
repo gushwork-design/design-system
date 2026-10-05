@@ -20,3 +20,4 @@ templates/**/package-lock.json
 # working tree that had it; the site now deploys from main in CI, and a Vercel deploy is a
 # whole snapshot, so the first CI publish served the lander with a 404 where the video was.
 # Re-render from videos/ai-crm-flow/ and commit the new file when it changes.
+.claude/hub/threads/
