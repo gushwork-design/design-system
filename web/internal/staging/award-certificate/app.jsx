@@ -99,15 +99,6 @@ function PropTextarea({ value, onChange, placeholder, rows = 3 }) {
   );
 }
 
-function PropSwitch({ value, onChange, label }) {
-  return (
-    <button type="button" role="switch" aria-checked={!!value} aria-label={label}
-      className={`gw-switch${value ? ' on' : ''}`} onClick={() => onChange(!value)}>
-      <span className="gw-switch__knob" />
-    </button>
-  );
-}
-
 /* Opens on click, never on hover; a plain check on the selected row. */
 function PropDropdown({ value, options, onChange }) {
   const [open, setOpen] = useState(false);
@@ -419,9 +410,6 @@ function App() {
               </PropRow>
               <PropRow label="Headline" align="start">
                 <PropTextarea value={data.headline} onChange={set('headline')} rows={2} placeholder="landed the whales." />
-              </PropRow>
-              <PropRow label="Own line">
-                <PropSwitch value={data.nameOwnLine} onChange={set('nameOwnLine')} label="Name on its own line" />
               </PropRow>
             </PropSection>
 
