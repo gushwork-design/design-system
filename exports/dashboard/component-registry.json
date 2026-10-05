@@ -1327,6 +1327,13 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "b045cb102000d0c1"
+    },
+    "topbar": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "dec19d1150b3440b",
+      "note": "move the menu button on the right side"
     }
   }
 }
