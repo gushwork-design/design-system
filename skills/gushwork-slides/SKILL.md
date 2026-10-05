@@ -21,7 +21,8 @@ cd ~/.claude/plugins/marketplaces/gushwork && git fetch -q && git log --oneline 
 ```
 
 Any commits listed means they are behind: tell them to run
-`claude plugin marketplace update gushwork` and restart Claude Code.
+`claude plugin marketplace update gushwork && claude plugin update gushwork-design@gushwork`,
+then `/reload-plugins` in the chat.
 
 ## Read these first
 

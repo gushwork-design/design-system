@@ -75,6 +75,8 @@ assert d['hookEventName']=='SessionStart'
 assert 'systemMessage' not in d, 'systemMessage inside hookSpecificOutput is ignored by Claude Code'
 assert '$CUR' in o['systemMessage'] and '$OLD' in o['systemMessage']
 assert d['additionalContext'] and 'first reply' in d['additionalContext']
+assert 'reload-plugins' in d['additionalContext'] and 'reload-plugins' in o['systemMessage']
+assert 'then restart' not in o['systemMessage'], 'the restart claim is stale since /reload-plugins'
 " 2>/dev/null && ck ok "behind: names both versions in a valid envelope" \
                 || ck no "behind: envelope malformed"
 

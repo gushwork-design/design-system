@@ -306,10 +306,12 @@ if bits:
 
 if flipped:
     tail = ("Auto-update was off on this machine — it is on now, so the next start picks this up. "
-            "To take it now: claude plugin update gushwork-design@gushwork, then restart.")
+            "To take it now: claude plugin update gushwork-design@gushwork, then /reload-plugins in "
+            "the chat. No restart needed.")
 else:
     tail = ("Auto-update should land this at your next start. To take it now: "
-            "claude plugin update gushwork-design@gushwork, then restart.")
+            "claude plugin update gushwork-design@gushwork, then /reload-plugins in the chat. "
+            "No restart needed.")
 
 # `systemMessage` is a UNIVERSAL field and sits at the TOP LEVEL of the envelope. Inside
 # `hookSpecificOutput` it is silently ignored (confirmed against the hooks docs, 1 Oct 2026), which
@@ -324,15 +326,19 @@ print(json.dumps({"systemMessage": head + " " + tail, "hookSpecificOutput": {
         # The user may not see systemMessage in every client (the desktop app, a stripped terminal),
         # so Claude says it once as well, in the first reply, in one sentence.
         + "Tell the user, once, in your first reply and in one sentence, that this session is on "
-          f"v{local} and v{remote} is out, with the update command below. Then carry on with what "
-          "they asked; do not repeat it. "
+          f"v{local} and v{remote} is out. Directly under that sentence put the update command, alone, "
+          "in a fenced code block tagged bash — the desktop app puts a Run button on it — then one "
+          "short line: when it finishes, type /reload-plugins in this chat; no restart is needed. "
+          "Then carry on with what they asked; do not repeat any of it. "
         # Only claim components moved when some actually did. A release can bump the plugin
         # without touching a component doc, and pointing at "the components listed above" when
         # nothing was listed reads as a bug and costs the whole notice its credibility.
         + ("Anything you build with this version may use superseded specs for the components "
            "named above; say so rather than silently building. " if (breaking or changed) else "")
-        + "Update with: claude plugin update gushwork-design@gushwork "
-          "(a restart is required either way)."
+        # "A restart is required either way" was true until Claude Code grew /reload-plugins
+        # (present in 2.1.263, 5 Oct 2026). A restart still works; it is no longer the ask.
+        + "Update with: claude plugin update gushwork-design@gushwork, then /reload-plugins "
+          "(no restart needed)."
     ),
 }}))
 PY

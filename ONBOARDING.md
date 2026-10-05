@@ -19,6 +19,10 @@ and skipping it meant running last month's design system indefinitely, with no w
 plugin now ships a session-start hook that turns it on itself, and tells you which components
 moved when you are behind.
 
+**Every new chat opens with a line that names you** — "Hey <you>, new chat. Gushwork design system
+v<version> is on." — so you know the plugin is loaded before you ask for anything. If you are behind,
+the update command follows it with a Run button: click it, type `/reload-plugins`, done.
+
 *Reading this yourself instead of pasting it in? Run steps 1 and 2 in a terminal, then restart
 Claude Code. Nothing to do at all if your repo has a `.claude/settings.json` mentioning
 `gushwork` — it installs itself.*
@@ -97,7 +101,7 @@ the setup block prevents that. If you skipped it, update by hand:
 claude plugin marketplace update gushwork && claude plugin update gushwork-design@gushwork
 ```
 
-Restart after. Either way a new version takes effect on the **next** start, not the current one.
+Then type `/reload-plugins` in the chat. No restart: the new version is live in that chat at once.
 
 ## Where to look things up
 

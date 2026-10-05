@@ -34,7 +34,14 @@
     "SessionEnd runs log-activity.sh once more when a session closes, so a session that ends records its",
     "final token totals. It does nothing unless a Gushwork skill ran in that session (the same gate as",
     "every other row), and a closed laptop or a crash simply means the last skill, file or artifact row",
-    "carries the most recent figures instead."
+    "carries the most recent figures instead.",
+    "",
+    "greet.sh opens every NEW chat with one line by name \u2014 \"Hey Utsav, new chat. Gushwork design",
+    "system v1.59.0 is on.\" \u2014 so a teammate knows the plugin is loaded, and which version, before any",
+    "skill has had a reason to fire (R48, 5 Oct 2026). startup|clear only: those begin a conversation;",
+    "resume and compact continue one, and \"new chat\" would be a lie there. It is additionalContext,",
+    "not systemMessage, because a hook cannot make Claude speak before the person types \u2014 the line",
+    "rides on the first reply. Its own script for the same reason as the others: one hook, one envelope."
   ],
   "hooks": {
     "SessionStart": [
@@ -50,6 +57,16 @@
             "type": "command",
             "command": "\"${CLAUDE_PLUGIN_ROOT}\"/scripts/check-approvals.sh",
             "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "startup|clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/scripts/greet.sh",
+            "timeout": 5
           }
         ]
       },
