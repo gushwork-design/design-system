@@ -58,7 +58,7 @@ Children sit under a 1px guide line and carry no icon.
   <button class="gd-account__act" data-gd-signout aria-label="Sign out"><svg>…</svg></button>
 </div>
 ```
-The avatar is the hub's 40px rounded-square tile with a dot pattern chosen from a hash of the email, so the same person draws the same mark. Name and role come from the session; when there is no real name, derive one from the address and keep the address in `title`. A long name wraps to two lines and clamps.
+The avatar is the hub's 40px rounded-square tile with a dot pattern chosen from a hash of the email, so the same person draws the same mark. Name and role come from the session; when there is no real name, derive one from the address and keep the address in `title`. A long name stays on one line and truncates with an ellipsis; the full name is in `title`.
 
 **States.** Rest; hover on the action; `data-state="loading"` draws the avatar and two text lines as pulsing blocks (`gd-pulse`) until the session answers, so nothing shoves its neighbours. Collapsed: avatar only.
 

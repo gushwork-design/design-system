@@ -749,11 +749,10 @@
       "previewFingerprint": "7a6a210cbfd6270d"
     },
     "banner": {
-      "reviewed": "rework",
+      "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "a1a03716c3a46bbb",
-      "note": "the action button placment seems off, it can be low the text",
+      "fingerprint": "93a038b529d25b23",
       "previewFingerprint": "85c79c9ba5fb6bc6"
     },
     "bar-chart": {
@@ -766,7 +765,8 @@
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "22ddf1db0c023456"
+      "fingerprint": "9577e161e2e587e6",
+      "previewFingerprint": "c4ae905e7703e951"
     },
     "breadcrumbs": {
       "reviewed": "passed",
@@ -1201,12 +1201,11 @@
       "fingerprint": "79763e18d0d8a8eb"
     },
     "sidebar-collapsed": {
-      "reviewed": "rework",
+      "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "7e5aa3c7001fdb7f",
-      "note": "on hover show a tooltip like appearance to show whats the icon/ tab is for",
-      "previewFingerprint": "0ae0da5e7d7e4912"
+      "previewFingerprint": "3046298aba4f990f"
     },
     "sign-in-modal": {
       "reviewed": "passed",
