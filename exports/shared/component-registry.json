@@ -123,6 +123,13 @@
       "reviewedOn": "2026-10-05",
       "fingerprint": "79238870a19a7240",
       "previewFingerprint": "eff36df49b327be3"
+    },
+    "gushwork-logo": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "75be20cb0cd7ded6",
+      "previewFingerprint": "6a39042b464a8c22"
     }
   }
 }
