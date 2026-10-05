@@ -969,11 +969,10 @@
       "previewFingerprint": "7243f0f41df0af93"
     },
     "funnel": {
-      "reviewed": "rework",
+      "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "03092d8836905420",
-      "note": "table design is not matching rest of table",
+      "fingerprint": "5ce63bc2b34f6033",
       "previewFingerprint": "eee7025a3dbe24a7"
     },
     "google-button": {
