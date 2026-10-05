@@ -758,6 +758,13 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .rv-cm__tag--note { background: var(--ul-hdr-bg); color: var(--ul-sub); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }
 .rv-cm__tag--reject { background: var(--gw-color-red-alpha-10, rgba(239,68,68,.1)); color: var(--gw-color-red-500); }
 .rv-cm .rv-refs { margin-top: var(--gw-space-8); }
+.rv-tabs { display: flex; align-items: center; gap: var(--gw-space-20); margin: 0 0 var(--gw-space-16); box-shadow: inset 0 -1px 0 var(--ul-hdr-line); }
+.rv-tab { all: unset; box-sizing: border-box; cursor: pointer; padding: var(--gw-space-8) 0; font: 500 13px/1.4 var(--gw-font-body); color: var(--ul-sub); box-shadow: inset 0 -2px 0 transparent; }
+.rv-tab span { margin-left: 2px; font-weight: 400; color: var(--ul-sub); }
+.rv-tab:hover { color: var(--ul-value); }
+.rv-tab.is-on { color: var(--ul-value); box-shadow: inset 0 -2px 0 var(--ul-value); }
+.rv-tab:focus-visible { outline: var(--gw-focus-ring); outline-offset: 2px; border-radius: var(--gw-radius-4); }
+.rv-tabs .rv-tabs__gh { margin-left: auto; font: 500 12.5px/1.4 var(--gw-font-body); color: var(--ul-sub); }
 .rv-tl { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--gw-space-16); }
 .rv-cm__m { min-width: 0; }
 .rv-cm__h { margin-bottom: 4px; }
@@ -1810,12 +1817,15 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   function paintThread(it) {
     var box = $('rv-th'); if (!box || BYID[RV.list[RV.i]] !== it) return;
     var t = THREADS[idOf(it)], cms = mergedComments(it, (t && t.comments) || []);
-    var live = it.state === 'rework' || it.state === 'redone' || cms.length;
-    if (!live) { box.innerHTML = ''; return; }
+    var talk = it.state === 'rework' || it.state === 'redone' || cms.length;
+    if (!talk && !(it.activity || []).length) { box.innerHTML = ''; return; }
     t = t || {};   // the notes draw at once; the thread joins them when it arrives
-    var rows = timeline(it, cms), lastCm = cms[cms.length - 1];
+    // Two tabs, as Asana does it (5 Oct 2026, Utsav: "you removed activity, both should be there"): Comments is the
+    // conversation alone; All activity is every event with the comments in place. One composer under both.
+    var tab = RV.tab === 'all' || !talk ? 'all' : 'comments';
+    var rows = tab === 'all' ? timeline(it, cms) : cms.slice(), lastCm = cms[cms.length - 1];
     // Updates from before the conversation started fold into one row, so the thread opens on the first note.
-    var lead = 0; while (lead < rows.length && rows[lead].ev) lead++;
+    var lead = 0; while (tab === 'all' && talk && lead < rows.length && rows[lead].ev) lead++;
     if (lead === rows.length) lead = 0;
     var early = RV.early && RV.early[idOf(it)];
     var html = (lead > 1 && !early ? '<li class="rv-ev rv-ev--more"><button type="button" class="rv-link" id="rv-early">Show ' + lead + ' earlier updates</button></li>' : '') +
@@ -1843,9 +1853,15 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     }).join('');
     var reply = owner ? '<div class="rv-cmp"><textarea id="rv-reply" rows="2" maxlength="2000" aria-label="Reply to Alfred" placeholder="Reply to Alfred: answer his question, or say what to do next"></textarea>' +
       '<div class="rv-cmp__bar"><span class="rv-hint--sm">He starts again with your reply and the whole thread</span><button type="button" class="rv-b rv-b--pass rv-b--sm" id="rv-reply-send" disabled>Send<kbd aria-hidden="true">⌘↵</kbd></button></div></div>' : '';
-    box.innerHTML = '<h3>Comments' + (t.url ? '<a class="rv-link" href="' + esc(t.url) + '" target="_blank" rel="noopener">On GitHub</a>' : '') + '</h3>' +
-      (html ? '<ol class="rv-tl">' + html + '</ol>' : '<p class="rv-th__empty">No comments yet. Your send-back note starts the thread, and Alfred replies after every rework.</p>') +
-      (t.error ? '<p class="rv-th__empty">' + esc(t.error) + '</p>' : '') + reply;
+    var nAll = (it.activity || []).filter(function (a) { return a.what !== 'sent back' && a.what !== 'rejected'; }).length + cms.length;
+    var tabs = '<div class="rv-tabs" role="tablist">' +
+      '<button type="button" role="tab" class="rv-tab' + (tab === 'comments' ? ' is-on' : '') + '" aria-selected="' + (tab === 'comments') + '" data-tab="comments">Comments' + (cms.length ? ' <span>' + cms.length + '</span>' : '') + '</button>' +
+      '<button type="button" role="tab" class="rv-tab' + (tab === 'all' ? ' is-on' : '') + '" aria-selected="' + (tab === 'all') + '" data-tab="all">All activity' + (nAll ? ' <span>' + nAll + '</span>' : '') + '</button>' +
+      (t.url ? '<a class="rv-link rv-tabs__gh" href="' + esc(t.url) + '" target="_blank" rel="noopener">On GitHub</a>' : '') + '</div>';
+    box.innerHTML = tabs +
+      (html ? '<ol class="rv-tl">' + html + '</ol>' : '<p class="rv-th__empty">' + (tab === 'comments' ? 'No comments yet. Your send-back note starts the thread, and Alfred replies after every rework.' : 'Nothing has happened to this item yet.') + '</p>') +
+      (t.error && tab === 'comments' ? '<p class="rv-th__empty">' + esc(t.error) + '</p>' : '') + (talk ? reply : '');
+    box.querySelectorAll('[data-tab]').forEach(function (b) { b.addEventListener('click', function () { RV.tab = b.getAttribute('data-tab'); paintThread(it); }); });
     var more = $('rv-early'); if (more) more.addEventListener('click', function () { RV.early = RV.early || {}; RV.early[idOf(it)] = true; paintThread(it); });
     var ta = $('rv-reply'), send = $('rv-reply-send');
     if (!ta) return;
@@ -1969,7 +1985,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     }
     var acts = it.activity || [];
     var talk = it.state === 'rework' || it.state === 'redone' || acts.some(function (a) { return a.what === 'sent back' || a.what === 'rejected'; });
-    var actHtml = acts.length && !talk ? '<div class="rv-act"><h3>Activity</h3><ol>' + acts.map(function (a) {
+    var actHtml = false ? '<div class="rv-act"><h3>Activity</h3><ol>' + acts.map(function (a) {
       var moved = a.what === 'spec moved' || a.what === 'drawing moved';
       var cls = a.what === 'approved' ? 'is-ok' : a.what === 'sent back' ? 'is-warn' : a.what === 'rejected' ? 'is-bad' : moved ? 'is-move' : 'is-ship';
       var when = fmtWhen(a.at);
