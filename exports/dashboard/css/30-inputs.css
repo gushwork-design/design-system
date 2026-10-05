@@ -228,8 +228,10 @@
 .gd .gd-drp__day button:hover, .gd .gd-drp__day button.is-hover{ background: var(--gd-menu-hover); }
 .gd .gd-drp__day[data-range="mid"] button:hover{ background: color-mix(in srgb, var(--gd-range-band), var(--gd-text) 12%); }
 .gd .gd-drp__day button[aria-current="date"]{ box-shadow: inset 0 0 0 1px var(--gd-border-strong); }
-.gd .gd-drp__day[data-range="start"] button, .gd .gd-drp__day[data-range="end"] button, .gd .gd-drp__day[data-range="single"] button{ background: var(--gd-ink); color: var(--gd-ink-fg); box-shadow: none; }
-.gd .gd-drp__day[data-range="start"] button:hover, .gd .gd-drp__day[data-range="end"] button:hover, .gd .gd-drp__day[data-range="single"] button:hover{ background: var(--gd-ink-hover); }
+/* selected ends: ink in light; in dark one step darker than ink (neutral-200, was neutral-100) so they stop glaring */
+.gd .gd-drp{ --gd-drp-sel: light-dark(var(--gd-ink), var(--gw-color-neutral-200)); --gd-drp-sel-hover: light-dark(var(--gd-ink-hover), var(--gw-color-neutral-100)); }
+.gd .gd-drp__day[data-range="start"] button, .gd .gd-drp__day[data-range="end"] button, .gd .gd-drp__day[data-range="single"] button{ background: var(--gd-drp-sel); color: var(--gd-ink-fg); box-shadow: none; }
+.gd .gd-drp__day[data-range="start"] button:hover, .gd .gd-drp__day[data-range="end"] button:hover, .gd .gd-drp__day[data-range="single"] button:hover{ background: var(--gd-drp-sel-hover); }
 .gd .gd-drp__day button:disabled{ color: var(--gd-disabled-ink); background: none; cursor: not-allowed; }
 .gd .gd-drp__foot{ display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-12); padding: var(--gw-space-12) var(--gw-space-16); box-shadow: inset 0 1px 0 var(--gd-border); }
 .gd .gd-drp__sum{ font: var(--gw-text-body-12-med); color: var(--gd-text-muted); font-feature-settings: "tnum" 1; }
