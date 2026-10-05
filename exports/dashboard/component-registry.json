@@ -1231,6 +1231,12 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "f85385f1d7e0b795"
+    },
+    "status-list": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "6ffa0495a4ba0f1e"
     }
   }
 }
