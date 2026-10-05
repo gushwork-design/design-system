@@ -285,6 +285,13 @@
       "reviewedOn": "2026-10-05",
       "fingerprint": "19df15a7ece8d048",
       "note": "preview is not there"
+    },
+    "layout-testimonial": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "16624532cf51a067",
+      "note": "preview is not there"
     }
   }
 }
