@@ -1243,6 +1243,12 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "f573e6806b7af43f"
+    },
+    "table-cell-types": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "f9ce84031c8df124"
     }
   }
 }
