@@ -271,6 +271,13 @@
       "reviewedOn": "2026-10-05",
       "fingerprint": "34f701c388bfb2ca",
       "note": "preview is not there"
+    },
+    "layout-split-card": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "2e74d4f24d2eec3a",
+      "note": "preview is not there"
     }
   }
 }
