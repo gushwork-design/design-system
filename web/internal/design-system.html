@@ -754,8 +754,14 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 :root[data-theme="dark"] .rv-ta:focus-visible { box-shadow: inset 0 0 0 1px var(--gw-color-white); }
 .rv-b { height: 36px; padding: 0 var(--gw-space-16); border: 0; border-radius: var(--gw-radius-12); cursor: pointer; font: var(--gw-text-button-14); transition: background var(--gw-motion-fast); }
 .rv-b:disabled { opacity: .45; cursor: default; }
+/* Saving: the dashboard button's busy state (exports/dashboard/actions.md): a 14px spinner before the label, which stays, and no pointer events. */
+.rv-b[aria-busy="true"] { pointer-events: none; display: inline-flex; align-items: center; gap: var(--gw-space-8); }
+.rv-b[aria-busy="true"]::before { content: ""; width: 14px; height: 14px; flex: none; border-radius: 50%; border: 2px solid currentColor; border-top-color: transparent; animation: rv-spin 700ms linear infinite; }
+@keyframes rv-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .rv-b[aria-busy="true"]::before { animation: none; } }
+.rv-save__bar { position: absolute; left: 0; bottom: 0; height: 2px; background: var(--ul-value); transition: width var(--gw-motion-fast); }
 .rv-b--sm { height: 28px; padding: 0 var(--gw-space-12); border-radius: var(--gw-radius-8); }
-.rv-save { position: sticky; top: var(--gw-space-8); z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-12); margin-bottom: var(--gw-space-16); padding: var(--gw-space-8) var(--gw-space-8) var(--gw-space-8) var(--gw-space-16); border-radius: var(--gw-radius-12); background: var(--gw-color-yellow-alpha-10); box-shadow: inset 0 0 0 1px var(--ul-hdr-line), var(--gw-shadow-s2); font: 400 13px/1.5 var(--gw-font-body); color: var(--ul-cell); backdrop-filter: blur(8px); }
+.rv-save { overflow: hidden; position: sticky; top: var(--gw-space-8); z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-12); margin-bottom: var(--gw-space-16); padding: var(--gw-space-8) var(--gw-space-8) var(--gw-space-8) var(--gw-space-16); border-radius: var(--gw-radius-12); background: var(--gw-color-yellow-alpha-10); box-shadow: inset 0 0 0 1px var(--ul-hdr-line), var(--gw-shadow-s2); font: 400 13px/1.5 var(--gw-font-body); color: var(--ul-cell); backdrop-filter: blur(8px); }
 .rv-save[hidden] { display: none; }
 .rv-save b { color: var(--ul-value); font-weight: 600; }
 .rv-h__r .rv-b--sm { margin-right: var(--gw-space-4); }
@@ -1670,10 +1676,13 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   }
   function saveBtn(id) {
     var n = Object.keys(DRAFTS).length;
-    return owner && n ? '<button type="button" class="rv-b rv-b--pass rv-b--sm" id="' + id + '">Save ' + n + '</button>' : '';
+    if (!owner || !(n || SAVING)) return '';
+    return SAVING ? '<button type="button" class="rv-b rv-b--pass rv-b--sm" id="' + id + '" aria-busy="true">' + savingLabel() + '</button>'
+      : '<button type="button" class="rv-b rv-b--pass rv-b--sm" id="' + id + '">Save ' + n + '</button>';
   }
   /* Stage a decision. It shows everywhere in the Review tab as not saved; nothing is sent until Save. */
   function stage(it, action, note) {
+    if (SAVING) { toast('Saving. Mark more once it has finished.'); return; }
     DRAFTS[idOf(it)] = { action: action, note: note || '', fp: it.fp };
     storeDrafts(); RV.mode = '';
     toast((action === 'pass' ? 'Marked approved.' : action === 'rework' ? 'Marked to send back.' : 'Marked rejected.') + ' Press Save to apply it.');
@@ -1683,15 +1692,26 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   function discardAll() { DRAFTS = {}; storeDrafts(); toast('Discarded. Nothing was saved.'); if (RV.open) renderDrawer(); reviewRefresh(); renderSaveBar(); }
   /* Save: apply every staged decision, one after another (each is a commit on main and, for a rework, a routine). A failure
      leaves that one staged and says why; the others still go. */
-  var SAVING = false;
+  var SAVING = false, SAVEP = { n: 0, total: 0 };
+  function savingLabel() { return 'Saving ' + SAVEP.n + ' of ' + SAVEP.total; }
+  /* Update the saving state in place, without re-drawing the drawer: the Save buttons, the bar's message and its progress line. */
+  function paintSaving() {
+    ['rv-savenow', 'rv-savebar'].forEach(function (id) {
+      var b = $(id); if (!b) return;
+      if (SAVING) { b.setAttribute('aria-busy', 'true'); b.textContent = savingLabel(); }
+      else b.removeAttribute('aria-busy');
+    });
+    var m = document.querySelector('#rv-save .rv-save__t'); if (m && SAVING) m.innerHTML = '<b>' + savingLabel() + '</b> · keep this page open. Each decision is written to main one after another';
+    var l = document.querySelector('#rv-save .rv-save__bar'); if (l) l.style.width = SAVEP.total ? Math.round(SAVEP.n / SAVEP.total * 100) + '%' : '0';
+  }
   function saveAll() {
     var ids = Object.keys(DRAFTS); if (!ids.length || SAVING) return;
-    SAVING = true; renderSaveBar(); if (RV.open) renderDrawer();
+    SAVING = true; SAVEP = { n: 0, total: ids.length }; renderSaveBar(); paintSaving();
     var done = { pass: 0, reject: 0, rework: 0 }, routines = 0, fails = [];
     ids.reduce(function (p, id) {
       return p.then(function () {
         var d = DRAFTS[id], it = BYID[id];
-        if (!it) { delete DRAFTS[id]; return; }
+        if (!it) { delete DRAFTS[id]; SAVEP.n++; paintSaving(); return; }
         return fetch('/api/review', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' },
           body: JSON.stringify({ scope: it.scope, key: it.key, action: d.action, note: d.note, fp: d.fp }) })
           .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
@@ -1699,10 +1719,11 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
             if (!r.ok) { fails.push(it.key + ': ' + (r.j && r.j.error ? r.j.error : 'could not save')); return; }
             QSTATE[id] = r.j.decision; delete DRAFTS[id]; done[d.action]++;
             if (d.action === 'rework' && r.j.routine && r.j.routine.fired) routines++;
-          }).catch(function () { fails.push(it.key + ': could not reach the site'); });
+          }).catch(function () { fails.push(it.key + ': could not reach the site'); })
+          .then(function () { SAVEP.n++; paintSaving(); });
       });
     }, Promise.resolve()).then(function () {
-      SAVING = false; storeDrafts();
+      SAVING = false; storeDrafts(); paintSaving();
       var parts = [];
       if (done.pass) parts.push(done.pass + ' approved');
       if (done.reject) parts.push(done.reject + ' rejected');
@@ -1721,12 +1742,12 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     var bar = $('rv-save'); if (!bar) return;
     var ids = Object.keys(DRAFTS), c = { pass: 0, reject: 0, rework: 0 };
     ids.forEach(function (id) { c[DRAFTS[id].action]++; });
-    if (!owner || !ids.length) { bar.hidden = true; bar.innerHTML = ''; return; }
+    if (!owner || !(ids.length || SAVING)) { bar.hidden = true; bar.innerHTML = ''; return; }
     var parts = [];
     if (c.pass) parts.push(c.pass + ' to approve'); if (c.rework) parts.push(c.rework + ' to send back'); if (c.reject) parts.push(c.reject + ' to reject');
     bar.hidden = false;
     bar.innerHTML = '<span class="rv-save__t"><b>' + ids.length + ' not saved</b> · ' + parts.join(', ') + '. Nothing changes until you save.</span>' +
-      '<span class="rv-acts"><button type="button" class="rv-b rv-b--ghost rv-b--sm" id="rv-discard"' + (SAVING ? ' disabled' : '') + '>Discard</button><button type="button" class="rv-b rv-b--pass rv-b--sm" id="rv-savebar"' + (SAVING ? ' disabled' : '') + '>' + (SAVING ? 'Saving' : 'Save') + '</button></span>';
+      '<span class="rv-acts"><button type="button" class="rv-b rv-b--ghost rv-b--sm" id="rv-discard"' + (SAVING ? ' disabled' : '') + '>Discard</button><button type="button" class="rv-b rv-b--pass rv-b--sm" id="rv-savebar"' + (SAVING ? ' aria-busy="true"' : '') + '>' + (SAVING ? savingLabel() : 'Save') + '</button></span>' + (SAVING ? '<span class="rv-save__bar" style="width:' + (SAVEP.total ? Math.round(SAVEP.n / SAVEP.total * 100) : 0) + '%"></span>' : '');
     $('rv-discard').addEventListener('click', discardAll); $('rv-savebar').addEventListener('click', saveAll);
   }
   function post(it, action, note) {
