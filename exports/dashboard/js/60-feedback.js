@@ -182,7 +182,7 @@
       const d = doc.createElement('dialog');
       d.className = 'gd-modal gd-modal--sm gd-confirm';
       const id = 'gd-confirm-' + Math.random().toString(36).slice(2, 8);
-      d.setAttribute('aria-labelledby', id + '-t'); d.setAttribute('aria-describedby', id + '-d');
+      d.setAttribute('role', 'alertdialog'); d.setAttribute('aria-labelledby', id + '-t'); d.setAttribute('aria-describedby', id + '-d');
       const items = (o.items || []).map((i) => '<li>' + esc(i) + '</li>').join('');
       const danger = o.danger !== false;
       d.innerHTML = '<div class="gd-modal__head"><h2 class="gd-modal__title" id="' + id + '-t">' + esc(o.title || 'Are you sure?') + '</h2></div>' +

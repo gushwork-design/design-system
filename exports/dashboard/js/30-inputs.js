@@ -168,7 +168,8 @@ GD.inputs = GD.inputs || {};
   /* ---------------------------------------------------------------- search clear, indeterminate */
   document.addEventListener('click', (e) => {
     const c = e.target.closest('[data-gd-clear]'); if (!c) return;
-    const el = c.closest('.gd-input').querySelector('.gd-input__el'); el.value = ''; el.dispatchEvent(new Event('input', { bubbles: true })); el.focus();
+    const box = c.closest('.gd-input'); if (!box) return;       // the filter builder's Clear filters shares this attribute (40-tables); it is not a search field
+    const el = box.querySelector('.gd-input__el'); if (!el) return; el.value = ''; el.dispatchEvent(new Event('input', { bubbles: true })); el.focus();
   });
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape' || !e.target.matches?.('.gd-input--search .gd-input__el') || !e.target.value) return;

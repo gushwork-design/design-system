@@ -841,6 +841,7 @@
 .gd .gd-select > .gd-input, .gd .gd-combo > .gd-input, .gd .gd-multi-wrap > .gd-input{ width: 100%; }
 .gd button.gd-input{ cursor: pointer; font-feature-settings: normal; }
 .gd button.gd-input:hover, .gd button.gd-input.is-hover, .gd button.gd-input[aria-expanded="true"]{ box-shadow: inset 0 0 0 1px var(--gd-border-focus); }
+.gd button.gd-input:focus-visible{ outline: none; box-shadow: inset 0 0 0 1px var(--gd-border-focus); }   /* R41: a field shows its edge, not the ring; the select trigger is a button, so the shell's button ring had been landing on it */
 .gd button.gd-input:disabled:hover{ box-shadow: inset 0 0 0 1px var(--gd-border-strong); }
 .gd .gd-select__value{ flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .gd .gd-select__value[data-empty]{ color: var(--gd-placeholder); }
@@ -962,7 +963,7 @@
   display: inline-flex; flex-direction: column; width: max-content; max-width: 100%; color: var(--gd-text);
   background: var(--gd-raised-bg); border-radius: var(--gw-radius-16); box-shadow: inset 0 0 0 1px var(--gd-border-strong), var(--gw-shadow-s4);
 }
-.gd .gd-drp--pop{ position: absolute; z-index: 60; top: calc(100% + var(--gw-space-4)); left: 0; }
+.gd .gd-drp--pop{ position: absolute; z-index: 60; top: calc(100% + var(--gw-space-4)); left: 0; max-width: calc(100vw - 2 * var(--gw-space-8)); box-sizing: border-box; }   /* never wider than the screen, so it cannot run off the right edge */
 .gd .gd-drp--pop[hidden]{ display: none; }
 .gd .gd-drp__main{ display: flex; }
 .gd .gd-drp__presets{ flex: none; width: 176px; display: flex; flex-direction: column; gap: 2px; padding: var(--gw-space-12) var(--gw-space-8); box-shadow: inset -1px 0 0 var(--gd-border); }
@@ -1145,7 +1146,7 @@
   .gd-table--sticky-select :is(.gd-table__row, .gd-table__group > .gd-table__row) > :nth-child(-n+2) {
     position: sticky; left: 0; z-index: 1; background-color: var(--gd-card-bg); background-image: linear-gradient(var(--_ov), var(--_ov));
   }
-  .gd-table--sticky-select .gd-table__row > :nth-child(2) { left: var(--gd-sel-w); }
+  .gd-table--sticky-select :is(.gd-table__row, .gd-table__group > .gd-table__row) > :nth-child(2) { left: var(--gd-sel-w); }   /* same specificity as the pin above, so it wins by coming later: column 2 sits after the checkbox column, not under it */
   .gd-table--sticky-first .gd-table__row > :first-child, .gd-table--sticky-select .gd-table__row > :nth-child(2) { box-shadow: inset -1px 0 0 var(--gd-border); }
   .gd-table--sticky-select .gd-table__row > :first-child { box-shadow: none; }
   .gd-table--sticky-first .gd-table__row--head > :first-child, .gd-table--sticky-select .gd-table__row--head > :nth-child(-n+2) { z-index: 3; }
@@ -1228,10 +1229,10 @@
   .gd-table__row--head .gd-table__cell--check { background-color: var(--gd-card-bg); }
 
   /* ================================================ bulk-action-bar ====== */
-  .gd-bulk { position: sticky; bottom: var(--gd-gap); z-index: 1; display: flex; align-items: center; gap: var(--gw-space-4); width: fit-content; max-width: calc(100% - 2 * var(--gd-gap));
+  .gd-bulk { position: sticky; bottom: var(--gd-gap); z-index: 1; display: flex; flex-wrap: wrap; align-items: center; gap: var(--gw-space-4); width: fit-content; max-width: calc(100% - 2 * var(--gd-gap));   /* wraps onto a second row when the count and the actions do not fit, so Clear is never pushed off screen */
     margin: var(--gd-gap) auto; padding: var(--gw-space-4) var(--gw-space-4) var(--gw-space-4) var(--gw-space-16);
     border-radius: var(--gw-radius-12); background: var(--gd-ink); color: var(--gd-ink-fg); box-shadow: var(--gw-shadow-s3); }
-  .gd-bulk--fixed { position: fixed; left: 50%; bottom: var(--gw-space-24); margin: 0; transform: translateX(-50%); }
+  .gd-bulk--fixed { position: fixed; left: 50%; bottom: var(--gw-space-24); margin: 0; transform: translateX(-50%); max-width: calc(100vw - 2 * var(--gw-space-16)); }
   .gd-bulk__n { margin-right: var(--gw-space-12); font: var(--gw-text-body-14-med); letter-spacing: var(--gw-text-body-14-med-tracking); font-feature-settings: "tnum" 1; white-space: nowrap; }
   .gd-bulk__btn { display: inline-flex; align-items: center; gap: var(--gw-space-8); height: var(--gd-control-h); padding: 0 var(--gw-space-12); border: 0; border-radius: var(--gw-radius-8);
     background: none; color: inherit; font: var(--gw-text-button-14); white-space: nowrap; cursor: pointer; }
