@@ -1352,6 +1352,13 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "aeb596fa47bbc0d9"
+    },
+    "widget-grid": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "a1d25c975dca98de",
+      "note": "check padding between heading and the charts"
     }
   }
 }
