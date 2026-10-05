@@ -478,7 +478,7 @@ thing before anyone reviews any of them:
 
 1. **Check for a matching proposal before inventing one.** Read the relevant surface's
    `exports/<surface>/component-registry.json` `components` block — **regardless of its
-   `review` status** — for an entry that already covers this gap. If one exists, reuse its
+   `review` status, except `rejected`, which is archived and never reused** — for an entry that already covers this gap. If one exists, reuse its
    exact spec; do not build a second, slightly different version. Say so in your notice:
    *"reusing the pending proposal from `notices/<date>-<slug>.md`, not a new one."* This is
    the one case where reading an unreviewed entry is required, not just permitted — see the
@@ -503,6 +503,8 @@ it passes — same obligation `ai-agents` and `comparison-table` already carry i
 `exports/ad-page/built-here.json` ("report the value rather than reproducing it silently"),
 just stated once here instead of per-fold. Promotion to citable-without-disclosure is
 **`bash scripts/review-pass.sh <surface> <key>`** — already built, nothing to invent.
+
+**Archived components are not part of the system.** A registry entry whose `review` record says `"reviewed": "rejected"` was rejected and archived (R54 addendum). Do not compose from it, cite it, or reuse its spec as a proposal: build as if it did not exist, and if the screen needs that thing, treat it as a missing element and say so.
 
 ### Then notify — every time
 

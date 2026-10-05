@@ -710,7 +710,7 @@ def chip(cls, label, title=""):
 
 def review_chip(rev):
     st = rev["state"]
-    label = {"passed": "passed", "rejected": "rejected"}.get(st, "not reviewed")
+    label = {"passed": "passed", "rejected": "archived"}.get(st, "not reviewed")
     who = f'{rev["on"]} {rev["by"]}'.strip()
     return chip(st, label, who or "Has not been through a review pass")
 
@@ -756,7 +756,8 @@ def build_foundations(groups, faces, reg, counts):
         META["foundations"].append({"key": key, "title": CL.display_title(g), "count": n, "unit": unit,
                                     "review": rev["state"], "href": f"foundations/{key}.html"})
         counts["rev_" + rev["state"]] = counts.get("rev_" + rev["state"], 0) + 1
-        if rev["state"] != "passed":
+        # A rejected group is archived, not waiting. Its tokens stay in use: foundations are not hidden from skills.
+        if rev["state"] not in ("passed", "rejected"):
             queue.append(("foundation", key, CL.display_title(g),
                           f"foundations/{key}", n, unit))
 
@@ -807,10 +808,14 @@ def build_parts(reg, counts, ad, adv, tok):
         comps = block.get("components") or {}
         rblock = block.get("review") or {}
         names = sorted(comps)
+        # Archived (R54 addendum, 5 Oct 2026): a rejected component keeps its files and its page, but the library
+        # stops listing it. It lives under Archived on the Review tab; passing or reworking it there brings it back.
+        archived = [n for n in names if CL.review_of(rblock, n)["state"] == "rejected"]
+        listed = [n for n in names if n not in archived]
 
-        rail = [("Overview", "index.html", False, str(len(names)) if names else "")]
+        rail = [("Overview", "index.html", False, str(len(listed)) if listed else "")]
         rail.append((None, "", False, ""))
-        rail += [(n, f"{n}.html", False, "") for n in names]
+        rail += [(n, f"{n}.html", False, "") for n in listed]
 
         META["surfaces"].append({"key": skey, "title": stitle, "what": what, "components": [
             {"name": n, "version": comps[n].get("version", ""), "changed": comps[n].get("changed", ""),
@@ -819,7 +824,7 @@ def build_parts(reg, counts, ad, adv, tok):
 
         # --- surface overview -------------------------------------------------
         rows = []
-        for n in names:
+        for n in listed:
             e = comps[n]
             rev = CL.review_of(rblock, n)
             counts["components"] += 1
@@ -842,6 +847,10 @@ def build_parts(reg, counts, ad, adv, tok):
                      "<th>Component</th><th>Version</th><th>Spec last moved</th>"
                      "<th>Doc</th><th>Review</th></tr></thead><tbody>"
                      + "".join(rows) + "</tbody></table></div>")
+            if archived:
+                table += (f'<p class="md-p">{len(archived)} archived (rejected, not part of the system): '
+                          + ", ".join(f"<code>{esc(n)}</code>" for n in archived)
+                          + ". They are under Archived on the Review tab.</p>")
         else:
             table = ('<div class="empty">Nothing measured yet. This shelf is here rather '
                      "than absent so the gap is visible — an absent surface reads as one "
@@ -851,8 +860,8 @@ def build_parts(reg, counts, ad, adv, tok):
             title=stitle, lede=what,
             crumb='<a href="../../index.html">Library</a> / Parts',
             rail=[(l, h, h == "index.html", n) for l, h, _, n in rail],
-            rail_title=f"{stitle} · {len(names)}",
-            chips=f'<span class="pill">{len(names)} components</span>',
+            rail_title=f"{stitle} · {len(listed)}",
+            chips=f'<span class="pill">{len(listed)} components</span>',
             body=f'<section class="sec" id="inventory"><h2>What this library holds</h2>'
                  f"{table}</section>",
             toc=[(2, "What this library holds", "inventory")]))
@@ -1208,9 +1217,13 @@ def build_components(reg, counts):
     rows = {s: [] for s, _ in CAT_SURFACES}
     for e in cat:
         rows[e["surface"]].append(dict(e))
+    archived = {f"{skey}/{key}" for skey, block in reg.items()
+                for key, r in ((block or {}).get("review") or {}).items() if (r or {}).get("reviewed") == "rejected"}
+    for skey in rows:
+        rows[skey] = [e for e in rows[skey] if e.get("registry") not in archived]
     for skey, block in reg.items():
         for key in sorted((block or {}).get("components") or {}):
-            if f"{skey}/{key}" not in seen and skey in rows:
+            if f"{skey}/{key}" not in seen and skey in rows and f"{skey}/{key}" not in archived:
                 rows[skey].append({"surface": skey, "group": "", "name": key, "note": "",
                                    "node": (block["components"][key] or {}).get("node"),
                                    "variants": None, "fidelity": None, "registry": f"{skey}/{key}"})

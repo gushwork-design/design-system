@@ -221,6 +221,8 @@ without it is treated as a dashboard and diffed against the wrong component set 
 uses that have since changed. Shared components come from `exports/shared/component-registry.json`,
 merged in automatically.
 
+**Archived components are not part of the system.** A registry entry whose `review` record says `"reviewed": "rejected"` was rejected and archived (R54 addendum). Do not compose from it, cite it, or reuse its spec as a proposal: build as if it did not exist, and if the screen needs that thing, treat it as a missing element and say so.
+
 **List the `AUTHORED` layouts you used.** They are the entries most likely to take a breaking
 bump — the moment one of them is measured in Figma, every deck built against the draft is wrong
 rather than merely dated, and the stamp is the only way its owner finds out.

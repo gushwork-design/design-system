@@ -101,6 +101,8 @@ stamp without it is treated as a dashboard and diffed against the wrong componen
 uses that have since changed. Shared components — `badge`, the logo, the icon set — come from
 `exports/shared/component-registry.json`, merged in automatically.
 
+**Archived components are not part of the system.** A registry entry whose `review` record says `"reviewed": "rejected"` was rejected and archived (R54 addendum). Do not compose from it, cite it, or reuse its spec as a proposal: build as if it did not exist, and if the screen needs that thing, treat it as a missing element and say so.
+
 The cover and closer are owned by Figma frames, so they drift when those frames move. Bump the
 matching registry entry in the same commit that re-measures them, and set `breaking: true` when an
 existing document would now print wrong rather than merely dated.
