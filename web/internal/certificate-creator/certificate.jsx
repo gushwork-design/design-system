@@ -69,7 +69,7 @@ const PRESETS = [
     id: 'powerhouse',
     label: 'Powerhouse',
     name: 'Sukruti',
-    nameOwnLine: true,
+    nameOwnLine: false,
     headline: 'brings the energy everyone borrows.',
     before: 'Strong on every metric & stronger for everyone around her. Recognized as the',
     award: 'Powerhouse of',
@@ -142,6 +142,9 @@ function EditableText({ value, onChange, editable, placeholder, ...rest }) {
   );
 }
 
+/* The name always runs into the headline on its first line (Utsav, 5 Oct 2026); nameOwnLine is
+   kept in saved files but no longer read. */
+
 /* data-layer names one PSD layer each; data-text marks a run the PDF
    exporter draws as live text (font key → certificate-export.js). */
 function Certificate({ data, logoSvg, certRef, onEdit }) {
@@ -212,13 +215,13 @@ function Certificate({ data, logoSvg, certRef, onEdit }) {
           {editable ? (
             <>
               <EditableText editable value={data.name} onChange={ed('name')} placeholder="Name" data-text="display" style={{ color: CERT.blue }} />
-              {data.nameOwnLine ? <br /> : ' '}
+              {' '}
               <EditableText editable value={data.headline} onChange={ed('headline')} placeholder="the headline" data-text="display" style={{ color: CERT.black }} />
             </>
           ) : (
             <>
               {name && <span data-text="display" style={{ color: CERT.blue }}>{name}</span>}
-              {name && headline && (data.nameOwnLine ? <br /> : ' ')}
+              {name && headline && ' '}
               {headline && <span data-text="display" style={{ color: CERT.black }}>{headline}</span>}
             </>
           )}
