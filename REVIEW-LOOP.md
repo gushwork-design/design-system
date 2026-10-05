@@ -249,6 +249,7 @@ person approves and merges that pull request, the same rule as every other chang
                           gw:review-state (for the badge)               approve + merge -> publish -> plain "passed"
 ```
 
+- **Preview fingerprint.** Sent alongside, since 5 Oct 2026: the fingerprint of the drawing (`web/previews/<scope>/<key>.frag`), stored as `previewFingerprint`. A reworked drawing reads "redone", a passed one "expired" (R45 addendum).
 - **Fingerprint.** The one the page was showing, sent with the decision. If the source moved since, the stored fingerprint no
   longer matches and the pass reads "expired" straight away.
 - **Undo** takes the decision back out of the pull request (the item is put back as `main` has it), then clears the badge.

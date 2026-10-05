@@ -692,7 +692,8 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "3d5c1b1d04885a37",
-      "note": "1. cant we add update now as primary button and remind later as secondary option. - once they click on update now, we can open claude code directly and give them a bash or something so that they can update their tool/ product on their own instatntly and remind later will ping them again as they open it again"
+      "note": "1. cant we add update now as primary button and remind later as secondary option. - once they click on update now, we can open claude code directly and give them a bash or something so that they can update their tool/ product on their own instatntly and remind later will ping them again as they open it again",
+      "previewFingerprint": "34d249a0b9f983c3"
     },
     "access-denied-screen": {
       "reviewed": "passed",
@@ -705,7 +706,8 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "1d04fe53f5b5c993",
-      "note": "truccate the name, or use Priya R. instead - do not break in 2 lines"
+      "note": "truccate the name, or use Priya R. instead - do not break in 2 lines",
+      "previewFingerprint": "249198dadce2403d"
     },
     "action-button": {
       "reviewed": "passed",
@@ -742,14 +744,16 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "b9c1ed94ddc99a90",
-      "note": "use diff colors when group, and for users too, lets add diff colors"
+      "note": "use diff colors when group, and for users too, lets add diff colors",
+      "previewFingerprint": "7a6a210cbfd6270d"
     },
     "banner": {
       "reviewed": "rework",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "a1a03716c3a46bbb",
-      "note": "the action button placment seems off, it can be low the text"
+      "note": "the action button placment seems off, it can be low the text",
+      "previewFingerprint": "85c79c9ba5fb6bc6"
     },
     "bar-chart": {
       "reviewed": "passed",
@@ -786,7 +790,8 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "90326f5bfc358f93",
-      "note": "the compact density card is brealing, export button can be at top right corner (keeping padding)"
+      "note": "the compact density card is brealing, export button can be at top right corner (keeping padding)",
+      "previewFingerprint": "9a9b5d4be9e153b6"
     },
     "chart-frame": {
       "reviewed": "passed",
@@ -853,14 +858,16 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "34aae46e604b8dec",
-      "note": "\"Completion rate\" - table looks add with one added on the top"
+      "note": "\"Completion rate\" - table looks add with one added on the top",
+      "previewFingerprint": "afd408b238274c93"
     },
     "date-range-picker": {
       "reviewed": "rework",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "0e2db6ac90426074",
-      "note": "in dark mode, the selected dates look look very light,"
+      "note": "in dark mode, the selected dates look look very light,",
+      "previewFingerprint": "8dd4f6dec438f72a"
     },
     "datetime-field": {
       "reviewed": "passed",
@@ -873,7 +880,8 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "0a6858018d88036b",
-      "note": "spacing tag and text is missing, we can keep 4 px gap"
+      "note": "spacing tag and text is missing, we can keep 4 px gap",
+      "previewFingerprint": "6069893e410ef30d"
     },
     "detail-view": {
       "reviewed": "passed",
@@ -916,7 +924,8 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "5dd526b9eb6f2abb",
-      "note": "spacing looks odd on left, beside \"Add filter\""
+      "note": "spacing looks odd on left, beside \"Add filter\"",
+      "previewFingerprint": "d976f1f6c8eb2e0d"
     },
     "filter-chip": {
       "reviewed": "passed",
@@ -941,7 +950,8 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "03092d8836905420",
-      "note": "table design is not matching rest of table"
+      "note": "table design is not matching rest of table",
+      "previewFingerprint": "eee7025a3dbe24a7"
     },
     "google-button": {
       "reviewed": "passed",
@@ -954,7 +964,8 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "35a8abbe59b33c7f",
-      "note": "make black and white focus state with thinner outline"
+      "note": "make black and white focus state with thinner outline",
+      "previewFingerprint": "d4b296433e79deb6"
     },
     "histogram": {
       "reviewed": "passed",
@@ -985,7 +996,8 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "793072d3a52d42f8",
-      "note": "no need of underline when info icon is there and tooltip placement seems off"
+      "note": "no need of underline when info icon is there and tooltip placement seems off",
+      "previewFingerprint": "c18d77ba97ef502e"
     },
     "issue-summary": {
       "reviewed": "passed",
@@ -1010,7 +1022,8 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "2bb3918b3c2275db",
-      "note": "make sure table matches with other designs"
+      "note": "make sure table matches with other designs",
+      "previewFingerprint": "5702d27f4be5141e"
     },
     "line-chart": {
       "reviewed": "passed",
@@ -1029,7 +1042,8 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "982961bc319168d8",
-      "note": "there are random squares in the grid, fix them if cant remove"
+      "note": "there are random squares in the grid, fix them if cant remove",
+      "previewFingerprint": "cb67abb14ad7be67"
     },
     "menu": {
       "reviewed": "passed",
@@ -1048,14 +1062,16 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "393968a8d5c27df5",
-      "note": "no need of outline on \"Q4 pipeline\" frame"
+      "note": "no need of outline on \"Q4 pipeline\" frame",
+      "previewFingerprint": "7e6612c7d8c21105"
     },
     "multi-select": {
       "reviewed": "rework",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "f327d2ff103138e9",
-      "note": "padding issues in wrapped chips, and arrow palcement should be on top right only in that too, check all tho"
+      "note": "padding issues in wrapped chips, and arrow palcement should be on top right only in that too, check all tho",
+      "previewFingerprint": "8abd539082d91257"
     },
     "nav-group": {
       "reviewed": "passed",
@@ -1188,7 +1204,8 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "7e5aa3c7001fdb7f",
-      "note": "on hover show a tooltip like appearance to show whats the icon/ tab is for"
+      "note": "on hover show a tooltip like appearance to show whats the icon/ tab is for",
+      "previewFingerprint": "0ae0da5e7d7e4912"
     },
     "sign-in-modal": {
       "reviewed": "passed",
@@ -1333,7 +1350,8 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "dec19d1150b3440b",
-      "note": "move the menu button on the right side"
+      "note": "move the menu button on the right side",
+      "previewFingerprint": "5eeabbdd5d4a52d1"
     },
     "unavailable-state": {
       "reviewed": "passed",
@@ -1358,7 +1376,8 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "a1d25c975dca98de",
-      "note": "check padding between heading and the charts"
+      "note": "check padding between heading and the charts",
+      "previewFingerprint": "6ae9f32a7df0a3c8"
     },
     "workspace-switcher": {
       "reviewed": "passed",
@@ -1371,7 +1390,8 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "6b0643eeed002b76",
-      "note": "save this in templates"
+      "note": "save this in templates",
+      "previewFingerprint": "410329c2eabe53a0"
     }
   }
 }

@@ -122,5 +122,11 @@ c = await checkGithub('t');
 t('a working token is connected, and the probe branch is removed', [c.ok, c.verdict.startsWith('Connected')], [true, true]);
 t('the check never contains the token', JSON.stringify(c).includes('"t"'), false);
 
+// The drawing's fingerprint (R45 addendum, 5 Oct 2026): stored when sent, dropped when the item has no drawing.
+t('a preview fingerprint is stored with the decision',
+  applyDecision(reg(), row({ pfp: '0123456789abcdef' }), 'utsav', '2026-10-05').review.button.previewFingerprint, '0123456789abcdef');
+t('no preview fingerprint sent means none kept, even if an older record had one',
+  'previewFingerprint' in applyDecision({ components: { button: {} }, review: { button: { reviewed: 'rework', fingerprint: 'x', previewFingerprint: 'old' } } }, row({}), 'u', 'd').review.button, false);
+
 console.log(`${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

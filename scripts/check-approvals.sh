@@ -71,14 +71,14 @@ dec_cmds, rework, dec_names = [], [], []
 for d in decisions:
     if not isinstance(d, dict) or not d.get("scope") or not d.get("key"):
         continue
-    sc, k, act, note, fp = d["scope"], d["key"], d.get("action"), d.get("note") or "", d.get("fp") or ""
+    sc, k, act, note, fp, pfp = d["scope"], d["key"], d.get("action"), d.get("note") or "", d.get("fp") or "", d.get("pfp") or ""
     # Decided on the site and already written to the review pull request by the site itself (via github): there is
     # nothing for this session to record. Only a REWORK still matters here, because its note is the brief.
     if d.get("via") in ("github", "main"):
         if act == "rework":
             rework.append((sc, k, note))
         continue
-    exp = f" --expect {fp}" if fp else ""
+    exp = (f" --expect {fp}" if fp else "") + (f" --expect-preview {pfp}" if pfp else "")
     base = f"bash scripts/review-pass.sh {sc} {k}"
     if act == "pass":
         dec_cmds.append(base + exp)

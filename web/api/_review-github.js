@@ -11,6 +11,10 @@
    source has moved since, the stored fingerprint no longer matches and the pass reads "expired" at once. That is the
    same guard `review-pass.sh --expect` gives the session path.
 
+   THERE ARE TWO OF THEM since 5 Oct 2026. `fingerprint` covers the spec (registry entry + doc); `previewFingerprint`
+   covers the drawing (web/previews/<scope>/<key>.frag). The rework routine may only redraw, and a redraw never moved
+   the first one, so a reworked item could not read "redone" (R45). The page sends both; this stores both.
+
    THE FILE IS WRITTEN THE WAY review-pass.sh WRITES IT: JSON, 2 spaces, raw unicode, a final newline. JS and Python
    produce identical bytes for it (tested against every registry in the repo), so a decision made here and one made by
    the script look the same in a diff.
@@ -48,6 +52,10 @@ export function applyDecision(doc, row, who, today) {
   rec.reviewedBy = who;
   rec.reviewedOn = today;
   rec.fingerprint = row.fp;
+  // The drawing's own fingerprint (R45 addendum, 5 Oct 2026). Optional: an item with no preview sends none, and a
+  // record keeps none, so the generator falls back to the spec fingerprint alone for it.
+  if (row.pfp) rec.previewFingerprint = row.pfp;
+  else delete rec.previewFingerprint;
   if (row.note) rec.note = row.note;
   else if (rec.note !== undefined && row.action === 'pass') delete rec.note;
   return doc;

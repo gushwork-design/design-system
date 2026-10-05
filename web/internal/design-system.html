@@ -1393,6 +1393,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       var want = q.action === 'pass' ? 'passed' : q.action === 'reject' ? 'rejected' : 'rework';
       // The source has moved since this decision was made: the published data was built after that, so its state is the truth.
       if (q.fp && it.fp && q.fp !== it.fp) return { state: it.state, queued: false, q: null };
+      if (q.pfp && it.pfp && q.pfp !== it.pfp) return { state: it.state, queued: false, q: null };   // the drawing moved
       if (it.state === want) return { state: it.state, queued: false, q: null };   // the registry has caught up with it
       return { state: want, queued: true, q: q };
     }
@@ -1455,7 +1456,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   function renderReview(d) {
     indexItems(d);
     // A draft for an item that is gone, or whose source has moved since it was marked, no longer describes what is on screen.
-    Object.keys(DRAFTS).forEach(function (id) { var it = BYID[id]; if (!it || (DRAFTS[id].fp && it.fp !== DRAFTS[id].fp)) delete DRAFTS[id]; });
+    Object.keys(DRAFTS).forEach(function (id) { var it = BYID[id]; if (!it || (DRAFTS[id].fp && it.fp !== DRAFTS[id].fp) || (DRAFTS[id].pfp && it.pfp !== DRAFTS[id].pfp)) delete DRAFTS[id]; });
     storeDrafts(); renderSaveBar();
     var count = function (f) { return ITEMS.filter(function (it) { return inFilter(it, f); }).length; };
     $('ds-rev-stats').innerHTML = metric('Waiting on you', String(count('waiting')), 'never reviewed, redone, or changed since') + metric('In rework', String(count('rework')), 'sent back with a note') +
@@ -1683,7 +1684,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   /* Stage a decision. It shows everywhere in the Review tab as not saved; nothing is sent until Save. */
   function stage(it, action, note) {
     if (SAVING) { toast('Saving. Mark more once it has finished.'); return; }
-    DRAFTS[idOf(it)] = { action: action, note: note || '', fp: it.fp };
+    DRAFTS[idOf(it)] = { action: action, note: note || '', fp: it.fp, pfp: it.pfp || '' };
     storeDrafts(); RV.mode = '';
     toast((action === 'pass' ? 'Marked approved.' : action === 'rework' ? 'Marked to send back.' : 'Marked rejected.') + ' Press Save to apply it.');
     var n = nextWaiting(); if (n >= 0) RV.i = n;
@@ -1713,7 +1714,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
         var d = DRAFTS[id], it = BYID[id];
         if (!it) { delete DRAFTS[id]; SAVEP.n++; paintSaving(); return; }
         return fetch('/api/review', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ scope: it.scope, key: it.key, action: d.action, note: d.note, fp: d.fp }) })
+          body: JSON.stringify({ scope: it.scope, key: it.key, action: d.action, note: d.note, fp: d.fp, pfp: d.pfp || '' }) })
           .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
           .then(function (r) {
             if (!r.ok) { fails.push(it.key + ': ' + (r.j && r.j.error ? r.j.error : 'could not save')); return; }
@@ -1753,7 +1754,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   function post(it, action, note) {
     var btns = document.querySelectorAll('#rv .rv-b'); btns.forEach(function (b) { b.disabled = true; });
     fetch('/api/review', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ scope: it.scope, key: it.key, action: action, note: note, fp: it.fp }) })
+      body: JSON.stringify({ scope: it.scope, key: it.key, action: action, note: note, fp: it.fp, pfp: it.pfp || '' }) })
       .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
       .then(function (r) {
         if (!r.ok) { toast(r.j && r.j.error ? r.j.error : 'Could not save that.'); renderDrawer(); return; }
