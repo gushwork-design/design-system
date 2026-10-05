@@ -47,7 +47,7 @@ One floating pill for a tool's actions, centred over the free canvas, 24 from th
 
 ## tool-chrome
 
-Appearance (System, Light, Dark) and Help (Send an email, Message on Slack), top-right.
+Appearance (System, Light, Dark), Help (Send an email, Message on Slack) and the **profile**, top-right. The profile is the hub's mark (shell.js `avatarSVG`), 24 in the cluster; its menu shows the mark at 40, the name, the role (Owner, Admin, Gushwork team), the address, and Sign out.
 
 | Property | Value |
 |---|---|

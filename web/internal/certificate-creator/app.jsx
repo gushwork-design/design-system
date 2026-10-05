@@ -895,6 +895,9 @@ function App() {
       return [];
     }
   }, []);
+  // the profile mark is drawn by tool-chrome.js into any [data-t-profile] slot
+  useEffect(() => { if (window.gwProfile) window.gwProfile.draw(); }, [view, panelOpen]);
+
   // the first visit to each place runs its tour once, after the page has drawn
   useEffect(() => {
     if (saved.state !== 'ready' || tour) return undefined;
@@ -1240,6 +1243,9 @@ function App() {
       <div className="right-col" ref={savedRef} aria-hidden={!panelOpen}>
         <header className="right-head">
           <button type="button" className="saved-new right-back" onClick={toFiles}><ArrowLeftIcon /> All files</button>
+          <span className="right-head__end">
+          {/* the person signed in: the hub's profile mark and menu, from tool-chrome.js */}
+          <button type="button" className="t-iconbtn t-iconbtn--prof" data-t-profile hidden aria-haspopup="menu" aria-expanded="false" />
           <Gd>
             <GdMenuButton label="File actions" icon={<DotsIcon />} outline sm items={[
               { label: 'New certificate', icon: <PlusIcon />, onClick: () => startNew() },
@@ -1259,6 +1265,7 @@ function App() {
               canManage && { label: 'Delete file', icon: <TrashIcon />, danger: true, onClick: () => setConfirmItem(current) },
             ]} />
           </Gd>
+          </span>
         </header>
 
         <section className="prop-section">
