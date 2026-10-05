@@ -41,7 +41,12 @@ Short, stable facts so a fresh session can pick up cold. Update as we go. No sec
 ## Open draft PRs from this project (Utsav merges)
 - #191 Add CLAUDE.md (+ the memory file). #194 Draw: slides/title-bar. #196 Fix library build on Python 3.11.
 - Closed 2026-10-05 at Utsav's yes: #19 (superseded; branch ad-page/ai-services-lander kept).
-- #91 is obsolete: ruling R34 deleted secondary-500, so there is nothing to hide. Closing it is Utsav's call.
+- Closed 2026-10-05 at Utsav's yes: #91 (obsolete: ruling R34 deleted secondary-500, nothing left to hide).
+
+## Where things are
+- Memory: this file (on `main` once #191 merges; until then on the dev branch).
+- Threads of 2026-10-05 (triage, title-bar, CLAUDE.md, py311, #91 redo) ran as subagents from the lead session: their results are in PRs #191, #194, #196 and the lead chat. No thread registry files exist for them (`.claude/hub/threads/` is only written by the `/thread` mod, which hasn't been run).
+- Routines: Routines list in the Claude Code sidebar. They were created through the API, so an agent cannot edit their prompts; Utsav pastes `.claude/hub/routine-memory-snippet.md` into each. Pending.
 
 ## Merged through this project
 - (none yet)
