@@ -154,6 +154,31 @@ calls.length = 0;
 r = await post(dm('do the second one please', 'UOWNER'));
 t('a reviewer\'s DM that is not a question is ticked AND answered in words, so the tick is never a mystery', [r.body.concierge, calls.map((c) => c.method), calls[1].body.text.includes('9pm')], ['ticked', ['reactions.add', 'chat.postMessage'], true]);
 
+/* ---- Bruce for Utsav: his DMs start the routine; nobody else's do ---- */
+{
+  const { handleMessage, forBruce } = await import('../web/api/_concierge.js');
+  const fired = [];
+  const fire = async (ev) => { fired.push(ev.text); return { fired: true }; };
+  const ev = (text, user = 'UUTSAV', extra = {}) => ({ type: 'message', channel_type: 'im', user, channel: 'D9', ts: '300.3', text, ...extra });
+  const deps = { token: 'xoxb-test', root: '.', owners: new Set(['UUTSAV']), bruceUsers: new Set(['UUTSAV']), fire };
+  calls.length = 0;
+  let o = await handleMessage(ev('why did the publish fail last night?'), deps);
+  t('Utsav asking a real question: 👀, the routine starts, no canned reply', [o.did, calls.map((c) => c.method), calls[0].body.name, fired.length], ['bruce', ['reactions.add'], 'eyes', 1]);
+  calls.length = 0;
+  o = await handleMessage(ev('send me the white logo svg'), deps);
+  t('Utsav asking for a file still gets it instantly from the concierge', [o.did, fired.length], ['answered', 1]);
+  calls.length = 0;
+  o = await handleMessage(ev('make me a banner for the launch'), deps);
+  t('a design request from Utsav goes to the routine', [o.did, fired.length], ['bruce', 2]);
+  calls.length = 0;
+  o = await handleMessage(ev('why did the publish fail?', 'USOMEONE'), deps);
+  t('a teammate asking the same thing never starts a run', [o.did === 'bruce', fired.length], [false, 2]);
+  calls.length = 0;
+  o = await handleMessage(ev('check the routines', 'UUTSAV'), { ...deps, fire: async () => ({ fired: false, why: 'not set' }) });
+  t('no trigger configured: Bruce says so in the thread', [o.did, calls.at(-1).method, calls.at(-1).body.thread_ts], ['bruce-failed', 'chat.postMessage', '300.3']);
+  ok('greetings stay with the concierge', forBruce(understand('hi', catalog)) === false);
+}
+
 calls.length = 0;
 r = await post(dm('hi', 'UOWNER'));
 t('a reviewer saying hi gets a greeting, not a tick', [r.body.concierge, calls.map((c) => c.method)], ['answered', ['chat.postMessage']]);

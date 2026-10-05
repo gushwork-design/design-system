@@ -14,6 +14,13 @@
    Slack app that closes the ✅ review loop. No second app, no server: the request URL stays
    /api/slack-events, so the review loop is untouched.
 
+   BRUCE FOR UTSAV (5 Oct 2026). A DM from Utsav himself (OWNER_SLACK_ID) is different: anything that is not a plain file,
+   template or tool request starts the "Bruce" routine (GW_BRUCE_TRIGGER_URL + GW_BRUCE_TRIGGER_TOKEN), a Claude Code cloud
+   session with the repo, which does the work and answers in the thread as Bruce. Everyone else still gets the concierge
+   and nothing else, so a teammate's message never spends a model run. Utsav's words: "he can do everything with me in DM
+   but for others just a messenger for now", and "later we will open it for more people": the gate is BRUCE_USER_IDS (a
+   comma list), falling back to OWNER_SLACK_ID, so widening it is a setting.
+
    Plain keyword matching on purpose. Everything he can hand over is a file that must exist in the
    deploy; scripts/concierge.test.mjs fails if one is missing.
    ========================================================================= */
@@ -355,13 +362,37 @@ async function uploadFiles(token, root, channel, threadTs, files) {
   return done.length;
 }
 
+/* Start the Bruce routine for one of Utsav's DMs. The routine reads the thread itself (conversations.replies) and answers
+   in it; this only hands over where to answer and what was said. Never throws. */
+export async function fireBruce(event, env = process.env, f = fetch) {
+  const url = env.GW_BRUCE_TRIGGER_URL || '', token = env.GW_BRUCE_TRIGGER_TOKEN || '';
+  if (!url || !token) return { fired: false, why: 'not set' };
+  const text = [`Slack DM from <@${event.user}>.`, `user: ${event.user}`, `channel: ${event.channel}`, `thread_ts: ${event.thread_ts || event.ts}`, `message_ts: ${event.ts}`,
+    `in_thread: ${event.thread_ts ? 'yes' : 'no'}`, `message:`, String(event.text || '').slice(0, 4000)].join('\n');
+  try {
+    const r = await f(url, {
+      method: 'POST',
+      headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json', 'anthropic-beta': 'experimental-cc-routine-2026-04-01', 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({ text }),
+    });
+    return r.ok ? { fired: true } : { fired: false, why: `status ${r.status}` };
+  } catch { return { fired: false, why: 'unreachable' }; }
+}
+
+/* Utsav's DMs go to the routine unless the concierge can answer outright: a file, a template or a tool. */
+export function forBruce(u) {
+  if (u.greeting || u.thanks) return false;
+  const direct = u.parts.length > 0 && u.parts.every((p) => p.type === 'assets' || p.type === 'templates' || p.type === 'tools');
+  return !direct || u.designRequest;
+}
+
 /**
  * One Slack message event in, answer out. `deps`: { token, root, owners: Set of Slack IDs }.
  * Returns what it did, for the log and the tests. Never throws on a bad question; a Slack error is returned, not raised,
  * so the caller can still answer 200 and Slack does not retry.
  */
 export async function handleMessage(event, deps) {
-  const { token, root, owners = new Set() } = deps;
+  const { token, root, owners = new Set(), bruceUsers = new Set(), fire = fireBruce } = deps;
   const isDm = event.type === 'message';
   if (!event.user || event.bot_id || (event.subtype && event.subtype !== 'file_share')) return { did: 'ignored' };
   const catalog = buildCatalog(root);
@@ -370,6 +401,17 @@ export async function handleMessage(event, deps) {
   const asked = u.parts.length > 0 || u.designRequest || u.greeting || u.thanks || u.help;
   const threadTs = isDm ? event.thread_ts : event.thread_ts || event.ts;
   try {
+    // Utsav's own DM: Bruce proper. A 👀 says it was picked up; the routine answers in the thread.
+    if (isDm && bruceUsers.has(event.user) && forBruce(u)) {
+      const replyTs = event.thread_ts || event.ts;
+      try { await slack(token, 'reactions.add', { channel: event.channel, timestamp: event.ts, name: 'eyes' }); } catch { /* the answer matters more */ }
+      const run = await fire(event);
+      if (!run.fired) {
+        await slack(token, 'chat.postMessage', { channel: event.channel, thread_ts: replyTs, text: `I couldn’t start on that (${run.why}). Check GW_BRUCE_TRIGGER_URL and GW_BRUCE_TRIGGER_TOKEN on the site.` });
+        return { did: 'bruce-failed', why: run.why };
+      }
+      return { did: 'bruce' };
+    }
     // A reviewer's DM that is none of those is most likely a reply to the nightly report ("do 2", "skip the focus ring"). The 9pm run
     // reads it. Bruce says so in words, and ticks it, so nobody has to guess what the tick means.
     if (isDm && owners.has(event.user) && !asked) {

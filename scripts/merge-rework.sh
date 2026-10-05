@@ -17,6 +17,8 @@
 # WHAT IT REFUSES, each with a reason, and the PR stays open for Utsav:
 #   - the switch is off: .github/automerge-off exists on origin/main
 #   - not a rework: title is not "Rework: <scope>/<key>", or the branch is not rework/* or nightly/*
+#     (or, for a change Utsav asked Bruce for in his DM: branch bruce/* and title "Bruce: <what>"; the path rules
+#     below are the same, and there is no decision or fix record to check)
 #   - not decided: the registry on origin/main does not say `rework` for that item
 #   - no fix record: the PR does not add web/previews/<scope>/<key>.reworked answering that send-back
 #     (bash scripts/mark-reworked.sh writes it), so the item could not come back to Waiting
@@ -70,24 +72,35 @@ if pr["state"] != "OPEN":
     refuse(f"the PR is {pr['state'].lower()}")
 if pr["baseRefName"] != "main":
     refuse(f"it targets {pr['baseRefName']}, not main")
-if not re.match(r"^(rework|nightly)/", pr["headRefName"]):
-    refuse(f"branch {pr['headRefName']} is not rework/* or nightly/*")
-m = re.match(r"^Rework: ([a-z0-9-]+)/([a-z0-9-]+)$", pr["title"].strip())
-if not m:
+# Two lanes. A REWORK answers a send-back on the review page. A BRUCE change is one Utsav asked Bruce for in his DM
+# (5 Oct 2026): same hub-only paths, but there is no review decision or fix record to check, because the ask is the decision.
+bruce = bool(re.match(r"^bruce/", pr["headRefName"]))
+if bruce:
+    if not re.match(r"^Bruce: \S", pr["title"].strip()):
+        refuse(f"title {pr['title']!r} is not 'Bruce: <what changed>'")
+elif not re.match(r"^(rework|nightly)/", pr["headRefName"]):
+    refuse(f"branch {pr['headRefName']} is not rework/*, nightly/* or bruce/*")
+m = None if bruce else re.match(r"^Rework: ([a-z0-9-]+)/([a-z0-9-]+)$", pr["title"].strip())
+if not bruce and not m:
     refuse(f"title {pr['title']!r} is not 'Rework: <scope>/<key>'")
-scope, key = m.groups()
+scope, key = m.groups() if m else ("", "")
 if pr["mergeable"] == "CONFLICTING":
     refuse("it conflicts with main")
 
 # The decision has to be on main, not just named in a title.
 surface, block = ("shared", "foundations") if scope == "foundation" else (scope, "review")
+rec = {}
 try:
+    if bruce:
+        raise StopIteration
     raw = subprocess.run(["git", "show", f"origin/main:exports/{surface}/component-registry.json"],
                          capture_output=True, text=True, check=True).stdout
     rec = (json.loads(raw).get(block) or {}).get(key) or {}
+except StopIteration:
+    pass
 except Exception:
     refuse(f"no registry for '{scope}' on main")
-if rec.get("reviewed") != "rework":
+if not bruce and rec.get("reviewed") != "rework":
     refuse(f"{scope}/{key} is {rec.get('reviewed', 'pending')!r} on main, not 'rework'")
 
 # The hub, and only the hub. Skills read exports/, skills/ and foundation/; none of it is here.
@@ -113,6 +126,9 @@ if not pr["files"]:
     refuse("it changes no files")
 if bad:
     refuse("it touches files a rework may not merge on its own: " + ", ".join(bad))
+if bruce:
+    print(f"✔ Bruce change: {len(pr['files'])} hub file(s), no conflict")
+    sys.exit(0)
 # The fix record, read from the PR's own head, has to answer the send-back that is on main now.
 record_path = os.path.relpath(CL.rework_record_path(scope, key), CL.ROOT)
 if record_path not in [x["path"] for x in pr["files"]]:
