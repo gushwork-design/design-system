@@ -1366,6 +1366,60 @@ def load_used_for():
         return {}
 
 
+def _git(*args):
+    return subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True, timeout=30).stdout
+
+
+def _merged_in(rev):
+    """The PR that brought `rev` to main: the oldest first-parent merge that contains it. None for a direct commit."""
+    for line in reversed(_git("log", "--first-parent", "--merges", "--ancestry-path", "--format=%s", f"{rev}..HEAD").splitlines()):
+        m = re.match(r"^Merge pull request #(\d+) ", line)
+        if m:
+            return int(m.group(1))
+        break
+    return None
+
+
+def source_moved(it):
+    """For an expired pass: the commit that moved it, so the Activity list says why it came back to Waiting (5 Oct
+    2026; Utsav, after account-row went back to Waiting with nothing in its history). Walks the commits that touched
+    its registry, its doc and its drawing, oldest first, and returns the first one after which the fingerprint no
+    longer matches the one the decision stored. Often that is another item's rework in the same doc."""
+    scope, key = it["scope"], it["key"]
+    if scope == "foundation":
+        return None
+    rp = f"exports/{scope}/component-registry.json"
+    try:
+        rec = (json.load(open(os.path.join(ROOT, rp), encoding="utf-8")).get("review") or {}).get(key) or {}
+        entry = json.load(open(os.path.join(ROOT, rp), encoding="utf-8"))["components"][key]
+    except (OSError, ValueError, KeyError):
+        return None
+    dp = CL.component_doc_path(scope, entry)
+    fr = f"web/previews/{scope}/{key}.frag"
+    spec_moved = rec.get("fingerprint") and rec["fingerprint"] != it.get("fp")
+    paths = [rp, dp] if spec_moved else [fr]
+    revs = _git("log", "--reverse", "--format=%H %aI %s", "-n", "300", "--", *[x for x in paths if x]).splitlines()
+    seen = False
+    for line in revs:
+        rev, at, subj = (line.split(" ", 2) + ["", ""])[:3]
+        if spec_moved:
+            try:
+                ent = json.loads(_git("show", f"{rev}:{rp}"))["components"].get(key)
+            except (ValueError, KeyError):
+                continue
+            if not ent:
+                continue
+            fp = CL.spec_fingerprint(key, ent, _git("show", f"{rev}:{CL.component_doc_path(scope, ent)}"))
+            want = rec["fingerprint"]
+        else:
+            fp, want = CL.fingerprint(_git("show", f"{rev}:{fr}")), rec.get("previewFingerprint")
+        if fp == want:
+            seen = True
+        elif seen:
+            return {"at": at, "what": "spec moved" if spec_moved else "drawing moved", "pr": _merged_in(rev), "note": subj}
+    return None
+
+
 def review_activity(items, limit=8):
     """Each item's history for the review drawer's Activity list (R54 addendum, 5 Oct 2026), read from git, so it
     costs nothing to keep: every decision the page saves is a commit "Review: <action> <scope>/<key> — <note>",
@@ -1396,6 +1450,13 @@ def review_activity(items, limit=8):
             (k for k in by_branch if m.group(2) == k.replace("/", "-") or m.group(2).startswith(k.replace("/", "-") + "-")), None)
         if key:
             acts[key].append({"at": at.strip(), "what": "fixed and published", "pr": int(m.group(1))})
+    for k, it in ids.items():
+        if it.get("state") == "expired":
+            ev = source_moved(it)
+            # Its own rework already reads "fixed and published in #N"; a second line for the same PR says nothing new.
+            if ev and not any(a.get("pr") == ev["pr"] and a["what"] == "fixed and published" for a in acts[k] if ev["pr"]):
+                acts[k].append(ev)
+                acts[k].sort(key=lambda e: e["at"], reverse=True)
     for k, it in ids.items():
         # Commit subjects are cut at ~90 characters; the registry has the latest note whole.
         for ev in acts[k]:
