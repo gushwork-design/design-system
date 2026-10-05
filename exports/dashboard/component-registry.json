@@ -904,6 +904,12 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "8bf2011ff642ad84"
+    },
+    "explorer-layout": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "b223de0ff38bc5b8"
     }
   }
 }
