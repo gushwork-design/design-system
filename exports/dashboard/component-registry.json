@@ -817,6 +817,12 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "8bd1d9ff657f0116"
+    },
+    "column-menu": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "ab77736ba8f52f48"
     }
   }
 }
