@@ -95,7 +95,7 @@ States and tokens as tabs pill. Behaviour: emits `gd:change {item,value}`. Prove
 
 **Use** beside a metric or column name to define it (bounce rate, cost per lead). **Not** for errors, or for text people must read to proceed.
 
-Anatomy: `.gd-hint` > `.gd-hint__label` (dotted underline) + `.gd-hint__btn` (info glyph, `data-tip` carries the definition, `aria-label` names it).
+Anatomy: `.gd-hint` > `.gd-hint__label` (plain text, no underline: the glyph is the cue) + `.gd-hint__btn` (info glyph, `data-tip` carries the definition, `aria-label` names it). The bubble opens centred under the label and glyph together, not under the glyph alone.
 ```html
 <span class="gd-hint"><span class="gd-hint__label">Bounce rate</span><button class="gd-hint__btn" aria-label="About bounce rate" data-tip="Share of sessions that ended on the first page."><svg …/></button></span>
 ```
