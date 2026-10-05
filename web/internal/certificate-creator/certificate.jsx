@@ -22,9 +22,9 @@ const CERT = {
   black: '#0D0D0D',           // Flat Black (--gw-color-black)
   panel: '#F7F8F9',           // --gw-color-neutral-25, measured 66:4
   grey: '#4D545C',            // --gw-color-neutral-800, measured 66:8 / 66:11
-  // the grid's gradient stops, 10% darker than Figma's #E9EAEE / #F7F8F9 (Utsav, 6 Oct 2026)
-  gridIn: '#D2D3D6',          // centre stop
-  gridOut: '#DEDFE0',         // outer stop (was the panel colour, so the lines faded out at the edges)
+  gridIn: '#E9EAEE',          // measured: grid stroke gradient, centre stop (66:5)
+  gridOut: '#F7F8F9',         //           outer stop = the panel, so the lines fade out (a 10% darker,
+                              //           edge-to-edge grid was tried 6 Oct 2026 and reverted)
   gridOpacity: 0.7,           // measured 66:5
   panelInset: 10,             // 66:4 at 10,10, 575 × 728, radius 20
   panelW: 575, panelH: 728, panelR: 20,   // as Figma; the page itself (the blue frame) is square
