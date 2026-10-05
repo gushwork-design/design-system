@@ -7,7 +7,8 @@
 #   bash scripts/release.sh 1.44.0 "what changed" --session "<uuid> <chat title>"
 #   bash scripts/release.sh 1.44.0 "what changed" --session "..." --publish
 #   bash scripts/release.sh 1.44.0 "what changed" --quiet                 # nobody is told
-#   bash scripts/release.sh 1.44.0 "what changed" --notify "New: the ad-page template"
+#   bash scripts/release.sh 1.44.0 "what changed" --notify "New: the ad-page template" \
+#        --link https://gushwork-design.vercel.app/library/web/ad-page.html      # repeatable, ≤4
 #
 # --quiet or --notify is REQUIRED (R50). A bump alone no longer wakes anyone: the SessionStart
 # notice fires only when .claude-plugin/notify.json names a version newer than the copy a
@@ -40,13 +41,14 @@
 set -euo pipefail
 cd "$(git -C "$(dirname "$0")" rev-parse --show-toplevel)"
 
-VERSION="" SUMMARY="" SESSION="" PUBLISH=0 QUIET=0 NOTIFY=""
+VERSION="" SUMMARY="" SESSION="" PUBLISH=0 QUIET=0 NOTIFY="" LINKS=()
 while [ $# -gt 0 ]; do
   case "$1" in
     --session) SESSION="${2:-}"; shift 2 ;;
     --publish) PUBLISH=1; shift ;;
     --quiet)   QUIET=1; shift ;;
     --notify)  NOTIFY="${2:-}"; shift 2 ;;
+    --link)    LINKS+=("${2:-}"); shift 2 ;;
     -*) echo "unknown flag: $1" >&2; exit 1 ;;
     *) if [ -z "$VERSION" ]; then VERSION="$1"; elif [ -z "$SUMMARY" ]; then SUMMARY="$1";
        else echo "unexpected argument: $1" >&2; exit 1; fi; shift ;;
@@ -57,11 +59,14 @@ done
   echo 'usage: bash scripts/release.sh <version> "<summary>" (--quiet | --notify "<what to tell people>") [--session "<uuid> <title>"] [--publish]' >&2
   exit 1; }
 if [ "$QUIET" = 1 ] && [ -n "$NOTIFY" ]; then echo "--quiet and --notify together make no sense" >&2; exit 1; fi
+if [ "${#LINKS[@]}" -gt 0 ] && [ -z "$NOTIFY" ]; then echo "--link only means something with --notify" >&2; exit 1; fi
+for l in "${LINKS[@]+"${LINKS[@]}"}"; do case "$l" in http://*|https://*) ;; *) echo "--link must be a URL: $l" >&2; exit 1 ;; esac; done
 if [ "$QUIET" = 0 ] && [ -z "$NOTIFY" ]; then
   cat >&2 <<'EOF'
 Say who hears about this release (R50):
     --quiet                       nobody — auto-update carries it in silently (most releases)
     --notify "<one line>"         every teammate's next new chat opens with this line and the update step
+    --link <url>                  with --notify: a page that explains it (repeatable, up to 4)
 Ask Utsav before --notify. New skill, new template, a breaking component: ask. Site, hub, log work: --quiet.
 EOF
   exit 1
@@ -102,13 +107,14 @@ bash scripts/stamp-release.sh "$VERSION" | sed 's/^/  /'
 if [ -n "$NOTIFY" ]; then
   # Written here so it rides in the release commit: version.json projects it, and the next
   # publish is what makes every teammate's next new chat open with it.
-  NOTIFY="$NOTIFY" VERSION="$VERSION" python3 - <<'PY'
+  NOTIFY="$NOTIFY" VERSION="$VERSION" LINKS="$(printf '%s\n' "${LINKS[@]+"${LINKS[@]}"}")" python3 - <<'PY'
 import json, os
 p = ".claude-plugin/notify.json"
 d = json.load(open(p))
 d["version"], d["summary"] = os.environ["VERSION"], os.environ["NOTIFY"].strip()[:200]
+d["links"] = [l.strip() for l in os.environ.get("LINKS", "").split("\n") if l.strip()][:4]
 open(p, "w").write(json.dumps(d, indent=2, ensure_ascii=False) + "\n")
-print(f"  notify.json          -> v{d['version']}: {d['summary']}")
+print(f"  notify.json          -> v{d['version']}: {d['summary']}" + (f"  ({len(d['links'])} link(s))" if d["links"] else ""))
 PY
 else
   echo "  notify.json          -> unchanged (quiet release — nobody is told)"

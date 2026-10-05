@@ -38,21 +38,10 @@ pl = json.load(open(".claude-plugin/plugin.json"))
 # stays silent for everyone: a notice nobody asked for is exactly what this field exists to stop.
 try:
     nf = json.load(open(".claude-plugin/notify.json"))
-    notify = {"version": nf.get("version"), "summary": nf.get("summary") or ""}
+    notify = {"version": nf.get("version"), "summary": nf.get("summary") or "",
+              "links": [l for l in (nf.get("links") or []) if isinstance(l, str) and l.startswith("http")][:4]}
 except Exception:
     notify = None
-releases = []
-try:
-    out = subprocess.run(["bash", "-c", ". scripts/_releases.sh; releases"],
-                         capture_output=True, text=True, timeout=30).stdout
-    # split on "\n", never splitlines(): the body field carries RS (0x1e) for its newlines, and
-    # Python's splitlines() treats RS as a line break too — which cut the list to five records.
-    for line in out.split("\n")[:12]:
-        f = line.split("\x1f")
-        if len(f) >= 4 and f[0]:
-            releases.append({"version": f[0], "date": f[2][:11].strip(), "summary": f[3][:200]})
-except Exception:
-    releases = []
 # Every surface's registry, merged flat. Names are unique across surfaces — the only one that
 # ever appeared twice was `badge`, and that was one shared component listed twice rather than a
 # collision, which is why it now lives in exports/shared/ alone. If two surfaces ever do want the
@@ -138,11 +127,6 @@ print(json.dumps({
     "version": pl_v,
     "released": released,
     "notify": notify,
-    # The last dozen releases, newest first, from the same derivation the changelog uses, so a
-    # notice can say WHAT moved since the copy a teammate runs rather than only that it moved
-    # (R50, Utsav: "also tell what feature or anything got added or moved"). Twelve is a window,
-    # not a history: a copy older than that is told how many more there were.
-    "releases": releases,
     "notice": "https://gushwork-design.vercel.app/preview/changelog-sheet.html",
     "install": "https://gushwork-design.vercel.app/preview/install.html",
     "components": {

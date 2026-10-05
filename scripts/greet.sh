@@ -3,8 +3,8 @@
 # SessionStart hook — opens every NEW chat with a one-line greeting by name.
 #
 # WHY. A teammate had no way to tell the plugin was active until a skill fired, and the skills
-# fire only when a request matches one. A session that opens with "Hey Swapnil, new chat. Gushwork
-# design system v1.59.0 is on." says three things at once: the plugin is loaded, which version it
+# fire only when a request matches one. A session that opens with "Hey Swapnil, fresh chat — you're on Gushwork
+# design system v1.59.0" says three things at once: the plugin is loaded, which version it
 # is, and that this is a fresh chat rather than a resumed one. Ruled by Utsav, 5 Oct 2026 (R48).
 #
 # WHAT IT CAN AND CANNOT DO. A hook cannot make Claude speak before the person types; it can only
@@ -24,6 +24,9 @@
 #
 # Test it by hand:
 #   echo '{"source":"startup"}' | CLAUDE_PLUGIN_ROOT=. bash scripts/greet.sh | python3 -m json.tool
+#
+# The line reads: "Hey Utsav, fresh chat — you're on Gushwork design system v1.59.0. What are we
+# making today?"
 #   echo '{"source":"resume"}'  | CLAUDE_PLUGIN_ROOT=. bash scripts/greet.sh        # prints nothing
 #   GW_GREET_NAME=Swapnil GW_GREET_SOURCE=startup CLAUDE_PLUGIN_ROOT=. bash scripts/greet.sh
 
@@ -81,18 +84,20 @@ try:
 except Exception:
     pass
 
+# Utsav, 5 Oct 2026: "this message sounds too mechanical — make it more humane… you can say you
+# are on v…". A colleague's opener, not a status line.
 who = f"Hey {name}," if name else "Hey there,"
-what = f"Gushwork design system v{version} is on." if version else "Gushwork design system is on."
-line = f"{who} new chat. {what} What are we making?"
+what = f"you're on Gushwork design system v{version}." if version else "the Gushwork design system is loaded."
+line = f"{who} fresh chat — {what} What are we making today?"
 
 ctx = (
     "Gushwork design-system plugin — new-chat greeting. This is a new chat, not a resumed one. "
-    f"Open your FIRST reply in this chat with exactly this line, on its own, before anything else: \"{line}\" "
-    "Then answer what the user asked. If their first message already contains a request, drop the "
-    "closing question and keep the rest of the line as it is. Say it once: never repeat it later in the "
-    "chat, never add an emoji, never pad it into a paragraph. If an update notice elsewhere in this "
-    "context says a newer version is available, put its update step directly under the greeting, "
-    "then carry on."
+    f"Open your FIRST reply in this chat with this line, before anything else: \"{line}\" "
+    "Sound like a colleague saying hello, never like a system notice. Then answer what the user asked. "
+    "If their first message already contains a request, drop the closing question and keep the rest. "
+    "Say it once: never repeat it later in the chat, never add an emoji, never pad it into a paragraph. "
+    "If an update notice elsewhere in this context says a newer version is out, fold it in right after "
+    "the greeting in the same voice, as that notice describes, then carry on."
 )
 print(json.dumps({"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": ctx}}))
 PY
