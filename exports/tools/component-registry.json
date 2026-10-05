@@ -17,11 +17,11 @@
   "registryVersion": "1.58.0",
   "components": {
     "tool-panel": {
-      "version": "1.58.0",
-      "changed": "2026-10-03",
+      "version": "2.0.0",
+      "changed": "2026-10-05",
       "breaking": false,
       "doc": "components.md",
-      "note": "The floating, collapsible panel a tool keeps its controls in, with its collapse icon and reopen button."
+      "note": "The floating, collapsible panel a tool keeps its controls in. Collapsed, it folds to its own header: logo tile, the tool name and the reopen button."
     },
     "tool-action-pill": {
       "version": "1.58.0",
@@ -50,6 +50,13 @@
       "breaking": false,
       "doc": "components.md",
       "note": "A Save and share panel on the right: this item (created, edited, status), save, copy link, the shared list with who saved and edited, delete behind a confirm."
+    },
+    "tool-files-home": {
+      "version": "2.0.0",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "components.md",
+      "note": "A tool's own Files page, Canva-style: tabs (All, Mine, Shared with me), search, sort, grid or list of files with live thumbnails, people, access and relative edit time."
     }
   },
   "review": {

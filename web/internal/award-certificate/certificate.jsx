@@ -106,9 +106,40 @@ function awardLine(d) {
   return [d.award, d.period].map((s) => (s || '').trim()).filter(Boolean).join(' ');
 }
 
+/* Click-to-edit (Utsav, 5 Oct 2026). A plain-text contentEditable run, kept in step with the
+   panel's fields both ways. React never re-renders its text while it has focus (that would jump
+   the caret); Enter is refused and paste is flattened to text, so the run stays one text node,
+   which is what the PDF exporter reads. data-ph is a placeholder drawn only when the run is
+   empty, and never in an export (the exporters set data-exporting on the sheet). */
+function EditableText({ value, onChange, editable, placeholder, ...rest }) {
+  const ref = React.useRef(null);
+  React.useLayoutEffect(() => {
+    const el = ref.current;
+    if (el && document.activeElement !== el && el.textContent !== (value || '')) el.textContent = value || '';
+  }, [value]);
+  if (!editable) return <span {...rest}>{value}</span>;
+  return (
+    <span
+      {...rest}
+      ref={ref}
+      contentEditable
+      suppressContentEditableWarning
+      spellCheck={false}
+      data-ph={placeholder}
+      className="cert-edit"
+      onInput={(e) => onChange(e.currentTarget.textContent)}
+      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); e.currentTarget.blur(); } }}
+      onPaste={(e) => { e.preventDefault(); document.execCommand('insertText', false, e.clipboardData.getData('text/plain').replace(/\s+/g, ' ')); }}
+      onBlur={(e) => { if (e.currentTarget.textContent !== (value || '')) onChange(e.currentTarget.textContent); }}
+    />
+  );
+}
+
 /* data-layer names one PSD layer each; data-text marks a run the PDF
    exporter draws as live text (font key → certificate-export.js). */
-function Certificate({ data, logoSvg, certRef }) {
+function Certificate({ data, logoSvg, certRef, onEdit }) {
+  const editable = !!onEdit;
+  const ed = (key) => (v) => onEdit && onEdit(key, v);
   const name = (data.name || '').trim();
   const headline = (data.headline || '').trim();
   const award = awardLine(data);
@@ -171,9 +202,19 @@ function Certificate({ data, logoSvg, certRef }) {
             lineHeight: 1.2, letterSpacing: 0, color: CERT.black, overflowWrap: 'break-word',
           }}
         >
-          {name && <span data-text="display" style={{ color: CERT.blue }}>{name}</span>}
-          {name && headline && (data.nameOwnLine ? <br /> : ' ')}
-          {headline && <span data-text="display" style={{ color: CERT.black }}>{headline}</span>}
+          {editable ? (
+            <>
+              <EditableText editable value={data.name} onChange={ed('name')} placeholder="Name" data-text="display" style={{ color: CERT.blue }} />
+              {data.nameOwnLine ? <br /> : ' '}
+              <EditableText editable value={data.headline} onChange={ed('headline')} placeholder="the headline" data-text="display" style={{ color: CERT.black }} />
+            </>
+          ) : (
+            <>
+              {name && <span data-text="display" style={{ color: CERT.blue }}>{name}</span>}
+              {name && headline && (data.nameOwnLine ? <br /> : ' ')}
+              {headline && <span data-text="display" style={{ color: CERT.black }}>{headline}</span>}
+            </>
+          )}
         </h2>
 
         <div style={{ width: CERT.innerW, display: 'flex', flexDirection: 'column', gap: CERT.gapBody }}>
@@ -184,11 +225,25 @@ function Certificate({ data, logoSvg, certRef }) {
               lineHeight: 1.72, letterSpacing: 0, color: CERT.grey,
             }}
           >
-            {before && <span data-text="body" style={{ color: CERT.grey }}>{before}</span>}
-            {before && award && ' '}
-            {award && <span data-text="bodySemi" style={{ fontFamily: CERT_FONT.bodySemi, fontWeight: 600, color: CERT.blue }}>{award}</span>}
-            {(before || award) && after && ' '}
-            {after && <span data-text="body" style={{ color: CERT.grey }}>{after}</span>}
+            {editable ? (
+              <>
+                <EditableText editable value={data.before} onChange={ed('before')} placeholder="Text before the award" data-text="body" style={{ color: CERT.grey }} />
+                {' '}
+                <EditableText editable value={data.award} onChange={ed('award')} placeholder="Award" data-text="bodySemi" style={{ fontFamily: CERT_FONT.bodySemi, fontWeight: 600, color: CERT.blue }} />
+                {' '}
+                <EditableText editable value={data.period} onChange={ed('period')} placeholder="Period" data-text="bodySemi" style={{ fontFamily: CERT_FONT.bodySemi, fontWeight: 600, color: CERT.blue }} />
+                {' '}
+                <EditableText editable value={data.after} onChange={ed('after')} placeholder="text after the award" data-text="body" style={{ color: CERT.grey }} />
+              </>
+            ) : (
+              <>
+                {before && <span data-text="body" style={{ color: CERT.grey }}>{before}</span>}
+                {before && award && ' '}
+                {award && <span data-text="bodySemi" style={{ fontFamily: CERT_FONT.bodySemi, fontWeight: 600, color: CERT.blue }}>{award}</span>}
+                {(before || award) && after && ' '}
+                {after && <span data-text="body" style={{ color: CERT.grey }}>{after}</span>}
+              </>
+            )}
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: CERT.gapSig, alignItems: 'flex-start' }}>
@@ -200,7 +255,7 @@ function Certificate({ data, logoSvg, certRef }) {
                 minHeight: 40,
               }}
             >
-              <span data-text="sig">{data.signature}</span>
+              <EditableText editable={editable} value={data.signature} onChange={ed('signature')} placeholder="Signature" data-text="sig" />
             </div>
             <div
               data-layer="Signed by"
@@ -209,7 +264,7 @@ function Certificate({ data, logoSvg, certRef }) {
                 letterSpacing: 0, color: CERT.grey, whiteSpace: 'nowrap', minHeight: 14,
               }}
             >
-              <span data-text="body">{data.signedBy}</span>
+              <EditableText editable={editable} value={data.signedBy} onChange={ed('signedBy')} placeholder="Name, role, Gushwork" data-text="body" />
             </div>
           </div>
         </div>
@@ -227,4 +282,4 @@ function Certificate({ data, logoSvg, certRef }) {
   );
 }
 
-Object.assign(window, { CERT, CERT_FONT, PRESETS, SIGNATORY_DEFAULT, Certificate, awardLine, GRID_D });
+Object.assign(window, { EditableText, CERT, CERT_FONT, PRESETS, SIGNATORY_DEFAULT, Certificate, awardLine, GRID_D });

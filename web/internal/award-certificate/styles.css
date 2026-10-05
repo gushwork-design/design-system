@@ -306,3 +306,90 @@ html[data-tool-panel="open"] .t-acts { right: calc(var(--t-panel-w) + var(--t-in
 @media (prefers-reduced-motion: reduce) { .right-col, .app .preview-col { transition: none; } }
 .prop-segmented { display: inline-flex; align-items: center; }
 .prop-segmented.acc-general { display: grid; grid-template-columns: 1fr 1fr; width: 100%; }
+
+/* ── Click-to-edit on the sheet (preview only; data-exporting hides every affordance) ── */
+.cert-edit { outline: none; border-radius: 2px; cursor: text; transition: box-shadow var(--gw-motion-fast), background var(--gw-motion-fast); }
+.cert:not([data-exporting]) .cert-edit:hover { box-shadow: 0 0 0 2px color-mix(in srgb, var(--gw-color-neutral-400) 45%, transparent); }
+.cert:not([data-exporting]) .cert-edit:focus { box-shadow: 0 0 0 2px var(--gw-color-neutral-400); background: color-mix(in srgb, var(--gw-color-white) 60%, transparent); }
+.cert:not([data-exporting]) .cert-edit:empty::before { content: attr(data-ph); opacity: .35; }
+
+/* ── This certificate: file name, clash notice ── */
+.file-name { display: flex; flex-direction: column; gap: var(--gw-space-8); }
+.clash {
+  display: flex; flex-direction: column; gap: var(--gw-space-8);
+  padding: var(--gw-space-12); background: var(--t-note-bg);
+  border: 1px solid var(--t-note-border); border-radius: var(--gw-radius-12);
+}
+.clash p { margin: 0; font: var(--gw-text-body-12-reg); letter-spacing: var(--gw-text-body-12-reg-tracking); color: var(--t-note-fg); }
+.clash strong { font-weight: 600; }
+.del-confirm__acts { display: flex; justify-content: flex-end; gap: var(--gw-space-8); }
+.del-confirm__acts .r-btn { height: 32px; border-radius: var(--gw-radius-8); }
+.right-head { gap: var(--gw-space-8); }
+.right-head h2 { flex: 1; min-width: 0; text-align: center; }
+.saved-new { display: inline-flex; align-items: center; gap: var(--gw-space-4); }
+.saved-new svg { width: 12px; height: 12px; }
+
+/* ── Files home (Utsav, 5 Oct 2026): the tool opens on every certificate file you can see ── */
+.app--home { min-height: 100vh; }
+.home { max-width: 1200px; margin: 0 auto; padding: var(--gw-space-16) var(--gw-space-16) 96px; display: flex; flex-direction: column; gap: var(--gw-space-16); }
+.home-bar {
+  display: flex; align-items: center; gap: var(--gw-space-12);
+  min-height: 57px; padding: var(--gw-space-12) 88px var(--gw-space-12) 0;   /* clear of the hub's Appearance and Help */
+}
+.home-bar .brand-link { display: block; line-height: 0; border-radius: var(--gw-radius-8); color: inherit; }
+.home-bar .brand-icon { width: 32px; height: 32px; border-radius: var(--gw-radius-8); }
+:root[data-theme="dark"] .home-bar .brand-icon { box-shadow: 0 0 0 1px var(--gw-color-neutral-800); }
+.home-bar h1 { flex: 1; margin: 0; font: var(--gw-text-h6); letter-spacing: 0; color: var(--t-heading); }
+.home-tools { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-12); flex-wrap: wrap; }
+.home-search { width: 320px; max-width: 100%; }
+.home-note { margin: 0; }
+.home-empty {
+  display: flex; flex-direction: column; align-items: center; gap: var(--gw-space-8); text-align: center;
+  padding: 64px var(--gw-space-16); border: 1px dashed var(--t-field-hover); border-radius: var(--gw-radius-16);
+}
+.home-empty p { margin: 0; }
+.home-more { display: flex; justify-content: center; }
+.file-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); gap: var(--gw-space-16); }
+.file-card {
+  position: relative; display: flex; flex-direction: column;
+  background: var(--t-panel-bg); border: 1px solid var(--t-panel-border); border-radius: var(--gw-radius-16);
+  overflow: hidden; transition: border-color var(--gw-motion-fast), box-shadow var(--gw-motion-fast);
+}
+.file-card:hover { border-color: var(--t-border-strong); box-shadow: var(--gw-shadow-s3); }
+.file-open { display: flex; flex-direction: column; padding: 0; border: 0; background: transparent; text-align: left; cursor: pointer; color: inherit; }
+.file-thumb { display: grid; place-items: center; height: 300px; background: var(--t-field-bg); border-bottom: 1px solid var(--t-panel-border); overflow: hidden; }
+.file-thumb__sheet { display: block; width: calc(595px * .32); height: calc(842px * .32); position: relative; box-shadow: var(--gw-shadow-s2); }
+.file-thumb__sheet > .cert { position: absolute; top: 0; left: 0; transform: scale(.32); transform-origin: 0 0; pointer-events: none; }
+.file-info { display: flex; flex-direction: column; gap: var(--gw-space-2); padding: var(--gw-space-12); min-width: 0; }
+.file-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.file-info .saved-meta { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.file-tags { position: absolute; top: var(--gw-space-8); left: var(--gw-space-8); display: flex; gap: var(--gw-space-4); }
+.file-tags .saved-tag { margin: 0; background: var(--t-panel-bg); }
+.file-acts { position: absolute; top: var(--gw-space-8); right: var(--gw-space-8); display: flex; gap: var(--gw-space-4); }
+.file-acts .saved-del { background: var(--t-panel-bg); border: 1px solid var(--t-panel-border); }
+.file-card:hover .file-acts .saved-del, .file-acts .saved-del:focus-visible { opacity: 1; }
+
+/* ── Files home, after Canva's projects page (Mobbin): sort, grid / list, people, relative time ── */
+.home-right { display: flex; align-items: center; gap: var(--gw-space-8); }
+.home-sort { width: 168px; }
+.home-layout button { width: 36px; padding: 0; }
+.home-layout svg { width: 16px; height: 16px; display: block; }
+.file-meta-row { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-8); min-width: 0; }
+.avatars { display: inline-flex; flex: none; }
+.acc-avatar--sm { width: 24px; height: 24px; font: var(--gw-text-body-10-reg); font-weight: 600; box-shadow: 0 0 0 2px var(--t-panel-bg); }
+.avatars .acc-avatar--sm + .acc-avatar--sm { margin-left: calc(var(--gw-space-4) * -1); }
+.file-table { width: 100%; border-collapse: collapse; background: var(--t-panel-bg); border: 1px solid var(--t-panel-border); border-radius: var(--gw-radius-16); overflow: hidden; }
+.file-table th {
+  text-align: left; padding: var(--gw-space-12) var(--gw-space-16); border-bottom: 1px solid var(--t-rule);
+  font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); color: var(--t-label);
+}
+.file-table td { padding: var(--gw-space-8) var(--gw-space-16); border-bottom: 1px solid var(--t-rule); vertical-align: middle; }
+.file-table tbody tr { cursor: pointer; transition: background var(--gw-motion-fast); }
+.file-table tbody tr:last-child td { border-bottom: 0; }
+.file-table tbody tr:hover { background: var(--t-hover); }
+.file-table tbody tr:hover .saved-del { opacity: 1; }
+.file-row-name { display: flex; align-items: center; gap: var(--gw-space-12); min-width: 0; }
+.file-mini { flex: none; width: 36px; height: 51px; position: relative; overflow: hidden; border-radius: var(--gw-radius-4); box-shadow: 0 0 0 1px var(--t-panel-border); }
+.file-mini__sheet > .cert { position: absolute; top: 0; left: 0; transform: scale(.0605); transform-origin: 0 0; pointer-events: none; }
+.file-row-acts { width: 80px; text-align: right; white-space: nowrap; }
+.gw-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
