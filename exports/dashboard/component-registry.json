@@ -1201,6 +1201,12 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "8eb0e1375b8475bd"
+    },
+    "sparkline": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "1e9668462afc96e1"
     }
   }
 }
