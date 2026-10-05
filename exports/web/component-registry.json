@@ -326,8 +326,8 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "b011f54c631f2238",
-      "previewFingerprint": "0d792d4171e9d3b4",
-      "note": "the tooltip sohuld be shown on hover"
+      "previewFingerprint": "1f588013fe5168c4",
+      "note": "the blue is the hover state and the tooltip will be in the hove state too, the white ones are default state"
     },
     "video": {
       "reviewed": "passed",
