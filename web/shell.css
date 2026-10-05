@@ -1549,7 +1549,7 @@
 /* ---------------------------------------------------------------------------
    9. Below 1440 — SCALE the canvas. Do not reflow. RULED.
 
-   exports/dashboard/build-rules.md, ruled by Utsav 7 Aug 2026 after three
+   exports/dashboard/shell.md, ruled by Utsav 7 Aug 2026 after three
    attempts got it wrong: "1440 is the minimum width. Below it, SCALE the
    canvas." Reflow is named there as a rejected attempt — it produces a layout
    matching none of the drawn variants.

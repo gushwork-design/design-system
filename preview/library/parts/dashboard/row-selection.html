@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>row-selection — Gushwork</title>
+<meta name="description" content="Dashboard · tables.md">
+<meta name="robots" content="noindex">
+<script>try{var c=localStorage.getItem('gw-theme-choice'),t=c==='dark'||c==='light'?c:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20x%3D%221%22%20y%3D%221%22%20width%3D%2278%22%20height%3D%2278%22%20rx%3D%2219%22%20fill%3D%22%230070ff%22%20stroke%3D%22%230061e0%22%20stroke-width%3D%222%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="../../../foundation/tokens.css">
+<link rel="stylesheet" href="../../../shell.css">
+<style>
+.cl{--cl-gap:var(--gw-space-40)}
+.cl h2{font:var(--gw-text-h5);color:var(--s-heading);margin:0}
+.cl h3{font:var(--gw-text-h7);color:var(--s-heading);margin:0}
+.cl h4{font:var(--gw-text-body-16-sem);color:var(--s-heading);margin:0}
+.cl p{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+      color:var(--s-body);margin:0;max-width:78ch}
+.cl code,.cl .mono{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px}
+
+/* --- page head ------------------------------------------------------------ */
+.cl-head{display:flex;flex-direction:column;gap:var(--gw-space-16)}
+.cl-head h1{font:var(--gw-text-h4);color:var(--s-heading);margin:0}
+.cl-lede{font:var(--gw-text-body-18-reg);letter-spacing:var(--gw-text-body-18-reg-tracking);
+         color:var(--s-body);margin:0;max-width:72ch}
+
+/* --- the tally ------------------------------------------------------------ */
+.cl-tally{display:flex;flex-wrap:wrap;gap:var(--gw-space-12)}
+.cl-stat{flex:1 1 150px;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-16) var(--gw-space-20);
+         display:flex;flex-direction:column;gap:var(--gw-space-4)}
+.cl-stat b{font:var(--gw-text-h6);color:var(--s-heading);font-feature-settings:"tnum" 1}
+.cl-stat span{font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-400);
+              text-transform:uppercase;letter-spacing:.06em}
+
+/* --- review queue --------------------------------------------------------- */
+.cl-queue{background:var(--s-card-bg);border:1px solid var(--gw-color-yellow-300);
+          border-left:3px solid var(--gw-color-yellow-400);border-radius:var(--gw-radius-12);
+          padding:var(--gw-space-20) var(--gw-space-24);display:flex;flex-direction:column;
+          gap:var(--gw-space-12)}
+.cl-queue h2{font:var(--gw-text-h7)}
+.cl-queue ul{margin:0;padding-left:var(--gw-space-20);display:flex;flex-direction:column;
+             gap:var(--gw-space-4)}
+.cl-queue li{font:var(--gw-text-body-14-reg);color:var(--s-body)}
+.cl-queue a{color:var(--gw-color-primary-600);text-decoration:none}
+.cl-queue a:hover{text-decoration:underline}
+.cl-pass{background:var(--s-card-bg);border:1px solid var(--gw-color-green-300);
+         border-left:3px solid var(--gw-color-green-400)}
+
+/* --- controls ------------------------------------------------------------- */
+.cl-bar{position:sticky;top:0;z-index:5;background:var(--s-page-bg);
+        padding:var(--gw-space-12) 0;display:flex;flex-wrap:wrap;gap:var(--gw-space-8);
+        align-items:center;border-bottom:1px solid var(--s-chrome-border)}
+.cl-find{flex:1 1 220px;min-width:180px;background:var(--s-field-bg);
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         padding:var(--gw-space-8) var(--gw-space-12);font:var(--gw-text-body-14-reg);
+         color:var(--s-heading)}
+.cl-find::placeholder{color:var(--s-placeholder)}
+.cl-find:focus{outline:none;border-color:var(--gw-color-neutral-400)}
+.cl-filter{display:flex;gap:var(--gw-space-4);flex-wrap:wrap}
+.cl-f{font:var(--gw-text-body-12-med);color:var(--s-body);background:transparent;
+      border:1px solid var(--s-field-border);border-radius:var(--gw-radius-full);
+      padding:6px var(--gw-space-12);cursor:pointer}
+.cl-f:hover{border-color:var(--gw-color-primary-500)}
+.cl-f[aria-pressed="true"]{background:var(--gw-color-black);color:var(--gw-color-white);
+                           border-color:var(--gw-color-black)}
+.cl-f:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.cl-count{font:var(--gw-text-body-12-reg);color:var(--gw-color-neutral-400);margin-left:auto}
+
+/* --- sections ------------------------------------------------------------- */
+.cl-sec{display:flex;flex-direction:column;gap:var(--gw-space-20);
+        scroll-margin-top:var(--gw-space-80)}
+.cl-sec[hidden]{display:none}
+.cl-sechead{display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--gw-space-12)}
+.cl-note{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+         color:var(--s-body);background:var(--gw-color-neutral-25);
+         border:1px solid var(--s-card-border);border-left:3px solid var(--gw-color-neutral-300);
+         border-radius:var(--gw-radius-8);padding:var(--gw-space-12) var(--gw-space-16);
+         white-space:pre-wrap;max-width:88ch}
+:root[data-theme="dark"] .cl-note{background:var(--gw-color-neutral-900)}
+.cl-sub{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.cl-sub[hidden]{display:none}
+
+/* --- chips ---------------------------------------------------------------- */
+.cl-chip{display:inline-flex;align-items:center;gap:6px;font:var(--gw-text-body-12-med);
+         border-radius:var(--gw-radius-full);padding:3px var(--gw-space-8);white-space:nowrap}
+.cl-chip--measured{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.cl-chip--transcribed{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.cl-chip--ruled{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+.cl-chip--passed{background:var(--gw-color-green-500);color:var(--gw-color-white)}
+.cl-chip--pending{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+.cl-chip--rejected{background:var(--gw-color-red-500);color:var(--gw-color-white)}
+.cl-chip--gap{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+:root[data-theme="dark"] .cl-chip--measured{background:var(--gw-color-green-900);
+                                            color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .cl-chip--transcribed{background:var(--gw-color-yellow-900);
+                                               color:var(--gw-color-yellow-100)}
+:root[data-theme="dark"] .cl-chip--ruled{background:var(--gw-color-primary-900);
+                                         color:var(--gw-color-primary-200)}
+:root[data-theme="dark"] .cl-chip--pending{background:var(--gw-color-neutral-800);
+                                           color:var(--gw-color-neutral-300)}
+:root[data-theme="dark"] .cl-chip--gap{background:var(--gw-color-red-900);
+                                       color:var(--gw-color-red-200)}
+
+/* --- colour --------------------------------------------------------------- */
+.cl-ramp{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));
+         gap:var(--gw-space-8)}
+.cl-sw{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+       border-radius:var(--gw-radius-10);overflow:hidden;display:flex;flex-direction:column}
+.cl-sw[hidden]{display:none}
+.cl-sw__chip{height:64px;border-bottom:1px solid var(--s-card-border);
+             background-image:linear-gradient(45deg,var(--gw-color-neutral-100) 25%,transparent 25%),
+                              linear-gradient(-45deg,var(--gw-color-neutral-100) 25%,transparent 25%),
+                              linear-gradient(45deg,transparent 75%,var(--gw-color-neutral-100) 75%),
+                              linear-gradient(-45deg,transparent 75%,var(--gw-color-neutral-100) 75%);
+             background-size:12px 12px;
+             background-position:0 0,0 6px,6px -6px,-6px 0}
+.cl-sw__fill{width:100%;height:100%}
+.cl-sw__body{padding:var(--gw-space-8) var(--gw-space-12);display:flex;
+             flex-direction:column;gap:3px}
+.cl-sw__name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;
+             color:var(--s-heading);word-break:break-all;line-height:1.35}
+.cl-sw__hex{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;
+            color:var(--gw-color-neutral-400);text-transform:uppercase}
+.cl-sw__ac{display:flex;gap:4px;margin-top:2px}
+.cl-ac{font-size:9.5px;font-weight:600;letter-spacing:.04em;border-radius:var(--gw-radius-4);
+       padding:1px 4px;line-height:1.5}
+.cl-ac--ok{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.cl-ac--no{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+:root[data-theme="dark"] .cl-ac--ok{background:var(--gw-color-green-900);color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .cl-ac--no{background:var(--gw-color-red-900);color:var(--gw-color-red-200)}
+
+/* --- type ----------------------------------------------------------------- */
+.cl-types{display:flex;flex-direction:column;gap:2px}
+.cl-t{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:var(--gw-space-20);
+      align-items:start;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+      border-radius:var(--gw-radius-10);padding:var(--gw-space-16) var(--gw-space-20)}
+.cl-t[hidden]{display:none}
+.cl-t__spec{color:var(--s-heading);min-width:0;overflow-wrap:anywhere}
+.cl-t__meta{display:flex;flex-direction:column;gap:2px;text-align:right}
+.cl-t__name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+            color:var(--gw-color-primary-600)}
+.cl-t__val{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10.5px;
+           color:var(--gw-color-neutral-400);line-height:1.5}
+@media (max-width:860px){.cl-t{grid-template-columns:1fr}.cl-t__meta{text-align:left}}
+
+/* --- faces ---------------------------------------------------------------- */
+.cl-faces{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+          gap:var(--gw-space-16)}
+.cl-face{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-24);
+         display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.cl-face__aa{font-size:52px;line-height:1.05;color:var(--s-heading)}
+.cl-face__wt{display:flex;flex-direction:column;gap:2px}
+.cl-face__wt span{color:var(--s-heading);font-size:19px;line-height:1.45}
+
+/* --- space / radius / shadow ---------------------------------------------- */
+.cl-rows{display:flex;flex-direction:column;gap:6px}
+.cl-row{display:grid;grid-template-columns:132px minmax(0,1fr) 60px;gap:var(--gw-space-16);
+        align-items:center;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-radius:var(--gw-radius-8);padding:var(--gw-space-8) var(--gw-space-16)}
+.cl-row[hidden]{display:none}
+.cl-row__n{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+           color:var(--gw-color-primary-600);word-break:break-all}
+.cl-row__v{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+           color:var(--gw-color-neutral-400);text-align:right}
+.cl-bararea{min-height:18px;display:flex;align-items:center}
+.cl-barfill{height:16px;background:var(--gw-color-primary-500);border-radius:var(--gw-radius-2);
+            max-width:100%}
+.cl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));
+         gap:var(--gw-space-12)}
+.cl-tile{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-10);padding:var(--gw-space-16);display:flex;
+         flex-direction:column;align-items:center;gap:var(--gw-space-8)}
+.cl-tile[hidden]{display:none}
+.cl-tile__demo{width:72px;height:72px;background:var(--gw-color-primary-100);
+               border:1.5px solid var(--gw-color-primary-500)}
+.cl-tile__sh{width:100%;height:64px;background:var(--gw-color-white);
+             border-radius:var(--gw-radius-8)}
+:root[data-theme="dark"] .cl-tile__sh{background:var(--gw-color-neutral-800)}
+/* The alpha checker is drawn in neutral-100, which is near-white and shouts on a
+   black ground. Same job, quieter, in dark. */
+:root[data-theme="dark"] .cl-sw__chip{
+  background-image:linear-gradient(45deg,var(--gw-color-neutral-800) 25%,transparent 25%),
+                   linear-gradient(-45deg,var(--gw-color-neutral-800) 25%,transparent 25%),
+                   linear-gradient(45deg,transparent 75%,var(--gw-color-neutral-800) 75%),
+                   linear-gradient(-45deg,transparent 75%,var(--gw-color-neutral-800) 75%)}
+
+/* --- tables --------------------------------------------------------------- */
+.cl-tbl{width:100%;border-collapse:collapse;background:var(--s-card-bg);
+        border:1px solid var(--s-card-border);border-radius:var(--gw-radius-10);
+        overflow:hidden;font:var(--gw-text-body-14-reg)}
+.cl-tblwrap{overflow-x:auto}
+.cl-tbl th{text-align:left;font:var(--gw-text-body-12-med);text-transform:uppercase;
+           letter-spacing:.06em;color:var(--gw-color-neutral-400);
+           padding:var(--gw-space-8) var(--gw-space-16);
+           border-bottom:1px solid var(--s-card-border);white-space:nowrap}
+.cl-tbl td{padding:var(--gw-space-8) var(--gw-space-16);color:var(--s-body);
+           border-bottom:1px solid var(--s-card-border);vertical-align:top}
+.cl-tbl tr:last-child td{border-bottom:none}
+.cl-tbl tr[hidden]{display:none}
+.cl-tbl .mono{color:var(--gw-color-primary-600)}
+.cl-tbl .num{font-feature-settings:"tnum" 1;white-space:nowrap}
+
+/* --- gaps ----------------------------------------------------------------- */
+.cl-gaps{display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.cl-gap{display:grid;grid-template-columns:28px minmax(0,1fr);gap:var(--gw-space-12);
+        background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-left:3px solid var(--gw-color-red-400);border-radius:var(--gw-radius-8);
+        padding:var(--gw-space-12) var(--gw-space-16)}
+.cl-gap__n{font:var(--gw-text-body-14-sem);color:var(--gw-color-red-500);
+           font-feature-settings:"tnum" 1}
+.cl-gap__t{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+           color:var(--s-body);white-space:pre-wrap;margin:0}
+
+/* --- use-case cards ------------------------------------------------------- */
+.cl-cases{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+          gap:var(--gw-space-12)}
+.cl-case{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-20);
+         display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.cl-case__n{display:flex;align-items:baseline;justify-content:space-between;gap:var(--gw-space-8)}
+.cl-case__list{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:4px}
+.cl-case__list li{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10.5px;
+                  color:var(--gw-color-neutral-600);background:var(--gw-color-neutral-25);
+                  border:1px solid var(--s-card-border);border-radius:var(--gw-radius-4);
+                  padding:1px 5px}
+:root[data-theme="dark"] .cl-case__list li{background:var(--gw-color-neutral-900)}
+
+/* --- misc ----------------------------------------------------------------- */
+.cl-src{display:flex;flex-wrap:wrap;gap:var(--gw-space-8)}
+.cl-src code{background:var(--s-code-bg);border:1px solid var(--s-code-border);
+             color:var(--s-code-fg);border-radius:var(--gw-radius-4);padding:2px 7px}
+.cl-empty{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-400);
+          border:1px dashed var(--s-field-border);border-radius:var(--gw-radius-10);
+          padding:var(--gw-space-24);text-align:center}
+.cl-jump{display:flex;flex-wrap:wrap;gap:6px}
+.cl-jump a{font:var(--gw-text-body-12-med);color:var(--s-body);text-decoration:none;
+           border:1px solid var(--s-field-border);border-radius:var(--gw-radius-full);
+           padding:5px var(--gw-space-12)}
+.cl-jump a:hover{border-color:var(--gw-color-primary-500);color:var(--gw-color-primary-600)}
+@media print{.cl-bar,.cl-jump{display:none}}
+
+*{box-sizing:border-box}
+/* Body/body-16-reg, the site-wide page default ruled 29 Sep 2026 (796:12917).
+   This sheet named the family but no size, so it fell to the browser's 16px at
+   `normal` leading — the right size by accident, the wrong line-height. */
+body{margin:0;background:var(--s-page-bg);
+     font:var(--gw-text-body-16-reg);
+     letter-spacing:var(--gw-text-body-16-reg-tracking);
+     color:var(--s-body);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
+
+/* ---- topbar ------------------------------------------------------------- */
+.lb-top{position:sticky;top:0;z-index:20;height:60px;display:flex;align-items:center;
+        gap:var(--gw-space-16);padding:0 var(--gw-space-24);
+        background:var(--s-chrome-bg);border-bottom:1px solid var(--s-chrome-border)}
+.lb-brand{display:flex;align-items:center;gap:var(--gw-space-12);text-decoration:none;
+          flex:none}
+.lb-brand__chip{width:32px;height:32px;border-radius:var(--gw-radius-8);
+                background:var(--gw-color-primary-500);color:var(--gw-color-white);
+                box-shadow:inset 0 0 0 1px var(--gw-color-primary-600);
+                display:grid;place-items:center;flex:none}
+.lb-brand__chip svg{width:16px;height:16px;display:block}
+.lb-brand__n{font:var(--gw-text-h7);color:var(--s-heading)}
+.lb-crumb{font:var(--gw-text-body-14-reg);color:var(--s-group-label);
+          white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-crumb a{color:var(--gw-color-primary-600);text-decoration:none}
+.lb-top__r{display:flex;align-items:center;gap:var(--gw-space-12);margin-left:auto}
+.lb-find{width:300px;height:36px;background:var(--s-field-bg);
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         padding:0 var(--gw-space-12);font:var(--gw-text-body-14-reg);color:var(--s-heading)}
+.lb-find::placeholder{color:var(--s-placeholder)}
+.lb-find:focus{outline:none;border-color:var(--gw-color-neutral-400)}
+.lb-tbtn{width:36px;height:36px;display:grid;place-items:center;background:transparent;
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         color:var(--s-body);cursor:pointer;flex:none}
+.lb-tbtn svg{width:18px;height:18px;display:block}
+.lb-tbtn:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+@media (max-width:820px){.lb-find{display:none}}
+
+/* ---- three columns ------------------------------------------------------- */
+.lb-3{display:grid;grid-template-columns:240px minmax(0,1fr) 212px;align-items:start;
+      max-width:1600px;margin:0 auto}
+.lb-rail{position:sticky;top:60px;max-height:calc(100vh - 60px);overflow-y:auto;
+         border-right:1px solid var(--s-chrome-border);padding:var(--gw-space-24) 0}
+.lb-rail__t{font:var(--gw-text-body-12-med);text-transform:uppercase;letter-spacing:.06em;
+            color:var(--s-group-label);padding:0 var(--gw-space-20) var(--gw-space-8)}
+.lb-rail a{display:flex;justify-content:space-between;gap:var(--gw-space-8);
+           font:var(--gw-text-body-14-reg);color:var(--s-body);text-decoration:none;
+           padding:6px var(--gw-space-20)}
+.lb-rail a:hover{background:var(--s-nav-hover);color:var(--s-heading)}
+.lb-rail a.on{background:var(--s-nav-sel);color:var(--s-heading);
+              font:var(--gw-text-body-14-sem)}
+.lb-rail a span{color:var(--gw-color-neutral-400);font:var(--gw-text-body-12-reg);flex:none}
+.lb-rail a.on span{color:var(--s-heading)}
+.lb-rail__sep{margin:var(--gw-space-12) var(--gw-space-20) var(--gw-space-8);
+              border-top:1px solid var(--s-chrome-border)}
+
+.lb-mid{grid-column:2;padding:var(--gw-space-32) var(--gw-space-40) var(--gw-space-80);
+        min-width:0;display:flex;flex-direction:column;gap:var(--gw-space-24)}
+.lb-toc{grid-column:3;position:sticky;top:60px;max-height:calc(100vh - 60px);overflow-y:auto;
+        padding:var(--gw-space-32) var(--gw-space-20);display:flex;flex-direction:column;
+        gap:5px}
+.lb-toc b{font:var(--gw-text-body-12-med);text-transform:uppercase;letter-spacing:.06em;
+          color:var(--gw-color-neutral-400);margin-bottom:3px}
+.lb-toc a{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-600);
+          text-decoration:none;line-height:1.35}
+.lb-toc a:hover{color:var(--gw-color-primary-600)}
+.lb-toc a.l3{padding-left:var(--gw-space-12)}
+@media (max-width:1180px){.lb-3{grid-template-columns:220px minmax(0,1fr)}
+                          .lb-toc{display:none}}
+@media (max-width:820px){.lb-3{grid-template-columns:minmax(0,1fr)}
+                         /* `.lb-mid{grid-column:2}` above made the grid two columns even here, so the rail
+                            was squeezed to 0 wide and there was no way to move between sections. Both
+                            go back to column 1, and the rail becomes one scrolling row of chips instead
+                            of a 400px list in front of the content. */
+                         .lb-mid,.lb-rail{grid-column:1}
+                         .lb-rail{position:static;max-height:none;border-right:0;
+                                  border-bottom:1px solid var(--s-chrome-border);
+                                  display:flex;flex-direction:row;align-items:center;gap:var(--gw-space-8);
+                                  overflow-x:auto;padding:var(--gw-space-12) var(--gw-space-20);
+                                  scrollbar-width:none}
+                         .lb-rail::-webkit-scrollbar{display:none}
+                         .lb-rail__t,.lb-rail__sep{display:none}
+                         .lb-rail a{flex:none;white-space:nowrap;gap:var(--gw-space-4);
+                                    padding:6px var(--gw-space-12);border-radius:var(--gw-radius-full);
+                                    border:1px solid var(--s-chrome-border)}
+                         .lb-mid{padding:var(--gw-space-24) var(--gw-space-20)}}
+@media (max-width:640px){.lb-crumb{display:none}}
+
+/* ---- page head ----------------------------------------------------------- */
+.lb-h{display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.lb-h h1{font:var(--gw-text-h4);margin:0}
+.lb-h .lede{font:var(--gw-text-body-16-reg);color:var(--s-body);margin:0;max-width:74ch}
+.lb-row{display:flex;flex-wrap:wrap;gap:var(--gw-space-8);align-items:center}
+.lb-rowfind{width:100%;max-width:360px;height:36px;padding:0 12px;margin:0 0 20px;border:0;border-radius:12px;background:var(--s-field-bg);
+  box-shadow:inset 0 0 0 1px var(--s-field-border);color:var(--s-heading);font:var(--gw-text-body-14-reg)}
+.lb-rowfind::placeholder{color:var(--s-placeholder)}
+.cat-name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px;color:var(--s-heading);font-weight:600}
+a.cat-name{color:var(--gw-color-primary-600);text-decoration:none}
+:root[data-theme="dark"] a.cat-name{color:var(--gw-color-primary-400)}
+.cat-note{display:block;margin-top:2px;font:var(--gw-text-body-12-reg);color:var(--s-body)}
+@media (max-width:760px){.lb-mid td a,.lb-mid th a{display:inline-flex;align-items:center;min-height:24px}}
+.cat-link{font:var(--gw-text-body-14-med);color:var(--gw-color-primary-600);text-decoration:none}
+:root[data-theme="dark"] .cat-link{color:var(--gw-color-primary-400)}
+.cat-link:hover{text-decoration:underline}
+.sec>.lb-meta{margin:4px 0 14px}
+.cat-dim{color:var(--s-body)}
+.chip--annotated{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+:root[data-theme="dark"] .chip--annotated{background:var(--gw-color-neutral-800);color:var(--gw-color-neutral-300)}
+.lb-meta{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+         color:var(--gw-color-neutral-400)}
+
+.chip{display:inline-flex;align-items:center;gap:5px;font:var(--gw-text-body-12-med);
+      border-radius:var(--gw-radius-full);padding:3px var(--gw-space-8);white-space:nowrap}
+.chip--measured{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.chip--transcribed{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.chip--ruled,.chip--extracted{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+.chip--structure{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.chip--built-here{background:var(--gw-color-orange-50);color:var(--gw-color-orange-700)}
+.chip--passed{background:var(--gw-color-green-500);color:var(--gw-color-white)}
+.chip--pending{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+.chip--rejected{background:var(--gw-color-red-500);color:var(--gw-color-white)}
+.chip--gap{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+.chip--web{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+:root[data-theme="dark"] .chip--measured{background:var(--gw-color-green-900);color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .chip--transcribed,
+:root[data-theme="dark"] .chip--structure{background:var(--gw-color-yellow-900);color:var(--gw-color-yellow-100)}
+:root[data-theme="dark"] .chip--ruled,
+:root[data-theme="dark"] .chip--extracted,
+:root[data-theme="dark"] .chip--web{background:var(--gw-color-primary-900);color:var(--gw-color-primary-200)}
+:root[data-theme="dark"] .chip--pending{background:var(--gw-color-neutral-800);color:var(--gw-color-neutral-300)}
+:root[data-theme="dark"] .chip--built-here{background:var(--gw-color-orange-900);color:var(--gw-color-orange-100)}
+:root[data-theme="dark"] .chip--gap{background:var(--gw-color-red-900);color:var(--gw-color-red-200)}
+
+/* ---- markdown ------------------------------------------------------------ */
+.md{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.md h2{font:var(--gw-text-h6);margin:var(--gw-space-20) 0 0;scroll-margin-top:80px}
+.md h3{font:var(--gw-text-h7);margin:var(--gw-space-16) 0 0;scroll-margin-top:80px}
+.md h4,.md h5,.md h6{font:var(--gw-text-body-16-sem);margin:var(--gw-space-12) 0 0}
+.md p{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+      color:var(--s-body);margin:0;max-width:80ch}
+.md ul,.md ol{margin:0;padding-left:var(--gw-space-20);display:flex;
+              flex-direction:column;gap:5px}
+.md li{font:var(--gw-text-body-14-reg);color:var(--s-body);max-width:78ch}
+.md code{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px;
+         background:var(--s-code-bg);border:1px solid var(--s-code-border);
+         color:var(--s-code-fg);border-radius:var(--gw-radius-4);padding:1px 5px}
+.md a{color:var(--gw-color-primary-600)}
+.md-pre{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-radius:var(--gw-radius-8);padding:var(--gw-space-16);overflow-x:auto;margin:0}
+.md-pre code{background:none;border:0;padding:0;color:var(--s-body);font-size:12px}
+.md-q{margin:0;border-left:3px solid var(--gw-color-neutral-300);
+      padding:var(--gw-space-8) var(--gw-space-16);font:var(--gw-text-body-14-reg);
+      color:var(--s-body)}
+.md-hr{border:0;border-top:1px solid var(--s-card-border);margin:var(--gw-space-12) 0}
+.md-tblwrap{overflow-x:auto}
+.md-tbl{width:100%;border-collapse:collapse;background:var(--s-card-bg);
+        border:1px solid var(--s-card-border);border-radius:var(--gw-radius-8);
+        overflow:hidden;font:var(--gw-text-body-14-reg)}
+.md-tbl th{text-align:left;font:var(--gw-text-body-12-med);text-transform:uppercase;
+           letter-spacing:.06em;color:var(--gw-color-neutral-400);
+           padding:var(--gw-space-8) var(--gw-space-12);
+           border-bottom:1px solid var(--s-card-border);white-space:nowrap}
+.md-tbl td{padding:var(--gw-space-8) var(--gw-space-12);color:var(--s-body);
+           border-bottom:1px solid var(--s-card-border);vertical-align:top}
+.md-tbl tr:last-child td{border-bottom:none}
+.md-tbl code{white-space:nowrap}
+
+.note{font:var(--gw-text-body-14-reg);color:var(--s-body);
+      background:var(--gw-color-neutral-25);border:1px solid var(--s-card-border);
+      border-left:3px solid var(--gw-color-neutral-300);border-radius:var(--gw-radius-8);
+      padding:var(--gw-space-12) var(--gw-space-16);white-space:pre-wrap;max-width:88ch}
+:root[data-theme="dark"] .note{background:var(--gw-color-neutral-900)}
+.note--find{border-left-color:var(--gw-color-yellow-400);white-space:normal}
+.empty{border:1px dashed var(--s-field-border);border-radius:var(--gw-radius-10);
+       padding:var(--gw-space-24);text-align:center;font:var(--gw-text-body-14-reg);
+       color:var(--gw-color-neutral-400)}
+.sec{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.sec h2{font:var(--gw-text-h6);margin:0;scroll-margin-top:80px}
+</style>
+</head>
+<body>
+<header class="lb-top">
+  <a class="lb-brand" href="/internal/design-system#library">
+    <span class="lb-brand__chip"><svg viewBox="0 0 80 80" fill="none" aria-hidden="true"><path d="M76.6088 4.56344C77.5025 2.36058 75.8495 0 73.4723 0H9.14286C4.0934 0 0 4.0934 0 9.14286V66.7778C0 72.018 5.17081 75.6829 9.9603 73.5568C40.8494 59.8449 64.3785 34.7075 76.6088 4.56344Z" fill="currentColor"/><path d="M32.5161 80C31.4022 80 30.9357 78.5531 31.8259 77.8835C54.9007 60.5265 71.4338 35.8047 78.7658 8.0522C78.9403 7.39154 80 7.51618 80 8.19951V70.8571C80 75.9066 75.9066 80 70.8571 80H32.5161Z" fill="currentColor"/></svg></span>
+    <span class="lb-brand__n">Component Library</span></a>
+  <span class="lb-crumb"><a href="../../index.html">Library</a> / <a href="index.html">Dashboard</a></span>
+  <div class="lb-top__r"><input class="lb-find" id="lb-find" type="search" placeholder="Filter this library" aria-label="Filter this library">
+    <button class="lb-tbtn" id="lb-theme" type="button" aria-label="Switch theme">
+      <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z"/></svg></button></div>
+</header>
+<div class="lb-3"><nav class="lb-rail"><div class="lb-rail__t">Dashboard · 112</div><a href="index.html" data-q="overview 112">Overview<span>112</span></a><div class="lb-rail__sep"></div><a href="access-denied-screen.html" data-q="access-denied-screen ">access-denied-screen</a><a href="account-row.html" data-q="account-row ">account-row</a><a href="action-button.html" data-q="action-button ">action-button</a><a href="activity-timeline.html" data-q="activity-timeline ">activity-timeline</a><a href="analytics-overview-template.html" data-q="analytics-overview-template ">analytics-overview-template</a><a href="app-shell.html" data-q="app-shell ">app-shell</a><a href="area-chart.html" data-q="area-chart ">area-chart</a><a href="avatar.html" data-q="avatar ">avatar</a><a href="avatar-group.html" data-q="avatar-group ">avatar-group</a><a href="banner.html" data-q="banner ">banner</a><a href="bar-chart.html" data-q="bar-chart ">bar-chart</a><a href="board.html" data-q="board ">board</a><a href="breadcrumbs.html" data-q="breadcrumbs ">breadcrumbs</a><a href="breakdown-bar.html" data-q="breakdown-bar ">breakdown-bar</a><a href="build-notice.html" data-q="build-notice ">build-notice</a><a href="bulk-action-bar.html" data-q="bulk-action-bar ">bulk-action-bar</a><a href="card.html" data-q="card ">card</a><a href="chart-frame.html" data-q="chart-frame ">chart-frame</a><a href="chart-tooltip.html" data-q="chart-tooltip ">chart-tooltip</a><a href="checkbox.html" data-q="checkbox ">checkbox</a><a href="checklist.html" data-q="checklist ">checklist</a><a href="coachmark.html" data-q="coachmark ">coachmark</a><a href="column-menu.html" data-q="column-menu ">column-menu</a><a href="combobox.html" data-q="combobox ">combobox</a><a href="command-palette.html" data-q="command-palette ">command-palette</a><a href="confirm-dialog.html" data-q="confirm-dialog ">confirm-dialog</a><a href="content-panel.html" data-q="content-panel ">content-panel</a><a href="data-table.html" data-q="data-table ">data-table</a><a href="date-range-picker.html" data-q="date-range-picker ">date-range-picker</a><a href="datetime-field.html" data-q="datetime-field ">datetime-field</a><a href="delta-pill.html" data-q="delta-pill ">delta-pill</a><a href="detail-view.html" data-q="detail-view ">detail-view</a><a href="docked-panel.html" data-q="docked-panel ">docked-panel</a><a href="donut-chart.html" data-q="donut-chart ">donut-chart</a><a href="drawer.html" data-q="drawer ">drawer</a><a href="empty-state.html" data-q="empty-state ">empty-state</a><a href="explorer-layout.html" data-q="explorer-layout ">explorer-layout</a><a href="filter-builder.html" data-q="filter-builder ">filter-builder</a><a href="filter-chip.html" data-q="filter-chip ">filter-chip</a><a href="form-field.html" data-q="form-field ">form-field</a><a href="form-section.html" data-q="form-section ">form-section</a><a href="funnel.html" data-q="funnel ">funnel</a><a href="google-button.html" data-q="google-button ">google-button</a><a href="heatmap.html" data-q="heatmap ">heatmap</a><a href="histogram.html" data-q="histogram ">histogram</a><a href="horizontal-bar-chart.html" data-q="horizontal-bar-chart ">horizontal-bar-chart</a><a href="icon-button.html" data-q="icon-button ">icon-button</a><a href="incident-row.html" data-q="incident-row ">incident-row</a><a href="info-hint.html" data-q="info-hint ">info-hint</a><a href="issue-summary.html" data-q="issue-summary ">issue-summary</a><a href="key-value-list.html" data-q="key-value-list ">key-value-list</a><a href="legend.html" data-q="legend ">legend</a><a href="legend-table.html" data-q="legend-table ">legend-table</a><a href="line-chart.html" data-q="line-chart ">line-chart</a><a href="log-viewer.html" data-q="log-viewer ">log-viewer</a><a href="login-screen.html" data-q="login-screen ">login-screen</a><a href="menu.html" data-q="menu ">menu</a><a href="metric-strip.html" data-q="metric-strip ">metric-strip</a><a href="modal.html" data-q="modal ">modal</a><a href="multi-select.html" data-q="multi-select ">multi-select</a><a href="nav-group.html" data-q="nav-group ">nav-group</a><a href="nav-item.html" data-q="nav-item ">nav-item</a><a href="page-header.html" data-q="page-header ">page-header</a><a href="page-layout.html" data-q="page-layout ">page-layout</a><a href="pagination.html" data-q="pagination ">pagination</a><a href="period-select.html" data-q="period-select ">period-select</a><a href="popover.html" data-q="popover ">popover</a><a href="progress-bar.html" data-q="progress-bar ">progress-bar</a><a href="query-builder.html" data-q="query-builder ">query-builder</a><a href="radio.html" data-q="radio ">radio</a><a href="ring.html" data-q="ring ">ring</a><a href="row-actions-menu.html" data-q="row-actions-menu ">row-actions-menu</a><a href="row-selection.html" data-q="row-selection " class="on">row-selection</a><a href="saved-views.html" data-q="saved-views ">saved-views</a><a href="search-field.html" data-q="search-field ">search-field</a><a href="search-trigger.html" data-q="search-trigger ">search-trigger</a><a href="segmented-control.html" data-q="segmented-control ">segmented-control</a><a href="select.html" data-q="select ">select</a><a href="session-expired.html" data-q="session-expired ">session-expired</a><a href="setting-row.html" data-q="setting-row ">setting-row</a><a href="sidebar.html" data-q="sidebar ">sidebar</a><a href="sidebar-collapsed.html" data-q="sidebar-collapsed ">sidebar-collapsed</a><a href="sign-in-modal.html" data-q="sign-in-modal ">sign-in-modal</a><a href="skeleton.html" data-q="skeleton ">skeleton</a><a href="sparkline.html" data-q="sparkline ">sparkline</a><a href="split-button.html" data-q="split-button ">split-button</a><a href="stat-card.html" data-q="stat-card ">stat-card</a><a href="status-banner.html" data-q="status-banner ">status-banner</a><a href="status-dot.html" data-q="status-dot ">status-dot</a><a href="status-list.html" data-q="status-list ">status-list</a><a href="sub-nav.html" data-q="sub-nav ">sub-nav</a><a href="table-cell-types.html" data-q="table-cell-types ">table-cell-types</a><a href="table-states.html" data-q="table-states ">table-states</a><a href="table-toolbar.html" data-q="table-toolbar ">table-toolbar</a><a href="tabs-pill.html" data-q="tabs-pill ">tabs-pill</a><a href="tabs-underline.html" data-q="tabs-underline ">tabs-underline</a><a href="tag.html" data-q="tag ">tag</a><a href="text-input.html" data-q="text-input ">text-input</a><a href="textarea.html" data-q="textarea ">textarea</a><a href="theme-and-density.html" data-q="theme-and-density ">theme-and-density</a><a href="theme-menu.html" data-q="theme-menu ">theme-menu</a><a href="time-range-bar.html" data-q="time-range-bar ">time-range-bar</a><a href="timezone-select.html" data-q="timezone-select ">timezone-select</a><a href="toast.html" data-q="toast ">toast</a><a href="toggle.html" data-q="toggle ">toggle</a><a href="tooltip.html" data-q="tooltip ">tooltip</a><a href="topbar.html" data-q="topbar ">topbar</a><a href="unavailable-state.html" data-q="unavailable-state ">unavailable-state</a><a href="unsaved-changes-bar.html" data-q="unsaved-changes-bar ">unsaved-changes-bar</a><a href="uptime-bar.html" data-q="uptime-bar ">uptime-bar</a><a href="widget-grid.html" data-q="widget-grid ">widget-grid</a><a href="workspace-switcher.html" data-q="workspace-switcher ">workspace-switcher</a></nav><main class="lb-mid"><div class="lb-h"><h1>row-selection</h1><p class="lede">Dashboard · tables.md</p><div class="lb-row"><span class="chip chip--extracted" title="Extracted from the design hub's shipped code and generalised, not measured off Figma. The hub is its source of truth. Elements marked NEW in the doc are not in the hub at all.">extracted</span><span class="chip chip--pending" title="Has not been through a review pass">not reviewed</span><span class="pill">v2.0.0</span></div><div class="lb-meta">review: bash scripts/review-pass.sh dashboard row-selection</div></div><div class="md"><h2 id="data-table">Tables</h2>
+<p>Tables for heavy analytics screens: dense, scrolling, sortable, selectable. Everything here is a div grid (not a <code>&lt;table&gt;</code>), because every row is its own grid and a content-sized track would resolve per row. Styles are <code>css/40-tables.css</code>, behaviour is <code>js/40-tables.js</code> (hooks listed in its header). Toolbar, filters and saved views are in <a href="filtering.md">filtering.md</a>. Density follows <code>--gd-row-h</code>, <code>--gd-head-h</code>, <code>--gd-cell-px</code> and <code>--gd-control-h</code>, so <code>data-density=&quot;compact&quot;</code> on any ancestor tightens the whole table. Menus (column menu, row actions, items per page) are the <code>gd-menu</code> of 20-actions, opened by its <code>data-gd-menu</code> trigger; this file only listens for the <code>gd:menu</code> event they emit.</p>
+<h3 id="table-cell-types">Data table</h3>
+<p><b>Purpose.</b> A sortable grid of records: leads, sessions, campaigns, channels. Use it for 5 or more comparable rows with several attributes. Do not use it for a handful of label/value pairs (use key-value-list), for a single metric (stat-card), or for a form (rows with inputs belong to the settings pattern, not here).</p>
+<p><b>Anatomy.</b></p>
+<pre class="md-pre"><code>&lt;div class=&quot;gd-tview&quot;&gt;                                  &lt;!-- bordered frame; --flush inside a card --&gt;
+  &lt;div class=&quot;gd-table-wrap&quot; style=&quot;--gd-table-max-h:480px&quot;&gt;   &lt;!-- the scroller; sticky header needs a max height --&gt;
+    &lt;div class=&quot;gd-table gd-table--sticky-first&quot; role=&quot;table&quot; aria-label=&quot;Leads&quot;
+         style=&quot;--gd-cols:minmax(180px,1.6fr) 100px 80px 120px; --gd-table-min:720px&quot;&gt;
+      &lt;div class=&quot;gd-table__row gd-table__row--head&quot; role=&quot;row&quot;&gt;
+        &lt;div class=&quot;gd-table__th&quot; role=&quot;columnheader&quot; aria-sort=&quot;ascending&quot; data-gd-col=&quot;lead&quot;&gt;
+          &lt;button class=&quot;gd-table__sort&quot; type=&quot;button&quot; data-gd-sort&gt;Lead &lt;svg&gt;…&lt;/svg&gt;&lt;/button&gt;&lt;/div&gt;
+        &lt;div class=&quot;gd-table__th gd-table__th--num&quot; role=&quot;columnheader&quot;&gt;Score&lt;/div&gt; …
+      &lt;/div&gt;
+      &lt;div class=&quot;gd-table__body&quot; role=&quot;rowgroup&quot;&gt;
+        &lt;div class=&quot;gd-table__row&quot; role=&quot;row&quot; data-gd-id=&quot;lead_1&quot;&gt;
+          &lt;div class=&quot;gd-table__cell gd-table__cell--strong&quot; role=&quot;cell&quot;&gt;Acme Roofing&lt;/div&gt;
+          &lt;div class=&quot;gd-table__cell gd-table__cell--num&quot; role=&quot;cell&quot;&gt;92&lt;/div&gt; …</code></pre>
+<p>Columns come from one custom property, <code>--gd-cols</code>, set on the table. Use a fixed first track and <code>minmax(floor, 1fr)</code> for the rest so every row resolves identically. <code>--gd-table-min</code> is the width below which the wrapper scrolls sideways.</p>
+<p><b>Cell modifiers.</b> <code>--strong</code> (value colour, the row's label), <code>--muted</code>, <code>--num</code> (right-aligned, tabular numerals; add <code>gd-table__th--num</code> on its header), <code>--flex</code> (inline content: badge, avatar), <code>--check</code>, <code>--rank</code>, <code>--actions</code>, <code>--heat</code>. Plain cells truncate with an ellipsis; put the full text in <code>title</code>.</p>
+<p><b>Variants.</b></p>
+<ul><li><b>Sticky first column.</b> <code>gd-table--sticky-first</code> pins column 1; <code>gd-table--sticky-select</code> pins the checkbox column and column 2 (first track <code>var(--gd-sel-w)</code>). The header stays pinned by default.</li><li><b>Sorting.</b> <code>aria-sort</code> on the header and a <code>data-gd-sort</code> button. The glyph is the hub's arrows-down-up; the active direction brightens and turns primary/500.</li><li><b>Expandable row groups</b> (hub <code>.ul-grp</code>). <code>.gd-table__group</code> wraps a <code>data-gd-expand</code> row and a <code>.gd-table__detail</code>; the caret rotates, the open group takes the sunken fill. The hub dims closed groups while one is open; that effect is dropped because it needs <code>:has()</code> over every row.</li><li><b>Tree rows.</b> <code>role=&quot;treegrid&quot;</code> on the table; rows carry <code>data-level</code>, <code>aria-level</code>, <code>aria-expanded</code>, <code>data-gd-expand</code>, and the first cell holds <code>.gd-table__tree</code> with <code>--lvl</code> (indent 16px per level) and a <code>.gd-table__caret</code>. Leaves keep an empty caret slot so labels align. Collapsing a row hides its descendants (<code>data-gd-collapsed</code>) and remembers collapsed children.</li><li><b>Totals row.</b> <code>.gd-table__row--total</code> plus <code>--pin-bottom</code> (sticky foot, in its own rowgroup) or <code>--pin-top</code> (under the header). Bold, tabular, strong rule on the inner edge.</li><li><b>Grouped column headers.</b> Two header rows: the second has <code>gd-table__row--head2</code> and sticks below the first; the spanning cell is <code>gd-table__th--group</code> with <code>grid-column: span N</code>.</li><li><b>Rank column.</b> <code>gd-table__cell--rank</code>, header <code>#</code>.</li><li><b>Trend delta cell.</b> A <code>.gd-delta.gd-delta--sm</code> (delta-pill, owned by the data author) in a <code>--flex --num</code> cell.</li><li><b>Header hint.</b> A <code>.gd-hint</code> (owned by the actions author) in place of the plain label, so the definition lives on the header. Hint and sort button are siblings; do not nest.</li><li><b>Inset</b> (<code>gd-table--inset</code>). The hub's look: rows inset 8, hover radius 12, hairlines as pseudo-elements. Not compatible with sticky columns.</li><li><b>Lazy</b> (<code>gd-table--lazy</code>). <code>content-visibility: auto</code> on rows for hundreds of rows. Keep rows light: no per-row shadow, transition or <code>:has()</code>.</li></ul>
+<p><b>States.</b> Row: rest, hover (<code>--gd-row-hover</code>), selected (<code>aria-selected=&quot;true&quot;</code>, <code>--gd-row-selected</code>), active (a row whose actions menu is open, <code>data-gd-active</code>). Header: rest, sort hover, sorted. Group: closed, open. Loading, empty, error and no-results are table-states.</p>
+<p><b>Tokens.</b> <code>--gd-row-h</code>, <code>--gd-head-h</code>, <code>--gd-cell-px</code>, <code>--gd-card-bg</code>, <code>--gd-border</code>, <code>--gd-border-strong</code>, <code>--gd-text</code>, <code>--gd-text-body</code>, <code>--gd-text-muted</code>, <code>--gd-accent</code>, <code>--gd-sunken-bg</code>, plus <code>--gd-row-hover</code> and <code>--gd-row-selected</code> declared in 40-tables.css. The hub's header has no fill (its last rule wins over the earlier grey one), so the sticky header is the card colour with a firmer rule; 00-base documents the table header as sunken, which the hub no longer draws.</p>
+<p><b>Accessibility.</b> <code>role=&quot;table&quot;</code> (or <code>treegrid</code>), <code>row</code>, <code>columnheader</code>, <code>cell</code>, <code>rowgroup</code>. <code>aria-sort</code> only on sortable columns. A sort button is a real button. Rows with an expander are focusable (<code>tabindex=&quot;0&quot;</code>) and respond to Enter and Space. Hover is never the only carrier of information.</p>
+<p><b>Behaviour.</b> Sort reorders the rows client-side by <code>data-gd-value</code> or cell text (<code>data-gd-type=&quot;number&quot;</code> on the header for numeric), blanks last, stable; <code>data-gd-sort-mode=&quot;server&quot;</code> only fires <code>gd:sort</code>. Group and tree toggles flip <code>aria-expanded</code>.</p>
+<p><b>Provenance.</b> Extracted: <code>web/admin/analytics.html:362-428,457</code>, <code>access-control.html:105-157</code>. New: sticky header and first column, <code>--gd-cols</code>, totals, tree, grouped headers, rank, lazy. Mobbin: Semrush, Causal, Substack, Mixpanel. Pending library review.</p>
+<h3 id="row-selection">Table cell types</h3>
+<p><b>Purpose.</b> The cell shapes a data table uses, with exact markup so every table prints them identically. Use these; do not invent a cell per screen.</p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Type</th><th>Markup</th></tr></thead><tbody><tr><td>Text</td><td><code>&lt;div class=&quot;gd-table__cell&quot; role=&quot;cell&quot;&gt;Dallas, TX&lt;/div&gt;</code>; <code>--strong</code> for the row label, <code>--muted</code> for secondary</td></tr><tr><td>Number</td><td><code>&lt;div class=&quot;gd-table__cell gd-table__cell--num&quot; role=&quot;cell&quot;&gt;1,204&lt;/div&gt;</code> with a <code>gd-table__th--num</code> header</td></tr><tr><td>Badge</td><td><code>&lt;div class=&quot;gd-table__cell gd-table__cell--flex&quot; role=&quot;cell&quot;&gt;&lt;span class=&quot;gd-badge gd-badge--good&quot;&gt;Active&lt;/span&gt;&lt;/div&gt;</code> (badge is the data author's)</td></tr><tr><td>Avatar and name</td><td><code>--flex</code> cell with <code>&lt;span class=&quot;gd-table__avatar&quot;&gt;PN&lt;/span&gt;&lt;span class=&quot;gd-table__who&quot;&gt;&lt;b class=&quot;gd-table__trunc&quot;&gt;Priya Nair&lt;/b&gt;&lt;small&gt;Account lead&lt;/small&gt;&lt;/span&gt;</code></td></tr><tr><td>Progress</td><td><code>--flex gd-table__prog</code> cell with <code>&lt;span class=&quot;gd-table__meter&quot;&gt;&lt;i style=&quot;--v:72%&quot;&gt;&lt;/i&gt;&lt;/span&gt;&lt;span&gt;72%&lt;/span&gt;</code>; the number is always printed</td></tr><tr><td>Sparkline</td><td><code>--flex</code> cell with <code>&lt;svg class=&quot;gd-table__spark gd-table__spark--up&quot; viewBox=&quot;0 0 72 20&quot; role=&quot;img&quot; aria-label=&quot;…&quot;&gt;&lt;path d=&quot;…&quot;/&gt;&lt;/svg&gt;</code>; <code>--up</code>, <code>--down</code>, <code>--flat</code> pick good, danger, muted; default accent</td></tr><tr><td>Link</td><td><code>&lt;a class=&quot;gd-table__link&quot; href&gt;</code>, underlined in the value colour (hub <code>.ul-c--out a</code>)</td></tr><tr><td>Actions</td><td><code>--actions</code> cell holding one <code>.gd-table__more</code> (see Row actions menu)</td></tr><tr><td>Heat</td><td><code>gd-table__cell--heat</code> with <code>data-heat=&quot;0..5&quot;</code>; fill is the charts author's <code>--gd-seq-1…5</code> ramp, 0 is empty</td></tr><tr><td>Rank, delta</td><td>see Data table</td></tr></tbody></table></div>
+<p><b>Rules.</b> The sparkline takes its direction word into the <code>aria-label</code> and is never the only carrier of the trend: pair it with the number. Heat cells always print the value; colour never stands alone, and level 4 and 5 swap the text to the inverse so the ratio holds in both themes. A cell with no value shows an em dash in muted text, not 0. <code>data-gd-sparklines=&quot;off&quot;</code> on the table hides sparklines (the column menu's &quot;Show sparklines&quot; item sets it).</p>
+<p><b>Tokens.</b> <code>--gd-accent</code>, <code>--gd-good</code>, <code>--gd-danger</code>, <code>--gd-border-strong</code> (meter track), <code>--gd-selected-bg</code> (avatar), <code>--gd-seq-1…5</code>, text aliases.</p>
+<p><b>Accessibility.</b> Decorative avatars are <code>aria-hidden</code>; the name carries the meaning. Meters are <code>aria-hidden</code> because the number is printed beside them.</p>
+<p><b>Provenance.</b> Extracted: <code>.ul-c</code>, <code>.ul-badge</code>, <code>.ul-c--who</code>, <code>.ul-c--out a</code> (analytics.html:378-397). New: avatar and name, progress, sparkline, heat. Mobbin: Mixpanel, Fresha.</p>
+<h3 id="bulk-action-bar">Row selection</h3>
+<p><b>Purpose.</b> Pick rows to act on in bulk. Use it when a table has bulk actions. Do not add a checkbox column to a read-only table.</p>
+<p><b>Anatomy.</b> First track <code>var(--gd-sel-w)</code>; header cell <code>.gd-table__cell--check</code> holds <code>&lt;label class=&quot;gd-check&quot;&gt;&lt;input type=&quot;checkbox&quot; data-gd-select-all aria-label=&quot;Select all rows&quot;&gt;&lt;span class=&quot;gd-check__box&quot;&gt;&lt;/span&gt;&lt;/label&gt;</code>; each row holds the same with <code>data-gd-select-row</code>. Combine with <code>gd-table--sticky-select</code>.</p>
+<p><b>States.</b> Header: unchecked, checked (all selectable visible rows), indeterminate (some). Row: <code>aria-selected=&quot;true&quot;</code> gives the primary/alpha-10 fill; a disabled row's checkbox is skipped by select-all and by ranges.</p>
+<p><b>Behaviour.</b> Click toggles. Shift-click selects the range from the last clicked row to this one, applying this row's new state. The header box selects or clears every visible, enabled row (hidden rows on other pages are untouched; the bulk count counts them). <code>gd:selection {count, ids}</code> fires on every change. Esc clears the selection when focus is in the table or bar and not in a text field. The header box also carries <code>aria-checked=&quot;mixed&quot;</code> while indeterminate so the checkbox styling matches.</p>
+<p><b>Accessibility.</b> Every checkbox has a label naming its row. The selected state is carried by the checkbox and <code>aria-selected</code>, never colour alone.</p>
+<p><b>Tokens.</b> <code>--gd-row-selected</code>, <code>--gd-sel-w</code>. <b>Provenance.</b> NEW, Mobbin Calendly, Midday. The old data-table ruling (primary/alpha-10) is kept; the hub draws no selected row.</p>
+<h3 id="column-menu">Bulk action bar</h3>
+<p><b>Purpose.</b> The floating bar that appears while one or more rows are selected: &quot;N selected&quot;, the actions, and a clear control. Do not use it as a general toolbar.</p>
+<p><b>Anatomy.</b></p>
+<pre class="md-pre"><code>&lt;div class=&quot;gd-bulk&quot; data-gd-bulk data-gd-for=&quot;#leads&quot; role=&quot;toolbar&quot; aria-label=&quot;Bulk actions&quot; hidden&gt;
+  &lt;span class=&quot;gd-bulk__n&quot; aria-live=&quot;polite&quot;&gt;&lt;span data-gd-bulk-count&gt;0&lt;/span&gt; selected&lt;/span&gt;
+  &lt;button class=&quot;gd-bulk__btn&quot; type=&quot;button&quot;&gt;Export&lt;/button&gt;
+  &lt;button class=&quot;gd-bulk__btn gd-bulk__btn--danger&quot; type=&quot;button&quot;&gt;Delete&lt;/button&gt;
+  &lt;button class=&quot;gd-bulk__btn gd-bulk__btn--icon&quot; type=&quot;button&quot; aria-label=&quot;Clear selection&quot; data-gd-bulk-clear&gt;…&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+<p>It is an ink pill (<code>--gd-ink</code> fill, inverts in dark). Default is <code>position: sticky</code> at the bottom of its scroller so it floats without leaving the layout; <code>gd-bulk--fixed</code> pins it to the viewport. Destructive actions take the red label (<code>--gd-bulk-danger</code>), never a red fill; the confirm dialog carries the weight.</p>
+<p><b>States.</b> Rest, hover (<code>--gd-bulk-hover</code>), focus (ink-fg outline). Hidden at zero.</p>
+<p><b>Behaviour.</b> Shown and counted by selection; Clear unchecks everything and returns focus to the header checkbox. The count is announced politely.</p>
+<p><b>Finding.</b> The brief's z-index list has no layer for a floating bar; it uses <code>z-index: 1</code> inside its scroller. A page-level floating bar would need a ruling.</p>
+<p><b>Provenance.</b> NEW, Mobbin Calendly, Midday, Aboard.</p>
+<h3 id="row-actions-menu">Column menu</h3>
+<p><b>Purpose.</b> Show and hide columns. Use it on tables with more than about six columns. Do not use it to reorder.</p>
+<p><b>Anatomy.</b> A <code>gd-btn</code> triggers (<code>data-gd-menu=&quot;id&quot;</code>), a <code>gd-menu</code> with <code>data-gd-colmenu data-gd-keep data-gd-for=&quot;#table&quot;</code> holds <code>gd-menu__item role=&quot;menuitemcheckbox&quot; aria-checked data-gd-col=&quot;key&quot;</code> per column; the header cell and every row cell carry the same <code>data-gd-col</code> positions. Optional item <code>data-gd-table-flag=&quot;sparklines&quot;</code> (&quot;Show sparklines&quot;).</p>
+<p><b>Behaviour.</b> Toggling writes <code>--gd-cols</code> (the original tracks are read once, hidden ones dropped) and sets <code>hidden</code> on that column's cells in every row. Paired-control guard: when one column is left, its item becomes <code>aria-disabled=&quot;true&quot;</code> and cannot be unchecked, so the table is never empty. Fixed columns (checkbox, actions) have no item. <code>gd:columns {visible}</code> fires.</p>
+<p><b>Tokens.</b> From <code>gd-menu</code>. <b>Accessibility.</b> <code>menuitemcheckbox</code> with <code>aria-checked</code>; keyboard from 20-actions. <b>Provenance.</b> NEW, Mobbin Midday, Neon.</p>
+<h3 id="pagination">Row actions menu</h3>
+<p><b>Purpose.</b> The per-row overflow menu. Use it for 3 or more row actions; one or two actions are buttons.</p>
+<p><b>Anatomy.</b> A <code>.gd-table__more</code> button per row (<code>data-gd-menu=&quot;row-menu&quot;</code>, <code>aria-haspopup=&quot;menu&quot;</code>, <code>aria-label=&quot;Actions for &lt;row&gt;&quot;</code>) and ONE shared <code>gd-menu</code> with <code>data-gd-row-menu</code> outside the table. Items carry <code>data-gd-action</code>; the destructive item is <code>gd-menu__item--danger</code> (red label, same shape) and sits last after a separator. One menu for the whole table keeps hundreds of rows light.</p>
+<p><b>States.</b> Trigger: rest, hover, expanded. The row stays lit (<code>data-gd-active</code>) while its menu is open.</p>
+<p><b>Behaviour.</b> The menu is placed fixed by 20-actions so the scroller never clips it. Choosing an item fires <code>gd:rowaction {action, row, id}</code> on the row (<code>id</code> from the row's <code>data-gd-id</code>).</p>
+<p><b>Accessibility.</b> 44px hit area (a pseudo-element) without growing the row; Esc closes and returns focus. <b>Provenance.</b> Extracted: <code>.ac-icbtn</code> (access-control.html:188-196), menu from 20-actions.</p>
+<h3 id="table-states">Pagination</h3>
+<p><b>Purpose.</b> Move through a long result set. Use it below a table; infinite scroll belongs to the log viewer.</p>
+<p><b>Anatomy.</b> <code>.gd-pager</code> with left side (<code>[data-gd-range]</code> &quot;1–25 of 482&quot;, &quot;Items per page&quot; and a <code>gd-btn gd-btn--sm gd-pager__per</code> trigger with a <code>[data-gd-value]</code>) and right side (<code>[data-gd-pages]</code> &quot;Page 3 of 20&quot;, prev and next as 28px <code>.gd-pager__btn</code>). Variant: add first and last buttons and replace the text with <code>Page &lt;input class=&quot;gd-pager__jump&quot; data-gd-page-input&gt; of &lt;span data-gd-page-of&gt;</code>.</p>
+<p><b>States.</b> Button: rest, hover, disabled (opacity .4, on page 1 for first/prev and on the last page for next/last). The jump input shows a 1px edge on focus, not a ring (R41).</p>
+<p><b>Behaviour.</b> <code>data-gd-pager</code> with <code>data-gd-page</code>, <code>data-gd-per</code>, <code>data-gd-total</code>. With <code>data-gd-for=&quot;#table&quot;</code> it slices the table's rows itself and counts what survives a search; without it, it only maintains labels and fires <code>gd:page {page, per, pages}</code> for server paging. The jump input commits on Enter or blur and clamps to the range. The per-page menu is a <code>gd-menu</code> of <code>menuitemradio</code> items with <code>data-value</code>; changing it returns to page 1.</p>
+<p><b>Tokens.</b> <code>--gd-border-strong</code>, <code>--gd-ctl-hover</code>, text aliases. A quantity that cannot be read is removed: the pager is hidden while loading or in error, never shown as &quot;0 of 0&quot;.</p>
+<p><b>Provenance.</b> Extracted: <code>.ul-pg</code> (analytics.html:459-461), <code>.ac-pg</code> (access-control.html:82-91). New: items per page, first and last, jump input. Mobbin Semrush.</p>
+<h3 id="log-viewer">Table states</h3>
+<p><b>Purpose.</b> What a table shows when it has no rows to show: loading, empty, error, no results for the current filter. Each is a state of the same frame, not a separate screen.</p>
+<p><b>Anatomy.</b> Put <code>data-state=&quot;loading|empty|error|noresults&quot;</code> on the <code>.gd-tview</code>. Inside: the table with a ghost body (<code>.gd-table__body--ghost</code>, rows of <code>.gd-ghost</code> bars), and one <code>.gd-tstate--empty|--error|--noresults</code> per state wrapping a <code>.gd-empty</code> (the feedback author's; <code>--error</code> for the failure). The header stays so the shape of the data is known; the live body is hidden.</p>
+<p><b>Copy.</b> Empty: what will appear and the one action. Error: what failed and Retry (<code>data-gd-emit=&quot;retry&quot;</code>); the data is not claimed lost. No results: names the filter and offers Clear filters (<code>data-gd-emit=&quot;clear-filters&quot;</code>, which also clears chips).</p>
+<p><b>Rules.</b> Loading sets <code>aria-busy=&quot;true&quot;</code> on the table. Counts and the pager are removed in loading and error (<code>[data-gd-count]</code>), never zeroed. A zero that was actually read (&quot;Archived 0&quot;) stays. The empty and error badges are rounded squares. Error is <code>role=&quot;alert&quot;</code>.</p>
+<p><b>Behaviour.</b> <code>GD.tables.setState(view, state)</code>; a search that hides every row switches to <code>noresults</code> automatically when that block exists. <b>Provenance.</b> Extracted: loading rows (analytics.html:1585-1586), empty (<code>.ul-empty</code>). New: error, no-results.</p>
+<h3 id="histogram">Log viewer</h3>
+<p><b>Purpose.</b> Dense, monospace, scannable log lines for services and jobs: time, level, service, message, with a live tail. Use it for event streams you read top to bottom. Do not use it for records you sort and compare (data table).</p>
+<p><b>Anatomy.</b></p>
+<pre class="md-pre"><code>&lt;div class=&quot;gd-logs&quot; data-gd-logs data-live=&quot;on&quot; data-wrap=&quot;off&quot; role=&quot;table&quot; aria-label=&quot;Application logs&quot; aria-rowcount=&quot;1284&quot;&gt;
+  &lt;div class=&quot;gd-logs__bar&quot;&gt; Live · Wrap lines · Expand logs · count &lt;/div&gt;
+  &lt;div class=&quot;gd-logs__scroll&quot; tabindex=&quot;0&quot;&gt;
+    &lt;div class=&quot;gd-logs__older&quot;&gt;&lt;button class=&quot;gd-btn gd-btn--sm&quot; data-gd-logs-older&gt;Load older&lt;/button&gt;&lt;/div&gt;
+    &lt;div class=&quot;gd-logs__head&quot; role=&quot;row&quot;&gt;…&lt;/div&gt;
+    &lt;div class=&quot;gd-logs__row&quot; role=&quot;row&quot; aria-rowindex=&quot;1&quot; data-level=&quot;error&quot; tabindex=&quot;0&quot; data-gd-expand aria-expanded=&quot;false&quot;&gt;
+      &lt;div class=&quot;gd-logs__c gd-logs__c--time&quot; role=&quot;cell&quot;&gt;…&lt;/div&gt; &lt;!-- level badge, service, message --&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;gd-logs__detail&quot; role=&quot;row&quot; hidden&gt;&lt;dl class=&quot;gd-logs__kv&quot; role=&quot;cell&quot;&gt;&lt;dt&gt;request_id&lt;/dt&gt;&lt;dd&gt;…&lt;/dd&gt;&lt;/dl&gt;&lt;/div&gt;</code></pre>
+<p>A 4px severity bar is the row's first grid track, coloured by <code>data-level</code> (<code>debug</code> border-strong, <code>info</code> placeholder grey, <code>ok</code> good, <code>warn</code> warn, <code>error</code> and <code>fatal</code> danger); the level badge repeats it in words so colour is never alone. Rows are fixed height (<code>--gd-log-h</code> = half of <code>--gd-row-h</code>, 28px comfortable, 20 compact), which is what makes the list virtualisation-friendly: keep <code>aria-rowcount</code> on the container and <code>aria-rowindex</code> on each rendered row, and render only the window. Rows use <code>content-visibility: auto</code> meanwhile. <code>gd-logs--select</code> adds a checkbox column (same selection hooks as the table).</p>
+<p><b>Variants.</b> Wrap (<code>data-wrap=&quot;on&quot;</code>, rows grow, message pre-wraps; incompatible with fixed-height virtualisation, so it is a toggle and off by default). Expand logs (every row opens its key/value detail). Load older (button at the top; busy while the host loads, <code>gd:logs {older, done}</code>).</p>
+<p><b>Live tailing.</b> <code>data-live=&quot;on&quot;</code> keeps the view at the bottom as rows are appended. Scrolling up pauses it (<code>paused</code>, amber dot, &quot;Jump to latest&quot; button, no jumping when rows arrive); returning to the bottom or pressing Live resumes. Pressing Live while on turns it off. <code>gd:logs {live}</code> fires.</p>
+<p><b>States.</b> Row: rest, hover, expanded (<code>aria-expanded</code>), selected, focus. Bar button: pressed. Empty: <code>.gd-logs__empty</code>.</p>
+<p><b>Tokens.</b> <code>--gd-font-mono</code> (declared in 40-tables.css), <code>--gd-good</code>, <code>--gd-warn</code>, <code>--gd-danger</code>, <code>--gd-placeholder</code>, <code>--gd-row-hover</code>, <code>--gd-sunken-bg</code>. <b>Finding:</b> <code>tokens.css</code> has no monospace token; the hub's <code>ui-monospace, Menlo, monospace</code> stack is used and flagged, not added as a token.</p>
+<p><b>Accessibility.</b> Rows are focusable and open with Enter or Space; the scroller is focusable for keyboard scrolling; live state is a labelled toggle button.</p>
+<p><b>Provenance.</b> NEW, Mobbin Railway, Cloudflare, Supabase, Modal, Okta, Sentry.</p>
+<h3>Histogram</h3>
+<p><b>Purpose.</b> Event volume over time, stacked by level, above a log or table, with a brush to pick a time range. A thin companion to the log viewer, not a general chart: use the bar-chart for anything else.</p>
+<p><b>Anatomy.</b> <code>.gd-hist[data-gd-hist][data-gd-bucket=&quot;600000&quot;]</code> with a <code>.gd-hist__plot</code> (focusable group) of <code>.gd-hist__bar</code> elements, one per bucket: <code>data-t</code> (epoch ms or ISO), <code>title</code>, and <code>style=&quot;--h:62%; --i:70; --w:20&quot;</code> where <code>--h</code> is the bar's height share, <code>--i</code> and <code>--w</code> the info and warn percentages of that bar (the remainder is error). One element per bucket keeps 500 buckets cheap. Then <code>.gd-hist__brush</code>, <code>.gd-hist__axis</code>, a legend and a range readout (<code>[data-gd-hist-range]</code> with <code>[data-gd-hist-label]</code> and a Clear range button <code>data-gd-hist-clear</code>).</p>
+<p><b>Colour.</b> Info <code>--gd-accent</code>, warn <code>--gd-warn</code>, error <code>--gd-danger</code>: status colours, not categorical series, so R11's ceiling of three does not apply. The legend names them.</p>
+<p><b>Behaviour.</b> Drag across the plot to select; releasing fires <code>gd:range {fromIndex, toIndex, from, to}</code> (<code>to</code> is the end of the last bucket). A click without a drag, Esc, or Clear range clears it (<code>from</code> and <code>to</code> null). Keyboard: Left and Right move a cursor, Shift plus arrows extends a range, Enter commits, Esc clears.</p>
+<p><b>Finding.</b> The charts author's bar-chart is rendered from data by <code>GD.charts</code>, with no static markup to reuse, so this ships its own minimal bars. Fold it into bar-chart if the owner wants one component.</p>
+<p><b>Accessibility.</b> The plot is <code>role=&quot;group&quot;</code> with a label that says how to select; each bar has a <code>title</code> with its time and counts; the range is also printed as text.</p>
+<p><b>Provenance.</b> NEW, Mobbin Sentry, Datadog log explorer.</p></div></main><div class="lb-toc"><b>On this page</b><a href="#data-table" class="l3">Data table</a><a href="#table-cell-types" class="l3">Table cell types</a><a href="#row-selection" class="l3">Row selection</a><a href="#bulk-action-bar" class="l3">Bulk action bar</a><a href="#column-menu" class="l3">Column menu</a><a href="#row-actions-menu" class="l3">Row actions menu</a><a href="#pagination" class="l3">Pagination</a><a href="#table-states" class="l3">Table states</a><a href="#log-viewer" class="l3">Log viewer</a><a href="#histogram" class="l3">Histogram</a></div></div>
+<script>
+(function(){
+  /* Theme: the same keys as the main site. `gw-theme-choice` is what the person picked (light, dark or system) and is
+     written only when they pick; no choice means System, which follows the machine. `gw-theme` is the resolved
+     light or dark. This button toggles light and dark, so using it is a choice. */
+  var CH='gw-theme-choice', RES='gw-theme';
+  function pref(){try{var v=localStorage.getItem(CH);return (v==='light'||v==='dark'||v==='system')?v:'system'}catch(e){return 'system'}}
+  function res(p){return p==='dark'?'dark':p==='light'?'light':(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}
+  function apply(p,remember){var r=res(p);
+    document.documentElement.setAttribute('data-theme',r);
+    try{localStorage.setItem(RES,r);if(remember)localStorage.setItem(CH,p)}catch(e){}
+    var b=document.getElementById('lb-theme');
+    if(b)b.setAttribute('aria-label',r==='dark'?'Switch to light':'Switch to dark');}
+  var btn=document.getElementById('lb-theme');
+  if(btn)btn.addEventListener('click',function(){
+    apply(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark',true)});
+  apply(pref(),false);
+  try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){if(pref()==='system')apply('system',false)})}catch(e){}
+
+  /* Rail filter. Narrows the inventory in place — it does not navigate, because the
+     rail is a list of siblings and losing your place to search them is worse than
+     scrolling. */
+  var f=document.getElementById('lb-find');
+  if(f){
+    var rows=[].slice.call(document.querySelectorAll('.lb-rail a'));
+    f.addEventListener('input',function(){
+      var t=f.value.trim().toLowerCase();
+      rows.forEach(function(a){
+        a.hidden=!!t&&a.getAttribute('data-q').indexOf(t)===-1});
+    });
+  }
+
+  /* Component list filter: hides rows that do not match, and a surface whose rows all went. */
+  var rf=document.getElementById('lb-rows');
+  if(rf){
+    var trs=[].slice.call(document.querySelectorAll('tr[data-q]')), secs=[].slice.call(document.querySelectorAll('section[data-cat]'));
+    rf.addEventListener('input',function(){
+      var t=rf.value.trim().toLowerCase();
+      trs.forEach(function(r){r.hidden=!!t&&r.getAttribute('data-q').indexOf(t)===-1});
+      secs.forEach(function(sc){sc.hidden=!sc.querySelector('tr[data-q]:not([hidden])')});
+    });
+  }
+
+  /* Mark the on-this-page entry for whatever heading is currently at the top. */
+  var toc=[].slice.call(document.querySelectorAll('.lb-toc a'));
+  if(toc.length){
+    var heads=toc.map(function(a){return document.getElementById(a.hash.slice(1))})
+                 .filter(Boolean);
+    var tick=function(){
+      var best=0;
+      heads.forEach(function(h,i){if(h.getBoundingClientRect().top<=90)best=i});
+      toc.forEach(function(a,i){a.style.color=i===best?'var(--gw-color-primary-600)':''});
+    };
+    document.addEventListener('scroll',tick,{passive:true});tick();
+  }
+})();
+</script>
+</body></html>

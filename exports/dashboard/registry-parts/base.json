@@ -1,0 +1,14 @@
+{
+  "theme-and-density": {
+    "version": "2.0.0",
+    "changed": "2026-10-05",
+    "breaking": false,
+    "doc": "base.md"
+  },
+  "analytics-overview-template": {
+    "version": "2.0.0",
+    "changed": "2026-10-05",
+    "breaking": false,
+    "doc": "templates.md"
+  }
+}

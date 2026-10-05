@@ -356,7 +356,7 @@ a.cat-name{color:var(--gw-color-primary-600);text-decoration:none}
       border-radius:var(--gw-radius-full);padding:3px var(--gw-space-8);white-space:nowrap}
 .chip--measured{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
 .chip--transcribed{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
-.chip--ruled{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+.chip--ruled,.chip--extracted{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
 .chip--structure{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
 .chip--built-here{background:var(--gw-color-orange-50);color:var(--gw-color-orange-700)}
 .chip--passed{background:var(--gw-color-green-500);color:var(--gw-color-white)}
@@ -368,6 +368,7 @@ a.cat-name{color:var(--gw-color-primary-600);text-decoration:none}
 :root[data-theme="dark"] .chip--transcribed,
 :root[data-theme="dark"] .chip--structure{background:var(--gw-color-yellow-900);color:var(--gw-color-yellow-100)}
 :root[data-theme="dark"] .chip--ruled,
+:root[data-theme="dark"] .chip--extracted,
 :root[data-theme="dark"] .chip--web{background:var(--gw-color-primary-900);color:var(--gw-color-primary-200)}
 :root[data-theme="dark"] .chip--pending{background:var(--gw-color-neutral-800);color:var(--gw-color-neutral-300)}
 :root[data-theme="dark"] .chip--built-here{background:var(--gw-color-orange-900);color:var(--gw-color-orange-100)}
@@ -471,7 +472,7 @@ a.cat-name{color:var(--gw-color-primary-600);text-decoration:none}
 <p>Four components make up <code>fold/Comparison Table</code>:</p>
 <div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Element</th><th>Role</th></tr></thead><tbody><tr><td><code>table-header</code></td><td>The header row. No variants.</td></tr><tr><td><code>table-row</code></td><td>A comparison row. <code>State</code> [<code>Default</code>, <code>Hover</code>].</td></tr><tr><td><code>table-toggle</code></td><td>The row-expand control. <code>Switch</code> [<code>no</code>, <code>yes</code>].</td></tr><tr><td><code>table-phone-card</code></td><td>The phone-breakpoint replacement for a table row. No variants.</td></tr></tbody></table></div>
 <p>On phone, the comparison table becomes a stack of <code>table-phone-card</code>s rather than a scrolling grid.</p>
-<p><b>These are the marketing comparison table, not a data grid.</b> For browsable product data use the dashboard's <code>section/table</code> — see <code>exports/dashboard/sections.md</code>.</p>
+<p><b>These are the marketing comparison table, not a data grid.</b> For browsable product data use the dashboard's <code>data-table</code> — see <code>exports/dashboard/tables.md</code>.</p>
 <h3 id="table-elements"><code>fold/fold-element/timeline-tab</code></h3>
 <p><code>State</code> [<code>default</code>, <code>Hover</code>] — note the <b>mixed casing</b>, lowercase <code>default</code> and capitalised <code>Hover</code>. Both are literal keys.</p>
 <p>Used by <code>fold/Timeline</code> for the week-based step tabs.</p>
