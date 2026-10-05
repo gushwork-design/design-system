@@ -3,7 +3,7 @@
 
     python3 scripts/template-previews.py <outdir>
 
-Writes <outdir>/<slug>/index.html for ad-page, ad-page-signup, analytics-overview, case-study, slide-deck, lead-magnet and one-pager — the
+Writes <outdir>/<slug>/index.html for ad-page, ad-page-signup, case-study, slide-deck, lead-magnet and one-pager — the
 templates' own HTML, not a screenshot of it. Two things are done to each copy, and nothing else:
 
   1. Paths. The templates reference ../../fonts and ../../../../assets from where they live in
@@ -155,9 +155,6 @@ def main(out):
     viewer = ('<style>@media screen{body{padding:32px 0}.page{margin:0 auto 32px;'
               'box-shadow:var(--gw-shadow-s3)}}</style>\n')
     write(out, 'lead-magnet', t.replace('</head>', viewer + '</head>', 1))
-    # Analytics overview: the dashboard template. build-dashboard-css.sh writes its served copy (links already absolute,
-    # the stamp's registry URL blanked), so the route shows exactly what the review drawer shows.
-    write(out, 'analytics-overview', (ROOT / 'web/previews/dashboard/pages/analytics-overview.html').read_text(encoding='utf-8'))
     # One-pager: screen-first single page. Its own assets/ sit beside it, so the route needs a base.
     t = sitepaths((ROOT / 'templates/one-pager/one-pager.html').read_text(encoding='utf-8'), 2)
     t = t.replace('<meta charset="utf-8">', '<meta charset="utf-8">\n<base href="/internal/templates/one-pager/">', 1)
