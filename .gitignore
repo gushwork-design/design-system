@@ -15,7 +15,8 @@ templates/**/out/
 templates/**/package-lock.json
 .vercel
 
-# Rendered ad-page video. 7MB, and a fresh copy lands on every re-render — the source
-# is the HyperFrames project at videos/ai-crm-flow/, and publish-sheets.sh ships the
-# working tree, so deploys do not need it in git.
-web/internal/staging/**/ai-crm-flow.mp4
+# The rendered ad-page video (web/internal/staging/ai-crm-lander/ai-crm-flow.mp4) IS
+# committed, as of 5 Oct 2026. It used to be ignored because publish-sheets.sh shipped a
+# working tree that had it; the site now deploys from main in CI, and a Vercel deploy is a
+# whole snapshot, so the first CI publish served the lander with a 404 where the video was.
+# Re-render from videos/ai-crm-flow/ and commit the new file when it changes.
