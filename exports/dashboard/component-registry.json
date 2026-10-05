@@ -793,6 +793,12 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "568eb4b0acb4465d"
+    },
+    "chart-tooltip": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "e9b512e04268edac"
     }
   }
 }
