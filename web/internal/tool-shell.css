@@ -217,8 +217,53 @@ body {
 .panel-reopen:focus-visible,
 .brand-card .brand-link:focus-visible { outline: var(--gw-focus-ring); outline-offset: var(--gw-focus-offset); }
 
-/* Reopen: floats where the panel was, only while it is collapsed */
-.panel-reopen {
+/* Collapsed (Utsav, 5 Oct 2026): the panel folds to its own header, not to a bare icon. The
+   logo tile, the tool's name and the reopen button float where the panel was, on the panel's
+   surface, so the tool keeps its name while the preview has the screen. Same row as .brand-card
+   (padding 12 12 12 16, gap 12, 32 tile, 28 button); radius 20 = the tile's 8 + 12 of padding. */
+.panel-mini {
+  position: fixed;
+  top: var(--t-inset);
+  left: var(--t-inset);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: var(--gw-space-12);
+  max-width: var(--t-panel-w);
+  padding: var(--gw-space-12) var(--gw-space-12) var(--gw-space-12) var(--gw-space-16);
+  background: var(--t-panel-bg);
+  border: 1px solid var(--t-panel-border);
+  border-radius: var(--gw-radius-20);
+  box-shadow: var(--gw-shadow-s3);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-8px);
+  transition: opacity 200ms ease, transform 200ms ease, visibility 0s linear 200ms;
+}
+.app[data-panel="closed"] .panel-mini {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: opacity 200ms ease 120ms, transform 200ms ease 120ms, visibility 0s linear 0s;
+}
+.panel-mini .brand-link { display: block; flex-shrink: 0; border-radius: var(--gw-radius-8); line-height: 0; color: inherit; }
+.panel-mini .brand-icon { width: 32px; height: 32px; border-radius: var(--gw-radius-8); display: block; }
+:root[data-theme="dark"] .panel-mini .brand-icon { box-shadow: 0 0 0 1px var(--gw-color-neutral-800); }
+.panel-mini__name {
+  min-width: 0;
+  font-family: var(--gw-font-display);
+  font-size: 16px;                     /* the panel title: .brand-card h1 */
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--t-heading);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.panel-mini .panel-reopen { margin-left: var(--gw-space-4); }
+
+/* The older bare reopen button, for a tool not yet on .panel-mini */
+.app > .panel-reopen {
   position: fixed;
   top: var(--t-inset);
   left: var(--t-inset);
@@ -226,15 +271,15 @@ body {
   width: 36px;
   height: 36px;
   padding: 0;
-  border-radius: var(--gw-radius-12);   /* control Kind=button Size=36 */
+  border-radius: var(--gw-radius-12);
   background: var(--t-panel-bg);
   box-shadow: var(--gw-shadow-s2);
   opacity: 0;
   visibility: hidden;
   transition: opacity 200ms ease, visibility 0s linear 200ms, background var(--gw-motion-fast);
 }
-.panel-reopen svg { width: 16px; height: 16px; }
-.app[data-panel="closed"] .panel-reopen {
+.app > .panel-reopen svg { width: 16px; height: 16px; }
+.app[data-panel="closed"] > .panel-reopen {
   opacity: 1;
   visibility: visible;
   transition: opacity 200ms ease 120ms, visibility 0s linear 0s, background var(--gw-motion-fast);
@@ -516,7 +561,7 @@ input[type='range']:focus-visible { outline: var(--gw-focus-ring); outline-offse
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .left-col, .preview-col, .floating-toolbar, .panel-reopen { transition: none; }
+  .left-col, .preview-col, .floating-toolbar, .panel-reopen, .panel-mini { transition: none; }
 }
 
 /* ---------------------------------------------------------------------------
@@ -993,7 +1038,9 @@ html[data-theme] .preview-content[data-theme] {
 .floating-toolbar *:focus,
 .floating-toolbar *:focus-visible,
 .panel-reopen:focus,
-.panel-reopen:focus-visible { outline: none !important; }
+.panel-reopen:focus-visible,
+.panel-mini *:focus,
+.panel-mini *:focus-visible { outline: none !important; }
 .prop-input:focus,
 .prop-textarea:focus,
 .prop-input-prefix:focus-within,

@@ -73,7 +73,7 @@ rule the web templates follow.
 
 - **A floating, collapsible panel on the left** (360 wide, 12 in from every edge, radius 20, black
   in dark like the hub's panel) that holds every control. A header with the **Gushwork logo tile**,
-  the tool's name and a collapse icon; a reopen button when it is collapsed. Below 900px it overlays
+  the tool's name and a collapse icon. Collapsed, it folds to that same header (`.panel-mini`: logo tile, name, reopen), never to a bare icon. Below 900px it overlays
   the preview.
 - **The header mark is always the Gushwork logo (R44).** Copy the SVG from the ID card's `.brand-card`:
   the symbol on Flat Black at 32px, radius 8, a link back to `/internal/tools`, with a 1px neutral/800

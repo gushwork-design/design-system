@@ -91,6 +91,10 @@ The email signature creator and the employee ID card generator were redesigned i
     The black logo tile at 32px, a link to Tools, with a neutral/800 ring in dark, the same on every
     tool and in every drawing of one. R44.
 
+29. **Collapsed, the panel keeps its header.** "In collapsed, show logo and name too; this is a
+    component change" (Utsav, 5 Oct 2026). The bare 36 reopen button became `.panel-mini`: the logo
+    tile, the tool's name and the reopen button, in the panel's own surface, on every tool.
+
 ## Left open (the owner's call)
 
 - **A third typeface in the signature preview** (Plus Jakarta Sans). In the artefact, not the chrome.

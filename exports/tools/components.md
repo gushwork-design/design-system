@@ -25,7 +25,7 @@ The floating, collapsible panel a tool keeps its controls in.
 | Dark fill | black, hairline `neutral/900` |
 | Header | the 32 Gushwork logo (radius 8; a 1px `neutral/800` ring in dark) as a link back to Tools, the tool's name in Vert Grotesk Display 16, collapse button right; padding 12 12 12 16, a hairline beneath |
 | Collapse button | 24 square, radius 4, 12 icon |
-| Reopen button | 36 square, radius 12, 16 icon; shown only when the panel is collapsed |
+| Collapsed | the panel folds to its own header, `.panel-mini`: the logo tile (linked to Tools), the tool's name and the reopen button (28, outlined), floating where the panel was, inset 12; padding 12 12 12 16, gap 12, radius 20 (8 + 12), the panel's fill, border and `s3`. Utsav, 5 Oct 2026: the tool keeps its logo and name while the preview has the screen |
 
 **Rules (R44).** The header mark is always the Gushwork logo tile, the same SVG the tools carry in
 `.brand-card`, linked back to Tools. Never a per-tool icon or a stand-in, in the tool or in any drawing
@@ -94,3 +94,22 @@ saved certificates are shared through `/api/certificates`. **New, pending review
 | Saved list | rows: name (`body-14-med`) with a Restricted or View only tag (20 tall pill), award, "Saved by who, date", and "Edited by who, date" when it was edited; padding 4, radius 12; current on the field fill; hover neutral; search past 5 items |
 
 Source: `web/internal/award-certificate/styles.css`, the "Save and share" block.
+
+---
+
+## tool-files-home
+
+A tool's **Files page**, for tools whose work is kept and shared as files (first: the award
+certificate generator, Utsav, 5 Oct 2026). After Canva's projects page (Mobbin). **New, pending review.**
+
+| Property | Value |
+|---|---|
+| Page | max 1200, padding 16, the tool canvas; the hub's Appearance and Help top-right |
+| Bar | the 32 logo tile linked to Tools, the page title in `h6`, the primary "New certificate" (36, black; white in dark) |
+| Tools row | a tab-group (All, Mine, Shared with me, each with a count), search (320), sort dropdown (Newest edited, Oldest edited, Name A to Z, Z to A), a grid / list switch (remembered on the device) |
+| Grid card | radius 16, the panel fill and border; a 300 tall thumbnail well on the field fill with the live file at 0.32; title (`body-14-med`, one line), "Edited 2 min ago · Priya" and the people avatars on one line; Restricted / View only tags top-left; Share and Delete icon buttons top-right on hover for the owner |
+| List | a table in the same card shape: a 36 wide live thumbnail, title and award, People (24 avatars, overlapping by 4), Access, Edited, the owner's actions on hover |
+| Avatars | 24 circles on the field fill with a 2px ring in the panel colour, the first letter of the first name; "+n" past three |
+| States | loading, empty (dashed 16 radius well, a line and New certificate), nothing matches |
+
+Source: `web/internal/award-certificate/` (`FilesHome` in app.jsx, the "Files home" blocks in styles.css).

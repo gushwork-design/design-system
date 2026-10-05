@@ -46,9 +46,46 @@ function decodeData(str) {
     return out;
   } catch { return null; }
 }
+/* Routes live in the #fragment: none = the Files home; #file=<id> (or the older #saved=<id>) a
+   saved file; #new a blank one; #c=<data> an unsaved certificate carried in the link. */
 function readHash() {
-  const h = new URLSearchParams(location.hash.slice(1));
-  return { saved: h.get('saved') || '', c: h.get('c') || '' };
+  const raw = location.hash.slice(1);
+  const h = new URLSearchParams(raw);
+  return { saved: h.get('file') || h.get('saved') || '', c: h.get('c') || '', isNew: raw === 'new' };
+}
+function routeOf() {
+  const h = readHash();
+  return h.saved || h.c || h.isNew ? 'editor' : 'home';
+}
+function defaultTitle(d) {
+  return [d.name, awardLine(d)].filter((x) => x && x.trim()).join(' · ') || 'Untitled certificate';
+}
+function ago(iso) {
+  const t = new Date(iso).getTime(); if (!t) return '';
+  const m = Math.round((Date.now() - t) / 60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return `${m} min ago`;
+  const h = Math.round(m / 60); if (h < 24) return `${h} hour${h === 1 ? '' : 's'} ago`;
+  const d = Math.round(h / 24); if (d < 7) return `${d} day${d === 1 ? '' : 's'} ago`;
+  return when(iso);
+}
+/* who has it: the owner, then the people added (Canva's People column) */
+function Avatars({ it, max = 3 }) {
+  const people = [it.savedBy, ...((it.access && it.access.people) || []).map((p) => p.email)];
+  const shown = people.slice(0, max);
+  return (
+    <span className="avatars" title={people.map((e) => firstName(e)).join(', ')}>
+      {shown.map((e) => <span key={e} className="acc-avatar acc-avatar--sm">{firstName(e).slice(0, 1)}</span>)}
+      {people.length > max && <span className="acc-avatar acc-avatar--sm">+{people.length - max}</span>}
+    </span>
+  );
+}
+function titleOf(it) { return (it && it.title) || defaultTitle((it && it.data) || {}); }
+/* one line: award · who, when (edited when it was, else saved) */
+function rowMeta(it) {
+  const edited = it.updatedAt !== it.savedAt;
+  const by = `${who(edited ? it.updatedBy : it.savedBy)}, ${when(edited ? it.updatedAt : it.savedAt)}`;
+  return it.title ? `${awardLine(it.data) || 'No award'} · ${by}` : by;   // a default title already names the award
 }
 function when(iso) {
   try { return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); } catch { return ''; }
@@ -56,7 +93,18 @@ function when(iso) {
 function whenTime(iso) {
   try { return new Date(iso).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); } catch { return ''; }
 }
-function who(email) { return String(email || '').split('@')[0] || 'someone'; }
+/* People by first name: from their Google sign-in when the tool has seen them (NAMES, filled from
+   /api/certificates), otherwise from the address ("priya.r@…" reads "Priya"). */
+const NAMES = {};
+function firstName(email) {
+  const e = String(email || '').toLowerCase();
+  if (!e.includes('@')) return e || 'Someone';
+  const full = NAMES[e];
+  const word = full ? full.trim().split(/\s+/)[0] : e.split('@')[0].split(/[._+-]/)[0];
+  return word ? word.charAt(0).toUpperCase() + word.slice(1) : 'Someone';
+}
+function fullName(email) { return NAMES[String(email || '').toLowerCase()] || ''; }
+function who(email) { return firstName(email); }
 
 async function api(method, body, query = '') {
   const r = await fetch('/api/certificates' + query, {
@@ -65,7 +113,11 @@ async function api(method, body, query = '') {
     body: body ? JSON.stringify(body) : undefined,
   });
   let j = null; try { j = await r.json(); } catch { /* not JSON: the endpoint is not there */ }
-  if (!r.ok || !j) throw new Error((j && j.error) || 'The saved list is not available here.');
+  if (!r.ok || !j) {
+    const err = new Error((j && j.error) || 'The saved list is not available here.');
+    err.status = r.status; err.body = j;
+    throw err;
+  }
   return j;
 }
 
@@ -204,6 +256,26 @@ function UsersIcon() {
     </svg>
   );
 }
+function PlusIcon() {
+  return (
+    <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
+      <path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z" />
+    </svg>
+  );
+}
+function ArrowLeftIcon() {
+  return (
+    <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
+      <path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z" />
+    </svg>
+  );
+}
+function GridIcon() {
+  return (<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M104,40H56A16,16,0,0,0,40,56v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V56A16,16,0,0,0,104,40Zm0,64H56V56h48v48Zm96-64H152a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V56A16,16,0,0,0,200,40Zm0,64H152V56h48v48Zm-96,32H56a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V152A16,16,0,0,0,104,136Zm0,64H56V152h48v48Zm96-64H152a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V152A16,16,0,0,0,200,136Zm0,64H152V152h48v48Z" /></svg>);
+}
+function ListIcon() {
+  return (<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z" /></svg>);
+}
 function CheckIcon() {
   return (
     <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
@@ -313,13 +385,13 @@ function AccessModal({ item, onClose, onSaved }) {
         <ul className="acc-people">
           <li>
             <span className="acc-avatar" aria-hidden>{who(item.savedBy).slice(0, 1).toUpperCase()}</span>
-            <span className="acc-who"><span className="saved-name">{who(item.savedBy)}</span><span className="saved-meta">{item.savedBy}</span></span>
+            <span className="acc-who"><span className="saved-name">{who(item.savedBy)}</span><span className="saved-meta">{fullName(item.savedBy) ? `${fullName(item.savedBy)} · ${item.savedBy}` : item.savedBy}</span></span>
             <span className="acc-owner">Owner</span>
           </li>
           {access.people.map((p) => (
             <li key={p.email}>
               <span className="acc-avatar" aria-hidden>{who(p.email).slice(0, 1).toUpperCase()}</span>
-              <span className="acc-who"><span className="saved-name">{who(p.email)}</span><span className="saved-meta">{p.email}</span></span>
+              <span className="acc-who"><span className="saved-name">{who(p.email)}</span><span className="saved-meta">{fullName(p.email) ? `${fullName(p.email)} · ${p.email}` : p.email}</span></span>
               <RoleSwitch value={p.role} onChange={(r) => setPerson(p.email, r)} labels={{ view: 'View', edit: 'Edit' }} />
               <button type="button" className="saved-del acc-remove" onClick={() => drop(p.email)} aria-label={`Remove ${p.email}`} title="Remove"><CloseIcon /></button>
             </li>
@@ -361,10 +433,146 @@ function ConfirmDelete({ item, onCancel, onConfirm }) {
         </button>
       </>}>
       <ul className="t-confirm__lost">
-        <li>{item.data.name || 'Untitled'} · {awardLine(item.data) || 'No award'}</li>
+        <li>{titleOf(item)}</li>
         <li className="saved-meta">Saved by {who(item.savedBy)}, {when(item.savedAt)}</li>
       </ul>
     </Modal>
+  );
+}
+
+/* ── Files home: every certificate file this person can see, Canva-style (Utsav, 5 Oct 2026) ── */
+function FilesHome({ saved, me, logoSvg, onOpen, onNew, onShare, onDelete }) {
+  const [tab, setTab] = useState('all');
+  const [q, setQ] = useState('');
+  const [limit, setLimit] = useState(24);
+  const [sort, setSort] = useState('newest');
+  const [layout, setLayout] = useState(() => { try { return localStorage.getItem('gw-cert-layout') || 'grid'; } catch { return 'grid'; } });
+  const pickLayout = (l) => { setLayout(l); try { localStorage.setItem('gw-cert-layout', l); } catch { /* a convenience only */ } };
+  const SORTS = {
+    newest: (a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)),
+    oldest: (a, b) => String(a.updatedAt).localeCompare(String(b.updatedAt)),
+    az: (a, b) => titleOf(a).localeCompare(titleOf(b)),
+    za: (a, b) => titleOf(b).localeCompare(titleOf(a)),
+  };
+  const items = saved.items.filter((it) => {
+    if (tab === 'mine' && it.savedBy !== me) return false;
+    if (tab === 'shared' && it.savedBy === me) return false;
+    const t = q.trim().toLowerCase();
+    return !t || [titleOf(it), it.data.name, awardLine(it.data), who(it.savedBy), who(it.updatedBy), it.savedBy].join(' ').toLowerCase().includes(t);
+  }).sort(SORTS[sort]);
+  const counts = {
+    all: saved.items.length,
+    mine: saved.items.filter((it) => it.savedBy === me).length,
+    shared: saved.items.filter((it) => it.savedBy !== me).length,
+  };
+  return (
+    <div className="home">
+      <header className="home-bar">
+        <a className="brand-link" href="/internal/tools" title="Back to Tools" aria-label="Back to Tools">
+          <svg className="brand-icon" width="32" height="32" viewBox="0 0 160 160" fill="none" aria-hidden>
+            <rect width="160" height="160" rx="20" fill="#0D0D0D" />
+            <path d="M116.609 44.5634C117.503 42.3606 115.85 40 113.472 40H49.1429C44.0934 40 40 44.0934 40 49.1429V106.778C40 112.018 45.1708 115.683 49.9603 113.557C80.8494 99.8449 104.378 74.7075 116.609 44.5634Z" fill="white" />
+            <path d="M72.5161 120C71.4022 120 70.9357 118.553 71.8259 117.884C94.9007 100.527 111.434 75.8047 118.766 48.0522C118.94 47.3915 120 47.5162 120 48.1995V110.857C120 115.907 115.907 120 110.857 120H72.5161Z" fill="white" />
+          </svg>
+        </a>
+        <h1>Award certificates</h1>
+        <button type="button" className="r-btn r-btn--primary" onClick={onNew}><PlusIcon /> New certificate</button>
+      </header>
+
+      <div className="home-tools">
+        <div className="prop-segmented home-tabs" role="tablist">
+          {[['all', 'All'], ['mine', 'Mine'], ['shared', 'Shared with me']].map(([k, l]) => (
+            <button key={k} type="button" role="tab" aria-selected={tab === k} className={tab === k ? 'active' : ''} onClick={() => setTab(k)}>
+              {l}{saved.state === 'ready' ? ` · ${counts[k]}` : ''}
+            </button>
+          ))}
+        </div>
+        <div className="home-right">
+          <input className="prop-input home-search" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by name, award or person" />
+          <div className="home-sort">
+            <PropDropdown value={sort} onChange={setSort} options={[
+              { value: 'newest', label: 'Newest edited' }, { value: 'oldest', label: 'Oldest edited' },
+              { value: 'az', label: 'Name, A to Z' }, { value: 'za', label: 'Name, Z to A' },
+            ]} />
+          </div>
+          <div className="prop-segmented home-layout" role="tablist" aria-label="Layout">
+            <button type="button" role="tab" aria-selected={layout === 'grid'} className={layout === 'grid' ? 'active' : ''} onClick={() => pickLayout('grid')} aria-label="Grid" title="Grid"><GridIcon /></button>
+            <button type="button" role="tab" aria-selected={layout === 'list'} className={layout === 'list' ? 'active' : ''} onClick={() => pickLayout('list')} aria-label="List" title="List"><ListIcon /></button>
+          </div>
+        </div>
+      </div>
+
+      {saved.state === 'loading' && <p className="prop-tip home-note">Loading certificates…</p>}
+      {saved.state === 'error' && <p className="prop-tip saved-error home-note">{saved.error}</p>}
+      {saved.state === 'ready' && items.length === 0 && (
+        <div className="home-empty">
+          <p className="saved-name">{saved.items.length ? 'Nothing matches' : 'No certificates yet'}</p>
+          <p className="prop-tip">{saved.items.length ? 'Try another tab or search.' : 'Make the first one. Files you create, or that others share with you, show up here.'}</p>
+          {!saved.items.length && <button type="button" className="r-btn r-btn--primary" onClick={onNew}><PlusIcon /> New certificate</button>}
+        </div>
+      )}
+
+      {layout === 'list' && items.length > 0 && (
+        <table className="file-table">
+          <thead><tr><th>Name</th><th>People</th><th>Access</th><th>Edited</th><th><span className="gw-sr">Actions</span></th></tr></thead>
+          <tbody>
+            {items.slice(0, limit).map((it) => (
+              <tr key={it.id} onClick={() => onOpen(it)}>
+                <td>
+                  <span className="file-row-name">
+                    <span className="file-mini" aria-hidden><span className="file-mini__sheet"><Certificate data={it.data} logoSvg={logoSvg} /></span></span>
+                    <span className="acc-who"><span className="saved-name file-title">{titleOf(it)}</span><span className="saved-meta">{awardLine(it.data) || 'No award'}</span></span>
+                  </span>
+                </td>
+                <td><Avatars it={it} /></td>
+                <td><span className="saved-meta">{it.access && it.access.general === 'restricted' ? 'Restricted' : 'Everyone with the tool'}{it.can && !it.can.edit ? ' · View only' : ''}</span></td>
+                <td><span className="saved-meta">{ago(it.updatedAt)} · {who(it.updatedBy)}</span></td>
+                <td className="file-row-acts" onClick={(e) => e.stopPropagation()}>
+                  {it.can && it.can.manage && (
+                    <>
+                      <button type="button" className="saved-del" onClick={() => onShare(it)} aria-label={`Share ${titleOf(it)}`} title="Share"><UsersIcon /></button>
+                      <button type="button" className="saved-del" onClick={() => onDelete(it)} aria-label={`Delete ${titleOf(it)}`} title="Delete"><TrashIcon /></button>
+                    </>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+      {layout === 'grid' && <ul className="file-grid">
+        {items.slice(0, limit).map((it) => (
+          <li key={it.id} className="file-card">
+            <button type="button" className="file-open" onClick={() => onOpen(it)} aria-label={`Open ${titleOf(it)}`}>
+              <span className="file-thumb" aria-hidden>
+                <span className="file-thumb__sheet"><Certificate data={it.data} logoSvg={logoSvg} /></span>
+              </span>
+              <span className="file-info">
+                <span className="saved-name file-title">{titleOf(it)}</span>
+                <span className="file-meta-row">
+                  <span className="saved-meta">Edited {ago(it.updatedAt)} · {who(it.updatedBy)}</span>
+                  <Avatars it={it} />
+                </span>
+              </span>
+            </button>
+            <span className="file-tags">
+              {it.access && it.access.general === 'restricted' && <span className="saved-tag">Restricted</span>}
+              {it.can && !it.can.edit && <span className="saved-tag">View only</span>}
+            </span>
+            {it.can && it.can.manage && (
+              <span className="file-acts">
+                <button type="button" className="saved-del" onClick={() => onShare(it)} aria-label={`Share ${titleOf(it)}`} title="Share"><UsersIcon /></button>
+                <button type="button" className="saved-del" onClick={() => onDelete(it)} aria-label={`Delete ${titleOf(it)}`} title="Delete"><TrashIcon /></button>
+              </span>
+            )}
+          </li>
+        ))}
+      </ul>}
+      {items.length > limit && (
+        <div className="home-more"><button type="button" className="r-btn" onClick={() => setLimit((n) => n + 24)}>Show more</button></div>
+      )}
+    </div>
   );
 }
 
@@ -386,6 +594,13 @@ function App() {
   const [accessItem, setAccessItem] = useState(null);     // the certificate the share dialog edits
   const [linkError, setLinkError] = useState('');
   const [filter, setFilter] = useState('');
+  const [view, setView] = useState(routeOf);          // 'home' (the Files page) | 'editor'
+  const [me, setMe] = useState('');
+  const [fileTitle, setFileTitle] = useState('');     // empty = the default title from the name and award
+  const [touched, setTouched] = useState(false);      // a new, unsaved file has been edited
+  const [clash, setClash] = useState(null);           // the newer copy someone else saved
+  const [leaveTo, setLeaveTo] = useState(null);       // a pending navigation away from unsaved edits
+  const itemsRef = useRef([]);
   const certRef = useRef(null);
   const stageRef = useRef(null);
   const savedRef = useRef(null);
@@ -400,12 +615,15 @@ function App() {
   }, []);
 
   // the hub's Appearance and Help sit left of the right panel while it is open
-  useEffect(() => { document.documentElement.setAttribute('data-tool-panel', panelOpen ? 'open' : 'closed'); }, [panelOpen]);
+  useEffect(() => { document.documentElement.setAttribute('data-tool-panel', view === 'home' ? 'home' : panelOpen ? 'open' : 'closed'); }, [panelOpen, view]);
 
   // the shared saved list, then whatever the link points at
   const loadList = useCallback(async () => {
     try {
       const j = await api('GET');
+      Object.assign(NAMES, j.names || {});
+      setMe(j.me || '');
+      itemsRef.current = j.items || [];
       setSaved({ state: 'ready', items: j.items || [], error: '' });
       return j.items || [];
     } catch (e) {
@@ -413,16 +631,34 @@ function App() {
       return [];
     }
   }, []);
-  useEffect(() => {
+  // the Files list, then whatever the link points at; the fragment is the route
+  const applyRoute = useCallback((items) => {
     const h = readHash();
-    if (h.c) { const d = decodeData(h.c); if (d) setData((prev) => ({ ...prev, ...d })); }
-    loadList().then((items) => {
-      if (!h.saved) return;
+    setView(routeOf());
+    setClash(null); setLinkError(''); setTouched(false);
+    if (h.saved) {
       const it = items.find((x) => x.id === h.saved);
-      if (it) { setData((prev) => ({ ...prev, ...it.data })); setCurrent(it); }
-      else setLinkError('That certificate was deleted, or it is not shared with you. Ask its owner for access.');
-    });
-  }, [loadList]);
+      if (it) { setData(fromPreset(PRESETS[0])); setData((prev) => ({ ...prev, ...it.data })); setCurrent(it); setFileTitle(it.title || ''); }
+      else { setCurrent(null); setLinkError('That certificate was deleted, or it is not shared with you. Ask its owner for access.'); }
+    } else if (h.c) {
+      const d = decodeData(h.c);
+      setCurrent(null); setFileTitle('');
+      if (d) setData((prev) => ({ ...prev, ...d }));
+    } else if (h.isNew) {
+      setCurrent(null); setFileTitle(''); setData(fromPreset(PRESETS[0]));
+    } else {
+      setCurrent(null);
+    }
+  }, []);
+  useEffect(() => {
+    loadList().then(applyRoute);
+    const onHash = () => {
+      // coming back to the Files page refreshes it, so other people's saves show up
+      if (routeOf() === 'home') loadList().then(applyRoute); else applyRoute(itemsRef.current);
+    };
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, [loadList, applyRoute]);
 
   // fit the A4 sheet into the space right of the panel, above the bar
   useLayoutEffect(() => {
@@ -439,12 +675,12 @@ function App() {
     ro.observe(el);
     window.addEventListener('resize', fit);
     return () => { ro.disconnect(); window.removeEventListener('resize', fit); };
-  }, []);
+  }, [view]);
 
   // text that runs past the panel's bottom padding is flagged, not clipped silently
   useLayoutEffect(() => {
     const cert = certRef.current;
-    if (!cert) return;
+    if (!cert || view !== 'editor') return;
     const col = cert.querySelector('.cert-col');
     if (!col) return;
     const limit = CERT.panelInset + CERT.panelH - CERT.pad;
@@ -461,10 +697,11 @@ function App() {
     return () => { document.removeEventListener('mousedown', onDoc); document.removeEventListener('keydown', onKey); };
   }, [menuOpen]);
 
-  const set = (key) => (v) => setData((d) => ({ ...d, [key]: v, preset: key === 'period' || key === 'signature' || key === 'signedBy' ? d.preset : 'custom' }));
+  const set = (key) => (v) => { setTouched(true); setData((d) => ({ ...d, [key]: v, preset: key === 'period' || key === 'signature' || key === 'signedBy' ? d.preset : 'custom' })); };
+  const onEdit = (key, v) => set(key)(v);
   const pickPreset = (id) => {
     const p = PRESETS.find((x) => x.id === id);
-    if (p) setData((d) => fromPreset(p, d));
+    if (p) { setTouched(true); setData((d) => fromPreset(p, d)); }
   };
 
   const filename = ['gushwork-certificate', slug(data.name), slug(data.period)].filter(Boolean).join('-');
@@ -474,6 +711,8 @@ function App() {
     setMenuOpen(false);
     if (!certRef.current || job.state === 'working') return;
     setJob({ kind, state: 'working' });
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    certRef.current.setAttribute('data-exporting', '');
     try {
       const opts = { filename, title, logoSvg };
       if (kind === 'pdf') await CertExport.exportPdf(certRef.current, opts);
@@ -484,50 +723,58 @@ function App() {
       console.error(e);
       setJob({ kind, state: 'err' });
     }
+    if (certRef.current) certRef.current.removeAttribute('data-exporting');
     setTimeout(() => setJob((j) => (j.kind === kind ? { kind: null, state: 'idle' } : j)), 2400);
   }, [filename, title, logoSvg, job.state]);
 
-  const dirty = !current || !same(current.data, data);
+  const dirty = !current || !same(current.data, data) || (fileTitle || '') !== (current.title || '');
+  const unsaved = current ? dirty : touched;
 
-  const save = async () => {
+  const save = async (force) => {
     if (saveState === 'working') return;
     setSaveState('working'); setSaveError('');
     try {
-      const j = await api('POST', { id: current ? current.id : undefined, data: pick(data) });
-      setCurrent(j.item);
-      history.replaceState(null, '', '#saved=' + j.item.id);
+      const j = await api('POST', { id: current ? current.id : undefined, data: pick(data), title: fileTitle, base: current ? current.updatedAt : undefined, force: !!force });
+      setCurrent(j.item); setClash(null); setTouched(false);
+      itemsRef.current = [j.item, ...itemsRef.current.filter((x) => x.id !== j.item.id)];
+      history.replaceState(null, '', '#file=' + j.item.id);
       setSaved((st) => ({ state: 'ready', error: '', items: [j.item, ...st.items.filter((x) => x.id !== j.item.id)] }));
       setSaveState('ok');
     } catch (e) {
+      if (e.status === 409 && e.body && e.body.item) { setClash(e.body.item); setSaveState('idle'); return; }
       setSaveError(e.message); setSaveState('err');
     }
     setTimeout(() => setSaveState((v) => (v === 'working' ? v : 'idle')), 2400);
   };
 
   const share = async () => {
-    const hash = current && !dirty ? 'saved=' + current.id : 'c=' + encodeData(data);
+    const hash = current && !dirty ? 'file=' + current.id : 'c=' + encodeData(data);
     const url = location.origin + location.pathname + '#' + hash;
     try { await navigator.clipboard.writeText(url); setShareState('ok'); } catch { setShareState('err'); }
     setTimeout(() => setShareState('idle'), 2400);
   };
 
-  const openItem = (it) => {
-    setData((prev) => ({ ...prev, ...it.data }));
-    setCurrent(it);
-    setLinkError('');
-    history.replaceState(null, '', '#saved=' + it.id);
+  // navigation goes through the fragment, so Back works; unsaved edits ask first
+  const navigate = (hash) => { if (hash) location.hash = hash; else { history.pushState(null, '', location.pathname); window.dispatchEvent(new HashChangeEvent('hashchange')); } };
+  const go = (hash) => {
+    const doIt = () => navigate(hash);
+    if (view === 'editor' && unsaved && canEdit) setLeaveTo(() => doIt); else doIt();
   };
-  const startNew = () => {
-    setCurrent(null);
-    setData((d) => fromPreset(PRESETS[0], d));
-    history.replaceState(null, '', location.pathname);
+  const openItem = (it) => go('file=' + it.id);
+  const startNew = () => go('new');
+  const toFiles = () => go('');
+  const loadTheirs = () => {
+    if (!clash) return;
+    setData((prev) => ({ ...prev, ...clash.data })); setCurrent(clash); setFileTitle(clash.title || ''); setClash(null);
+    setSaved((st) => ({ ...st, items: st.items.map((x) => (x.id === clash.id ? clash : x)) }));
   };
   // delete happens only from the confirm's own Delete button
   const remove = async (it) => {
     try {
       await api('DELETE', null, '?id=' + it.id);
       setSaved((st) => ({ ...st, items: st.items.filter((x) => x.id !== it.id) }));
-      if (current && current.id === it.id) { setCurrent(null); history.replaceState(null, '', location.pathname); }
+      itemsRef.current = itemsRef.current.filter((x) => x.id !== it.id);
+      if (view === 'editor' && current && current.id === it.id) { setCurrent(null); setConfirmItem(null); navigate(''); return; }
     } catch (e) {
       setSaved((st) => ({ ...st, error: e.message }));
     }
@@ -558,11 +805,48 @@ function App() {
     ...(data.preset === 'custom' ? [{ value: 'custom', label: 'Custom' }] : []),
   ];
 
+  const dialogs = (
+    <>
+      {accessItem && <AccessModal item={accessItem} onClose={() => setAccessItem(null)} onSaved={accessSaved} />}
+      {confirmItem && <ConfirmDelete item={confirmItem} onCancel={() => setConfirmItem(null)} onConfirm={() => remove(confirmItem)} />}
+      {leaveTo && (
+        <Modal open size="sm" onClose={() => setLeaveTo(null)} title="Leave without saving?"
+          desc="Your changes to this certificate are not saved. Leave and they are lost."
+          initialFocus=".t-cancel"
+          foot={<>
+            <button type="button" className="r-btn t-cancel" onClick={() => setLeaveTo(null)}>Keep editing</button>
+            <button type="button" className="r-btn r-btn--danger" onClick={() => { const f = leaveTo; setLeaveTo(null); f(); }}>Leave without saving</button>
+          </>} />
+      )}
+    </>
+  );
+
+  if (view === 'home') {
+    return (
+      <div className="app app--home">
+        <FilesHome saved={saved} me={me} logoSvg={logoSvg} onOpen={openItem} onNew={startNew}
+          onShare={(it) => setAccessItem(it)} onDelete={(it) => setConfirmItem(it)} />
+        {dialogs}
+      </div>
+    );
+  }
+
   return (
     <div className="app" data-panel={panelOpen ? 'open' : 'closed'}>
-      <button type="button" className="panel-reopen" onClick={() => setPanelOpen(true)} aria-label="Open editor panel" title="Open editor panel">
-        <SidebarIcon />
-      </button>
+      {/* collapsed: the panel folds to its own header (tool-panel, 5 Oct 2026) */}
+      <div className="panel-mini" aria-hidden={panelOpen}>
+        <a className="brand-link" href="/internal/tools" title="Back to Tools" aria-label="Back to Tools" tabIndex={panelOpen ? -1 : 0}>
+          <svg className="brand-icon" width="32" height="32" viewBox="0 0 160 160" fill="none" aria-hidden>
+            <rect width="160" height="160" rx="20" fill="#0D0D0D" />
+            <path d="M116.609 44.5634C117.503 42.3606 115.85 40 113.472 40H49.1429C44.0934 40 40 44.0934 40 49.1429V106.778C40 112.018 45.1708 115.683 49.9603 113.557C80.8494 99.8449 104.378 74.7075 116.609 44.5634Z" fill="white" />
+            <path d="M72.5161 120C71.4022 120 70.9357 118.553 71.8259 117.884C94.9007 100.527 111.434 75.8047 118.766 48.0522C118.94 47.3915 120 47.5162 120 48.1995V110.857C120 115.907 115.907 120 110.857 120H72.5161Z" fill="white" />
+          </svg>
+        </a>
+        <span className="panel-mini__name">Award certificate</span>
+        <button type="button" className="panel-reopen" onClick={() => setPanelOpen(true)} aria-label="Open editor panel" title="Open editor panel" tabIndex={panelOpen ? -1 : 0}>
+          <SidebarIcon />
+        </button>
+      </div>
 
       <div className="left-col" aria-hidden={!panelOpen}>
         <header className="brand-card">
@@ -626,15 +910,30 @@ function App() {
 
       <div className="right-col" ref={savedRef} aria-hidden={!panelOpen}>
         <header className="right-head">
+          <button type="button" className="saved-new right-back" onClick={toFiles}><ArrowLeftIcon /> All files</button>
           <h2>Save and share</h2>
-          {current && <button type="button" className="saved-new" onClick={startNew}>New certificate</button>}
+          <button type="button" className="saved-new" onClick={startNew}>New</button>
         </header>
 
         <section className="prop-section">
           <header className="prop-section-head"><h3>This certificate</h3></header>
+          <label className="file-name">
+            <span className="acc-label">File name</span>
+            <input className="prop-input" type="text" value={fileTitle} placeholder={defaultTitle(data)} maxLength={120}
+              readOnly={!canEdit} onChange={(e) => { setTouched(true); setFileTitle(e.target.value); }} />
+          </label>
+          {clash && (
+            <div className="clash" role="alert">
+              <p><strong>{who(clash.updatedBy)} saved a newer version</strong> at {whenTime(clash.updatedAt)}, after you opened this file.</p>
+              <div className="del-confirm__acts">
+                <button type="button" className="r-btn" onClick={loadTheirs}>Load theirs</button>
+                <button type="button" className="r-btn r-btn--danger" onClick={() => save(true)}>Keep mine</button>
+              </div>
+              <p className="prop-tip">Load theirs drops your changes. Keep mine replaces theirs.</p>
+            </div>
+          )}
           <div className="this-card">
-            <span className="saved-name">{data.name || 'Untitled'}</span>
-            <span className="saved-meta">{awardLine(data) || 'No award'}</span>
+            <span className="saved-meta">{data.name || 'No name'} · {awardLine(data) || 'No award'}</span>
             <dl className="this-meta">
               {current ? (
                 <>
@@ -649,7 +948,7 @@ function App() {
             </dl>
           </div>
           <div className="right-actions">
-            <button type="button" className="r-btn r-btn--primary" onClick={save}
+            <button type="button" className="r-btn r-btn--primary" onClick={() => save()}
               disabled={saveState === 'working' || (current && !dirty) || saved.state === 'error' || !canEdit}
               title={!canEdit ? 'You can view this certificate. Ask its owner for edit access.' : undefined}>
               {saveState === 'ok' && !dirty ? <CheckIcon /> : <SaveIcon />}
@@ -678,7 +977,7 @@ function App() {
 
         <section className="prop-section saved-section">
           <header className="prop-section-head saved-head">
-            <h3>Saved{saved.state === 'ready' && saved.items.length ? ` · ${saved.items.length}` : ''}</h3>
+            <h3>Recent files</h3>
           </header>
           {saved.state === 'loading' && <p className="prop-tip">Loading the saved list…</p>}
           {saved.state === 'error' && <p className="prop-tip saved-error">{saved.error}</p>}
@@ -690,13 +989,11 @@ function App() {
           )}
           {saved.state === 'ready' && shown.length > 0 && (
             <ul className="saved-list">
-              {shown.map((it) => (
+              {shown.slice(0, 8).map((it) => (
                 <li key={it.id} className={`saved-row${current && current.id === it.id ? ' is-on' : ''}`}>
                   <button type="button" className="saved-open" onClick={() => openItem(it)}>
-                    <span className="saved-name">{it.data.name || 'Untitled'}{it.access && it.access.general === 'restricted' && <span className="saved-tag">Restricted</span>}{it.can && !it.can.edit && <span className="saved-tag">View only</span>}</span>
-                    <span className="saved-meta">{awardLine(it.data) || 'No award'}</span>
-                    <span className="saved-meta">Saved by {who(it.savedBy)}, {when(it.savedAt)}</span>
-                    {(it.updatedAt !== it.savedAt) && <span className="saved-meta">Edited by {who(it.updatedBy)}, {when(it.updatedAt)}</span>}
+                    <span className="saved-name">{titleOf(it)}{it.access && it.access.general === 'restricted' && <span className="saved-tag">Restricted</span>}{it.can && !it.can.edit && <span className="saved-tag">View only</span>}</span>
+                    <span className="saved-meta">{rowMeta(it)}</span>
                   </button>
                   {(!it.can || it.can.manage) && (
                     <button type="button" className="saved-del" onClick={() => setConfirmItem(it)} aria-label={`Delete ${it.data.name || 'certificate'}`} title="Delete">
@@ -711,14 +1008,13 @@ function App() {
         </section>
       </div>
 
-      {accessItem && <AccessModal item={accessItem} onClose={() => setAccessItem(null)} onSaved={accessSaved} />}
-      {confirmItem && <ConfirmDelete item={confirmItem} onCancel={() => setConfirmItem(null)} onConfirm={() => remove(confirmItem)} />}
+      {dialogs}
 
       <main className="preview-col" ref={stageRef}>
         <div className="cert-stage">
           <div className="cert-scale-wrap" style={{ width: CERT.W * scale, height: CERT.H * scale }}>
             <div className="cert-scale" style={{ transform: `scale(${scale})` }}>
-              <Certificate data={data} logoSvg={logoSvg} certRef={certRef} />
+              <Certificate data={data} logoSvg={logoSvg} certRef={certRef} onEdit={canEdit ? onEdit : undefined} />
             </div>
           </div>
           <p className={`cert-caption${overflow ? ' is-warn' : ''}`}>

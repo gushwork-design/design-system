@@ -16,10 +16,17 @@
       The shared-password door has no identity, so it is treated as an admin, the same choice the
       gate itself makes for that session.
 
-   WHAT IT STORES. One hash, `gw:certs`: id -> {id, data, access, savedBy, savedAt, updatedBy,
+   FILES (Utsav, 5 Oct 2026). Each certificate is a file with a `title`, so sales and HR can each
+   make their own and share them, Canva-style. Saving is guarded against clashes: an edit carries
+   `base`, the updatedAt it started from, and if someone saved since, the save is refused with 409
+   and the newer copy, unless the editor chose `force` (keep mine).
+
+   WHAT IT STORES. One hash, `gw:certs`: id -> {id, title, data, access, savedBy, savedAt, updatedBy,
    updatedAt}. `data` is only the certificate's own text fields, whitelisted and length-capped;
    `access` is validated (domain emails only, at most MAX_PEOPLE). Nothing else a browser sends
-   is kept.
+   is kept. A second hash, `gw:cert-names`, keeps each visitor's display name from their own
+   verified session (never from a request body), so the tool can show "Utsav" instead of an
+   address; the list read returns the names of the people it mentions.
 
    HOW MUCH. Capped at MAX_ITEMS certificates; a save past the cap is refused, not trimmed, so
    nobody's saved work disappears without them deleting it.
@@ -29,8 +36,11 @@ import { COOKIE, verify, readCookie, sessionSecret } from './_session.js';
 import { loadRules, decide, isAdmin, allowedDomain } from './_access.js';
 
 const KEY = 'gw:certs';
+const NAMES = 'gw:cert-names';   // email -> the display name from that person's own Google sign-in
 const MAX_ITEMS = 1000;
 const MAX_PEOPLE = 50;
+const MAX_TITLE = 120;
+const cleanTitle = (t) => (typeof t === 'string' ? t.trim().slice(0, MAX_TITLE) : '');
 /* Live at /internal/award-certificate since 5 Oct 2026; the old staging path stays so a rule set on it still counts. */
 const TOOL_PATHS = ['/internal/staging/award-certificate', '/internal/award-certificate'];
 const FIELDS = {
@@ -128,6 +138,10 @@ export default async function handler(req, res) {
     admin: !email || session.via === 'password' || isAdmin(email, rules),
   };
 
+  // remember this visitor's own name, from the signed session only
+  const myName = email && session.name && session.name !== email ? String(session.name).slice(0, 80) : '';
+  if (myName) { try { await pipe(cfg, [['HSET', NAMES, email, myName]]); } catch { /* a missing name falls back to the address */ } }
+
   const load = async (id) => {
     const r = await pipe(cfg, [['HGET', KEY, id]]);
     return r[0] && r[0].result ? JSON.parse(r[0].result) : null;
@@ -142,7 +156,19 @@ export default async function handler(req, res) {
         .map((it) => present(it, me))
         .filter((it) => it.can.view)
         .sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
-      return json(res, 200, { items, me: me.email });
+      const emails = new Set([me.email]);
+      for (const it of items) {
+        emails.add(it.savedBy); emails.add(it.updatedBy);
+        (it.access.people || []).forEach((p) => emails.add(p.email));
+      }
+      const list = [...emails].filter((e) => e && e.includes('@'));
+      let names = {};
+      if (list.length) {
+        const n = await pipe(cfg, [['HMGET', NAMES, ...list]]);
+        const vals = (n[0] && n[0].result) || [];
+        list.forEach((e, i) => { if (vals[i]) names[e] = vals[i]; });
+      }
+      return json(res, 200, { items, me: me.email, names });
     }
 
     if (req.method === 'POST') {
@@ -158,8 +184,18 @@ export default async function handler(req, res) {
         const can = perms(prev, me);
         if (!can.view) return json(res, 404, { error: 'That certificate was deleted.' });
         const item = { ...prev };
+        const editing = body.data !== undefined || body.title !== undefined;
+        if (editing && !can.edit) return json(res, 403, { error: 'You can view this certificate but not edit it.' });
+        // clash guard: someone saved after this editor opened the file
+        if (editing && !body.force && typeof body.base === 'string' && body.base !== prev.updatedAt) {
+          return json(res, 409, { error: 'Someone saved a newer version.', item: present(prev, me) });
+        }
+        if (body.title !== undefined) {
+          item.title = cleanTitle(body.title);
+          item.updatedBy = me.email;
+          item.updatedAt = now;
+        }
         if (body.data !== undefined) {
-          if (!can.edit) return json(res, 403, { error: 'You can view this certificate but not edit it.' });
           const data = clean(body.data);
           if (!data) return json(res, 400, { error: 'Nothing to save.' });
           item.data = data;
@@ -182,7 +218,7 @@ export default async function handler(req, res) {
       if ((r[0] && r[0].result) >= MAX_ITEMS) return json(res, 507, { error: 'The list is full. Delete some old certificates first.' });
       const access = body.access ? cleanAccess(body.access, me.email) : DEFAULT_ACCESS;
       if (typeof access === 'string') return json(res, 400, { error: access });
-      const item = { id: newId(), data, access, savedBy: me.email, savedAt: now, updatedBy: me.email, updatedAt: now };
+      const item = { id: newId(), title: cleanTitle(body.title), data, access, savedBy: me.email, savedAt: now, updatedBy: me.email, updatedAt: now };
       await pipe(cfg, [['HSET', KEY, item.id, JSON.stringify(item)]]);
       return json(res, 200, { item: present(item, me) });
     }
