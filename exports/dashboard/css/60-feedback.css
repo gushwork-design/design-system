@@ -112,13 +112,11 @@
 .gd .gd-banner__icon svg { width: 16px; height: 16px; display: block; }
 .gd .gd-banner__body { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: var(--gw-space-2); }
 .gd .gd-banner__title { color: var(--gd-text); font: var(--gw-text-body-14-sem); letter-spacing: var(--gw-text-body-14-sem-tracking); }
-.gd .gd-banner__actions { flex: none; display: flex; align-items: center; gap: var(--gw-space-8); align-self: center; }
+.gd .gd-banner { flex-wrap: wrap; }
+.gd .gd-banner .gd-fb-close { order: 2; margin-left: auto; }
+/* the action sits under the text, in line with it (icon 16 + gap), at every width */
+.gd .gd-banner__actions { order: 3; flex: 0 0 calc(100% - 16px - var(--gd-gap)); margin-left: calc(16px + var(--gd-gap)); display: flex; align-items: center; gap: var(--gw-space-8); }
 .gd .gd-banner code { font-size: .92em; }
-@media (max-width: 559px) {   /* actions drop to their own row under the text */
-  .gd .gd-banner { flex-wrap: wrap; }
-  .gd .gd-banner .gd-fb-close { order: 2; margin-left: auto; }
-  .gd .gd-banner__actions { order: 3; flex-basis: 100%; align-self: flex-start; }
-}
 
 /* ---- empty state ---------------------------------------------------------- */
 .gd .gd-empty {
