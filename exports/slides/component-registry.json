@@ -222,6 +222,13 @@
       "reviewedOn": "2026-10-05",
       "fingerprint": "a57f8d302fc1e75e",
       "note": "preview is not there"
+    },
+    "icon-tile": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "bf28abe33c0f0e96",
+      "note": "preview is not there"
     }
   }
 }
