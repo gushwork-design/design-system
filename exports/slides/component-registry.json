@@ -322,11 +322,11 @@
       "previewFingerprint": "1deaae76f54957b6"
     },
     "rule-label": {
-      "reviewed": "rework",
+      "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "18c150e1d219851c",
-      "note": "preview is not there"
+      "previewFingerprint": "2bb0e9549828fd1b"
     },
     "step-card": {
       "reviewed": "rework",
