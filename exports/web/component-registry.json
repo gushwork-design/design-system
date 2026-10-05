@@ -322,12 +322,11 @@
       "note": "new design in the templates"
     },
     "timeline": {
-      "reviewed": "rework",
+      "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "b011f54c631f2238",
-      "previewFingerprint": "6e6d5deb4786bda7",
-      "note": "spacing above tooltip is inconsistant"
+      "previewFingerprint": "6baf4a81f209dcb3"
     },
     "video": {
       "reviewed": "passed",
