@@ -87,8 +87,10 @@ saved certificates are shared through `/api/certificates`. **New, pending review
 | Header | "Save and share" in the panel title style (Vert 16 semibold), the same 57 row and hairline as the editor; "New certificate" (28, outlined) right while an item is open |
 | This certificate | a card on `--t-field-bg` with a `--t-field-border` hairline, radius 12: name, award, then Created (who, date), Last edited (who, date and time), Status (Saved, Unsaved changes, Not saved yet) |
 | Actions | Save (control button 36, radius 12, black; white in dark) and Copy link (outlined), side by side; a line under them says what the link opens |
-| Delete | "Delete this certificate" (danger text, 28), and a trash icon on each row on hover. Neither deletes: each opens a confirm |
-| Confirm | an inline block on `--t-danger-bg` with a `--t-danger` hairline, radius 12 (8 in a row): the question in words ("Delete Ajith's certificate? It is removed for everyone…"), then Cancel (outlined) and Delete (danger), 32 tall |
-| Saved list | rows: name (`body-14-med`), award, "Saved by who, date", and "Edited by who, date" when it was edited; padding 4, radius 12; current on the field fill; hover neutral; search past 5 items |
+| Access row | in the certificate card: "Everyone with the tool can edit / view (· n people added)" or "Only people added (n)"; Status reads "View only" for a viewer |
+| Owner actions | Manage access (outlined, people icon) and Delete (the neutral outlined shape with a red label), shown only to the owner and hub admins; others see "Owned by …" |
+| Share dialog | the library's **modal** (dashboard `overlays.md`), md 480, on the tool tokens: Add people (work email, View / Edit, Add), People with access (owner first, each with View / Edit and remove), General access (Everyone with the tool / Only people added; with a View / Edit for the first). Cancel, then Save access |
+| Delete | never on one click: opens the library's **confirm dialog** (sm 400, alertdialog): the title names it ("Delete Ajith's certificate?"), a sentence on the consequence, the lost item listed, Cancel focused by default, then "Delete certificate" (red label and edge, no fill) |
+| Saved list | rows: name (`body-14-med`) with a Restricted or View only tag (20 tall pill), award, "Saved by who, date", and "Edited by who, date" when it was edited; padding 4, radius 12; current on the field fill; hover neutral; search past 5 items |
 
 Source: `web/internal/award-certificate/styles.css`, the "Save and share" block.

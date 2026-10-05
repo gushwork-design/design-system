@@ -4,30 +4,41 @@
    Served as /api/certificates, a module behind gw.js like its neighbours, so it costs no new
    function against the Hobby plan's 12.
 
-   WHO. Whoever the gate lets open the tool. The check is the gate's own decide() on the tool's
-   path, so the list and the page can never disagree: limit the tool to HR in Access Control and
-   the list is limited with it. middleware.js gates /internal/* pages, not /api/*, so this is
-   checked here on every request.
+   TWO LAYERS OF ACCESS.
+   1. The tool. Whoever the gate lets open it, checked with the gate's own decide() on the tool's
+      path, so the list and the page can never disagree. middleware.js gates /internal/* pages,
+      not /api/*, so this is checked here on every request.
+   2. Each certificate (Utsav, 5 Oct 2026). Its creator owns it. `access` says who else sees it:
+      `general` is 'tool' (everyone who can open the tool) or 'restricted' (only the people
+      listed), `role` is what 'tool' grants ('edit' or 'view'), and `people` names work emails
+      with their own role. Only the owner and hub admins change access or delete. A certificate
+      saved before this existed has no `access` and reads as everyone-can-edit, which is what it was.
+      The shared-password door has no identity, so it is treated as an admin, the same choice the
+      gate itself makes for that session.
 
-   WHAT IT STORES. One hash, `gw:certs`: id -> {id, data, savedBy, savedAt, updatedBy, updatedAt}.
-   `data` is only the certificate's own text fields, whitelisted and length-capped below; nothing
-   else a browser sends is kept. savedBy is the verified session's work email.
+   WHAT IT STORES. One hash, `gw:certs`: id -> {id, data, access, savedBy, savedAt, updatedBy,
+   updatedAt}. `data` is only the certificate's own text fields, whitelisted and length-capped;
+   `access` is validated (domain emails only, at most MAX_PEOPLE). Nothing else a browser sends
+   is kept.
 
    HOW MUCH. Capped at MAX_ITEMS certificates; a save past the cap is refused, not trimmed, so
    nobody's saved work disappears without them deleting it.
    ========================================================================= */
 
 import { COOKIE, verify, readCookie, sessionSecret } from './_session.js';
-import { loadRules, decide } from './_access.js';
+import { loadRules, decide, isAdmin, allowedDomain } from './_access.js';
 
 const KEY = 'gw:certs';
 const MAX_ITEMS = 1000;
+const MAX_PEOPLE = 50;
 /* Live at /internal/award-certificate since 5 Oct 2026; the old staging path stays so a rule set on it still counts. */
 const TOOL_PATHS = ['/internal/staging/award-certificate', '/internal/award-certificate'];
 const FIELDS = {
   preset: 40, name: 80, headline: 200, before: 400, award: 120, after: 400,
   period: 40, signature: 60, signedBy: 120,
 };
+const DEFAULT_ACCESS = { general: 'tool', role: 'edit', people: [] };
+const ROLES = ['view', 'edit'];
 
 function store() {
   const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
@@ -62,10 +73,44 @@ function clean(raw) {
   return out;
 }
 
+/* Returns a valid access object, or a string saying what is wrong. */
+function cleanAccess(raw, owner) {
+  if (!raw || typeof raw !== 'object') return 'Bad access.';
+  const general = raw.general === 'restricted' ? 'restricted' : 'tool';
+  const role = ROLES.includes(raw.role) ? raw.role : 'edit';
+  const list = Array.isArray(raw.people) ? raw.people : [];
+  if (list.length > MAX_PEOPLE) return `At most ${MAX_PEOPLE} people.`;
+  const domain = '@' + allowedDomain();
+  const seen = new Set();
+  const people = [];
+  for (const p of list) {
+    const email = String((p && p.email) || '').trim().toLowerCase();
+    if (!email || email === owner || seen.has(email)) continue;
+    if (!/^[^\s@]+@[^\s@]+$/.test(email) || !email.endsWith(domain)) return `${email} is not a ${domain} address.`;
+    seen.add(email);
+    people.push({ email, role: ROLES.includes(p.role) ? p.role : 'view' });
+  }
+  return { general, role, people };
+}
+
 function newId() {
   const b = new Uint8Array(9);
   crypto.getRandomValues(b);
   return Array.from(b, (x) => x.toString(16).padStart(2, '0')).join('');
+}
+
+/* What this person may do with this certificate. */
+function perms(item, me) {
+  const access = item.access || DEFAULT_ACCESS;
+  const manage = me.admin || item.savedBy === me.email;
+  const person = (access.people || []).find((p) => p.email === me.email);
+  const edit = manage || (person && person.role === 'edit') || (access.general === 'tool' && access.role === 'edit');
+  const view = edit || !!person || access.general === 'tool';
+  return { view, edit, manage };
+}
+
+function present(item, me) {
+  return { ...item, access: item.access || DEFAULT_ACCESS, can: perms(item, me) };
 }
 
 export default async function handler(req, res) {
@@ -77,7 +122,16 @@ export default async function handler(req, res) {
   }
   const cfg = store();
   if (!cfg) return json(res, 503, { error: 'The store is not connected.' });
-  const who = session.email ? String(session.email).toLowerCase() : '(shared password)';
+  const email = session.email ? String(session.email).toLowerCase() : '';
+  const me = {
+    email: email || '(shared password)',
+    admin: !email || session.via === 'password' || isAdmin(email, rules),
+  };
+
+  const load = async (id) => {
+    const r = await pipe(cfg, [['HGET', KEY, id]]);
+    return r[0] && r[0].result ? JSON.parse(r[0].result) : null;
+  };
 
   try {
     if (req.method === 'GET') {
@@ -85,35 +139,59 @@ export default async function handler(req, res) {
       const items = ((r[0] && r[0].result) || [])
         .map((s) => { try { return JSON.parse(s); } catch { return null; } })
         .filter(Boolean)
+        .map((it) => present(it, me))
+        .filter((it) => it.can.view)
         .sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
-      return json(res, 200, { items });
+      return json(res, 200, { items, me: me.email });
     }
 
     if (req.method === 'POST') {
       let body = req.body;
       if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = null; } }
-      const data = clean(body && body.data);
-      if (!data) return json(res, 400, { error: 'Nothing to save.' });
+      if (!body || typeof body !== 'object') return json(res, 400, { error: 'Nothing to save.' });
       const now = new Date().toISOString();
-      const asked = body && typeof body.id === 'string' && /^[a-f0-9]{18}$/.test(body.id) ? body.id : '';
-      let item;
+      const asked = typeof body.id === 'string' && /^[a-f0-9]{18}$/.test(body.id) ? body.id : '';
+
       if (asked) {
-        const r = await pipe(cfg, [['HGET', KEY, asked]]);
-        const prev = r[0] && r[0].result ? JSON.parse(r[0].result) : null;
+        const prev = await load(asked);
         if (!prev) return json(res, 404, { error: 'That certificate was deleted.' });
-        item = { ...prev, data, updatedBy: who, updatedAt: now };
-      } else {
-        const r = await pipe(cfg, [['HLEN', KEY]]);
-        if ((r[0] && r[0].result) >= MAX_ITEMS) return json(res, 507, { error: 'The list is full. Delete some old certificates first.' });
-        item = { id: newId(), data, savedBy: who, savedAt: now, updatedBy: who, updatedAt: now };
+        const can = perms(prev, me);
+        if (!can.view) return json(res, 404, { error: 'That certificate was deleted.' });
+        const item = { ...prev };
+        if (body.data !== undefined) {
+          if (!can.edit) return json(res, 403, { error: 'You can view this certificate but not edit it.' });
+          const data = clean(body.data);
+          if (!data) return json(res, 400, { error: 'Nothing to save.' });
+          item.data = data;
+          item.updatedBy = me.email;
+          item.updatedAt = now;
+        }
+        if (body.access !== undefined) {
+          if (!can.manage) return json(res, 403, { error: 'Only the owner can change who has access.' });
+          const access = cleanAccess(body.access, prev.savedBy);
+          if (typeof access === 'string') return json(res, 400, { error: access });
+          item.access = access;
+        }
+        await pipe(cfg, [['HSET', KEY, item.id, JSON.stringify(item)]]);
+        return json(res, 200, { item: present(item, me) });
       }
+
+      const data = clean(body.data);
+      if (!data) return json(res, 400, { error: 'Nothing to save.' });
+      const r = await pipe(cfg, [['HLEN', KEY]]);
+      if ((r[0] && r[0].result) >= MAX_ITEMS) return json(res, 507, { error: 'The list is full. Delete some old certificates first.' });
+      const access = body.access ? cleanAccess(body.access, me.email) : DEFAULT_ACCESS;
+      if (typeof access === 'string') return json(res, 400, { error: access });
+      const item = { id: newId(), data, access, savedBy: me.email, savedAt: now, updatedBy: me.email, updatedAt: now };
       await pipe(cfg, [['HSET', KEY, item.id, JSON.stringify(item)]]);
-      return json(res, 200, { item });
+      return json(res, 200, { item: present(item, me) });
     }
 
     if (req.method === 'DELETE') {
       const id = String((req.query && req.query.id) || '');
       if (!/^[a-f0-9]{18}$/.test(id)) return json(res, 400, { error: 'Bad id.' });
+      const prev = await load(id);
+      if (prev && !perms(prev, me).manage) return json(res, 403, { error: 'Only the owner can delete this certificate.' });
       await pipe(cfg, [['HDEL', KEY, id]]);
       return json(res, 200, { ok: true, id });
     }

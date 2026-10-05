@@ -190,11 +190,181 @@ function TrashIcon() {
     </svg>
   );
 }
+function CloseIcon() {
+  return (
+    <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
+      <path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z" />
+    </svg>
+  );
+}
+function UsersIcon() {
+  return (
+    <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
+      <path d="M117.25,157.92a60,60,0,1,0-66.5,0A95.83,95.83,0,0,0,3.53,195.63a8,8,0,1,0,13.4,8.74,80,80,0,0,1,134.14,0,8,8,0,0,0,13.4-8.74A95.83,95.83,0,0,0,117.25,157.92ZM40,108a44,44,0,1,1,44,44A44.05,44.05,0,0,1,40,108Zm210.14,98.7a8,8,0,0,1-11.07-2.33A79.83,79.83,0,0,0,172,168a8,8,0,0,1,0-16,44,44,0,1,0-16.34-84.87,8,8,0,1,1-5.94-14.85,60,60,0,0,1,55.53,105.64,95.83,95.83,0,0,1,47.22,37.71A8,8,0,0,1,250.14,206.7Z" />
+    </svg>
+  );
+}
 function CheckIcon() {
   return (
     <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
       <path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z" />
     </svg>
+  );
+}
+
+/* ── overlays: the library's modal and confirm dialog, on the tool shell's tokens ── */
+function Modal({ open, onClose, title, desc, size = 'md', alert = false, initialFocus, children, foot }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const d = ref.current;
+    if (!d) return;
+    if (open && !d.open) {
+      d.showModal();
+      const f = initialFocus && d.querySelector(initialFocus);
+      if (f) f.focus();
+    }
+    if (!open && d.open) d.close();
+  }, [open]);
+  return (
+    <dialog ref={ref} className={`t-modal t-modal--${size}`} role={alert ? 'alertdialog' : 'dialog'} aria-labelledby="t-modal-title"
+      onCancel={(e) => { e.preventDefault(); onClose(); }}
+      onMouseDown={(e) => { if (e.target === ref.current) onClose(); }}>
+      {open && (
+        <>
+          <div className="t-modal__head">
+            <div>
+              <h2 className="t-modal__title" id="t-modal-title">{title}</h2>
+              {desc && <p className="t-modal__desc">{desc}</p>}
+            </div>
+            <button type="button" className="t-modal__close" onClick={onClose} aria-label="Close"><CloseIcon /></button>
+          </div>
+          <div className="t-modal__body">{children}</div>
+          <div className="t-modal__foot">{foot}</div>
+        </>
+      )}
+    </dialog>
+  );
+}
+
+function RoleSwitch({ value, onChange, labels = { view: 'Can view', edit: 'Can edit' } }) {
+  return (
+    <div className="prop-segmented role-switch" role="tablist">
+      {['view', 'edit'].map((r) => (
+        <button key={r} type="button" role="tab" aria-selected={value === r} className={value === r ? 'active' : ''} onClick={() => onChange(r)}>{labels[r]}</button>
+      ))}
+    </div>
+  );
+}
+
+function accessLine(a) {
+  const access = a || { general: 'tool', role: 'edit', people: [] };
+  const n = (access.people || []).length;
+  const extra = n ? ` · ${n} ${n === 1 ? 'person' : 'people'} added` : '';
+  return access.general === 'restricted'
+    ? `Only people added${n ? ` (${n})` : ''}`
+    : `Everyone with the tool can ${access.role === 'view' ? 'view' : 'edit'}${extra}`;
+}
+
+function AccessModal({ item, onClose, onSaved }) {
+  const [access, setAccess] = useState(() => JSON.parse(JSON.stringify(item.access || { general: 'tool', role: 'edit', people: [] })));
+  const [email, setEmail] = useState('');
+  const [role, setRole] = useState('edit');
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+  const add = () => {
+    const e = email.trim().toLowerCase();
+    if (!e) return;
+    if (!/^[^\s@]+@gushwork\.ai$/.test(e)) { setError('Add a work address ending in @gushwork.ai.'); return; }
+    if (e === item.savedBy) { setError('That is the owner, who always has access.'); return; }
+    setError('');
+    setAccess((a) => ({ ...a, people: [...a.people.filter((p) => p.email !== e), { email: e, role }] }));
+    setEmail('');
+  };
+  const setPerson = (e, r) => setAccess((a) => ({ ...a, people: a.people.map((p) => (p.email === e ? { ...p, role: r } : p)) }));
+  const drop = (e) => setAccess((a) => ({ ...a, people: a.people.filter((p) => p.email !== e) }));
+  const submit = async () => {
+    setBusy(true); setError('');
+    try {
+      const j = await api('POST', { id: item.id, access });
+      onSaved(j.item);
+    } catch (e) { setError(e.message); setBusy(false); }
+  };
+  return (
+    <Modal open onClose={onClose} title={item.data.name ? `Share ${item.data.name}'s certificate` : 'Share this certificate'}
+      desc="Choose who can see and edit this certificate. The tool's own access still applies on top."
+      initialFocus=".acc-add input"
+      foot={<>
+        <button type="button" className="r-btn" onClick={onClose}>Cancel</button>
+        <button type="button" className="r-btn r-btn--primary" onClick={submit} disabled={busy}>{busy ? 'Saving…' : 'Save access'}</button>
+      </>}>
+      <div className="acc-block">
+        <span className="acc-label">Add people</span>
+        <div className="acc-add">
+          <input className="prop-input" type="email" value={email} placeholder="name@gushwork.ai"
+            onChange={(e) => setEmail(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); add(); } }} />
+          <RoleSwitch value={role} onChange={setRole} labels={{ view: 'View', edit: 'Edit' }} />
+          <button type="button" className="r-btn" onClick={add}>Add</button>
+        </div>
+        {error && <p className="prop-tip saved-error">{error}</p>}
+      </div>
+
+      <div className="acc-block">
+        <span className="acc-label">People with access</span>
+        <ul className="acc-people">
+          <li>
+            <span className="acc-avatar" aria-hidden>{who(item.savedBy).slice(0, 1).toUpperCase()}</span>
+            <span className="acc-who"><span className="saved-name">{who(item.savedBy)}</span><span className="saved-meta">{item.savedBy}</span></span>
+            <span className="acc-owner">Owner</span>
+          </li>
+          {access.people.map((p) => (
+            <li key={p.email}>
+              <span className="acc-avatar" aria-hidden>{who(p.email).slice(0, 1).toUpperCase()}</span>
+              <span className="acc-who"><span className="saved-name">{who(p.email)}</span><span className="saved-meta">{p.email}</span></span>
+              <RoleSwitch value={p.role} onChange={(r) => setPerson(p.email, r)} labels={{ view: 'View', edit: 'Edit' }} />
+              <button type="button" className="saved-del acc-remove" onClick={() => drop(p.email)} aria-label={`Remove ${p.email}`} title="Remove"><CloseIcon /></button>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="acc-block">
+        <span className="acc-label">General access</span>
+        <div className="prop-segmented acc-general" role="tablist">
+          <button type="button" role="tab" aria-selected={access.general === 'tool'} className={access.general === 'tool' ? 'active' : ''}
+            onClick={() => setAccess((a) => ({ ...a, general: 'tool' }))}>Everyone with the tool</button>
+          <button type="button" role="tab" aria-selected={access.general === 'restricted'} className={access.general === 'restricted' ? 'active' : ''}
+            onClick={() => setAccess((a) => ({ ...a, general: 'restricted' }))}>Only people added</button>
+        </div>
+        {access.general === 'tool' ? (
+          <div className="acc-row">
+            <span className="prop-tip">Everyone who can open this tool</span>
+            <RoleSwitch value={access.role} onChange={(r) => setAccess((a) => ({ ...a, role: r }))} />
+          </div>
+        ) : (
+          <p className="prop-tip">Only you, the people above and hub admins can see it. It disappears from everyone else's list.</p>
+        )}
+      </div>
+    </Modal>
+  );
+}
+
+function ConfirmDelete({ item, onCancel, onConfirm }) {
+  const [busy, setBusy] = useState(false);
+  return (
+    <Modal open alert size="sm" onClose={onCancel} title={item.data.name ? `Delete ${item.data.name}'s certificate?` : 'Delete this certificate?'}
+      desc="It is removed for everyone who can see it, and the links to it stop working. This cannot be undone."
+      initialFocus=".t-cancel"
+      foot={<>
+        <button type="button" className="r-btn t-cancel" onClick={onCancel}>Cancel</button>
+        <button type="button" className="r-btn r-btn--danger" disabled={busy} onClick={async () => { setBusy(true); await onConfirm(); }}>
+          {busy ? 'Deleting…' : 'Delete certificate'}
+        </button>
+      </>}>
+      <ul className="t-confirm__lost">
+        <li>{item.data.name || 'Untitled'} · {awardLine(item.data) || 'No award'}</li>
+        <li className="saved-meta">Saved by {who(item.savedBy)}, {when(item.savedAt)}</li>
+      </ul>
+    </Modal>
   );
 }
 
@@ -212,7 +382,9 @@ function App() {
   const [saveState, setSaveState] = useState('idle'); // idle | working | ok | err
   const [saveError, setSaveError] = useState('');
   const [shareState, setShareState] = useState('idle');
-  const [confirmDelete, setConfirmDelete] = useState('');
+  const [confirmItem, setConfirmItem] = useState(null);   // the certificate the delete dialog asks about
+  const [accessItem, setAccessItem] = useState(null);     // the certificate the share dialog edits
+  const [linkError, setLinkError] = useState('');
   const [filter, setFilter] = useState('');
   const certRef = useRef(null);
   const stageRef = useRef(null);
@@ -248,6 +420,7 @@ function App() {
       if (!h.saved) return;
       const it = items.find((x) => x.id === h.saved);
       if (it) { setData((prev) => ({ ...prev, ...it.data })); setCurrent(it); }
+      else setLinkError('That certificate was deleted, or it is not shared with you. Ask its owner for access.');
     });
   }, [loadList]);
 
@@ -341,7 +514,7 @@ function App() {
   const openItem = (it) => {
     setData((prev) => ({ ...prev, ...it.data }));
     setCurrent(it);
-    setConfirmDelete('');
+    setLinkError('');
     history.replaceState(null, '', '#saved=' + it.id);
   };
   const startNew = () => {
@@ -351,7 +524,6 @@ function App() {
   };
   // delete happens only from the confirm's own Delete button
   const remove = async (it) => {
-    setConfirmDelete('');
     try {
       await api('DELETE', null, '?id=' + it.id);
       setSaved((st) => ({ ...st, items: st.items.filter((x) => x.id !== it.id) }));
@@ -359,7 +531,15 @@ function App() {
     } catch (e) {
       setSaved((st) => ({ ...st, error: e.message }));
     }
+    setConfirmItem(null);
   };
+  const accessSaved = (item) => {
+    setSaved((st) => ({ ...st, items: st.items.map((x) => (x.id === item.id ? item : x)) }));
+    if (current && current.id === item.id) setCurrent(item);
+    setAccessItem(null);
+  };
+  const canEdit = !current || !current.can || current.can.edit;
+  const canManage = !!(current && (!current.can || current.can.manage));
   const q = filter.trim().toLowerCase();
   const shown = saved.items.filter((it) => !q || [it.data.name, awardLine(it.data), it.savedBy, it.updatedBy].join(' ').toLowerCase().includes(q));
 
@@ -460,7 +640,8 @@ function App() {
                 <>
                   <div><dt>Created</dt><dd>{who(current.savedBy)}, {when(current.savedAt)}</dd></div>
                   <div><dt>Last edited</dt><dd>{who(current.updatedBy)}, {whenTime(current.updatedAt)}</dd></div>
-                  <div><dt>Status</dt><dd>{dirty ? 'Unsaved changes' : 'Saved'}</dd></div>
+                  <div><dt>Status</dt><dd>{!canEdit ? 'View only' : dirty ? 'Unsaved changes' : 'Saved'}</dd></div>
+                  <div><dt>Access</dt><dd title={accessLine(current.access)}>{accessLine(current.access)}</dd></div>
                 </>
               ) : (
                 <div><dt>Status</dt><dd>Not saved yet</dd></div>
@@ -469,9 +650,10 @@ function App() {
           </div>
           <div className="right-actions">
             <button type="button" className="r-btn r-btn--primary" onClick={save}
-              disabled={saveState === 'working' || (current && !dirty) || saved.state === 'error'}>
+              disabled={saveState === 'working' || (current && !dirty) || saved.state === 'error' || !canEdit}
+              title={!canEdit ? 'You can view this certificate. Ask its owner for edit access.' : undefined}>
               {saveState === 'ok' && !dirty ? <CheckIcon /> : <SaveIcon />}
-              {saveState === 'working' ? 'Saving…' : saveState === 'ok' && !dirty ? 'Saved' : saveState === 'err' ? 'Failed. Try again' : current ? (dirty ? 'Save changes' : 'Saved') : 'Save'}
+              {saveState === 'working' ? 'Saving…' : saveState === 'ok' && !dirty ? 'Saved' : saveState === 'err' ? 'Failed. Try again' : !canEdit ? 'View only' : current ? (dirty ? 'Save changes' : 'Saved') : 'Save'}
             </button>
             <button type="button" className={`r-btn${shareState === 'err' ? ' is-error' : ''}`} onClick={share}>
               {shareState === 'ok' ? <CheckIcon /> : <LinkIcon />}
@@ -480,19 +662,18 @@ function App() {
           </div>
           {saveState === 'err' && <p className="prop-tip saved-error">{saveError}</p>}
           <p className="prop-tip">{current && !dirty
-            ? 'The link opens this saved certificate for anyone with access to the tool.'
+            ? (current.access && current.access.general === 'restricted'
+              ? 'The link opens this certificate only for the people who have access to it.'
+              : 'The link opens this saved certificate for anyone with access to the tool.')
             : 'Unsaved, the link carries the details in it. Save first to share the copy everyone edits.'}</p>
-          {current && (confirmDelete === current.id ? (
-            <div className="del-confirm" role="alertdialog" aria-label="Confirm delete">
-              <p>Delete {current.data.name || 'this certificate'}'s certificate? It is removed for everyone, and this cannot be undone.</p>
-              <div className="del-confirm__acts">
-                <button type="button" className="r-btn" onClick={() => setConfirmDelete('')}>Cancel</button>
-                <button type="button" className="r-btn r-btn--danger" onClick={() => remove(current)}>Delete</button>
-              </div>
+          {canManage && (
+            <div className="right-actions">
+              <button type="button" className="r-btn" onClick={() => setAccessItem(current)}><UsersIcon /> Manage access</button>
+              <button type="button" className="r-btn r-btn--danger-quiet" onClick={() => setConfirmItem(current)}><TrashIcon /> Delete</button>
             </div>
-          ) : (
-            <button type="button" className="r-link-danger" onClick={() => setConfirmDelete(current.id)}><TrashIcon /> Delete this certificate</button>
-          ))}
+          )}
+          {current && !canManage && <p className="prop-tip">Owned by {who(current.savedBy)}. Only they can change who has access or delete it.</p>}
+          {linkError && <p className="prop-tip saved-error">{linkError}</p>}
         </section>
 
         <section className="prop-section saved-section">
@@ -510,27 +691,17 @@ function App() {
           {saved.state === 'ready' && shown.length > 0 && (
             <ul className="saved-list">
               {shown.map((it) => (
-                <li key={it.id} className={`saved-row${current && current.id === it.id ? ' is-on' : ''}${confirmDelete === it.id ? ' is-confirming' : ''}`}>
-                  {confirmDelete === it.id && !(current && current.id === it.id) ? (
-                    <div className="del-confirm del-confirm--row" role="alertdialog" aria-label="Confirm delete">
-                      <p>Delete {it.data.name || 'this certificate'}'s certificate for everyone?</p>
-                      <div className="del-confirm__acts">
-                        <button type="button" className="r-btn" onClick={() => setConfirmDelete('')}>Cancel</button>
-                        <button type="button" className="r-btn r-btn--danger" onClick={() => remove(it)}>Delete</button>
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      <button type="button" className="saved-open" onClick={() => openItem(it)}>
-                        <span className="saved-name">{it.data.name || 'Untitled'}</span>
-                        <span className="saved-meta">{awardLine(it.data) || 'No award'}</span>
-                        <span className="saved-meta">Saved by {who(it.savedBy)}, {when(it.savedAt)}</span>
-                        {(it.updatedAt !== it.savedAt) && <span className="saved-meta">Edited by {who(it.updatedBy)}, {when(it.updatedAt)}</span>}
-                      </button>
-                      <button type="button" className="saved-del" onClick={() => setConfirmDelete(it.id)} aria-label="Delete" title="Delete">
-                        <TrashIcon />
-                      </button>
-                    </>
+                <li key={it.id} className={`saved-row${current && current.id === it.id ? ' is-on' : ''}`}>
+                  <button type="button" className="saved-open" onClick={() => openItem(it)}>
+                    <span className="saved-name">{it.data.name || 'Untitled'}{it.access && it.access.general === 'restricted' && <span className="saved-tag">Restricted</span>}{it.can && !it.can.edit && <span className="saved-tag">View only</span>}</span>
+                    <span className="saved-meta">{awardLine(it.data) || 'No award'}</span>
+                    <span className="saved-meta">Saved by {who(it.savedBy)}, {when(it.savedAt)}</span>
+                    {(it.updatedAt !== it.savedAt) && <span className="saved-meta">Edited by {who(it.updatedBy)}, {when(it.updatedAt)}</span>}
+                  </button>
+                  {(!it.can || it.can.manage) && (
+                    <button type="button" className="saved-del" onClick={() => setConfirmItem(it)} aria-label={`Delete ${it.data.name || 'certificate'}`} title="Delete">
+                      <TrashIcon />
+                    </button>
                   )}
                 </li>
               ))}
@@ -539,6 +710,9 @@ function App() {
           {saved.state === 'ready' && saved.error && <p className="prop-tip saved-error">{saved.error}</p>}
         </section>
       </div>
+
+      {accessItem && <AccessModal item={accessItem} onClose={() => setAccessItem(null)} onSaved={accessSaved} />}
+      {confirmItem && <ConfirmDelete item={confirmItem} onCancel={() => setConfirmItem(null)} onConfirm={() => remove(confirmItem)} />}
 
       <main className="preview-col" ref={stageRef}>
         <div className="cert-stage">

@@ -233,30 +233,69 @@ html[data-tool-panel="open"] .t-acts { right: calc(var(--t-panel-w) + var(--t-in
 .r-btn--primary { background: var(--t-primary-bg); color: var(--t-primary-fg); border-color: transparent; }
 .r-btn--primary:hover:not(:disabled) { background: var(--t-primary-hover); }
 .r-btn:disabled { cursor: default; opacity: .5; }
-.r-btn--danger { background: var(--t-danger-bg); color: var(--t-danger); border-color: var(--t-danger); box-shadow: none; }
-.r-btn--danger:hover { background: var(--t-danger-bg); }
+/* danger, per the library's confirm dialog: a red label and a red edge on the neutral shape, never a red fill */
+.r-btn--danger { color: var(--t-danger); border-color: var(--t-danger); }
+.r-btn--danger:hover:not(:disabled) { background: var(--t-danger-bg); }
+/* the trigger: the neutral outlined shape with a red label */
+.r-btn--danger-quiet { color: var(--t-danger); }
+.r-btn--danger-quiet:hover:not(:disabled) { background: var(--t-danger-bg); }
 .r-btn.is-error { color: var(--t-danger); border-color: var(--t-danger); }
 
-.r-link-danger {
-  align-self: flex-start; display: inline-flex; align-items: center; gap: var(--gw-space-8);
-  height: 28px; padding: 0 var(--gw-space-8); margin-left: calc(var(--gw-space-8) * -1);
-  background: transparent; border: 0; border-radius: var(--gw-radius-8);
-  color: var(--t-danger); font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); cursor: pointer;
+.saved-tag {
+  display: inline-flex; align-items: center; height: 20px; margin-left: var(--gw-space-8); padding: 0 var(--gw-space-8);
+  border: 1px solid var(--t-field-border); border-radius: var(--gw-radius-full);
+  font: var(--gw-text-body-10-reg); color: var(--t-label); vertical-align: 2px;
 }
-.r-link-danger svg { width: 16px; height: 16px; }
-.r-link-danger:hover { background: var(--t-danger-bg); }
 
-/* the confirm: asks in words, two explicit buttons, nothing deletes on one click */
-.del-confirm {
-  display: flex; flex-direction: column; gap: var(--gw-space-12);
-  padding: var(--gw-space-12); background: var(--t-danger-bg);
-  border: 1px solid var(--t-danger); border-radius: var(--gw-radius-12);
+/* ── Modal: the library's modal (dashboard overlays.md) on the tool's tokens.
+   md 480, sm 400, never wider than the viewport minus 32; max height 640 and the body scrolls.
+   Radius 16, s3, a 1px panel border; scrim black at 44%. Head: title body-16-sem, a description,
+   close. Foot: right-aligned, secondary first, primary last. Native <dialog>: focus trap, Esc. */
+.t-modal {
+  --_w: 480px; width: min(var(--_w), calc(100vw - 32px)); max-height: min(640px, calc(100dvh - 64px));
+  margin: auto; padding: 0; overflow: hidden;
+  background: var(--t-panel-bg); color: var(--t-text);
+  border: 1px solid var(--t-panel-border); border-radius: var(--gw-radius-16); box-shadow: var(--gw-shadow-s3);
 }
-.del-confirm p { margin: 0; font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); color: var(--t-heading); }
-.del-confirm__acts { display: flex; justify-content: flex-end; gap: var(--gw-space-8); }
-.del-confirm__acts .r-btn { height: 32px; border-radius: var(--gw-radius-8); }
-.del-confirm--row { flex: 1; min-width: 0; padding: var(--gw-space-8); border-radius: var(--gw-radius-8); }
-.saved-row.is-confirming { padding: 0; }
+.t-modal[open] { display: flex; flex-direction: column; }
+.t-modal--sm { --_w: 400px; }
+.t-modal::backdrop { background: color-mix(in srgb, var(--gw-color-black) 44%, transparent); }
+.t-modal__head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--gw-space-12); padding: var(--gw-space-16) var(--gw-space-16) 0; }
+.t-modal__title { margin: 0; font: var(--gw-text-body-16-sem); letter-spacing: var(--gw-text-body-16-sem-tracking); color: var(--t-heading); }
+.t-modal__desc { margin: var(--gw-space-4) 0 0; font: var(--gw-text-body-14-reg); letter-spacing: var(--gw-text-body-14-reg-tracking); color: var(--t-label); }
+.t-modal__close {
+  flex: none; width: 28px; height: 28px; display: grid; place-items: center; padding: 0;
+  background: transparent; border: 1px solid var(--t-btn-border); border-radius: var(--gw-radius-8);
+  color: var(--t-label); cursor: pointer;
+}
+.t-modal__close svg { width: 12px; height: 12px; }
+.t-modal__close:hover { background: var(--t-hover); color: var(--t-heading); }
+.t-modal__body { flex: 1; min-height: 0; overflow-y: auto; padding: var(--gw-space-16); display: flex; flex-direction: column; gap: var(--gw-space-16); }
+.t-modal__foot { display: flex; justify-content: flex-end; gap: var(--gw-space-8); padding: 0 var(--gw-space-16) var(--gw-space-16); }
+.t-confirm__lost {
+  margin: 0; padding: var(--gw-space-12) var(--gw-space-16); list-style: none; display: flex; flex-direction: column; gap: var(--gw-space-4);
+  border-radius: var(--gw-radius-8); background: var(--t-field-bg); color: var(--t-heading); font: var(--gw-text-body-14-med);
+}
+
+/* the share dialog */
+.acc-block { display: flex; flex-direction: column; gap: var(--gw-space-8); }
+.acc-label { font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); color: var(--t-label); }
+.acc-add { display: flex; align-items: center; gap: var(--gw-space-8); }
+.acc-add .prop-input { flex: 1; }
+.acc-people { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--gw-space-4); }
+.acc-people li { display: flex; align-items: center; gap: var(--gw-space-12); min-height: 44px; padding: var(--gw-space-4) 0; }
+.acc-avatar {
+  flex: none; width: 32px; height: 32px; display: grid; place-items: center; border-radius: var(--gw-radius-full);
+  background: var(--t-field-bg); border: 1px solid var(--t-field-border); color: var(--t-heading); font: var(--gw-text-body-12-med);
+}
+.acc-who { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.acc-owner { font: var(--gw-text-body-12-med); color: var(--t-label); padding: 0 var(--gw-space-8); }
+.acc-remove { opacity: 1; }
+.acc-remove svg { width: 12px; height: 12px; }
+.acc-row { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-12); }
+.acc-general { display: grid; grid-template-columns: 1fr 1fr; }
+.role-switch { flex: none; display: inline-flex; }
+.prop-segmented button { cursor: pointer; }
 
 @media (max-width: 900px) {
   .app { --t-offset-r: 0px; }
@@ -265,3 +304,4 @@ html[data-tool-panel="open"] .t-acts { right: calc(var(--t-panel-w) + var(--t-in
   .app[data-panel="open"] .right-col { box-shadow: var(--gw-shadow-s4); top: auto; max-height: 50vh; }
 }
 @media (prefers-reduced-motion: reduce) { .right-col, .app .preview-col { transition: none; } }
+.prop-segmented { display: inline-flex; align-items: center; }
