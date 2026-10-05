@@ -177,6 +177,18 @@ t('a reviewer\'s DM that is not a question is ticked AND answered in words, so t
   o = await handleMessage(ev('check the routines', 'UUTSAV'), { ...deps, fire: async () => ({ fired: false, why: 'not set' }) });
   t('no trigger configured: Bruce says so in the thread', [o.did, calls.at(-1).method, calls.at(-1).body.thread_ts], ['bruce-failed', 'chat.postMessage', '300.3']);
   ok('greetings stay with the concierge', forBruce(understand('hi', catalog)) === false);
+  // A reply under an Alfred ping goes to Alfred; any other thread reply goes to Bruce.
+  const sent = [];
+  const pingDeps = { ...deps, findPing: async (tok, ch, ts) => (ts === '400.4' ? { issue: 7, scope: 'web', key: 'timeline' } : null), toAlfred: async (p, text) => { sent.push([p.issue, text]); return { ok: true, fired: true }; } };
+  calls.length = 0;
+  o = await handleMessage(ev('make the blue darker', 'UUTSAV', { thread_ts: '400.4', ts: '401.1' }), pingDeps);
+  t('a reply under an Alfred ping goes to his thread, ticked, said in words', [o.did, sent, calls.map((c) => c.method), calls.at(-1).body.thread_ts], ['to-alfred', [[7, 'make the blue darker']], ['reactions.add', 'chat.postMessage'], '400.4']);
+  calls.length = 0;
+  o = await handleMessage(ev('and the other one?', 'UUTSAV', { thread_ts: '500.5', ts: '501.1' }), pingDeps);
+  t('a reply in any other thread is for Bruce', [o.did, sent.length], ['bruce', 1]);
+  calls.length = 0;
+  o = await handleMessage(ev('do it', 'UUTSAV', { thread_ts: '400.4', ts: '402.1' }), { ...pingDeps, toAlfred: async () => ({ ok: false, why: 'the site has no GitHub token' }) });
+  t('if it cannot reach Alfred it says so', [o.did, calls.at(-1).body.text.includes('no GitHub token')], ['to-alfred-failed', true]);
 }
 
 calls.length = 0;

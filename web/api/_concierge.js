@@ -379,6 +379,27 @@ export async function fireBruce(event, env = process.env, f = fetch) {
   } catch { return { fired: false, why: 'unreachable' }; }
 }
 
+/* A reply in the thread of one of Bruce's Alfred pings (scripts/bruce-pings.mjs) is an answer to Alfred, not a new ask:
+   it goes to the item's GitHub thread and starts Alfred in reply mode, the same as replying in the review drawer. The
+   ping carries { issue, scope, key } as Slack message metadata. Returns null when the thread is not a single-item ping. */
+export async function pingOf(token, channel, threadTs) {
+  const j = await slack(token, 'conversations.replies', { channel, ts: threadTs, limit: '1', include_all_metadata: 'true' }, true);
+  const m = j.messages && j.messages[0] && j.messages[0].metadata;
+  if (!m || m.event_type !== 'gw_alfred_ping') return null;
+  const p = m.event_payload || {};
+  return Number(p.issue) && /^[a-z0-9-]{1,32}$/.test(p.scope) && /^[a-z0-9-]{1,80}$/.test(p.key) ? { issue: Number(p.issue), scope: p.scope, key: p.key } : null;
+}
+
+export async function replyToAlfred(ping, text) {
+  const gh = process.env.GW_GITHUB_TOKEN || '';
+  if (!gh) return { ok: false, why: 'the site has no GitHub token' };
+  const { postComment, ownerComment } = await import('./_review-thread.js');
+  const { fireRework } = await import('./_review.js');
+  await postComment(gh, ping.issue, ownerComment(String(text).slice(0, 2000)));
+  const run = await fireRework({ scope: ping.scope, key: ping.key, reply: String(text).slice(0, 2000), thread: ping.issue });
+  return { ok: true, fired: run.fired };
+}
+
 /* Utsav's DMs go to the routine unless the concierge can answer outright: a file, a template or a tool. */
 export function forBruce(u) {
   if (u.greeting || u.thanks) return false;
@@ -392,7 +413,7 @@ export function forBruce(u) {
  * so the caller can still answer 200 and Slack does not retry.
  */
 export async function handleMessage(event, deps) {
-  const { token, root, owners = new Set(), bruceUsers = new Set(), fire = fireBruce } = deps;
+  const { token, root, owners = new Set(), bruceUsers = new Set(), fire = fireBruce, findPing = pingOf, toAlfred = replyToAlfred } = deps;
   const isDm = event.type === 'message';
   if (!event.user || event.bot_id || (event.subtype && event.subtype !== 'file_share')) return { did: 'ignored' };
   const catalog = buildCatalog(root);
@@ -401,6 +422,22 @@ export async function handleMessage(event, deps) {
   const asked = u.parts.length > 0 || u.designRequest || u.greeting || u.thanks || u.help;
   const threadTs = isDm ? event.thread_ts : event.thread_ts || event.ts;
   try {
+    // His reply under an Alfred ping is for Alfred.
+    if (isDm && bruceUsers.has(event.user) && event.thread_ts) {
+      let ping = null;
+      try { ping = await findPing(token, event.channel, event.thread_ts); } catch { /* not a ping we can read: Bruce takes it */ }
+      if (ping) {
+        let out;
+        try { out = await toAlfred(ping, event.text || ''); } catch (e) { out = { ok: false, why: 'GitHub refused it' }; }
+        if (out.ok) {
+          try { await slack(token, 'reactions.add', { channel: event.channel, timestamp: event.ts, name: 'white_check_mark' }); } catch { /* the line below says it */ }
+          await slack(token, 'chat.postMessage', { channel: event.channel, thread_ts: event.thread_ts, text: out.fired ? 'Passed to Alfred. He’ll answer in the item’s thread, and I’ll let you know.' : 'I put it on the item’s thread, but Alfred didn’t start. He’ll pick it up in the 9pm sweep.' });
+          return { did: 'to-alfred' };
+        }
+        await slack(token, 'chat.postMessage', { channel: event.channel, thread_ts: event.thread_ts, text: `I couldn’t pass that to Alfred (${out.why}). Reply in the item’s drawer instead.` });
+        return { did: 'to-alfred-failed' };
+      }
+    }
     // Utsav's own DM: Bruce proper. A 👀 says it was picked up; the routine answers in the thread.
     if (isDm && bruceUsers.has(event.user) && forBruce(u)) {
       const replyTs = event.thread_ts || event.ts;
