@@ -197,8 +197,8 @@ Manual update, when someone hasn't:
 claude plugin marketplace update gushwork && claude plugin update gushwork-design@gushwork
 ```
 
-**A restart is required either way.** Claude Code says so on install and it means it — a
-teammate who updates without restarting is still on the old skills.
+**Then `/reload-plugins` in the chat.** No restart since Claude Code 2.1 — but a teammate who
+updates and does neither is still on the old skills.
 
 ## Checking what someone is actually running
 

@@ -193,6 +193,7 @@ except Exception:
     sys.exit(0)
 print(json.dumps({
     "version": mk.get("metadata", {}).get("version"),
+    "notify": (lambda s: (json.loads(s) if s.strip() else None))(at_head(".claude-plugin/notify.json")),
     "components": {k: {"version": v.get("version"), "breaking": bool(v.get("breaking"))}
                    for k, v in reg.get("components", {}).items()},
 }))
@@ -237,6 +238,16 @@ lv, rv = semver(local), semver(remote)
 if not lv or not rv or rv <= lv:
     sys.exit(0)                                    # current, or unparseable — say nothing
 
+# Behind is not enough (R51, 5 Oct 2026). Utsav releases at night, and most bumps are site, hub
+# or log work that changes nothing a teammate builds with; auto-update carries those in silently.
+# The notice fires only when the newest release he FLAGGED — `notify` in version.json, written by
+# release.sh --notify after he said yes — is ahead of this copy. No flag, or a flag this copy
+# already has: say nothing. The autoUpdate flip below still runs, so the quiet path still updates.
+nf = d.get("notify") or {}
+nv = semver(nf.get("version"))
+flagged = bool(nv) and nv > lv
+
+
 # Which components moved since the copy this session is running, and which of those break a
 # build that used them. Same comparison check-drift.sh makes against a stamped artifact.
 must, also = [], []
@@ -245,7 +256,11 @@ for name, c in (d.get("components") or {}).items():
     if cv and cv > lv:
         (must if c.get("breaking") else also).append(name)
 
-print(json.dumps({"remote": remote, "breaking": sorted(must), "changed": sorted(also)}))
+print(json.dumps({"remote": remote, "flagged": flagged, "summary": (nf.get("summary") or "")[:200],
+                  "notify_version": nf.get("version") if flagged else None,
+                  "links": [l for l in (nf.get("links") or []) if isinstance(l, str) and l.startswith("http")][:4],
+                  "changelog": d.get("notice") or "",
+                  "breaking": sorted(must), "changed": sorted(also)}))
 PY
 )"
 [ -n "$VERDICT" ] || exit 0
@@ -274,6 +289,10 @@ print("yes")
 PY
 )"
 
+# ── quiet path: behind, but not flagged — the flip above was the whole job ─────────────────
+VERDICT="$VERDICT" python3 -c 'import json,os,sys; sys.exit(0 if json.loads(os.environ["VERDICT"]).get("flagged") else 1)' \
+  2>/dev/null || exit 0
+
 # ── say it ─────────────────────────────────────────────────────────────────────────────────
 # systemMessage reaches the person; additionalContext reaches Claude, so it can answer "am I
 # current?" without re-deriving any of this. Plain stdout would land in both, unstructured.
@@ -285,14 +304,24 @@ local, remote = os.environ["LOCAL_VERSION"], v["remote"]
 breaking, changed = v["breaking"], v["changed"]
 flipped = os.environ.get("FLIPPED") == "yes"
 
-head = f"Gushwork design system v{remote} is out — this session is on v{local}."
+# A colleague's voice, not a status line (Utsav, 5 Oct 2026: "too mechanical — make it more humane").
+head = f"You're on Gushwork design system v{local}, and v{remote} is out."
+# Only the flagged release is described — Utsav (5 Oct 2026): "no need to tell about prev
+# versions, talk about what got added in the version that is getting added". The changelog
+# sheet is always linked for anyone who wants the rest; --link adds pages that explain it.
+nv = v.get("notify_version") or remote
+if v.get("summary"):
+    head += f" v{nv} brought {v['summary']}." if nv != remote else f" It brings {v['summary']}."
+links = [l for l in (v.get("links") or [])] + ([v["changelog"]] if v.get("changelog") else [])
+if links:
+    head += " Read more: " + " · ".join(links) + "."
 # How far behind, in minor releases, when the major matches: "11 releases behind" is a different
 # message from "1 behind", and the first is the one that gets acted on.
 try:
     lm, rm = [int(x) for x in local.split(".")[:2]], [int(x) for x in remote.split(".")[:2]]
     gap = rm[1] - lm[1] if lm[0] == rm[0] else 0
     if gap >= 3:
-        head += f" That is {gap} releases behind."
+        head += f" You're {gap} releases back."
 except Exception:
     pass
 bits = []
@@ -305,11 +334,13 @@ if bits:
     head += " " + " · ".join(bits) + "."
 
 if flipped:
-    tail = ("Auto-update was off on this machine — it is on now, so the next start picks this up. "
-            "To take it now: claude plugin update gushwork-design@gushwork, then restart.")
+    tail = ("Auto-update was off on this machine; I turned it on, so the next start picks this up. "
+            "To take it now: claude plugin update gushwork-design@gushwork, then /reload-plugins in "
+            "the chat. No restart.")
 else:
-    tail = ("Auto-update should land this at your next start. To take it now: "
-            "claude plugin update gushwork-design@gushwork, then restart.")
+    tail = ("It lands on its own at your next start. To take it now: "
+            "claude plugin update gushwork-design@gushwork, then /reload-plugins in the chat. "
+            "No restart.")
 
 # `systemMessage` is a UNIVERSAL field and sits at the TOP LEVEL of the envelope. Inside
 # `hookSpecificOutput` it is silently ignored (confirmed against the hooks docs, 1 Oct 2026), which
@@ -318,21 +349,32 @@ print(json.dumps({"systemMessage": head + " " + tail, "hookSpecificOutput": {
     "hookEventName": "SessionStart",
     "additionalContext": (
         f"Gushwork design system: running v{local}, v{remote} is available. "
+        + (f"What is new in v{nv}: {v['summary']}. " if v.get("summary") else "")
+        + "Say only what this flagged version adds; do not list earlier releases. "
         + (f"Breaking since v{local}: {', '.join(breaking)}. " if breaking else "")
         + (f"Also changed: {', '.join(changed)}. " if changed else "")
         + "If the user asks whether they are current, they are not. "
         # The user may not see systemMessage in every client (the desktop app, a stripped terminal),
         # so Claude says it once as well, in the first reply, in one sentence.
-        + "Tell the user, once, in your first reply and in one sentence, that this session is on "
-          f"v{local} and v{remote} is out, with the update command below. Then carry on with what "
-          "they asked; do not repeat it. "
+        + "In your first reply, right after the greeting line (or as your opener if there is none), "
+          f"tell them in one or two warm sentences that they're on v{local} and v{remote} is out"
+        + (f", and what v{nv} brings" if v.get("summary") else "")
+        + ". Write it the way a colleague would — for example: \"You're on v1.58.0, and v1.61.0 "
+          "just landed with the ads skill. Worth grabbing before we start: click Run below, then type "
+          "/reload-plugins. No restart.\" Never say 'this session', 'notice', 'is available' or "
+          "'update step'. Directly under it put the update command, alone, in a fenced code block "
+          "tagged bash — the desktop app puts a Run button on it. "
+        + (("Then one line, 'Read more:', with these links: " + ", ".join(links) + ". ") if links else "")
+        + "Then carry on with what they asked; do not repeat any of it. "
         # Only claim components moved when some actually did. A release can bump the plugin
         # without touching a component doc, and pointing at "the components listed above" when
         # nothing was listed reads as a bug and costs the whole notice its credibility.
         + ("Anything you build with this version may use superseded specs for the components "
            "named above; say so rather than silently building. " if (breaking or changed) else "")
-        + "Update with: claude plugin update gushwork-design@gushwork "
-          "(a restart is required either way)."
+        # "A restart is required either way" was true until Claude Code grew /reload-plugins
+        # (present in 2.1.263, 5 Oct 2026). A restart still works; it is no longer the ask.
+        + "Update with: claude plugin update gushwork-design@gushwork, then /reload-plugins "
+          "(no restart needed)."
     ),
 }}))
 PY

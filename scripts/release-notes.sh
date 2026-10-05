@@ -54,8 +54,9 @@ fi
 
 cat <<'EOF'
 
-If you have auto-update on it arrives at your next restart. If not:
+If you have auto-update on it arrives at your next start. To take it now:
 `claude plugin marketplace update gushwork && claude plugin update gushwork-design@gushwork`
+then type /reload-plugins in the chat — no restart.
 
 Check what you're on: the skill says its version when it fires.
 ──────── to here ────────

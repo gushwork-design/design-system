@@ -19,8 +19,9 @@ than claiming to be current. If the user asks whether they are up to date, check
 cd ~/.claude/plugins/marketplaces/gushwork && git fetch -q && git log --oneline HEAD..origin/main
 ```
 
-Any commits listed means they are behind: tell them to run `claude plugin marketplace update gushwork`
-and restart Claude Code.
+Any commits listed means they are behind: tell them to run
+`claude plugin marketplace update gushwork && claude plugin update gushwork-design@gushwork`,
+then `/reload-plugins` in the chat.
 
 ## Read these first
 
