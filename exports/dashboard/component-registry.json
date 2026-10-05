@@ -1081,11 +1081,10 @@
       "previewFingerprint": "9be07fee528d9e9e"
     },
     "multi-select": {
-      "reviewed": "rework",
+      "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "f327d2ff103138e9",
-      "note": "padding issues in wrapped chips, and arrow palcement should be on top right only in that too, check all tho",
+      "fingerprint": "4492f50dcd96154a",
       "previewFingerprint": "8abd539082d91257"
     },
     "nav-group": {
