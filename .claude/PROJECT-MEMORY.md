@@ -36,6 +36,7 @@ Short, stable facts so a fresh session can pick up cold. Update as we go. No sec
 
 ## Decisions made in this project
 - 2026-10-05: memory lives at `.claude/PROJECT-MEMORY.md`, committed on the dev branch (no PR until asked).
+- 2026-10-05: added a `/hub` mod at `mods/design-hub/` (not part of the plugin; load locally with `claude --plugin-dir mods/design-hub`). Mods draw only in terminal and Desktop, not cloud sessions.
 
 ## Merged through this project
 - (none yet)
