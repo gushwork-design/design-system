@@ -1350,7 +1350,8 @@
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "8818d398bc284da7"
+      "fingerprint": "b28d88ce4cbf9a55",
+      "previewFingerprint": "b6a9019ec8aaaacd"
     },
     "theme-menu": {
       "reviewed": "passed",
