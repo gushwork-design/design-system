@@ -1235,3 +1235,12 @@ html:has(script[src*="employee-id-card/app.jsx"]) #root:empty::after { backgroun
 .t-prof__name { font: var(--gw-text-body-14-sem); color: var(--t-heading); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .t-prof__role { font: var(--gw-text-body-12-reg); color: var(--t-label); }
 .t-prof__mail { padding: 0 var(--gw-space-8) var(--gw-space-8); font: var(--gw-text-body-12-reg); color: var(--t-label); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* The collapse and reopen buttons are ghosts (Utsav, 5 Oct 2026): no border at rest, the hover fill
+   only, and a 16 icon (was 12) so the glyph still reads without its frame. */
+.panel-collapse,
+.panel-mini .panel-reopen { border-color: transparent; }
+.panel-collapse svg,
+.panel-mini .panel-reopen svg { width: 16px; height: 16px; }
+.panel-collapse,
+.panel-mini .panel-reopen { padding: var(--gw-space-4); width: 28px; height: 28px; }
