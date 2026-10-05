@@ -854,6 +854,13 @@
       "reviewedOn": "2026-10-05",
       "fingerprint": "34aae46e604b8dec",
       "note": "\"Completion rate\" - table looks add with one added on the top"
+    },
+    "date-range-picker": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "0e2db6ac90426074",
+      "note": "in dark mode, the selected dates look look very light,"
     }
   }
 }
