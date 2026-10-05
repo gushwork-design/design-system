@@ -1248,15 +1248,11 @@
       "previewFingerprint": "80ce4d3972e932b6"
     },
     "sidebar-collapsed": {
-      "reviewed": "rework",
+      "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "be4a7521b7fae397",
-      "previewFingerprint": "82425e7198c83636",
-      "note": "it should look something like this in light mode",
-      "refs": [
-        "web/previews/dashboard/refs/sidebar-collapsed/20261005-140146-1-screenshot-2026-10-05-at-7-31-17-pm.png"
-      ]
+      "previewFingerprint": "99e53f0740cffeb3"
     },
     "sign-in-modal": {
       "reviewed": "passed",
