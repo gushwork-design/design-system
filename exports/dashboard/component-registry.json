@@ -1005,11 +1005,10 @@
       "previewFingerprint": "95f0e45694e8e178"
     },
     "info-hint": {
-      "reviewed": "rework",
+      "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "793072d3a52d42f8",
-      "note": "no need of underline when info icon is there and tooltip placement seems off",
+      "fingerprint": "d9412037828ddf38",
       "previewFingerprint": "c18d77ba97ef502e"
     },
     "issue-summary": {
