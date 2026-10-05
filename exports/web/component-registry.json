@@ -214,6 +214,25 @@
       "reviewedOn": "2026-10-02",
       "fingerprint": "0fd6f219750af8d0",
       "note": "visual is not added for the review"
+    },
+    "navbar": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-04",
+      "fingerprint": "5754443d8a35c21c"
+    },
+    "client-avatar": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-04",
+      "fingerprint": "fc6eefa39a5a7158"
+    },
+    "form": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-04",
+      "fingerprint": "0777a79984b4e83a",
+      "note": "flag is missing"
     }
   }
 }

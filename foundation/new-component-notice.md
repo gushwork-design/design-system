@@ -71,6 +71,21 @@ where reading an unreviewed entry is required — it's still never citable as *s
 `bash scripts/review-pass.sh <surface> <key>` says so, but that's a different question from
 whether you're allowed to look at it before building.
 
+## 0a. A new element is registered for review, not only declared (R43)
+
+Declaring is not enough. A new element also goes to the design hub, so the owner can approve it
+there. In the same change as the notice:
+
+1. Add it to the surface's `exports/<surface>/component-registry.json` `components` block as pending
+   (a new surface gets its own registry and a category in the Library).
+2. Draw it at `web/previews/<surface>/<name>.frag`, light and dark where both exist, from tokens.
+3. Describe it in the surface's doc (`doc` in the registry entry points at it).
+4. Run `bash scripts/library-site.sh` and `bash scripts/check-previews.sh`.
+
+Register only what is **new**. Reusing a library control does not register it again. Without a
+registry entry and a drawing, the element never shows in Design System → Review, and an element that
+never shows there has not been reviewed, whatever the notice says.
+
 ## 1a. Skip this whole section if the person you're talking to is the reviewer
 
 The four-line block below exists to bridge *requester ≠ reviewer* — someone building a page

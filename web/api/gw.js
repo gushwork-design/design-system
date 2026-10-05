@@ -29,6 +29,7 @@ import usageLog from './_usage-log.js';
 import logOutput from './_log-output.js';
 import visits from './_visits.js';
 import review from './_review.js';
+import health from './_health.js';
 
 const ROUTES = {
   'log-usage': logUsage,
@@ -40,6 +41,7 @@ const ROUTES = {
   'log-output': logOutput,
   'visits': visits,
   'review': review,
+  'health': health,
 };
 
 export default async function handler(req, res) {

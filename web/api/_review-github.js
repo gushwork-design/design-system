@@ -15,6 +15,11 @@
    produce identical bytes for it (tested against every registry in the repo), so a decision made here and one made by
    the script look the same in a diff.
 
+   STRAIGHT TO MAIN FIRST (R46). A decision is first committed straight to main, one commit per decision, with no pull
+   request in the way, so it is on record at once. The ruleset on main must let this token's account bypass the
+   "pull request required" rule; until it does, GitHub refuses the commit and the decision falls back to the pull
+   request above, so nothing is lost. Only the one registry file for that item is ever written.
+
    The token is GW_GITHUB_TOKEN: a fine-grained token for this one repository with Contents and Pull requests set to
    Read and write. Without it nothing here runs and the button falls back to the queue.
    ========================================================================= */
@@ -56,6 +61,17 @@ export function revertDecision(doc, scope, key, mainDoc) {
   else if (doc[block]) {
     delete doc[block][key];
     if (!Object.keys(doc[block]).length && !(mainDoc && mainDoc[block])) delete doc[block];
+  }
+  return doc;
+}
+
+/* Undo of a straight-to-main decision: put the record back as it was before (prev), or remove it if there was none. */
+export function restoreRecord(doc, scope, key, prev) {
+  const { block } = registryTarget(scope);
+  if (prev) { doc[block] = doc[block] || {}; doc[block][key] = prev; }
+  else if (doc[block]) {
+    delete doc[block][key];
+    if (!Object.keys(doc[block]).length) delete doc[block];
   }
   return doc;
 }
@@ -144,6 +160,34 @@ export async function recordViaGithub(token, row, who, today, undo = false) {
     });
   }
   return { pr: { number: pr.number, url: pr.html_url } };
+}
+
+/* Write one decision (or undo one) straight to main. Returns { prev, sha }: the record as it was, which the row keeps so an undo can
+   put it back. Retries once if main moved under it. Throws if GitHub refuses (a protected main, most likely), and the caller falls back
+   to the pull request. Only the registry file for this one item is touched. */
+export async function recordDirect(token, row, who, today, undo = false, prev = null) {
+  const { path, block } = registryTarget(row.scope);
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const cur = await readFile(token, path, BASE);
+      const before = cur.doc[block] && cur.doc[block][row.key] ? JSON.parse(JSON.stringify(cur.doc[block][row.key])) : null;
+      let message;
+      if (undo) {
+        restoreRecord(cur.doc, row.scope, row.key, prev);
+        message = `Review: undo ${row.scope}/${row.key} (${who})`;
+      } else {
+        applyDecision(cur.doc, row, who, today);
+        message = `Review: ${row.action} ${row.scope}/${row.key}${row.note ? ' — ' + row.note.slice(0, 80) : ''} (${who})`;
+      }
+      const out = await gh(token, repo(`/contents/${path}`), {
+        method: 'PUT', body: JSON.stringify({ message, content: b64(serialize(cur.doc)), sha: cur.sha, branch: BASE }),
+      });
+      return { prev: before, sha: out && out.commit ? out.commit.sha : '' };
+    } catch (e) {
+      if (attempt === 0 && e.status === 409) continue;
+      throw e;
+    }
+  }
 }
 
 /* What to show the owner when GitHub refuses: the status, GitHub's own reason, and which call it was, so a 403 can be told

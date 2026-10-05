@@ -3,7 +3,7 @@
 # SessionStart hook — hands Claude the one rule that must hold whether or not any skill triggers.
 #
 # WHY THIS IS A HOOK. Skills load when Claude matches the request to a skill's description, and the
-# four surface skills (web, dashboard, slides, lead-magnet) each describe a specific deliverable.
+# five surface skills (web, dashboard, tools, slides, lead-magnet) each describe a specific deliverable.
 # "A Corner Watch game with the Gushwork logo" is none of them, so nothing loaded, and the result
 # had the name and the blue and none of the tokens, the fonts or the real logo (30 Sep 2026). A rule
 # that depends on a description matching is a rule that sometimes does not run. This one runs at
@@ -28,10 +28,12 @@ rule = (
     "or playful — must use the plugin's own tokens (foundation/tokens.css), its two typefaces (Vert "
     "Grotesk Display for headings, Inter for the rest) and the real logo files (assets/logo/), never "
     "an approximation, a redrawn logo, a near-match blue or a third typeface. Use the matching surface "
-    "skill when there is one (gushwork-web, gushwork-dashboard, gushwork-slides, gushwork-lead-magnet). "
+    "skill when there is one (gushwork-web, gushwork-dashboard, gushwork-tools, gushwork-slides, gushwork-lead-magnet). "
     "For everything else that carries the brand, invoke the gushwork-brand skill BEFORE writing any "
     "code or markup. If the user explicitly asks for an off-brand look, do it and say in one line that "
-    "it is off-system."
+    "it is off-system. Anything you create that the library does not already have must also be registered "
+    "for review on the design hub (the surface's component-registry.json plus a drawn preview; see "
+    "foundation/new-component-notice.md section 0a), never shipped silently."
 )
 print(json.dumps({"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": rule}}))
 PY

@@ -88,14 +88,14 @@ settings, which is what [`ROLLOUT.md`](ROLLOUT.md) recommends.
 Verdicts from a [`notices/`](notices/) review are exactly what feeds step 1. That is the loop
 closing: a deviation someone hit in a real build becomes a measured value everyone gets.
 
-## Four surfaces, four skills
+## Five surfaces, five skills
 
-The system covers four surfaces that look and behave differently, so they are four skills with
+The system covers five surfaces that look and behave differently, so they are five skills with
 disjoint trigger vocabularies. They are deliberately **not** merged.
 
-A fifth skill, `gushwork-brand`, is the catch-all for everything else that carries the Gushwork
+A sixth skill, `gushwork-brand`, is the catch-all for everything else that carries the Gushwork
 name, logo or blue — a game, a poster, a one-off tool. It exists because a skill only loads when the
-request matches its description, and a request that matches none of the four loaded nothing. It
+request matches its description, and a request that matches none of the five loaded nothing. It
 holds the floor (tokens, two typefaces, the real logo, voice) and hands off to a surface skill when
 one fits. `hooks/hooks.json` also injects that floor at every session start, so the rule does not
 depend on any description matching.
@@ -104,6 +104,7 @@ depend on any description matching.
 |---|---|---|
 | [`gushwork-web`](skills/gushwork-web/SKILL.md) | Public marketing site | landing page, ad lander, hero, fold, CTA section, pricing, comparison table, testimonial, case study, FAQ, navbar, footer |
 | [`gushwork-dashboard`](skills/gushwork-dashboard/SKILL.md) | Logged-in analytics dashboards and web apps | dashboard, analytics screen, data table, chart, filters, settings page, side nav, sign-in |
+| [`gushwork-tools`](skills/gushwork-tools/SKILL.md) | Hub tools (`/internal`) | new hub tool, change to the email signature or ID card tool, tool panel, tool card, a generator for the team |
 | [`gushwork-lead-magnet`](skills/gushwork-lead-magnet/SKILL.md) | Downloadable PDF | lead magnet, gated asset, PDF checklist, prompt pack, audit worksheet, playbook, buyer guide |
 | [`gushwork-slides`](skills/gushwork-slides/SKILL.md) | Presented deck | sales deck, pitch deck, QBR, investor update, slide, `.pptx`, Google Slides |
 | [`gushwork-brand`](skills/gushwork-brand/SKILL.md) | Anything else with the brand | game, poster, banner, social post, email header, animation, internal tool, one-off page — when none of the four above fits |
@@ -121,7 +122,7 @@ Jakarta Sans by design. That is R21, not a bug.
 
 ## Foundation — referenced, never duplicated
 
-All four skills point at these. None restates them, and none should.
+All six skills point at these. None restates them, and none should.
 
 | File | Holds |
 |---|---|
@@ -149,6 +150,7 @@ gushwork-design/
 ├── skills/
 │   ├── gushwork-web/SKILL.md
 │   ├── gushwork-dashboard/SKILL.md
+│   ├── gushwork-tools/SKILL.md
 │   ├── gushwork-lead-magnet/SKILL.md
 │   ├── gushwork-slides/SKILL.md
 │   └── gushwork-brand/SKILL.md

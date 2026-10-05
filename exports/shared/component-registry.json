@@ -103,18 +103,17 @@
       "fingerprint": "9c1e6facfe4c7417"
     },
     "ruled": {
-      "reviewed": "rework",
-      "reviewedBy": "utsav-gushwork",
-      "reviewedOn": "2026-10-02",
-      "fingerprint": "cd39f57a0df5d6bd",
-      "note": "remove focus ring, we dont need it"
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-03",
+      "fingerprint": "b9312e9fe1a9ed34"
     },
     "slides": {
       "reviewed": "rejected",
-      "reviewedBy": "utsav-gushwork",
-      "reviewedOn": "2026-10-02",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-04",
       "fingerprint": "8f66ae1cf12b554c",
-      "note": "i will new ones"
+      "note": "not designed properly"
     }
   }
 }

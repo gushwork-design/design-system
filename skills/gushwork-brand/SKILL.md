@@ -22,6 +22,7 @@ Hand off, and stop reading this one, when the thing is:
 | a dashboard, app screen, KPI card, data table, product settings page | `gushwork-dashboard` |
 | a deck, pitch, QBR, one slide | `gushwork-slides` |
 | a downloadable PDF behind an ad | `gushwork-lead-magnet` |
+| a tool on the design hub (`/internal/...`): the email signature or ID card tool, or a new one like them | `gushwork-tools` |
 
 Everything else is this skill's. The four surface skills stay disjoint on purpose — this one exists
 so that *nothing falls between them*, not to overlap them.

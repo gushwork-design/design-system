@@ -7,7 +7,7 @@
 <script>try{var c=localStorage.getItem('gw-theme-choice'),t=c==='dark'||c==='light'?c:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20width%3D%2280%22%20height%3D%2280%22%20rx%3D%2220%22%20fill%3D%22%230d0d0d%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
 <link rel="stylesheet" href="/foundation/tokens.css">
-<link rel="stylesheet" href="/shell.css?v=ghost2">
+<link rel="stylesheet" href="/shell.css?v=ghost3">
 <script src="/shell.js?v=ghost1" defer></script>
 <style>
 /* /admin/usage-log — the session log, read back for the owner.
@@ -747,12 +747,18 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .rv-acts { display: flex; gap: var(--gw-space-8); }
 .rv-foot--col .rv-acts { justify-content: flex-end; }
 .rv-hint { font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
+.rv-hint kbd { font: inherit; font-weight: 500; color: var(--ul-value); }
 .rv-lab { font: 500 13px/1.4 var(--gw-font-body); color: var(--ul-value); }
 .rv-ta { width: 100%; box-sizing: border-box; padding: var(--gw-space-12); border: 0; border-radius: var(--gw-radius-12); resize: vertical; background: var(--ul-field-bg); color: var(--ul-field-fg); font: 400 14px/1.5 var(--gw-font-body); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }
 .rv-ta:focus-visible { outline: none; box-shadow: inset 0 0 0 1px var(--gw-color-black); }   /* the edge, not the ring (R41) */
 :root[data-theme="dark"] .rv-ta:focus-visible { box-shadow: inset 0 0 0 1px var(--gw-color-white); }
 .rv-b { height: 36px; padding: 0 var(--gw-space-16); border: 0; border-radius: var(--gw-radius-12); cursor: pointer; font: var(--gw-text-button-14); transition: background var(--gw-motion-fast); }
 .rv-b:disabled { opacity: .45; cursor: default; }
+.rv-b--sm { height: 28px; padding: 0 var(--gw-space-12); border-radius: var(--gw-radius-8); }
+.rv-save { position: sticky; top: var(--gw-space-8); z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-12); margin-bottom: var(--gw-space-16); padding: var(--gw-space-8) var(--gw-space-8) var(--gw-space-8) var(--gw-space-16); border-radius: var(--gw-radius-12); background: var(--gw-color-yellow-alpha-10); box-shadow: inset 0 0 0 1px var(--ul-hdr-line), var(--gw-shadow-s2); font: 400 13px/1.5 var(--gw-font-body); color: var(--ul-cell); backdrop-filter: blur(8px); }
+.rv-save[hidden] { display: none; }
+.rv-save b { color: var(--ul-value); font-weight: 600; }
+.rv-h__r .rv-b--sm { margin-right: var(--gw-space-4); }
 .rv-b--pass { background: var(--ul-prim-bg); color: var(--ul-prim-fg); }
 .rv-b--pass:hover:not(:disabled) { background: var(--ul-prim-hover); }
 .rv-b--ghost { background: none; color: var(--ul-ctl-fg); box-shadow: inset 0 0 0 1px var(--ul-ctl-line); }
@@ -916,6 +922,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
           <span class="rv-ro__i"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80Zm-72,78.63V184a8,8,0,0,1-16,0V158.63a24,24,0,1,1,16,0ZM160,80H96V56a32,32,0,0,1,64,0Z"/></svg></span>
           <div class="rv-ro__t"><b>Only the owner can approve, rework or reject</b><span>You can look at everything that is in review, and open any item to see what it looks like.</span></div>
         </div>
+        <div class="rv-save" id="rv-save" role="status" hidden></div>
         <div class="ul-metrics" id="ds-rev-stats"></div>
         <div class="an-bar ds-cats"><div class="ul-tabs an-tabs" id="ds-rev-tabs" role="tablist" aria-label="Review"></div></div>
         <section class="ul-sec" aria-labelledby="ds-rev-h">
@@ -1163,6 +1170,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       { key: 'lead', title: 'Lead magnet', surface: 'lead-magnet', recipes: ['lead-magnet-doc'], templates: ['lead-magnet'] },
       { key: 'onepager', title: 'One-pagers', surface: null, recipes: [], templates: ['one-pager'] }] },
     { key: 'dashboard', title: 'Dashboard', subs: [{ key: 'all', title: 'Dashboard', surface: 'dashboard', recipes: ['dashboard-screen'], templates: [] }] },
+    { key: 'tools', title: 'Tools', subs: [{ key: 'all', title: 'Tools', surface: 'tools', recipes: [], templates: [] }] },
     { key: 'shared', title: 'Shared', subs: [{ key: 'all', title: 'Shared', surface: 'shared', recipes: [], templates: [] }] },
     { key: 'creatives', title: 'Ad creatives', subs: [{ key: 'all', title: 'Ad creatives', surface: 'ads', recipes: ['ad-creative'], templates: [] }] }
   ];
@@ -1248,9 +1256,9 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   }
   /* THE LIBRARY SHOWS ONLY WHAT HAS BEEN APPROVED (Utsav, 2 Oct 2026). Something is approved when its review state is
      passed and the source has not moved since: pending, in rework, rejected and expired are not shown here, they are in
-     the Review tab. An owner also sees an approval they have just pressed (it is "being recorded"), so their own work does not
-     vanish; everyone else sees only what the registry holds. */
-  function approved(scope, key) { var it = BYID[scope + '/' + key]; return !!it && eff(it).state === 'passed'; }
+     the Review tab. A decision already committed to main is live for everyone at once, before the next publish (R46). An owner also
+     sees one that is still being written down, so their own work does not vanish. */
+  function approved(scope, key) { var it = BYID[scope + '/' + key]; return !!it && effSaved(it).state === 'passed'; }
   var FD_PARTS = {
     color: [['color', fdColor]],
     type: [['typefaces', fdFaces], ['type', fdScale], ['type-links', fdLinks]],
@@ -1353,20 +1361,32 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
      Approve, Rework and Reject are buttons. They do not edit the repo (a site cannot, and main needs a reviewed PR):
      they queue the decision (/api/review) and the next Claude session records it with the fingerprint that was
      on screen, so a decision made on something that has since moved is refused rather than applied. */
-  var STATE_LABEL = { pending: 'not reviewed', expired: 'expired', passed: 'approved', rejected: 'rejected', rework: 'in rework' };
+  var STATE_LABEL = { pending: 'not reviewed', expired: 'expired', redone: 'redone', passed: 'approved', rejected: 'rejected', rework: 'in rework' };
   var STATE_CLASS = { passed: ' ul-badge--ok', rejected: ' ul-badge--bad', expired: ' ul-badge--warn', rework: ' ul-badge--warn' };
   function badgeOf(state, queued, q) {
-    var tail = !queued ? '' : (q && q.pr && q.pr.url
+    var tail = !queued ? '' : q && q.draft ? '<span class="rv-q">not saved</span>' : (q && q.pr && q.pr.url
       ? '<a class="rv-q rv-q--pr" href="' + esc(q.pr.url) + '" target="_blank" rel="noopener" title="Open the pull request on GitHub">in PR #' + esc(q.pr.number) + '</a>'
-      : '<span class="rv-q">being recorded</span>');
+      : '<span class="rv-q">' + (q && q.via === 'main' ? 'on main, live' : 'being recorded') + '</span>');
     return '<span class="ul-badge' + (STATE_CLASS[state] || '') + '">' + esc(STATE_LABEL[state] || state) + '</span>' + tail;
   }
   var QSTATE = {}, ITEMS = [], BYID = {}, RV = { filter: 'waiting', list: [], i: 0, open: false, mode: '', wide: false };
   function idOf(it) { return it.scope + '/' + it.key; }
+  /* A decision is staged first and applied when the owner presses Save (R47). The drafts live in this browser, so a reload
+     does not lose them, and nothing reaches main, the Library or a routine until Save. */
+  var DRAFTS = (function () { try { var j = JSON.parse(localStorage.getItem('gw-review-drafts') || '{}'); return j && typeof j === 'object' ? j : {}; } catch (e) { return {}; } })();
+  function storeDrafts() { try { localStorage.setItem('gw-review-drafts', JSON.stringify(DRAFTS)); } catch (e) { /* drafts stay for this visit */ } }
+  function draftWant(d) { return d.action === 'pass' ? 'passed' : d.action === 'reject' ? 'rejected' : 'rework'; }
   function eff(it) {
+    var d = DRAFTS[idOf(it)];
+    if (d) return { state: draftWant(d), queued: true, q: { draft: true, action: d.action, note: d.note } };
+    return effSaved(it);
+  }
+  function effSaved(it) {
     var q = QSTATE[idOf(it)];
     if (q && q.action && q.action !== 'undo') {
       var want = q.action === 'pass' ? 'passed' : q.action === 'reject' ? 'rejected' : 'rework';
+      // The source has moved since this decision was made: the published data was built after that, so its state is the truth.
+      if (q.fp && it.fp && q.fp !== it.fp) return { state: it.state, queued: false, q: null };
       if (it.state === want) return { state: it.state, queued: false, q: null };   // the registry has caught up with it
       return { state: want, queued: true, q: q };
     }
@@ -1374,7 +1394,12 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   }
   function loadQueued() {
     return fetch('/api/review', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : { state: {} }; })
-      .then(function (j) { QSTATE = j.state || {}; }).catch(function () { QSTATE = {}; });
+      .then(function (j) {
+        QSTATE = j.state || {};
+        // Everyone sees a decision that is already on main (live before the next publish). Only the owner also sees one that is
+        // still being written down, so their own work does not vanish.
+        if (!owner) Object.keys(QSTATE).forEach(function (k) { if (QSTATE[k].via !== 'main') delete QSTATE[k]; });
+      }).catch(function () { QSTATE = {}; });
   }
   function scopeTitle(it) { return it.kind === 'foundation' ? 'Foundations' : it.surface; }
 
@@ -1401,7 +1426,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     return st ? 'by ' + String(heads[st.i]).toLowerCase() + ', ' + (st.dir < 0 ? 'descending' : 'ascending') : dflt;
   }
   /* The Review inbox: first click on Status puts what is waiting for you first; Decided leads with the newest. */
-  var STATE_RANK = { pending: 0, expired: 0, rework: 1, rejected: 2, passed: 3 };
+  var STATE_RANK = { pending: 0, expired: 0, redone: 0, rework: 1, rejected: 2, passed: 3 };
   var REV_SORT = [
     { get: function (it) { return it.label; }, dir: 1 },
     { get: function (it) { return scopeTitle(it); }, dir: 1 },
@@ -1413,7 +1438,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   var FILTERS = [['waiting', 'Waiting'], ['rework', 'In rework'], ['passed', 'Approved'], ['rejected', 'Rejected']];
   function inFilter(it, f) {
     var s = eff(it).state;
-    return f === 'waiting' ? (s === 'pending' || s === 'expired') : s === f;
+    return f === 'waiting' ? (s === 'pending' || s === 'expired' || s === 'redone') : s === f;
   }
   function toast(msg, ms) {
     var t = $('rv-toast'); if (!t) { t = document.createElement('div'); t.id = 'rv-toast'; t.className = 'rv-toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
@@ -1423,8 +1448,11 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   var RF = { q: '', shown: 30 };
   function renderReview(d) {
     indexItems(d);
+    // A draft for an item that is gone, or whose source has moved since it was marked, no longer describes what is on screen.
+    Object.keys(DRAFTS).forEach(function (id) { var it = BYID[id]; if (!it || (DRAFTS[id].fp && it.fp !== DRAFTS[id].fp)) delete DRAFTS[id]; });
+    storeDrafts(); renderSaveBar();
     var count = function (f) { return ITEMS.filter(function (it) { return inFilter(it, f); }).length; };
-    $('ds-rev-stats').innerHTML = metric('Waiting on you', String(count('waiting')), 'never reviewed, or changed since') + metric('In rework', String(count('rework')), 'sent back with a note') +
+    $('ds-rev-stats').innerHTML = metric('Waiting on you', String(count('waiting')), 'never reviewed, redone, or changed since') + metric('In rework', String(count('rework')), 'sent back with a note') +
       metric('Approved', String(count('passed')), 'of ' + ITEMS.length + ', let into the skills');
     pills($('ds-rev-tabs'), FILTERS.map(function (f) { return [f[0], f[1] + ' ' + count(f[0])]; }), RV.filter, function (v) { RV.filter = v; RF.shown = 30; renderReview(d); });
     var q = RF.q.trim().toLowerCase();
@@ -1551,7 +1579,17 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     document.addEventListener('keydown', function (ev) {
       if (!RV.open) return;
       var typing = /^(TEXTAREA|INPUT)$/.test((ev.target || {}).tagName || '');
-      if (ev.key === 'Escape') { closeDrawer(); }
+      var mod = ev.metaKey || ev.ctrlKey || ev.altKey;
+      var press = function (id) { var b = $(id); if (b && !b.disabled) { ev.preventDefault(); b.click(); return true; } return false; };
+      /* The note box: Cmd or Ctrl + Enter sends it, Escape backs out of the note before it closes the drawer. */
+      if (typing && (ev.metaKey || ev.ctrlKey) && ev.key === 'Enter') { press('rv-send'); return; }
+      if (ev.key === 'Escape') { if (RV.mode && press('rv-cancel')) return; closeDrawer(); }
+      /* The decisions, owner only (the buttons are not drawn for anyone else, and not while one is queued). A, R, X and U
+         are plain letters, so a held Cmd, Ctrl or Alt (reload, find) is left alone. */
+      else if (!typing && !mod && ev.key.toLowerCase() === 'a') { press('rv-pass'); }
+      else if (!typing && !mod && ev.key.toLowerCase() === 'r') { press('rv-rework'); }
+      else if (!typing && !mod && ev.key.toLowerCase() === 'x') { press('rv-reject'); }
+      else if (!typing && !mod && ev.key.toLowerCase() === 'u') { press('rv-undo'); }
       else if (!typing && ev.key === 'e') { setWide(!RV.wide); }
       else if (!typing && (ev.key === 'ArrowRight' || ev.key === 'j')) { step(1); }
       else if (!typing && (ev.key === 'ArrowLeft' || ev.key === 'k')) { step(-1); }
@@ -1570,7 +1608,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     RV.i = i; RV.mode = ''; renderDrawer();
   }
   function nextWaiting() {
-    for (var i = RV.i + 1; i < RV.list.length; i++) { var it = BYID[RV.list[i]]; var s = it && eff(it).state; if (s === 'pending' || s === 'expired') return i; }
+    for (var i = RV.i + 1; i < RV.list.length; i++) { var it = BYID[RV.list[i]]; var s = it && eff(it).state; if (s === 'pending' || s === 'expired' || s === 'redone') return i; }
     return -1;
   }
   function renderDrawer() {
@@ -1578,27 +1616,31 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     var e = eff(it), el = $('rv');
     var gh = it.doc ? 'https://github.com/gushwork-design/design-system/blob/main/' + (function () { var o = it.scope === 'shared' ? (/^v2\//.test(it.doc) ? ['exports', 'dashboard'] : ['foundation']) : ['exports', it.scope]; it.doc.split('/').forEach(function (g) { if (g === '..') o.pop(); else if (g && g !== '.') o.push(g); }); return o.join('/'); })() : '';
     var can = owner, hist = '';
-    if (e.queued) {
+    if (e.queued && e.q.draft) {
+      hist = '<div class="rv-note rv-note--q"><b>Marked ' + (e.q.action === 'pass' ? 'approved' : e.q.action === 'reject' ? 'rejected' : 'sent back') + ', not saved yet.</b> Nothing changes until you press Save.' +
+        (e.q.note ? ' Your note: ' + esc(e.q.note) : '') + ' <button class="rv-link" type="button" id="rv-undo">Undo</button></div>';
+    } else if (e.queued) {
       var did = e.q.action === 'pass' ? 'approved' : e.q.action === 'reject' ? 'rejected' : 'sent this back';
       hist = '<div class="rv-note rv-note--q"><b>You ' + did + ' it.</b> ' + (e.q.pr && e.q.pr.url
         ? 'It is in <a class="rv-link" href="' + esc(e.q.pr.url) + '" target="_blank" rel="noopener">pull request #' + esc(e.q.pr.number) + '</a>, and becomes final when someone approves and merges it.'
+        : e.q.via === 'main' ? 'It is recorded on main and live here now. The published pages catch up at the next publish.'
         : 'It is recorded in the repo at the next Claude session.') +
         (e.q.note ? ' Your note: ' + esc(e.q.note) : '') + ' <button class="rv-link" type="button" id="rv-undo">Undo</button></div>';
     } else if (it.by) {
-      hist = '<div class="rv-note"><b>' + esc(STATE_LABEL[it.state] === 'expired' ? 'Approved, then the source moved' : (STATE_LABEL[it.state] || '')) + '</b> · ' + esc(it.by) + (it.on ? ', ' + esc(it.on) : '') + (it.note ? '<br>' + esc(it.note) : '') + '</div>';
+      hist = '<div class="rv-note"><b>' + esc(it.state === 'expired' ? 'Approved, then the source moved' : it.state === 'redone' ? 'Redone since you sent it back' : (STATE_LABEL[it.state] || '')) + '</b> · ' + esc(it.by) + (it.on ? ', ' + esc(it.on) : '') + (it.note ? '<br>' + esc(it.note) : '') + '</div>';
     }
     var foot;
     if (!can) foot = '<div class="rv-foot"><span class="rv-hint">Only an owner can approve, rework or reject.</span></div>';
     else if (RV.mode === 'rework' || RV.mode === 'reject') {
       foot = '<div class="rv-foot rv-foot--col"><label class="rv-lab" for="rv-note">' + (RV.mode === 'rework' ? 'What needs fixing? This goes to the next Claude session as the brief.' : 'Why is this rejected?') + '</label>' +
         '<textarea id="rv-note" class="rv-ta" rows="4" maxlength="500" placeholder="' + (RV.mode === 'rework' ? 'The labels bind raw white, they should use the neutral-900 token.' : 'It duplicates the card and nothing uses it.') + '"></textarea>' +
-        '<div class="rv-acts"><button type="button" class="rv-b rv-b--ghost" id="rv-cancel">Cancel</button><button type="button" class="rv-b rv-b--' + (RV.mode === 'reject' ? 'bad' : 'warn') + '" id="rv-send" disabled>' + (RV.mode === 'rework' ? 'Send back' : 'Reject') + '</button></div></div>';
+        '<div class="rv-acts"><button type="button" class="rv-b rv-b--ghost" id="rv-cancel">Cancel</button><button type="button" class="rv-b rv-b--' + (RV.mode === 'reject' ? 'bad' : 'warn') + '" id="rv-send" disabled>' + (RV.mode === 'rework' ? 'Send back' : 'Reject') + '</button></div><span class="rv-hint"><kbd>\u2318</kbd> <kbd>\u21b5</kbd> send · <kbd>Esc</kbd> cancel</span></div>';
     } else {
       foot = '<div class="rv-foot"><div class="rv-acts"><button type="button" class="rv-b rv-b--pass" id="rv-pass">Approve</button><button type="button" class="rv-b rv-b--ghost" id="rv-rework">Rework</button><button type="button" class="rv-b rv-b--ghost" id="rv-reject">Reject</button></div>' +
-        '<span class="rv-hint">← → to move · E to expand · Esc to close</span></div>';
+        '<span class="rv-hint"><kbd>A</kbd> approve · <kbd>R</kbd> rework · <kbd>X</kbd> reject · <kbd>\u2318</kbd> <kbd>S</kbd> save · <kbd>\u2190</kbd> <kbd>\u2192</kbd> move · <kbd>Esc</kbd> close</span></div>';
     }
     el.innerHTML = '<header class="rv-h"><div class="rv-h__t"><span class="rv-h__s">' + esc(scopeTitle(it)) + ' · ' + (RV.i + 1) + ' of ' + RV.list.length + '</span><h2>' + esc(it.label) + '</h2></div>' +
-      '<div class="rv-h__r">' + badgeOf(e.state, e.queued, e.q) + '<button type="button" class="rv-x" id="rv-prev" aria-label="Previous"' + (RV.i === 0 ? ' disabled' : '') + '>‹</button><button type="button" class="rv-x" id="rv-next" aria-label="Next"' + (RV.i >= RV.list.length - 1 ? ' disabled' : '') + '>›</button><button type="button" class="rv-x" id="rv-close" aria-label="Close">✕</button></div></header>' +
+      '<div class="rv-h__r">' + saveBtn('rv-savenow') + badgeOf(e.state, e.queued, e.q) + '<button type="button" class="rv-x" id="rv-prev" aria-label="Previous"' + (RV.i === 0 ? ' disabled' : '') + '>‹</button><button type="button" class="rv-x" id="rv-next" aria-label="Next"' + (RV.i >= RV.list.length - 1 ? ' disabled' : '') + '>›</button><button type="button" class="rv-x" id="rv-close" aria-label="Close">✕</button></div></header>' +
       '<div class="rv-body" id="rv-body"><section class="rv-sec"><div class="rv-sh"><h3>What it looks like</h3><button type="button" class="rv-ex" id="rv-ex" aria-expanded="false" title="Open the drawer out to see everything (E)"></button></div><div class="rv-vis" id="rv-vis">' + (it.kind === 'foundation' ? ghost() : visualFor(it, null)) + '</div></section>' +
       '<section class="rv-sec rv-sec--det"><h3>Details</h3><div class="rv-dl">' + detailRow('Kind', esc(it.kind === 'foundation' ? 'Foundation group' : 'Component')) + detailRow('Version', esc(it.version ? 'v' + it.version : '')) +
       detailRow('Spec last moved', esc(it.changed || '')) + detailRow('Doc', gh ? '<a class="ds-a" href="' + esc(gh) + '" target="_blank" rel="noopener">' + esc(it.doc.split('/').pop()) + '</a>' : '') +
@@ -1611,18 +1653,83 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     $('rv-prev').addEventListener('click', function () { step(-1); });
     $('rv-next').addEventListener('click', function () { step(1); });
     var on = function (id, fn) { var b = $(id); if (b) b.addEventListener('click', fn); };
-    on('rv-pass', function () { send(it, 'pass', ''); });
+    on('rv-pass', function () { stage(it, 'pass', ''); });
     on('rv-rework', function () { RV.mode = 'rework'; renderDrawer(); $('rv-note').focus(); });
     on('rv-reject', function () { RV.mode = 'reject'; renderDrawer(); $('rv-note').focus(); });
     on('rv-cancel', function () { RV.mode = ''; renderDrawer(); });
-    on('rv-undo', function () { send(it, 'undo', ''); });
+    on('rv-undo', function () {
+      if (DRAFTS[idOf(it)]) { delete DRAFTS[idOf(it)]; storeDrafts(); toast('Taken back. Nothing was saved.'); renderDrawer(); reviewRefresh(); renderSaveBar(); }
+      else post(it, 'undo', '');
+    });
+    on('rv-savenow', saveAll);
     var ta = $('rv-note');
     if (ta) {
       ta.addEventListener('input', function () { $('rv-send').disabled = !ta.value.trim(); });
-      on('rv-send', function () { send(it, RV.mode, ta.value.trim()); });
+      on('rv-send', function () { stage(it, RV.mode, ta.value.trim()); });
     }
   }
-  function send(it, action, note) {
+  function saveBtn(id) {
+    var n = Object.keys(DRAFTS).length;
+    return owner && n ? '<button type="button" class="rv-b rv-b--pass rv-b--sm" id="' + id + '">Save ' + n + '</button>' : '';
+  }
+  /* Stage a decision. It shows everywhere in the Review tab as not saved; nothing is sent until Save. */
+  function stage(it, action, note) {
+    DRAFTS[idOf(it)] = { action: action, note: note || '', fp: it.fp };
+    storeDrafts(); RV.mode = '';
+    toast((action === 'pass' ? 'Marked approved.' : action === 'rework' ? 'Marked to send back.' : 'Marked rejected.') + ' Press Save to apply it.');
+    var n = nextWaiting(); if (n >= 0) RV.i = n;
+    renderDrawer(); reviewRefresh(); renderSaveBar();
+  }
+  function discardAll() { DRAFTS = {}; storeDrafts(); toast('Discarded. Nothing was saved.'); if (RV.open) renderDrawer(); reviewRefresh(); renderSaveBar(); }
+  /* Save: apply every staged decision, one after another (each is a commit on main and, for a rework, a routine). A failure
+     leaves that one staged and says why; the others still go. */
+  var SAVING = false;
+  function saveAll() {
+    var ids = Object.keys(DRAFTS); if (!ids.length || SAVING) return;
+    SAVING = true; renderSaveBar(); if (RV.open) renderDrawer();
+    var done = { pass: 0, reject: 0, rework: 0 }, routines = 0, fails = [];
+    ids.reduce(function (p, id) {
+      return p.then(function () {
+        var d = DRAFTS[id], it = BYID[id];
+        if (!it) { delete DRAFTS[id]; return; }
+        return fetch('/api/review', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ scope: it.scope, key: it.key, action: d.action, note: d.note, fp: d.fp }) })
+          .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+          .then(function (r) {
+            if (!r.ok) { fails.push(it.key + ': ' + (r.j && r.j.error ? r.j.error : 'could not save')); return; }
+            QSTATE[id] = r.j.decision; delete DRAFTS[id]; done[d.action]++;
+            if (d.action === 'rework' && r.j.routine && r.j.routine.fired) routines++;
+          }).catch(function () { fails.push(it.key + ': could not reach the site'); });
+      });
+    }, Promise.resolve()).then(function () {
+      SAVING = false; storeDrafts();
+      var parts = [];
+      if (done.pass) parts.push(done.pass + ' approved');
+      if (done.reject) parts.push(done.reject + ' rejected');
+      if (done.rework) parts.push(done.rework + ' sent back' + (routines ? ' (the rework routine started' + (routines > 1 ? ' for ' + routines : '') + ')' : ' (picked up tonight)'));
+      toast((parts.length ? 'Saved: ' + parts.join(', ') + '.' : 'Nothing was saved.') + (fails.length ? ' Not saved: ' + fails.join('; ') + '.' : ''), 6000);
+      if (RV.open) renderDrawer(); reviewRefresh(); renderSaveBar();
+    });
+  }
+  /* Cmd or Ctrl + S saves from anywhere on the Review tab, with or without the drawer open. */
+  document.addEventListener('keydown', function (ev) {
+    if (!(ev.metaKey || ev.ctrlKey) || ev.key.toLowerCase() !== 's' || !Object.keys(DRAFTS).length) return;
+    var app = $('ds-review-app'); if (!owner || !app || app.hidden) return;
+    ev.preventDefault(); saveAll();
+  });
+  function renderSaveBar() {
+    var bar = $('rv-save'); if (!bar) return;
+    var ids = Object.keys(DRAFTS), c = { pass: 0, reject: 0, rework: 0 };
+    ids.forEach(function (id) { c[DRAFTS[id].action]++; });
+    if (!owner || !ids.length) { bar.hidden = true; bar.innerHTML = ''; return; }
+    var parts = [];
+    if (c.pass) parts.push(c.pass + ' to approve'); if (c.rework) parts.push(c.rework + ' to send back'); if (c.reject) parts.push(c.reject + ' to reject');
+    bar.hidden = false;
+    bar.innerHTML = '<span class="rv-save__t"><b>' + ids.length + ' not saved</b> · ' + parts.join(', ') + '. Nothing changes until you save.</span>' +
+      '<span class="rv-acts"><button type="button" class="rv-b rv-b--ghost rv-b--sm" id="rv-discard"' + (SAVING ? ' disabled' : '') + '>Discard</button><button type="button" class="rv-b rv-b--pass rv-b--sm" id="rv-savebar"' + (SAVING ? ' disabled' : '') + '>' + (SAVING ? 'Saving' : 'Save') + '</button></span>';
+    $('rv-discard').addEventListener('click', discardAll); $('rv-savebar').addEventListener('click', saveAll);
+  }
+  function post(it, action, note) {
     var btns = document.querySelectorAll('#rv .rv-b'); btns.forEach(function (b) { b.disabled = true; });
     fetch('/api/review', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ scope: it.scope, key: it.key, action: action, note: note, fp: it.fp }) })
@@ -1632,7 +1739,9 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
         if (action === 'undo') { delete QSTATE[idOf(it)]; toast('Undone.'); RV.mode = ''; renderDrawer(); }
         else {
           QSTATE[idOf(it)] = r.j.decision; RV.mode = '';
-          var where = r.j.decision && r.j.decision.pr ? ' In pull request #' + r.j.decision.pr.number + '.' : ' It is recorded at the next session.';
+          var dec = r.j.decision || {};
+          var where = dec.via === 'main' ? ' Recorded on main.' : dec.pr ? ' In pull request #' + dec.pr.number + '.' : ' It is recorded at the next session.';
+          if (action === 'rework') where += r.j.routine && r.j.routine.fired ? ' The rework routine has started.' : ' It will be picked up tonight.';
           toast((action === 'pass' ? 'Approved.' : action === 'rework' ? 'Sent back with your note.' : 'Rejected.') + where + (r.j.githubError ? ' (' + r.j.githubError + ', so it is queued.)' : ''));
           var n = nextWaiting(); if (n >= 0) { RV.i = n; renderDrawer(); } else { renderDrawer(); }
         }
@@ -1685,7 +1794,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   function start(name) {
     if (started[name]) return; started[name] = 1;
     if (name === 'library') libLoading();
-    if (name === 'library') Promise.all([data(), tokens(), prompts(), owner ? loadQueued() : Promise.resolve()]).then(function (r) { libData = r[0]; libTok = r[1]; indexItems(r[0]); renderLibrary(r[0], r[1]); })
+    if (name === 'library') Promise.all([data(), tokens(), prompts(), loadQueued()]).then(function (r) { libData = r[0]; libTok = r[1]; indexItems(r[0]); renderLibrary(r[0], r[1]); })
       .catch(function () { $('ds-fd').innerHTML = '<div class="ul-empty"><div class="ul-empty__copy"><h2>Could not load the library</h2></div></div>'; });
     if (name === 'review') me.then(function () {
       /* Admins can look at everything here. Only the owner can act, and the page says so. */
@@ -1694,7 +1803,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       if (!admin) return;
       $('ds-rev-ro').hidden = owner; $('ds-gh-check').hidden = !owner;
       revLoading();
-      Promise.all([data(), owner ? loadQueued() : Promise.resolve()]).then(function (r) {
+      Promise.all([data(), loadQueued()]).then(function (r) {
         reviewData = r[0]; renderReview(r[0]);
         if (owner) $('ds-gh-check').addEventListener('click', function () {
           var b = this; b.disabled = true; b.textContent = 'Checking…';

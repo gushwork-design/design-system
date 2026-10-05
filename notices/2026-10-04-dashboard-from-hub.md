@@ -3,7 +3,7 @@
 Built 4 Oct 2026 for heavy analytics dashboards and web apps. Files: `exports/dashboard/` (`css/`,
 `js/`, `registry-parts/`, 14 docs, built `dashboard.css`, `dashboard.js`, `component-registry.json`),
 `web/previews/dashboard/*.frag` (110), `skills/gushwork-dashboard/SKILL.md` (rewritten),
-`foundation/states.md` (new), `scripts/build-dashboard-css.sh` (new). Ruling: **R43**.
+`foundation/states.md` (new), `scripts/build-dashboard-css.sh` (new). Ruling: **R50**.
 
 The Figma-measured dashboard set (the skill, `exports/dashboard/*.md` and `v2/`, 29 Library pages,
 the GTM and Meta Ads builds) is removed. Nothing in it applies now.

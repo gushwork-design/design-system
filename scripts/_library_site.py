@@ -498,6 +498,8 @@ PARTS = [
     ("slides", "Slides", "stack-overflow-logo", "Sales and discovery decks, 1920×1080."),
     ("lead-magnet", "Lead magnet", "download-simple",
      "The downloadable PDF behind an ad lander."),
+    ("tools", "Tools", "wrench",
+     "The shell the hub's small internal tools share. Only what the library did not already have."),
     ("shared", "Shared", "check-circle",
      "Held once and merged into every surface, so a change is reported once."),
     ("ads", "Ad creatives", "toolbox",
@@ -1190,7 +1192,7 @@ def build_index(reg, counts, groups_n, ad, gaps):
 
 CAT_SURFACES = [("foundation", "Foundation"), ("web", "Web"), ("ad-page", "Ad page"),
                 ("dashboard", "Dashboard"), ("slides", "Slides"),
-                ("lead-magnet", "Lead magnet"), ("shared", "Shared")]
+                ("lead-magnet", "Lead magnet"), ("tools", "Tools"), ("shared", "Shared")]
 GROUP_LABEL = {"components": "Components", "folds": "Folds", "shell and elements": "Shell and elements", "foundation": ""}
 FID_LABEL = {"measured": ("measured", "Measured", "Read off the rendered component in Figma."),
              "inventory": ("transcribed", "Inventory", "Variant matrix and rules only; not read off the render."),
@@ -1314,6 +1316,19 @@ FOUNDATION_VIEW = {"color": "color", "typefaces": "faces", "type": "scale", "typ
                    "ruled": "motion", "slides": "slides"}
 
 
+def review_state(state, rec, fp):
+    """The state the Review tab shows. A pass whose source has moved since reads `expired`. A rework whose source
+    has moved since the note was written reads `redone`: someone has had a go at it, so it goes back to Waiting
+    with a tag. The registry still says `rework` until the owner decides again; nothing is written for `redone`.
+    A rework with no stored fingerprint cannot be compared, so it stays in rework."""
+    stored = rec.get("fingerprint")
+    if state == "passed" and stored != fp:
+        return "expired"
+    if state == "rework" and stored and stored != fp:
+        return "redone"
+    return state
+
+
 def review_items(reg, groups):
     """Everything reviewable, with its state, who decided and when, and its current fingerprint. The queue above
     lists only what is waiting; the Review tab needs the whole set to show passed, sent-back and expired too."""
@@ -1326,7 +1341,7 @@ def review_items(reg, groups):
             continue
         rec = fblock.get(key) or {}
         rev = CL.review_of(fblock, key)
-        state = "expired" if rev["state"] == "passed" and rec.get("fingerprint") != fps[key] else rev["state"]
+        state = review_state(rev["state"], rec, fps[key])
         out.append({"scope": "foundation", "key": key, "label": CL.display_title(g), "kind": "foundation",
                     "state": state, "by": rev["by"], "on": rev["on"], "note": rev["note"], "fp": fps[key],
                     "view": FOUNDATION_VIEW.get(key, ""), "href": f"foundations/{key}.html"})
@@ -1339,7 +1354,7 @@ def review_items(reg, groups):
             rec = rblock.get(n) or {}
             rev = CL.review_of(rblock, n)
             fp = CL.component_fingerprint(skey, n, reg)
-            state = "expired" if rev["state"] == "passed" and rec.get("fingerprint") != fp else rev["state"]
+            state = review_state(rev["state"], rec, fp)
             prev = os.path.join(ROOT, "web", "previews", skey, n + ".frag")
             # The ad-page folds have a Figma render each; two are filed under a shorter name.
             stem = {"eyebrow-ad-page": "eyebrow", "footer-with-cta": "footer-cta"}.get(n, n)
