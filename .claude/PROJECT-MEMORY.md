@@ -38,6 +38,8 @@ Short, stable facts so a fresh session can pick up cold. Update as we go. No sec
 - 2026-10-05: memory lives at `.claude/PROJECT-MEMORY.md`, committed on the dev branch (no PR until asked).
 - 2026-10-05: `mods/design-hub` v0.2 adds `/hub` (memory + threads pane) and `/thread <title>: <task>` (parallel subagent threads, one JSON file each under `.claude/hub/threads/`, see `.claude/hub/README.md`). Load locally with `claude --plugin-dir mods/design-hub`; it draws only in terminal and Desktop, not cloud sessions. Not part of the plugin. Not yet run end to end.
 
+- 2026-10-05: Utsav chose the `/thread` mod for new threads (one JSON file each in `.claude/hub/threads/`). Slash commands are typed by the user, so the lead cannot run `/thread` itself; when Utsav has not typed one, the lead falls back to a subagent and says so. The mod has not been run end to end yet.
+
 ## Open draft PRs from this project (Utsav merges)
 - #191 Add CLAUDE.md (+ the memory file). #194 Draw: slides/title-bar. #196 Fix library build on Python 3.11.
 - Closed 2026-10-05 at Utsav's yes: #19 (superseded; branch ad-page/ai-services-lander kept).
