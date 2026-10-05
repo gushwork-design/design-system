@@ -102,7 +102,7 @@ printf '%s' "$(run "$(fake "$OLD")" "file://$TMP/v.json")" | grep -q 'a new temp
 run "$(fake "$OLD")" "file://$TMP/v.json" | python3 -c "
 import json,sys
 o=json.load(sys.stdin); m=o['systemMessage']; c=o['hookSpecificOutput']['additionalContext']
-assert "You're on Gushwork design system v$OLD" in m and 'a new template' in m, m
+assert 'on Gushwork design system v$OLD' in m and 'a new template' in m, m
 assert 'https://example.test/ad-page' in m and 'https://example.test/ad-page' in c, 'links missing'
 assert 'changelog-sheet' in m, 'the changelog sheet must always be linked'
 assert 'do not list earlier releases' in c and 'colleague' in c, c
