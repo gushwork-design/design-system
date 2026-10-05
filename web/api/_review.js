@@ -34,7 +34,7 @@
 
 import { COOKIE, verify, readCookie, sessionSecret } from './_session.js';
 import { isOwner } from './_access.js';
-import { recordViaGithub, recordDirect, explain, checkGithub } from './_review-github.js';
+import { recordViaGithub, recordDirect, explain, checkGithub, refPath, commitRef } from './_review-github.js';
 
 const LIST_KEY = 'gw:review-decisions';
 const STATE_KEY = 'gw:review-state';
@@ -78,6 +78,11 @@ export function publicState(state) {
 }
 
 /* Fire the rework routine. Never throws: a rework is already recorded, and the nightly run is the fallback. */
+/* The brief's line about attached reference files: they are in the repo, so the session reads them from its checkout. */
+export function refsBrief(refs) {
+  return refs && refs.length ? `\nHe attached ${refs.length} reference file${refs.length === 1 ? '' : 's'}; look at ${refs.length === 1 ? 'it' : 'them'} before you start (paths in the repo): ${refs.join(', ')}` : '';
+}
+
 export async function fireRework(row, env = process.env, f = fetch) {
   const url = env.GW_REWORK_TRIGGER_URL || '', token = env.GW_REWORK_TRIGGER_TOKEN || '';
   if (!url || !token) return { fired: false, why: 'not set' };
@@ -85,7 +90,7 @@ export async function fireRework(row, env = process.env, f = fetch) {
     const r = await f(url, {
       method: 'POST',
       headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json', 'anthropic-beta': 'experimental-cc-routine-2026-04-01', 'anthropic-version': '2023-06-01' },
-      body: JSON.stringify({ text: `Rework ${row.scope}/${row.key}. Utsav's note: ${row.note}\nThe fingerprint he reviewed: ${row.fp}.` }),
+      body: JSON.stringify({ text: `Rework ${row.scope}/${row.key}. Utsav's note: ${row.note}\nThe fingerprint he reviewed: ${row.fp}.` + refsBrief(row.refs) }),
     });
     return r.ok ? { fired: true } : { fired: false, why: `status ${r.status}` };
   } catch { return { fired: false, why: 'unreachable' }; }
@@ -117,7 +122,36 @@ export function checkDecision(body, email, now = new Date()) {
   if ((action === 'reject' || action === 'rework') && !note) return { ok: false, error: 'Say what is wrong: a note is required.' };
   if (fp && !/^[0-9a-f]{8,64}$/.test(fp)) return { ok: false, error: 'Bad fingerprint.' };
   if (pfp && !/^[0-9a-f]{8,64}$/.test(pfp)) return { ok: false, error: 'Bad fingerprint.' };
-  return { ok: true, row: { at: now.toISOString(), scope, key, action, note, fp, pfp, by: email } };
+  // Reference files must already be in this item's own refs folder (the attach step put them there).
+  const refs = Array.isArray(b.refs) ? b.refs.map(String) : [];
+  const own = `web/previews/${scope}/refs/${key}/`;
+  if (refs.length > MAX_REFS || refs.some((r) => !r.startsWith(own) || !/^[a-z0-9-]+\.?[a-z0-9]*$/.test(r.slice(own.length)) || r.includes('..'))) return { ok: false, error: 'Bad attachment.' };
+  if (refs.length && action !== 'rework' && action !== 'reject') return { ok: false, error: 'Attachments go with a send-back or a reject.' };
+  const row = { at: now.toISOString(), scope, key, action, note, fp, pfp, by: email };
+  if (refs.length) row.refs = refs;
+  return { ok: true, row };
+}
+
+/* Attachments (5 Oct 2026, Utsav: "add images and files for ref and also allow image paste"). One file per request, so a
+   request stays under the function's 4.5 MB body limit; the page shrinks big images first. Kinds a reviewer would attach as
+   a reference and that the site can serve safely: images (no SVG, which can carry script), PDFs and plain text. */
+export const MAX_REFS = 6;
+export const MAX_REF_BYTES = 3 * 1024 * 1024;
+const REF_TYPES = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp', 'image/gif': 'gif', 'application/pdf': 'pdf',
+  'text/plain': 'txt', 'text/markdown': 'md', 'text/csv': 'csv', 'application/json': 'json' };
+export function checkAttachment(body, now = new Date()) {
+  const b = body && typeof body === 'object' ? body : {};
+  const scope = String(b.scope || ''), key = String(b.key || ''), type = String(b.type || ''), data = String(b.data || '');
+  if (!/^[a-z0-9-]{1,32}$/.test(scope) || !/^[a-z0-9-]{1,80}$/.test(key)) return { ok: false, error: 'Bad item.' };
+  if (!REF_TYPES[type]) return { ok: false, error: 'Images, PDFs and text files only.' };
+  if (!/^[A-Za-z0-9+/]+=*$/.test(data)) return { ok: false, error: 'Bad file.' };
+  const bytes = Math.floor(data.length * 3 / 4) - (data.endsWith('==') ? 2 : data.endsWith('=') ? 1 : 0);
+  if (!bytes) return { ok: false, error: 'The file is empty.' };
+  if (bytes > MAX_REF_BYTES) return { ok: false, error: 'Files over 3 MB are too big.' };
+  const n = Math.max(1, Math.min(MAX_REFS, parseInt(b.n, 10) || 1));
+  const stamp = now.toISOString().replace(/[-:]/g, '').replace('T', '-').slice(0, 15);
+  let name = String(b.name || 'file').replace(/\.[^.]*$/, '') + '.' + REF_TYPES[type];
+  return { ok: true, path: refPath(scope, key, stamp, n, name), data, scope, key };
 }
 
 export default async function handler(req, res) {
@@ -145,6 +179,14 @@ export default async function handler(req, res) {
 
   let body = req.body;
   if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = null; } }
+  if (body && body.action === 'attach') {
+    const a = checkAttachment(body);
+    if (!a.ok) return json(res, 400, { error: a.error });
+    const token = process.env.GW_GITHUB_TOKEN || '';
+    if (!token) return json(res, 503, { error: 'Attachments need the GitHub token on the site.' });
+    try { return json(res, 200, { ok: true, ...(await commitRef(token, a.path, a.data, `Review: reference for ${a.scope}/${a.key} (${email})`)) }); }
+    catch (e) { return json(res, 502, { error: 'Could not store the attachment. ' + explain(e) }); }
+  }
   const v = checkDecision(body, email);
   if (!v.ok) return json(res, 400, { error: v.error });
   const { row } = v;
