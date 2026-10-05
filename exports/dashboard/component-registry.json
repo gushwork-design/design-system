@@ -874,6 +874,12 @@
       "reviewedOn": "2026-10-05",
       "fingerprint": "0a6858018d88036b",
       "note": "spacing tag and text is missing, we can keep 4 px gap"
+    },
+    "detail-view": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "41379b02d398020d"
     }
   }
 }
