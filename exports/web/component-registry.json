@@ -326,8 +326,8 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "b011f54c631f2238",
-      "previewFingerprint": "e618b315c2cf7d65",
-      "note": "1. hover mode should be in all the white blocks and add subtle animation\n2. add mobile version for this too"
+      "previewFingerprint": "e4fcaef85b7efc64",
+      "note": "1. in desktop the tooltips are coming offplaced.\n2. in mobile is taking too much space, week 1 can be above the placed above the main text frame - and lets not repeat in tooltip"
     },
     "video": {
       "reviewed": "passed",
