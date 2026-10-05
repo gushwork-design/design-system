@@ -285,7 +285,7 @@ a.gd-hbar__row:hover, a.gd-hbar__row.is-hover { background: var(--gd-hover-bg); 
 .gd-heat__cell[data-l="5"] { background: var(--gd-seq-5); box-shadow: none; }
 .gd-heat__cell[data-l="x"] { visibility: hidden; }                     /* outside the date range */
 .gd-heat__cell:hover, .gd-heat__cell.is-hover, .gd-heat__cell[data-on] { box-shadow: 0 0 0 2px var(--gd-text); position: relative; z-index: 1; }
-.gd-heat__cell:focus-visible { outline: var(--gw-focus-ring); }
+.gd-heat__cell:focus-visible { outline: 1px solid light-dark(var(--gw-color-black), var(--gw-color-white)); }   /* black on light, white on dark, 1px: a ring that reads on every step of the scale */
 .gd-heat__key { display: flex; align-items: center; justify-content: flex-end; gap: var(--gw-space-4); font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
 .gd-heat__key i { width: 12px; height: 12px; border-radius: var(--gw-radius-4); background: var(--gd-sunken-bg); box-shadow: inset 0 0 0 1px var(--gd-border); }
 .gd-heat__key i[data-l="1"] { background: var(--gd-seq-1); box-shadow: none; } .gd-heat__key i[data-l="2"] { background: var(--gd-seq-2); box-shadow: none; }
@@ -324,26 +324,32 @@ a.gd-hbar__row:hover, a.gd-hbar__row.is-hover { background: var(--gd-hover-bg); 
 .gd-funnel--v .gd-funnel__label { text-align: center; }
 .gd-funnel--v .gd-funnel__val { text-align: center; }
 .gd-funnel--v .gd-funnel__meta { display: flex; flex-direction: column; align-items: center; gap: var(--gw-space-2, 2px); font: var(--gw-text-body-12-med); font-feature-settings: "tnum" 1; color: var(--gd-text-muted); }
-.gd-funnel__table { width: 100%; border-collapse: collapse; font: var(--gw-text-body-12-med); font-feature-settings: "tnum" 1; }
-.gd-funnel__table th, .gd-funnel__table td { height: var(--gd-row-h); padding: 0 var(--gd-cell-px); text-align: right; border-top: 1px solid var(--gd-border); color: var(--gd-text); }
-.gd-funnel__table th:first-child, .gd-funnel__table td:first-child { text-align: left; }
-.gd-funnel__table thead th { height: var(--gd-head-h); border-top: 0; background: var(--gd-sunken-bg); color: var(--gd-text-muted); font-weight: 500; }
+.gd-funnel__table { width: 100%; border-collapse: collapse; font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); font-feature-settings: "tnum" 1; }
+.gd-funnel__table th, .gd-funnel__table td { height: var(--gd-row-h); padding: 0 var(--gd-cell-px); text-align: right; color: var(--gd-text-body); }
+.gd-funnel__table tbody :is(th, td) { border-bottom: 1px solid var(--gd-border); }
+.gd-funnel__table tbody tr:hover { background: var(--gd-row-hover); }
+.gd-funnel__table :is(th, td):first-child { text-align: left; }
+.gd-funnel__table tbody :is(th, td):first-child { color: var(--gd-text); }
+/* same header as the data table: no fill, small uppercase muted label, a firmer rule */
+.gd-funnel__table thead th { height: var(--gd-head-h); background: none; border-bottom: 1px solid var(--gd-border-strong); color: var(--gd-text-muted); text-transform: uppercase; white-space: nowrap; }
 
 /* ============================================================================
    legend-table: a row per series, a checkbox toggles it
    ============================================================================ */
-.gd-ltable { width: 100%; border-collapse: collapse; font: var(--gw-text-body-14-reg); color: var(--gd-text-body); }
-.gd-ltable th, .gd-ltable td { height: var(--gd-row-h); padding: 0 var(--gd-cell-px); border-top: 1px solid var(--gd-border); text-align: right; font-feature-settings: "tnum" 1; white-space: nowrap; }
-.gd-ltable thead th { height: var(--gd-head-h); border-top: 0; background: var(--gd-sunken-bg); font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
+.gd-ltable { width: 100%; border-collapse: collapse; font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); color: var(--gd-text-body); }
+.gd-ltable th, .gd-ltable td { height: var(--gd-row-h); padding: 0 var(--gd-cell-px); text-align: right; font-feature-settings: "tnum" 1; white-space: nowrap; }
+.gd-ltable tbody :is(th, td) { border-bottom: 1px solid var(--gd-border); }
+/* same header as the data table: no fill, small uppercase muted label, a firmer rule */
+.gd-ltable thead th { height: var(--gd-head-h); background: none; border-bottom: 1px solid var(--gd-border-strong); font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); text-transform: uppercase; color: var(--gd-text-muted); }
 .gd-ltable__sel { width: 1%; text-align: left !important; }
 .gd-ltable__name { text-align: left !important; width: 100%; }
 .gd-ltable tbody th { font-weight: 500; color: var(--gd-text); }
 .gd-ltable__name > span { display: inline-flex; align-items: center; gap: var(--gw-space-8); min-width: 0; }
 .gd-ltable tbody tr { transition: background var(--gw-motion-fast); }
-.gd-ltable tbody tr:hover, .gd-ltable tbody tr.is-hover { background: var(--gd-hover-bg); }
+.gd-ltable tbody tr:hover, .gd-ltable tbody tr.is-hover { background: var(--gd-row-hover); }
 .gd-ltable tbody tr[data-off] :is(th, td):not(.gd-ltable__sel) { color: var(--gd-text-muted); }
 .gd-ltable tbody tr[data-off] .gd-sw { opacity: .35; }
-.gd-ltable td { color: var(--gd-text); }
+.gd-ltable td { color: var(--gd-text-body); }
 /* the checkbox is .gd-check from 20-actions; this is only a fallback so the table works on its own */
 .gd-ltable input[type="checkbox"] { width: 16px; height: 16px; margin: 0; accent-color: var(--gd-ink); cursor: pointer; vertical-align: middle; }
 

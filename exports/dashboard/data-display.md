@@ -8,7 +8,7 @@ Rules that apply to the whole set: a figure that can change carries `gd-num` (ta
 
 **Purpose.** The container for a section of a screen: a chart, a table, a form group. Use it to group related content under one title. Do not nest a card inside a card; use a bordered well or the key value list inside.
 
-**Anatomy.** `.gd-card` > `.gd-card__head` (`__titles` > `__title`, `__desc`; `__actions`), `.gd-card__body`, optional `.gd-card__foot`.
+**Anatomy.** `.gd-card` > `.gd-card__head` (`__titles` > `__title`, `__desc`; `__actions`), `.gd-card__body`, optional `.gd-card__foot`. `__actions` sit at the top right of the head (inside the card padding, in compact too); they drop under the title only when the card is too narrow for both.
 ```html
 <section class="gd-card"><div class="gd-card__head"><div class="gd-card__titles"><h3 class="gd-card__title">Lead sources</h3><p class="gd-card__desc">Last 30 days</p></div><div class="gd-card__actions">…</div></div><div class="gd-card__body">…</div></section>
 ```
@@ -96,11 +96,11 @@ Rules that apply to the whole set: a figure that can change carries `gd-num` (ta
 
 ## Avatar
 
-**Purpose.** A person or account mark. The hub's generated mark: a rounded square with a 3x3 dot profile chosen by hashing a seed (email), the same on every device. **Anatomy.** `.gd-avatar` (24 `--sm`, 32 default, 40 `--lg`) containing the svg, or `data-gd-avatar="seed"` and JS renders it. Level: `--team` (primary-300), `--admin` and `--owner` (black in light; neutral-800 in dark, an added alias `--gd-avatar-admin`, because black vanishes on the dark ground). `--initials` is the fallback when no seed exists. Radius is 20% of the size. **Accessibility.** `role=img` with the person's name. **Provenance.** extracted: `web/shell.js:407-455`; initials NEW.
+**Purpose.** A person or account mark. The hub's generated mark: a rounded square with a 3x3 dot profile chosen by hashing a seed (email), the same on every device. **Anatomy.** `.gd-avatar` (24 `--sm`, 32 default, 40 `--lg`) containing the svg, or `data-gd-avatar="seed"` and JS renders it. Level: `--team` (primary-300), `--admin` and `--owner` (black in light; neutral-800 in dark, an added alias `--gd-avatar-admin`, because black vanishes on the dark ground). Team avatars take one of five tones, all at the `-300` step: blue (default), red, yellow, orange, green. `data-tone="red|yellow|orange|green"` sets it; with `data-gd-avatar` outside a group JS picks a stable tone from the seed. Admin and owner stay black. `--initials` is the fallback when no seed exists. Radius is 20% of the size. **Accessibility.** `role=img` with the person's name. **Provenance.** extracted: `web/shell.js:407-455`; initials NEW.
 
 ## Avatar group
 
-**Purpose.** Several people at once, stacked with an overflow count. **Anatomy.** `.gd-avatar-group` (`--sm`, `--lg`) > avatars + `.gd-avatar-group__more` ("+3"). Overlap is 25%, with a 2px ring in the card colour. Show at most 4 and count the rest. **Accessibility.** `role=group` with a label giving the total. **Provenance.** NEW; pending library review.
+**Purpose.** Several people at once, stacked with an overflow count. **Anatomy.** `.gd-avatar-group` (`--sm`, `--lg`) > avatars + `.gd-avatar-group__more` ("+3"). Overlap is 25%, with a 2px ring in the card colour. Show at most 4 and count the rest. Neighbours take the next tone in turn (blue, red, yellow, orange, green) so they read as different people; a `data-tone` on one avatar overrides. **Accessibility.** `role=group` with a label giving the total. **Provenance.** NEW; pending library review.
 
 ## Tag
 

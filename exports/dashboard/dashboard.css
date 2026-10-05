@@ -287,6 +287,12 @@
 .gd-topbar { display: none; flex: none; align-items: center; justify-content: space-between; gap: var(--gw-space-8); height: calc(var(--gd-control-h) + var(--gw-space-24)); padding: 0 var(--gw-space-20); background: var(--gd-panel-bg); position: relative; z-index: 40; }
 .gd-topbar--always { display: flex; }
 .gd-topbar__start, .gd-topbar__acts { display: flex; align-items: center; gap: var(--gw-space-8); min-width: 0; }
+/* the menu button sits at the right end: brand left, then search and theme, then the burger. The start group dissolves into the
+   bar's own row so the markup order (burger first, which the template keeps) is only changed visually. */
+.gd-topbar__start { display: contents; }
+.gd-topbar .gd-sidebar__brand { order: 0; }
+.gd-topbar__acts { order: 1; margin-left: auto; }
+.gd-topbar__btn[data-gd-nav-toggle] { order: 2; }
 .gd-topbar__btn { width: var(--gd-control-h); height: var(--gd-control-h); border-radius: var(--gw-radius-8); }
 .gd-topbar__btn--box { border: 1px solid var(--gd-border); }
 .gd-topbar__btn .gd-ico-close, .gd-topbar__btn[aria-expanded="true"] .gd-ico-open { display: none; }
@@ -426,9 +432,9 @@
 .gd-widget-grid__item { grid-column: span 6; position: relative; min-width: 0; display: flex; flex-direction: column; background: var(--gd-card-bg); border: 1px solid var(--gd-border); border-radius: var(--gw-radius-12); }
 .gd-widget-grid__item[data-size="s"] { grid-column: span 4; } .gd-widget-grid__item[data-size="m"] { grid-column: span 6; }
 .gd-widget-grid__item[data-size="l"] { grid-column: span 8; } .gd-widget-grid__item[data-size="full"] { grid-column: span 12; }
-.gd-widget-grid__head { display: flex; align-items: center; gap: var(--gw-space-8); min-height: calc(var(--gd-control-h) + var(--gw-space-8)); padding: 0 var(--gd-card-pad); }
+.gd-widget-grid__head { display: flex; align-items: center; gap: var(--gw-space-8); padding: var(--gd-card-pad) var(--gd-card-pad) 0; }   /* top padding = side padding; the heading no longer floats in a tall bar */
 .gd-widget-grid__title { flex: 1; min-width: 0; margin: 0; font: var(--gw-text-body-14-sem); letter-spacing: var(--gw-text-body-14-sem-tracking); color: var(--gd-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.gd-widget-grid__body { padding: 0 var(--gd-card-pad) var(--gd-card-pad); min-height: calc(var(--gd-row-h) * 2); }
+.gd-widget-grid__body { padding: var(--gw-space-12) var(--gd-card-pad) var(--gd-card-pad); min-height: calc(var(--gd-row-h) * 2); }
 .gd-widget-grid__handle, .gd-widget-grid__size, .gd-widget-grid__remove { display: none; }
 .gd-widget-grid[data-editing="true"] .gd-widget-grid__handle { display: grid; }
 .gd-widget-grid[data-editing="true"] .gd-widget-grid__size { display: inline-flex; }
@@ -734,15 +740,15 @@
 .gd .gd-period__t{ font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
 
 /* --- info hint: dotted label + (i) trigger; the definition is a data-tip bubble ----- */
-.gd .gd-hint{ display: inline-flex; align-items: center; gap: var(--gw-space-4); vertical-align: baseline; }
-.gd .gd-hint__label{ text-decoration: underline dotted; text-decoration-color: var(--gd-text-muted); text-underline-offset: 4px; text-decoration-thickness: 1px; }
+.gd .gd-hint{ position: relative; display: inline-flex; align-items: center; gap: var(--gw-space-4); vertical-align: baseline; }   /* the bubble anchors to the whole hint */
+.gd .gd-hint__label{ text-decoration: none; }   /* the (i) is the only cue, no underline */
 .gd .gd-hint__btn{
-  position: relative; display: inline-grid; place-items: center; flex: none; width: 16px; height: 16px; padding: 0;
+  display: inline-grid; place-items: center; flex: none; width: 16px; height: 16px; padding: 0;
   border: 0; border-radius: 50%; background: none; color: var(--gd-text-muted); cursor: help; transition: color var(--gw-motion-fast);
 }
 .gd .gd-hint__btn svg{ width: 14px; height: 14px; display: block; }
 .gd .gd-hint__btn:hover, .gd .gd-hint__btn.is-hover{ color: var(--gd-text); }
-.gd .gd-hint__btn[data-tip]::after{ width: max-content; max-width: 240px; white-space: normal; padding: var(--gw-space-8) var(--gw-space-12); font: var(--gw-text-body-12-reg); }
+.gd .gd-hint__btn[data-tip]::after{ left: 50%; transform: translateX(-50%); width: max-content; max-width: 240px; white-space: normal; padding: var(--gw-space-8) var(--gw-space-12); font: var(--gw-text-body-12-reg); }   /* centred under the label and glyph together */
 
 /* ==== 30-inputs.css ==== */
 /* ============================================================================
@@ -831,10 +837,14 @@
 .gd .gd-combo__toggle{ flex: none; width: 20px; height: 20px; display: grid; place-items: center; padding: 0; border: 0; background: none; color: var(--gd-text-muted); cursor: pointer; }
 
 /* multi-select: chips inside the shell */
-.gd .gd-input--multi{ height: auto; min-height: var(--gd-control-h); flex-wrap: wrap; gap: var(--gw-space-4); padding: 3px var(--gw-space-8) 3px var(--gw-space-8); cursor: text; }
+.gd .gd-input--multi{ --_chip-h: min(22px, calc(var(--gd-control-h) - 6px)); position: relative; height: auto; min-height: var(--gd-control-h); flex-wrap: wrap; gap: var(--gw-space-4);
+  /* top and bottom padding is what centres a single chip row in the control; keeping it when the chips wrap stops the rows crowding the edge. The right padding clears the arrow. */
+  padding: calc((var(--gd-control-h) - var(--_chip-h)) / 2) calc(var(--gw-space-8) + 12px + var(--gw-space-8)) calc((var(--gd-control-h) - var(--_chip-h)) / 2) var(--gw-space-8); cursor: text; }
+/* the arrow is pinned top right, level with the first row, however many rows the chips make */
+.gd .gd-input--multi > .gd-input__caret{ position: absolute; right: var(--gw-space-8); top: calc((var(--gd-control-h) - 12px) / 2); }
 .gd .gd-input--multi .gd-input__el{ flex: 1 1 72px; min-width: 72px; height: 22px; }
 .gd .gd-input__chip{
-  display: inline-flex; align-items: center; gap: var(--gw-space-4); height: min(22px, calc(var(--gd-control-h) - 6px)); padding: 0 2px 0 var(--gw-space-8);
+  display: inline-flex; align-items: center; gap: var(--gw-space-4); height: var(--_chip-h, min(22px, calc(var(--gd-control-h) - 6px))); padding: 0 2px 0 var(--gw-space-8);
   border-radius: var(--gw-radius-4); background: var(--gd-sunken-bg); color: var(--gd-text); box-shadow: inset 0 0 0 1px var(--gd-border-strong);
   font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); white-space: nowrap; max-width: 100%;
 }
@@ -975,8 +985,10 @@
 .gd .gd-drp__day button:hover, .gd .gd-drp__day button.is-hover{ background: var(--gd-menu-hover); }
 .gd .gd-drp__day[data-range="mid"] button:hover{ background: color-mix(in srgb, var(--gd-range-band), var(--gd-text) 12%); }
 .gd .gd-drp__day button[aria-current="date"]{ box-shadow: inset 0 0 0 1px var(--gd-border-strong); }
-.gd .gd-drp__day[data-range="start"] button, .gd .gd-drp__day[data-range="end"] button, .gd .gd-drp__day[data-range="single"] button{ background: var(--gd-ink); color: var(--gd-ink-fg); box-shadow: none; }
-.gd .gd-drp__day[data-range="start"] button:hover, .gd .gd-drp__day[data-range="end"] button:hover, .gd .gd-drp__day[data-range="single"] button:hover{ background: var(--gd-ink-hover); }
+/* selected ends: ink in light; in dark one step darker than ink (neutral-200, was neutral-100) so they stop glaring */
+.gd .gd-drp{ --gd-drp-sel: light-dark(var(--gd-ink), var(--gw-color-neutral-200)); --gd-drp-sel-hover: light-dark(var(--gd-ink-hover), var(--gw-color-neutral-100)); }
+.gd .gd-drp__day[data-range="start"] button, .gd .gd-drp__day[data-range="end"] button, .gd .gd-drp__day[data-range="single"] button{ background: var(--gd-drp-sel); color: var(--gd-ink-fg); box-shadow: none; }
+.gd .gd-drp__day[data-range="start"] button:hover, .gd .gd-drp__day[data-range="end"] button:hover, .gd .gd-drp__day[data-range="single"] button:hover{ background: var(--gd-drp-sel-hover); }
 .gd .gd-drp__day button:disabled{ color: var(--gd-disabled-ink); background: none; cursor: not-allowed; }
 .gd .gd-drp__foot{ display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-12); padding: var(--gw-space-12) var(--gw-space-16); box-shadow: inset 0 1px 0 var(--gd-border); }
 .gd .gd-drp__sum{ font: var(--gw-text-body-12-med); color: var(--gd-text-muted); font-feature-settings: "tnum" 1; }
@@ -1083,6 +1095,7 @@
   /* header: no fill (hub's final style), a firmer rule, sticky so it stays while the body scrolls */
   .gd-table__row--head { position: sticky; top: 0; z-index: 2; height: var(--gd-head-h); --_ov: transparent; box-shadow: inset 0 -1px 0 var(--gd-border-strong); }
   .gd-table__row--head2 { top: var(--gd-head-h); }
+  .gd-table__row--head:has(+ .gd-table__row--head2) { box-shadow: none; }   /* two-level header: only the lower row carries the strong rule, the group label keeps its own hairline */
   .gd-table__th {
     display: flex; align-items: center; gap: var(--gw-space-4); min-width: 0; padding: 0 var(--gd-cell-px);
     font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); text-transform: uppercase; color: var(--gd-text-muted); white-space: nowrap;
@@ -1280,6 +1293,7 @@
   .gd-fbuilder__none { margin: 0; font: var(--gw-text-body-12-reg); color: var(--gd-text-muted); }
   .gd-fbuilder__foot { display: flex; align-items: center; gap: var(--gw-space-8); }
   .gd-fbuilder__foot > .gd-fbuilder__sp { flex: 1 1 auto; }
+  .gd-fbuilder__foot > .gd-btn--ghost:first-child { margin-left: calc(var(--gw-space-12) * -1); }   /* the ghost button's own 12px padding no longer pushes "Add filter" in from the Where / And labels */
 
   /* ===================================================== saved-views ===== */
   .gd-views { display: flex; align-items: center; gap: var(--gw-space-4); flex-wrap: wrap; padding: 0 var(--gw-space-12); }
@@ -1399,6 +1413,10 @@
   --gd-tone-violet-fg:  light-dark(color-mix(in srgb, var(--gw-color-chart-violet) 55%, var(--gw-color-black)), var(--gw-color-chart-violet));
   --gd-track:           light-dark(var(--gw-color-neutral-200), var(--gw-color-neutral-600));
   --gd-avatar-team:     var(--gw-color-primary-300);
+  --gd-avatar-red:      var(--gw-color-red-300);      /* the other team tones sit at the same -300 level as the blue */
+  --gd-avatar-yellow:   var(--gw-color-yellow-300);
+  --gd-avatar-orange:   var(--gw-color-orange-300);
+  --gd-avatar-green:    var(--gw-color-green-300);
   --gd-avatar-admin:    light-dark(var(--gw-color-black), var(--gw-color-neutral-800));   /* hub is black in both; black vanishes on the dark ground */
   --gd-avatar-initials-bg: light-dark(var(--gw-color-neutral-100), var(--gw-color-neutral-850));
 }
@@ -1463,11 +1481,11 @@
 .gd-card--flush > .gd-card__head { padding: var(--gd-card-pad); }
 .gd-card--flush > .gd-card__body { padding: 0 var(--gd-card-pad) var(--gd-card-pad); }
 .gd-card--flush > .gd-card__body--bleed { padding: 0; }
-.gd-card__head { display: flex; align-items: center; justify-content: space-between; gap: var(--gd-gap); min-height: 24px; flex-wrap: wrap; }
+.gd-card__head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--gd-gap); min-height: 24px; flex-wrap: wrap; }   /* actions pin to the top right; they only drop below the title when the card is too narrow for both */
 .gd-card__titles { flex: 1 1 160px; display: flex; flex-direction: column; gap: var(--gw-space-2); min-width: 0; }
 .gd-card__title { margin: 0; font: var(--gw-text-body-16-sem); letter-spacing: var(--gw-text-body-16-sem-tracking); color: var(--gd-text); }
 .gd-card__desc { margin: 0; font: var(--gw-text-body-14-reg); letter-spacing: var(--gw-text-body-14-reg-tracking); color: var(--gd-text-muted); }
-.gd-card__actions { display: flex; align-items: center; gap: var(--gw-space-8); margin-left: auto; }
+.gd-card__actions { flex: none; display: flex; align-items: center; gap: var(--gw-space-8); margin-left: auto; }
 .gd-card__body { min-width: 0; }
 .gd-card__body[hidden] { display: none; }
 .gd-card__foot { display: flex; align-items: center; justify-content: space-between; gap: var(--gd-gap); padding-top: var(--gd-gap); border-top: 1px solid var(--gd-border); }
@@ -1635,12 +1653,22 @@ button.gd-legend__item:disabled { opacity: .5; cursor: not-allowed; }
 .gd-avatar__tile { fill: var(--gd-avatar-team); }
 .gd-avatar--admin .gd-avatar__tile, .gd-avatar--owner .gd-avatar__tile { fill: var(--gd-avatar-admin); }
 .gd-avatar__dot { fill: var(--gw-color-white); }
+/* team tones: blue (default), red, yellow, orange, green. Admin and owner stay black. */
+.gd-avatar--team[data-tone="red"]    .gd-avatar__tile { fill: var(--gd-avatar-red); }
+.gd-avatar--team[data-tone="yellow"] .gd-avatar__tile { fill: var(--gd-avatar-yellow); }
+.gd-avatar--team[data-tone="orange"] .gd-avatar__tile { fill: var(--gd-avatar-orange); }
+.gd-avatar--team[data-tone="green"]  .gd-avatar__tile { fill: var(--gd-avatar-green); }
 .gd-avatar--initials { text-transform: uppercase; }
 
 /* --------------------------------------------------------- avatar-group --- */
 .gd-avatar-group { --gd-avatar-size: 32px; display: inline-flex; align-items: center; padding-left: calc(var(--gd-avatar-size) * .25); }
 .gd-avatar-group--sm { --gd-avatar-size: 24px; } .gd-avatar-group--lg { --gd-avatar-size: 40px; }
 .gd-avatar-group > * { margin-left: calc(var(--gd-avatar-size) * -.25); box-shadow: 0 0 0 2px var(--gd-card-bg); }
+/* in a group each person gets the next tone, so neighbours are told apart (a data-tone on the avatar wins) */
+.gd-avatar-group > .gd-avatar--team:not([data-tone]):nth-child(5n+2) .gd-avatar__tile { fill: var(--gd-avatar-red); }
+.gd-avatar-group > .gd-avatar--team:not([data-tone]):nth-child(5n+3) .gd-avatar__tile { fill: var(--gd-avatar-yellow); }
+.gd-avatar-group > .gd-avatar--team:not([data-tone]):nth-child(5n+4) .gd-avatar__tile { fill: var(--gd-avatar-orange); }
+.gd-avatar-group > .gd-avatar--team:not([data-tone]):nth-child(5n+5) .gd-avatar__tile { fill: var(--gd-avatar-green); }
 .gd-avatar-group__more { width: var(--gd-avatar-size); height: var(--gd-avatar-size); display: inline-grid; place-items: center; border-radius: 20%; background: var(--gd-sunken-bg);
   color: var(--gd-text-muted); font: var(--gw-text-body-12-med); font-feature-settings: "tnum" 1; }
 .gd-avatar-group--sm .gd-avatar-group__more { font: var(--gw-text-body-10-med); }
@@ -1999,7 +2027,7 @@ a.gd-hbar__row:hover, a.gd-hbar__row.is-hover { background: var(--gd-hover-bg); 
 .gd-heat__cell[data-l="5"] { background: var(--gd-seq-5); box-shadow: none; }
 .gd-heat__cell[data-l="x"] { visibility: hidden; }                     /* outside the date range */
 .gd-heat__cell:hover, .gd-heat__cell.is-hover, .gd-heat__cell[data-on] { box-shadow: 0 0 0 2px var(--gd-text); position: relative; z-index: 1; }
-.gd-heat__cell:focus-visible { outline: var(--gw-focus-ring); }
+.gd-heat__cell:focus-visible { outline: 1px solid light-dark(var(--gw-color-black), var(--gw-color-white)); }   /* black on light, white on dark, 1px: a ring that reads on every step of the scale */
 .gd-heat__key { display: flex; align-items: center; justify-content: flex-end; gap: var(--gw-space-4); font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
 .gd-heat__key i { width: 12px; height: 12px; border-radius: var(--gw-radius-4); background: var(--gd-sunken-bg); box-shadow: inset 0 0 0 1px var(--gd-border); }
 .gd-heat__key i[data-l="1"] { background: var(--gd-seq-1); box-shadow: none; } .gd-heat__key i[data-l="2"] { background: var(--gd-seq-2); box-shadow: none; }
@@ -2038,26 +2066,32 @@ a.gd-hbar__row:hover, a.gd-hbar__row.is-hover { background: var(--gd-hover-bg); 
 .gd-funnel--v .gd-funnel__label { text-align: center; }
 .gd-funnel--v .gd-funnel__val { text-align: center; }
 .gd-funnel--v .gd-funnel__meta { display: flex; flex-direction: column; align-items: center; gap: var(--gw-space-2, 2px); font: var(--gw-text-body-12-med); font-feature-settings: "tnum" 1; color: var(--gd-text-muted); }
-.gd-funnel__table { width: 100%; border-collapse: collapse; font: var(--gw-text-body-12-med); font-feature-settings: "tnum" 1; }
-.gd-funnel__table th, .gd-funnel__table td { height: var(--gd-row-h); padding: 0 var(--gd-cell-px); text-align: right; border-top: 1px solid var(--gd-border); color: var(--gd-text); }
-.gd-funnel__table th:first-child, .gd-funnel__table td:first-child { text-align: left; }
-.gd-funnel__table thead th { height: var(--gd-head-h); border-top: 0; background: var(--gd-sunken-bg); color: var(--gd-text-muted); font-weight: 500; }
+.gd-funnel__table { width: 100%; border-collapse: collapse; font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); font-feature-settings: "tnum" 1; }
+.gd-funnel__table th, .gd-funnel__table td { height: var(--gd-row-h); padding: 0 var(--gd-cell-px); text-align: right; color: var(--gd-text-body); }
+.gd-funnel__table tbody :is(th, td) { border-bottom: 1px solid var(--gd-border); }
+.gd-funnel__table tbody tr:hover { background: var(--gd-row-hover); }
+.gd-funnel__table :is(th, td):first-child { text-align: left; }
+.gd-funnel__table tbody :is(th, td):first-child { color: var(--gd-text); }
+/* same header as the data table: no fill, small uppercase muted label, a firmer rule */
+.gd-funnel__table thead th { height: var(--gd-head-h); background: none; border-bottom: 1px solid var(--gd-border-strong); color: var(--gd-text-muted); text-transform: uppercase; white-space: nowrap; }
 
 /* ============================================================================
    legend-table: a row per series, a checkbox toggles it
    ============================================================================ */
-.gd-ltable { width: 100%; border-collapse: collapse; font: var(--gw-text-body-14-reg); color: var(--gd-text-body); }
-.gd-ltable th, .gd-ltable td { height: var(--gd-row-h); padding: 0 var(--gd-cell-px); border-top: 1px solid var(--gd-border); text-align: right; font-feature-settings: "tnum" 1; white-space: nowrap; }
-.gd-ltable thead th { height: var(--gd-head-h); border-top: 0; background: var(--gd-sunken-bg); font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
+.gd-ltable { width: 100%; border-collapse: collapse; font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); color: var(--gd-text-body); }
+.gd-ltable th, .gd-ltable td { height: var(--gd-row-h); padding: 0 var(--gd-cell-px); text-align: right; font-feature-settings: "tnum" 1; white-space: nowrap; }
+.gd-ltable tbody :is(th, td) { border-bottom: 1px solid var(--gd-border); }
+/* same header as the data table: no fill, small uppercase muted label, a firmer rule */
+.gd-ltable thead th { height: var(--gd-head-h); background: none; border-bottom: 1px solid var(--gd-border-strong); font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); text-transform: uppercase; color: var(--gd-text-muted); }
 .gd-ltable__sel { width: 1%; text-align: left !important; }
 .gd-ltable__name { text-align: left !important; width: 100%; }
 .gd-ltable tbody th { font-weight: 500; color: var(--gd-text); }
 .gd-ltable__name > span { display: inline-flex; align-items: center; gap: var(--gw-space-8); min-width: 0; }
 .gd-ltable tbody tr { transition: background var(--gw-motion-fast); }
-.gd-ltable tbody tr:hover, .gd-ltable tbody tr.is-hover { background: var(--gd-hover-bg); }
+.gd-ltable tbody tr:hover, .gd-ltable tbody tr.is-hover { background: var(--gd-row-hover); }
 .gd-ltable tbody tr[data-off] :is(th, td):not(.gd-ltable__sel) { color: var(--gd-text-muted); }
 .gd-ltable tbody tr[data-off] .gd-sw { opacity: .35; }
-.gd-ltable td { color: var(--gd-text); }
+.gd-ltable td { color: var(--gd-text-body); }
 /* the checkbox is .gd-check from 20-actions; this is only a fallback so the table works on its own */
 .gd-ltable input[type="checkbox"] { width: 16px; height: 16px; margin: 0; accent-color: var(--gd-ink); cursor: pointer; vertical-align: middle; }
 
@@ -2478,7 +2512,7 @@ a.gd-hbar__row:hover, a.gd-hbar__row.is-hover { background: var(--gd-hover-bg); 
      session-expired      NEW: not in the hub — reference Mobbin Linear / Intercom / Google Docs "session expired". Pending library review.
    FIXED SCALE. The full-page screens do not follow --gd-control-h / data-density: sign-in is a one-off marketing-grade surface, so
    controls are 48, the card is 480, type is the hub's. They reflow (never scale) under 560px.
-   Aliases declared here (light-dark): --gd-auth-bg --gd-auth-grid --gd-auth-cell --gd-auth-field
+   Aliases declared here (light-dark): --gd-auth-bg --gd-auth-grid --gd-auth-field
    ============================================================================ */
 
 .gd {
@@ -2486,7 +2520,6 @@ a.gd-hbar__row:hover, a.gd-hbar__row.is-hover { background: var(--gd-hover-bg); 
   /* The hub dims the whole grid to 30% in dark (opacity on the layer). light-dark() cannot carry an opacity, so the same 30% is
      baked into the colour: identical result, one declaration per alias. */
   --gd-auth-grid: light-dark(var(--gw-color-neutral-100), color-mix(in srgb, var(--gw-color-neutral-900) 30%, transparent));
-  --gd-auth-cell: light-dark(var(--gw-color-neutral-50),  color-mix(in srgb, var(--gw-color-neutral-900) 30%, transparent));
   /* --gd-field-bg is neutral-900 in dark, the same as the card, so the well vanishes (the hub hit this too). Inset it: grey in light, black in dark. */
   --gd-auth-field: light-dark(var(--gw-color-neutral-25), var(--gw-color-black));
 }
@@ -2505,12 +2538,6 @@ a.gd-hbar__row:hover, a.gd-hbar__row.is-hover { background: var(--gd-hover-bg); 
   background-image: linear-gradient(to right, var(--gd-auth-grid) 1px, transparent 1px), linear-gradient(to bottom, var(--gd-auth-grid) 1px, transparent 1px);
   background-size: 40px 40px;
 }
-.gd .gd-auth__cell { position: absolute; width: 40px; height: 40px; background: var(--gd-auth-cell); }   /* filled cells break the regularity, as on the hero */
-.gd .gd-auth__cell:nth-child(1) { left: 400px; top: 80px; }
-.gd .gd-auth__cell:nth-child(2) { left: 440px; top: 120px; }
-.gd .gd-auth__cell:nth-child(3) { left: 800px; top: 240px; }
-.gd .gd-auth__cell:nth-child(4) { right: 120px; bottom: 200px; }
-.gd .gd-auth__cell:nth-child(5) { right: 280px; bottom: 80px; }
 
 .gd .gd-auth__card {
   position: relative; width: 480px; max-width: 100%; padding: var(--gw-space-40) var(--gw-space-32);
@@ -2597,7 +2624,6 @@ a.gd-hbar__row:hover, a.gd-hbar__row.is-hover { background: var(--gd-hover-bg); 
   .gd .gd-auth--embedded { padding: var(--gw-space-16); }
   .gd .gd-auth__card { padding: var(--gw-space-32) var(--gw-space-20); gap: var(--gw-space-32); border-radius: var(--gw-radius-16); }
   .gd .gd-auth__title { font: var(--gw-text-h6); letter-spacing: var(--gw-text-h6-tracking); }
-  .gd .gd-auth__cell { display: none; }
   .gd .gd-modal.gd-auth-modal { padding: var(--gw-space-32) var(--gw-space-20); border-radius: var(--gw-radius-16); }
 }
 

@@ -2,9 +2,9 @@
 
 The screens around the front door of a dashboard or web app: the full-page sign-in, its Google button, the same card as a dialog, the page shown to someone who is signed in but not allowed, and the notice shown when a session lapses mid-work. Source is the hub's `/login` page and sign-in modal (`web/shell.css` 805-960 and 1262-1500, `web/login.html`), where the hub and the old Figma export disagree the hub wins. Code is `css/70-auth.css` and `js/70-auth.js`. Fields and buttons are not redefined here: the form uses `.gd-field` / `.gd-input` (30-inputs), `.gd-btn` (20-actions), the dialog shell `.gd-modal` and banner `.gd-banner` (60-feedback), and the badge of `.gd-empty`.
 
-**Fixed scale.** The full-page screens ignore `--gd-control-h` and `data-density`: controls are 48, the card is 480, type is the hub's. They never scale; under 560px they reflow (card padding 32/20, title steps to 26, filled lattice cells hide).
+**Fixed scale.** The full-page screens ignore `--gd-control-h` and `data-density`: controls are 48, the card is 480, type is the hub's. They never scale; under 560px they reflow (card padding 32/20, title steps to 26).
 
-**Aliases added** (declared under `.gd`, `light-dark()`): `--gd-auth-bg` (page ground, neutral-25 light / black dark), `--gd-auth-grid`, `--gd-auth-cell` (the lattice, with the hub's 30%-in-dark baked into the colour), `--gd-auth-field` (an inset well: `--gd-field-bg` is neutral-900 in dark, the same as the card, so the field vanished).
+**Aliases added** (declared under `.gd`, `light-dark()`): `--gd-auth-bg` (page ground, neutral-25 light / black dark), `--gd-auth-grid` (the lattice lines, with the hub's 30%-in-dark baked into the colour), `--gd-auth-field` (an inset well: `--gd-field-bg` is neutral-900 in dark, the same as the card, so the field vanished).
 
 **Which old text rulings still apply.** The old split screen had `welcomeTitle`, `welcomeDescription` and `creatorInfo`. The hub card has no welcome panel, so R13 (two-line subtext, 56px reserved) is retired with the panel. R12 survives in two places: the card subtitle says what this dashboard is and how to use it, not a status update, and a dashboard-specific sign-in may carry one fixed attribution line, `Created and owned by {first name} on {D MMM YYYY} at {h:mm am/pm}.` (`.gd-auth__attrib`), never a tagline. R3 (Google button 48 / r12 / no arrow) applies unchanged.
 
@@ -16,7 +16,7 @@ The screens around the front door of a dashboard or web app: the full-page sign-
 
 ```html
 <div class="gd-auth">
-  <div class="gd-auth__grid" aria-hidden="true"><span class="gd-auth__cell"></span> ×5</div>
+  <div class="gd-auth__grid" aria-hidden="true"></div>
   <div class="gd-auth__card">                                  <!-- data-state="success" swaps the doors for the status line -->
     <div class="gd-auth__head">
       <span class="gd-auth__chip"><svg viewBox="0 0 80 80" width="30" height="30">…</svg></span>
