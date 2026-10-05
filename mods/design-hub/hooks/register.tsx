@@ -96,9 +96,17 @@ export const register: Register = on => {
     if (e.agentId !== undefined) {
       const mine = (await load($)).find(t => t.agentId === e.agentId)
       if (mine) {
+        let result = e.answer
+        if (!result.trim()) {
+          // A thread that ends by handing back leaves no final text: take its last message.
+          const found = await $.session.messages({ agentId: e.agentId })
+          if (!('deny' in found)) {
+            result = [...found].reverse().find(m => m.role === 'assistant' && m.text.trim())?.text ?? ''
+          }
+        }
         await $.fs.write(
           file(mine.id),
-          JSON.stringify({ ...mine, status: 'done', result: e.answer.slice(0, 2000) }, null, 2),
+          JSON.stringify({ ...mine, status: 'done', result: result.slice(0, 2000) }, null, 2),
         )
         $.ui.invalidate('ui.render')
         $.ui.toast(`Thread done: ${mine.title}`)
