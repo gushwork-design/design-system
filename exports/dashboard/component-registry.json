@@ -1461,12 +1461,11 @@
       "previewFingerprint": "410329c2eabe53a0"
     },
     "shortcut-key": {
-      "reviewed": "rework",
+      "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "b9fffa5c4c2a5753",
-      "previewFingerprint": "af29bdadc7ae7958",
-      "note": "colors are not going well, delete should be red colors, approve dark mode - color of A tag seems weird, it can be like Rework light mode button"
+      "fingerprint": "ad80096e0c840a94",
+      "previewFingerprint": "97c3a2ac1deea9ca"
     }
   }
 }
