@@ -9,8 +9,10 @@ W="${2:-560}"
 OUT="${3:-/tmp/$(basename "$FRAG" .frag).png}"
 DARK="${4:-}"
 ROOT="$(pwd)"
-CH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-[ -x "$CH" ] || { echo "Chrome not found at $CH" >&2; exit 1; }
+# CHROME overrides; otherwise the Mac app, then a Linux install (a GitHub runner has google-chrome).
+CH="${CHROME:-/Applications/Google Chrome.app/Contents/MacOS/Google Chrome}"
+[ -x "$CH" ] || CH="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+[ -n "$CH" ] && [ -x "$CH" ] || { echo "Chrome not found" >&2; exit 1; }
 HTML="$(mktemp -d)/shot.html"
 python3 - "$ROOT" "$FRAG" "$W" "$HTML" "$DARK" <<'PY'
 import sys, json
@@ -41,6 +43,6 @@ fit(); setTimeout(fit,300); setTimeout(fit,1200);
 </script></body></html>"""
 open(html, "w", encoding="utf-8").write(page)
 PY
-"$CH" --headless=new --disable-gpu --hide-scrollbars --allow-file-access-from-files --window-size=$((W+32)),${SHOT_H:-2200} \
+"$CH" --headless=new --no-sandbox --disable-gpu --hide-scrollbars --allow-file-access-from-files --window-size=$((W+32)),${SHOT_H:-2200} \
   --virtual-time-budget=4000 --screenshot="$OUT" "file://$HTML" >/dev/null 2>&1
 echo "$OUT"

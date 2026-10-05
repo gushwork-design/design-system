@@ -11,6 +11,10 @@
 //   node scripts/bruce-pings.mjs --dry-run  print what it would send
 
 import { decisionActions, decisionMenu } from '../web/api/_slack-actions.js';
+import { execFileSync } from 'node:child_process';
+import { existsSync, readFileSync, mkdtempSync } from 'node:fs';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 
 const REPO = process.env.GITHUB_REPOSITORY || 'gushwork-design/design-system';
 const SITE = (process.env.SITE_BASE || 'https://design.gushwork.ai').replace(/\/$/, '');
@@ -80,6 +84,60 @@ export async function slack(method, body, f = fetch) {
   return j;
 }
 
+/* The PR that shipped this fix: the #number Alfred named, if it is this item's rework PR and merged; else the newest
+   merged one. Returns its merge commit, or null. */
+export async function fixCommit(p, comment, f = fetch) {
+  const named = [...String(comment || '').matchAll(/#(\d+)/g)].map((m) => Number(m[1]));
+  const want = `Rework: ${p.scope}/${p.key}`;
+  for (const n of named) {
+    try { const pr = await gh(`repos/${REPO}/pulls/${n}`, {}, f); if (pr.title === want && pr.merged_at) return pr.merge_commit_sha; } catch { /* try the next */ }
+  }
+  const q = encodeURIComponent(`repo:${REPO} is:pr is:merged in:title "${want}"`);
+  const hit = await gh(`search/issues?q=${q}&sort=updated&order=desc&per_page=1`, {}, f);
+  const n = hit && hit.items && hit.items[0] && hit.items[0].number;
+  if (!n) return null;
+  const pr = await gh(`repos/${REPO}/pulls/${n}`, {}, f);
+  return pr.merged_at ? pr.merge_commit_sha : null;
+}
+
+/* Render the item's drawing at the commit before the fix and at the fix, and share both into the ping's thread. Skipped
+   when there is no drawing or the two are identical (a fix that changed only the hub's own pages). */
+async function sendShots(p, channel, threadTs, f) {
+  const sha = await fixCommit(p, p.comment, f);
+  if (!sha) return;
+  const frag = `web/previews/${p.scope}/${p.key}.frag`;
+  const dir = mkdtempSync(join(tmpdir(), 'shots-'));
+  const shoot = (rev, name) => {
+    const tree = join(dir, name);
+    execFileSync('git', ['worktree', 'add', '--detach', tree, rev], { stdio: 'ignore' });
+    if (!existsSync(join(tree, frag))) return null;
+    const out = join(dir, `${p.key}-${name}.png`);
+    execFileSync('bash', [join(tree, 'scripts/preview-shot.sh'), frag, '900', out], { cwd: tree, stdio: 'ignore', env: { ...process.env, SHOT_H: '1200' } });
+    try { execFileSync('convert', [out, '-trim', '+repage', '-bordercolor', 'white', '-border', '16', out], { stdio: 'ignore' }); } catch { /* untrimmed is fine */ }
+    return out;
+  };
+  const before = shoot(`${sha}^1`, 'before'), after = shoot(sha, 'after');
+  if (!after) return;
+  if (before && readFileSync(before).equals(readFileSync(after))) return;
+  const files = [];
+  for (const [path, title] of [[before, 'Before'], [after, 'After']]) {
+    if (!path) continue;
+    const bytes = readFileSync(path);
+    const got = await slackForm('files.getUploadURLExternal', { filename: path.split('/').pop(), length: String(bytes.length) }, f);
+    const up = await f(got.upload_url, { method: 'POST', body: bytes });
+    if (!up.ok) throw new Error(`upload ${up.status}`);
+    files.push({ id: got.file_id, title });
+  }
+  await slackForm('files.completeUploadExternal', { files: JSON.stringify(files), channel_id: channel, thread_ts: threadTs, initial_comment: before ? 'Before and after.' : 'How it looks now.' }, f);
+}
+
+async function slackForm(method, body, f = fetch) {
+  const r = await f(`https://slack.com/api/${method}`, { method: 'POST', headers: { authorization: `Bearer ${process.env.SLACK_BOT_TOKEN}`, 'content-type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(body).toString() });
+  const j = await r.json().catch(() => ({}));
+  if (!j.ok) throw new Error(`slack ${method}: ${j.error || r.status}`);
+  return j;
+}
+
 export async function run({ dry = false, f = fetch, hours = 24 } = {}) {
   const since = new Date(Date.now() - hours * 3600e3).toISOString();
   const comments = await gh(`repos/${REPO}/issues/comments?since=${encodeURIComponent(since)}&per_page=100&sort=created&direction=asc`, {}, f);
@@ -91,7 +149,7 @@ export async function run({ dry = false, f = fetch, hours = 24 } = {}) {
     if ((reacted || []).length) continue;                       // already sent
     if (!titles.has(c.issue_url)) titles.set(c.issue_url, (await gh(c.issue_url.replace('https://api.github.com/', ''), {}, f)).title);
     const p = parsePing(c, titles.get(c.issue_url));
-    if (p) pings.push(p);
+    if (p) pings.push({ ...p, comment: c.body });
   }
   // Two comments on one item in a burst: the latest says where it stands.
   const latest = [...new Map(pings.map((p) => [`${p.scope}/${p.key}`, p])).values()];
@@ -100,11 +158,15 @@ export async function run({ dry = false, f = fetch, hours = 24 } = {}) {
   if (dry) return { sent: 0, text, would: latest.length };
   const dm = await slack('conversations.open', { users: process.env.OWNER_SLACK_ID }, f);
   const one = latest.length === 1 ? latest[0] : null;
-  await slack('chat.postMessage', {
+  const posted = await slack('chat.postMessage', {
     channel: dm.channel.id, text, blocks: blocksFor(latest), unfurl_links: false, unfurl_media: false,
     // A reply in this thread goes back to Alfred's thread when it is about one item (_concierge.js reads this).
     ...(one && one.issue ? { metadata: { event_type: 'gw_alfred_ping', event_payload: { issue: one.issue, scope: one.scope, key: one.key } } } : {}),
   }, f);
+  // Before and after, under a single finished item, so most reviews need no click (SHOTS=1: the workflow has Chrome).
+  if (one && !one.blocked && process.env.SHOTS === '1') {
+    try { await sendShots(one, dm.channel.id, posted.ts, f); } catch (e) { console.warn('shots:', String(e.message || e).slice(0, 200)); }
+  }
   for (const p of pings) {                                       // every comment read, not only the latest per item
     try { await gh(`repos/${REPO}/issues/comments/${p.id}/reactions`, { method: 'POST', body: JSON.stringify({ content: MARK }) }, f); } catch { /* sent twice is better than not sent */ }
   }
