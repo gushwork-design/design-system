@@ -96,11 +96,11 @@ Rules that apply to the whole set: a figure that can change carries `gd-num` (ta
 
 ## Avatar
 
-**Purpose.** A person or account mark. The hub's generated mark: a rounded square with a 3x3 dot profile chosen by hashing a seed (email), the same on every device. **Anatomy.** `.gd-avatar` (24 `--sm`, 32 default, 40 `--lg`) containing the svg, or `data-gd-avatar="seed"` and JS renders it. Level: `--team` (primary-300), `--admin` and `--owner` (black in light; neutral-800 in dark, an added alias `--gd-avatar-admin`, because black vanishes on the dark ground). `--initials` is the fallback when no seed exists. Radius is 20% of the size. **Accessibility.** `role=img` with the person's name. **Provenance.** extracted: `web/shell.js:407-455`; initials NEW.
+**Purpose.** A person or account mark. The hub's generated mark: a rounded square with a 3x3 dot profile chosen by hashing a seed (email), the same on every device. **Anatomy.** `.gd-avatar` (24 `--sm`, 32 default, 40 `--lg`) containing the svg, or `data-gd-avatar="seed"` and JS renders it. Level: `--team` (primary-300), `--admin` and `--owner` (black in light; neutral-800 in dark, an added alias `--gd-avatar-admin`, because black vanishes on the dark ground). Team avatars take one of five tones, all at the `-300` step: blue (default), red, yellow, orange, green. `data-tone="red|yellow|orange|green"` sets it; with `data-gd-avatar` outside a group JS picks a stable tone from the seed. Admin and owner stay black. `--initials` is the fallback when no seed exists. Radius is 20% of the size. **Accessibility.** `role=img` with the person's name. **Provenance.** extracted: `web/shell.js:407-455`; initials NEW.
 
 ## Avatar group
 
-**Purpose.** Several people at once, stacked with an overflow count. **Anatomy.** `.gd-avatar-group` (`--sm`, `--lg`) > avatars + `.gd-avatar-group__more` ("+3"). Overlap is 25%, with a 2px ring in the card colour. Show at most 4 and count the rest. **Accessibility.** `role=group` with a label giving the total. **Provenance.** NEW; pending library review.
+**Purpose.** Several people at once, stacked with an overflow count. **Anatomy.** `.gd-avatar-group` (`--sm`, `--lg`) > avatars + `.gd-avatar-group__more` ("+3"). Overlap is 25%, with a 2px ring in the card colour. Show at most 4 and count the rest. Neighbours take the next tone in turn (blue, red, yellow, orange, green) so they read as different people; a `data-tone` on one avatar overrides. **Accessibility.** `role=group` with a label giving the total. **Provenance.** NEW; pending library review.
 
 ## Tag
 

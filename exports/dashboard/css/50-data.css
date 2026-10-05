@@ -46,6 +46,10 @@
   --gd-tone-violet-fg:  light-dark(color-mix(in srgb, var(--gw-color-chart-violet) 55%, var(--gw-color-black)), var(--gw-color-chart-violet));
   --gd-track:           light-dark(var(--gw-color-neutral-200), var(--gw-color-neutral-600));
   --gd-avatar-team:     var(--gw-color-primary-300);
+  --gd-avatar-red:      var(--gw-color-red-300);      /* the other team tones sit at the same -300 level as the blue */
+  --gd-avatar-yellow:   var(--gw-color-yellow-300);
+  --gd-avatar-orange:   var(--gw-color-orange-300);
+  --gd-avatar-green:    var(--gw-color-green-300);
   --gd-avatar-admin:    light-dark(var(--gw-color-black), var(--gw-color-neutral-800));   /* hub is black in both; black vanishes on the dark ground */
   --gd-avatar-initials-bg: light-dark(var(--gw-color-neutral-100), var(--gw-color-neutral-850));
 }
@@ -282,12 +286,22 @@ button.gd-legend__item:disabled { opacity: .5; cursor: not-allowed; }
 .gd-avatar__tile { fill: var(--gd-avatar-team); }
 .gd-avatar--admin .gd-avatar__tile, .gd-avatar--owner .gd-avatar__tile { fill: var(--gd-avatar-admin); }
 .gd-avatar__dot { fill: var(--gw-color-white); }
+/* team tones: blue (default), red, yellow, orange, green. Admin and owner stay black. */
+.gd-avatar--team[data-tone="red"]    .gd-avatar__tile { fill: var(--gd-avatar-red); }
+.gd-avatar--team[data-tone="yellow"] .gd-avatar__tile { fill: var(--gd-avatar-yellow); }
+.gd-avatar--team[data-tone="orange"] .gd-avatar__tile { fill: var(--gd-avatar-orange); }
+.gd-avatar--team[data-tone="green"]  .gd-avatar__tile { fill: var(--gd-avatar-green); }
 .gd-avatar--initials { text-transform: uppercase; }
 
 /* --------------------------------------------------------- avatar-group --- */
 .gd-avatar-group { --gd-avatar-size: 32px; display: inline-flex; align-items: center; padding-left: calc(var(--gd-avatar-size) * .25); }
 .gd-avatar-group--sm { --gd-avatar-size: 24px; } .gd-avatar-group--lg { --gd-avatar-size: 40px; }
 .gd-avatar-group > * { margin-left: calc(var(--gd-avatar-size) * -.25); box-shadow: 0 0 0 2px var(--gd-card-bg); }
+/* in a group each person gets the next tone, so neighbours are told apart (a data-tone on the avatar wins) */
+.gd-avatar-group > .gd-avatar--team:not([data-tone]):nth-child(5n+2) .gd-avatar__tile { fill: var(--gd-avatar-red); }
+.gd-avatar-group > .gd-avatar--team:not([data-tone]):nth-child(5n+3) .gd-avatar__tile { fill: var(--gd-avatar-yellow); }
+.gd-avatar-group > .gd-avatar--team:not([data-tone]):nth-child(5n+4) .gd-avatar__tile { fill: var(--gd-avatar-orange); }
+.gd-avatar-group > .gd-avatar--team:not([data-tone]):nth-child(5n+5) .gd-avatar__tile { fill: var(--gd-avatar-green); }
 .gd-avatar-group__more { width: var(--gd-avatar-size); height: var(--gd-avatar-size); display: inline-grid; place-items: center; border-radius: 20%; background: var(--gd-sunken-bg);
   color: var(--gd-text-muted); font: var(--gw-text-body-12-med); font-feature-settings: "tnum" 1; }
 .gd-avatar-group--sm .gd-avatar-group__more { font: var(--gw-text-body-10-med); }
