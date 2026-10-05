@@ -56,10 +56,17 @@ jobs:
           echo "ready=1" >> "$GITHUB_ENV"
       - uses: actions/checkout@v4
         if: env.ready == '1'
+        with:
+          fetch-depth: 0          # the before/after images render the drawing at the fix and at the commit before it
       - uses: actions/setup-node@v4
         if: env.ready == '1'
         with:
           node-version: 20
+      - name: Tools for the before/after images
+        if: env.ready == '1'
+        run: command -v convert >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq imagemagick >/dev/null) || true
       - name: Send what Alfred said
         if: env.ready == '1'
+        env:
+          SHOTS: '1'
         run: node scripts/bruce-pings.mjs
