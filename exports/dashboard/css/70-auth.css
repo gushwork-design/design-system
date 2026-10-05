@@ -13,7 +13,7 @@
      session-expired      NEW: not in the hub — reference Mobbin Linear / Intercom / Google Docs "session expired". Pending library review.
    FIXED SCALE. The full-page screens do not follow --gd-control-h / data-density: sign-in is a one-off marketing-grade surface, so
    controls are 48, the card is 480, type is the hub's. They reflow (never scale) under 560px.
-   Aliases declared here (light-dark): --gd-auth-bg --gd-auth-grid --gd-auth-cell --gd-auth-field
+   Aliases declared here (light-dark): --gd-auth-bg --gd-auth-grid --gd-auth-field
    ============================================================================ */
 
 .gd {
@@ -21,7 +21,6 @@
   /* The hub dims the whole grid to 30% in dark (opacity on the layer). light-dark() cannot carry an opacity, so the same 30% is
      baked into the colour: identical result, one declaration per alias. */
   --gd-auth-grid: light-dark(var(--gw-color-neutral-100), color-mix(in srgb, var(--gw-color-neutral-900) 30%, transparent));
-  --gd-auth-cell: light-dark(var(--gw-color-neutral-50),  color-mix(in srgb, var(--gw-color-neutral-900) 30%, transparent));
   /* --gd-field-bg is neutral-900 in dark, the same as the card, so the well vanishes (the hub hit this too). Inset it: grey in light, black in dark. */
   --gd-auth-field: light-dark(var(--gw-color-neutral-25), var(--gw-color-black));
 }
@@ -40,12 +39,6 @@
   background-image: linear-gradient(to right, var(--gd-auth-grid) 1px, transparent 1px), linear-gradient(to bottom, var(--gd-auth-grid) 1px, transparent 1px);
   background-size: 40px 40px;
 }
-.gd .gd-auth__cell { position: absolute; width: 40px; height: 40px; background: var(--gd-auth-cell); }   /* filled cells break the regularity, as on the hero */
-.gd .gd-auth__cell:nth-child(1) { left: 400px; top: 80px; }
-.gd .gd-auth__cell:nth-child(2) { left: 440px; top: 120px; }
-.gd .gd-auth__cell:nth-child(3) { left: 800px; top: 240px; }
-.gd .gd-auth__cell:nth-child(4) { right: 120px; bottom: 200px; }
-.gd .gd-auth__cell:nth-child(5) { right: 280px; bottom: 80px; }
 
 .gd .gd-auth__card {
   position: relative; width: 480px; max-width: 100%; padding: var(--gw-space-40) var(--gw-space-32);
@@ -132,6 +125,5 @@
   .gd .gd-auth--embedded { padding: var(--gw-space-16); }
   .gd .gd-auth__card { padding: var(--gw-space-32) var(--gw-space-20); gap: var(--gw-space-32); border-radius: var(--gw-radius-16); }
   .gd .gd-auth__title { font: var(--gw-text-h6); letter-spacing: var(--gw-text-h6-tracking); }
-  .gd .gd-auth__cell { display: none; }
   .gd .gd-modal.gd-auth-modal { padding: var(--gw-space-32) var(--gw-space-20); border-radius: var(--gw-radius-16); }
 }
