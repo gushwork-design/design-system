@@ -306,7 +306,7 @@ if bits:
 
 if flipped:
     tail = ("Auto-update was off on this machine — it is on now, so the next start picks this up. "
-            "To take it now: claude plugin update gushwork-design@gushwork, then restart.")
+            "To take it now, use the update button in Claude's first reply, or run: claude plugin update gushwork-design@gushwork, then restart.")
 else:
     tail = ("Auto-update should land this at your next start. To take it now: "
             "claude plugin update gushwork-design@gushwork, then restart.")
@@ -331,8 +331,11 @@ print(json.dumps({"systemMessage": head + " " + tail, "hookSpecificOutput": {
         # nothing was listed reads as a bug and costs the whole notice its credibility.
         + ("Anything you build with this version may use superseded specs for the components "
            "named above; say so rather than silently building. " if (breaking or changed) else "")
-        + "Update with: claude plugin update gushwork-design@gushwork "
-          "(a restart is required either way)."
+        + "Show the update command in its OWN fenced code block tagged bash, with nothing else in the block, "
+          "so the app gives them a Run button and updating is one click (in a terminal they copy it): "
+          "```bash\nclaude plugin update gushwork-design@gushwork\n```  "
+          "Say once, in the same sentence or the next, that a restart is needed to take the new version. "
+          "(R48: this block replaces the plain 'run this command' line.)"
     ),
 }}))
 PY

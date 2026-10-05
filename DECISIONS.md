@@ -1193,3 +1193,11 @@ Ruled by Utsav, 4 Oct 2026: "add a save option, once anything approved, rejected
 - **Discard or Undo throws a draft away.** Nothing was sent, so there is nothing to revert. Undo on a saved decision still reverts it (a commit that restores the earlier record).
 - **A draft goes stale if the item changes.** When the Review data loads, a draft for an item whose source has moved since it was marked is dropped, because it no longer describes what is on screen.
 - **Counts.** The tab counts include staged decisions, since the rows move; the `not saved` tag and the bar say which are not applied yet.
+
+## R48 — a session opens with a short hello, and an update is one click
+Ruled by Utsav, 5 Oct 2026: a warm, short greeting by name when a session starts, so people know the skills are active and it builds a connection; and a one-click way to take a new version.
+
+- **The hello.** `scripts/welcome.sh` is a SessionStart hook on `startup` and `clear` (a new conversation), not on `resume` or `compact`. It gives Claude one instruction: open the first reply with one or two short, warm sentences, by first name, saying the Gushwork design skills are on and which version, then carry straight on with the work. No list, no emoji, said once. A skill's own "Using the Gushwork … skill" line may follow it. It is a hook, not a line in each skill, because a skill loads only when the request matches it and the greeting must reach everyone.
+- **The name** is the Claude account's display name, then the git `user.name`, then the part of the account email before the first dot or plus sign. It stays on the machine, is cleaned of anything but letters, apostrophes and hyphens, and is never used to guess anything about the person (they/them stays the default). `GW_NO_WELCOME=1` turns it off on a machine.
+- **One-click update.** When a newer version is out, the existing update notice now asks Claude to show the command in its own fenced `bash` block, so the desktop app gives it a Run button. In a terminal it is copy and paste. A restart is still needed to take the new version; this does not replace the auto-update flag.
+- **What this cannot do.** Nothing in a plugin runs while Claude is closed, so a plugin cannot start a session or message someone who has not opened Claude. Reaching them is a message outside Claude (Slack), which this ruling does not add.
