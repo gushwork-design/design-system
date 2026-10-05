@@ -201,6 +201,13 @@
       "reviewedOn": "2026-10-05",
       "fingerprint": "7a115e38e412f1cf",
       "note": "preview is not there"
+    },
+    "eyebrow": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "3dcdce606bd0b74c",
+      "note": "preview is not there"
     }
   }
 }
