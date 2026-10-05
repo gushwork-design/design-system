@@ -9,7 +9,8 @@
    Alfred already has GitHub, so it reads and writes the thread with no new secret, and the history outlives any one
    run. The repo is public, so the thread is too, as the rework notes already were. Who wrote a comment is read from a
    marker on its first line, because the site and the routine may post as the same GitHub account:
-     <!-- gw-hub:owner -->            the site, on Utsav's behalf (a send-back note, or a reply)
+     <!-- gw-hub:owner rework -->     the site, posting Utsav's send-back note (shown tagged "Rework note")
+     <!-- gw-hub:owner -->            the site, posting a reply he wrote in the drawer
      <!-- gw-hub:alfred -->           Alfred, after every run
      <!-- gw-hub:alfred blocked -->   Alfred, stopped and waiting on an answer
    Needs Issues read/write on GW_GITHUB_TOKEN. Without it every call here fails and the drawer says so.
@@ -24,18 +25,18 @@ export function threadTitle(scope, key) { return `Rework thread: ${scope}/${key}
 /* The first line of a comment says who wrote it. Pure, so it can be tested. */
 export function parseComment(c) {
   const body = String((c && c.body) || '');
-  const m = /^<!--\s*gw-hub:(owner|alfred)(\s+blocked)?\s*-->\s*\n?/.exec(body);
+  const m = /^<!--\s*gw-hub:(owner|alfred)(?:\s+(blocked|rework|reject))?\s*-->\s*\n?/.exec(body);
   return {
     id: c && c.id, at: (c && c.created_at) || '',
-    who: m ? m[1] : 'other', blocked: !!(m && m[2]),
+    who: m ? m[1] : 'other', blocked: !!(m && m[2] === 'blocked'), kind: m && (m[2] === 'rework' || m[2] === 'reject') ? m[2] : '',
     by: m ? '' : String((c && c.user && c.user.login) || ''),
     body: (m ? body.slice(m[0].length) : body).trim(),
   };
 }
 
-export function ownerComment(text, refs) {
+export function ownerComment(text, refs, kind) {
   const files = (refs || []).map((r) => `- [${r.split('/').pop()}](https://github.com/${OWNER}/${REPO}/blob/main/${r})`).join('\n');
-  return `<!-- gw-hub:owner -->\n${String(text || '').trim()}${files ? `\n\nReference files:\n${files}` : ''}`;
+  return `<!-- gw-hub:owner${kind ? ' ' + kind : ''} -->\n${String(text || '').trim()}${files ? `\n\nReference files:\n${files}` : ''}`;
 }
 
 async function gh(token, path, init = {}) {

@@ -21,5 +21,9 @@ t('a send-back start names the thread', reworkText({ scope: 'web', key: 'cta', n
 t('a send-back with no thread says nothing about one', reworkText({ scope: 'web', key: 'cta', note: 'n', fp: 'abc' }).includes('Thread:'), false);
 t('a reply starts in REPLY mode with the answer', reworkText({ scope: 'web', key: 'cta', reply: 'use neutral-900', thread: 12 }).startsWith('REPLY on web/cta. Utsav answered in the thread: use neutral-900'), true);
 
+t('a send-back note is tagged rework', parseComment(c('<!-- gw-hub:owner rework -->\nmake it white')).kind, 'rework');
+t('a reply carries no tag', parseComment(c('<!-- gw-hub:owner -->\nok')).kind, '');
+t('the send-back marker is written', ownerComment('n', [], 'rework').startsWith('<!-- gw-hub:owner rework -->'), true);
+
 console.log(`${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
