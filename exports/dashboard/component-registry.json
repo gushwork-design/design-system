@@ -1189,6 +1189,12 @@
       "reviewedOn": "2026-10-05",
       "fingerprint": "7e5aa3c7001fdb7f",
       "note": "on hover show a tooltip like appearance to show whats the icon/ tab is for"
+    },
+    "sign-in-modal": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "60a16061a8270027"
     }
   }
 }
