@@ -1542,7 +1542,7 @@
   }
 
   /* -- scale to fit --------------------------------------------------------
-     exports/dashboard/build-rules.md: "1440 is the minimum width. Below it,
+     exports/dashboard/shell.md: "1440 is the minimum width. Below it,
      SCALE the canvas." Reflow is a rejected attempt there, so nothing here
      rearranges — the 1440 layout is held and shrunk to fit.
 

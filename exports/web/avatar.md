@@ -5,7 +5,7 @@
 | Surface | Component | Node | What it is |
 |---|---|---|---|
 | **Marketing web** | `client/avatar` — this file | `1619:722` | A grayscale squircle holding a **real photo** of a client or author. |
-| Dashboard / product | `Avatar` — see `exports/dashboard/avatar.md` | `1658:24023` | A generated character representing an **app user**. |
+| Dashboard / product | `Avatar` — see `exports/dashboard/data-display.md` | `1658:24023` | A generated character representing an **app user**. |
 
 Never put a client photo in dashboard chrome, and never put the generated character on
 the website.

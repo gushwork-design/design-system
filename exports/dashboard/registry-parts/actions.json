@@ -1,0 +1,56 @@
+{
+  "action-button": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "actions.md"
+  },
+  "icon-button": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "actions.md"
+  },
+  "info-hint": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "actions.md"
+  },
+  "menu": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "actions.md"
+  },
+  "period-select": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "actions.md"
+  },
+  "segmented-control": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "actions.md"
+  },
+  "split-button": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "actions.md"
+  },
+  "tabs-pill": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "actions.md"
+  },
+  "tabs-underline": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "actions.md"
+  }
+}

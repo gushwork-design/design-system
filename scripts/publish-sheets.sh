@@ -227,6 +227,15 @@ for surface in shared dashboard web lead-magnet; do
   echo "  registry -> exports/$surface/component-registry.json"
 done
 
+# The dashboard's built stylesheet and script go up beside its registry. The review drawer loads
+# /exports/dashboard/dashboard.css to draw every dashboard component's preview, and a built
+# dashboard may link it instead of inlining it. They are generated from exports/dashboard/css and
+# /js by scripts/build-dashboard-css.sh; publishing stale ones draws stale previews, so stop here.
+bash scripts/build-dashboard-css.sh --check \
+  || { echo "  dashboard.css/js are out of date — run: bash scripts/build-dashboard-css.sh" >&2; exit 1; }
+cp exports/dashboard/dashboard.css exports/dashboard/dashboard.js "$STAGE/exports/dashboard/"
+echo "  dashboard.css, dashboard.js -> exports/dashboard/"
+
 # version.json — the other file here that is not for reading. The SessionStart hook in
 # hooks/hooks.json fetches it to find out whether the copy someone is running has been
 # superseded, and which components broke on the way. It sits at the ROOT of the deploy, so

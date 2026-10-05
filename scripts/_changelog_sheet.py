@@ -320,7 +320,7 @@ CSS = """
   html::-webkit-scrollbar-thumb:hover,.idx::-webkit-scrollbar-thumb:hover{
     background:var(--s-card-border, var(--gw-color-neutral-300));background-clip:content-box}
 
-  /* No narrow-viewport reflow here. exports/dashboard/build-rules.md rules that
+  /* No narrow-viewport reflow here. exports/dashboard/shell.md rules that
      below 1440 the canvas SCALES rather than rearranges — reflow is listed there
      as a rejected attempt. shell.js sets --gw-fit and .gw-shell zooms the whole
      1440 layout, so this page keeps its 800 / 60 / 260 split at every width. */

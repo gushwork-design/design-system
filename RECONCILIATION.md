@@ -1,5 +1,10 @@
 # Reconciliation — master specification vs. measured Figma
 
+> **4 Oct 2026.** The dashboard set this file reconciles (2.4–2.7, 2.10: the dashboard button, avatar,
+> header and sidebar, toast, KPI card and table row) was retired and rebuilt from the design hub; see
+> `exports/dashboard/README.md`. Those sections are kept as the record of why the measured set was
+> trusted over the spec. The ruling that blue fills are banned on dashboards still stands.
+
 Two sources describe this design system and they disagree.
 
 - **Measured** — values read through the Figma MCP off specific nodes: variant names from

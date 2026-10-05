@@ -206,7 +206,7 @@ a.cat-name{color:var(--gw-color-primary-600);text-decoration:none}
       border-radius:var(--gw-radius-full);padding:3px var(--gw-space-8);white-space:nowrap}
 .chip--measured{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
 .chip--transcribed{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
-.chip--ruled{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+.chip--ruled,.chip--extracted{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
 .chip--structure{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
 .chip--built-here{background:var(--gw-color-orange-50);color:var(--gw-color-orange-700)}
 .chip--passed{background:var(--gw-color-green-500);color:var(--gw-color-white)}
@@ -218,6 +218,7 @@ a.cat-name{color:var(--gw-color-primary-600);text-decoration:none}
 :root[data-theme="dark"] .chip--transcribed,
 :root[data-theme="dark"] .chip--structure{background:var(--gw-color-yellow-900);color:var(--gw-color-yellow-100)}
 :root[data-theme="dark"] .chip--ruled,
+:root[data-theme="dark"] .chip--extracted,
 :root[data-theme="dark"] .chip--web{background:var(--gw-color-primary-900);color:var(--gw-color-primary-200)}
 :root[data-theme="dark"] .chip--pending{background:var(--gw-color-neutral-800);color:var(--gw-color-neutral-300)}
 :root[data-theme="dark"] .chip--built-here{background:var(--gw-color-orange-900);color:var(--gw-color-orange-100)}
@@ -493,7 +494,7 @@ PARTS = [
      "The folds that kept getting used across ad landers over the last four to five "
      "months, drawn up in GW-Ads-Library. Harvested from what shipped, not proposed."),
     ("dashboard", "Dashboard", "desktop",
-     "Logged-in product screens. A separate Button and Avatar set from web, by design."),
+     "Logged-in analytics dashboards and web apps, from the design hub. A separate Button and Avatar set from web, by design."),
     ("slides", "Slides", "stack-overflow-logo", "Sales and discovery decks, 1920×1080."),
     ("lead-magnet", "Lead magnet", "download-simple",
      "The downloadable PDF behind an ad lander."),
@@ -512,7 +513,7 @@ RECIPES = [
     ("case-study", "Case study", "web", "measured page template",
      "One customer story. A measured template — copy it and fill it in."),
     ("dashboard-screen", "Dashboard screen", "dashboard", "—",
-     "A logged-in product surface — KPI rows, tables, side nav, filters."),
+     "A logged-in analytics screen or web-app page — overview, explorer, list with filters, settings, detail."),
     ("lead-magnet-doc", "Lead magnet", "lead-magnet", "print output",
      "The gated PDF itself — cover, interior, closer."),
     ("sales-deck", "Sales deck", "slides", "1920×1080", "A deck an AE drives on a call."),
@@ -692,6 +693,9 @@ PROV_RULE = dict(CL.PROV_RULE)
 PROV_RULE["built-here"] = ("Created here, not measured from Figma. The shipped page is "
                            "its source of truth. Has to be measured and passed before it "
                            "can enter skills/.")
+PROV_RULE["extracted"] = ("Extracted from the design hub's shipped code and generalised, not "
+                          "measured off Figma. The hub is its source of truth. Elements marked "
+                          "NEW in the doc are not in the hub at all.")
 PROV_RULE["structure"] = ("Node ids, the breakpoint split and every width and height are "
                           "node-traceable. No fill, radius or type style has been read "
                           "off these nodes yet.")
@@ -881,7 +885,9 @@ def build_parts(reg, counts, ad, adv, tok):
                     body = ('<div class="empty">No spec doc for this component yet. '
                             "The registry knows it exists; nothing has been written "
                             "down.</div>")
-                prov = "measured"
+                # The dashboard set is extracted from the design hub's shipped code, not read
+                # off Figma, so calling it "measured" would claim a measurement nobody made.
+                prov = "extracted" if skey == "dashboard" else "measured"
 
             pages.append(Page(
                 path=f"parts/{skey}/{n}",

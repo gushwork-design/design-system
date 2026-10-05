@@ -356,7 +356,7 @@ a.cat-name{color:var(--gw-color-primary-600);text-decoration:none}
       border-radius:var(--gw-radius-full);padding:3px var(--gw-space-8);white-space:nowrap}
 .chip--measured{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
 .chip--transcribed{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
-.chip--ruled{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+.chip--ruled,.chip--extracted{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
 .chip--structure{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
 .chip--built-here{background:var(--gw-color-orange-50);color:var(--gw-color-orange-700)}
 .chip--passed{background:var(--gw-color-green-500);color:var(--gw-color-white)}
@@ -368,6 +368,7 @@ a.cat-name{color:var(--gw-color-primary-600);text-decoration:none}
 :root[data-theme="dark"] .chip--transcribed,
 :root[data-theme="dark"] .chip--structure{background:var(--gw-color-yellow-900);color:var(--gw-color-yellow-100)}
 :root[data-theme="dark"] .chip--ruled,
+:root[data-theme="dark"] .chip--extracted,
 :root[data-theme="dark"] .chip--web{background:var(--gw-color-primary-900);color:var(--gw-color-primary-200)}
 :root[data-theme="dark"] .chip--pending{background:var(--gw-color-neutral-800);color:var(--gw-color-neutral-300)}
 :root[data-theme="dark"] .chip--built-here{background:var(--gw-color-orange-900);color:var(--gw-color-orange-100)}
@@ -448,7 +449,7 @@ focusable element on both surfaces.
 Keyboard only (R41, 3 Oct 2026): use it on :focus-visible, never on :focus,
 so a click leaves nothing behind. Text fields do not take it: a browser
 counts a click into one as keyboard focus, so a field shows its own edge
-(a 1px Neutral/400, or black in the dashboard) instead.</div><div class="cl-tblwrap"><table class="cl-tbl"><thead><tr><th>Token</th><th>Value</th></tr></thead><tbody><tr data-q="--gw-focus-ring 2px solid var(--gw-color-primary-alpha-40) "><td class="mono">--gw-focus-ring</td><td class="num">2px solid var(--gw-color-primary-alpha-40)</td></tr><tr data-q="--gw-focus-offset 2px "><td class="mono">--gw-focus-offset</td><td class="num">2px</td></tr></tbody></table></div></div></section><section class="sec" id="timing"><div class="cl-sub"><h3>Timing</h3><div class="cl-note">Toast auto-dismiss. Ruled by Utsav, 7 Aug 2026 — see exports/dashboard/toast.md,
+(a 1px Neutral/400, or black in the dashboard) instead.</div><div class="cl-tblwrap"><table class="cl-tbl"><thead><tr><th>Token</th><th>Value</th></tr></thead><tbody><tr data-q="--gw-focus-ring 2px solid var(--gw-color-primary-alpha-40) "><td class="mono">--gw-focus-ring</td><td class="num">2px solid var(--gw-color-primary-alpha-40)</td></tr><tr data-q="--gw-focus-offset 2px "><td class="mono">--gw-focus-offset</td><td class="num">2px</td></tr></tbody></table></div></div></section><section class="sec" id="timing"><div class="cl-sub"><h3>Timing</h3><div class="cl-note">Toast auto-dismiss. Ruled by Utsav, 7 Aug 2026 — see exports/dashboard/feedback.md,
 which previously recorded this as undefined.</div><div class="cl-tblwrap"><table class="cl-tbl"><thead><tr><th>Token</th><th>Value</th></tr></thead><tbody><tr data-q="--gw-toast-dismiss 4000ms "><td class="mono">--gw-toast-dismiss</td><td class="num">4000ms</td></tr></tbody></table></div></div></section></main><div class="lb-toc"><b>On this page</b><a href="#motion" class="l2">Motion</a><a href="#focus" class="l2">Focus</a><a href="#timing" class="l2">Timing</a></div></div>
 <script>
 (function(){

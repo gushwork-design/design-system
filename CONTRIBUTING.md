@@ -262,7 +262,7 @@ So when you add or correct a component, element or pattern:
    01 · Core                 building-blocks · shared-components
    02 · Web                  ↳ web/ component-library      112:414
    02 · Web                  ↳ web/ pattern-library        1658:22673
-   03 · Dashboard            ↳ dashboard/ component+pattern-library   1658:24112
+   03 · Dashboard            ↳ dashboard/ component+pattern-library   1658:24112   (retired as the dashboard source, 4 Oct 2026)
    ```
 
    Inside a page, the section is the **Figma group name** — `button`, `badge`, `card`,

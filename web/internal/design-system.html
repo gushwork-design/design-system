@@ -379,7 +379,7 @@ body[data-gw-page="design-system"] .sg__main > * { min-width: 0; }
 .ul-c--who { color: var(--ul-value); }
 .ul-c--none { color: var(--ul-sub); }
 .ul-c--ver { display: flex; align-items: center; gap: var(--gw-space-8); overflow: visible; }
-/* badge Size=sm: radius/4, py-4 px-8, 20h, /25 tint. NOTE v2/primitives.md reports the light
+/* badge Size=sm: radius/4, py-4 px-8, 20h, /25 tint. NOTE exports/dashboard/data-display.md reports the light
    tints at 3.07 to 3.15:1, under AA at 12px; built as measured, finding stands. */
 .ul-badge { display: inline-flex; align-items: center; height: 20px; padding: 0 var(--gw-space-8); border-radius: var(--gw-radius-4);
   font: var(--gw-text-button-12); background: var(--ul-b-no-bg); color: var(--ul-b-no-fg); }
@@ -1485,7 +1485,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       box.innerHTML = '<div class="rv-pv__in"></div>';
       host.appendChild(box);   // the ghost stays until this is ready; it is laid out now, but not shown
       var inner = box.firstChild, root = inner.attachShadow({ mode: 'open' });
-      root.innerHTML = '<link rel="stylesheet" href="/foundation/tokens.css"><link rel="stylesheet" href="/previews/_sheet.css">' + html;
+      root.innerHTML = '<link rel="stylesheet" href="/foundation/tokens.css"><link rel="stylesheet" href="/previews/_sheet.css"><link rel="stylesheet" href="/exports/dashboard/dashboard.css">' + html;
       var fit = function () {
         // Lay it out at the drawer's width first: a grid of cells wraps and needs no scaling. Only a drawing that is
         // wider than that (a 1240 fold) overflows, and it is then laid out at its own width and scaled down to fit.
