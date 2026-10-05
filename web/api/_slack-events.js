@@ -31,6 +31,7 @@
 
 import crypto from 'node:crypto';
 import { handleMessage } from './_concierge.js';
+import { handleAction } from './_slack-actions.js';
 
 const APPROVE_EMOJI = new Set(['white_check_mark', 'heavy_check_mark', 'ballot_box_with_check']);
 const QUEUE_KEY = 'gw:approvals';
@@ -88,6 +89,25 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
 
   const raw = await rawBody(req);
+
+  /* BUTTONS AND FORMS (R55 addendum). Slack posts interactive payloads form-encoded, as payload=<json>, to this same URL
+     (the app's Interactivity Request URL). Signed like events, so the signature is checked first. */
+  if (raw.startsWith('payload=')) {
+    if (!signatureValid(req, raw)) return res.status(401).json({ error: 'bad signature' });
+    let ip;
+    try { ip = JSON.parse(new URLSearchParams(raw).get('payload') || ''); } catch { return res.status(400).json({ error: 'bad payload' }); }
+    const allowed = new Set(String(process.env.BRUCE_USER_IDS || process.env.OWNER_SLACK_ID || '').split(',').map((x) => x.trim()).filter(Boolean));
+    const { ownerEmails } = await import('./_access.js');
+    const { recordDecision } = await import('./_review.js');
+    const cfg = store();
+    const email = String(process.env.OWNER_EMAIL || ownerEmails()[0] || '');
+    let out;
+    try {
+      out = await handleAction(ip, { token: process.env.SLACK_BOT_TOKEN, allowed, email, root: process.cwd(),
+        record: (body, who) => (cfg ? recordDecision(cfg, body, who) : [503, { error: 'the store is not connected' }]) });
+    } catch (e) { console.warn('[slack-actions]', String(e.message || e).slice(0, 200)); }
+    return out ? res.status(200).json(out) : res.status(200).end();
+  }
 
   let payload;
   try { payload = JSON.parse(raw); } catch { return res.status(400).json({ error: 'bad json' }); }

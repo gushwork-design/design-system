@@ -39,6 +39,9 @@ oauth_config:
       - users:read
   pkce_enabled: false
 settings:
+  interactivity:
+    is_enabled: true
+    request_url: https://design.gushwork.ai/api/slack-events
   event_subscriptions:
     request_url: https://design.gushwork.ai/api/slack-events
     bot_events:
