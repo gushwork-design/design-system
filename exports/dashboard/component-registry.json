@@ -1395,11 +1395,10 @@
       "fingerprint": "b045cb102000d0c1"
     },
     "topbar": {
-      "reviewed": "rework",
+      "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "dec19d1150b3440b",
-      "note": "move the menu button on the right side",
+      "fingerprint": "f870742356bcbe84",
       "previewFingerprint": "5eeabbdd5d4a52d1"
     },
     "unavailable-state": {
