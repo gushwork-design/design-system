@@ -21,6 +21,7 @@
 #   - no fix record: the PR does not add web/previews/<scope>/<key>.reworked answering that send-back
 #     (bash scripts/mark-reworked.sh writes it), so the item could not come back to Waiting
 #   - a file outside the hub paths, or one of the files that govern merging, publishing and access
+#   - generated preview/library files (the publish rebuilds them; committed in parallel they always conflict)
 #   - a conflict with main
 #
 # Merging uses the admin bypass on main's ruleset (since 4 Oct 2026), so it works only for a
@@ -41,7 +42,19 @@ if git cat-file -e origin/main:.github/automerge-off 2>/dev/null; then
   refuse "auto-merge is switched off (.github/automerge-off is on main)"
 fi
 
-INFO="$(gh pr view "$PR" --json state,baseRefName,headRefName,title,mergeable,files,headRefOid)"
+# REST only. Claude Code cloud sessions refuse GitHub GraphQL (HTTP 403), and `gh pr view` / `gh pr merge` use it.
+REPO="${GW_REPO:-gushwork-design/design-system}"
+PULL="$(gh api "repos/$REPO/pulls/$PR")"
+FILES="$(gh api --paginate "repos/$REPO/pulls/$PR/files?per_page=100" --jq '.[].filename')"
+INFO="$(PULL="$PULL" FILES="$FILES" python3 -c '
+import json, os
+p = json.loads(os.environ["PULL"])
+state = "MERGED" if p.get("merged") else p["state"].upper()
+m = p.get("mergeable")
+print(json.dumps({"state": state, "baseRefName": p["base"]["ref"], "headRefName": p["head"]["ref"],
+                  "title": p["title"], "headRefOid": p["head"]["sha"],
+                  "mergeable": "CONFLICTING" if m is False else ("MERGEABLE" if m else "UNKNOWN"),
+                  "files": [{"path": f} for f in os.environ["FILES"].splitlines() if f]}))')"
 
 PR_JSON="$INFO" python3 - <<'PY' || exit 1
 import fnmatch, importlib.util, json, os, re, subprocess, sys
@@ -78,13 +91,19 @@ if rec.get("reviewed") != "rework":
     refuse(f"{scope}/{key} is {rec.get('reviewed', 'pending')!r} on main, not 'rework'")
 
 # The hub, and only the hub. Skills read exports/, skills/ and foundation/; none of it is here.
-ALLOW = ["web/previews/*", "web/admin/*", "web/*.css", "web/*.js", "preview/library/*", "scripts/*"]
+ALLOW = ["web/previews/*", "web/admin/*", "web/*.css", "web/*.js", "scripts/*"]
 # Inside those, the files that decide who sees the site, what ships, and this check itself.
 DENY = ["web/middleware.js", "scripts/merge-rework.sh", "scripts/publish-sheets.sh",
         "scripts/release*.sh", "scripts/stamp-*.sh", "scripts/_review.py",
         "scripts/_component_library.py", "scripts/_library_site.py", "scripts/mark-reworked.sh", "scripts/hooks/*"]
 def top_level_web(p):  # web/*.css and web/*.js mean the hub's own files, not web/api/x.js
     return not (p.startswith("web/") and p.count("/") > 1 and not p.startswith(("web/previews/", "web/admin/")))
+# preview/library is generated, and the publish regenerates it. Committed from parallel reworks it is the
+# same 170 files in every PR, so the second one to merge always conflicts. Name it on its own.
+gen = [x["path"] for x in pr["files"] if x["path"].startswith("preview/library/")]
+if gen:
+    refuse(f"it commits {len(gen)} generated preview/library file(s); drop them "
+           "(git checkout origin/main -- preview/library), the publish rebuilds the library")
 bad = []
 for f in (x["path"] for x in pr["files"]):
     ok = any(fnmatch.fnmatch(f, a) for a in ALLOW) and top_level_web(f)
@@ -114,5 +133,8 @@ if [ "$DRY" = 1 ]; then
   exit 0
 fi
 
-gh pr merge "$PR" --merge --admin --delete-branch
+HEAD_REF="$(PULL="$PULL" python3 -c 'import json,os;print(json.loads(os.environ["PULL"])["head"]["ref"])')"
+# A merge through REST by an admin passes main's ruleset by its bypass; same as `gh pr merge --admin`.
+gh api -X PUT "repos/$REPO/pulls/$PR/merge" -f merge_method=merge >/dev/null
+gh api -X DELETE "repos/$REPO/git/refs/heads/$HEAD_REF" >/dev/null 2>&1 || true
 echo "✔ merged #$PR. publish-site.yml publishes it; the item returns to Waiting as redone."
