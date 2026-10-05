@@ -76,6 +76,8 @@ border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;
 box-shadow:0 16px 32px -12px rgba(88,92,95,.1);opacity:0;visibility:hidden;pointer-events:none;
 transition:opacity .15s ease,visibility .15s}
 .tcol.on:hover~.callout,.tcol.on:focus-visible~.callout{opacity:1;visibility:visible}
+.ttab{transition:background .15s ease,color .15s ease}
+.tcol.on:hover .ttab,.tcol.on:focus-visible .ttab{background:#0070ff!important;color:#fff!important}
 .cal-l{margin:0;font-size:14px;line-height:1;font-weight:500;color:#959ba4}
 .cal-b{margin:0;font-size:16px;line-height:24px;color:#f1f2f3;letter-spacing:-.002em}
 .trow{display:flex;width:1240px}
