@@ -350,6 +350,13 @@
       "fingerprint": "4f3074b5c817a033",
       "previewFingerprint": "3121dbde5129459f",
       "note": "wrong design"
+    },
+    "cta": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "3f7ffb91cad57972",
+      "previewFingerprint": "4c29b6ab6a337561"
     }
   }
 }
