@@ -1,0 +1,6 @@
+<div class="rvp"><div class="vgroup"><div class="vhead"><code>Slides / Layout / Big number</code><span class="vnote">Authored layout: ground only. Placeholder figure and context line, not a real statistic.</span><span class="scl">1920 x 1080 at 30%</span></div><div class="foldwrap"><div style="width:576px;height:324px;position:relative;overflow:hidden;background:#0070ff;font-family:'Vert Grotesk Display','Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif">
+<div style="position:absolute;inset:0;background-image:linear-gradient(to right,rgba(255,255,255,.3) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.3) 1px,transparent 1px);background-size:12px 12px;-webkit-mask-image:radial-gradient(ellipse 100% 100% at 48% 50%,transparent 20%,#000 100%);mask-image:radial-gradient(ellipse 100% 100% at 48% 50%,transparent 20%,#000 100%)"></div>
+<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px">
+<div style="font:600 27px/1.2 'Vert Grotesk Display','Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;letter-spacing:-0.1px;color:#ffffff">00%</div>
+<div style="font:600 7.8px/1.2 'Vert Grotesk Display','Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;color:#ffffff99">One line of context beneath the figure</div>
+</div></div></div></div></div>
