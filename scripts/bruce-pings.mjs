@@ -10,6 +10,8 @@
 //   node scripts/bruce-pings.mjs            send
 //   node scripts/bruce-pings.mjs --dry-run  print what it would send
 
+import { decisionActions, decisionMenu } from '../web/api/_slack-actions.js';
+
 const REPO = process.env.GITHUB_REPOSITORY || 'gushwork-design/design-system';
 const SITE = (process.env.SITE_BASE || 'https://design.gushwork.ai').replace(/\/$/, '');
 const MARK = 'rocket';
@@ -51,13 +53,27 @@ export function compose(pings) {
   return [lead, ...lines].join('\n');
 }
 
-async function gh(path, init = {}, f = fetch) {
+/* The same message as Slack blocks: Approve / Rework / Reject under a single finished item, a menu beside each finished
+   item in a batch, and only the link for one Alfred is stuck on (that wants an answer, not a decision). Pure. */
+export function blocksFor(pings) {
+  const sec = (text, id, accessory) => ({ type: 'section', ...(id ? { block_id: id } : {}), text: { type: 'mrkdwn', text }, ...(accessory ? { accessory } : {}) });
+  if (pings.length === 1) {
+    const p = pings[0];
+    return p.blocked ? [sec(compose(pings))] : [sec(compose(pings)), decisionActions(p.scope, p.key)];
+  }
+  const [lead, ...lines] = compose(pings).split('\n');
+  const shown = [...pings].sort((a, b) => Number(b.blocked) - Number(a.blocked)).slice(0, MAX_LINES);
+  return [sec(lead), ...shown.map((p, i) => sec(lines[i], `item:${p.scope}/${p.key}`, p.blocked ? null : decisionMenu(p.scope, p.key))),
+    ...lines.slice(shown.length).map((l) => sec(l))];
+}
+
+export async function gh(path, init = {}, f = fetch) {
   const r = await f(`https://api.github.com/${path}`, { ...init, headers: { authorization: `Bearer ${process.env.GITHUB_TOKEN}`, accept: 'application/vnd.github+json', 'x-github-api-version': '2022-11-28', ...(init.headers || {}) } });
   if (!r.ok) throw new Error(`github ${path}: ${r.status}`);
   return r.status === 204 ? null : r.json();
 }
 
-async function slack(method, body, f = fetch) {
+export async function slack(method, body, f = fetch) {
   const r = await f(`https://slack.com/api/${method}`, { method: 'POST', headers: { authorization: `Bearer ${process.env.SLACK_BOT_TOKEN}`, 'content-type': 'application/json; charset=utf-8' }, body: JSON.stringify(body) });
   const j = await r.json().catch(() => ({}));
   if (!j.ok) throw new Error(`slack ${method}: ${j.error || r.status}`);
@@ -85,7 +101,7 @@ export async function run({ dry = false, f = fetch, hours = 24 } = {}) {
   const dm = await slack('conversations.open', { users: process.env.OWNER_SLACK_ID }, f);
   const one = latest.length === 1 ? latest[0] : null;
   await slack('chat.postMessage', {
-    channel: dm.channel.id, text, unfurl_links: false, unfurl_media: false,
+    channel: dm.channel.id, text, blocks: blocksFor(latest), unfurl_links: false, unfurl_media: false,
     // A reply in this thread goes back to Alfred's thread when it is about one item (_concierge.js reads this).
     ...(one && one.issue ? { metadata: { event_type: 'gw_alfred_ping', event_payload: { issue: one.issue, scope: one.scope, key: one.key } } } : {}),
   }, f);

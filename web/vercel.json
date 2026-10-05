@@ -217,7 +217,7 @@
   ],
   "functions": {
     "api/gw.js": {
-      "includeFiles": "{assets/logo/**,assets/color/**,fonts/*.ttf,foundation/tokens.*,foundation/tailwind-theme.js,internal/templates.html}"
+      "includeFiles": "{assets/logo/**,assets/color/**,fonts/*.ttf,foundation/tokens.*,foundation/tailwind-theme.js,internal/templates.html,library/data.json}"
     }
   },
   "crons": [

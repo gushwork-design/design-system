@@ -232,8 +232,16 @@ export default async function handler(req, res) {
     try { return json(res, 200, { ok: true, ...(await commitRef(token, a.path, a.data, `Review: reference for ${a.scope}/${a.key} (${email})`)) }); }
     catch (e) { return json(res, 502, { error: 'Could not store the attachment. ' + explain(e) }); }
   }
+  const [status, out] = await recordDecision(cfg, body, email);
+  return json(res, status, out);
+}
+
+/* Record one decision (Pass, Rework, Reject or Undo) the way the Design System page does, for any caller that has already
+   proved the person is an owner: the page (a signed-in session) or Bruce's Slack buttons (R55 addendum). Returns
+   [status, body]. */
+export async function recordDecision(cfg, body, email) {
   const v = checkDecision(body, email);
-  if (!v.ok) return json(res, 400, { error: v.error });
+  if (!v.ok) return [400, { error: v.error }];
   const { row } = v;
   const field = `${row.scope}/${row.key}`;
   const token = process.env.GW_GITHUB_TOKEN || '';
@@ -249,16 +257,16 @@ export default async function handler(req, res) {
         if (prev && prev.via === 'main') {
           // Committed straight to main, so the undo is a commit that puts the record back as it was.
           try { await recordDirect(token, { scope: row.scope, key: row.key }, email, today, true, prev.prev || null); }
-          catch { return json(res, 502, { error: 'Could not undo it on main. Nothing was changed.' }); }
+          catch { return [502, { error: 'Could not undo it on main. Nothing was changed.' }]; }
           note = 'undone on main';
         } else if (prev && prev.via === 'github') {
           try { await recordViaGithub(token, { scope: row.scope, key: row.key }, email, today, true); }
-          catch { return json(res, 502, { error: 'Could not take it out of the pull request. Nothing was changed.' }); }
+          catch { return [502, { error: 'Could not take it out of the pull request. Nothing was changed.' }]; }
           note = 'reverted in the pull request';
         }
       }
       await redis(cfg, [['HDEL', STATE_KEY, field]]);
-      return json(res, 200, { ok: true, undone: field, note });
+      return [200, { ok: true, undone: field, note }];
     }
 
     let githubError = '';
@@ -289,6 +297,6 @@ export default async function handler(req, res) {
       catch { row.threadError = 'Could not post the note to the thread (the GitHub token needs Issues read and write).'; }
     }
     const routine = row.action === 'rework' ? await fireRework(row) : null;
-    return json(res, 200, { ok: true, decision: row, mode: row.via, githubError, routine });
-  } catch { return json(res, 502, { error: 'Could not save the decision.' }); }
+    return [200, { ok: true, decision: row, mode: row.via, githubError, routine }];
+  } catch { return [502, { error: 'Could not save the decision.' }]; }
 }

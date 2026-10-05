@@ -1,0 +1,38 @@
+# Bruce's morning note to Utsav in Slack (R55 addendum): what is waiting on him, what Alfred is stuck on, and whether the
+# site failed to publish. Two to four lines, silent when there is nothing. 9am IST = 03:30 UTC. No model call.
+# Uses the same two repository secrets as bruce-pings.yml: SLACK_BOT_TOKEN and OWNER_SLACK_ID.
+name: Bruce morning note
+
+on:
+  schedule:
+    - cron: '30 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: read
+  actions: read
+
+jobs:
+  note:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      OWNER_SLACK_ID: ${{ secrets.OWNER_SLACK_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Build the review states
+        # The committed data.json can lag main; the note must count what is true now.
+        run: bash scripts/library-site.sh >/dev/null
+      - name: Send the note
+        run: |
+          if [ -z "$SLACK_BOT_TOKEN" ] || [ -z "$OWNER_SLACK_ID" ]; then node scripts/bruce-morning.mjs --dry-run; exit 0; fi
+          node scripts/bruce-morning.mjs
