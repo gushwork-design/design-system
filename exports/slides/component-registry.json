@@ -262,11 +262,11 @@
       "previewFingerprint": "9efedbd4f8d8533b"
     },
     "layout-full-bleed": {
-      "reviewed": "rework",
+      "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "28beae3088ce8372",
-      "note": "preview is not there"
+      "previewFingerprint": "cfbb58083e5c2aab"
     },
     "layout-pricing": {
       "reviewed": "rework",
