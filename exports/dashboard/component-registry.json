@@ -1296,7 +1296,8 @@
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "f573e6806b7af43f"
+      "fingerprint": "fdc0a12d5e556e3d",
+      "previewFingerprint": "94320d300a3539bc"
     },
     "table-cell-types": {
       "reviewed": "passed",
