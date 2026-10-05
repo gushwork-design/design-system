@@ -699,6 +699,13 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "114f0839bf95535b"
+    },
+    "account-row": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "1d04fe53f5b5c993",
+      "note": "truccate the name, or use Priya R. instead - do not break in 2 lines"
     }
   }
 }
