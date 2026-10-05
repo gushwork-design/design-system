@@ -898,6 +898,12 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "5d4ce604ca0cba31"
+    },
+    "empty-state": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "8bf2011ff642ad84"
     }
   }
 }
