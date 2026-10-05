@@ -73,9 +73,9 @@ The top block holds the brand, or a workspace switcher when the person belongs t
 
 ## Topbar
 
-**Purpose.** The phone bar: burger, brand, and the two actions that have no other home on a phone (search icon, theme menu). It exists only because on a phone the rail is the thing the burger opens. At 768 and wider it is not drawn; the content panel bar carries search and theme instead. Use `gd-topbar--always` only for a phone-only app or to show it in docs.
+**Purpose.** The phone bar: brand on the left, then the two actions that have no other home on a phone (search icon, theme menu), then the menu button at the right end. It exists only because on a phone the rail is the thing the burger opens. At 768 and wider it is not drawn; the content panel bar carries search and theme instead. Use `gd-topbar--always` only for a phone-only app or to show it in docs.
 
-**Anatomy.** `.gd-topbar > .gd-topbar__start (burger + brand) + .gd-topbar__acts (search-trigger icon, theme-menu)`. The burger is `.gd-topbar__btn` with `data-gd-nav-toggle`, `aria-expanded` and `aria-controls` pointing at the rail; its glyph swaps list and close from the state.
+**Anatomy.** `.gd-topbar > .gd-topbar__start (burger + brand) + .gd-topbar__acts (search-trigger icon, theme-menu)`. The bar draws the burger last, at the right end (CSS `order`, the markup keeps it first). The burger is `.gd-topbar__btn` with `data-gd-nav-toggle`, `aria-expanded` and `aria-controls` pointing at the rail; its glyph swaps list and close from the state.
 
 **Tokens.** Height is `--gd-control-h + 24` (60 comfortable, 52 compact). **Provenance.** extracted: `web/shell.css:355-405, 1624-1704, 1828-1835`.
 
