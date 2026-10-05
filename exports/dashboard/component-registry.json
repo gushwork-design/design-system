@@ -874,11 +874,10 @@
       "previewFingerprint": "8956715143f3ccba"
     },
     "data-table": {
-      "reviewed": "rework",
+      "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "34aae46e604b8dec",
-      "note": "\"Completion rate\" - table looks add with one added on the top",
+      "fingerprint": "ba314f26718a1788",
       "previewFingerprint": "afd408b238274c93"
     },
     "date-range-picker": {
