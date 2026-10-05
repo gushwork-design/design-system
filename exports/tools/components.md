@@ -78,7 +78,7 @@ and never as an unlabelled wait.
 ## tool-saved-list
 
 A shared list of saved work in **its own panel, bottom right** (Utsav, 5 Oct 2026). First used by the award certificate
-generator (`web/internal/staging/award-certificate/`), where HR's saved certificates are shared
+generator (`web/internal/award-certificate/`), where HR's saved certificates are shared
 through `/api/certificates`. **New, pending review.**
 
 | Property | Value |
@@ -92,4 +92,4 @@ through `/api/certificates`. **New, pending review.**
 | Long lists | scrolls past 248; a search field appears above the list past 5 items |
 | States | loading, empty ("Nothing saved yet…"), store unavailable (danger text), each in `.prop-tip` |
 
-Source: `web/internal/staging/award-certificate/styles.css`, the "Saved" block.
+Source: `web/internal/award-certificate/styles.css`, the "Saved" block.

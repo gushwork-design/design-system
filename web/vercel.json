@@ -4,6 +4,16 @@
   "trailingSlash": false,
   "redirects": [
     {
+      "source": "/internal/staging/award-certificate",
+      "destination": "/internal/award-certificate",
+      "permanent": false
+    },
+    {
+      "source": "/internal/staging/award-certificate/",
+      "destination": "/internal/award-certificate",
+      "permanent": false
+    },
+    {
       "source": "/admin/design-system",
       "destination": "/internal/design-system",
       "permanent": false

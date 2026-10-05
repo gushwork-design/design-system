@@ -16,7 +16,7 @@
          same image as the JPG.
    ───────────────────────────────────────────────────────────────── */
 (function () {
-  const BASE = '/internal/staging/award-certificate/assets/fonts/';
+  const BASE = '/internal/award-certificate/assets/fonts/';
   const FONT_FILES = {
     display: BASE + 'VertGroteskDisplay-Bold.ttf',
     body: BASE + 'Inter-Regular.ttf',
