@@ -1,7 +1,7 @@
 {
   "$comment": [
     "Per-component versions for the dashboard surface. Built by scripts/build-dashboard-css.sh from",
-    "registry-parts/*.json \u2014 edit the parts, never this file. Bump a component's version in the same",
+    "registry-parts/*.json — edit the parts, never this file. Bump a component's version in the same",
     "commit that changes its spec; scripts/check-drift.sh reads this and a build's stamp. breaking=true",
     "when an existing build renders WRONG until updated. The review block is written by the review loop."
   ],
@@ -678,6 +678,14 @@
       "changed": "2026-10-03",
       "breaking": false,
       "doc": "navigation.md"
+    }
+  },
+  "review": {
+    "theme-and-density": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "c2b9465fd117f126"
     }
   }
 }
