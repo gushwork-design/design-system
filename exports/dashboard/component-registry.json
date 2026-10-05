@@ -1110,6 +1110,12 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "e4bad4a8c7186e02"
+    },
+    "ring": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "4bbe167d6fb37fef"
     }
   }
 }
