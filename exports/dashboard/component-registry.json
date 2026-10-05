@@ -1140,6 +1140,12 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "80e56a5c5a35a2a1"
+    },
+    "search-trigger": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "683ab8230ed189b4"
     }
   }
 }
