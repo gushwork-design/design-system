@@ -202,11 +202,21 @@
     {
       "source": "/api/tools",
       "destination": "/api/gw?action=tools"
+    },
+    {
+      "source": "/api/health",
+      "destination": "/api/gw?action=health"
     }
   ],
   "functions": {
     "api/gw.js": {
       "includeFiles": "{assets/logo/**,assets/color/**,fonts/*.ttf,foundation/tokens.*,foundation/tailwind-theme.js,internal/templates.html}"
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/health?cron=1",
+      "schedule": "30 3 * * *"
+    }
+  ]
 }
