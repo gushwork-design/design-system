@@ -1265,3 +1265,15 @@ Ruled by Utsav, 5 Oct 2026, reviewing the Review drawer footer, where "A approve
 - **Accessibility.** The cap is `aria-hidden`; the button carries `aria-keyshortcuts`.
 - **Where it lives.** New dashboard component `shortcut-key` (2.0.0, `actions.md`, `20-actions.css`, drawing `web/previews/dashboard/shortcut-key.frag`). The Review drawer's own `.rv-b kbd` (PR #216) is the hub's copy of it.
 - **Review:** `shortcut-key` is new and waits in Review; nothing here approves it.
+
+## R54 — a rework the routine makes merges and publishes itself; the Rework decision is the approval to ship it
+Ruled by Utsav, 5 Oct 2026: "i want it to be automatic, as i have already made the decision on review page", then "the reworked item will go in the waiting list for the review again and skills should read it after approval only", and "you can delete one of the rework routines".
+
+- **One rework hand.** Sending an item back on the Design System page fires the rework routine; it fixes that one item, opens one PR, and merges it with `bash scripts/merge-rework.sh <pr>`. The merge publishes through `publish-site.yml`. Nobody presses anything between the decision and the live hub.
+- **The nightly run no longer reworks.** It still draws missing previews (those PRs stay open for Utsav: nobody decided them) and still reports. It lists any item still marked rework with no PR, which is what a missed event looks like, so it can be sent back again.
+- **What merging approves: nothing.** The item reads `redone` and returns to Waiting (R45). It is passed or sent back from there, as before.
+- **Why skills cannot pick it up first.** A rework PR may merge only if every file it touches is on the hub: `web/previews/`, `web/admin/`, the hub's own `web/*.css` and `web/*.js`, `preview/library/`, `scripts/`. Never `exports/`, `skills/` or `foundation/`, which are what the skills read, and never the files that decide access, publishing or this check (`web/middleware.js`, `publish-sheets.sh`, `release*.sh`, `stamp-*.sh`, `_review.py`, `_component_library.py`, `hooks/`, `merge-rework.sh`). A fix that needs one of those stays an open PR under "Needs your call". The check is in the script, not in the routine's prompt.
+- **It also refuses** a PR whose title is not `Rework: <scope>/<key>`, whose branch is not `rework/*` or `nightly/*`, whose item is not marked `rework` on main, or that conflicts with main.
+- **The off switch.** Commit `.github/automerge-off` to main and every rework PR stays open until the file is removed.
+- **How it merges.** The admin bypass on main's ruleset (since 4 Oct 2026), as Utsav's token, with a merge commit. A merge by an Actions `GITHUB_TOKEN` would not fire the publish workflow, which is why this is a script the routine runs and not a workflow.
+- **What this changes.** The routines' "never merge, never publish" rule (2 Oct) now has one exception: a rework PR that passes this check. Drawings, rulings, releases and everything else stay PR-only.
