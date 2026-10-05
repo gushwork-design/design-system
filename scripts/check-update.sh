@@ -194,6 +194,9 @@ except Exception:
 print(json.dumps({
     "version": mk.get("metadata", {}).get("version"),
     "notify": (lambda s: (json.loads(s) if s.strip() else None))(at_head(".claude-plugin/notify.json")),
+    "releases": [{"version": m.group(1), "date": m.group(2).strip()[:11], "summary": m.group(3).strip()[:200]}
+                 for m in __import__("re").finditer(r"^\| \*\*v([0-9.]+)\*\* \| ([^|]*) \| ([^|]*) \|",
+                                                    at_head("CHANGELOG.md"), __import__("re").M)][:12],
     "components": {k: {"version": v.get("version"), "breaking": bool(v.get("breaking"))}
                    for k, v in reg.get("components", {}).items()},
 }))
@@ -247,6 +250,13 @@ nf = d.get("notify") or {}
 nv = semver(nf.get("version"))
 flagged = bool(nv) and nv > lv
 
+# What moved since this copy, newest first: every release in the window that is ahead of it.
+# The window is twelve; if the oldest entry is still ahead of this copy there were more.
+rel = [r for r in (d.get("releases") or []) if semver(r.get("version")) > lv]
+rel.sort(key=lambda r: semver(r.get("version")), reverse=True)
+more = bool(rel) and len(rel) == len(d.get("releases") or [])
+since = [{"version": r.get("version"), "summary": (r.get("summary") or "")[:200]} for r in rel[:8]]
+
 # Which components moved since the copy this session is running, and which of those break a
 # build that used them. Same comparison check-drift.sh makes against a stamped artifact.
 must, also = [], []
@@ -256,7 +266,7 @@ for name, c in (d.get("components") or {}).items():
         (must if c.get("breaking") else also).append(name)
 
 print(json.dumps({"remote": remote, "flagged": flagged, "summary": (nf.get("summary") or "")[:200],
-                  "breaking": sorted(must), "changed": sorted(also)}))
+                  "since": since, "more": more, "breaking": sorted(must), "changed": sorted(also)}))
 PY
 )"
 [ -n "$VERDICT" ] || exit 0
@@ -320,6 +330,12 @@ if changed:
     bits.append(f"{len(changed)} changed")
 if bits:
     head += " " + " · ".join(bits) + "."
+# What moved, release by release. Utsav's ask (R50): a notice that only says "you are behind"
+# tells nobody whether to care; the changelog line of each release in between does.
+since = v.get("since") or []
+if since:
+    rows = "; ".join(f"v{r['version']} — {r['summary']}" for r in since)
+    head += f" What changed since v{local}: {rows}" + ("; and earlier releases." if v.get("more") else ".")
 
 if flipped:
     tail = ("Auto-update was off on this machine — it is on now, so the next start picks this up. "
@@ -338,6 +354,11 @@ print(json.dumps({"systemMessage": head + " " + tail, "hookSpecificOutput": {
     "additionalContext": (
         f"Gushwork design system: running v{local}, v{remote} is available. "
         + (f"What is new for them: {v['summary']}. " if v.get("summary") else "")
+        + ((f"What changed since v{local}, newest first: "
+            + "; ".join(f"v{r['version']} — {r['summary']}" for r in since)
+            + ("; and earlier releases" if v.get("more") else "")
+            + ". Under your one sentence, list these as short bullets, one per release, before the "
+              "update command. ") if since else "")
         + (f"Breaking since v{local}: {', '.join(breaking)}. " if breaking else "")
         + (f"Also changed: {', '.join(changed)}. " if changed else "")
         + "If the user asks whether they are current, they are not. "

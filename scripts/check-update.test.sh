@@ -44,6 +44,9 @@ p, cur, unflagged = sys.argv[1:4]
 d = json.load(open(p))
 json.dump({**d, "notify": None}, open(unflagged, "w"))
 d["notify"] = {"version": cur, "summary": "a new template"}
+# a known release list, so the "what changed" assertion does not depend on the live history
+d["releases"] = [{"version": cur, "date": "05 Oct 2026", "summary": "the fixture release"},
+                 {"version": "0.0.1", "date": "01 Jan 2020", "summary": "the first release"}]
 json.dump(d, open(p, "w"))
 PY
 OLD="$(python3 -c "
@@ -98,6 +101,14 @@ out="$(run "$(fake "$OLD")" "file://$TMP/unflagged.json")"; rc=$?
                               || ck no "behind, not flagged: spoke (rc=$rc) $out"
 printf '%s' "$(run "$(fake "$OLD")" "file://$TMP/v.json")" | grep -q 'a new template' \
   && ck ok "flagged: the summary is in the notice" || ck no "flagged: summary missing"
+run "$(fake "$OLD")" "file://$TMP/v.json" | python3 -c "
+import json,sys
+o=json.load(sys.stdin); m=o['systemMessage']; c=o['hookSpecificOutput']['additionalContext']
+assert 'the fixture release' in m and 'the fixture release' in c, m
+assert 'the first release' not in m, 'a release this copy already has must not be listed'
+assert 'earlier releases' not in m, 'window not exhausted, must not claim more'
+" 2>/dev/null && ck ok "flagged: lists what changed since this copy, and only that" \
+              || ck no "flagged: what-changed list wrong"
 
 # 2 · the plugin moved but no component did → must not point at a list that is not
 #     there. Its own payload: the live registry normally DOES have components above OLD.
