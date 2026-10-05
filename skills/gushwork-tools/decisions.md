@@ -135,6 +135,11 @@ The email signature creator and the employee ID card generator were redesigned i
 40. **In the editor, Appearance and Help live in the file menu (⋯).** The canvas corner stays clear
     while a file is open; the Files home keeps the hub's corner controls (Utsav, 5 Oct 2026).
 
+41. **The tools show who is signed in.** The hub's own profile mark (shell.js avatarSVG: colour
+    is the level, the dot pattern is the person) sits beside Appearance and Help in every tool, and
+    in the Certificate Creator's right panel while a file is open; its menu holds the name, role,
+    address and Sign out (Utsav, 5 Oct 2026: "showing user profile is missing in the tool").
+
 ## Left open (the owner's call)
 
 - **A third typeface in the signature preview** (Plus Jakarta Sans). In the artefact, not the chrome.

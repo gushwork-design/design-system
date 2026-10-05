@@ -17,6 +17,13 @@
    checked, any this person cannot open locked and inert, then All tools. Locks come from
    /api/tools, the gate's own decide() for this viewer, so the menu and a 403 cannot disagree.
    Delegated on the document, so it works for logos React renders after this script runs.
+
+   THE PROFILE (Utsav, 5 Oct 2026: "showing user profile is missing in the tool"). The hub's own
+   profile mark, copied from /shell.js (avatarSVG, displayName): colour is the level (owner and
+   admin black, team Primary/300), the 3x3 dot pattern is the person, from a hash of the address.
+   It sits beside Appearance and Help; its menu carries the name, role and address, and Sign out.
+   window.gwProfile lets a tool draw the same mark elsewhere (the Certificate Creator's right panel
+   while its corner is clear) and open the same menu.
    ========================================================================= */
 (function () {
   var ICON = {
@@ -32,6 +39,7 @@
     'pen': 'M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l24-24L216,84.68Z',
     'id': 'M200,112a8,8,0,0,1-8,8H152a8,8,0,0,1,0-16h40A8,8,0,0,1,200,112Zm-8,24H152a8,8,0,0,0,0,16h40a8,8,0,0,0,0-16Zm40-80V200a16,16,0,0,1-16,16H40a16,16,0,0,1-16-16V56A16,16,0,0,1,40,40H216A16,16,0,0,1,232,56ZM216,200V56H40V200H216Zm-80.26-34a8,8,0,1,1-15.5,4c-2.63-10.26-13.06-18-24.25-18s-21.61,7.74-24.25,18a8,8,0,1,1-15.5-4,39.84,39.84,0,0,1,17.19-23.34,32,32,0,1,1,45.12,0A39.76,39.76,0,0,1,135.75,166ZM96,136a16,16,0,1,0-16-16A16,16,0,0,0,96,136Z',
     'certificate': 'M128,136a8,8,0,0,1-8,8H72a8,8,0,0,1,0-16h48A8,8,0,0,1,128,136Zm-8-40H72a8,8,0,0,0,0,16h48a8,8,0,0,0,0-16Zm112,65.47V224A8,8,0,0,1,220,231l-24-13.74L172,231A8,8,0,0,1,160,224V200H40a16,16,0,0,1-16-16V56A16,16,0,0,1,40,40H216a16,16,0,0,1,16,16V86.53a51.88,51.88,0,0,1,0,74.94ZM160,184V161.47A52,52,0,0,1,216,76V56H40V184Zm56-12a51.88,51.88,0,0,1-40,0v38.22l16-9.16a8,8,0,0,1,7.94,0l16,9.16Zm16-48a36,36,0,1,0-36,36A36,36,0,0,0,232,124Z',
+    'sign-out': 'M120,216a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V40a8,8,0,0,1,8-8h64a8,8,0,0,1,0,16H56V208h56A8,8,0,0,1,120,216Zm109.66-93.66-40-40a8,8,0,0,0-11.32,11.32L204.69,120H112a8,8,0,0,0,0,16h92.69l-26.35,26.34a8,8,0,0,0,11.32,11.32l40-40A8,8,0,0,0,229.66,122.34Z',
     'slack-logo': 'M221.13,128A32,32,0,0,0,184,76.31V56a32,32,0,0,0-56-21.13A32,32,0,0,0,76.31,72H56a32,32,0,0,0-21.13,56A32,32,0,0,0,72,179.69V200a32,32,0,0,0,56,21.13A32,32,0,0,0,179.69,184H200a32,32,0,0,0,21.13-56ZM72,152a16,16,0,1,1-16-16H72Zm48,48a16,16,0,0,1-32,0V152a16,16,0,0,1,16-16h16Zm0-80H56a16,16,0,0,1,0-32h48a16,16,0,0,1,16,16Zm0-48H104a16,16,0,1,1,16-16Zm16-16a16,16,0,0,1,32,0v48a16,16,0,0,1-16,16H136Zm16,160a16,16,0,0,1-16-16V184h16a16,16,0,0,1,0,32Zm48-48H152a16,16,0,0,1-16-16V136h64a16,16,0,0,1,0,32Zm0-48H184V104a16,16,0,1,1,16,16Z'
   };
   function icon(n) {
@@ -99,9 +107,11 @@
           '<a class="t-menu__row" role="menuitem" href="mailto:design@gushwork.ai">' + icon('envelope') + '<span>Send an email</span></a>' +
           '<a class="t-menu__row" role="menuitem" href="https://gushwork.slack.com/team/U06UAR183TR" target="_blank" rel="noopener">' + icon('slack-logo') + '<span>Message on Slack</span></a>' +
         '</div>' +
-      '</div>';
+      '</div>' +
+      '<button class="t-iconbtn t-iconbtn--prof" type="button" data-t-profile hidden aria-haspopup="menu" aria-expanded="false" data-tip-end></button>';
     document.body.appendChild(wrap);
     wrapRef = wrap;
+    drawProfiles();
 
     function closeAll(except) {
       [].forEach.call(wrap.querySelectorAll('[data-t-pop]'), function (p) {
@@ -216,6 +226,95 @@
   addEventListener('blur', closeLogoMenu);
   addEventListener('resize', closeLogoMenu);
   readAccess();    // early, so the first right click already knows the locks
+
+  /* ── the profile: the hub's mark, the hub's session ─────────────────────── */
+  var session = null;
+  var AVATAR_PATTERNS = [190, 341, 151, 403, 186, 149, 343, 189, 179, 307, 95, 159];
+  var LEVELS = {
+    owner: { fill: 'var(--gw-color-black)', label: 'Owner' },
+    admin: { fill: 'var(--gw-color-black)', label: 'Admin' },
+    team:  { fill: 'var(--gw-color-primary-300)', label: 'Gushwork team' }
+  };
+  function level() { return !session ? 'team' : session.owner ? 'owner' : session.admin ? 'admin' : 'team'; }
+  function avatarIndex(seed) {
+    var h = 2166136261, str = String(seed || '').toLowerCase();
+    for (var i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = (h + (h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24)) >>> 0; }
+    return h % AVATAR_PATTERNS.length;
+  }
+  function avatarSVG() {
+    var mask = AVATAR_PATTERNS[avatarIndex(session && (session.email || session.name))];
+    var dots = '';
+    for (var i = 0; i < 9; i++) {
+      if (!(mask >> i & 1)) continue;
+      var r = Math.floor(i / 3), c = i % 3;
+      dots += '<rect x="' + (11 + c * 7) + '" y="' + (11 + r * 7) + '" width="5" height="5" rx="1.5" fill="var(--gw-color-white)"/>';
+    }
+    return '<svg viewBox="0 0 40 40" aria-hidden="true" focusable="false"><rect width="40" height="40" rx="8" fill="' + LEVELS[level()].fill + '"/>' + dots + '</svg>';
+  }
+  function displayName() {
+    var n = String((session && session.name) || '').trim(), e = String((session && session.email) || '').trim();
+    if (n && n.indexOf('@') === -1 && n.toLowerCase() !== e.toLowerCase()) return n;
+    var local = (e || n).split('@')[0];
+    return local.split(/[._\-+]+/).filter(Boolean).map(function (w) { return w.charAt(0).toUpperCase() + w.slice(1); }).join(' ') || n || e;
+  }
+  function esc(v) { return String(v || '').replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  var profMenu = null;
+  function closeProfile() { if (profMenu) { profMenu.remove(); profMenu = null; document.querySelectorAll('[data-t-profile][aria-expanded="true"]').forEach(function (b) { b.setAttribute('aria-expanded', 'false'); }); } }
+  function openProfile(anchor) {
+    if (profMenu) { closeProfile(); return; }
+    if (!session || !session.signedIn) return;
+    var m = document.createElement('div');
+    m.className = 't-menu t-menu--profile';
+    m.setAttribute('role', 'menu');
+    m.innerHTML =
+      '<div class="t-prof">' +
+        '<span class="t-prof__av">' + avatarSVG() + '</span>' +
+        '<span class="t-prof__txt"><span class="t-prof__name">' + esc(displayName()) + '</span>' +
+        '<span class="t-prof__role">' + LEVELS[level()].label + '</span></span>' +
+      '</div>' +
+      (session.email ? '<div class="t-prof__mail" title="' + esc(session.email) + '">' + esc(session.email) + '</div>' : '') +
+      '<div class="t-menu__sep"></div>' +
+      '<a class="t-menu__row" role="menuitem" href="/api/auth/logout?next=' + encodeURIComponent('/') + '">' + icon('sign-out') + '<span>Sign out</span></a>';
+    document.body.appendChild(m);
+    profMenu = m;
+    var r = anchor.getBoundingClientRect();
+    m.style.top = (r.bottom + 8) + 'px';
+    m.style.left = Math.max(8, Math.min(r.right - m.offsetWidth, innerWidth - m.offsetWidth - 8)) + 'px';
+    anchor.setAttribute('aria-expanded', 'true');
+  }
+  function profileButtonHTML() {
+    return '<span class="t-prof__mini">' + avatarSVG() + '</span>';
+  }
+  function drawProfiles() {
+    document.querySelectorAll('[data-t-profile]').forEach(function (b) {
+      b.hidden = !(session && session.signedIn);
+      b.innerHTML = profileButtonHTML();
+      b.setAttribute('aria-label', 'Account: ' + displayName());
+      b.setAttribute('data-tip', displayName());
+    });
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('[data-t-profile]');
+    if (b) { e.preventDefault(); openProfile(b); return; }
+    if (profMenu && !profMenu.contains(e.target)) closeProfile();
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeProfile(); });
+  addEventListener('resize', closeProfile);
+  fetch('/api/auth/me', { credentials: 'same-origin' })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (j) {
+      session = j;
+      drawProfiles();
+      window.dispatchEvent(new CustomEvent('gw:session', { detail: j }));
+    })
+    .catch(function () { session = null; drawProfiles(); });
+  window.gwProfile = {
+    get session() { return session; },
+    avatarSVG: function () { return avatarSVG(); },
+    name: displayName,
+    draw: drawProfiles,
+    open: openProfile
+  };
 
   window.gwSetTheme = setTheme;
   apply(pref(), false);

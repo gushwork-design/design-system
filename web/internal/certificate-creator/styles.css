@@ -558,3 +558,4 @@ html[data-tool-panel="open"] .t-acts { right: calc(var(--t-panel-w) + var(--t-in
    5 Oct 2026). The Files home keeps the hub's corner controls. */
 html[data-tool-panel="open"] .t-acts, html[data-tool-panel="closed"] .t-acts { display: none; }
 .right-head .gd-menu { max-height: calc(100vh - 80px); }   /* the file menu holds file, Appearance and Help: let it show whole */
+.right-head__end { display: inline-flex; align-items: center; gap: var(--gw-space-12); }

@@ -35,7 +35,7 @@
       "changed": "2026-10-05",
       "breaking": false,
       "doc": "components.md",
-      "note": "The hub's Appearance and Help menus as worn top-right by a tool (tool-chrome.js, a copy of the hub's). Also the logo tile menu: right click for Design Hub and the tools, locked where the viewer has no access."
+      "note": "Appearance, Help and the signed-in profile (the hub mark, name, role, Sign out), top-right; plus the logo tile menu."
     },
     "tool-progress": {
       "version": "1.58.0",
