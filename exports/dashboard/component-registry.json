@@ -1359,6 +1359,12 @@
       "reviewedOn": "2026-10-05",
       "fingerprint": "a1d25c975dca98de",
       "note": "check padding between heading and the charts"
+    },
+    "workspace-switcher": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "5381e51364417a74"
     }
   }
 }
