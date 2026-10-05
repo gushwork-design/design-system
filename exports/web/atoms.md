@@ -188,7 +188,7 @@ Use the left column. Following the prose emits four invalid keys.
 | Error (red) — `Feedback=Red Warning` | Hard validation fail: wrong format, missing required | `"Oops! That does not look right. Do you wanna try again?"` | **yes** |
 | Warning (yellow) — `Feedback=Yellow Warning` | Value allowed but looks off | `"Heads up! Please double-check this field."` | no |
 | `Verified` | Passed a check, e.g. verified email | none — show the check | no |
-| `Loading` | Async validation in progress | none — spinner | no |
+| `Loading` | Async validation in progress | none — spinner, drawn centred in its 18px slot so it turns on its own centre and does not orbit | no |
 
 The rule calls the success state **"Success (green check)"**; the actual value is
 **`Verified`**. There is no `Success` key.
