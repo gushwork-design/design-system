@@ -126,6 +126,43 @@ async function api(method, body, query = '') {
   return j;
 }
 
+/* A section locked until the person asks to edit it, after the ID card generator's locked fields
+   (Utsav, 5 Oct 2026: "lock this section and only open when user wants to"). The lock chip opens a
+   short confirm; Yes unlocks the section for this file. */
+function LockedSection({ title, locked, onUnlock, prompt, children }) {
+  const [asking, setAsking] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!asking) return undefined;
+    const onDoc = (e) => { if (ref.current && !ref.current.contains(e.target)) setAsking(false); };
+    const onKey = (e) => { if (e.key === 'Escape') setAsking(false); };
+    document.addEventListener('mousedown', onDoc); document.addEventListener('keydown', onKey);
+    return () => { document.removeEventListener('mousedown', onDoc); document.removeEventListener('keydown', onKey); };
+  }, [asking]);
+  return (
+    <section className={`prop-section lockable-field${locked ? ' is-locked' : ''}`} ref={ref}>
+      <header className="prop-section-head lock-head">
+        <h3>{title}</h3>
+        {locked && (
+          <button type="button" className="lock-chip lock-chip--section" onClick={() => setAsking((v) => !v)} aria-expanded={asking} aria-label="Locked. Click to unlock">
+            <LockIcon /><span className="lock-chip-label">Click to unlock</span>
+          </button>
+        )}
+      </header>
+      {asking && (
+        <div className="lock-confirm" role="dialog" aria-label="Unlock">
+          <p>{prompt}</p>
+          <div className="lock-confirm__acts">
+            <button type="button" className="r-btn" onClick={() => setAsking(false)}>Cancel</button>
+            <button type="button" className="r-btn r-btn--primary" onClick={() => { setAsking(false); onUnlock(); }}>Yes, unlock</button>
+          </div>
+        </div>
+      )}
+      <div className="prop-rows">{children}</div>
+    </section>
+  );
+}
+
 /* ── controls ─────────────────────────────────────────────────── */
 function PropSection({ title, children }) {
   return (
@@ -145,9 +182,9 @@ function PropRow({ label, children, align = 'center' }) {
   );
 }
 
-function PropInput({ value, onChange, placeholder }) {
+function PropInput({ value, onChange, placeholder, readOnly = false }) {
   return (
-    <input className="prop-input" type="text" value={value || ''} placeholder={placeholder}
+    <input className="prop-input" type="text" value={value || ''} placeholder={placeholder} readOnly={readOnly}
       onChange={(e) => onChange(e.target.value)} spellCheck={false} />
   );
 }
@@ -870,7 +907,8 @@ function App() {
   const [clash, setClash] = useState(null);           // the newer copy someone else saved
   const [leaveTo, setLeaveTo] = useState(null);       // a pending navigation away from unsaved edits
   const [, setThemeTick] = useState(0);              // re-render the file menu's Appearance checks
-  const [tour, setTour] = useState(null);             // the tour running: cert-home or cert-editor
+  const [tour, setTour] = useState(null);
+  const [sigOpen, setSigOpen] = useState(false);     // Signed by stays locked until asked, per file             // the tour running: cert-home or cert-editor
   const itemsRef = useRef([]);
   const certRef = useRef(null);
   const stageRef = useRef(null);
@@ -918,7 +956,7 @@ function App() {
   const applyRoute = useCallback((items) => {
     const h = readHash();
     setView(routeOf());
-    setClash(null); setLinkError(''); setTouched(false);
+    setClash(null); setLinkError(''); setTouched(false); setSigOpen(false);
     if (h.saved) {
       const it = items.find((x) => x.id === h.saved);
       if (it) { setPages(pagesOf(it)); setActive(0); setCurrent(it); setFileTitle(it.title || ''); }
@@ -1035,6 +1073,34 @@ function App() {
     }
     setTimeout(() => setJob((j) => (j.kind === kind ? { kind: null, state: 'idle' } : j)), 2400);
   };
+
+  // arrows step through the pages (Utsav, 5 Oct 2026: "to see all pages quickly"), whenever the
+  // keys are not busy typing: a field, a select or the certificate's own text keeps its arrows
+  useEffect(() => {
+    if (view !== 'editor') return undefined;
+    const onKey = (e) => {
+      if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      const el = document.activeElement;
+      if (el && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName))) return;
+      if (document.querySelector('dialog[open], .gd-menu, .gd-coach')) return;
+      const n = pages.length, cur = activeRef.current;
+      let next = null;
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = Math.min(n - 1, cur + 1);
+      else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = Math.max(0, cur - 1);
+      else if (e.key === 'Home') next = 0;
+      else if (e.key === 'End') next = n - 1;
+      if (next === null) return;
+      e.preventDefault();
+      if (next === cur) return;
+      setActive(next);
+      requestAnimationFrame(() => {
+        const tile = document.querySelectorAll('.page-tile__open')[next];
+        if (tile) { tile.focus({ preventScroll: true }); tile.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' }); }
+      });
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [view, pages.length]);
 
   // pages: add (from the default template, keeping the period and signatory), duplicate, delete, reorder
   const addPage = () => { setTouched(true); const at = activeRef.current + 1; setPages((ps) => [...ps.slice(0, at), fromPreset(PRESETS[0], ps[activeRef.current]), ...ps.slice(at)]); setActive(at); };
@@ -1235,14 +1301,15 @@ function App() {
               </PropRow>
             </PropSection>
 
-            <PropSection title="Signed by">
+            <LockedSection title="Signed by" locked={!sigOpen} onUnlock={() => setSigOpen(true)}
+              prompt="Edit the signatory? Most certificates are signed by the CEO, so this rarely changes.">
               <PropRow label="Signature">
-                <PropInput value={data.signature} onChange={set('signature')} placeholder="Nayrhit B." />
+                <PropInput value={data.signature} onChange={set('signature')} placeholder="Nayrhit B." readOnly={!sigOpen} />
               </PropRow>
               <PropRow label="Name line">
-                <PropInput value={data.signedBy} onChange={set('signedBy')} placeholder="Nayrhit, CEO, Gushwork" />
+                <PropInput value={data.signedBy} onChange={set('signedBy')} placeholder="Nayrhit, CEO, Gushwork" readOnly={!sigOpen} />
               </PropRow>
-            </PropSection>
+            </LockedSection>
           </div>
         </aside>
       </div>
@@ -1376,7 +1443,7 @@ function App() {
         <div className="cert-stage">
           <div className="cert-scale-wrap" style={{ width: CERT.W * scale, height: CERT.H * scale }}>
             <div className="cert-scale" style={{ transform: `scale(${scale})` }}>
-              <Certificate key={activeRef.current} data={data} logoSvg={logoSvg} certRef={certRef} onEdit={canEdit ? onEdit : undefined} />
+              <Certificate key={activeRef.current} data={data} logoSvg={logoSvg} certRef={certRef} onEdit={canEdit ? onEdit : undefined} signLocked={!sigOpen} />
             </div>
           </div>
           {overflow && <p className="cert-caption is-warn">The text runs past the panel. Shorten the headline or the citation.</p>}
@@ -1404,7 +1471,7 @@ function App() {
         {canEdit && pages.length < 50 && (
           <button type="button" className="page-add" onClick={addPage} aria-label="Add a page" title="Add a page"><PlusIcon /></button>
         )}
-        <span className="page-count">{activeRef.current + 1} / {pages.length} · A4</span>
+        <span className="page-count" title="Use the arrow keys to move between pages">{activeRef.current + 1} / {pages.length} · A4</span>
       </nav>
 
       {/* off-screen, full-size copies of every page: what the downloads read */}

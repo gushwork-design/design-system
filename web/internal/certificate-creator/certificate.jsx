@@ -216,7 +216,8 @@ function readCitation(el) {
   const intact = CITE_RUNS.every((r) => r.key in spans) && el.querySelectorAll('[data-field]').length === 4;
   // text typed outside the runs, or runs merged away: read the whole thing and split it again
   const stray = [...el.childNodes].some((n) => n.nodeType === 3 && n.nodeValue.trim());
-  if (intact && !stray) return Object.fromEntries(CITE_RUNS.map((r) => [r.key, noTrail(spans[r.key])]));
+  // spaces at a run's edges are dropped: the runs are joined by one space, so an edge space doubled it
+  if (intact && !stray) return Object.fromEntries(CITE_RUNS.map((r) => [r.key, trimSpaces(noTrail(spans[r.key]))]));
   const all = noTrail(el.textContent).replace(/[^\S\n]+/g, ' ').trim();
   return splitCitation(all) || { before: all, award: '', period: '', after: '' };
 }
@@ -270,7 +271,7 @@ function CitationEditor({ data, onEdit, style }) {
 /* trims spaces, never a line break someone put there on purpose */
 function trimSpaces(v) { return String(v || '').replace(/^[ \t]+|[ \t]+$/g, ''); }
 
-function Certificate({ data, logoSvg, certRef, onEdit }) {
+function Certificate({ data, logoSvg, certRef, onEdit, signLocked = false }) {
   const editable = !!onEdit;
   const ed = (key) => (v) => onEdit && onEdit(key, v);
   const name = trimSpaces(data.name);
@@ -389,7 +390,7 @@ function Certificate({ data, logoSvg, certRef, onEdit }) {
                 minHeight: 40,
               }}
             >
-              <EditableText editable={editable} value={data.signature} onChange={ed('signature')} placeholder="Signature" data-text="sig" />
+              <EditableText editable={editable && !signLocked} value={data.signature} onChange={ed('signature')} placeholder="Signature" data-text="sig" />
             </div>
             <div
               data-layer="Signed by"
@@ -398,7 +399,7 @@ function Certificate({ data, logoSvg, certRef, onEdit }) {
                 letterSpacing: 0, color: CERT.grey, whiteSpace: 'nowrap', minHeight: 14,
               }}
             >
-              <EditableText editable={editable} value={data.signedBy} onChange={ed('signedBy')} placeholder="Name, role, Gushwork" data-text="body" />
+              <EditableText editable={editable && !signLocked} value={data.signedBy} onChange={ed('signedBy')} placeholder="Name, role, Gushwork" data-text="body" />
             </div>
           </div>
         </div>

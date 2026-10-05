@@ -147,6 +147,12 @@ The email signature creator and the employee ID card generator were redesigned i
     have no border at rest, only the hover fill; the collapse icon is 16 (was 12) so it still reads
     without its frame (Utsav, 5 Oct 2026).
 
+44. **Arrow keys move between pages** whenever the keys are not typing (Left / Up back, Right /
+    Down forward, Home, End), so a file of many certificates can be read through quickly.
+45. **Signed by is locked until asked**, after the ID card generator's locked fields: a lock chip,
+    a short confirm (Edit the signatory? / Yes, unlock), read-only fields and a non-editable
+    signature on the sheet until then; it locks again for each file (Utsav, 5 Oct 2026).
+
 ## Left open (the owner's call)
 
 - **A third typeface in the signature preview** (Plus Jakarta Sans). In the artefact, not the chrome.
