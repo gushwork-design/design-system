@@ -320,6 +320,14 @@
       "fingerprint": "7f7e932161b58e16",
       "previewFingerprint": "7fd9ae925f62afe4",
       "note": "new design in the templates"
+    },
+    "timeline": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "b011f54c631f2238",
+      "previewFingerprint": "0d792d4171e9d3b4",
+      "note": "the tooltip sohuld be shown on hover"
     }
   }
 }
