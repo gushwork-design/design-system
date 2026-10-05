@@ -282,15 +282,18 @@
     m.style.left = Math.max(8, Math.min(r.right - m.offsetWidth, innerWidth - m.offsetWidth - 8)) + 'px';
     anchor.setAttribute('aria-expanded', 'true');
   }
+  /* The mark alone reads as a random icon to anyone who has not met it (Utsav, 5 Oct 2026), so the
+     button carries the person's first name beside it. */
   function profileButtonHTML() {
-    return '<span class="t-prof__mini">' + avatarSVG() + '</span>';
+    var first = displayName().split(' ')[0];
+    return '<span class="t-prof__mini">' + avatarSVG() + '</span><span class="t-prof__label">' + esc(first) + '</span>';
   }
   function drawProfiles() {
     document.querySelectorAll('[data-t-profile]').forEach(function (b) {
       b.hidden = !(session && session.signedIn);
       b.innerHTML = profileButtonHTML();
       b.setAttribute('aria-label', 'Account: ' + displayName());
-      b.setAttribute('data-tip', displayName());
+      b.removeAttribute('data-tip');   // the name is on the button now
     });
   }
   document.addEventListener('click', function (e) {
