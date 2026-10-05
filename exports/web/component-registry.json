@@ -290,6 +290,13 @@
       "reviewedOn": "2026-10-05",
       "fingerprint": "c08345e8361fe036",
       "previewFingerprint": "084bc81f00a03af9"
+    },
+    "inline-input": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "7bf0ee686f4f43ef",
+      "previewFingerprint": "6866305f326ac1f4"
     }
   }
 }
