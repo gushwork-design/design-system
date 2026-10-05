@@ -248,6 +248,13 @@
       "reviewedOn": "2026-10-05",
       "fingerprint": "365920b33d971853",
       "previewFingerprint": "d1f098724778dda7"
+    },
+    "cards-grid-small": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "08ab2271717bae2a",
+      "previewFingerprint": "1ad1ac72b1bb8f56"
     }
   }
 }
