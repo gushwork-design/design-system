@@ -19,7 +19,9 @@
    WHAT IT STORES. One hash, `gw:certs`: id -> {id, data, access, savedBy, savedAt, updatedBy,
    updatedAt}. `data` is only the certificate's own text fields, whitelisted and length-capped;
    `access` is validated (domain emails only, at most MAX_PEOPLE). Nothing else a browser sends
-   is kept.
+   is kept. A second hash, `gw:cert-names`, keeps each visitor's display name from their own
+   verified session (never from a request body), so the tool can show "Utsav" instead of an
+   address; the list read returns the names of the people it mentions.
 
    HOW MUCH. Capped at MAX_ITEMS certificates; a save past the cap is refused, not trimmed, so
    nobody's saved work disappears without them deleting it.
@@ -29,6 +31,7 @@ import { COOKIE, verify, readCookie, sessionSecret } from './_session.js';
 import { loadRules, decide, isAdmin, allowedDomain } from './_access.js';
 
 const KEY = 'gw:certs';
+const NAMES = 'gw:cert-names';   // email -> the display name from that person's own Google sign-in
 const MAX_ITEMS = 1000;
 const MAX_PEOPLE = 50;
 /* Live at /internal/award-certificate since 5 Oct 2026; the old staging path stays so a rule set on it still counts. */
@@ -128,6 +131,10 @@ export default async function handler(req, res) {
     admin: !email || session.via === 'password' || isAdmin(email, rules),
   };
 
+  // remember this visitor's own name, from the signed session only
+  const myName = email && session.name && session.name !== email ? String(session.name).slice(0, 80) : '';
+  if (myName) { try { await pipe(cfg, [['HSET', NAMES, email, myName]]); } catch { /* a missing name falls back to the address */ } }
+
   const load = async (id) => {
     const r = await pipe(cfg, [['HGET', KEY, id]]);
     return r[0] && r[0].result ? JSON.parse(r[0].result) : null;
@@ -142,7 +149,19 @@ export default async function handler(req, res) {
         .map((it) => present(it, me))
         .filter((it) => it.can.view)
         .sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
-      return json(res, 200, { items, me: me.email });
+      const emails = new Set([me.email]);
+      for (const it of items) {
+        emails.add(it.savedBy); emails.add(it.updatedBy);
+        (it.access.people || []).forEach((p) => emails.add(p.email));
+      }
+      const list = [...emails].filter((e) => e && e.includes('@'));
+      let names = {};
+      if (list.length) {
+        const n = await pipe(cfg, [['HMGET', NAMES, ...list]]);
+        const vals = (n[0] && n[0].result) || [];
+        list.forEach((e, i) => { if (vals[i]) names[e] = vals[i]; });
+      }
+      return json(res, 200, { items, me: me.email, names });
     }
 
     if (req.method === 'POST') {

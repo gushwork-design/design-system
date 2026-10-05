@@ -56,7 +56,18 @@ function when(iso) {
 function whenTime(iso) {
   try { return new Date(iso).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); } catch { return ''; }
 }
-function who(email) { return String(email || '').split('@')[0] || 'someone'; }
+/* People by first name: from their Google sign-in when the tool has seen them (NAMES, filled from
+   /api/certificates), otherwise from the address ("priya.r@…" reads "Priya"). */
+const NAMES = {};
+function firstName(email) {
+  const e = String(email || '').toLowerCase();
+  if (!e.includes('@')) return e || 'Someone';
+  const full = NAMES[e];
+  const word = full ? full.trim().split(/\s+/)[0] : e.split('@')[0].split(/[._+-]/)[0];
+  return word ? word.charAt(0).toUpperCase() + word.slice(1) : 'Someone';
+}
+function fullName(email) { return NAMES[String(email || '').toLowerCase()] || ''; }
+function who(email) { return firstName(email); }
 
 async function api(method, body, query = '') {
   const r = await fetch('/api/certificates' + query, {
@@ -313,13 +324,13 @@ function AccessModal({ item, onClose, onSaved }) {
         <ul className="acc-people">
           <li>
             <span className="acc-avatar" aria-hidden>{who(item.savedBy).slice(0, 1).toUpperCase()}</span>
-            <span className="acc-who"><span className="saved-name">{who(item.savedBy)}</span><span className="saved-meta">{item.savedBy}</span></span>
+            <span className="acc-who"><span className="saved-name">{who(item.savedBy)}</span><span className="saved-meta">{fullName(item.savedBy) ? `${fullName(item.savedBy)} · ${item.savedBy}` : item.savedBy}</span></span>
             <span className="acc-owner">Owner</span>
           </li>
           {access.people.map((p) => (
             <li key={p.email}>
               <span className="acc-avatar" aria-hidden>{who(p.email).slice(0, 1).toUpperCase()}</span>
-              <span className="acc-who"><span className="saved-name">{who(p.email)}</span><span className="saved-meta">{p.email}</span></span>
+              <span className="acc-who"><span className="saved-name">{who(p.email)}</span><span className="saved-meta">{fullName(p.email) ? `${fullName(p.email)} · ${p.email}` : p.email}</span></span>
               <RoleSwitch value={p.role} onChange={(r) => setPerson(p.email, r)} labels={{ view: 'View', edit: 'Edit' }} />
               <button type="button" className="saved-del acc-remove" onClick={() => drop(p.email)} aria-label={`Remove ${p.email}`} title="Remove"><CloseIcon /></button>
             </li>
@@ -406,6 +417,7 @@ function App() {
   const loadList = useCallback(async () => {
     try {
       const j = await api('GET');
+      Object.assign(NAMES, j.names || {});
       setSaved({ state: 'ready', items: j.items || [], error: '' });
       return j.items || [];
     } catch (e) {
