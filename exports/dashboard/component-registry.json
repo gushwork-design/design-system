@@ -1046,11 +1046,10 @@
       "previewFingerprint": "78cc999e1f6dcf30"
     },
     "legend-table": {
-      "reviewed": "rework",
+      "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "2bb3918b3c2275db",
-      "note": "make sure table matches with other designs",
+      "fingerprint": "74f57a8b98bfab9e",
       "previewFingerprint": "5702d27f4be5141e"
     },
     "line-chart": {
