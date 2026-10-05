@@ -313,6 +313,13 @@
       "reviewedOn": "2026-10-05",
       "fingerprint": "d693e55b086658da",
       "note": "preview is not there"
+    },
+    "rule-label": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "83ce89d08d99fd8c",
+      "note": "preview is not there"
     }
   }
 }
