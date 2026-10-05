@@ -169,6 +169,12 @@
 .gd-topbar { display: none; flex: none; align-items: center; justify-content: space-between; gap: var(--gw-space-8); height: calc(var(--gd-control-h) + var(--gw-space-24)); padding: 0 var(--gw-space-20); background: var(--gd-panel-bg); position: relative; z-index: 40; }
 .gd-topbar--always { display: flex; }
 .gd-topbar__start, .gd-topbar__acts { display: flex; align-items: center; gap: var(--gw-space-8); min-width: 0; }
+/* the menu button sits at the right end: brand left, then search and theme, then the burger. The start group dissolves into the
+   bar's own row so the markup order (burger first, which the template keeps) is only changed visually. */
+.gd-topbar__start { display: contents; }
+.gd-topbar .gd-sidebar__brand { order: 0; }
+.gd-topbar__acts { order: 1; margin-left: auto; }
+.gd-topbar__btn[data-gd-nav-toggle] { order: 2; }
 .gd-topbar__btn { width: var(--gd-control-h); height: var(--gd-control-h); border-radius: var(--gw-radius-8); }
 .gd-topbar__btn--box { border: 1px solid var(--gd-border); }
 .gd-topbar__btn .gd-ico-close, .gd-topbar__btn[aria-expanded="true"] .gd-ico-open { display: none; }
