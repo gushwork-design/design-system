@@ -18,6 +18,8 @@
 #   - the switch is off: .github/automerge-off exists on origin/main
 #   - not a rework: title is not "Rework: <scope>/<key>", or the branch is not rework/* or nightly/*
 #   - not decided: the registry on origin/main does not say `rework` for that item
+#   - no fix record: the PR does not add web/previews/<scope>/<key>.reworked answering that send-back
+#     (bash scripts/mark-reworked.sh writes it), so the item could not come back to Waiting
 #   - a file outside the hub paths, or one of the files that govern merging, publishing and access
 #   - a conflict with main
 #
@@ -39,10 +41,12 @@ if git cat-file -e origin/main:.github/automerge-off 2>/dev/null; then
   refuse "auto-merge is switched off (.github/automerge-off is on main)"
 fi
 
-INFO="$(gh pr view "$PR" --json state,baseRefName,headRefName,title,mergeable,files)"
+INFO="$(gh pr view "$PR" --json state,baseRefName,headRefName,title,mergeable,files,headRefOid)"
 
 PR_JSON="$INFO" python3 - <<'PY' || exit 1
-import fnmatch, json, os, re, subprocess, sys
+import fnmatch, importlib.util, json, os, re, subprocess, sys
+_spec = importlib.util.spec_from_file_location("_cl", os.path.join("scripts", "_component_library.py"))
+CL = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(CL)
 
 pr = json.loads(os.environ["PR_JSON"])
 def refuse(why):
@@ -78,7 +82,7 @@ ALLOW = ["web/previews/*", "web/admin/*", "web/*.css", "web/*.js", "preview/libr
 # Inside those, the files that decide who sees the site, what ships, and this check itself.
 DENY = ["web/middleware.js", "scripts/merge-rework.sh", "scripts/publish-sheets.sh",
         "scripts/release*.sh", "scripts/stamp-*.sh", "scripts/_review.py",
-        "scripts/_component_library.py", "scripts/hooks/*"]
+        "scripts/_component_library.py", "scripts/_library_site.py", "scripts/mark-reworked.sh", "scripts/hooks/*"]
 def top_level_web(p):  # web/*.css and web/*.js mean the hub's own files, not web/api/x.js
     return not (p.startswith("web/") and p.count("/") > 1 and not p.startswith(("web/previews/", "web/admin/")))
 bad = []
@@ -90,7 +94,19 @@ if not pr["files"]:
     refuse("it changes no files")
 if bad:
     refuse("it touches files a rework may not merge on its own: " + ", ".join(bad))
-print(f"✔ {scope}/{key}: decided rework on main, {len(pr['files'])} hub file(s), no conflict")
+# The fix record, read from the PR's own head, has to answer the send-back that is on main now.
+record_path = os.path.relpath(CL.rework_record_path(scope, key), CL.ROOT)
+if record_path not in [x["path"] for x in pr["files"]]:
+    refuse(f"it has no fix record ({record_path}); run bash scripts/mark-reworked.sh {scope} {key} and commit it")
+try:
+    subprocess.run(["git", "fetch", "-q", "origin", pr["headRefOid"]], capture_output=True)  # may already be local
+    record = json.loads(subprocess.run(["git", "show", f"{pr['headRefOid']}:{record_path}"],
+                                       capture_output=True, text=True, check=True).stdout)
+except Exception:
+    refuse(f"could not read {record_path} from the PR")
+if not CL.rework_fixed(scope, key, rec, record):
+    refuse(f"{record_path} does not answer the send-back on main (decided {rec.get('reviewedOn', '?')}); re-run mark-reworked.sh")
+print(f"✔ {scope}/{key}: decided rework on main, fix record matches, {len(pr['files'])} hub file(s), no conflict")
 PY
 
 if [ "$DRY" = 1 ]; then
