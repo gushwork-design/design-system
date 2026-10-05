@@ -324,10 +324,14 @@ a.gd-hbar__row:hover, a.gd-hbar__row.is-hover { background: var(--gd-hover-bg); 
 .gd-funnel--v .gd-funnel__label { text-align: center; }
 .gd-funnel--v .gd-funnel__val { text-align: center; }
 .gd-funnel--v .gd-funnel__meta { display: flex; flex-direction: column; align-items: center; gap: var(--gw-space-2, 2px); font: var(--gw-text-body-12-med); font-feature-settings: "tnum" 1; color: var(--gd-text-muted); }
-.gd-funnel__table { width: 100%; border-collapse: collapse; font: var(--gw-text-body-12-med); font-feature-settings: "tnum" 1; }
-.gd-funnel__table th, .gd-funnel__table td { height: var(--gd-row-h); padding: 0 var(--gd-cell-px); text-align: right; border-top: 1px solid var(--gd-border); color: var(--gd-text); }
-.gd-funnel__table th:first-child, .gd-funnel__table td:first-child { text-align: left; }
-.gd-funnel__table thead th { height: var(--gd-head-h); border-top: 0; background: var(--gd-sunken-bg); color: var(--gd-text-muted); font-weight: 500; }
+.gd-funnel__table { width: 100%; border-collapse: collapse; font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); font-feature-settings: "tnum" 1; }
+.gd-funnel__table th, .gd-funnel__table td { height: var(--gd-row-h); padding: 0 var(--gd-cell-px); text-align: right; color: var(--gd-text-body); }
+.gd-funnel__table tbody :is(th, td) { border-bottom: 1px solid var(--gd-border); }
+.gd-funnel__table tbody tr:hover { background: var(--gd-row-hover); }
+.gd-funnel__table :is(th, td):first-child { text-align: left; }
+.gd-funnel__table tbody :is(th, td):first-child { color: var(--gd-text); }
+/* same header as the data table: no fill, small uppercase muted label, a firmer rule */
+.gd-funnel__table thead th { height: var(--gd-head-h); background: none; border-bottom: 1px solid var(--gd-border-strong); color: var(--gd-text-muted); text-transform: uppercase; white-space: nowrap; }
 
 /* ============================================================================
    legend-table: a row per series, a checkbox toggles it
