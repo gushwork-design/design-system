@@ -774,6 +774,22 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 /* the cap is a filled shape, so inset it: its gap to the right edge equals its gap above and below (button 36 high, cap 18 high) */
 .rv-b:has(> kbd) { padding-right: calc((36px - 18px) / 2); }
 .rv-lab { font: 500 13px/1.4 var(--gw-font-body); color: var(--ul-value); }
+/* Reference attachments on a send-back or reject (5 Oct 2026): thumbnails for images, a chip for any other file. */
+.rv-att { display: flex; flex-wrap: wrap; gap: var(--gw-space-8); }
+.rv-att:empty { display: none; }
+.rv-att__i { position: relative; display: flex; align-items: center; gap: var(--gw-space-8); height: 56px; max-width: 220px; padding: 0 var(--gw-space-12) 0 0; border-radius: var(--gw-radius-8); background: var(--ul-hdr-bg); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); color: var(--ul-cell); font: var(--gw-text-body-12-reg); text-decoration: none; overflow: hidden; }
+.rv-att__i:has(img) { padding: 0; }
+.rv-att__i img { width: 72px; height: 56px; object-fit: cover; flex: none; }
+.rv-att__i svg { width: 20px; height: 20px; margin-left: var(--gw-space-12); flex: none; color: var(--ul-sub); }
+.rv-att__i span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rv-att__x { all: unset; position: absolute; top: 4px; right: 4px; width: 18px; height: 18px; border-radius: var(--gw-radius-4); display: grid; place-items: center; cursor: pointer; background: var(--gw-color-black-alpha-60, rgba(0,0,0,.6)); color: var(--gw-color-white); font-size: 11px; line-height: 1; }
+.rv-att__x:focus-visible { box-shadow: 0 0 0 2px var(--gw-color-white); }
+.rv-acts--split { justify-content: space-between !important; align-items: center; }
+.rv-acts__l { display: flex; align-items: center; gap: var(--gw-space-12); }
+.rv-acts__l svg { width: 16px; height: 16px; }
+.rv-hint--sm { font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
+.rv-foot.is-drop { box-shadow: inset 0 0 0 2px var(--gw-color-primary-500); }
+.rv-refs { display: flex; flex-wrap: wrap; gap: var(--gw-space-8); margin-top: var(--gw-space-8); }
 .rv-ta { width: 100%; box-sizing: border-box; padding: var(--gw-space-12); border: 0; border-radius: var(--gw-radius-12); resize: vertical; background: var(--ul-field-bg); color: var(--ul-field-fg); font: 400 14px/1.5 var(--gw-font-body); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }
 .rv-ta:focus-visible { outline: none; box-shadow: inset 0 0 0 1px var(--gw-color-black); }   /* the edge, not the ring (R41) */
 :root[data-theme="dark"] .rv-ta:focus-visible { box-shadow: inset 0 0 0 1px var(--gw-color-white); }
@@ -1401,11 +1417,86 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       : '<span class="rv-q">' + (q && q.via === 'main' ? 'on main, live' : 'being recorded') + '</span>');
     return '<span class="ul-badge' + (STATE_CLASS[state] || '') + '">' + esc(STATE_LABEL[state] || state) + '</span>' + tail;
   }
-  var QSTATE = {}, ITEMS = [], BYID = {}, RV = { filter: 'waiting', list: [], i: 0, open: false, mode: '', wide: false };
+  var QSTATE = {}, ITEMS = [], BYID = {}, RV = { filter: 'waiting', list: [], i: 0, open: false, mode: '', wide: false, att: [] };
   function idOf(it) { return it.scope + '/' + it.key; }
   /* A decision is staged first and applied when the owner presses Save (R47). The drafts live in this browser, so a reload
      does not lose them, and nothing reaches main, the Library or a routine until Save. */
+  /* RV.att is the open form's attachments. */
   var DRAFTS = (function () { try { var j = JSON.parse(localStorage.getItem('gw-review-drafts') || '{}'); return j && typeof j === 'object' ? j : {}; } catch (e) { return {}; } })();
+  /* Attachments (5 Oct 2026, Utsav: "add images and files for ref and also allow image paste"). The open form's files live in
+     RV.att; once marked, a draft's files live in ATT[id] and in IndexedDB, so a reload before Save keeps them (localStorage is
+     too small for images). Save uploads them one at a time, then sends the decision with their repo paths. */
+  var ATT = {}, ATT_MAX = 6, ATT_BYTES = 3 * 1024 * 1024;
+  var ATT_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif', 'application/pdf', 'text/plain', 'text/markdown', 'text/csv', 'application/json'];
+  var CLIP = '<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M209.66,122.34a8,8,0,0,1,0,11.32l-82.05,82a56,56,0,0,1-79.2-79.21L147.67,35.73a40,40,0,1,1,56.61,56.55L105,193A24,24,0,1,1,71,159L154.3,74.38A8,8,0,1,1,165.7,85.6L82.39,170.31a8,8,0,1,0,11.27,11.36L192.93,81A24,24,0,1,0,159,47L59.76,147.68a40,40,0,1,0,56.53,56.62l82.06-82A8,8,0,0,1,209.66,122.34Z"/></svg>';
+  function attDb(mode, fn) {
+    return new Promise(function (ok) {
+      try {
+        var r = indexedDB.open('gw-review', 1);
+        r.onupgradeneeded = function () { r.result.createObjectStore('att'); };
+        r.onsuccess = function () { try { var tx = r.result.transaction('att', mode), out = fn(tx.objectStore('att')); tx.oncomplete = function () { ok(out && out.result); }; tx.onerror = function () { ok(null); }; } catch (e) { ok(null); } };
+        r.onerror = function () { ok(null); };
+      } catch (e) { ok(null); }
+    });
+  }
+  function keepAtt(id, list) { if (list && list.length) { ATT[id] = list; attDb('readwrite', function (st) { st.put(list.map(function (a) { return { name: a.name, type: a.type, blob: a.blob }; }), id); }); } else dropAtt(id); }
+  function dropAtt(id) { delete ATT[id]; attDb('readwrite', function (st) { st.delete(id); }); }
+  function attTypeOf(f) {
+    var t = f.type || '', n = (f.name || '').toLowerCase();
+    if (!t && /\.md$/.test(n)) t = 'text/markdown';
+    return ATT_TYPES.indexOf(t) >= 0 ? t : '';
+  }
+  /* A screenshot is often several MB; redraw anything over 2400px or 2 MB as WebP so it fits one request and stays sharp. */
+  function shrink(f, type) {
+    if (!/^image\/(png|jpeg|webp)$/.test(type) || !window.createImageBitmap) return Promise.resolve({ blob: f, type: type });
+    return createImageBitmap(f).then(function (bm) {
+      var k = Math.min(1, 2400 / Math.max(bm.width, bm.height));
+      if (k === 1 && f.size <= 2 * 1024 * 1024) return { blob: f, type: type };
+      var c = document.createElement('canvas'); c.width = Math.round(bm.width * k); c.height = Math.round(bm.height * k);
+      c.getContext('2d').drawImage(bm, 0, 0, c.width, c.height);
+      return new Promise(function (ok) { c.toBlob(function (b) { ok(b ? { blob: b, type: 'image/webp' } : { blob: f, type: type }); }, 'image/webp', 0.9); });
+    }).catch(function () { return { blob: f, type: type }; });
+  }
+  function addFiles(files) {
+    var list = Array.prototype.slice.call(files || []);
+    if (!list.length) return;
+    list.reduce(function (p, f) {
+      return p.then(function () {
+        if (RV.att.length >= ATT_MAX) { toast('Up to ' + ATT_MAX + ' files per item.'); return; }
+        var type = attTypeOf(f);
+        if (!type) { toast((f.name || 'That file') + ': images, PDFs and text files only.'); return; }
+        return shrink(f, type).then(function (r) {
+          if (r.blob.size > ATT_BYTES) { toast((f.name || 'That file') + ' is over 3 MB.'); return; }
+          var name = f.name && f.name !== 'image.png' ? f.name : 'pasted-' + (RV.att.length + 1) + '.png';
+          RV.att.push({ name: name, type: r.type, blob: r.blob, url: URL.createObjectURL(r.blob) });
+        });
+      });
+    }, Promise.resolve()).then(paintAtt);
+  }
+  function attHtml(list, removable) {
+    return list.map(function (a, i) {
+      var img = /^image\//.test(a.type) && a.url;
+      return '<' + (a.href ? 'a href="' + esc(a.href) + '" target="_blank" rel="noopener"' : 'div') + ' class="rv-att__i" title="' + esc(a.name) + '">' +
+        (img ? '<img src="' + esc(a.url) + '" alt="">' : '<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><use href="#wi-file-text"/></svg><span>' + esc(a.name) + '</span>') +
+        (removable ? '<button type="button" class="rv-att__x" data-att-x="' + i + '" aria-label="Remove ' + esc(a.name) + '">✕</button>' : '') + '</' + (a.href ? 'a' : 'div') + '>';
+    }).join('');
+  }
+  function paintAtt() {
+    var box = $('rv-att'); if (!box) return;
+    box.innerHTML = attHtml(RV.att, true);
+    box.querySelectorAll('[data-att-x]').forEach(function (b) {
+      b.addEventListener('click', function () { var a = RV.att.splice(+b.getAttribute('data-att-x'), 1)[0]; if (a && a.url) URL.revokeObjectURL(a.url); paintAtt(); });
+    });
+  }
+  function b64of(blob) {
+    return new Promise(function (ok, bad) { var r = new FileReader(); r.onload = function () { ok(String(r.result).split(',')[1] || ''); }; r.onerror = bad; r.readAsDataURL(blob); });
+  }
+  // Bring back the files of drafts marked before a reload.
+  Object.keys(DRAFTS).forEach(function (id) {
+    if (DRAFTS[id] && DRAFTS[id].att) attDb('readonly', function (st) { return st.get(id); }).then(function (v) {
+      if (v && v.length) ATT[id] = v.map(function (a) { return { name: a.name, type: a.type, blob: a.blob }; });
+    });
+  });
   function storeDrafts() { try { localStorage.setItem('gw-review-drafts', JSON.stringify(DRAFTS)); } catch (e) { /* drafts stay for this visit */ } }
   function draftWant(d) { return d.action === 'pass' ? 'passed' : d.action === 'reject' ? 'rejected' : 'rework'; }
   function eff(it) {
@@ -1497,7 +1588,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   function renderReview(d) {
     indexItems(d);
     // A draft for an item that is gone, or whose source has moved since it was marked, no longer describes what is on screen.
-    Object.keys(DRAFTS).forEach(function (id) { var it = BYID[id]; if (!it || (DRAFTS[id].fp && it.fp !== DRAFTS[id].fp) || (DRAFTS[id].pfp && it.pfp !== DRAFTS[id].pfp)) delete DRAFTS[id]; });
+    Object.keys(DRAFTS).forEach(function (id) { var it = BYID[id]; if (!it || (DRAFTS[id].fp && it.fp !== DRAFTS[id].fp) || (DRAFTS[id].pfp && it.pfp !== DRAFTS[id].pfp)) { delete DRAFTS[id]; dropAtt(id); } });
     storeDrafts(); renderSaveBar();
     var count = function (f) { return ITEMS.filter(function (it) { return inFilter(it, f); }).length; };
     $('ds-rev-stats').innerHTML = metric('Waiting on you', String(count('waiting')), 'never reviewed, redone, or changed since') + metric('In rework', String(count('rework')), 'sent back with a note') +
@@ -1700,7 +1791,8 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
         : 'It is recorded in the repo at the next Claude session.') +
         (e.q.note ? ' Your note: ' + esc(e.q.note) : '') + ' <button class="rv-link" type="button" id="rv-undo">Undo</button></div>';
     } else if (it.by) {
-      hist = '<div class="rv-note"><b>' + esc(it.state === 'expired' ? 'Approved, then the source moved' : it.state === 'redone' ? 'Redone since you sent it back' : (STATE_LABEL[it.state] || '')) + '</b> · ' + esc(personName(it.by)) + (it.on ? ', ' + esc(fmtWhen(it.at || it.on)) : '') + (it.note ? '<br>' + esc(it.note) : '') + '</div>';
+      hist = '<div class="rv-note"><b>' + esc(it.state === 'expired' ? 'Approved, then the source moved' : it.state === 'redone' ? 'Redone since you sent it back' : (STATE_LABEL[it.state] || '')) + '</b> · ' + esc(personName(it.by)) + (it.on ? ', ' + esc(fmtWhen(it.at || it.on)) : '') + (it.note ? '<br>' + esc(it.note) : '') +
+        (it.refs && it.refs.length ? '<div class="rv-refs">' + attHtml(it.refs.map(function (r) { var href = r.replace(/^web\//, '/'); return { name: r.split('/').pop(), type: /\.(png|jpe?g|webp|gif)$/.test(r) ? 'image/x' : '', url: href, href: href }; }), false) + '</div>' : '') + '</div>';
     }
     var acts = it.activity || [];
     var actHtml = acts.length ? '<div class="rv-act"><h3>Activity</h3><ol>' + acts.map(function (a) {
@@ -1718,7 +1810,10 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     else if (RV.mode === 'rework' || RV.mode === 'reject') {
       foot = '<div class="rv-foot rv-foot--col"><label class="rv-lab" for="rv-note">' + (RV.mode === 'rework' ? 'What needs fixing? This goes to the next Claude session as the brief.' : 'Why is this rejected?') + '</label>' +
         '<textarea id="rv-note" class="rv-ta" rows="4" maxlength="500" placeholder="' + (RV.mode === 'rework' ? 'The labels bind raw white, they should use the neutral-900 token.' : 'It duplicates the card and nothing uses it.') + '"></textarea>' +
-        '<div class="rv-acts"><button type="button" class="rv-b rv-b--ghost" id="rv-cancel" aria-keyshortcuts="Escape">Cancel<kbd aria-hidden="true">Esc</kbd></button><button type="button" class="rv-b rv-b--' + (RV.mode === 'reject' ? 'bad' : 'warn') + '" id="rv-send" disabled aria-keyshortcuts="Meta+Enter">' + (RV.mode === 'rework' ? 'Send back' : 'Reject') + '<kbd aria-hidden="true">\u2318\u21b5</kbd></button></div></div>';
+        '<div class="rv-att" id="rv-att"></div>' +
+        '<div class="rv-acts rv-acts--split"><div class="rv-acts__l"><button type="button" class="rv-b rv-b--ghost rv-b--sm" id="rv-attach" title="Attach images or files for reference">' + CLIP + 'Attach</button>' +
+        '<input type="file" id="rv-file" multiple hidden accept="image/png,image/jpeg,image/webp,image/gif,application/pdf,text/plain,text/markdown,.md,text/csv,application/json">' +
+        '<span class="rv-hint--sm">or paste or drop an image</span></div><div class="rv-acts"><button type="button" class="rv-b rv-b--ghost" id="rv-cancel" aria-keyshortcuts="Escape">Cancel<kbd aria-hidden="true">Esc</kbd></button><button type="button" class="rv-b rv-b--' + (RV.mode === 'reject' ? 'bad' : 'warn') + '" id="rv-send" disabled aria-keyshortcuts="Meta+Enter">' + (RV.mode === 'rework' ? 'Send back' : 'Reject') + '<kbd aria-hidden="true">\u2318\u21b5</kbd></button></div></div></div>';
     } else {
       foot = '<div class="rv-foot"><div class="rv-acts"><button type="button" class="rv-b rv-b--pass" id="rv-pass" aria-keyshortcuts="A">Approve<kbd aria-hidden="true">A</kbd></button><button type="button" class="rv-b rv-b--ghost" id="rv-rework" aria-keyshortcuts="R">Rework<kbd aria-hidden="true">R</kbd></button><button type="button" class="rv-b rv-b--ghost" id="rv-reject" aria-keyshortcuts="X">Reject<kbd aria-hidden="true">X</kbd></button></div></div>';
     }
@@ -1737,11 +1832,11 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     $('rv-next').addEventListener('click', function () { step(1); });
     var on = function (id, fn) { var b = $(id); if (b) b.addEventListener('click', fn); };
     on('rv-pass', function () { stage(it, 'pass', ''); });
-    on('rv-rework', function () { RV.mode = 'rework'; renderDrawer(); $('rv-note').focus(); });
-    on('rv-reject', function () { RV.mode = 'reject'; renderDrawer(); $('rv-note').focus(); });
-    on('rv-cancel', function () { RV.mode = ''; renderDrawer(); });
+    on('rv-rework', function () { RV.mode = 'rework'; RV.att = []; renderDrawer(); $('rv-note').focus(); });
+    on('rv-reject', function () { RV.mode = 'reject'; RV.att = []; renderDrawer(); $('rv-note').focus(); });
+    on('rv-cancel', function () { RV.mode = ''; RV.att = []; renderDrawer(); });
     on('rv-undo', function () {
-      if (DRAFTS[idOf(it)]) { delete DRAFTS[idOf(it)]; storeDrafts(); toast('Taken back. Nothing was saved.'); renderDrawer(); reviewRefresh(); renderSaveBar(); }
+      if (DRAFTS[idOf(it)]) { delete DRAFTS[idOf(it)]; dropAtt(idOf(it)); storeDrafts(); toast('Taken back. Nothing was saved.'); renderDrawer(); reviewRefresh(); renderSaveBar(); }
       else post(it, 'undo', '');
     });
     on('rv-savenow', saveAll);
@@ -1749,6 +1844,18 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     if (ta) {
       ta.addEventListener('input', function () { $('rv-send').disabled = !ta.value.trim(); });
       on('rv-send', function () { stage(it, RV.mode, ta.value.trim()); });
+      // Attach: the button, a paste of an image into the note, or a drop anywhere on the form.
+      var fin = $('rv-file'), form = el.querySelector('.rv-foot--col');
+      on('rv-attach', function () { fin.click(); });
+      fin.addEventListener('change', function () { addFiles(fin.files); fin.value = ''; });
+      ta.addEventListener('paste', function (ev) {
+        var files = Array.prototype.filter.call((ev.clipboardData && ev.clipboardData.files) || [], function (f) { return /^image\//.test(f.type); });
+        if (files.length) { ev.preventDefault(); addFiles(files); }
+      });
+      form.addEventListener('dragover', function (ev) { if (ev.dataTransfer && Array.prototype.indexOf.call(ev.dataTransfer.types, 'Files') >= 0) { ev.preventDefault(); form.classList.add('is-drop'); } });
+      form.addEventListener('dragleave', function (ev) { if (!form.contains(ev.relatedTarget)) form.classList.remove('is-drop'); });
+      form.addEventListener('drop', function (ev) { ev.preventDefault(); form.classList.remove('is-drop'); addFiles(ev.dataTransfer && ev.dataTransfer.files); });
+      paintAtt();
     }
   }
   function saveBtn(id) {
@@ -1760,13 +1867,15 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   /* Stage a decision. It shows everywhere in the Review tab as not saved; nothing is sent until Save. */
   function stage(it, action, note) {
     if (SAVING) { toast('Saving. Mark more once it has finished.'); return; }
-    DRAFTS[idOf(it)] = { action: action, note: note || '', fp: it.fp, pfp: it.pfp || '' };
-    storeDrafts(); RV.mode = '';
+    var att = action === 'pass' ? [] : (RV.att || []);
+    DRAFTS[idOf(it)] = { action: action, note: note || '', fp: it.fp, pfp: it.pfp || '', att: att.length };
+    keepAtt(idOf(it), att);
+    storeDrafts(); RV.mode = ''; RV.att = [];
     toast((action === 'pass' ? 'Marked approved.' : action === 'rework' ? 'Marked to send back.' : 'Marked rejected.') + ' Press Save to apply it.');
     var n = nextWaiting(); if (n >= 0) RV.i = n;
     renderDrawer(); reviewRefresh(); renderSaveBar();
   }
-  function discardAll() { DRAFTS = {}; storeDrafts(); toast('Discarded. Nothing was saved.'); if (RV.open) renderDrawer(); reviewRefresh(); renderSaveBar(); }
+  function discardAll() { Object.keys(DRAFTS).forEach(dropAtt); DRAFTS = {}; storeDrafts(); toast('Discarded. Nothing was saved.'); if (RV.open) renderDrawer(); reviewRefresh(); renderSaveBar(); }
   /* Save: apply every staged decision, one after another (each is a commit on main and, for a rework, a routine). A failure
      leaves that one staged and says why; the others still go. */
   var SAVING = false, SAVEP = { n: 0, total: 0 };
@@ -1788,13 +1897,26 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     ids.reduce(function (p, id) {
       return p.then(function () {
         var d = DRAFTS[id], it = BYID[id];
-        if (!it) { delete DRAFTS[id]; SAVEP.n++; paintSaving(); return; }
-        return fetch('/api/review', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ scope: it.scope, key: it.key, action: d.action, note: d.note, fp: d.fp, pfp: d.pfp || '' }) })
+        if (!it) { delete DRAFTS[id]; dropAtt(id); SAVEP.n++; paintSaving(); return; }
+        var files = ATT[id] || [];
+        if (d.att && files.length < d.att) { fails.push(it.key + ': its attachments were lost on reload, open it and attach them again'); return; }
+        // The files first, one request each, so the decision can name them.
+        var up = files.reduce(function (q, a, i) {
+          return q.then(function (refs) {
+            return b64of(a.blob).then(function (data) {
+              return fetch('/api/review', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' },
+                body: JSON.stringify({ action: 'attach', scope: it.scope, key: it.key, name: a.name, type: a.type, n: i + 1, data: data }) });
+            }).then(function (r) { return r.json().then(function (j) { if (!r.ok || !j.path) throw new Error((j && j.error) || 'could not store an attachment'); return refs.concat(j.path); }); });
+          });
+        }, Promise.resolve([]));
+        return up.then(function (refs) {
+          return fetch('/api/review', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ scope: it.scope, key: it.key, action: d.action, note: d.note, fp: d.fp, pfp: d.pfp || '', refs: refs }) });
+        })
           .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
           .then(function (r) {
             if (!r.ok) { fails.push(it.key + ': ' + (r.j && r.j.error ? r.j.error : 'could not save')); return; }
-            QSTATE[id] = r.j.decision; delete DRAFTS[id]; done[d.action]++;
+            QSTATE[id] = r.j.decision; delete DRAFTS[id]; dropAtt(id); done[d.action]++;
             if (d.action === 'rework' && r.j.routine && r.j.routine.fired) routines++;
           }).catch(function () { fails.push(it.key + ': could not reach the site'); })
           .then(function () { SAVEP.n++; paintSaving(); });

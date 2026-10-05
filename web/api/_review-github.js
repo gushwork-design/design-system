@@ -58,6 +58,10 @@ export function applyDecision(doc, row, who, today) {
   else delete rec.previewFingerprint;
   if (row.note) rec.note = row.note;
   else if (rec.note !== undefined && row.action === 'pass') delete rec.note;
+  // Reference files attached to a send-back or reject (5 Oct 2026): repo paths, committed just before this decision. A new
+  // decision replaces them, so an approval clears the last send-back's references.
+  if (row.refs && row.refs.length) rec.refs = row.refs.slice();
+  else delete rec.refs;
   return doc;
 }
 
@@ -239,4 +243,27 @@ export async function checkGithub(token) {
   const prs = await run('Read pull requests', () => gh(token, repo('/pulls?state=open&per_page=1')));
   if (prs.e) return out('The token can change the repository but not use pull requests. Set Pull requests to "Read and write" on the token.');
   return out('Connected. Approve will open or update a pull request for the decisions.');
+}
+
+/* Where a reference file attached to a decision lives: next to the item's drawing, one folder per item. `stamp` keeps
+   files from two send-backs apart; the name is the reviewer's own, made safe. Pure, so it can be tested. */
+export function refPath(scope, key, stamp, n, name) {
+  const dot = String(name || '').lastIndexOf('.');
+  const ext = dot > 0 ? String(name).slice(dot + 1).toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 5) : '';
+  const base = String(dot > 0 ? String(name).slice(0, dot) : name || 'file').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'file';
+  return `web/previews/${scope}/refs/${key}/${stamp}-${n}-${base}${ext ? '.' + ext : ''}`;
+}
+
+/* Commit one reference file (base64). Straight to main like a decision; if main refuses, onto the decisions branch, where
+   the decision itself will land too. Returns { path, via }. */
+export async function commitRef(token, path, base64, message) {
+  for (const branch of [BASE, BRANCH]) {
+    try {
+      if (branch === BRANCH) await ensureBranch(token);
+      await gh(token, repo(`/contents/${path}`), { method: 'PUT', body: JSON.stringify({ message, content: base64, branch }) });
+      return { path, via: branch === BASE ? 'main' : 'github' };
+    } catch (e) {
+      if (branch === BRANCH) throw e;
+    }
+  }
 }

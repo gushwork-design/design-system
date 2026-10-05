@@ -1498,7 +1498,7 @@ def review_items(reg, groups):
             stem = {"eyebrow-ad-page": "eyebrow", "footer-with-cta": "footer-cta"}.get(n, n)
             fig = f"/assets/{skey}/{stem}-desktop.png" if os.path.isfile(os.path.join(ROOT, "assets", skey, stem + "-desktop.png")) else ""
             out.append({"scope": skey, "key": n, "label": n, "kind": "component", "surface": stitle,
-                        "state": state, "by": rev["by"], "on": rev["on"], "at": rev["at"], "note": rev["note"], "fp": fp, "pfp": pfp,
+                        "state": state, "by": rev["by"], "on": rev["on"], "at": rev["at"], "note": rev["note"], "refs": [r for r in (rec.get("refs") or []) if isinstance(r, str)], "fp": fp, "pfp": pfp,
                         "version": e.get("version", ""), "changed": e.get("changed", ""), "doc": e.get("doc", ""),
                         "breaking": bool(e.get("breaking")), "href": f"parts/{skey}/{n}.html", "use": used.get(f"{skey}/{n}", ""),
                         "preview": f"/previews/{skey}/{n}.frag" if os.path.isfile(prev) else "", "figma": fig})
