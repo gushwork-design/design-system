@@ -149,6 +149,7 @@ function splitCitation(raw) {
    the caret); Enter is refused and paste is flattened to text, so the run stays one text node,
    which is what the PDF exporter reads. data-ph is a placeholder drawn only when the run is
    empty, and never in an export (the exporters set data-exporting on the sheet). */
+const noTrail = (t) => String(t || '').replace(/\n+$/, '');
 function EditableText({ value, onChange, editable, placeholder, ...rest }) {
   const ref = React.useRef(null);
   React.useLayoutEffect(() => {
@@ -165,10 +166,22 @@ function EditableText({ value, onChange, editable, placeholder, ...rest }) {
       spellCheck={false}
       data-ph={placeholder}
       className="cert-edit"
-      onInput={(e) => onChange(e.currentTarget.textContent)}
-      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); e.currentTarget.blur(); } }}
-      onPaste={(e) => { e.preventDefault(); document.execCommand('insertText', false, e.clipboardData.getData('text/plain').replace(/\s+/g, ' ')); }}
-      onBlur={(e) => { if (e.currentTarget.textContent !== (value || '')) onChange(e.currentTarget.textContent); }}
+      onInput={(e) => onChange(noTrail(e.currentTarget.textContent))}
+      onKeyDown={(e) => {
+        if (e.key !== 'Enter') return;
+        e.preventDefault();
+        // Shift + Return breaks the line here (a newline in the text, drawn by white-space: pre-line);
+        // Return alone finishes editing
+        if (e.shiftKey) document.execCommand('insertText', false, '\n');
+        else e.currentTarget.blur();
+      }}
+      onPaste={(e) => { e.preventDefault(); document.execCommand('insertText', false, e.clipboardData.getData('text/plain').replace(/[^\S\n]+/g, ' ')); }}
+      onBlur={(e) => {
+        // the browser keeps a trailing newline after a Shift + Return at the end; it is not a line
+        const t = noTrail(e.currentTarget.textContent);
+        if (e.currentTarget.textContent !== t) e.currentTarget.textContent = t;
+        if (t !== (value || '')) onChange(t);
+      }}
     />
   );
 }
@@ -178,14 +191,17 @@ function EditableText({ value, onChange, editable, placeholder, ...rest }) {
 
 /* data-layer names one PSD layer each; data-text marks a run the PDF
    exporter draws as live text (font key → certificate-export.js). */
+/* trims spaces, never a line break someone put there on purpose */
+function trimSpaces(v) { return String(v || '').replace(/^[ \t]+|[ \t]+$/g, ''); }
+
 function Certificate({ data, logoSvg, certRef, onEdit }) {
   const editable = !!onEdit;
   const ed = (key) => (v) => onEdit && onEdit(key, v);
-  const name = (data.name || '').trim();
-  const headline = (data.headline || '').trim();
+  const name = trimSpaces(data.name);
+  const headline = trimSpaces(data.headline);
   const award = awardLine(data);
-  const before = (data.before || '').trim();
-  const after = (data.after || '').trim();
+  const before = trimSpaces(data.before);
+  const after = trimSpaces(data.after);
 
   return (
     <div
@@ -241,6 +257,7 @@ function Certificate({ data, logoSvg, certRef, onEdit }) {
           style={{
             margin: 0, fontFamily: CERT_FONT.display, fontWeight: 700, fontSize: 58,
             lineHeight: 1.2, letterSpacing: 0, color: CERT.black, overflowWrap: 'break-word',
+            whiteSpace: 'pre-line',   // a Shift + Return in the text is a line break on the sheet
           }}
         >
           {editable ? (
@@ -270,7 +287,7 @@ function Certificate({ data, logoSvg, certRef, onEdit }) {
             } : undefined}
             style={{
               margin: 0, fontFamily: CERT_FONT.body, fontWeight: 400, fontSize: 14,
-              lineHeight: 1.72, letterSpacing: 0, color: CERT.grey,
+              lineHeight: 1.72, letterSpacing: 0, color: CERT.grey, whiteSpace: 'pre-line',
             }}
           >
             {editable ? (

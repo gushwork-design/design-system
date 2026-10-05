@@ -119,6 +119,10 @@ The email signature creator and the employee ID card generator were redesigned i
     Before / After field fills the lead-in, the blue award, the blue period and the close (Utsav,
     5 Oct 2026). The period anchors it (Q1-4, H1/2, FY, month year, year).
 
+36. **Shift + Return breaks a line on the sheet.** In any text on the certificate (and as a newline
+    in the panel's fields), a Shift + Return is a line break the sheet, the thumbnails and every
+    export keep; Return alone still finishes editing (Utsav, 5 Oct 2026).
+
 ## Left open (the owner's call)
 
 - **A third typeface in the signature preview** (Plus Jakarta Sans). In the artefact, not the chrome.
