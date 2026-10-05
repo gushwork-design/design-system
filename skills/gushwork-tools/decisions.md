@@ -104,6 +104,14 @@ The email signature creator and the employee ID card generator were redesigned i
     Canva's; downloads live in the right panel (PDF, JPG, PSD; all, this or chosen pages; quality);
     the file's other actions sit behind ⋯ so Delete is not loud (Utsav, 5 Oct 2026).
 
+32. **Borrow from the dashboard library, do not redraw.** "The search box and other components can
+    be taken from the dashboard lib, which aren't there in tools but there in dashboard" (Utsav,
+    5 Oct 2026). Certificate Creator's home, menus, list and dialogs are the dashboard's own
+    search field, select, menu, data table, empty state, modal and confirm dialog.
+33. **A template is a design, not its copy.** The four award certificates are one design with
+    different text: one Award template, with the copy offered as Starter text. The home's first tile
+    is Create new, not a blank (Utsav, 5 Oct 2026).
+
 ## Left open (the owner's call)
 
 - **A third typeface in the signature preview** (Plus Jakarta Sans). In the artefact, not the chrome.

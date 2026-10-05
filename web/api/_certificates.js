@@ -46,7 +46,7 @@ const cleanTitle = (t) => (typeof t === 'string' ? t.trim().slice(0, MAX_TITLE) 
    stay listed so a rule set on them before the rename still counts. */
 const TOOL_PATHS = ['/internal/certificate-creator', '/internal/award-certificate', '/internal/staging/award-certificate'];
 const FIELDS = {
-  preset: 40, name: 80, headline: 200, before: 400, award: 120, after: 400,
+  template: 40, preset: 40, name: 80, headline: 200, before: 400, award: 120, after: 400,
   period: 40, signature: 60, signedBy: 120,
 };
 const DEFAULT_ACCESS = { general: 'tool', role: 'edit', people: [] };

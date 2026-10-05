@@ -114,12 +114,12 @@ A file-keeping tool's **home**, after Google Docs' home (Utsav, 5 Oct 2026). **N
 
 | Property | Value |
 |---|---|
-| Top | the 32 blue logo tile linked to Tools, the tool's name (Vert 16 semibold), a 44 tall pill search (field fill, radius full, max 720) centred |
-| Template band | full width on the panel fill with hairlines: "Start a new certificate" (`body-16-sem`), then tiles 144 wide: a 144 × 204 live thumbnail (radius 8, hover: heading-colour edge and `s3`), the name (`body-14-med`) and the family (`body-12-reg`). The first tile is Blank (the layout faded, a blue + on a white disc). Future template families join this row |
-| Recent | "Recent certificates", then Owned by (anyone / me / not me), sort (Last edited, Oldest first, Name A to Z) and one grid / list toggle (36 icon button) |
-| Card | radius 16, the panel fill and border; a 240 tall well with the live file at 0.25; the title; one meta line: shared or lock icon, "3 pages · 2 min ago", and a ⋮ menu (Open, Make a copy, Manage access, Delete) |
-| List | a table: a mini live thumbnail, title, page count and award; Owner; Last edited; the ⋮ menu |
-| Empty | "No certificates yet" and "Select a blank certificate or choose a template above to get started" |
+| Top | the 32 blue logo tile linked to Tools, the tool's name (Vert 16 semibold), the dashboard **search field** (`gd-input--search`) at 44 tall, radius full, max 720, centred |
+| Template band | full width on the panel fill with hairlines: "Start a new certificate" (`body-16-sem`), then tiles 144 wide: a 144 × 204 thumbnail (radius 8, hover: heading-colour edge and `s3`), the name (`body-14-med`) and a line under it (`body-12-reg`). The first tile is **Create new** (a blue + on a disc, the field fill); then one tile per **template** (a design; its copy variants are Starter text in the editor, not templates) |
+| Recent | "Recent certificates", then the dashboard **select** for Owned by (anyone / me / not me) and for sort (Last edited, Oldest first, Name A to Z), and a dashboard **segmented control** (icon items) for grid / list |
+| Card | radius 16, the panel fill and border; a 240 tall well with the live file at 0.25; the title; one meta line: shared or lock icon, "3 pages · 2 min ago", and the dashboard **icon button + menu** (Open, Make a copy, Manage access, Delete) |
+| List | the dashboard **data table** (`gd-tview`, `gd-table`): a mini live thumbnail, title, page count and award; Owner (with a Restricted `gd-tag`); Last edited; the row menu |
+| Empty | the dashboard **empty state**: first use ("No certificates yet", Create new) or no results ("Nothing matches", Clear filters) |
 
 Source: `web/internal/certificate-creator/` (`FilesHome` and `CardMenu` in app.jsx, "Files home v2" in styles.css).
 

@@ -92,7 +92,12 @@ rule the web templates follow.
 
 ## The control family
 
-Use these, and do not draw a new one. Sizes are in `tool-shell.css`.
+Use these, and do not draw a new one. Sizes are in `tool-shell.css`. **Where the tools family has
+no piece, take the dashboard library's** (`exports/dashboard`: search field, select, menu, data table,
+empty state, modal, confirm dialog, segmented control, tag): its own `gd-` classes inside a `.gd`
+scope (`display: contents` as a wrapper), with `dashboard.css` linked after `tokens.css`. Do not
+redraw a dashboard component in tool classes (Utsav, 5 Oct 2026). Place its menus in a fixed layer
+under the trigger, as `dashboard.js` does, so a card or table never clips them.
 
 | For | Use |
 |---|---|

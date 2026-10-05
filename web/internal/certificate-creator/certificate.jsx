@@ -57,6 +57,13 @@ function gridPath() {
 }
 const GRID_D = gridPath();
 
+/* Templates are designs. Award is the first; a new design joins this list and the Files home's
+   "Start a new certificate" row. The PRESETS below are not templates: they are starter text for
+   the Award design (Utsav, 5 Oct 2026: "one design with different copy"). */
+const TEMPLATES = [
+  { id: 'award', label: 'Award certificate', sub: 'Blue frame · A4' },
+];
+
 const PRESETS = [
   {
     id: 'powerhouse',
@@ -282,4 +289,4 @@ function Certificate({ data, logoSvg, certRef, onEdit }) {
   );
 }
 
-Object.assign(window, { EditableText, CERT, CERT_FONT, PRESETS, SIGNATORY_DEFAULT, Certificate, awardLine, GRID_D });
+Object.assign(window, { TEMPLATES, EditableText, CERT, CERT_FONT, PRESETS, SIGNATORY_DEFAULT, Certificate, awardLine, GRID_D });
