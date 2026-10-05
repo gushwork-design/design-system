@@ -171,7 +171,7 @@ See the propagation table in [`README.md`](README.md). The short version:
 
    `--quiet` or `--notify "<one line for teammates>"` is required, and the default answer is
    quiet. A bump no longer wakes anyone: the session-start notice fires only when the newest
-   release flagged with `--notify` is ahead of the copy a teammate runs (R50). **Claude asks Utsav
+   release flagged with `--notify` is ahead of the copy a teammate runs (R51). **Claude asks Utsav
    before passing `--notify`** — a new skill, a new template or a breaking component is worth
    asking about; site, hub, log and script work is quiet without asking, said in one line.
 
@@ -268,7 +268,7 @@ So when you add or correct a component, element or pattern:
    01 · Core                 building-blocks · shared-components
    02 · Web                  ↳ web/ component-library      112:414
    02 · Web                  ↳ web/ pattern-library        1658:22673
-   03 · Dashboard            ↳ dashboard/ component+pattern-library   1658:24112
+   03 · Dashboard            ↳ dashboard/ component+pattern-library   1658:24112   (retired as the dashboard source, 4 Oct 2026)
    ```
 
    Inside a page, the section is the **Figma group name** — `button`, `badge`, `card`,

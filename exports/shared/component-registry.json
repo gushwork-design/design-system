@@ -31,7 +31,7 @@
       "version": "1.40.0",
       "changed": "2026-08-26",
       "breaking": false,
-      "doc": "v2/primitives.md",
+      "doc": "shared-components.md",
       "note": "FINDING: light tints fail 4.5:1 at their own 12px label — success 3.15, warning 3.07, danger 4.28 composited. Dark passes. Reported, not changed."
     },
     "gushwork-logo": {

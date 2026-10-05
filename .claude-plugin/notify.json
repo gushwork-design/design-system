@@ -1,5 +1,5 @@
 {
-  "$comment": "The newest release that is worth telling every teammate about. Written ONLY by scripts/release.sh --notify, after Utsav says yes (R50). A version bump that does not move this file reaches people silently through auto-update and nothing says anything.",
+  "$comment": "The newest release that is worth telling every teammate about. Written ONLY by scripts/release.sh --notify, after Utsav says yes (R51). A version bump that does not move this file reaches people silently through auto-update and nothing says anything.",
   "version": "1.58.0",
   "summary": "The update notice now reaches you in the chat, not just Claude",
   "links": []

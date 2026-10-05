@@ -10,7 +10,7 @@
 #   bash scripts/release.sh 1.44.0 "what changed" --notify "New: the ad-page template" \
 #        --link https://gushwork-design.vercel.app/library/web/ad-page.html      # repeatable, ≤4
 #
-# --quiet or --notify is REQUIRED (R50). A bump alone no longer wakes anyone: the SessionStart
+# --quiet or --notify is REQUIRED (R51). A bump alone no longer wakes anyone: the SessionStart
 # notice fires only when .claude-plugin/notify.json names a version newer than the copy a
 # teammate runs, and only --notify writes that file. Most releases are --quiet. Claude asks
 # Utsav before passing --notify; the answer is his, not the script's and not Claude's.
@@ -63,7 +63,7 @@ if [ "${#LINKS[@]}" -gt 0 ] && [ -z "$NOTIFY" ]; then echo "--link only means so
 for l in "${LINKS[@]+"${LINKS[@]}"}"; do case "$l" in http://*|https://*) ;; *) echo "--link must be a URL: $l" >&2; exit 1 ;; esac; done
 if [ "$QUIET" = 0 ] && [ -z "$NOTIFY" ]; then
   cat >&2 <<'EOF'
-Say who hears about this release (R50):
+Say who hears about this release (R51):
     --quiet                       nobody — auto-update carries it in silently (most releases)
     --notify "<one line>"         every teammate's next new chat opens with this line and the update step
     --link <url>                  with --notify: a page that explains it (repeatable, up to 4)

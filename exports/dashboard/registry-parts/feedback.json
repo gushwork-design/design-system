@@ -1,0 +1,16 @@
+{
+  "toast":             {"version":"2.0.0","changed":"2026-10-03","breaking":false,"doc":"feedback.md"},
+  "banner":            {"version":"2.0.0","changed":"2026-10-03","breaking":false,"doc":"feedback.md"},
+  "empty-state":       {"version":"2.0.0","changed":"2026-10-03","breaking":true,"doc":"feedback.md"},
+  "skeleton":          {"version":"2.0.0","changed":"2026-10-03","breaking":false,"doc":"feedback.md"},
+  "unavailable-state": {"version":"2.0.0","changed":"2026-10-03","breaking":false,"doc":"feedback.md"},
+  "board":             {"version":"2.0.0","changed":"2026-10-03","breaking":false,"doc":"feedback.md"},
+  "tooltip":           {"version":"2.0.0","changed":"2026-10-03","breaking":false,"doc":"overlays.md"},
+  "popover":           {"version":"2.0.0","changed":"2026-10-03","breaking":false,"doc":"overlays.md"},
+  "modal":             {"version":"2.0.0","changed":"2026-10-03","breaking":false,"doc":"overlays.md"},
+  "confirm-dialog":    {"version":"2.0.0","changed":"2026-10-03","breaking":false,"doc":"overlays.md"},
+  "drawer":            {"version":"2.0.0","changed":"2026-10-03","breaking":false,"doc":"overlays.md"},
+  "docked-panel":      {"version":"2.0.0","changed":"2026-10-03","breaking":false,"doc":"overlays.md"},
+  "coachmark":         {"version":"2.0.0","changed":"2026-10-03","breaking":false,"doc":"overlays.md"},
+  "command-palette":   {"version":"2.0.0","changed":"2026-10-03","breaking":false,"doc":"overlays.md"}
+}

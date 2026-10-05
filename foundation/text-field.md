@@ -56,7 +56,7 @@ Inter Medium, **line-height 1**.
 **`State=Hover` is byte-identical to `State=Default`.** Not an omission — the field's affordance
 is the caret, and its feedback is `Selected`. **The field has no hover treatment.** See
 `DECISIONS.md` → **R2**; this is the one documented exception to "every interactive element has a
-hover state" in `exports/dashboard/states.md`.
+hover state" in `foundation/states.md`.
 
 **The label shrinks on `Filled`, not on `Selected`.** A focused-but-empty field still shows its
 label at full size, with the caret on the line below. Slightly unusual, and measured — build it.
@@ -124,7 +124,7 @@ given. The login screen gives it 460.
 since R41 (3 Oct 2026) a text field does not get one: a browser counts a click into a text field as
 keyboard focus, so a ring would show on every click. Show the field's own edge instead — a 1px
 `neutral/400` border, or black in the dashboard — so the field never goes without a visible
-focus state, whether it is reached by click or by keyboard. `exports/dashboard/states.md` has the rule.
+focus state, whether it is reached by click or by keyboard. `foundation/states.md` has the rule.
 
 **`Selected` is not `:focus`.** `Selected` is the *design* state for "focused and empty". Once
 there is a value, the field is `Filled` whether or not it still has focus. Map them by content,

@@ -238,7 +238,7 @@ lv, rv = semver(local), semver(remote)
 if not lv or not rv or rv <= lv:
     sys.exit(0)                                    # current, or unparseable — say nothing
 
-# Behind is not enough (R50, 5 Oct 2026). Utsav releases at night, and most bumps are site, hub
+# Behind is not enough (R51, 5 Oct 2026). Utsav releases at night, and most bumps are site, hub
 # or log work that changes nothing a teammate builds with; auto-update carries those in silently.
 # The notice fires only when the newest release he FLAGGED — `notify` in version.json, written by
 # release.sh --notify after he said yes — is ahead of this copy. No flag, or a flag this copy

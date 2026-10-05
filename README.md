@@ -103,7 +103,7 @@ depend on any description matching.
 | Skill | Surface | Fires on |
 |---|---|---|
 | [`gushwork-web`](skills/gushwork-web/SKILL.md) | Public marketing site | landing page, ad lander, hero, fold, CTA section, pricing, comparison table, testimonial, case study, FAQ, navbar, footer |
-| [`gushwork-dashboard`](skills/gushwork-dashboard/SKILL.md) | Logged-in product | dashboard, app screen, KPI card, analytics panel, data table, side nav, filters, tabs, toasts |
+| [`gushwork-dashboard`](skills/gushwork-dashboard/SKILL.md) | Logged-in analytics dashboards and web apps | dashboard, analytics screen, data table, chart, filters, settings page, side nav, sign-in |
 | [`gushwork-tools`](skills/gushwork-tools/SKILL.md) | Hub tools (`/internal`) | new hub tool, change to the email signature or ID card tool, tool panel, tool card, a generator for the team |
 | [`gushwork-lead-magnet`](skills/gushwork-lead-magnet/SKILL.md) | Downloadable PDF | lead magnet, gated asset, PDF checklist, prompt pack, audit worksheet, playbook, buyer guide |
 | [`gushwork-slides`](skills/gushwork-slides/SKILL.md) | Presented deck | sales deck, pitch deck, QBR, investor update, slide, `.pptx`, Google Slides |
@@ -157,17 +157,19 @@ gushwork-design/
 ├── notices/          declared elements and deviations, one file per piece of work
 └── exports/
     ├── web/          page-shell · folds · fold-elements · atoms · cards · button · avatar · images
-    └── dashboard/    dashboard-build · sections · section-elements · button · avatar · controls · toast · build-rules
+    └── dashboard/    dashboard.css · dashboard.js · component-registry.json · README · shell · navigation · actions ·
+                      inputs · tables · filtering · data-display · charts · feedback · overlays · auth · patterns
 ```
 
 ## The composition ladder
 
-Both surfaces mirror each other. Compose downward; never place a lower tier directly into a
-page shell's slot.
+The web surface composes downward; never place a lower tier directly into a page shell's slot. The
+dashboard is different: it is one stylesheet of components, and `exports/dashboard/patterns.md` says how
+they are put together into screens.
 
 ```
 web         atoms  →  fold-elements  →  Folds     →  Page Build
-dashboard          section-elements  →  Sections  →  Dashboard Build
+dashboard          components  →  page recipes (patterns.md)  →  app-shell
 ```
 
 ## Three components exist separately per surface
@@ -177,16 +179,16 @@ goes off-system. Both skills carry a "which one?" pointer.
 
 | | Web | Dashboard |
 |---|---|---|
-| **Button** | `Button` `1457:668` — `Blue` / `Black` / `Outlined/ black` / … | `Button` `2203:931` — `Primary` / `Outline` / `Ghost` |
-| **Avatar** | `client/avatar` — grayscale squircle, real client photos | `Avatar` `1658:24023` — generated character, app users |
+| **Button** | `Button` `1457:668` — `Blue` / `Black` / `Outlined/ black` / … | `action-button` — black fill / outline / ghost / red label, never a blue fill |
+| **Avatar** | `client/avatar` — grayscale squircle, real client photos | `avatar` — the hub's generated dot-pattern mark, app users |
 | **Logo** | `gushwork-logo` — full marketing wordmark | `gushwork-logo-(internal-use)` — 32×32 symbol tile |
 
-The two button sets are **both literally named `Button`** and expose a `Style` property whose
-values are completely disjoint. This is intentional and permanent — never merge or alias
+The two button sets are named differently on purpose (web `Button`, dashboard `action-button`) and
+their styles are completely disjoint. This is intentional and permanent — never merge or alias
 them.
 
 **Badge is genuinely shared**, same component on both surfaces — web cards and tables,
-dashboard KPI cards.
+dashboard stat cards.
 
 ## When the library is missing something
 
@@ -276,7 +278,9 @@ in building this. The list above is the fix queue, not a changelog.
 
 Figma — **Gush Design System v2.0**, file key `VKcb4fgVyOHKfQonMgN772`. Marketing components
 on `↳ web/ pattern-library` with worked pages on `↳ web/ template-library`; product components
-on `↳ dashboard/ component+pattern-library` (`1658:24112`).
+on `↳ dashboard/ component+pattern-library` (`1658:24112`). **The dashboard is no longer sourced from
+Figma:** since 4 Oct 2026 its components are extracted from the design hub (`web/`) and documented in
+`exports/dashboard/`.
 
 When the Figma file changes, update the affected `exports/` file and re-check the rule in the
 matching `SKILL.md`. Tokens come from the variables — re-pull them, don't hand-edit.

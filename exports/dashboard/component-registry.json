@@ -1,203 +1,683 @@
 {
   "$comment": [
-    "Per-component versions. The plugin version tells someone the PLUGIN is stale; this tells them",
-    "which of the components THEY used actually changed, which is the only thing that makes them",
-    "act. Bump a component's version in the same commit that changes its spec \u2014 scripts/check-drift.sh",
-    "reads this file and a build's stamp, and reports the intersection.",
-    "",
-    "version = the plugin version in which that component's spec last changed.",
-    "breaking = true when a build using it will render WRONG until updated, as opposed to merely",
-    "missing an improvement. Drift on a breaking change is reported as MUST, everything else as MAY."
+    "Per-component versions for the dashboard surface. Built by scripts/build-dashboard-css.sh from",
+    "registry-parts/*.json \u2014 edit the parts, never this file. Bump a component's version in the same",
+    "commit that changes its spec; scripts/check-drift.sh reads this and a build's stamp. breaking=true",
+    "when an existing build renders WRONG until updated. The review block is written by the review loop."
   ],
-  "registryVersion": "1.43.0",
+  "registryVersion": "2.0.0",
   "components": {
-    "card-shell": {
-      "version": "1.38.0",
-      "changed": "2026-08-13",
+    "access-denied-screen": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/cards-and-chrome.md"
+      "doc": "auth.md"
+    },
+    "account-row": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "navigation.md"
+    },
+    "action-button": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "actions.md"
+    },
+    "activity-timeline": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "data-display.md"
+    },
+    "analytics-overview-template": {
+      "version": "2.0.0",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "templates.md"
+    },
+    "app-shell": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "shell.md"
+    },
+    "area-chart": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "charts.md"
+    },
+    "avatar": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "data-display.md"
+    },
+    "avatar-group": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "data-display.md"
+    },
+    "banner": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "feedback.md"
+    },
+    "bar-chart": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "charts.md"
+    },
+    "board": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "feedback.md"
+    },
+    "breadcrumbs": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "navigation.md"
+    },
+    "breakdown-bar": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "charts.md"
+    },
+    "build-notice": {
+      "version": "2.0.0",
+      "changed": "2026-10-04",
+      "breaking": false,
+      "doc": "notice.md"
+    },
+    "bulk-action-bar": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "tables.md"
+    },
+    "card": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "data-display.md"
+    },
+    "chart-frame": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "charts.md"
+    },
+    "chart-tooltip": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "charts.md"
     },
     "checkbox": {
-      "version": "1.38.0",
-      "changed": "2026-08-13",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/primitives.md"
+      "doc": "inputs.md"
     },
-    "control": {
-      "version": "1.38.0",
-      "changed": "2026-08-13",
+    "checklist": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/controls.md"
+      "doc": "data-display.md"
     },
-    "dashboard-switcher": {
-      "version": "1.39.0",
-      "changed": "2026-08-15",
+    "coachmark": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/overlays.md",
-      "added": true
+      "doc": "overlays.md"
+    },
+    "column-menu": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "tables.md"
+    },
+    "combobox": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "inputs.md"
+    },
+    "command-palette": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "overlays.md"
+    },
+    "confirm-dialog": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "overlays.md"
+    },
+    "content-panel": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "shell.md"
+    },
+    "data-table": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "tables.md"
     },
     "date-range-picker": {
-      "version": "1.39.0",
-      "changed": "2026-08-15",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/overlays.md",
-      "added": true
+      "doc": "inputs.md"
     },
-    "divider": {
-      "version": "1.38.0",
-      "changed": "2026-08-13",
+    "datetime-field": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/primitives.md"
+      "doc": "inputs.md"
+    },
+    "delta-pill": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "data-display.md"
+    },
+    "detail-view": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "detail.md"
+    },
+    "docked-panel": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "overlays.md"
+    },
+    "donut-chart": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "charts.md"
+    },
+    "drawer": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "overlays.md"
     },
     "empty-state": {
-      "version": "1.38.0",
-      "changed": "2026-08-13",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": true,
+      "doc": "feedback.md"
+    },
+    "explorer-layout": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/feedback.md"
+      "doc": "shell.md"
+    },
+    "filter-builder": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "filtering.md"
+    },
+    "filter-chip": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "filtering.md"
+    },
+    "form-field": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "inputs.md"
+    },
+    "form-section": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "inputs.md"
+    },
+    "funnel": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "charts.md"
+    },
+    "google-button": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "auth.md"
+    },
+    "heatmap": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "charts.md"
+    },
+    "histogram": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "tables.md"
+    },
+    "horizontal-bar-chart": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "charts.md"
     },
     "icon-button": {
-      "version": "1.38.0",
-      "changed": "2026-08-13",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/controls.md"
+      "doc": "actions.md"
     },
-    "icon-toggle-group": {
-      "version": "1.40.0",
-      "changed": "2026-08-26",
+    "incident-row": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/phone.md",
-      "added": true,
-      "note": "was never registered. On phone the toggle moves OUT of the topbar to a bottom-left dock at 20/20 and carries a white fill, a 1px neutral/200 border and Shadows/S3 \u2014 the desktop version has none of the three."
+      "doc": "data-display.md"
     },
-    "input": {
-      "version": "1.38.0",
-      "changed": "2026-08-13",
+    "info-hint": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/controls.md"
+      "doc": "actions.md"
+    },
+    "issue-summary": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "data-display.md"
+    },
+    "key-value-list": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "data-display.md"
     },
     "legend": {
-      "version": "1.38.0",
-      "changed": "2026-08-13",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/cards-and-chrome.md"
+      "doc": "data-display.md"
     },
-    "metric-card": {
-      "version": "1.42.0",
-      "changed": "2026-08-28",
+    "legend-table": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/overlays.md",
-      "note": "FINDING: does not fit card-layout's measured 196 analytics slot \u2014 content bottoms out ~104 against the 94 floor, so the pair lands ~214 and the lead exceeds its 198 ceiling. Gains a ruled unavailable state \u2014 a quantity that cannot be read is removed, never zeroed. Not breaking: existing builds render correctly, they have no failure treatment. See exports/dashboard/states.md."
+      "doc": "charts.md"
+    },
+    "line-chart": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "charts.md"
+    },
+    "log-viewer": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "tables.md"
+    },
+    "login-screen": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "auth.md"
+    },
+    "menu": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "actions.md"
+    },
+    "metric-strip": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "data-display.md"
     },
     "modal": {
-      "version": "1.38.0",
-      "changed": "2026-08-13",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/feedback.md"
+      "doc": "overlays.md"
+    },
+    "multi-select": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "inputs.md"
+    },
+    "nav-group": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "navigation.md"
+    },
+    "nav-item": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "navigation.md"
     },
     "page-header": {
-      "version": "1.39.0",
-      "changed": "2026-08-15",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/overlays.md",
-      "note": "the period pill ends in a 60% ring, not an icon"
+      "doc": "shell.md"
+    },
+    "page-layout": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "shell.md"
     },
     "pagination": {
-      "version": "1.39.0",
-      "changed": "2026-08-15",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/data-table.md",
-      "note": "page-size options now start at 5"
+      "doc": "tables.md"
+    },
+    "period-select": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "actions.md"
+    },
+    "popover": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "overlays.md"
     },
     "progress-bar": {
-      "version": "1.38.0",
-      "changed": "2026-08-13",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/primitives.md"
+      "doc": "data-display.md"
+    },
+    "query-builder": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "inputs.md"
+    },
+    "radio": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "inputs.md"
     },
     "ring": {
-      "version": "1.39.0",
-      "changed": "2026-08-15",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/overlays.md",
-      "added": true
+      "doc": "data-display.md"
     },
-    "section-header": {
-      "version": "1.39.0",
-      "changed": "2026-08-15",
+    "row-actions-menu": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/cards-and-chrome.md",
-      "note": "card-header subtext sits beside the title, gap 12 \u2014 not stacked under it"
+      "doc": "tables.md"
+    },
+    "row-selection": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "tables.md"
+    },
+    "saved-views": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "filtering.md"
+    },
+    "search-field": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "inputs.md"
+    },
+    "search-trigger": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "navigation.md"
+    },
+    "segmented-control": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "actions.md"
+    },
+    "select": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "inputs.md"
+    },
+    "session-expired": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "auth.md"
+    },
+    "setting-row": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "inputs.md"
     },
     "sidebar": {
-      "version": "1.40.0",
-      "changed": "2026-08-26",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/cards-and-chrome.md",
-      "note": "phone drawer measured: 240 anchored RIGHT below the topbar, 1.5px LEFT border, list-groups padding 12, no scrim, no user-card."
+      "doc": "shell.md"
+    },
+    "sidebar-collapsed": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "shell.md"
+    },
+    "sign-in-modal": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "auth.md"
     },
     "skeleton": {
-      "version": "1.38.0",
-      "changed": "2026-08-13",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/feedback.md"
+      "doc": "feedback.md"
+    },
+    "sparkline": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "charts.md"
+    },
+    "split-button": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "actions.md"
     },
     "stat-card": {
-      "version": "1.42.0",
-      "changed": "2026-08-28",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/cards-and-chrome.md",
-      "note": "Gains a ruled unavailable state \u2014 a quantity that cannot be read is removed, never zeroed. Not breaking: existing builds render correctly, they have no failure treatment. See exports/dashboard/states.md."
+      "doc": "data-display.md"
+    },
+    "status-banner": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "data-display.md"
     },
     "status-dot": {
-      "version": "1.38.0",
-      "changed": "2026-08-13",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/primitives.md"
+      "doc": "data-display.md"
     },
-    "tab-group": {
-      "version": "1.38.0",
-      "changed": "2026-08-13",
+    "status-list": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/controls.md"
+      "doc": "data-display.md"
     },
-    "tab-item": {
-      "version": "1.38.0",
-      "changed": "2026-08-13",
+    "sub-nav": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/controls.md"
+      "doc": "navigation.md"
     },
-    "table-cell": {
-      "version": "1.38.0",
-      "changed": "2026-08-13",
+    "table-cell-types": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/data-table.md"
+      "doc": "tables.md"
     },
-    "table-row": {
-      "version": "1.40.0",
-      "changed": "2026-08-26",
-      "breaking": true,
-      "doc": "v2/data-table.md",
-      "note": "build rule corrected: 'leave the first column unsized' only holds in a SHARED grid. Where each row is its own grid, give every non-first track minmax(floor,1fr) or rows land on different column boundaries."
+    "table-states": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "tables.md"
+    },
+    "table-toolbar": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "filtering.md"
+    },
+    "tabs-pill": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "actions.md"
+    },
+    "tabs-underline": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "actions.md"
+    },
+    "tag": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "data-display.md"
+    },
+    "text-input": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "inputs.md"
+    },
+    "textarea": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "inputs.md"
+    },
+    "theme-and-density": {
+      "version": "2.0.0",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "base.md"
+    },
+    "theme-menu": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "navigation.md"
+    },
+    "time-range-bar": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "inputs.md"
+    },
+    "timezone-select": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "inputs.md"
     },
     "toast": {
-      "version": "1.38.0",
-      "changed": "2026-08-13",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "toast.md"
+      "doc": "feedback.md"
+    },
+    "toggle": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "inputs.md"
     },
     "tooltip": {
-      "version": "1.39.0",
-      "changed": "2026-08-15",
-      "breaking": true,
-      "doc": "v2/overlays.md",
-      "note": "light bubble is Neutral/900, not Neutral/black"
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "overlays.md"
     },
     "topbar": {
-      "version": "1.40.0",
-      "changed": "2026-08-26",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/cards-and-chrome.md",
-      "note": "phone variant measured: 375x60, 1.5px border, 20x20 scaled logo tile, 36x36 drawer trigger alone at right, Semibold 16 title (a sixth display size, no token)."
+      "doc": "shell.md"
+    },
+    "unavailable-state": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "feedback.md"
+    },
+    "unsaved-changes-bar": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "inputs.md"
+    },
+    "uptime-bar": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "charts.md"
+    },
+    "widget-grid": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "shell.md"
+    },
+    "workspace-switcher": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "navigation.md"
     }
   }
 }

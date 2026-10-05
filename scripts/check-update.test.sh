@@ -35,7 +35,7 @@ run() {                       # run <plugin-root> <payload-url>
 
 bash scripts/version-json.sh > "$TMP/v.json"
 CUR="$(python3 -c "import json;print(json.load(open('$TMP/v.json'))['version'])")"
-# Every speaking case below is FLAGGED at the current version (R50): the live notify.json may
+# Every speaking case below is FLAGGED at the current version (R51): the live notify.json may
 # well point at an older release, and then "behind" is silent by design, not by accident.
 # unflagged.json is the same payload with the flag removed — the night-release case.
 python3 - "$TMP/v.json" "$CUR" "$TMP/unflagged.json" <<'PY'
@@ -93,7 +93,7 @@ assert 'then restart' not in o['systemMessage'], 'the restart claim is stale sin
                 || ck no "behind: envelope malformed"
 
 # 1b · behind, but the newest FLAGGED release is one this copy already has → silent. This is the
-#      R50 case: a bump that changes nothing a teammate builds with must not wake anyone.
+#      R51 case: a bump that changes nothing a teammate builds with must not wake anyone.
 out="$(run "$(fake "$OLD")" "file://$TMP/unflagged.json")"; rc=$?
 [ "$rc" = 0 ] && [ -z "$out" ] && ck ok "behind, not flagged: silent, exit 0" \
                               || ck no "behind, not flagged: spoke (rc=$rc) $out"

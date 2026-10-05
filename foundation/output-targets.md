@@ -45,22 +45,21 @@ outcome: a correct design delivered in a form the codebase cannot accept.
 
 ```
 foundation/tokens.css          import once, in the root layout
-exports/dashboard/**.md        the measured specs — build components from these
+exports/dashboard/dashboard.css|js  the dashboard components, built; docs beside them say which to use
 fonts/                         both variable faces, committed, licensed
 preview/*.html                 static reference builds, not importable
 ```
 
-**There is no `components/dashboard/` in this repo.** Until 28 Aug 2026 this file told every
-build to import from it before writing a component. The folder was never built — there is not
-one `.tsx` or `.jsx` in the plugin — so that instruction sent people looking for something that
-does not exist. Reported by a teammate on 28 Aug 2026 and corrected the same day.
+**The dashboard components are a stylesheet and a script, not a React library.** `exports/dashboard/dashboard.css`
+holds every component under `gd-` classes; `dashboard.js` holds their behaviour and `GD.charts`. Static HTML
+links or inlines them. A React or Next build imports the same stylesheet once and writes the same markup in
+JSX; the markup in each doc's **Anatomy** is the contract, and `dashboard.js` is delegated, so it works
+unchanged on markup React renders. There is no `components/dashboard/` folder: the docs in
+`exports/dashboard/` are the source of truth, and a components folder would only ever have been them,
+compiled once.
 
-Build each component from its **measured spec** instead: `exports/dashboard/v2/*.md` for the v2
-set, `exports/dashboard/*.md` for what v2 does not cover. Those specs are the source of truth in
-either case — a components folder would only ever have been the specs, compiled once.
-
-The reason the old line gave still stands, and it is why the specs are not optional: a
-hand-rolled kpi-card that looks right is the exact failure this repo exists to prevent.
+The docs are not optional: a hand-rolled stat-card that looks right is the exact failure this repo
+exists to prevent.
 
 ## Deploying — the two that bite
 

@@ -69,7 +69,7 @@ and guessing produces a screen that looks right and answers nothing.
 
 | Look for | Why |
 |---|---|
-| **A blue filled button on a dashboard** | means the wrong component got picked — web and dashboard have separate button sets, both named `Button`. The most common way output goes off-system. |
+| **A blue filled button on a dashboard** | means the wrong component got picked — web and dashboard have separate button sets (web `Button`, dashboard `action-button`). The most common way output goes off-system. |
 | **A raw hex code** | every value comes from `foundation/tokens.css`. A hardcoded colour is a bug. |
 | **A `Sample data` badge** | the numbers are illustrative. Don't put it in a deck until it's real. |
 | **A four-line Slack block** | Claude had to build something the library lacks. **Paste it to Utsav** — see below. |
@@ -109,15 +109,16 @@ Then type `/reload-plugins` in the chat. No restart: the new version is live in 
 |---|---|
 | What's the hex / size / type style? | `foundation/tokens.css` |
 | Which component do I use here? | `skills/gushwork-dashboard/SKILL.md`, `skills/gushwork-web/SKILL.md` |
-| What exactly does it measure? | `exports/dashboard/`, `exports/web/` |
-| Why does the shell scroll like that? | `exports/dashboard/build-rules.md` |
+| What exactly does it specify? | `exports/dashboard/`, `exports/web/` |
+| Why does the shell scroll like that? | `exports/dashboard/shell.md` |
 | Voice, casing, CTA copy | `foundation/voice.md` |
 | React or static HTML? | `foundation/output-targets.md` |
 
 ## Two things about the current state
 
-**The dashboard surface is solid** — measured off Figma and driven through a real nine-page
-build, so the defects are already found.
+**The dashboard surface was rebuilt on 4 Oct 2026** from the design hub's own code: 100+ components for
+heavy analytics dashboards and web apps. Every one is pending its review pass, so treat output as a
+strong draft and check the Design System page for which components are passed.
 
 **The web surface is thinner** — Button, eyebrow, navbar, footer and `client/avatar` are
 measured; roughly 22 components are still transcribed from annotations rather than verified

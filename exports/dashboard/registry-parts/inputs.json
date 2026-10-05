@@ -1,0 +1,110 @@
+{
+  "text-input": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "inputs.md"
+  },
+  "textarea": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "inputs.md"
+  },
+  "select": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "inputs.md"
+  },
+  "multi-select": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "inputs.md"
+  },
+  "combobox": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "inputs.md"
+  },
+  "search-field": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "inputs.md"
+  },
+  "checkbox": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "inputs.md"
+  },
+  "radio": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "inputs.md"
+  },
+  "toggle": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "inputs.md"
+  },
+  "form-field": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "inputs.md"
+  },
+  "setting-row": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "inputs.md"
+  },
+  "form-section": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "inputs.md"
+  },
+  "unsaved-changes-bar": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "inputs.md"
+  },
+  "date-range-picker": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "inputs.md"
+  },
+  "time-range-bar": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "inputs.md"
+  },
+  "datetime-field": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "inputs.md"
+  },
+  "timezone-select": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "inputs.md"
+  },
+  "query-builder": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "inputs.md"
+  }
+}

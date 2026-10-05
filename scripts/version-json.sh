@@ -34,7 +34,7 @@ import json, sys, subprocess
 mode = sys.argv[1]
 mk = json.load(open(".claude-plugin/marketplace.json"))
 pl = json.load(open(".claude-plugin/plugin.json"))
-# The newest release flagged to reach people (R50). Absent or unparseable → null, and the hook
+# The newest release flagged to reach people (R51). Absent or unparseable → null, and the hook
 # stays silent for everyone: a notice nobody asked for is exactly what this field exists to stop.
 try:
     nf = json.load(open(".claude-plugin/notify.json"))

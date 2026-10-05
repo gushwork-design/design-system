@@ -1,0 +1,137 @@
+/* ============================================================================
+   Gushwork dashboard — 70 auth (sign-in and session screens)
+   Provenance, per component:
+     login-screen         extracted: web/shell.css:1262-1500 (.gw-login*), web/login.html. Field, buttons and error line are the
+                          Inputs/Actions authors' (.gd-field, .gd-input, .gd-btn, .gd-field__error); not re-defined here.
+     google-button        extracted: web/shell.css:1374-1400 (.gw-login__google) and 883-905 (.gw-modal__btn); size from DECISIONS R3
+                          (48 / r12 / no arrow). Deliberately UNTHEMED. The dark-hover rule is NOT in R3 (it has none): see below.
+     sign-in-modal        extracted: web/shell.css:805-960 (.gw-modal, .gw-modal--solo). The dialog form of the same card; the --solo
+                          full-page form is login-screen. Shell is the Feedback author's .gd-modal.
+     access-denied-screen NEW: not in the hub as a page — reference Mobbin Linear / Notion / Vercel "no access" pages. Mirrors the hub's
+                          admin-required empty state (web/internal/design-system.html:909-912) with the badge a ROUNDED SQUARE.
+                          Pending library review.
+     session-expired      NEW: not in the hub — reference Mobbin Linear / Intercom / Google Docs "session expired". Pending library review.
+   FIXED SCALE. The full-page screens do not follow --gd-control-h / data-density: sign-in is a one-off marketing-grade surface, so
+   controls are 48, the card is 480, type is the hub's. They reflow (never scale) under 560px.
+   Aliases declared here (light-dark): --gd-auth-bg --gd-auth-grid --gd-auth-cell --gd-auth-field
+   ============================================================================ */
+
+.gd {
+  --gd-auth-bg:   light-dark(var(--gw-color-neutral-25), var(--gw-color-black));
+  /* The hub dims the whole grid to 30% in dark (opacity on the layer). light-dark() cannot carry an opacity, so the same 30% is
+     baked into the colour: identical result, one declaration per alias. */
+  --gd-auth-grid: light-dark(var(--gw-color-neutral-100), color-mix(in srgb, var(--gw-color-neutral-900) 30%, transparent));
+  --gd-auth-cell: light-dark(var(--gw-color-neutral-50),  color-mix(in srgb, var(--gw-color-neutral-900) 30%, transparent));
+  /* --gd-field-bg is neutral-900 in dark, the same as the card, so the well vanishes (the hub hit this too). Inset it: grey in light, black in dark. */
+  --gd-auth-field: light-dark(var(--gw-color-neutral-25), var(--gw-color-black));
+}
+
+/* --- the page: brand grid + centred card ------------------------------------ */
+.gd .gd-auth {
+  --gd-control-h: 48px; --gd-btn-r: var(--gw-radius-12); --gd-gap: var(--gw-space-16);
+  position: relative; overflow: hidden; isolation: isolate;
+  min-height: 100vh; min-height: 100dvh;
+  display: grid; grid-template-columns: minmax(0, 1fr); place-items: center; padding: var(--gw-space-60) var(--gw-space-40);   /* minmax(0,1fr): an auto track would size to the 480 card and defeat max-width:100% */
+  background: var(--gd-auth-bg);
+}
+.gd .gd-auth--embedded { min-height: 0; padding: var(--gw-space-24); }                 /* previews and docs: sits inside a frame, not the viewport */
+.gd .gd-auth__grid {
+  position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background-image: linear-gradient(to right, var(--gd-auth-grid) 1px, transparent 1px), linear-gradient(to bottom, var(--gd-auth-grid) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+.gd .gd-auth__cell { position: absolute; width: 40px; height: 40px; background: var(--gd-auth-cell); }   /* filled cells break the regularity, as on the hero */
+.gd .gd-auth__cell:nth-child(1) { left: 400px; top: 80px; }
+.gd .gd-auth__cell:nth-child(2) { left: 440px; top: 120px; }
+.gd .gd-auth__cell:nth-child(3) { left: 800px; top: 240px; }
+.gd .gd-auth__cell:nth-child(4) { right: 120px; bottom: 200px; }
+.gd .gd-auth__cell:nth-child(5) { right: 280px; bottom: 80px; }
+
+.gd .gd-auth__card {
+  position: relative; width: 480px; max-width: 100%; padding: var(--gw-space-40) var(--gw-space-32);
+  display: flex; flex-direction: column; gap: var(--gw-space-40);
+  background: var(--gd-raised-bg); border: 1px solid var(--gd-border-strong); border-radius: var(--gw-radius-24); box-shadow: var(--gw-shadow-s4);
+}
+.gd .gd-auth__card--bare { width: auto; padding: 0; background: none; border: 0; border-radius: 0; box-shadow: none; }   /* inside a dialog: the dialog draws the surface */
+
+.gd .gd-auth__head { display: flex; flex-direction: column; align-items: center; gap: var(--gw-space-20); }
+.gd .gd-auth__chip {                       /* the real mark (assets/logo/gushwork-symbol-white.svg paths) on the brand tile; 60 / r15 / 30 as measured */
+  flex: none; width: 60px; height: 60px; display: grid; place-items: center; border-radius: 15px;
+  background: var(--gw-color-primary-500); color: var(--gw-color-white); box-shadow: inset 0 0 0 2px var(--gw-color-primary-600);
+}
+.gd .gd-auth__chip svg { width: 30px; height: 30px; display: block; }
+.gd .gd-auth__copy { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
+.gd .gd-auth__title { margin: 0; color: var(--gd-text); font: var(--gw-text-h5); letter-spacing: var(--gw-text-h5-tracking); text-wrap: balance; }
+.gd .gd-auth__sub { margin: 0; color: var(--gd-text-body); font: var(--gw-text-body-16-med); letter-spacing: var(--gw-text-body-16-med-tracking); text-wrap: pretty; }
+.gd .gd-auth__dest { margin: 0; color: var(--gd-link); font: var(--gw-text-body-16-med); letter-spacing: var(--gw-text-body-16-med-tracking); }   /* destination name, sign-in-modal and direct links */
+.gd .gd-auth__dest[hidden] { display: none; }
+
+.gd .gd-auth__doors { display: flex; flex-direction: column; gap: var(--gw-space-16); }
+.gd .gd-auth__form { display: flex; flex-direction: column; gap: var(--gw-space-16); }
+.gd .gd-auth__form .gd-btn { width: 100%; margin-top: var(--gw-space-4); font: var(--gw-text-button-16); }
+.gd .gd-auth__form .gd-btn svg { width: 18px; height: 18px; }
+.gd :is(.gd-auth, .gd-auth-modal) .gd-input { padding: 0 var(--gw-space-16); background: var(--gd-auth-field); font: var(--gw-text-body-14-reg); }
+.gd :is(.gd-auth, .gd-auth-modal) .gd-input .gd-iconbtn { margin-right: calc(var(--gw-space-8) * -1); }      /* the 28px toggle sits 8 from the edge, not 16 */
+.gd .gd-auth__or { display: flex; align-items: center; gap: var(--gw-space-12); color: var(--gd-text-muted); font: var(--gw-text-body-12-reg); }
+.gd .gd-auth__or::before, .gd .gd-auth__or::after { content: ""; flex: 1; height: 1px; background: var(--gd-border-strong); }
+.gd .gd-auth__or[hidden], .gd .gd-auth__form[hidden], .gd .gd-google[hidden] { display: none; }
+.gd .gd-auth__note { margin: 0; text-align: center; color: var(--gd-text-body); font: var(--gw-text-body-14-med); letter-spacing: var(--gw-text-body-14-med-tracking); }
+.gd .gd-auth__note[hidden] { display: none; }
+.gd .gd-auth__attrib { margin: calc(var(--gw-space-8) * -1) 0 0; text-align: center; color: var(--gd-text-muted); font: var(--gw-text-body-12-reg); }   /* R12: fixed "Created and owned by …" attribution, only on a dashboard-specific sign-in */
+.gd .gd-auth__x { position: absolute; top: var(--gw-space-16); right: var(--gw-space-16); }
+
+/* show / hide password: both glyphs ship, aria-pressed picks one */
+.gd .gd-auth__reveal .gd-auth__eye-off { display: none; }
+.gd .gd-auth__reveal[aria-pressed="true"] .gd-auth__eye { display: none; }
+.gd .gd-auth__reveal[aria-pressed="true"] .gd-auth__eye-off { display: block; }
+
+/* success / redirect: the card keeps its mark, swaps the doors for a status line */
+.gd .gd-auth__done { display: none; flex-direction: column; align-items: center; gap: var(--gw-space-16); text-align: center; }
+.gd .gd-auth__card[data-state="success"] > :is(.gd-auth__doors, .gd-auth__attrib), .gd .gd-auth__card[data-state="success"] > .gd-auth__head > .gd-auth__copy { display: none; }
+.gd .gd-auth__card[data-state="success"] .gd-auth__done { display: flex; }
+.gd .gd-auth__card[data-state="success"] { gap: var(--gw-space-24); }
+.gd .gd-auth__spin { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--gd-text-muted); border-top-color: transparent; animation: gd-spin 700ms linear infinite; }
+
+/* --- google-button: UNTHEMED (R3). White, black label, own edge, both themes. -------- */
+.gd .gd-google {
+  display: flex; align-items: center; justify-content: center; gap: var(--gw-space-8); width: 100%; height: 48px; padding: 0 var(--gw-space-16) 0 var(--gw-space-20);
+  border: 1px solid var(--gw-color-neutral-200); border-radius: var(--gw-radius-12); background: var(--gw-color-white); color: var(--gw-color-black);
+  font: var(--gw-text-button-14); text-decoration: none; cursor: pointer; box-shadow: var(--gw-shadow-s3);
+  transition: box-shadow var(--gw-motion-fast), background var(--gw-motion-fast);
+}
+.gd .gd-google svg { width: 18px; height: 18px; flex: none; display: block; }    /* the four-colour G keeps its own fills; never recoloured */
+/* The hub's hover is shadow-s4 alone, which is invisible on a black page. R3 has no dark rule, so the fill steps to neutral-50 as well. Both unthemed. */
+.gd .gd-google:hover, .gd .gd-google.is-hover { background: var(--gw-color-neutral-50); box-shadow: var(--gw-shadow-s4); }
+.gd .gd-google[aria-disabled="true"], .gd .gd-google:disabled { opacity: .6; cursor: not-allowed; pointer-events: none; box-shadow: none; }
+.gd .gd-google[aria-busy="true"] { cursor: progress; pointer-events: none; }
+.gd .gd-google[aria-busy="true"] > svg { display: none; }
+.gd .gd-google[aria-busy="true"]::before { content: ""; width: 16px; height: 16px; flex: none; border-radius: 50%; border: 2px solid var(--gw-color-neutral-500); border-top-color: transparent; animation: gd-spin 700ms linear infinite; }
+
+/* --- sign-in-modal: a dialog around the same card ------------------------------------ */
+.gd .gd-modal.gd-auth-modal { --_w: 480px; max-height: calc(100dvh - 32px); overflow-y: auto; padding: var(--gw-space-40) var(--gw-space-32); border-radius: var(--gw-radius-24); box-shadow: var(--gw-shadow-s4); }
+.gd .gd-auth-modal .gd-auth__card { gap: var(--gw-space-32); }
+
+/* --- access-denied-screen: the empty-state shape (.gd-empty from 60-feedback) on the auth page ---- */
+.gd .gd-auth__card--denied { gap: var(--gw-space-24); padding: var(--gw-space-40) var(--gw-space-32) var(--gw-space-32); align-items: center; text-align: center; }
+.gd .gd-auth__card--denied .gd-empty { padding: 0; max-width: none; gap: var(--gw-space-20); }
+.gd .gd-auth__card--denied .gd-empty__badge { width: 48px; height: 48px; border-radius: var(--gw-radius-12); background: var(--gd-auth-field); box-shadow: inset 0 0 0 1px var(--gd-border-strong); }   /* selected-bg equals the card in dark and vanishes */
+.gd .gd-auth__card--denied .gd-empty__badge svg { width: 20px; height: 20px; }
+.gd .gd-auth__card--denied .gd-empty__title { font: var(--gw-text-body-20-sem); letter-spacing: var(--gw-text-body-20-sem-tracking); }
+.gd .gd-auth__card--denied .gd-empty__text { font: var(--gw-text-body-14-reg); letter-spacing: var(--gw-text-body-14-reg-tracking); }
+.gd .gd-auth__who { display: inline-flex; max-width: 100%; align-items: center; padding: var(--gw-space-4) var(--gw-space-8); border-radius: var(--gw-radius-8); background: var(--gd-sunken-bg); color: var(--gd-text); font: var(--gw-text-body-12-med); overflow-wrap: anywhere; }
+.gd .gd-auth__foot { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: var(--gw-space-8); }
+
+/* --- session-expired: a banner for a readable stale page, a modal when an action failed ---------- */
+.gd .gd-banner--session { align-items: center; }
+.gd .gd-modal--session .gd-modal__body { gap: var(--gw-space-8); }
+.gd .gd-modal--session .gd-auth__path { align-self: flex-start; max-width: 100%; padding: var(--gw-space-4) var(--gw-space-8); border-radius: var(--gw-radius-8); background: var(--gd-sunken-bg); color: var(--gd-text); font: var(--gw-text-body-12-med); overflow-wrap: anywhere; }
+
+/* --- phone: reflow, never scale --------------------------------------------------- */
+@media (max-width: 559px) {
+  .gd .gd-auth { padding: var(--gw-space-32) var(--gw-space-16); align-items: start; }
+  .gd .gd-auth--embedded { padding: var(--gw-space-16); }
+  .gd .gd-auth__card { padding: var(--gw-space-32) var(--gw-space-20); gap: var(--gw-space-32); border-radius: var(--gw-radius-16); }
+  .gd .gd-auth__title { font: var(--gw-text-h6); letter-spacing: var(--gw-text-h6-tracking); }
+  .gd .gd-auth__cell { display: none; }
+  .gd .gd-modal.gd-auth-modal { padding: var(--gw-space-32) var(--gw-space-20); border-radius: var(--gw-radius-16); }
+}

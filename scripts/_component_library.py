@@ -855,8 +855,8 @@ def render_gaps(items):
 USE_CASES = [
     ("web", "Landing pages", "Public marketing surfaces — heroes, folds, pricing, "
                              "case studies, ad landers.", "gushwork-web"),
-    ("dashboard", "Dashboards", "Logged-in product screens — KPI rows, tables, side nav, "
-                                "filters, toasts.", "gushwork-dashboard"),
+    ("dashboard", "Dashboards", "Logged-in analytics dashboards and web apps — tables, charts, "
+                                "filters, settings, sign-in.", "gushwork-dashboard"),
     ("lead-magnet", "Lead magnets", "The downloadable PDF behind an ad lander — covers, "
                                     "interiors, closers.", "gushwork-lead-magnet"),
     ("slides", "Slide decks", "Sales and discovery decks, 1920×1080.", "gushwork-slides"),
@@ -1026,7 +1026,8 @@ PARTS = [
     ("web", "Web", "Public marketing surfaces. Ad landers and brand pages both draw "
                    "from this one set — the difference is page-build's Type property, "
                    "not a different component.", "skills/gushwork-web"),
-    ("dashboard", "Dashboard", "Logged-in product screens. A separate Button and Avatar "
+    ("dashboard", "Dashboard", "Logged-in analytics dashboards and web apps, extracted from the "
+                               "design hub. A separate Button and Avatar "
                                "set from web, by design — never substitute one for the "
                                "other.", "skills/gushwork-dashboard"),
     ("slides", "Slides", "Sales and discovery decks, 1920×1080.", "skills/gushwork-slides"),
@@ -1060,7 +1061,7 @@ RECIPES = [
      "it in rather than rebuilding it from folds.",
      "skills/gushwork-web/templates/case-study"),
     ("dashboard-screen", "Dashboard screen", "dashboard", "—",
-     "A logged-in product surface — KPI rows, tables, side nav, filters.",
+     "A logged-in analytics screen or web-app page — overview, explorer, list with filters, settings, detail.",
      "skills/gushwork-dashboard"),
     ("lead-magnet-doc", "Lead magnet", "lead-magnet", "print output",
      "The gated PDF itself — cover, interior, closer.", "skills/gushwork-lead-magnet"),
