@@ -91,6 +91,18 @@ Anatomy: a tabs-pill track used as a radiogroup inside `.gd-period`, optional `.
 ```
 States and tokens as tabs pill. Behaviour: emits `gd:change {item,value}`. Provenance: extracted `analytics.html:555-559` (the Period `.ul-tabs`); it is a composition, kept as its own key because it is the pattern teams reach for first.
 
+## Shortcut key
+
+**Use** whenever a control has a keyboard shortcut: the shortcut is shown inside that control, after its label, as a quiet key cap. **Not** as a separate hint line under or beside a group of buttons (R53), and not for a shortcut with no control to carry it: that goes in the control's tooltip (`title`), as in "Save (⌘S)".
+
+Anatomy: `.gd-kbd` as the last child of a `.gd-btn`, `aria-hidden="true"`, with `aria-keyshortcuts` on the button so assistive tech still gets the key.
+```html
+<button type="button" class="gd-btn gd-btn--primary" aria-keyshortcuts="A">Approve<kbd class="gd-kbd" aria-hidden="true">A</kbd></button>
+```
+The cap is the label's own colour at 55% on a 14% tint of it, 18px tall with a 4px radius, 8px after the label. It is a filled shape, so the button's right padding is inset to `(control height - 18) / 2`, which makes the cap's gap to the right edge equal its gap above and below. Keys read as they appear on the keyboard: `A`, `Esc`, `⌘↵`. Not drawn at `--sm` (28px buttons are too tight), on touch (`hover: none`) or under 768px: there is no keyboard to press, and the shortcut still works.
+
+States: it follows its button (hover, focus, disabled, busy); the cap has none of its own. Tokens: `--gd-control-h`, `--gw-space-4`, `--gw-space-8`, `--gw-radius-4`, `--gw-text-body-12-med`. Provenance: NEW (R53, from Utsav's review of the Review drawer footer, 5 Oct 2026); the drawer's own `.rv-b kbd` is the hub's copy of the same pattern. Pending library review.
+
 ## Info hint
 
 **Use** beside a metric or column name to define it (bounce rate, cost per lead). **Not** for errors, or for text people must read to proceed.

@@ -35,6 +35,12 @@
     "breaking": false,
     "doc": "actions.md"
   },
+  "shortcut-key": {
+    "version": "2.0.0",
+    "changed": "2026-10-05",
+    "breaking": false,
+    "doc": "actions.md"
+  },
   "split-button": {
     "version": "2.0.0",
     "changed": "2026-10-03",
