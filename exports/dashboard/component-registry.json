@@ -823,6 +823,12 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "ab77736ba8f52f48"
+    },
+    "combobox": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "14fe6e2e7a231ede"
     }
   }
 }
