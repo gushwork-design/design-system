@@ -92,9 +92,10 @@
       "doc": "charts.md"
     },
     "build-notice": {
-      "version": "2.0.0",
-      "changed": "2026-10-04",
+      "version": "2.1.0",
+      "changed": "2026-10-05",
       "breaking": false,
+      "note": "Update now opens Claude Code with the update prompt ready; Remind later brings the notice back on the next open",
       "doc": "notice.md"
     },
     "bulk-action-bar": {
