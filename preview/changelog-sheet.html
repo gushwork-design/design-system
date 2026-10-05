@@ -190,7 +190,7 @@
   html::-webkit-scrollbar-thumb:hover,.idx::-webkit-scrollbar-thumb:hover{
     background:var(--s-card-border, var(--gw-color-neutral-300));background-clip:content-box}
 
-  /* No narrow-viewport reflow here. exports/dashboard/build-rules.md rules that
+  /* No narrow-viewport reflow here. exports/dashboard/shell.md rules that
      below 1440 the canvas SCALES rather than rearranges — reflow is listed there
      as a rejected attempt. shell.js sets --gw-fit and .gw-shell zooms the whole
      1440 layout, so this page keeps its 800 / 60 / 260 split at every width. */
@@ -223,19 +223,33 @@
       <h1>Change Log</h1>
       <div class="pa" data-page-actions></div>
     </div>
-    <p class="hd__meta">Last updated 1st Oct, 2026</p>
+    <p class="hd__meta">Last updated 5th Oct, 2026</p>
   </header>
   <main class="cl__main">
     <section class="intro"><p class="lede">Release notes for the Gushwork design system, including new
        components, corrected measurements, and rulings by version. This page is
        generated from <a class="lnk" href="https://github.com/gushwork-design/design-system/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer">CHANGELOG.md</a>
        on GitHub.</p></section>
+    <article class="rel" id="v2-0-0" data-md-heading="v2.0.0 · 05 Oct 2026, 13:17">
+      <div class="rail" data-md-skip>
+        <span class="pill pill--now">v2.0.0</span>
+        <span class="when">05 Oct 2026</span>
+        <span class="when">13:17</span>
+        <span class="tag">current</span>
+      </div>
+      <div class="body">
+        <p class="body__sum">The dashboard system is rebuilt from the design hub: 110 components for analytics dashboards and web apps, a rewritten skill, and a template</p>
+        <div class="meta">
+          <a class="meta__l" href="https://github.com/gushwork-design/design-system/commit/13868ff56b6d9ce999677b9c68f465d48b97f3ed" target="_blank" rel="noopener noreferrer"><svg class="gl"><use href="#i-commit"/></svg>13868ff</a>
+          <a class="meta__l" href="claude://resume/19f93586-5029-4abf-b1d5-13bebdee1ea0"><svg class="gl"><use href="#i-chat"/></svg>Dashboard rebuilt from the design hub</a>
+        </div>
+      </div>
+    </article>
     <article class="rel" id="v1-58-0" data-md-heading="v1.58.0 · 01 Oct 2026, 16:04">
       <div class="rail" data-md-skip>
-        <span class="pill pill--now">v1.58.0</span>
+        <span class="pill">v1.58.0</span>
         <span class="when">01 Oct 2026</span>
         <span class="when">16:04</span>
-        <span class="tag">current</span>
       </div>
       <div class="body">
         <p class="body__sum">Update notice that reaches people, usage-log tokens, and phone and dark-mode site fixes</p>
@@ -1433,7 +1447,8 @@
       <span>On this page</span>
     </div>
     <div class="idx__list" id="idx-list">
-      <a class="now" href="#v1-58-0">v1.58.0</a>
+      <a class="now" href="#v2-0-0">v2.0.0</a>
+      <a class="" href="#v1-58-0">v1.58.0</a>
       <a class="" href="#v1-57-0">v1.57.0</a>
       <a class="" href="#v1-56-0">v1.56.0</a>
       <a class="" href="#v1-55-0">v1.55.0</a>

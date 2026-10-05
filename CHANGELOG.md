@@ -24,6 +24,7 @@ reports its own stale date.**
 
 | Version | Date | What changed | Commit | Session |
 |---|---|---|---|---|
+| **v2.0.0** | 05 Oct 2026 13:17 | The dashboard system is rebuilt from the design hub: 110 components for analytics dashboards and web apps, a rewritten skill, and a template | [`13868ff`](https://github.com/gushwork-design/design-system/commit/13868ff56b6d9ce999677b9c68f465d48b97f3ed) | [Dashboard rebuilt from the design hub](claude://resume/19f93586-5029-4abf-b1d5-13bebdee1ea0) |
 | **v1.58.0** | 01 Oct 2026 16:04 | Update notice that reaches people, usage-log tokens, and phone and dark-mode site fixes | [`2ed07ac`](https://github.com/gushwork-design/design-system/commit/2ed07aca6f5e1578c0560dbea2d13a176bff7e6a) | [Site audit, phone fixes and update notice](claude://resume/20232308-5039-4d76-9f26-d170a3d51156) |
 | **v1.57.0** | 30 Sep 2026 19:45 | Keep a private copy of each output, so the Usage Logs page can open it | [`f0adcf6`](https://github.com/gushwork-design/design-system/commit/f0adcf66c1d0734d021c19f46a0d3a70ea475e4c) | [Gushwork Design](claude://resume/4e52956e-ec36-4a86-a3ae-98d70291548d) |
 | **v1.56.0** | 30 Sep 2026 19:34 | Group the Usage Logs by chat, log PNG and HTML outputs, and let Admin and Owner scroll with the nav | [`8f000cc`](https://github.com/gushwork-design/design-system/commit/8f000ccbb60003037af6506122d55f55d381ba9c) | [Gushwork Design](claude://resume/4e52956e-ec36-4a86-a3ae-98d70291548d) |
