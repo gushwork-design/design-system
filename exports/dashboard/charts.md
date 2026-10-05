@@ -154,7 +154,7 @@ Purpose. Intensity across two dimensions: day by hour, cohort by week, or a GitH
 
 Anatomy. `.gd-heat` > scrollable `.gd-heat__grid` (`role="grid"`, rows of `role="gridcell"` cells) + key (Less to More) + tooltip. Five steps of one hue, `--gd-seq-1…5`: darker means more on light, brighter means more on dark, so "more" always stands out from the ground. Zero and missing are different: empty is the sunken fill with a hairline, missing is `no data` in the label. `layout:'calendar'` runs weeks left to right in square cells with month labels; weeks start Monday (`weekStart`). Bins are linear (`bins:'quantile'` for skewed data).
 
-States: rest, hover (2px ring), focus-visible, empty, loading, error.
+States: rest, hover (2px ring), focus-visible (a 1px outline, black on light and white on dark, so it reads on every step of the scale), empty, loading, error.
 
 Accessibility. It is a real grid, so it is not `role="img"`: every cell has its own label ("Tue, 14:00: 63 sessions"). One cell is in the tab order; arrows move in two dimensions, Home/End jump to row ends, Esc hides the tip. Colour is never the only carrier: the value is in the label and tooltip.
 
@@ -164,7 +164,7 @@ Provenance. NEW: not in the hub (Mobbin Mixpanel retention, GitHub contributions
 
 Purpose. Step-to-step conversion. Horizontal for many steps or long labels; vertical for three to six steps where shape matters. A funnel table can be added for exact counts.
 
-Anatomy. `.gd-funnel` > ordered list. Horizontal: label, track with fill, count, percent of first step; between rows "63% continue, 870 left (37% drop-off)". Vertical (`layout:'vertical'`): columns, a hatched ghost of the previous step behind each fill, then count, label, continue and left. An abandonment row ("Abandoned before Paid") closes it. `table:true` adds step, count, completion, drop-off.
+Anatomy. `.gd-funnel` > ordered list. Horizontal: label, track with fill, count, percent of first step; between rows "63% continue, 870 left (37% drop-off)". Vertical (`layout:'vertical'`): columns, a hatched ghost of the previous step behind each fill, then count, label, continue and left. An abandonment row ("Abandoned before Paid") closes it. `table:true` adds step, count, completion, drop-off, in the data table's look: no header fill, a small uppercase muted header over a strong rule, a hairline under every row, hover `--gd-row-hover`, first column in `--gd-text`.
 
 Accessibility. A list whose text carries every figure; fills are decorative.
 
@@ -186,7 +186,7 @@ Provenance. Extracted: `web/admin/analytics.html:256-267`.
 
 Purpose. A table under a chart, one row per series: checkbox, colour dot, name, value columns (total, average, latest by default). Ticking toggles the series. Use when there are more than three series or exact values matter.
 
-Anatomy. `table.gd-ltable[data-gd-for="#chart"]` > rows with `input[type=checkbox][data-gd-series]` inside `.gd-check` (Actions author), `th` name with `.gd-sw`, `td` values. Row classes are its own; adopting the Tables author's cell classes is a follow-up. `legend:'table'` on a chart renders it below and wires it.
+Anatomy. `table.gd-ltable[data-gd-for="#chart"]` > rows with `input[type=checkbox][data-gd-series]` inside `.gd-check` (Actions author), `th` name with `.gd-sw`, `td` values. Row classes are its own, but the look is the data table's: no header fill, a small uppercase muted header over a strong rule, a hairline under every row, hover `--gd-row-hover`, 12px medium cells. `legend:'table'` on a chart renders it below and wires it.
 
 States: rest, row hover (also isolates the series on the chart), hidden (`data-off`, muted, dimmed dot), focus-visible on the checkbox.
 

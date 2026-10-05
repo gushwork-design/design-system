@@ -1257,7 +1257,7 @@ Ruled by Utsav, 5 Oct 2026, sending `dashboard/build-notice` back for rework: "u
 ## R53 — a keyboard shortcut is shown inside the control it triggers, as a key cap
 Ruled by Utsav, 5 Oct 2026, reviewing the Review drawer footer, where "A approve · R rework · X reject · ⌘ S save · ← → move · Esc close" sat outside the buttons: "the shortcuts don't need to be outside, they can be in the button only, like Approve A, keep the A colour subtler than the main CTA", then "the button thing can be a design pattern and rule, whenever shortcuts are there".
 
-- **The rule.** Wherever a control has a keyboard shortcut, the shortcut is drawn inside that control, after its label, as a quiet key cap (`.gd-kbd` in the dashboard system). It is never a separate hint line under or beside the controls.
+- **The rule.** Wherever a control has a keyboard shortcut, the shortcut is drawn inside that control, after its label, as a quiet key cap (`.gd-btn__key` in the dashboard system; `.gd-kbd` is the Feedback key hint and a different thing). It is never a separate hint line under or beside the controls.
 - **The cap is subtler than the label.** The label's own colour at 55% on a 14% tint of it, so one rule serves primary, outline, ghost and danger buttons in light and dark.
 - **A filled shape is inset, not padded like text.** The button's right padding becomes `(control height - 18px) / 2`, so the cap's gap to the edge equals its gap above and below. Equal padding left and right looked tight on the right (Utsav, same review).
 - **A shortcut with no control goes in a tooltip.** Save, move and close in the drawer are `title` text ("Save (⌘S)"), not a line.
