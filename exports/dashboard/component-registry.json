@@ -1433,7 +1433,8 @@
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "5381e51364417a74"
+      "fingerprint": "d4ba1f82dd37ffa1",
+      "previewFingerprint": "4834659d12a9c468"
     },
     "analytics-overview-template": {
       "reviewed": "rework",
