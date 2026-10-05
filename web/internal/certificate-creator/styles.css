@@ -558,3 +558,6 @@ html[data-tool-panel="open"] .t-acts { right: calc(var(--t-panel-w) + var(--t-in
    5 Oct 2026). The Files home keeps the hub's corner controls. */
 html[data-tool-panel="open"] .t-acts, html[data-tool-panel="closed"] .t-acts { display: none; }
 .right-head__end { display: inline-flex; align-items: center; gap: var(--gw-space-12); }
+/* "All files" is a way back, not an action: no border, the hover fill only (Utsav, 5 Oct 2026) */
+.saved-new.right-back { border-color: transparent; padding-left: var(--gw-space-4); }
+.saved-new.right-back:hover { background: var(--t-hover); }
