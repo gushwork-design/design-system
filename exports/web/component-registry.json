@@ -328,6 +328,13 @@
       "fingerprint": "b011f54c631f2238",
       "previewFingerprint": "0d792d4171e9d3b4",
       "note": "the tooltip sohuld be shown on hover"
+    },
+    "video": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "62c9d56b5e6fd51b",
+      "previewFingerprint": "6b48ce82b47895a5"
     }
   }
 }
