@@ -1182,6 +1182,13 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "79763e18d0d8a8eb"
+    },
+    "sidebar-collapsed": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "7e5aa3c7001fdb7f",
+      "note": "on hover show a tooltip like appearance to show whats the icon/ tab is for"
     }
   }
 }
