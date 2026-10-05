@@ -16,6 +16,8 @@
 #
 # WHAT IT REFUSES, each with a reason, and the PR stays open for Utsav:
 #   - the switch is off: .github/automerge-off exists on origin/main
+#   - a teammate deliverable (branch bruce-staging/*): any deletion or rename, or any file outside one
+#     web/internal/staging/<slug>/ folder. Only Utsav may delete or change templates, the library or the hub.
 #   - not a rework: title is not "Rework: <scope>/<key>", or the branch is not rework/* or nightly/*
 #     (or, for a change Utsav asked Bruce for in his DM: branch bruce/* and title "Bruce: <what>"; the path rules
 #     below are the same, and there is no decision or fix record to check)
@@ -47,7 +49,7 @@ fi
 # REST only. Claude Code cloud sessions refuse GitHub GraphQL (HTTP 403), and `gh pr view` / `gh pr merge` use it.
 REPO="${GW_REPO:-gushwork-design/design-system}"
 PULL="$(gh api "repos/$REPO/pulls/$PR")"
-FILES="$(gh api --paginate "repos/$REPO/pulls/$PR/files?per_page=100" --jq '.[].filename')"
+FILES="$(gh api --paginate "repos/$REPO/pulls/$PR/files?per_page=100" --jq '.[] | [.status, .filename] | @tsv')"
 INFO="$(PULL="$PULL" FILES="$FILES" python3 -c '
 import json, os
 p = json.loads(os.environ["PULL"])
@@ -56,7 +58,7 @@ m = p.get("mergeable")
 print(json.dumps({"state": state, "baseRefName": p["base"]["ref"], "headRefName": p["head"]["ref"],
                   "title": p["title"], "headRefOid": p["head"]["sha"],
                   "mergeable": "CONFLICTING" if m is False else ("MERGEABLE" if m else "UNKNOWN"),
-                  "files": [{"path": f} for f in os.environ["FILES"].splitlines() if f]}))')"
+                  "files": [{"status": l.split("\t")[0], "path": l.split("\t")[-1]} for l in os.environ["FILES"].splitlines() if l.strip()]}))')"
 
 PR_JSON="$INFO" python3 - <<'PY' || exit 1
 import fnmatch, importlib.util, json, os, re, subprocess, sys
@@ -74,12 +76,16 @@ if pr["baseRefName"] != "main":
     refuse(f"it targets {pr['baseRefName']}, not main")
 # Two lanes. A REWORK answers a send-back on the review page. A BRUCE change is one Utsav asked Bruce for in his DM
 # (5 Oct 2026): same hub-only paths, but there is no review decision or fix record to check, because the ask is the decision.
-bruce = bool(re.match(r"^bruce/", pr["headRefName"]))
+# A THIRD lane (5 Oct 2026, Utsav: "no destructive task should be allowed for others, only I can say to delete a template or
+# change this in the library"): bruce-staging/* carries a deliverable Bruce built for a TEAMMATE. It may only add or change
+# files inside one folder under web/internal/staging/, and may delete nothing anywhere. Everything else is the owner's.
+staging = bool(re.match(r"^bruce-staging/", pr["headRefName"]))
+bruce = staging or bool(re.match(r"^bruce/", pr["headRefName"]))
 if bruce:
     if not re.match(r"^Bruce: \S", pr["title"].strip()):
         refuse(f"title {pr['title']!r} is not 'Bruce: <what changed>'")
 elif not re.match(r"^(rework|nightly)/", pr["headRefName"]):
-    refuse(f"branch {pr['headRefName']} is not rework/*, nightly/* or bruce/*")
+    refuse(f"branch {pr['headRefName']} is not rework/*, nightly/*, bruce/* or bruce-staging/*")
 m = None if bruce else re.match(r"^Rework: ([a-z0-9-]+)/([a-z0-9-]+)$", pr["title"].strip())
 if not bruce and not m:
     refuse(f"title {pr['title']!r} is not 'Rework: <scope>/<key>'")
@@ -102,6 +108,21 @@ except Exception:
     refuse(f"no registry for '{scope}' on main")
 if not bruce and rec.get("reviewed") != "rework":
     refuse(f"{scope}/{key} is {rec.get('reviewed', 'pending')!r} on main, not 'rework'")
+
+if staging:
+    paths = [x["path"] for x in pr["files"]]
+    if not paths:
+        refuse("it changes no files")
+    removed = [x["path"] for x in pr["files"] if x["status"] in ("removed", "renamed")]
+    if removed:
+        refuse("a teammate's deliverable may not delete or move anything: " + ", ".join(removed))
+    m = re.match(r"^web/internal/staging/([a-z0-9-]+)/", paths[0])
+    folder = m.group(1) if m else None
+    outside = [p for p in paths if not folder or not p.startswith(f"web/internal/staging/{folder}/")]
+    if outside:
+        refuse("a teammate's deliverable stays inside one folder under web/internal/staging/: " + ", ".join(outside))
+    print(f"✔ teammate deliverable: {len(paths)} file(s) in web/internal/staging/{folder}/, nothing removed, no conflict")
+    sys.exit(0)
 
 # The hub, and only the hub. Skills read exports/, skills/ and foundation/; none of it is here.
 ALLOW = ["web/previews/*", "web/admin/*", "web/*.css", "web/*.js", "scripts/*"]
