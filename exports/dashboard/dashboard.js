@@ -1443,6 +1443,7 @@ window.GD = window.GD || {};
   var doc = document;
 
   /* ---- avatar: same patterns and FNV-1a hash as web/shell.js ------------- */
+  var TONES = ['blue', 'red', 'yellow', 'orange', 'green'];
   var PATTERNS = [190, 341, 151, 403, 186, 149, 343, 189, 179, 307, 95, 159];
   function idx(seed) {
     var h = 2166136261, s = String(seed || '').toLowerCase();
@@ -1459,6 +1460,8 @@ window.GD = window.GD || {};
       if (el.querySelector('svg')) return;
       var lv = el.getAttribute('data-level');
       if (lv) el.classList.add('gd-avatar--' + lv);
+      /* a person outside a group gets a stable tone from their seed; inside a group the CSS hands them out in order */
+      if (!el.hasAttribute('data-tone') && (!lv || lv === 'team') && !(el.parentNode && el.parentNode.classList && el.parentNode.classList.contains('gd-avatar-group'))) el.setAttribute('data-tone', TONES[idx(el.getAttribute('data-gd-avatar')) % TONES.length]);
       el.insertAdjacentHTML('afterbegin', avatarSVG(el.getAttribute('data-gd-avatar')));
     });
   }
