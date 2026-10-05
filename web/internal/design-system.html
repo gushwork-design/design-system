@@ -1395,6 +1395,10 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       if (q.fp && it.fp && q.fp !== it.fp) return { state: it.state, queued: false, q: null };
       if (q.pfp && it.pfp && q.pfp !== it.pfp) return { state: it.state, queued: false, q: null };   // the drawing moved
       if (it.state === want) return { state: it.state, queued: false, q: null };   // the registry has caught up with it
+      // Caught up AND moved on: `redone` can only be derived from a recorded rework, `expired` only from a recorded pass,
+      // so the registry already holds this decision and the derived state is the truth. Without this a rework whose
+      // drawing has since been redone kept showing as "in rework, on main" because the queued row outranked it.
+      if ((want === 'rework' && it.state === 'redone') || (want === 'passed' && it.state === 'expired')) return { state: it.state, queued: false, q: null };
       return { state: want, queued: true, q: q };
     }
     return { state: it.state, queued: false, q: null };
