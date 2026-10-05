@@ -961,6 +961,12 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "0e8943252a4552bd"
+    },
+    "horizontal-bar-chart": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "a34f81aad914c5ac"
     }
   }
 }
