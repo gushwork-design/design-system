@@ -1428,11 +1428,10 @@
       "fingerprint": "aeb596fa47bbc0d9"
     },
     "widget-grid": {
-      "reviewed": "rework",
+      "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "a1d25c975dca98de",
-      "note": "check padding between heading and the charts",
+      "fingerprint": "de40be1838225e4d",
       "previewFingerprint": "6ae9f32a7df0a3c8"
     },
     "workspace-switcher": {
