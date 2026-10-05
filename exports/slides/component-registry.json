@@ -179,5 +179,14 @@
       "doc": "layouts.md",
       "note": "A real 'Thank You!' slide exists on the Sales Pitch page of GW-Slides but has not been measured. Measuring it is a breaking bump."
     }
+  },
+  "review": {
+    "annotation": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "25aaac7d1d3af43c",
+      "note": "preview is not there"
+    }
   }
 }
