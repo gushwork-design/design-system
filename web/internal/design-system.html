@@ -813,6 +813,24 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .rv-cmp textarea { all: unset; box-sizing: border-box; display: block; width: 100%; min-height: 44px; padding: var(--gw-space-12) var(--gw-space-16) 0; color: var(--ul-field-fg); font: 400 14px/1.5 var(--gw-font-body); white-space: pre-wrap; }
 .rv-cmp textarea::placeholder { color: var(--ul-sub); }
 .rv-cmp__bar { display: flex; justify-content: flex-end; align-items: center; gap: var(--gw-space-12); padding: var(--gw-space-8) var(--gw-space-8) var(--gw-space-8) var(--gw-space-16); }
+/* Linear-style comments: flat, quiet, one header line each. */
+.rv-tl .rv-cm { grid-template-columns: 20px minmax(0, 1fr); gap: var(--gw-space-12); }
+.rv-tl .rv-cm__a { width: 20px; height: 20px; border-radius: 50%; box-shadow: none; background: var(--ul-ctl-hover); font-size: 10px; color: var(--ul-cell); margin-top: 1px; }
+.rv-tl .rv-cm--alfred .rv-cm__a { background: var(--gw-color-primary-500); color: var(--gw-color-white); }
+.rv-tl .rv-cm__h { gap: 6px; margin-bottom: 2px; }
+.rv-tl .rv-cm__h b { font-weight: 500; }
+.rv-cm__k, .rv-cm__w { font: 400 12.5px/1.4 var(--gw-font-body); color: var(--ul-sub); }
+.rv-cm__k::before, .rv-cm__w::before, .rv-tl .rv-cm__h time::before { content: "·"; margin-right: 6px; color: var(--ul-sub); }
+.rv-cm__w { color: var(--gw-color-yellow-500); }
+.rv-tl .rv-cm__h time { font: 400 12.5px/1.4 var(--gw-font-body); }
+.rv-tl .rv-cm__b { color: var(--ul-value); }
+.rv-th .rv-tl { gap: var(--gw-space-20); }
+.rv-cmp { display: flex; align-items: flex-end; gap: var(--gw-space-8); margin-top: var(--gw-space-24, 24px); padding: 6px 6px 6px var(--gw-space-12); border-radius: var(--gw-radius-12); background: transparent; box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }
+.rv-cmp textarea { flex: 1; min-height: 28px; padding: 4px 0; resize: none; overflow-y: auto; font-size: 13.5px; line-height: 20px; }
+.rv-cmp__go { all: unset; box-sizing: border-box; flex: none; width: 28px; height: 28px; display: grid; place-items: center; border-radius: var(--gw-radius-8); background: var(--ul-value); color: var(--ul-bg, var(--gw-color-black)); cursor: pointer; }
+.rv-cmp__go svg { width: 14px; height: 14px; }
+.rv-cmp__go:disabled { background: var(--ul-ctl-hover); color: var(--ul-sub); cursor: default; }
+.rv-cmp__go:focus-visible { outline: var(--gw-focus-ring); outline-offset: 2px; }
 .rv-th__empty { font: 400 13px/1.5 var(--gw-font-body); color: var(--ul-sub); }
 .rv-rp { margin-top: var(--gw-space-16); display: grid; gap: var(--gw-space-8); }
 .rv-rp .rv-ta { min-height: 64px; }
@@ -1891,9 +1909,10 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       }
       var who = c.who === 'alfred' ? 'Alfred' : c.who === 'owner' ? 'Utsav' : (c.by || 'Someone');
       var waiting = c === lastCm && c.blocked;
-      var tags = (c.who === 'alfred' ? '<span class="rv-cm__tag rv-cm__tag--ai">AI agent</span>' : '') +
-        (c.kind === 'rework' ? '<span class="rv-cm__tag rv-cm__tag--note">Rework note</span>' : c.kind === 'reject' ? '<span class="rv-cm__tag rv-cm__tag--reject">Reject note</span>' : '') +
-        (waiting ? '<span class="rv-cm__tag">Waiting on you</span>' : '');
+      // Linear's comment line (5 Oct 2026, Utsav: "cramped and unnecessary elements"): avatar, name, a muted word for what
+      // kind of comment it is, the time. No chips, no cards; only "waiting on you" keeps a colour, because it asks for action.
+      var kindTxt = c.kind === 'rework' ? 'rework note' : c.kind === 'reject' ? 'reject note' : c.who === 'alfred' ? 'AI agent' : '';
+      var tags = (kindTxt ? '<span class="rv-cm__k">' + kindTxt + '</span>' : '') + (waiting ? '<span class="rv-cm__w">waiting on you</span>' : '');
       var files = c.refs && c.refs.length ? '<div class="rv-refs">' + attHtml(c.refs.map(function (r) { var href = r.replace(/^web\//, '/'); return { name: r.split('/').pop(), type: /\.(png|jpe?g|webp|gif)$/.test(r) ? 'image/x' : '', url: href, href: href }; }), false) + '</div>' : '';
       var opts = [];
       var body = (c.body || '').split('\n').filter(function (ln) {
@@ -1901,11 +1920,10 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       }).join('\n').trim();
       var chips = opts.length ? '<div class="rv-opts">' + opts.map(function (o) { return '<button type="button" class="rv-opt" data-opt="' + esc('Go with ' + o.n + ': ' + o.t) + '"><span>' + esc(o.n) + '</span>' + esc(o.t) + '</button>'; }).join('') + '</div>' : '';
       var inner = (body ? '<div class="rv-cm__b">' + linkify(body) + '</div>' : '') + chips + files;
-      return '<li class="rv-cm rv-cm--' + esc(c.who) + (waiting ? ' is-waiting' : '') + '"><span class="rv-cm__a" aria-hidden="true">' + esc(who.charAt(0)) + '</span><div class="rv-cm__m"><div class="rv-cm__h"><b>' + esc(who) + '</b>' + tags + '<time datetime="' + esc(c.at) + '">' + esc(fmtWhen(c.at)) + '</time></div>' +
-        (c.kind ? '<div class="rv-card">' + inner + '</div>' : inner) + '</div></li>';
+      return '<li class="rv-cm rv-cm--' + esc(c.who) + (waiting ? ' is-waiting' : '') + '"><span class="rv-cm__a" aria-hidden="true">' + esc(who.charAt(0)) + '</span><div class="rv-cm__m"><div class="rv-cm__h"><b>' + esc(who) + '</b>' + tags + '<time datetime="' + esc(c.at) + '" title="' + esc(fmtWhen(c.at)) + '">' + esc(shortWhen(c.at)) + '</time></div>' + inner + '</div></li>';
     }).join('');
-    var reply = owner ? '<div class="rv-cmp"><textarea id="rv-reply" rows="2" maxlength="2000" aria-label="Reply to Alfred" placeholder="Reply to Alfred…"></textarea>' +
-      '<div class="rv-cmp__bar"><button type="button" class="rv-b rv-b--pass rv-b--sm" id="rv-reply-send" disabled>Send<kbd aria-hidden="true">⌘↵</kbd></button></div></div>' : '';
+    var reply = owner ? '<div class="rv-cmp"><textarea id="rv-reply" rows="1" maxlength="2000" aria-label="Reply to Alfred" placeholder="Reply to Alfred…"></textarea>' +
+      '<button type="button" class="rv-cmp__go" id="rv-reply-send" disabled aria-label="Send (⌘↵)" title="Send (⌘↵)"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M205.66,117.66a8,8,0,0,1-11.32,0L136,59.31V216a8,8,0,0,1-16,0V59.31L61.66,117.66a8,8,0,0,1-11.32-11.32l72-72a8,8,0,0,1,11.32,0l72,72A8,8,0,0,1,205.66,117.66Z"/></svg></button></div>' : '';
     var nAll = (it.activity || []).filter(function (a) { return a.what !== 'sent back' && a.what !== 'rejected'; }).length + cms.filter(function (c) { return c.kind; }).length;
     var tabs = '<div class="rv-tabs" role="tablist">' +
       '<button type="button" role="tab" class="rv-tab' + (tab === 'comments' ? ' is-on' : '') + '" aria-selected="' + (tab === 'comments') + '" data-tab="comments">Comments' + (cms.length ? ' <span>' + cms.length + '</span>' : '') + '</button>' +
@@ -1919,7 +1937,8 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     var ta = $('rv-reply'), send = $('rv-reply-send');
     if (!ta) return;
     ta.value = REPLY[idOf(it)] || ''; send.disabled = !ta.value.trim();
-    var sync = function () { REPLY[idOf(it)] = ta.value; send.disabled = !ta.value.trim(); };
+    var sync = function () { REPLY[idOf(it)] = ta.value; send.disabled = !ta.value.trim(); ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 200) + 'px'; };
+    if (ta.value) sync();
     ta.addEventListener('input', sync);
     box.querySelectorAll('[data-opt]').forEach(function (b) { b.addEventListener('click', function () { ta.value = b.getAttribute('data-opt'); sync(); ta.focus(); }); });
     ta.addEventListener('keydown', function (ev) { if ((ev.metaKey || ev.ctrlKey) && ev.key === 'Enter') { ev.preventDefault(); ev.stopPropagation(); if (!send.disabled) send.click(); } });
