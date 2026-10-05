@@ -205,11 +205,11 @@
       "previewFingerprint": "bdfec0b8b066d444"
     },
     "eyebrow": {
-      "reviewed": "rework",
+      "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "3dcdce606bd0b74c",
-      "note": "preview is not there"
+      "previewFingerprint": "e0c7693f26ae7902"
     },
     "feature-row": {
       "reviewed": "rework",
