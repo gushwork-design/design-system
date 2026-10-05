@@ -986,6 +986,12 @@
       "reviewedOn": "2026-10-05",
       "fingerprint": "793072d3a52d42f8",
       "note": "no need of underline when info icon is there and tooltip placement seems off"
+    },
+    "issue-summary": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "51fb5edb40e6c93c"
     }
   }
 }
