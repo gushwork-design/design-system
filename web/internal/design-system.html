@@ -731,6 +731,21 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .rv-note { padding: var(--gw-space-12) var(--gw-space-16); border-radius: var(--gw-radius-12); background: var(--ul-hdr-bg); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); font: 400 13px/1.5 var(--gw-font-body); color: var(--ul-cell); }
 .rv-note b { color: var(--ul-value); font-weight: 600; }
 .rv-note--q { background: var(--gw-color-yellow-alpha-10); box-shadow: none; }
+/* Activity (R54 addendum): what happened to this item, newest first, read from git at publish. A dot per event on a thin rail. */
+.rv-act { margin: var(--gw-space-20) 0 0; }
+.rv-act h3 { margin: 0 0 var(--gw-space-12); font: 600 12px/1.3 var(--gw-font-body); letter-spacing: .04em; text-transform: uppercase; color: var(--ul-sub); }
+.rv-act ol { list-style: none; margin: 0; padding: 0; }
+.rv-act li { position: relative; padding: 0 0 var(--gw-space-12) var(--gw-space-20); font: 400 13px/1.5 var(--gw-font-body); color: var(--ul-cell); }
+.rv-act li::before { content: ""; position: absolute; left: 3px; top: 7px; width: 7px; height: 7px; border-radius: 50%; background: var(--ul-sub); }
+.rv-act li::after { content: ""; position: absolute; left: 6px; top: 18px; bottom: 0; width: 1px; background: var(--ul-hdr-line); }
+.rv-act li:last-child::after { display: none; }
+.rv-act li.is-ok::before { background: var(--gw-color-green-500); }
+.rv-act li.is-warn::before { background: var(--gw-color-yellow-500); }
+.rv-act li.is-bad::before { background: var(--gw-color-red-500); }
+.rv-act li.is-ship::before { background: var(--gw-color-primary-500); }
+.rv-act b { color: var(--ul-value); font-weight: 600; }
+.rv-act time { display: block; font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
+.rv-act q { display: block; margin-top: 2px; color: var(--ul-cell); quotes: "\201C" "\201D"; }
 /* The admin's read-only notice at the top of Review: a warning tint and a lock, so it is the first thing read on the tab. */
 .rv-ro { display: flex; align-items: center; gap: var(--gw-space-16); padding: var(--gw-space-16) var(--gw-space-20); border-radius: var(--gw-radius-12);
   background: var(--gw-color-yellow-alpha-10); box-shadow: inset 0 0 0 1px var(--gw-color-yellow-alpha-20); }
@@ -989,7 +1004,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   var me = fetch('/api/auth/me', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : {}; })
     .then(function (j) { owner = !!(j && j.owner); admin = owner || !!(j && j.admin); }).catch(function () {});
   var dataP = null;
-  function data() { return dataP || (dataP = fetch(LIB + 'data.json', { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw new Error('data ' + r.status); return r.json(); })); }
+  function data() { return dataP || (dataP = fetch(LIB + 'data.json', { credentials: 'same-origin', cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error('data ' + r.status); return r.json(); })); }
 
   function $(id) { return document.getElementById(id); }
   function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
@@ -1665,6 +1680,14 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     } else if (it.by) {
       hist = '<div class="rv-note"><b>' + esc(it.state === 'expired' ? 'Approved, then the source moved' : it.state === 'redone' ? 'Redone since you sent it back' : (STATE_LABEL[it.state] || '')) + '</b> · ' + esc(personName(it.by)) + (it.on ? ', ' + esc(it.on) : '') + (it.note ? '<br>' + esc(it.note) : '') + '</div>';
     }
+    var acts = it.activity || [];
+    var actHtml = acts.length ? '<div class="rv-act"><h3>Activity</h3><ol>' + acts.map(function (a) {
+      var cls = a.what === 'approved' ? 'is-ok' : a.what === 'sent back' ? 'is-warn' : a.what === 'rejected' ? 'is-bad' : 'is-ship';
+      var d = new Date(a.at), when = isNaN(d) ? a.at : d.toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+      var what = a.pr ? 'Fixed and published in <a class="rv-link" href="https://github.com/gushwork-design/design-system/pull/' + a.pr + '" target="_blank" rel="noopener">#' + a.pr + '</a>'
+        : esc(a.what.charAt(0).toUpperCase() + a.what.slice(1)) + (a.by ? ' by ' + esc(personName(a.by)) : '');
+      return '<li class="' + cls + '"><b>' + what + '</b><time datetime="' + esc(a.at) + '">' + esc(when) + '</time>' + (a.note ? '<q>' + esc(a.note) + '</q>' : '') + '</li>';
+    }).join('') + '</ol></div>' : '';
     var foot;
     if (!can) foot = '<div class="rv-foot"><span class="rv-hint">Only an owner can approve, rework or reject.</span></div>';
     else if (RV.mode === 'rework' || RV.mode === 'reject') {
@@ -1679,7 +1702,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       '<div class="rv-body" id="rv-body"><section class="rv-sec"><div class="rv-sh"><h3>What it looks like</h3><button type="button" class="rv-ex" id="rv-ex" aria-expanded="false" title="Open the drawer out to see everything (E)"></button></div><div class="rv-vis" id="rv-vis">' + (it.kind === 'foundation' ? ghost() : visualFor(it, null)) + '</div></section>' +
       '<section class="rv-sec rv-sec--det"><h3>Details</h3><div class="rv-dl">' + detailRow('Kind', esc(it.kind === 'foundation' ? 'Foundation group' : 'Component')) + (it.use ? '<div class="rv-d rv-d--text"><span>Used for</span><p>' + esc(it.use) + '</p></div>' : '') + detailRow('Version', esc(it.version ? 'v' + it.version : '')) +
       detailRow('Spec last moved', esc(it.changed || '')) + detailRow('Doc', gh ? '<a class="ds-a" href="' + esc(gh) + '" target="_blank" rel="noopener">' + esc(it.doc.split('/').pop()) + '</a>' : '') +
-      detailRow('Fingerprint', '<code>' + esc(it.fp) + '</code>') + '</div>' + hist + '</section></div>' + foot;
+      detailRow('Fingerprint', '<code>' + esc(it.fp) + '</code>') + '</div>' + hist + actHtml + '</section></div>' + foot;
     if (it.kind === 'foundation') tokens().then(function (t) { if (RV.open && BYID[RV.list[RV.i]] === it) { $('rv-vis').innerHTML = visualFor(it, t); settleVis(); } }).catch(function () {});
     var pv = el.querySelector('[data-pv]'); if (pv) mountPreview(pv, it);
     $('rv-close').addEventListener('click', closeDrawer);

@@ -29,7 +29,9 @@ Usage:  python3 scripts/_library_site.py     # writes preview/library/**
 import importlib.util
 import json
 import os
+import re
 import shutil
+import subprocess
 import sys
 from datetime import date
 
@@ -1364,6 +1366,44 @@ def load_used_for():
         return {}
 
 
+def review_activity(items, limit=8):
+    """Each item's history for the review drawer's Activity list (R54 addendum, 5 Oct 2026), read from git, so it
+    costs nothing to keep: every decision the page saves is a commit "Review: <action> <scope>/<key> — <note>",
+    and every rework that shipped is a merge of a PR titled "Rework: <scope>/<key>" (the merge IS the publish).
+    Newest first, at most `limit` per item. No git (a tarball checkout) means no history, not an error."""
+    try:
+        out = subprocess.run(["git", "log", "--format=%x1e%aI%x1f%s%x1f%b", "-n", "4000"], cwd=ROOT,
+                             capture_output=True, text=True, timeout=30).stdout
+    except Exception:
+        return
+    ids = {f'{it["scope"]}/{it["key"]}': it for it in items}
+    by_branch = sorted(ids, key=len, reverse=True)
+    acts = {k: [] for k in ids}
+    verb = {"pass": "approved", "rework": "sent back", "reject": "rejected"}
+    for rec in out.split("\x1e"):
+        if not rec.strip():
+            continue
+        at, subj, body = (rec.split("\x1f") + ["", ""])[:3]
+        m = re.match(r"^Review: (pass|rework|reject) ([a-z0-9-]+/[a-z0-9-]+)(?: — (.*?))? \(([^)]*)\)$", subj.strip())
+        if m and m.group(2) in acts:
+            acts[m.group(2)].append({"at": at.strip(), "what": verb[m.group(1)], "note": m.group(3) or "", "by": m.group(4)})
+            continue
+        m = re.match(r"^Merge pull request #(\d+) from [^ /]+/(?:rework|nightly)/\d{4}-\d{2}-\d{2}-(\S+)$", subj.strip())
+        if not m:
+            continue
+        t = re.match(r"^Rework: ([a-z0-9-]+/[a-z0-9-]+)\s*$", body.strip().splitlines()[0] if body.strip() else "")
+        key = t.group(1) if t and t.group(1) in acts else next(
+            (k for k in by_branch if m.group(2) == k.replace("/", "-") or m.group(2).startswith(k.replace("/", "-") + "-")), None)
+        if key:
+            acts[key].append({"at": at.strip(), "what": "fixed and published", "pr": int(m.group(1))})
+    for k, it in ids.items():
+        # Commit subjects are cut at ~90 characters; the registry has the latest note whole.
+        for ev in acts[k]:
+            if ev.get("note") and it.get("note", "").startswith(ev["note"]):
+                ev["note"] = it["note"]
+        it["activity"] = acts[k][:limit]
+
+
 def review_items(reg, groups):
     """Everything reviewable, with its state, who decided and when, and its current fingerprint. The queue above
     lists only what is waiting; the Review tab needs the whole set to show passed, sent-back and expired too."""
@@ -1438,6 +1478,7 @@ def main():
         written += 1
 
     items = review_items(reg, groups)
+    review_activity(items)
 
     # The same facts as plain data, for the Design System page to list natively.
     data = {
