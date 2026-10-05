@@ -504,7 +504,7 @@ it passes — same obligation `ai-agents` and `comparison-table` already carry i
 just stated once here instead of per-fold. Promotion to citable-without-disclosure is
 **`bash scripts/review-pass.sh <surface> <key>`** — already built, nothing to invent.
 
-**Archived components are not part of the system.** A registry entry whose `review` record says `"reviewed": "rejected"` was rejected and archived (R54 addendum). Do not compose from it, cite it, or reuse its spec as a proposal: build as if it did not exist, and if the screen needs that thing, treat it as a missing element and say so.
+**Archived components and templates are not part of the system.** A registry entry whose `review` record says `"reviewed": "rejected"` was rejected and archived (R54 addendum); a template is a registry entry too, so an archived template is out as well. Never use one: do not compose from it, start from it, copy its markup, cite it, or reuse its spec as a proposal, and do not "take inspiration" from it either. Build from the approved library as if it did not exist, and if the screen needs that thing, treat it as a missing element and say so. Before starting from any template or component, check its `review` record in the registry; if it reads `rejected`, it is archived.
 
 ### Then notify — every time
 

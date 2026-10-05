@@ -202,7 +202,7 @@ the set almost covers. Build it, then declare it. Three conditions, all required
 3. **Mark it in the code**: a comment saying it is new, what it was needed for, and that it is pending
    library review.
 
-**Archived components are not part of the system.** A registry entry whose `review` record says `"reviewed": "rejected"` was rejected and archived (R54 addendum). Do not compose from it, cite it, or reuse its spec as a proposal: build as if it did not exist, and if the screen needs that thing, treat it as a missing element and say so.
+**Archived components and templates are not part of the system.** A registry entry whose `review` record says `"reviewed": "rejected"` was rejected and archived (R54 addendum); a template is a registry entry too, so an archived template is out as well. Never use one: do not compose from it, start from it, copy its markup, cite it, or reuse its spec as a proposal, and do not "take inspiration" from it either. Build from the approved library as if it did not exist, and if the screen needs that thing, treat it as a missing element and say so. Before starting from any template or component, check its `review` record in the registry; if it reads `rejected`, it is archived.
 
 **Then notify, every time, without being asked.** If you created or modified any element, tell the user
 before you finish, as **one four-line message block they copy straight into Slack** linking a
