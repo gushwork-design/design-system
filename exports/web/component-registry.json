@@ -327,7 +327,7 @@
       "reviewedOn": "2026-10-05",
       "fingerprint": "b011f54c631f2238",
       "previewFingerprint": "6e6d5deb4786bda7",
-      "note": "gap above tooltip is incosistent"
+      "note": "spacing above tooltip is inconsistant"
     },
     "video": {
       "reviewed": "passed",
