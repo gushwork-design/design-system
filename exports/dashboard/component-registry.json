@@ -928,11 +928,10 @@
       "previewFingerprint": "58fec5677c3dba48"
     },
     "filter-builder": {
-      "reviewed": "rework",
+      "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "5dd526b9eb6f2abb",
-      "note": "spacing looks odd on left, beside \"Add filter\"",
+      "fingerprint": "1d3dfb59d8ba7151",
       "previewFingerprint": "d976f1f6c8eb2e0d"
     },
     "filter-chip": {
