@@ -439,7 +439,9 @@ export async function handleMessage(event, deps) {
       }
     }
     // Utsav's own DM: Bruce proper. A 👀 says it was picked up; the routine answers in the thread.
-    if (isDm && bruceUsers.has(event.user) && forBruce(u)) {
+    // In a thread he is already talking to Bruce in, every follow-up is for Bruce, even one that names a logo or a font:
+    // "the logo should be in original color" is a brief, not a file request. The concierge shortcut is for top-level DMs only.
+    if (isDm && bruceUsers.has(event.user) && (event.thread_ts || forBruce(u))) {
       const replyTs = event.thread_ts || event.ts;
       try { await slack(token, 'reactions.add', { channel: event.channel, timestamp: event.ts, name: 'eyes' }); } catch { /* the answer matters more */ }
       const run = await fire(event);
