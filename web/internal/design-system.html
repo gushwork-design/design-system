@@ -1643,8 +1643,15 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   }
 
   var RF = { q: '', shown: 30 };
+  /* A link straight to one item (R55 addendum): #review/<scope>/<key> opens its drawer once the Review data is in. Bruce's
+     Slack pings use it, so a ping is one tap from the decision. */
+  var PENDING_OPEN = null;
+  function openPending() {
+    if (!PENDING_OPEN || !BYID[PENDING_OPEN] || !$('rv')) return;
+    var id = PENDING_OPEN; PENDING_OPEN = null; openDrawer(id, null);
+  }
   function renderReview(d) {
-    indexItems(d);
+    indexItems(d); setTimeout(openPending, 0);
     // A draft for an item that is gone, or whose source has moved since it was marked, no longer describes what is on screen.
     Object.keys(DRAFTS).forEach(function (id) { var it = BYID[id]; if (!it || (DRAFTS[id].fp && it.fp !== DRAFTS[id].fp) || (DRAFTS[id].pfp && it.pfp !== DRAFTS[id].pfp)) { delete DRAFTS[id]; dropAtt(id); } });
     storeDrafts(); renderSaveBar();
@@ -1939,7 +1946,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     drawerEl(); $('rv').hidden = false; $('rv-scrim').hidden = false; document.documentElement.classList.add('rv-open');
     renderDrawer(); $('rv').focus();
   }
-  function closeDrawer() { RV.open = false; RV.wide = false; if ($('rv')) $('rv').classList.remove('rv--wide'); if ($('rv')) { $('rv').hidden = true; $('rv-scrim').hidden = true; } document.documentElement.classList.remove('rv-open'); }
+  function closeDrawer() { if (/^#review\/.+\/./.test(location.hash)) { try { history.replaceState(null, '', '#review'); } catch (e) {} } RV.open = false; RV.wide = false; if ($('rv')) $('rv').classList.remove('rv--wide'); if ($('rv')) { $('rv').hidden = true; $('rv-scrim').hidden = true; } document.documentElement.classList.remove('rv-open'); }
   function step(n) {
     var i = RV.i + n; if (i < 0 || i >= RV.list.length) return;
     RV.i = i; RV.mode = ''; renderDrawer();
@@ -2222,6 +2229,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
         else if (parts[2]) L.sub[L.cat] = parts[2];
       }
     }
+    if (name === 'review' && parts[1] && parts[2]) { PENDING_OPEN = parts[1] + '/' + parts.slice(2).join('/'); if (reviewData) setTimeout(openPending, 0); }
     TABS.forEach(function (t) { $('ds-' + t).hidden = t !== name; });
     document.querySelectorAll('#ds-tabs .ul-tab').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-tab') === name)); });
     if (push) { try { history.replaceState(null, '', '#' + name); } catch (e) { location.hash = name; } }
