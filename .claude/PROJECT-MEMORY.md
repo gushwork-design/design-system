@@ -38,5 +38,9 @@ Short, stable facts so a fresh session can pick up cold. Update as we go. No sec
 - 2026-10-05: memory lives at `.claude/PROJECT-MEMORY.md`, committed on the dev branch (no PR until asked).
 - 2026-10-05: `mods/design-hub` v0.2 adds `/hub` (memory + threads pane) and `/thread <title>: <task>` (parallel subagent threads, one JSON file each under `.claude/hub/threads/`, see `.claude/hub/README.md`). Load locally with `claude --plugin-dir mods/design-hub`; it draws only in terminal and Desktop, not cloud sessions. Not part of the plugin. Not yet run end to end.
 
+## Open draft PRs from this project (Utsav merges)
+- #191 Add CLAUDE.md. #194 Draw: slides/title-bar.
+- Pending Utsav's call: redo #91 on the new path (web/internal/design-system.html); close #19 (main has a rebuilt lander); fix scripts/_library_site.py on Python 3.11.
+
 ## Merged through this project
 - (none yet)
