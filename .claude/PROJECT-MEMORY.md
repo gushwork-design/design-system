@@ -36,7 +36,7 @@ Short, stable facts so a fresh session can pick up cold. Update as we go. No sec
 
 ## Decisions made in this project
 - 2026-10-05: memory lives at `.claude/PROJECT-MEMORY.md`, committed on the dev branch (no PR until asked).
-- 2026-10-05: added a `/hub` mod at `mods/design-hub/` (not part of the plugin; load locally with `claude --plugin-dir mods/design-hub`). Mods draw only in terminal and Desktop, not cloud sessions.
+- 2026-10-05: `mods/design-hub` v0.2 adds `/hub` (memory + threads pane) and `/thread <title>: <task>` (parallel subagent threads, one JSON file each under `.claude/hub/threads/`, see `.claude/hub/README.md`). Load locally with `claude --plugin-dir mods/design-hub`; it draws only in terminal and Desktop, not cloud sessions. Not part of the plugin. Not yet run end to end.
 
 ## Merged through this project
 - (none yet)

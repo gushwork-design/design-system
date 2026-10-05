@@ -1,1 +1,1 @@
-{ "name": "design-hub", "version": "0.1.0", "description": "A /hub pane for the Gushwork design hub: project memory, routines and where work stands." }
+{ "name": "design-hub", "version": "0.2.0", "description": "A /hub pane and /thread command for the Gushwork design hub: threads that run in parallel and share one memory." }
