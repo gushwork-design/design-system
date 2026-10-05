@@ -1365,6 +1365,13 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "5381e51364417a74"
+    },
+    "analytics-overview-template": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "6b0643eeed002b76",
+      "note": "save this in templates"
     }
   }
 }
