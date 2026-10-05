@@ -952,7 +952,8 @@
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "36c5d4a824840832"
+      "fingerprint": "6cb30e3f94c0922c",
+      "previewFingerprint": "7243f0f41df0af93"
     },
     "funnel": {
       "reviewed": "rework",
