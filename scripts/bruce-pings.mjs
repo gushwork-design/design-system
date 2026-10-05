@@ -173,7 +173,22 @@ export async function run({ dry = false, f = fetch, hours = 24 } = {}) {
   return { sent: latest.length, text };
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+/* A test ping for one real item (workflow_dispatch input `test_item`): the same message, buttons and images as a real
+   one, without an Alfred comment. Its buttons are real, so a press records a real decision on that item. */
+export async function sendTest(item, f = fetch) {
+  const m = /^([a-z0-9-]+)\/([a-z0-9-]+)$/.exec(String(item || ''));
+  if (!m) throw new Error(`test item must look like web/faqs, got ${item}`);
+  const p = { id: 0, scope: m[1], key: m[2], blocked: false, issue: null, comment: '',
+    line: 'This is a test ping. The buttons are real, so pressing one records your decision on this item.' };
+  const dm = await slack('conversations.open', { users: process.env.OWNER_SLACK_ID }, f);
+  const posted = await slack('chat.postMessage', { channel: dm.channel.id, text: compose([p]), blocks: blocksFor([p]), unfurl_links: false, unfurl_media: false }, f);
+  if (process.env.SHOTS === '1') { try { await sendShots(p, dm.channel.id, posted.ts, f); } catch (e) { console.warn('shots:', String(e.message || e).slice(0, 200)); } }
+  return compose([p]);
+}
+
+if (import.meta.url === `file://${process.argv[1]}` && process.argv.includes('--test')) {
+  sendTest(process.argv[process.argv.indexOf('--test') + 1]).then((t) => console.log('sent test:\n' + t)).catch((e) => { console.error(String(e.message || e)); process.exit(1); });
+} else if (import.meta.url === `file://${process.argv[1]}`) {
   const dry = process.argv.includes('--dry-run');
   run({ dry }).then((r) => { console.log(r.text ? `${dry ? 'would send' : 'sent'} ${r.would || r.sent}:\n${r.text}` : 'nothing new from Alfred'); })
     .catch((e) => { console.error(String(e.message || e)); process.exit(1); });

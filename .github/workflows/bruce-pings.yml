@@ -17,6 +17,11 @@ on:
   schedule:
     - cron: '*/30 * * * *'
   workflow_dispatch:
+    inputs:
+      test_item:
+        description: 'Send a test ping for this item (e.g. web/faqs) instead of reading Alfred''s comments'
+        required: false
+        default: ''
 
 permissions:
   issues: write
@@ -69,4 +74,6 @@ jobs:
         if: env.ready == '1'
         env:
           SHOTS: '1'
-        run: node scripts/bruce-pings.mjs
+          TEST_ITEM: ${{ github.event.inputs.test_item }}
+        run: |
+          if [ -n "$TEST_ITEM" ]; then node scripts/bruce-pings.mjs --test "$TEST_ITEM"; else node scripts/bruce-pings.mjs; fi
