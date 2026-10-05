@@ -1480,7 +1480,7 @@ def review_items(reg, groups):
         rev = CL.review_of(fblock, key)
         state = review_state(rev["state"], rec, fps[key], fixed=CL.rework_fixed("foundation", key, rec))
         out.append({"scope": "foundation", "key": key, "label": CL.display_title(g), "kind": "foundation",
-                    "state": state, "by": rev["by"], "on": rev["on"], "note": rev["note"], "fp": fps[key],
+                    "state": state, "by": rev["by"], "on": rev["on"], "at": rev["at"], "note": rev["note"], "fp": fps[key],
                     "view": FOUNDATION_VIEW.get(key, ""), "href": f"foundations/{key}.html"})
     for skey, stitle, glyph, what, *_ in PARTS:
         block = reg.get(skey) or {}
@@ -1498,7 +1498,7 @@ def review_items(reg, groups):
             stem = {"eyebrow-ad-page": "eyebrow", "footer-with-cta": "footer-cta"}.get(n, n)
             fig = f"/assets/{skey}/{stem}-desktop.png" if os.path.isfile(os.path.join(ROOT, "assets", skey, stem + "-desktop.png")) else ""
             out.append({"scope": skey, "key": n, "label": n, "kind": "component", "surface": stitle,
-                        "state": state, "by": rev["by"], "on": rev["on"], "note": rev["note"], "fp": fp, "pfp": pfp,
+                        "state": state, "by": rev["by"], "on": rev["on"], "at": rev["at"], "note": rev["note"], "fp": fp, "pfp": pfp,
                         "version": e.get("version", ""), "changed": e.get("changed", ""), "doc": e.get("doc", ""),
                         "breaking": bool(e.get("breaking")), "href": f"parts/{skey}/{n}.html", "use": used.get(f"{skey}/{n}", ""),
                         "preview": f"/previews/{skey}/{n}.frag" if os.path.isfile(prev) else "", "figma": fig})
