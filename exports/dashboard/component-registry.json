@@ -774,6 +774,12 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "4d2206576b3c87b4"
+    },
+    "bulk-action-bar": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "bf09e81111d51a97"
     }
   }
 }
