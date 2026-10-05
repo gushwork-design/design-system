@@ -936,6 +936,39 @@ def component_fingerprint(surface, key, reg=None):
     return fingerprint(f"{key}|{entry.get('version','')}|{entry.get('changed','')}|{body}")
 
 
+def rework_record_path(surface, key):
+    """Where a rework's fix record lives: web/previews/<surface>/<key>.reworked (R54 addendum, 5 Oct 2026).
+    One file per item, so two rework PRs never conflict over a shared ledger."""
+    return os.path.join(ROOT, "web", "previews", surface, key + ".reworked")
+
+
+def rework_record_for(rec, fixed):
+    """The record a fix writes: which send-back it answers, and when it was fixed. The note is stored as a
+    fingerprint, not as text, so the file says nothing the registry does not."""
+    out = {"fixed": fixed, "decidedOn": rec.get("reviewedOn", ""), "note": fingerprint(rec.get("note", ""))}
+    if rec.get("reviewedAt"):
+        out["decidedAt"] = rec["reviewedAt"]
+    return out
+
+
+def rework_fixed(surface, key, rec, record=None):
+    """True when a fix record answers THIS send-back: same decision date (and time, when the registry has one)
+    and the same note. A fix for an earlier send-back does not count for a later one."""
+    if record is None:
+        p = rework_record_path(surface, key)
+        if not os.path.isfile(p):
+            return False
+        try:
+            with open(p, encoding="utf-8") as fh:
+                record = json.load(fh)
+        except Exception:
+            return False
+    if not isinstance(record, dict) or not record.get("fixed"):
+        return False
+    want = rework_record_for(rec, record["fixed"])
+    return all(record.get(k) == v for k, v in want.items())
+
+
 def preview_fingerprint(surface, key):
     """The drawing the reviewer was looking at: web/previews/<surface>/<key>.frag. Empty when
     there is no drawing.

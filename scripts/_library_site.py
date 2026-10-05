@@ -1316,7 +1316,7 @@ FOUNDATION_VIEW = {"color": "color", "typefaces": "faces", "type": "scale", "typ
                    "ruled": "motion", "slides": "slides"}
 
 
-def review_state(state, rec, fp, pfp=""):
+def review_state(state, rec, fp, pfp="", fixed=False):
     """The state the Review tab shows. A pass whose source has moved since reads `expired`. A rework whose source
     has moved since the note was written reads `redone`: someone has had a go at it, so it goes back to Waiting
     with a tag. The registry still says `rework` until the owner decides again; nothing is written for `redone`.
@@ -1324,13 +1324,17 @@ def review_state(state, rec, fp, pfp=""):
 
     "Source" is two things. The spec (`fingerprint`: registry entry + doc) and, since 5 Oct 2026, the drawing
     (`previewFingerprint`: the .frag the reviewer saw). The drawing is compared only when the decision stored one
-    and a drawing exists now, so a decision made before that date behaves exactly as it did."""
+    and a drawing exists now, so a decision made before that date behaves exactly as it did.
+
+    And a third signal (R54 addendum, 5 Oct 2026): `fixed`, a fix record for this exact send-back
+    (web/previews/<scope>/<key>.reworked). A fix that changed only shared hub CSS moves neither fingerprint, and
+    without the record it would sit in rework for good instead of coming back to Waiting."""
     stored = rec.get("fingerprint")
     stored_p = rec.get("previewFingerprint")
     moved = stored != fp or bool(stored_p and pfp and stored_p != pfp)
     if state == "passed" and moved:
         return "expired"
-    if state == "rework" and ((stored and stored != fp) or (stored_p and pfp and stored_p != pfp)):
+    if state == "rework" and (fixed or (stored and stored != fp) or (stored_p and pfp and stored_p != pfp)):
         return "redone"
     return state
 
@@ -1347,7 +1351,7 @@ def review_items(reg, groups):
             continue
         rec = fblock.get(key) or {}
         rev = CL.review_of(fblock, key)
-        state = review_state(rev["state"], rec, fps[key])
+        state = review_state(rev["state"], rec, fps[key], fixed=CL.rework_fixed("foundation", key, rec))
         out.append({"scope": "foundation", "key": key, "label": CL.display_title(g), "kind": "foundation",
                     "state": state, "by": rev["by"], "on": rev["on"], "note": rev["note"], "fp": fps[key],
                     "view": FOUNDATION_VIEW.get(key, ""), "href": f"foundations/{key}.html"})
@@ -1361,7 +1365,7 @@ def review_items(reg, groups):
             rev = CL.review_of(rblock, n)
             fp = CL.component_fingerprint(skey, n, reg)
             pfp = CL.preview_fingerprint(skey, n)
-            state = review_state(rev["state"], rec, fp, pfp)
+            state = review_state(rev["state"], rec, fp, pfp, fixed=CL.rework_fixed(skey, n, rec))
             prev = os.path.join(ROOT, "web", "previews", skey, n + ".frag")
             # The ad-page folds have a Figma render each; two are filed under a shorter name.
             stem = {"eyebrow-ad-page": "eyebrow", "footer-with-cta": "footer-cta"}.get(n, n)
