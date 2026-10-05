@@ -706,6 +706,12 @@
       "reviewedOn": "2026-10-05",
       "fingerprint": "1d04fe53f5b5c993",
       "note": "truccate the name, or use Priya R. instead - do not break in 2 lines"
+    },
+    "action-button": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "d6af122e1f2e64ed"
     }
   }
 }
