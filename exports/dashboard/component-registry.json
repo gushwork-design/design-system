@@ -1092,6 +1092,12 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "ca16447a9f9f86be"
+    },
+    "popover": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "ed37bc1ef14d5872"
     }
   }
 }
