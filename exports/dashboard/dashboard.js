@@ -3212,12 +3212,15 @@ function syncTables(root) {
    1. It must never break the dashboard. Offline, private host, blocked CORS, malformed JSON: every
       failure path ends in silence.
    2. It fires once per change-set (recorded when SHOWN, not when dismissed). A later change is a
-      different signature and earns one fresh showing.
+      different signature and earns one fresh showing. "Remind later" is the one way to earn another
+      showing of the SAME change-set: it leaves a note that is spent the next time the dashboard opens,
+      so it can postpone the notice by one visit and never hide it for good.
    3. Never window.prompt as a clipboard fallback: it is modal. The text is revealed in place.
    4. The registry URL points at the public deploy, not raw.githubusercontent.com. */
 (function () {
   GD.drift = GD.drift || {};
   var KEY = 'gw-drift-dismissed';
+  var SNOOZE = 'gw-drift-snooze';          /* the signature a person asked to be reminded about; spent on the next open */
 
   function findStamp() {
     try {
@@ -3240,7 +3243,12 @@ function syncTables(root) {
   function build(stamp, must, may, gone) {
     var all = must.concat(may);
     var sig = all.map(function (c) { return c.name + '@' + c.version; }).concat(gone.map(function (g) { return g + '@gone'; })).sort().join(',');
-    try { if ((localStorage.getItem(KEY) || '') === sig) return; } catch (e) {}
+    try {
+      if ((localStorage.getItem(KEY) || '') === sig) {
+        if ((localStorage.getItem(SNOOZE) || '') !== sig) return;   /* seen already, and no reminder was asked for */
+        localStorage.removeItem(SNOOZE);                            /* the reminder is spent: this open is the one they asked for */
+      }
+    } catch (e) {}                                                  /* storage blocked: show it, every open, never hide it */
 
     var host = document.querySelector('[data-gd-drift]');
     if (!host) { host = el('aside', 'gd-drift'); host.setAttribute('role', 'status'); host.setAttribute('data-gd-drift', ''); (document.querySelector('.gd') || document.body).appendChild(host); }
@@ -3270,27 +3278,50 @@ function syncTables(root) {
 
     function promptText() {
       var to = (all[0] && all[0].registryVersion) || 'the current version';
-      var lines = ['Update this dashboard to the Gushwork design system v' + to + '.', 'It was built on v' + stamp.pluginVersion + ' and these components have changed since:', ''];
+      var here = ''; try { if (location.protocol === 'file:') here = ' (' + decodeURIComponent(location.pathname) + ')'; } catch (e) {}
+      var lines = ['Update this dashboard' + here + ' to the Gushwork design system v' + to + '.', 'It was built on v' + stamp.pluginVersion + ' and these components have changed since:', ''];
       all.forEach(function (c) { lines.push('- ' + c.name + (c.breaking ? ' (BREAKING)' : '') + ' → v' + c.version + (c.doc ? '  [exports/dashboard/' + c.doc + ']' : '') + (c.note ? '\n    ' + c.note : (c.added ? '\n    new component' : ''))); });
       gone.forEach(function (g) { lines.push('- ' + g + ' → no longer exists; replace it with its successor in exports/dashboard/README.md'); });
       lines.push('', 'Read exports/dashboard/component-registry.json and the doc each entry points at, apply the changes to this file, then re-check it with scripts/check-drift.sh.');
       return lines.join('\n');
     }
     var acts = el('div', 'gd-drift__acts');
-    var act = el('button', 'gd-btn gd-btn--outline gd-btn--sm', 'How to update'); act.type = 'button';
-    var box = el('textarea', 'gd-drift__fallback'); box.readOnly = true;
-    function done() { act.textContent = 'Copied, paste in Claude'; setTimeout(function () { act.textContent = 'How to update'; }, 4000); }
+    var act = el('button', 'gd-btn gd-btn--primary gd-btn--sm', 'Update now'); act.type = 'button';
+    var later = el('button', 'gd-btn gd-btn--outline gd-btn--sm', 'Remind later'); later.type = 'button';
+    var steps = el('div', 'gd-drift__steps');                       /* revealed once the prompt is on the clipboard */
+    var stepsText = el('p');
+    var cmd = el('textarea', 'gd-drift__fallback gd-drift__cmd'); cmd.readOnly = true; cmd.rows = 1; cmd.value = 'claude'; cmd.setAttribute('aria-label', 'Command to open Claude Code');
+    steps.appendChild(stepsText); steps.appendChild(cmd);
+    var box = el('textarea', 'gd-drift__fallback'); box.readOnly = true; box.setAttribute('aria-label', 'Update instruction to copy');
+    /* Claude.app registers claude://code/new?q=<prompt>: a new Code session with the prompt already in the box
+       (not sent; the person presses Enter). Verified in the app's URL handler, v2.19675.0, cap 14336 chars. With
+       no app installed the click does nothing, which is why the prompt is also copied and the steps shown. */
+    function openClaude(text) {
+      if (text.length > 12000) return;
+      try { var a = document.createElement('a'); a.href = 'claude://code/new?q=' + encodeURIComponent(text); a.rel = 'noopener'; document.body.appendChild(a); a.click(); a.remove(); } catch (e) {}
+    }
+    function reveal(copied) {
+      stepsText.textContent = (copied ? 'Opening Claude Code with the update ready, press Enter to send. If nothing opens, the prompt is copied: ' : 'Opening Claude Code with the update ready. If nothing opens, copy the text below: ')
+        + 'open Claude Code in this dashboard\u2019s folder and paste it.';
+      steps.classList.add('is-on'); cmd.style.display = 'block';
+    }
+    function done() { act.textContent = 'Opening Claude Code'; reveal(true); }
     function fallback(text) {
       var ta = el('textarea'); ta.value = text; ta.readOnly = true; ta.style.cssText = 'position:fixed;left:-9999px'; document.body.appendChild(ta); ta.select();
       var ok = false; try { ok = document.execCommand('copy'); } catch (e) {} ta.remove();
       if (ok) return done();
-      box.value = text; box.style.display = 'block'; box.focus(); box.select(); act.textContent = 'Copy the text below';
+      box.value = text; box.style.display = 'block'; act.textContent = 'Update now'; reveal(false);
     }
     act.addEventListener('click', function () {
       var t = promptText();
+      openClaude(t);
       try { if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(t).then(done, function () { fallback(t); }); else fallback(t); } catch (e) { fallback(t); }
     });
-    acts.appendChild(act); host.appendChild(acts); host.appendChild(box);
+    later.addEventListener('click', function () {
+      try { localStorage.setItem(SNOOZE, sig); } catch (e) {}       /* blocked storage: it hides for this visit and is back on the next, never lost */
+      host.classList.remove('is-on');
+    });
+    acts.appendChild(act); acts.appendChild(later); host.appendChild(acts); host.appendChild(steps); host.appendChild(box);
 
     var foot = el('span', 'gd-drift__foot', 'built ' + (stamp.createdAt || '') + ' on v' + stamp.pluginVersion + ' · ');
     if (stamp.changelog) { var a = el('a', null, 'full changelog →'); a.href = stamp.changelog; a.target = '_blank'; a.rel = 'noopener'; foot.appendChild(a); }

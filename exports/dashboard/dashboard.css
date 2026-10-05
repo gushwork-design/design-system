@@ -2634,3 +2634,9 @@ a.gd-hbar__row:hover, a.gd-hbar__row.is-hover { background: var(--gd-hover-bg); 
 .gd .gd-drift__fallback { display: none; width: 100%; min-height: 96px; font: var(--gw-text-body-12-reg); font-family: var(--gd-font-mono, ui-monospace, Menlo, monospace);
   color: var(--gd-text); background: var(--gd-sunken-bg); border: 1px solid var(--gd-border-strong); border-radius: var(--gw-radius-8); padding: var(--gw-space-8); }
 .gd .gd-drift__fallback:focus { outline: none; border-color: var(--gd-border-focus); }   /* R41: a text field shows its edge */
+/* Update now / Remind later: one row, primary first. Focus rings come from the base :focus-visible rule (R41), so both are keyboard-visible. */
+.gd .gd-drift__acts .gd-btn { flex: 0 0 auto; }
+.gd .gd-drift__steps { display: none; flex-direction: column; gap: var(--gw-space-4); font: var(--gw-text-body-12-reg); }
+.gd .gd-drift__steps.is-on { display: flex; }
+.gd .gd-drift__steps p { margin: 0; }
+.gd .gd-drift__cmd { display: none; min-height: 0; resize: none; }
