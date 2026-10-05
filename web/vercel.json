@@ -213,6 +213,10 @@
     {
       "source": "/api/health",
       "destination": "/api/gw?action=health"
+    },
+    {
+      "source": "/api/certificates",
+      "destination": "/api/gw?action=certificates"
     }
   ],
   "functions": {
