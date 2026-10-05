@@ -2428,3 +2428,6 @@ html:has(script[src*="shell.js"]):not(.gw-shell-ready) body::before { background
 .gw-ghost--l1    { width: 96px; height: 10px; border-radius: 5px; }
 .gw-ghost--l2    { width: 56px; height: 8px;  border-radius: 4px; }
 @media (prefers-reduced-motion: reduce) { .gw-ghost { animation: none; } }
+
+/* Caveat, for the slide margin annotation preview only (foundation/tokens.css does not declare it) */
+@font-face{font-family:'Caveat';src:url('/fonts/Caveat-VariableFont_wght.ttf') format('truetype-variations');font-weight:400 700;font-style:normal;font-display:swap}
