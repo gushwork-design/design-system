@@ -115,7 +115,10 @@
 
     // panel (rounded)
     const px = C.panelInset, py = C.panelInset, pw = C.panelW, ph = C.panelH, r = C.panelR;
-    const rr = `M${r} 0H${pw - r}A${r} ${r} 0 0 1 ${pw} ${r}V${ph - r}A${r} ${r} 0 0 1 ${pw - r} ${ph}H${r}A${r} ${r} 0 0 1 0 ${ph - r}V${r}A${r} ${r} 0 0 1 ${r} 0Z`;
+    // square when the radius is 0 (an arc of radius 0 is not something to hand a path parser)
+    const rr = r > 0
+      ? `M${r} 0H${pw - r}A${r} ${r} 0 0 1 ${pw} ${r}V${ph - r}A${r} ${r} 0 0 1 ${pw - r} ${ph}H${r}A${r} ${r} 0 0 1 0 ${ph - r}V${r}A${r} ${r} 0 0 1 ${r} 0Z`
+      : `M0 0H${pw}V${ph}H0Z`;
     const panelRgb = hexRgb(C.panel);
     page.drawSvgPath(rr, { x: px, y: H - py, color: rgb(panelRgb[0] / 255, panelRgb[1] / 255, panelRgb[2] / 255) });
 

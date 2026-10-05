@@ -153,6 +153,9 @@ The email signature creator and the employee ID card generator were redesigned i
     a short confirm (Edit the signatory? / Yes, unlock), read-only fields and a non-editable
     signature on the sheet until then; it locks again for each file (Utsav, 5 Oct 2026).
 
+46. **The certificate's panel is square.** Figma draws it at radius 20; it is 0 on screen, in the
+    thumbnails and in every download (Utsav, 5 Oct 2026: "please fix them into sharp corners").
+
 ## Left open (the owner's call)
 
 - **A third typeface in the signature preview** (Plus Jakarta Sans). In the artefact, not the chrome.
