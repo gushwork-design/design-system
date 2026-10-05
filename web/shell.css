@@ -200,6 +200,9 @@
   --s-group-label:   var(--gw-color-neutral-400);  /* unchanged; legible on /900 */
   --s-placeholder:   var(--gw-color-neutral-400);
   --s-field-icon:    var(--gw-color-neutral-400);
+  /* The ⌘K chip. The system-dark block above sets it, this explicit Dark block did not, so a person who CHOSE Dark (on a light OS) got the
+     light chip, near white on black. One step up from the field, as in the system-dark block. Found 5 Oct 2026. */
+  --s-kbd-bg:        var(--gw-color-neutral-900);
 }
 
 /* ---------------------------------------------------------------------------
