@@ -1146,6 +1146,12 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "683ab8230ed189b4"
+    },
+    "segmented-control": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "ef6be419dd5cb40e"
     }
   }
 }
