@@ -65,7 +65,7 @@ export const register: Register = on => {
 
   on('command.run', { command: 'thread' }, async ($, e) => {
     const [head, ...rest] = e.args.split(':')
-    const title = head.trim()
+    const title = (head ?? '').trim()
     const task = rest.join(':').trim() || title
     if (!title) return { text: 'Usage: /thread <short title>: <task>' }
 
@@ -127,7 +127,7 @@ export const register: Register = on => {
             <Text>
               {t.status === 'running' ? 'running' : 'done   '} {t.title}
             </Text>
-            {t.result && <Text dimColor>  {t.result.split('\n')[0].slice(0, 100)}</Text>}
+            {t.result && <Text dimColor>  {(t.result.split('\n')[0] ?? '').slice(0, 100)}</Text>}
           </Box>
         ))}
         <Text bold>Memory</Text>
