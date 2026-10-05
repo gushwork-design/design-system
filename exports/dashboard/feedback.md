@@ -47,7 +47,7 @@ Aliases added in `60-feedback.css`: `--gd-fb-{info,success,warning,error}-{bg,li
 </div>
 ```
 
-**Variants.** Neutral is the hub's `.ac-note`. Tinted kinds follow the toast rule (tinted in light, neutral with a coloured icon in dark). Omit the close button for a banner that must stay (a read-only or permissions notice). Under 560px the actions drop under the text.
+**Variants.** Neutral is the hub's `.ac-note`. Tinted kinds follow the toast rule (tinted in light, neutral with a coloured icon in dark). Omit the close button for a banner that must stay (a read-only or permissions notice). The actions sit under the text, in line with it, at every width.
 
 **States.** Rest; close hover; hidden after dismiss. With `data-gd-banner-key` the dismissal persists in localStorage and the banner is hidden on load.
 
