@@ -910,6 +910,13 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "b223de0ff38bc5b8"
+    },
+    "filter-builder": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "5dd526b9eb6f2abb",
+      "note": "spacing looks odd on left, beside \"Add filter\""
     }
   }
 }
