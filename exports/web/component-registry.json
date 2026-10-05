@@ -230,9 +230,9 @@
     "form": {
       "reviewed": "rework",
       "reviewedBy": "utsav.singh@gushwork.ai",
-      "reviewedOn": "2026-10-04",
-      "fingerprint": "0777a79984b4e83a",
-      "note": "flag is missing",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "be439785c55823cc",
+      "note": "country flag and avatars are missing, you can take the avatar from here https://www.figma.com/design/VKcb4fgVyOHKfQonMgN772/Gush-Design-System-v2.0?node-id=1948-8226&t=2sN2OJ41r7XNQyh2-11\n\nand country flags should show all country flags, take deign reference from figma",
       "previewFingerprint": "09c2b44d99753c96"
     },
     "card-review": {
