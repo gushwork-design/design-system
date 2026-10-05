@@ -127,6 +127,14 @@ The email signature creator and the employee ID card generator were redesigned i
     typing or pasting over it is split again into the lead-in, the blue award and period, and the
     close (Utsav, 5 Oct 2026: "selection just selects first part, that's confusing").
 
+38. **"Body copy", not "Citation".** The panel section is named for what people call it, and the
+    "prints together in blue" hint is gone (Utsav, 5 Oct 2026).
+39. **A first-run tour.** The dashboard library's coachmark, shown once per person on the Files home
+    (3 steps) and in the editor (7 steps), after Navattic and Flodesk on Mobbin; Skip or Esc ends
+    it; "Take the tour" replays it. The step's target gets the library's brand-blue outline.
+40. **In the editor, Appearance and Help live in the file menu (⋯).** The canvas corner stays clear
+    while a file is open; the Files home keeps the hub's corner controls (Utsav, 5 Oct 2026).
+
 ## Left open (the owner's call)
 
 - **A third typeface in the signature preview** (Plus Jakarta Sans). In the artefact, not the chrome.

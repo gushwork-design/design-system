@@ -299,6 +299,9 @@ function OpenIcon() {
 function LockIcon() {
   return (<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z" /></svg>);
 }
+function CompassIcon() {
+  return (<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216ZM172.42,72.84l-64,32a8.05,8.05,0,0,0-3.58,3.58l-32,64A8,8,0,0,0,80,184a8.1,8.1,0,0,0,3.58-.84l64-32a8.05,8.05,0,0,0,3.58-3.58l32-64a8,8,0,0,0-10.74-10.74ZM138,138,97.89,158.11,118,118l40.15-20.07Z" /></svg>);
+}
 function CheckIcon() {
   return (
     <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
@@ -393,11 +396,16 @@ function GdMenuButton({ label, icon, items, outline = false, sm = false }) {
         <div ref={mRef} style={mStyle} className="gd-menu" role="menu">
           {items.filter(Boolean).map((it, i) => it === 'sep'
             ? <div key={i} className="gd-menu__sep" />
-            : (
-              <button key={i} type="button" role="menuitem" className={`gd-menu__item${it.danger ? ' gd-menu__item--danger' : ''}`} onClick={() => { setOpen(false); it.onClick(); }}>
-                {it.icon}<span className="gd-menu__text">{it.label}</span>
-              </button>
-            ))}
+            : it.section
+              ? <div key={i} className="gd-menu__label">{it.section}</div>
+              : (
+                <button key={i} type="button" role={it.checked === undefined ? 'menuitem' : 'menuitemradio'}
+                  aria-checked={it.checked === undefined ? undefined : !!it.checked}
+                  className={`gd-menu__item${it.danger ? ' gd-menu__item--danger' : ''}`} onClick={() => { setOpen(false); it.onClick(); }}>
+                  {it.icon}<span className="gd-menu__text">{it.label}</span>
+                  {it.checked !== undefined && <svg className="gd-menu__check" viewBox="0 0 16 16" aria-hidden><path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+                </button>
+              ))}
         </div>
       )}
     </div>
@@ -410,6 +418,92 @@ function GdEmpty({ kind = 'first-use', icon, title, text, children }) {
       <div className="gd-empty__copy"><h3 className="gd-empty__title">{title}</h3><p className="gd-empty__text">{text}</p></div>
       {children && <div className="gd-empty__actions">{children}</div>}
     </div>
+  );
+}
+
+/* Appearance and Help, the hub's own (tool-chrome.js keeps the keys and applies the theme). In the
+   editor they live in the file menu instead of the canvas corner (Utsav, 5 Oct 2026). */
+const themeChoice = () => { try { const v = localStorage.getItem('gw-theme-choice'); return v === 'light' || v === 'dark' ? v : 'system'; } catch { return 'system'; } };
+const setThemeChoice = (v) => { if (window.gwSetTheme) window.gwSetTheme(v); };
+function SunIcon() { return (<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z" /></svg>); }
+function MoonIcon() { return (<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M233.54,142.23a8,8,0,0,0-8-2,88.08,88.08,0,0,1-109.8-109.8,8,8,0,0,0-10-10,104.84,104.84,0,0,0-52.91,37A104,104,0,0,0,136,224a103.09,103.09,0,0,0,62.52-20.88,104.84,104.84,0,0,0,37-52.91A8,8,0,0,0,233.54,142.23ZM188.9,190.34A88,88,0,0,1,65.66,67.11a89,89,0,0,1,31.4-26A106,106,0,0,0,96,56,104.11,104.11,0,0,0,200,160a106,106,0,0,0,14.92-1.06A89,89,0,0,1,188.9,190.34Z" /></svg>); }
+function DesktopIcon() { return (<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M208,40H48A24,24,0,0,0,24,64V176a24,24,0,0,0,24,24h72v16H96a8,8,0,0,0,0,16h64a8,8,0,0,0,0-16H136V200h72a24,24,0,0,0,24-24V64A24,24,0,0,0,208,40ZM48,56H208a8,8,0,0,1,8,8v80H40V64A8,8,0,0,1,48,56ZM208,184H48a8,8,0,0,1-8-8V160H216v16A8,8,0,0,1,208,184Z" /></svg>); }
+function MailIcon() { return (<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M224,48H32a8,8,0,0,0-8,8V192a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A8,8,0,0,0,224,48Zm-96,85.15L52.57,64H203.43ZM98.71,128,40,181.81V74.19Zm11.84,10.85,12,11.05a8,8,0,0,0,10.82,0l12-11.05,58,53.15H52.57ZM157.29,128,216,74.18V181.82Z" /></svg>); }
+function ChatIcon() { return (<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M216,48H40A16,16,0,0,0,24,64V224a15.85,15.85,0,0,0,9.24,14.5A16.13,16.13,0,0,0,40,240a15.89,15.89,0,0,0,10.25-3.78l.09-.07L83,208H216a16,16,0,0,0,16-16V64A16,16,0,0,0,216,48Zm0,144H80a8,8,0,0,0-5.23,1.95L40,224V64H216Z" /></svg>); }
+
+/* ── First-run tour: the dashboard library's coachmark (gd-coach), after Navattic and Flodesk on
+   Mobbin. A few steps point at real controls; shown once per person and place (gd-tour:<id>, as the
+   library stores it), Skip or Esc ends it, and "Take the tour" replays it. ── */
+const TOURS = {
+  'cert-home': [
+    { sel: '.tpl-row .tpl', title: 'Start here', text: 'Create new starts a certificate from the Award template. More templates will sit beside it.' },
+    { sel: '.home-search', title: 'Find any certificate', text: 'Search by name, award or the person who made it.' },
+    { sel: '.home-recent .home-right', title: 'Yours and shared', text: 'Filter to what you own or what others shared with you. Each card\'s ⋮ menu opens, copies, shares or deletes it.' },
+  ],
+  'cert-editor': [
+    { sel: '.cert-scale .cert [data-layer="Headline"]', title: 'Edit on the certificate', text: 'Click any text and type. Shift + Return starts a new line.' },
+    { sel: '.cert-scale .cert-cite', title: 'Paste a whole body copy', text: 'Paste it here and the award and the period turn blue on their own. Triple click selects all of it.' },
+    { sel: '.left-col .form-card', title: 'Or use the fields', text: 'Template, starter text, name and body copy. They stay in step with the certificate.' },
+    { sel: '.page-strip', title: 'One file, many certificates', text: 'Add a page for each person, duplicate one, or drag to reorder.' },
+    { sel: '.right-col .right-actions', title: 'Save and share', text: 'Save keeps the file for your team; Copy link sends it. The ⋯ menu holds Manage access, Delete, Appearance and Help.' },
+    { sel: '.right-col .dl-section', title: 'Download for print', text: 'An A4 PDF for printing, a JPG or a layered PSD, for every page or the ones you pick.' },
+    { sel: '.brand-card .brand-link', title: 'Jump between tools', text: 'Right click the logo for the Design Hub and the other tools.' },
+  ],
+};
+const tourSeen = (id) => { try { return !!localStorage.getItem('gd-tour:' + id); } catch { return true; } };
+const tourDone = (id) => { try { localStorage.setItem('gd-tour:' + id, new Date().toISOString()); } catch { /* shows again next time, nothing worse */ } };
+
+function Tour({ id, onEnd }) {
+  const steps = (TOURS[id] || []).filter((st) => document.querySelector(st.sel));
+  const [i, setI] = useState(0);
+  const [pos, setPos] = useState(null);
+  const card = useRef(null);
+  const step = steps[i];
+  const end = (completed) => { tourDone(id); document.querySelectorAll('[data-tour-on]').forEach((n) => n.removeAttribute('data-tour-on')); onEnd(completed); };
+  useLayoutEffect(() => {
+    if (!step) return undefined;
+    const target = document.querySelector(step.sel);
+    document.querySelectorAll('[data-tour-on]').forEach((n) => n.removeAttribute('data-tour-on'));
+    if (target) target.setAttribute('data-tour-on', '');
+    const place = () => {
+      const t = target && target.getBoundingClientRect(); const c = card.current;
+      if (!t || !c) return;
+      const cw = c.offsetWidth, ch = c.offsetHeight, gap = 14, vw = innerWidth, vh = innerHeight;
+      // the side with room, in the library's order: below, right, left, above
+      const fits = { bottom: vh - t.bottom > ch + gap, right: vw - t.right > cw + gap, left: t.left > cw + gap, top: t.top > ch + gap };
+      const side = ['bottom', 'right', 'left', 'top'].find((k) => fits[k]) || 'bottom';
+      let x, y;
+      if (side === 'bottom' || side === 'top') { x = t.left + t.width / 2 - cw / 2; y = side === 'bottom' ? t.bottom + gap : t.top - ch - gap; }
+      else { y = t.top + t.height / 2 - ch / 2; x = side === 'right' ? t.right + gap : t.left - cw - gap; }
+      const cx = Math.max(12, Math.min(x, vw - cw - 12)), cy = Math.max(12, Math.min(y, vh - ch - 12));
+      setPos({ left: cx, top: cy, side,
+        ax: Math.max(16, Math.min(cw - 16, t.left + t.width / 2 - cx)), ay: Math.max(16, Math.min(ch - 16, t.top + t.height / 2 - cy)) });
+    };
+    place();
+    const nxt = card.current && card.current.querySelector('[data-next]'); if (nxt) nxt.focus();
+    addEventListener('resize', place); addEventListener('scroll', place, true);
+    const onKey = (e) => { if (e.key === 'Escape') end(false); };
+    addEventListener('keydown', onKey);
+    return () => { removeEventListener('resize', place); removeEventListener('scroll', place, true); removeEventListener('keydown', onKey); };
+  }, [i, step && step.sel]);
+  if (!step) return null;
+  const last = i === steps.length - 1;
+  return (
+    <Gd>
+      <div ref={card} className="gd-coach" role="dialog" aria-labelledby="tour-t" aria-describedby="tour-d"
+        data-placement={pos ? pos.side : 'bottom'}
+        style={pos ? { left: pos.left, top: pos.top, zIndex: 250, '--gd-arrow-x': pos.ax + 'px', '--gd-arrow-y': pos.ay + 'px' } : { left: -9999, top: 0 }}>
+        <div className="gd-coach__body">
+          <h3 className="gd-coach__title" id="tour-t">{step.title}</h3>
+          <p className="gd-coach__text" id="tour-d">{step.text}</p>
+        </div>
+        <div className="gd-coach__foot">
+          <span className="gd-coach__count" aria-live="polite">{i + 1} of {steps.length}</span>
+          {!last && <button type="button" className="gd-btn gd-btn--ghost" onClick={() => end(false)}>Skip</button>}
+          <button type="button" data-next className="gd-btn gd-btn--primary" onClick={() => (last ? end(true) : setI(i + 1))}>{last ? 'Done' : 'Next'}</button>
+        </div>
+      </div>
+    </Gd>
   );
 }
 
@@ -587,7 +681,7 @@ function CardMenu({ it, onOpen, onShare, onCopy, onDelete }) {
   );
 }
 
-function FilesHome({ saved, me, logoSvg, onOpen, onNew, onShare, onDelete, onCopy }) {
+function FilesHome({ saved, me, logoSvg, onOpen, onNew, onShare, onDelete, onCopy, onTour }) {
   const [owner, setOwner] = useState('anyone');
   const [q, setQ] = useState('');
   const [limit, setLimit] = useState(30);
@@ -624,7 +718,10 @@ function FilesHome({ saved, me, logoSvg, onOpen, onNew, onShare, onDelete, onCop
 
       <section className="home-band" aria-labelledby="start-h">
         <div className="home-wrap">
-          <h2 id="start-h" className="home-h">Start a new certificate</h2>
+          <div className="home-band__head">
+            <h2 id="start-h" className="home-h">Start a new certificate</h2>
+            <button type="button" className="gd-btn gd-btn--ghost gd-btn--sm" onClick={onTour}>Take the tour</button>
+          </div>
           <div className="tpl-row">
             <button type="button" className="tpl" onClick={() => onNew(TEMPLATES[0].id)}>
               <span className="tpl-thumb tpl-thumb--new"><span className="tpl-plus"><PlusIcon /></span></span>
@@ -765,6 +862,8 @@ function App() {
   const [touched, setTouched] = useState(false);      // a new, unsaved file has been edited
   const [clash, setClash] = useState(null);           // the newer copy someone else saved
   const [leaveTo, setLeaveTo] = useState(null);       // a pending navigation away from unsaved edits
+  const [, setThemeTick] = useState(0);              // re-render the file menu's Appearance checks
+  const [tour, setTour] = useState(null);             // the tour running: cert-home or cert-editor
   const itemsRef = useRef([]);
   const certRef = useRef(null);
   const stageRef = useRef(null);
@@ -796,6 +895,15 @@ function App() {
       return [];
     }
   }, []);
+  // the first visit to each place runs its tour once, after the page has drawn
+  useEffect(() => {
+    if (saved.state !== 'ready' || tour) return undefined;
+    const id = view === 'home' ? 'cert-home' : 'cert-editor';
+    if (tourSeen(id)) return undefined;
+    const t = setTimeout(() => setTour(id), 700);
+    return () => clearTimeout(t);
+  }, [view, saved.state]);
+
   // the Files list, then whatever the link points at; the fragment is the route
   const applyRoute = useCallback((items) => {
     const h = readHash();
@@ -1027,6 +1135,7 @@ function App() {
     <>
       {accessItem && <AccessModal item={accessItem} onClose={() => setAccessItem(null)} onSaved={accessSaved} />}
       {confirmItem && <ConfirmDelete item={confirmItem} onCancel={() => setConfirmItem(null)} onConfirm={() => remove(confirmItem)} />}
+      {tour && <Tour key={tour} id={tour} onEnd={() => setTour(null)} />}
       {leaveTo && (
         <Modal open size="sm" onClose={() => setLeaveTo(null)} title="Leave without saving?"
           desc="Your changes to this certificate are not saved. Leave and they are lost."
@@ -1042,7 +1151,7 @@ function App() {
   if (view === 'home') {
     return (
       <div className="app app--home">
-        <FilesHome saved={saved} me={me} logoSvg={logoSvg} onOpen={openItem} onNew={startNew} onCopy={copyFile}
+        <FilesHome saved={saved} me={me} logoSvg={logoSvg} onOpen={openItem} onNew={startNew} onCopy={copyFile} onTour={() => setTour('cert-home')}
           onShare={(it) => setAccessItem(it)} onDelete={(it) => setConfirmItem(it)} />
         {dialogs}
       </div>
@@ -1104,7 +1213,7 @@ function App() {
               </PropRow>
             </PropSection>
 
-            <PropSection title="Citation">
+            <PropSection title="Body copy">
               <PropRow label="Before" align="start">
                 <PropTextarea value={data.before} onChange={set('before')} rows={3} placeholder="Text before the award, or paste the whole citation" onPaste={pasteCitation} />
               </PropRow>
@@ -1114,7 +1223,6 @@ function App() {
               <PropRow label="After" align="start">
                 <PropTextarea value={data.after} onChange={set('after')} rows={2} placeholder="Text after the award" onPaste={pasteCitation} />
               </PropRow>
-              <p className="prop-tip">The award and the period print together in blue: <strong>{awardLine(data) || 'nothing yet'}</strong></p>
             </PropSection>
 
             <PropSection title="Signed by">
@@ -1136,6 +1244,16 @@ function App() {
             <GdMenuButton label="File actions" icon={<DotsIcon />} outline sm items={[
               { label: 'New certificate', icon: <PlusIcon />, onClick: () => startNew() },
               { label: 'Make a copy', icon: <CopyIcon />, onClick: duplicateFile },
+              { label: 'Take the tour', icon: <CompassIcon />, onClick: () => setTour('cert-editor') },
+              'sep',
+              { section: 'Appearance' },
+              { label: 'System', icon: <DesktopIcon />, checked: themeChoice() === 'system', onClick: () => { setThemeChoice('system'); setThemeTick((n) => n + 1); } },
+              { label: 'Light', icon: <SunIcon />, checked: themeChoice() === 'light', onClick: () => { setThemeChoice('light'); setThemeTick((n) => n + 1); } },
+              { label: 'Dark', icon: <MoonIcon />, checked: themeChoice() === 'dark', onClick: () => { setThemeChoice('dark'); setThemeTick((n) => n + 1); } },
+              'sep',
+              { section: 'Help' },
+              { label: 'Send an email', icon: <MailIcon />, onClick: () => { location.href = 'mailto:design@gushwork.ai'; } },
+              { label: 'Message on Slack', icon: <ChatIcon />, onClick: () => window.open('https://gushwork.slack.com/team/U06UAR183TR', '_blank', 'noopener') },
               canManage && { label: 'Manage access', icon: <UsersIcon />, onClick: () => setAccessItem(current) },
               canManage && 'sep',
               canManage && { label: 'Delete file', icon: <TrashIcon />, danger: true, onClick: () => setConfirmItem(current) },

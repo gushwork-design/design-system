@@ -286,6 +286,9 @@ function Certificate({ data, logoSvg, certRef, onEdit }) {
       style={{
         position: 'relative', width: CERT.W, height: CERT.H, overflow: 'hidden',
         background: CERT.blue, boxSizing: 'border-box',
+        // the sheet sets its own text rules, so a thumbnail inside a <button> (centred text) or any
+        // other host draws it exactly as the editor does
+        textAlign: 'left', whiteSpace: 'normal', fontStyle: 'normal', textTransform: 'none',
       }}
     >
       <div data-layer="Background" style={{ position: 'absolute', inset: 0, background: CERT.blue }} />
