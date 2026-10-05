@@ -743,11 +743,10 @@
       "fingerprint": "21bc284cb81c400b"
     },
     "avatar-group": {
-      "reviewed": "rework",
+      "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "b9c1ed94ddc99a90",
-      "note": "use diff colors when group, and for users too, lets add diff colors",
+      "fingerprint": "7c176640e7731e11",
       "previewFingerprint": "7a6a210cbfd6270d"
     },
     "banner": {
