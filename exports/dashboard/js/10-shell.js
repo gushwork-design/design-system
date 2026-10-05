@@ -396,7 +396,7 @@
     fit(); keys(); openCurrent(); stack();
     $$('.gd-sidebar').forEach(function (r) {
       if (!r.__gdInit) { r.__gdInit = true; if (r.hasAttribute('data-gd-persist') && store('gd-rail') === 'collapsed') r.setAttribute('data-collapsed', 'true'); }
-      var t = $('[data-gd-rail-toggle]', r); if (t) t.setAttribute('aria-expanded', String(r.getAttribute('data-collapsed') !== 'true'));
+      var t = $('[data-gd-rail-toggle]', r); if (t) { var open = r.getAttribute('data-collapsed') !== 'true'; t.setAttribute('aria-expanded', String(open)); t.setAttribute('aria-label', open ? 'Collapse sidebar' : 'Expand sidebar'); }
       titles(r);
     });
     $$('[data-gd-edit]').forEach(autosize);
