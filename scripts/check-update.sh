@@ -193,6 +193,7 @@ except Exception:
     sys.exit(0)
 print(json.dumps({
     "version": mk.get("metadata", {}).get("version"),
+    "notify": (lambda s: (json.loads(s) if s.strip() else None))(at_head(".claude-plugin/notify.json")),
     "components": {k: {"version": v.get("version"), "breaking": bool(v.get("breaking"))}
                    for k, v in reg.get("components", {}).items()},
 }))
@@ -237,6 +238,15 @@ lv, rv = semver(local), semver(remote)
 if not lv or not rv or rv <= lv:
     sys.exit(0)                                    # current, or unparseable — say nothing
 
+# Behind is not enough (R50, 5 Oct 2026). Utsav releases at night, and most bumps are site, hub
+# or log work that changes nothing a teammate builds with; auto-update carries those in silently.
+# The notice fires only when the newest release he FLAGGED — `notify` in version.json, written by
+# release.sh --notify after he said yes — is ahead of this copy. No flag, or a flag this copy
+# already has: say nothing. The autoUpdate flip below still runs, so the quiet path still updates.
+nf = d.get("notify") or {}
+nv = semver(nf.get("version"))
+flagged = bool(nv) and nv > lv
+
 # Which components moved since the copy this session is running, and which of those break a
 # build that used them. Same comparison check-drift.sh makes against a stamped artifact.
 must, also = [], []
@@ -245,7 +255,8 @@ for name, c in (d.get("components") or {}).items():
     if cv and cv > lv:
         (must if c.get("breaking") else also).append(name)
 
-print(json.dumps({"remote": remote, "breaking": sorted(must), "changed": sorted(also)}))
+print(json.dumps({"remote": remote, "flagged": flagged, "summary": (nf.get("summary") or "")[:200],
+                  "breaking": sorted(must), "changed": sorted(also)}))
 PY
 )"
 [ -n "$VERDICT" ] || exit 0
@@ -274,6 +285,10 @@ print("yes")
 PY
 )"
 
+# ── quiet path: behind, but not flagged — the flip above was the whole job ─────────────────
+VERDICT="$VERDICT" python3 -c 'import json,os,sys; sys.exit(0 if json.loads(os.environ["VERDICT"]).get("flagged") else 1)' \
+  2>/dev/null || exit 0
+
 # ── say it ─────────────────────────────────────────────────────────────────────────────────
 # systemMessage reaches the person; additionalContext reaches Claude, so it can answer "am I
 # current?" without re-deriving any of this. Plain stdout would land in both, unstructured.
@@ -286,6 +301,8 @@ breaking, changed = v["breaking"], v["changed"]
 flipped = os.environ.get("FLIPPED") == "yes"
 
 head = f"Gushwork design system v{remote} is out — this session is on v{local}."
+if v.get("summary"):
+    head += f" New: {v['summary']}."
 # How far behind, in minor releases, when the major matches: "11 releases behind" is a different
 # message from "1 behind", and the first is the one that gets acted on.
 try:
@@ -320,6 +337,7 @@ print(json.dumps({"systemMessage": head + " " + tail, "hookSpecificOutput": {
     "hookEventName": "SessionStart",
     "additionalContext": (
         f"Gushwork design system: running v{local}, v{remote} is available. "
+        + (f"What is new for them: {v['summary']}. " if v.get("summary") else "")
         + (f"Breaking since v{local}: {', '.join(breaking)}. " if breaking else "")
         + (f"Also changed: {', '.join(changed)}. " if changed else "")
         + "If the user asks whether they are current, they are not. "

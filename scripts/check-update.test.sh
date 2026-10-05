@@ -35,6 +35,17 @@ run() {                       # run <plugin-root> <payload-url>
 
 bash scripts/version-json.sh > "$TMP/v.json"
 CUR="$(python3 -c "import json;print(json.load(open('$TMP/v.json'))['version'])")"
+# Every speaking case below is FLAGGED at the current version (R50): the live notify.json may
+# well point at an older release, and then "behind" is silent by design, not by accident.
+# unflagged.json is the same payload with the flag removed — the night-release case.
+python3 - "$TMP/v.json" "$CUR" "$TMP/unflagged.json" <<'PY'
+import json, sys
+p, cur, unflagged = sys.argv[1:4]
+d = json.load(open(p))
+json.dump({**d, "notify": None}, open(unflagged, "w"))
+d["notify"] = {"version": cur, "summary": "a new template"}
+json.dump(d, open(p, "w"))
+PY
 OLD="$(python3 -c "
 v=[int(x) for x in '$CUR'.split('.')]; v[1]-=1; print('.'.join(map(str,v)))")"
 
@@ -79,6 +90,14 @@ assert 'reload-plugins' in d['additionalContext'] and 'reload-plugins' in o['sys
 assert 'then restart' not in o['systemMessage'], 'the restart claim is stale since /reload-plugins'
 " 2>/dev/null && ck ok "behind: names both versions in a valid envelope" \
                 || ck no "behind: envelope malformed"
+
+# 1b · behind, but the newest FLAGGED release is one this copy already has → silent. This is the
+#      R50 case: a bump that changes nothing a teammate builds with must not wake anyone.
+out="$(run "$(fake "$OLD")" "file://$TMP/unflagged.json")"; rc=$?
+[ "$rc" = 0 ] && [ -z "$out" ] && ck ok "behind, not flagged: silent, exit 0" \
+                              || ck no "behind, not flagged: spoke (rc=$rc) $out"
+printf '%s' "$(run "$(fake "$OLD")" "file://$TMP/v.json")" | grep -q 'a new template' \
+  && ck ok "flagged: the summary is in the notice" || ck no "flagged: summary missing"
 
 # 2 · the plugin moved but no component did → must not point at a list that is not
 #     there. Its own payload: the live registry normally DOES have components above OLD.

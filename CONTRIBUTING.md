@@ -167,7 +167,13 @@ in the GitHub UI.
 See the propagation table in [`README.md`](README.md). The short version:
 
 1. Change Figma **and** measure it into the repo in the same sitting. Figma alone ships nothing.
-2. **`bash scripts/release.sh 1.2.0 "what changed, in one line" --session "<uuid> <title>"`**
+2. **`bash scripts/release.sh 1.2.0 "what changed, in one line" --quiet --session "<uuid> <title>"`**
+
+   `--quiet` or `--notify "<one line for teammates>"` is required, and the default answer is
+   quiet. A bump no longer wakes anyone: the session-start notice fires only when the newest
+   release flagged with `--notify` is ahead of the copy a teammate runs (R50). **Claude asks Utsav
+   before passing `--notify`** — a new skill, a new template or a breaking component is worth
+   asking about; site, hub, log and script work is quiet without asking, said in one line.
 
    One command, because the steps below were written down, were correct, and still got done
    wrong. v1.40.0 moved `plugin.json` and both announce lines but not `marketplace.json` —
