@@ -49,7 +49,7 @@
       "changed": "2026-10-05",
       "breaking": false,
       "doc": "components.md",
-      "note": "A shared list of saved work in its own panel, bottom right: open, current, delete with one confirm. First used by the award certificate."
+      "note": "A Save and share panel on the right: this item (created, edited, status), save, copy link, the shared list with who saved and edited, delete behind a confirm."
     }
   },
   "review": {
