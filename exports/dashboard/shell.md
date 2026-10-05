@@ -159,6 +159,8 @@ The header is `display: contents` so the tab strip is a child of `.gd-page` and 
   <div class="gd-sr gd-widget-grid__live" aria-live="polite"></div>
 </section>
 ```
+**Spacing.** A widget's padding is `--gd-card-pad` on the top and both sides and under the body; the heading sits that far from the top and 12px above its chart.
+
 **Sizes.** `data-size` `s` (4 columns), `m` (6), `l` (8), `full` (12). On a phone every widget is full width except `s`, which is half.
 
 **Edit mode.** Entering shows the banner, a drag handle, the size group (S, M, L, XL) and a remove badge on each widget, the drop slot, and the add panel. The remove badge is a rounded square in the ink fill, never a circle, never red. Cancel restores the exact order, sizes and removed widgets from when editing began; Done keeps them. Esc cancels. A removed widget reappears in the add panel.
