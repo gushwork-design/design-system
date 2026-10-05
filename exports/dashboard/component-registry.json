@@ -787,6 +787,12 @@
       "reviewedOn": "2026-10-05",
       "fingerprint": "90326f5bfc358f93",
       "note": "the compact density card is brealing, export button can be at top right corner (keeping padding)"
+    },
+    "chart-frame": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "568eb4b0acb4465d"
     }
   }
 }
