@@ -139,8 +139,10 @@ export default async function handler(req, res) {
     }
     const owners = new Set((process.env.SLACK_REVIEWER_IDS || '').split(',').map((x) => x.trim()).filter(Boolean));
     // Who gets Bruce proper in a DM. Utsav only for now; BRUCE_USER_IDS opens it to more people later without a code change.
-    const bruceUsers = new Set(String(process.env.BRUCE_USER_IDS || process.env.OWNER_SLACK_ID || '').split(',').map((x) => x.trim()).filter(Boolean));
-    const out = await handleMessage(event, { token, root: process.cwd(), owners, bruceUsers });
+    // Empty = everyone may DM Bruce (5 Oct 2026). A list narrows it.
+    const bruceUsers = new Set(String(process.env.BRUCE_USER_IDS || '').split(',').map((x) => x.trim()).filter(Boolean));
+    const memory = await import('./_bruce-memory.js');
+    const out = await handleMessage(event, { token, root: process.cwd(), owners, bruceUsers, ownerId: String(process.env.OWNER_SLACK_ID || '').trim(), memory });
     if (out.did === 'error') console.warn('[concierge]', out.error);
     return res.status(200).json({ ok: true, concierge: out.did });
   }

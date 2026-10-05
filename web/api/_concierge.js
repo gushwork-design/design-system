@@ -364,11 +364,12 @@ async function uploadFiles(token, root, channel, threadTs, files) {
 
 /* Start the Bruce routine for one of Utsav's DMs. The routine reads the thread itself (conversations.replies) and answers
    in it; this only hands over where to answer and what was said. Never throws. */
-export async function fireBruce(event, env = process.env, f = fetch) {
+export async function fireBruce(event, env = process.env, f = fetch, extra = {}) {
   const url = env.GW_BRUCE_TRIGGER_URL || '', token = env.GW_BRUCE_TRIGGER_TOKEN || '';
   if (!url || !token) return { fired: false, why: 'not set' };
-  const text = [`Slack DM from <@${event.user}>.`, `user: ${event.user}`, `channel: ${event.channel}`, `thread_ts: ${event.thread_ts || event.ts}`, `message_ts: ${event.ts}`,
-    `in_thread: ${event.thread_ts ? 'yes' : 'no'}`, `message:`, String(event.text || '').slice(0, 4000)].join('\n');
+  const notes = (extra.notes || []).length ? ['memory (your notes on this person, newest first):', ...extra.notes.map((n) => `- ${n}`)] : ['memory: nothing yet'];
+  const text = [`Slack DM from <@${event.user}>.`, `user: ${event.user}`, `role: ${extra.owner ? 'owner' : 'teammate'}`, `channel: ${event.channel}`, `thread_ts: ${event.thread_ts || event.ts}`, `message_ts: ${event.ts}`,
+    `in_thread: ${event.thread_ts ? 'yes' : 'no'}`, ...(extra.memoryToken ? [`memory_token: ${extra.memoryToken}`] : []), ...notes, `message:`, String(event.text || '').slice(0, 4000)].join('\n');
   try {
     const r = await f(url, {
       method: 'POST',
@@ -402,7 +403,7 @@ export async function replyToAlfred(ping, text) {
 
 /* Utsav's DMs go to the routine unless the concierge can answer outright: a file, a template or a tool. */
 export function forBruce(u) {
-  if (u.greeting || u.thanks) return false;
+  if (u.greeting || u.thanks || u.help) return false;   // small talk and "what can you do" never spend a run
   const direct = u.parts.length > 0 && u.parts.every((p) => p.type === 'assets' || p.type === 'templates' || p.type === 'tools');
   return !direct || u.designRequest;
 }
@@ -413,7 +414,9 @@ export function forBruce(u) {
  * so the caller can still answer 200 and Slack does not retry.
  */
 export async function handleMessage(event, deps) {
-  const { token, root, owners = new Set(), bruceUsers = new Set(), fire = fireBruce, findPing = pingOf, toAlfred = replyToAlfred } = deps;
+  const { token, root, owners = new Set(), bruceUsers = new Set(), ownerId = '', fire = fireBruce, findPing = pingOf, toAlfred = replyToAlfred, memory = null } = deps;
+  // Bruce is open to everyone in a DM (Utsav, 5 Oct 2026); BRUCE_USER_IDS, when set, narrows it to a list again.
+  const mayAskBruce = (id) => bruceUsers.size ? bruceUsers.has(id) : true;
   const isDm = event.type === 'message';
   if (!event.user || event.bot_id || (event.subtype && event.subtype !== 'file_share')) return { did: 'ignored' };
   const catalog = buildCatalog(root);
@@ -423,7 +426,7 @@ export async function handleMessage(event, deps) {
   const threadTs = isDm ? event.thread_ts : event.thread_ts || event.ts;
   try {
     // His reply under an Alfred ping is for Alfred.
-    if (isDm && bruceUsers.has(event.user) && event.thread_ts) {
+    if (isDm && mayAskBruce(event.user) && event.thread_ts) {
       let ping = null;
       try { ping = await findPing(token, event.channel, event.thread_ts); } catch { /* not a ping we can read: Bruce takes it */ }
       if (ping) {
@@ -441,10 +444,24 @@ export async function handleMessage(event, deps) {
     // Utsav's own DM: Bruce proper. A 👀 says it was picked up; the routine answers in the thread.
     // In a thread he is already talking to Bruce in, every follow-up is for Bruce, even one that names a logo or a font:
     // "the logo should be in original color" is a brief, not a file request. The concierge shortcut is for top-level DMs only.
-    if (isDm && bruceUsers.has(event.user) && (event.thread_ts || forBruce(u))) {
+    if (isDm && mayAskBruce(event.user) && (event.thread_ts || forBruce(u))) {
       const replyTs = event.thread_ts || event.ts;
+      const isOwner = !!ownerId && event.user === ownerId;
+      // Every run spends Utsav's account, so everyone but him has a daily cap. Past it, the concierge still answers.
+      let quota = { allowed: true, used: 0, cap: 0 }, notes = [], memoryToken = '';
+      if (memory) {
+        try { quota = await memory.takeRun(event.user, { uncapped: isOwner }); } catch { /* no count is better than no answer */ }
+        if (!quota.allowed) {
+          const reply = compose(u, catalog, event.ts);
+          await slack(token, 'chat.postMessage', { channel: event.channel, ...(replyTs !== event.ts ? { thread_ts: replyTs } : {}), unfurl_links: false,
+            text: `You’ve used today’s ${quota.cap} Bruce ${quota.cap === 1 ? 'run' : 'runs'}, so I can only do the quick things until tomorrow.\n\n` + reply.text });
+          return { did: 'capped', used: quota.used };
+        }
+        try { notes = await memory.readNotes(event.user); } catch { /* fine without */ }
+        try { memoryToken = memory.mintToken(event.user); } catch { /* fine without */ }
+      }
       try { await slack(token, 'reactions.add', { channel: event.channel, timestamp: event.ts, name: 'eyes' }); } catch { /* the answer matters more */ }
-      const run = await fire(event);
+      const run = await fire(event, undefined, undefined, { owner: isOwner, notes, memoryToken });
       if (!run.fired) {
         await slack(token, 'chat.postMessage', { channel: event.channel, thread_ts: replyTs, text: `I couldn’t start on that (${run.why}). Check GW_BRUCE_TRIGGER_URL and GW_BRUCE_TRIGGER_TOKEN on the site.` });
         return { did: 'bruce-failed', why: run.why };

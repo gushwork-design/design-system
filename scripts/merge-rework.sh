@@ -105,12 +105,14 @@ if not bruce and rec.get("reviewed") != "rework":
 
 # The hub, and only the hub. Skills read exports/, skills/ and foundation/; none of it is here.
 ALLOW = ["web/previews/*", "web/admin/*", "web/*.css", "web/*.js", "scripts/*"]
+if bruce:
+    ALLOW.append("web/internal/staging/*")   # deliverables Bruce builds for people go live under /internal/staging/<slug>
 # Inside those, the files that decide who sees the site, what ships, and this check itself.
 DENY = ["web/middleware.js", "scripts/merge-rework.sh", "scripts/publish-sheets.sh",
         "scripts/release*.sh", "scripts/stamp-*.sh", "scripts/_review.py",
         "scripts/_component_library.py", "scripts/_library_site.py", "scripts/mark-reworked.sh", "scripts/hooks/*"]
 def top_level_web(p):  # web/*.css and web/*.js mean the hub's own files, not web/api/x.js
-    return not (p.startswith("web/") and p.count("/") > 1 and not p.startswith(("web/previews/", "web/admin/")))
+    return not (p.startswith("web/") and p.count("/") > 1 and not p.startswith(("web/previews/", "web/admin/", "web/internal/staging/")))
 # preview/library is generated, and the publish regenerates it. Committed from parallel reworks it is the
 # same 170 files in every PR, so the second one to merge always conflicts. Name it on its own.
 gen = [x["path"] for x in pr["files"] if x["path"].startswith("preview/library/")]
