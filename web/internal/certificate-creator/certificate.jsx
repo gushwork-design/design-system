@@ -113,6 +113,37 @@ function awardLine(d) {
   return [d.award, d.period].map((s) => (s || '').trim()).filter(Boolean).join(' ');
 }
 
+/* Smart paste (Utsav, 5 Oct 2026): a whole citation pasted in one go is split into the plain
+   lead-in, the blue award, the blue period and the plain close, so nobody has to cut it up by hand.
+   "You raised your game. Recognized as Breakout Performer of Q3 2026 and for setting the standard
+   in growth." -> before "You raised your game. Recognized as", award "Breakout Performer of",
+   period "Q3 2026", after "and for setting the standard in growth."
+   The award is the run after "Recognized as/for (the)" up to the period; without that cue it is the
+   run of capitalised words (and of/for/the/in) just before the period. Returns null when there is
+   no period to anchor on, and the paste then lands as plain text. */
+const PERIOD_RE = /\b((?:Q[1-4]|H[12]|FY\s?)\s?'?\d{2,4}|(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{4}|(?:19|20)\d{2})\b/;
+function splitCitation(raw) {
+  const text = String(raw || '').replace(/\s+/g, ' ').trim();
+  const pm = PERIOD_RE.exec(text);
+  if (!pm) return null;
+  const head = text.slice(0, pm.index).trim();
+  const after = text.slice(pm.index + pm[0].length).trim();
+  const cue = /^(.*\bRecogni[sz]ed\s+(?:as|for|with)(?:\s+(?:the|a|an))?)\s+(.+)$/i.exec(head);
+  let before, award;
+  if (cue) { before = cue[1]; award = cue[2]; }
+  else {
+    const words = head.split(' ');
+    let i = words.length;
+    const join = /^(of|for|the|in|and|&)$/i;
+    while (i > 0 && (/^[A-Z0-9]/.test(words[i - 1]) || join.test(words[i - 1]))) i--;
+    while (i < words.length && join.test(words[i]) && !/^(of|for|in)$/i.test(words[words.length - 1] || '')) i++;
+    if (i >= words.length) return null;
+    before = words.slice(0, i).join(' '); award = words.slice(i).join(' ');
+  }
+  if (!award) return null;
+  return { before, award, period: pm[0].replace(/\s+/g, ' '), after };
+}
+
 /* Click-to-edit (Utsav, 5 Oct 2026). A plain-text contentEditable run, kept in step with the
    panel's fields both ways. React never re-renders its text while it has focus (that would jump
    the caret); Enter is refused and paste is flattened to text, so the run stays one text node,
@@ -230,6 +261,13 @@ function Certificate({ data, logoSvg, certRef, onEdit }) {
         <div style={{ width: CERT.innerW, display: 'flex', flexDirection: 'column', gap: CERT.gapBody }}>
           <p
             data-layer="Citation"
+            onPasteCapture={editable ? (e) => {
+              const parts = splitCitation(e.clipboardData.getData('text/plain'));
+              if (!parts) return;
+              e.preventDefault(); e.stopPropagation();
+              if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+              onEdit('citation', parts);
+            } : undefined}
             style={{
               margin: 0, fontFamily: CERT_FONT.body, fontWeight: 400, fontSize: 14,
               lineHeight: 1.72, letterSpacing: 0, color: CERT.grey,
@@ -292,4 +330,4 @@ function Certificate({ data, logoSvg, certRef, onEdit }) {
   );
 }
 
-Object.assign(window, { TEMPLATES, EditableText, CERT, CERT_FONT, PRESETS, SIGNATORY_DEFAULT, Certificate, awardLine, GRID_D });
+Object.assign(window, { splitCitation, TEMPLATES, EditableText, CERT, CERT_FONT, PRESETS, SIGNATORY_DEFAULT, Certificate, awardLine, GRID_D });

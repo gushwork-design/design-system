@@ -1190,3 +1190,20 @@ html:has(script[src*="employee-id-card/app.jsx"]) #root:empty::after { backgroun
 }
 /* narrow screens: the panel overlays instead of pushing, so the preview ghost takes the full width */
 @media (max-width: 900px) { #root:empty::after { left: 0; } }
+
+/* ---------------------------------------------------------------------------
+   The logo tile's menu (tool-chrome.js). A click on the tile does nothing; a right click opens
+   Design Hub, the tools (current one checked, ones you cannot open locked) and All tools.
+   The hub's menu shape: .t-menu, 32 rows, radius 8 in 12 with 4 of padding.
+   ------------------------------------------------------------------------ */
+.brand-link { cursor: default; }
+.t-menu--logo { position: fixed; z-index: 300; min-width: 248px; top: 0; right: auto; }
+.t-menu__label { padding: var(--gw-space-8) var(--gw-space-8) var(--gw-space-4); font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); color: var(--t-label); }
+.t-menu__sep { height: 1px; margin: var(--gw-space-2) var(--gw-space-4); background: var(--t-rule); }
+.t-menu__end { margin-left: auto; display: inline-flex; color: var(--t-label); }
+.t-menu__end svg { width: 14px; height: 14px; }
+.t-menu__row.is-on { background: var(--gw-color-neutral-100); }
+:root[data-theme="dark"] .t-menu__row.is-on { background: var(--gw-color-neutral-900); }
+.t-menu__row.is-locked { color: var(--t-muted); cursor: not-allowed; }
+.t-menu__row.is-locked:hover { background: none; }
+.t-menu--logo .t-menu__row:focus-visible { outline: none; background: var(--t-hover); }
