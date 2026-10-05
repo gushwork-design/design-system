@@ -1248,11 +1248,12 @@
       "previewFingerprint": "80ce4d3972e932b6"
     },
     "sidebar-collapsed": {
-      "reviewed": "passed",
+      "reviewed": "rework",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "8c4abca511b05450",
-      "previewFingerprint": "3046298aba4f990f"
+      "fingerprint": "be4a7521b7fae397",
+      "previewFingerprint": "3046298aba4f990f",
+      "note": "3 changes:\n\n1. space between hover state tooltip box and the icon frame should be 4px, and it should be white based in light mode and vice versa\n2. also add hover state of dark mode as well.\nthe collapse icon can be smaller (same as others)"
     },
     "sign-in-modal": {
       "reviewed": "passed",
