@@ -526,3 +526,22 @@ html[data-tool-panel="open"] .t-acts { right: calc(var(--t-panel-w) + var(--t-in
 .home-empty__t { margin: 0; font: var(--gw-text-body-16-sem); color: var(--t-heading); }
 .home-wrap { width: 100%; }
 .page-tile__open { color: inherit; }
+/* "Create new": a plain tile, not a faded blank sheet (Utsav, 5 Oct 2026) */
+.tpl-thumb--new { background: var(--t-field-bg); }
+.tpl-thumb--new .tpl-plus svg { width: 48px; height: 48px; padding: 12px; }
+
+/* ── Dashboard-library pieces inside the tool (Utsav, 5 Oct 2026) ──
+   .gd scopes their tokens; as a wrapper it lays out nothing and paints nothing. */
+.gd.gd-scope { display: contents; }
+.gd.home { background: var(--t-canvas); color: var(--t-text); font: inherit; }
+.home-top .gd-input--search.home-search { --gd-input-w: 720px; flex: 1; max-width: 720px; height: 44px; margin: 0 auto; border-radius: var(--gw-radius-full); }
+.home-recent .home-right { gap: var(--gw-space-8); }
+.gd .file-row { cursor: pointer; }
+.gd .file-row .gd-table__cell { align-items: center; }
+.file-tag { margin-left: var(--gw-space-8); }
+.gd .gd-empty { margin: 0 auto; }
+.t-modal .acc-add .gd-input { flex: 1; }
+.t-modal .acc-general { width: 100%; display: grid; grid-template-columns: 1fr 1fr; }
+.gd .gd-seg.role-switch { flex: none; }
+.right-head .gd-pop .gd-menu { min-width: 200px; }
+:root[data-theme="dark"] .tpl-plus svg { background: var(--gw-color-neutral-900); box-shadow: 0 0 0 1px var(--gw-color-neutral-800); }

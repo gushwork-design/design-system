@@ -10,6 +10,7 @@ const DEFAULT_PERIOD = 'Q2 2026';
 
 function fromPreset(p, prev) {
   return {
+    template: (prev && prev.template) || 'award',
     preset: p.id,
     name: p.name,
     nameOwnLine: p.nameOwnLine,
@@ -29,7 +30,7 @@ function slug(s) {
 
 /* Share links carry the certificate's fields in the #fragment, which the browser never sends to a
    server; a saved certificate's link carries only its id, so it always opens the latest save. */
-const DATA_KEYS = ['preset', 'name', 'nameOwnLine', 'headline', 'before', 'award', 'after', 'period', 'signature', 'signedBy'];
+const DATA_KEYS = ['template', 'preset', 'name', 'nameOwnLine', 'headline', 'before', 'award', 'after', 'period', 'signature', 'signedBy'];
 function pick(d) { const o = {}; DATA_KEYS.forEach((k) => { o[k] = d[k]; }); return o; }
 function same(a, b) { return DATA_KEYS.every((k) => (a[k] || '') === (b[k] || '')); }
 function pagesOf(it) {
@@ -51,7 +52,7 @@ function decodeData(str) {
   } catch { return null; }
 }
 /* Routes live in the #fragment: none = the Files home; #file=<id> (or the older #saved=<id>) a
-   saved file; #new a blank one; #c=<data> an unsaved certificate carried in the link. */
+   saved file; #new (or #new=<template>) a new one from a template; #c=<data> an unsaved certificate carried in the link. */
 function readHash() {
   const raw = location.hash.slice(1);
   const h = new URLSearchParams(raw);
@@ -175,7 +176,7 @@ function PropDropdown({ value, options, onChange }) {
     <div ref={rootRef} className={`prop-dropdown${open ? ' open' : ''}`}>
       <button type="button" className="prop-dropdown-trigger" onClick={() => setOpen((v) => !v)}
         aria-haspopup="listbox" aria-expanded={open}>
-        <span className="prop-dropdown-value">{selected ? selected.label : 'Custom'}</span>
+        <span className="prop-dropdown-value">{selected ? selected.label : 'Your own text'}</span>
         <svg className="prop-dropdown-caret" width="12" height="12" viewBox="0 0 12 12" aria-hidden>
           <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
@@ -286,8 +287,8 @@ function DotsIcon() {
 function CopyIcon() {
   return (<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M216,32H88a8,8,0,0,0-8,8V80H40a8,8,0,0,0-8,8V216a8,8,0,0,0,8,8H168a8,8,0,0,0,8-8V176h40a8,8,0,0,0,8-8V40A8,8,0,0,0,216,32ZM160,208H48V96H160Zm48-48H176V88a8,8,0,0,0-8-8H96V48H208Z" /></svg>);
 }
-function SearchIcon() {
-  return (<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z" /></svg>);
+function SearchIcon({ className }) {
+  return (<svg className={className} viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z" /></svg>);
 }
 function DotsVIcon() {
   return (<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M140,128a12,12,0,1,1-12-12A12,12,0,0,1,140,128ZM128,72a12,12,0,1,0-12-12A12,12,0,0,0,128,72Zm0,112a12,12,0,1,0,12,12A12,12,0,0,0,128,184Z" /></svg>);
@@ -306,7 +307,113 @@ function CheckIcon() {
   );
 }
 
-/* ── overlays: the library's modal and confirm dialog, on the tool shell's tokens ── */
+/* ── Dashboard library pieces (exports/dashboard), for what the tools family does not have:
+   the search field, select, icon button + menu, empty state, data table, modal and confirm.
+   Their own gd- classes and look, inside a .gd scope (display: contents, so it adds no box);
+   open and close are React's, not dashboard.js's, so the two never fight over the DOM. ── */
+function useOutside(open, setOpen, ref) {
+  useEffect(() => {
+    if (!open) return undefined;
+    const onDoc = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    const onKey = (e) => { if (e.key === 'Escape') setOpen(false); };
+    document.addEventListener('mousedown', onDoc); document.addEventListener('keydown', onKey);
+    return () => { document.removeEventListener('mousedown', onDoc); document.removeEventListener('keydown', onKey); };
+  }, [open]);
+}
+/* The library's menu placement: position fixed under the trigger, clamped to the viewport, flipped
+   up when the space below is short, so no scroller or card clips it. */
+function useFixedMenu(open, triggerRef, menuRef, align = 'end') {
+  const [style, setStyle] = useState(null);
+  useLayoutEffect(() => {
+    if (!open) { setStyle(null); return undefined; }
+    const place = () => {
+      const t = triggerRef.current, m = menuRef.current;
+      if (!t || !m) return;
+      const r = t.getBoundingClientRect();
+      const mh = m.offsetHeight, mw = Math.max(m.offsetWidth, r.width);
+      const below = window.innerHeight - r.bottom;
+      const top = below < mh + 12 && r.top > mh + 12 ? r.top - mh - 4 : r.bottom + 4;
+      let left = align === 'end' ? r.right - mw : r.left;
+      left = Math.max(8, Math.min(left, window.innerWidth - mw - 8));
+      setStyle({ position: 'fixed', top, left, right: 'auto', bottom: 'auto', minWidth: r.width, zIndex: 200 });
+    };
+    place();
+    window.addEventListener('resize', place); window.addEventListener('scroll', place, true);
+    return () => { window.removeEventListener('resize', place); window.removeEventListener('scroll', place, true); };
+  }, [open]);
+  return style || { position: 'fixed', visibility: 'hidden', top: 0, left: 0 };
+}
+function Gd({ children }) { return <div className="gd gd-scope">{children}</div>; }
+function GdSearch({ value, onChange, placeholder, className = '' }) {
+  return (
+    <label className={`gd-input gd-input--search ${className}`}>
+      <SearchIcon className="gd-input__icon" />
+      <input className="gd-input__el" type="search" value={value} placeholder={placeholder} aria-label={placeholder} onChange={(e) => onChange(e.target.value)} />
+      {value && <button type="button" className="gd-iconbtn gd-iconbtn--sm gd-input__clear" aria-label="Clear search" onClick={() => onChange('')}><CloseIcon /></button>}
+    </label>
+  );
+}
+function GdSelect({ value, options, onChange, label }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  useOutside(open, setOpen, ref);
+  const cur = options.find((o) => o.value === value) || options[0];
+  const tRef = useRef(null), mRef = useRef(null);
+  const mStyle = useFixedMenu(open, tRef, mRef, 'end');
+  return (
+    <div className="gd-select gd-select--auto gd-pop" ref={ref}>
+      <button ref={tRef} type="button" className="gd-input gd-input--auto" aria-haspopup="listbox" aria-expanded={open} aria-label={label} onClick={() => setOpen((v) => !v)}>
+        <span className="gd-select__value">{cur.label}</span>
+        <svg className="gd-input__caret" viewBox="0 0 12 12" aria-hidden><path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
+      </button>
+      {open && (
+        <div ref={mRef} style={mStyle} className="gd-menu" role="listbox">
+          {options.map((o) => (
+            <button key={o.value} type="button" className="gd-menu__item" role="option" aria-selected={o.value === value} onClick={() => { onChange(o.value); setOpen(false); }}>
+              <span className="gd-menu__text">{o.label}</span>
+              <svg className="gd-menu__check" viewBox="0 0 16 16" aria-hidden><path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+/* items: [{label, icon, onClick, danger}] or 'sep' */
+function GdMenuButton({ label, icon, items, outline = false, sm = false }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  useOutside(open, setOpen, ref);
+  const tRef = useRef(null), mRef = useRef(null);
+  const mStyle = useFixedMenu(open, tRef, mRef, 'end');
+  return (
+    <div className="gd-pop" ref={ref} onClick={(e) => e.stopPropagation()}>
+      <button ref={tRef} type="button" className={`gd-iconbtn${outline ? ' gd-iconbtn--outline' : ''}${sm ? ' gd-iconbtn--sm' : ''}`} aria-haspopup="menu" aria-expanded={open} aria-label={label} onClick={() => setOpen((v) => !v)}>{icon}</button>
+      {open && (
+        <div ref={mRef} style={mStyle} className="gd-menu" role="menu">
+          {items.filter(Boolean).map((it, i) => it === 'sep'
+            ? <div key={i} className="gd-menu__sep" />
+            : (
+              <button key={i} type="button" role="menuitem" className={`gd-menu__item${it.danger ? ' gd-menu__item--danger' : ''}`} onClick={() => { setOpen(false); it.onClick(); }}>
+                {it.icon}<span className="gd-menu__text">{it.label}</span>
+              </button>
+            ))}
+        </div>
+      )}
+    </div>
+  );
+}
+function GdEmpty({ kind = 'first-use', icon, title, text, children }) {
+  return (
+    <div className={`gd-empty gd-empty--${kind}`} aria-live="polite">
+      <span className="gd-empty__badge" aria-hidden>{icon}</span>
+      <div className="gd-empty__copy"><h3 className="gd-empty__title">{title}</h3><p className="gd-empty__text">{text}</p></div>
+      {children && <div className="gd-empty__actions">{children}</div>}
+    </div>
+  );
+}
+
+/* ── overlays: the dashboard library's modal and confirm dialog ── */
 function Modal({ open, onClose, title, desc, size = 'md', alert = false, initialFocus, children, foot }) {
   const ref = useRef(null);
   useEffect(() => {
@@ -320,31 +427,33 @@ function Modal({ open, onClose, title, desc, size = 'md', alert = false, initial
     if (!open && d.open) d.close();
   }, [open]);
   return (
-    <dialog ref={ref} className={`t-modal t-modal--${size}`} role={alert ? 'alertdialog' : 'dialog'} aria-labelledby="t-modal-title"
+    <div className="gd gd-scope">
+    <dialog ref={ref} className={`gd-modal t-modal${size === 'sm' ? ' gd-modal--sm' : ''}${alert ? ' gd-confirm' : ''}`} role={alert ? 'alertdialog' : 'dialog'} aria-labelledby="t-modal-title"
       onCancel={(e) => { e.preventDefault(); onClose(); }}
       onMouseDown={(e) => { if (e.target === ref.current) onClose(); }}>
       {open && (
         <>
-          <div className="t-modal__head">
+          <div className="gd-modal__head">
             <div>
-              <h2 className="t-modal__title" id="t-modal-title">{title}</h2>
-              {desc && <p className="t-modal__desc">{desc}</p>}
+              <h2 className="gd-modal__title" id="t-modal-title">{title}</h2>
+              {desc && <p className="gd-modal__desc">{desc}</p>}
             </div>
-            <button type="button" className="t-modal__close" onClick={onClose} aria-label="Close"><CloseIcon /></button>
+            <button type="button" className="gd-iconbtn gd-iconbtn--sm" onClick={onClose} aria-label="Close"><CloseIcon /></button>
           </div>
-          <div className="t-modal__body">{children}</div>
-          <div className="t-modal__foot">{foot}</div>
+          {children && <div className="gd-modal__body">{children}</div>}
+          <div className="gd-modal__foot">{foot}</div>
         </>
       )}
     </dialog>
+    </div>
   );
 }
 
 function RoleSwitch({ value, onChange, labels = { view: 'Can view', edit: 'Can edit' } }) {
   return (
-    <div className="prop-segmented role-switch" role="tablist">
+    <div className="gd-seg role-switch" role="radiogroup">
       {['view', 'edit'].map((r) => (
-        <button key={r} type="button" role="tab" aria-selected={value === r} className={value === r ? 'active' : ''} onClick={() => onChange(r)}>{labels[r]}</button>
+        <button key={r} type="button" role="radio" aria-checked={value === r} tabIndex={value === r ? 0 : -1} className="gd-seg__item" onClick={() => onChange(r)}>{labels[r]}</button>
       ))}
     </div>
   );
@@ -388,16 +497,16 @@ function AccessModal({ item, onClose, onSaved }) {
       desc="Choose who can see and edit this certificate. The tool's own access still applies on top."
       initialFocus=".acc-add input"
       foot={<>
-        <button type="button" className="r-btn" onClick={onClose}>Cancel</button>
-        <button type="button" className="r-btn r-btn--primary" onClick={submit} disabled={busy}>{busy ? 'Saving…' : 'Save access'}</button>
+        <button type="button" className="gd-btn" onClick={onClose}>Cancel</button>
+        <button type="button" className="gd-btn gd-btn--primary" onClick={submit} disabled={busy}>{busy ? 'Saving…' : 'Save access'}</button>
       </>}>
       <div className="acc-block">
         <span className="acc-label">Add people</span>
         <div className="acc-add">
-          <input className="prop-input" type="email" value={email} placeholder="name@gushwork.ai"
-            onChange={(e) => setEmail(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); add(); } }} />
+          <label className="gd-input"><input className="gd-input__el" type="email" value={email} placeholder="name@gushwork.ai" aria-label="Work email"
+            onChange={(e) => setEmail(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); add(); } }} /></label>
           <RoleSwitch value={role} onChange={setRole} labels={{ view: 'View', edit: 'Edit' }} />
-          <button type="button" className="r-btn" onClick={add}>Add</button>
+          <button type="button" className="gd-btn" onClick={add}>Add</button>
         </div>
         {error && <p className="prop-tip saved-error">{error}</p>}
       </div>
@@ -415,7 +524,7 @@ function AccessModal({ item, onClose, onSaved }) {
               <span className="acc-avatar" aria-hidden>{who(p.email).slice(0, 1).toUpperCase()}</span>
               <span className="acc-who"><span className="saved-name">{who(p.email)}</span><span className="saved-meta">{fullName(p.email) ? `${fullName(p.email)} · ${p.email}` : p.email}</span></span>
               <RoleSwitch value={p.role} onChange={(r) => setPerson(p.email, r)} labels={{ view: 'View', edit: 'Edit' }} />
-              <button type="button" className="saved-del acc-remove" onClick={() => drop(p.email)} aria-label={`Remove ${p.email}`} title="Remove"><CloseIcon /></button>
+              <button type="button" className="gd-iconbtn gd-iconbtn--sm" onClick={() => drop(p.email)} aria-label={`Remove ${p.email}`}><CloseIcon /></button>
             </li>
           ))}
         </ul>
@@ -423,10 +532,10 @@ function AccessModal({ item, onClose, onSaved }) {
 
       <div className="acc-block">
         <span className="acc-label">General access</span>
-        <div className="prop-segmented acc-general" role="tablist">
-          <button type="button" role="tab" aria-selected={access.general === 'tool'} className={access.general === 'tool' ? 'active' : ''}
+        <div className="gd-seg acc-general" role="radiogroup">
+          <button type="button" role="radio" aria-checked={access.general === 'tool'} className="gd-seg__item"
             onClick={() => setAccess((a) => ({ ...a, general: 'tool' }))}>Everyone with the tool</button>
-          <button type="button" role="tab" aria-selected={access.general === 'restricted'} className={access.general === 'restricted' ? 'active' : ''}
+          <button type="button" role="radio" aria-checked={access.general === 'restricted'} className="gd-seg__item"
             onClick={() => setAccess((a) => ({ ...a, general: 'restricted' }))}>Only people added</button>
         </div>
         {access.general === 'tool' ? (
@@ -449,12 +558,12 @@ function ConfirmDelete({ item, onCancel, onConfirm }) {
       desc="It is removed for everyone who can see it, and the links to it stop working. This cannot be undone."
       initialFocus=".t-cancel"
       foot={<>
-        <button type="button" className="r-btn t-cancel" onClick={onCancel}>Cancel</button>
-        <button type="button" className="r-btn r-btn--danger" disabled={busy} onClick={async () => { setBusy(true); await onConfirm(); }}>
+        <button type="button" className="gd-btn t-cancel" onClick={onCancel}>Cancel</button>
+        <button type="button" className="gd-btn gd-btn--danger" disabled={busy} onClick={async () => { setBusy(true); await onConfirm(); }}>
           {busy ? 'Deleting…' : 'Delete certificate'}
         </button>
       </>}>
-      <ul className="t-confirm__lost">
+      <ul className="gd-confirm__lost">
         <li>{titleOf(item)}</li>
         <li className="saved-meta">Saved by {who(item.savedBy)}, {when(item.savedAt)}</li>
       </ul>
@@ -463,32 +572,18 @@ function ConfirmDelete({ item, onCancel, onConfirm }) {
 }
 
 /* ── Files home, after Google Docs' home (Utsav, 5 Oct 2026): search on top, a band to start a new
-   certificate from blank or a template, then recent certificates with owner filter, sort and
+   certificate (Create new, or a template), then recent certificates with owner filter, sort and
    grid / list. Templates are the presets today; more template families can join the band. ── */
 function CardMenu({ it, onOpen, onShare, onCopy, onDelete }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef(null);
-  useEffect(() => {
-    if (!open) return undefined;
-    const onDoc = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
-    const onKey = (e) => { if (e.key === 'Escape') setOpen(false); };
-    document.addEventListener('mousedown', onDoc); document.addEventListener('keydown', onKey);
-    return () => { document.removeEventListener('mousedown', onDoc); document.removeEventListener('keydown', onKey); };
-  }, [open]);
   const manage = it.can && it.can.manage;
   return (
-    <span className="r-menu-wrap card-menu" ref={ref} onClick={(e) => e.stopPropagation()}>
-      <button type="button" className="saved-del card-menu__btn" onClick={() => setOpen((v) => !v)} aria-haspopup="menu" aria-expanded={open} aria-label={`More for ${titleOf(it)}`} title="More"><DotsVIcon /></button>
-      {open && (
-        <span className="r-menu" role="menu">
-          <button type="button" role="menuitem" className="r-menu__item" onClick={() => { setOpen(false); onOpen(it); }}><OpenIcon /> Open</button>
-          <button type="button" role="menuitem" className="r-menu__item" onClick={() => { setOpen(false); onCopy(it); }}><CopyIcon /> Make a copy</button>
-          {manage && <button type="button" role="menuitem" className="r-menu__item" onClick={() => { setOpen(false); onShare(it); }}><UsersIcon /> Manage access</button>}
-          {manage && <span className="r-menu__rule" />}
-          {manage && <button type="button" role="menuitem" className="r-menu__item r-menu__item--danger" onClick={() => { setOpen(false); onDelete(it); }}><TrashIcon /> Delete</button>}
-        </span>
-      )}
-    </span>
+    <GdMenuButton label={`More for ${titleOf(it)}`} icon={<DotsVIcon />} sm items={[
+      { label: 'Open', icon: <OpenIcon />, onClick: () => onOpen(it) },
+      { label: 'Make a copy', icon: <CopyIcon />, onClick: () => onCopy(it) },
+      manage && { label: 'Manage access', icon: <UsersIcon />, onClick: () => onShare(it) },
+      manage && 'sep',
+      manage && { label: 'Delete', icon: <TrashIcon />, danger: true, onClick: () => onDelete(it) },
+    ]} />
   );
 }
 
@@ -510,12 +605,11 @@ function FilesHome({ saved, me, logoSvg, onOpen, onNew, onShare, onDelete, onCop
     const t = q.trim().toLowerCase();
     return !t || [titleOf(it), ...(it.pages || [it.data]).map((p) => `${p.name} ${awardLine(p)}`), who(it.savedBy), who(it.updatedBy), it.savedBy].join(' ').toLowerCase().includes(t);
   }).sort(SORTS[sort]);
-  const blank = { ...fromPreset(PRESETS[0]), name: '', headline: '', before: '', award: '', after: '' };
   const shared = (it) => (it.access && ((it.access.people || []).length || it.access.general === 'tool')) && it.savedBy !== me;
   const sub = (it) => `${(it.pages || []).length > 1 ? `${it.pages.length} pages · ` : ''}${ago(it.updatedAt)}`;
 
   return (
-    <div className="home">
+    <div className="gd home">
       <header className="home-top">
         <a className="brand-link" href="/internal/tools" title="Back to Tools" aria-label="Back to Tools">
           <svg className="brand-icon" width="32" height="32" viewBox="0 0 160 160" fill="none" aria-hidden>
@@ -525,26 +619,23 @@ function FilesHome({ saved, me, logoSvg, onOpen, onNew, onShare, onDelete, onCop
           </svg>
         </a>
         <h1>Certificate Creator</h1>
-        <label className="home-search">
-          <SearchIcon />
-          <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search certificates, people, awards" aria-label="Search" />
-        </label>
+        <GdSearch className="home-search" value={q} onChange={setQ} placeholder="Search certificates, people, awards" />
       </header>
 
       <section className="home-band" aria-labelledby="start-h">
         <div className="home-wrap">
           <h2 id="start-h" className="home-h">Start a new certificate</h2>
           <div className="tpl-row">
-            <button type="button" className="tpl" onClick={() => onNew('blank')}>
-              <span className="tpl-thumb tpl-thumb--blank"><span className="tpl-sheet"><Certificate data={blank} logoSvg={logoSvg} /></span><span className="tpl-plus"><PlusIcon /></span></span>
-              <span className="tpl-name">Blank certificate</span>
-              <span className="tpl-sub">Award layout</span>
+            <button type="button" className="tpl" onClick={() => onNew(TEMPLATES[0].id)}>
+              <span className="tpl-thumb tpl-thumb--new"><span className="tpl-plus"><PlusIcon /></span></span>
+              <span className="tpl-name">Create new</span>
+              <span className="tpl-sub">{TEMPLATES[0].label}</span>
             </button>
-            {PRESETS.map((p) => (
-              <button key={p.id} type="button" className="tpl" onClick={() => onNew(p.id)}>
-                <span className="tpl-thumb"><span className="tpl-sheet"><Certificate data={fromPreset(p)} logoSvg={logoSvg} /></span></span>
-                <span className="tpl-name">{p.label}</span>
-                <span className="tpl-sub">Award</span>
+            {TEMPLATES.map((t) => (
+              <button key={t.id} type="button" className="tpl" onClick={() => onNew(t.id)}>
+                <span className="tpl-thumb"><span className="tpl-sheet"><Certificate data={{ ...fromPreset(PRESETS[0]), template: t.id }} logoSvg={logoSvg} /></span></span>
+                <span className="tpl-name">{t.label}</span>
+                <span className="tpl-sub">{t.sub}</span>
               </button>
             ))}
           </div>
@@ -555,51 +646,58 @@ function FilesHome({ saved, me, logoSvg, onOpen, onNew, onShare, onDelete, onCop
         <div className="home-recent__bar">
           <h2 id="recent-h" className="home-h">Recent certificates</h2>
           <div className="home-right">
-            <div className="home-sort home-owner">
-              <PropDropdown value={owner} onChange={setOwner} options={[
-                { value: 'anyone', label: 'Owned by anyone' }, { value: 'me', label: 'Owned by me' }, { value: 'others', label: 'Not owned by me' },
-              ]} />
+            <GdSelect label="Owner" value={owner} onChange={setOwner} options={[
+              { value: 'anyone', label: 'Owned by anyone' }, { value: 'me', label: 'Owned by me' }, { value: 'others', label: 'Not owned by me' },
+            ]} />
+            <GdSelect label="Sort" value={sort} onChange={setSort} options={[
+              { value: 'newest', label: 'Last edited' }, { value: 'oldest', label: 'Oldest first' }, { value: 'az', label: 'Name, A to Z' },
+            ]} />
+            <div className="gd-seg" role="radiogroup" aria-label="Layout">
+              <button type="button" role="radio" aria-checked={layout === 'grid'} className="gd-seg__item gd-seg__item--icon" aria-label="Grid" tabIndex={layout === 'grid' ? 0 : -1} onClick={() => pickLayout('grid')}><GridIcon /></button>
+              <button type="button" role="radio" aria-checked={layout === 'list'} className="gd-seg__item gd-seg__item--icon" aria-label="List" tabIndex={layout === 'list' ? 0 : -1} onClick={() => pickLayout('list')}><ListIcon /></button>
             </div>
-            <div className="home-sort">
-              <PropDropdown value={sort} onChange={setSort} options={[
-                { value: 'newest', label: 'Last edited' }, { value: 'oldest', label: 'Oldest first' }, { value: 'az', label: 'Name, A to Z' },
-              ]} />
-            </div>
-            <button type="button" className="t-modal__close home-layout-btn" onClick={() => pickLayout(layout === 'grid' ? 'list' : 'grid')}
-              aria-label={layout === 'grid' ? 'List view' : 'Grid view'} title={layout === 'grid' ? 'List view' : 'Grid view'}>
-              {layout === 'grid' ? <ListIcon /> : <GridIcon />}
-            </button>
           </div>
         </div>
 
         {saved.state === 'loading' && <p className="prop-tip home-note">Loading certificates…</p>}
         {saved.state === 'error' && <p className="prop-tip saved-error home-note">{saved.error}</p>}
-        {saved.state === 'ready' && items.length === 0 && (
-          <div className="home-empty">
-            <p className="home-empty__t">{saved.items.length ? 'Nothing matches' : 'No certificates yet'}</p>
-            <p className="prop-tip">{saved.items.length ? 'Try another search or owner.' : 'Select a blank certificate or choose a template above to get started.'}</p>
-          </div>
+        {saved.state === 'ready' && items.length === 0 && (saved.items.length
+          ? <GdEmpty kind="no-results" icon={<SearchIcon />} title="Nothing matches" text="Try another search or owner.">
+              <button type="button" className="gd-btn" onClick={() => { setQ(''); setOwner('anyone'); }}>Clear filters</button>
+            </GdEmpty>
+          : <GdEmpty icon={<PlusIcon />} title="No certificates yet" text="Create new or choose a template above to get started.">
+              <button type="button" className="gd-btn gd-btn--primary" onClick={() => onNew(TEMPLATES[0].id)}><PlusIcon /> Create new</button>
+            </GdEmpty>
         )}
 
         {layout === 'list' && items.length > 0 && (
-          <table className="file-table">
-            <thead><tr><th>Name</th><th>Owner</th><th>Last edited</th><th><span className="gw-sr">Actions</span></th></tr></thead>
-            <tbody>
-              {items.slice(0, limit).map((it) => (
-                <tr key={it.id} onClick={() => onOpen(it)}>
-                  <td>
-                    <span className="file-row-name">
-                      <span className="file-mini" aria-hidden><span className="file-mini__sheet"><Certificate data={it.data} logoSvg={logoSvg} /></span></span>
-                      <span className="acc-who"><span className="saved-name file-title">{titleOf(it)}</span><span className="saved-meta">{(it.pages || []).length > 1 ? `${it.pages.length} pages · ` : ''}{awardLine(it.data) || 'No award'}</span></span>
-                    </span>
-                  </td>
-                  <td><span className="saved-meta">{it.savedBy === me ? 'me' : who(it.savedBy)}{it.access && it.access.general === 'restricted' ? ' · Restricted' : ''}</span></td>
-                  <td><span className="saved-meta">{ago(it.updatedAt)} · {who(it.updatedBy)}</span></td>
-                  <td className="file-row-acts"><CardMenu it={it} onOpen={onOpen} onShare={onShare} onCopy={onCopy} onDelete={onDelete} /></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="gd-tview">
+            <div className="gd-table-wrap">
+              <div className="gd-table" role="table" aria-label="Recent certificates" style={{ '--gd-cols': 'minmax(240px,2fr) minmax(120px,1fr) minmax(160px,1fr) 48px' }}>
+                <div className="gd-table__row gd-table__row--head" role="row">
+                  <div className="gd-table__th" role="columnheader">Name</div>
+                  <div className="gd-table__th" role="columnheader">Owner</div>
+                  <div className="gd-table__th" role="columnheader">Last edited</div>
+                  <div className="gd-table__th" role="columnheader"><span className="gd-sr">Actions</span></div>
+                </div>
+                <div className="gd-table__body" role="rowgroup">
+                  {items.slice(0, limit).map((it) => (
+                    <div key={it.id} className="gd-table__row file-row" role="row" onClick={() => onOpen(it)}>
+                      <div className="gd-table__cell" role="cell">
+                        <span className="file-row-name">
+                          <span className="file-mini" aria-hidden><span className="file-mini__sheet"><Certificate data={it.data} logoSvg={logoSvg} /></span></span>
+                          <span className="acc-who"><span className="gd-table__cell--strong file-title">{titleOf(it)}</span><span className="gd-table__cell--muted">{(it.pages || []).length > 1 ? `${it.pages.length} pages · ` : ''}{awardLine(it.data) || 'No award'}</span></span>
+                        </span>
+                      </div>
+                      <div className="gd-table__cell gd-table__cell--muted" role="cell">{it.savedBy === me ? 'me' : who(it.savedBy)}{it.access && it.access.general === 'restricted' && <span className="gd-tag gd-tag--neutral file-tag"><span className="gd-tag__label">Restricted</span></span>}</div>
+                      <div className="gd-table__cell gd-table__cell--muted" role="cell">{ago(it.updatedAt)} · {who(it.updatedBy)}</div>
+                      <div className="gd-table__cell gd-table__cell--actions" role="cell"><CardMenu it={it} onOpen={onOpen} onShare={onShare} onCopy={onCopy} onDelete={onDelete} /></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
         )}
 
         {layout === 'grid' && (
@@ -625,7 +723,7 @@ function FilesHome({ saved, me, logoSvg, onOpen, onNew, onShare, onDelete, onCop
           </ul>
         )}
         {items.length > limit && (
-          <div className="home-more"><button type="button" className="r-btn" onClick={() => setLimit((n) => n + 30)}>Show more</button></div>
+          <div className="home-more"><button type="button" className="gd-btn" onClick={() => setLimit((n) => n + 30)}>Show more</button></div>
         )}
       </section>
     </div>
@@ -641,12 +739,11 @@ function App() {
   activeRef.current = Math.min(active, pages.length - 1);
   const data = pages[activeRef.current];
   const setData = (upd) => setPages((ps) => ps.map((p, i) => (i === activeRef.current ? (typeof upd === 'function' ? upd(p) : upd) : p)));
-  const [fileMenu, setFileMenu] = useState(false);
   const [dl, setDl] = useState({ type: 'pdf', which: 'all', picked: [], dpi: 300 });
   const [dropPage, setDropPage] = useState(null);   // a page waiting on its delete confirm
   const dragFrom = useRef(null);
   const exportRefs = useRef([]);
-  const fileMenuRef = useRef(null);
+
   const [panelOpen, setPanelOpen] = useState(true);
   const [logoSvg, setLogoSvg] = useState('');
   const [scale, setScale] = useState(0.8);
@@ -713,11 +810,9 @@ function App() {
       setCurrent(null); setFileTitle('');
       if (d && d.length) { setPages(d.map((x) => ({ ...fromPreset(PRESETS[0]), ...x }))); setActive(0); }
     } else if (h.isNew) {
-      // #new=<template>: a preset, or blank (the award layout with its text cleared)
-      const tpl = PRESETS.find((x) => x.id === h.template);
-      const first = tpl ? fromPreset(tpl) : h.template === 'blank'
-        ? { ...fromPreset(PRESETS[0]), preset: 'custom', name: '', headline: '', before: '', award: '', after: '' }
-        : fromPreset(PRESETS[0]);
+      // #new=<template>: that design with its first starter text
+      const tpl = TEMPLATES.find((x) => x.id === h.template) || TEMPLATES[0];
+      const first = { ...fromPreset(PRESETS[0]), template: tpl.id };
       setCurrent(null); setFileTitle(''); setPages([first]); setActive(0);
     } else {
       setCurrent(null);
@@ -770,7 +865,7 @@ function App() {
     return () => { document.removeEventListener('mousedown', onDoc); document.removeEventListener('keydown', onKey); };
   }, [menuOpen]);
 
-  const set = (key) => (v) => { setTouched(true); setData((d) => ({ ...d, [key]: v, preset: key === 'period' || key === 'signature' || key === 'signedBy' ? d.preset : 'custom' })); };
+  const set = (key) => (v) => { setTouched(true); setData((d) => ({ ...d, [key]: v, preset: ['period', 'signature', 'signedBy', 'template'].includes(key) ? d.preset : 'custom' })); };
   const onEdit = (key, v) => set(key)(v);
   const pickPreset = (id) => {
     const p = PRESETS.find((x) => x.id === id);
@@ -828,15 +923,7 @@ function App() {
     setPages((ps) => { const next = ps.slice(); const [m] = next.splice(from, 1); next.splice(to, 0, m); return next; });
     setActive(to);
   };
-  useEffect(() => {
-    if (!fileMenu) return undefined;
-    const onDoc = (e) => { if (fileMenuRef.current && !fileMenuRef.current.contains(e.target)) setFileMenu(false); };
-    const onKey = (e) => { if (e.key === 'Escape') setFileMenu(false); };
-    document.addEventListener('mousedown', onDoc); document.addEventListener('keydown', onKey);
-    return () => { document.removeEventListener('mousedown', onDoc); document.removeEventListener('keydown', onKey); };
-  }, [fileMenu]);
   const duplicateFile = () => {
-    setFileMenu(false);
     setCurrent(null); setTouched(true);
     setFileTitle(`Copy of ${titleOf({ title: fileTitle, data: pages[0] })}`);
     history.replaceState(null, '', '#new');
@@ -923,7 +1010,7 @@ function App() {
 
   const presetOptions = [
     ...PRESETS.map((p) => ({ value: p.id, label: p.label })),
-    ...(data.preset === 'custom' ? [{ value: 'custom', label: 'Custom' }] : []),
+    ...(data.preset === 'custom' ? [{ value: 'custom', label: 'Your own text' }] : []),
   ];
 
   const dialogs = (
@@ -935,8 +1022,8 @@ function App() {
           desc="Your changes to this certificate are not saved. Leave and they are lost."
           initialFocus=".t-cancel"
           foot={<>
-            <button type="button" className="r-btn t-cancel" onClick={() => setLeaveTo(null)}>Keep editing</button>
-            <button type="button" className="r-btn r-btn--danger" onClick={() => { const f = leaveTo; setLeaveTo(null); f(); }}>Leave without saving</button>
+            <button type="button" className="gd-btn t-cancel" onClick={() => setLeaveTo(null)}>Keep editing</button>
+            <button type="button" className="gd-btn gd-btn--danger" onClick={() => { const f = leaveTo; setLeaveTo(null); f(); }}>Leave without saving</button>
           </>} />
       )}
     </>
@@ -988,6 +1075,9 @@ function App() {
           <div className="form">
             <PropSection title="Award">
               <PropRow label="Template">
+                <PropDropdown value={data.template || 'award'} options={TEMPLATES.map((t) => ({ value: t.id, label: t.label }))} onChange={set('template')} />
+              </PropRow>
+              <PropRow label="Starter text">
                 <PropDropdown value={data.preset} options={presetOptions} onChange={pickPreset} />
               </PropRow>
               <PropRow label="Period">
@@ -1032,18 +1122,15 @@ function App() {
       <div className="right-col" ref={savedRef} aria-hidden={!panelOpen}>
         <header className="right-head">
           <button type="button" className="saved-new right-back" onClick={toFiles}><ArrowLeftIcon /> All files</button>
-          <div className="r-menu-wrap" ref={fileMenuRef}>
-            <button type="button" className="t-modal__close r-more" onClick={() => setFileMenu((v) => !v)} aria-haspopup="menu" aria-expanded={fileMenu} aria-label="More" title="More"><DotsIcon /></button>
-            {fileMenu && (
-              <div className="r-menu" role="menu">
-                <button type="button" role="menuitem" className="r-menu__item" onClick={() => { setFileMenu(false); startNew(); }}><PlusIcon /> New certificate</button>
-                <button type="button" role="menuitem" className="r-menu__item" onClick={duplicateFile}><CopyIcon /> Make a copy</button>
-                {canManage && <button type="button" role="menuitem" className="r-menu__item" onClick={() => { setFileMenu(false); setAccessItem(current); }}><UsersIcon /> Manage access</button>}
-                {canManage && <div className="r-menu__rule" />}
-                {canManage && <button type="button" role="menuitem" className="r-menu__item r-menu__item--danger" onClick={() => { setFileMenu(false); setConfirmItem(current); }}><TrashIcon /> Delete file</button>}
-              </div>
-            )}
-          </div>
+          <Gd>
+            <GdMenuButton label="File actions" icon={<DotsIcon />} outline sm items={[
+              { label: 'New certificate', icon: <PlusIcon />, onClick: () => startNew() },
+              { label: 'Make a copy', icon: <CopyIcon />, onClick: duplicateFile },
+              canManage && { label: 'Manage access', icon: <UsersIcon />, onClick: () => setAccessItem(current) },
+              canManage && 'sep',
+              canManage && { label: 'Delete file', icon: <TrashIcon />, danger: true, onClick: () => setConfirmItem(current) },
+            ]} />
+          </Gd>
         </header>
 
         <section className="prop-section">
@@ -1138,8 +1225,8 @@ function App() {
           desc={`${pages[dropPage] && pages[dropPage].name ? pages[dropPage].name + "'s certificate" : 'This page'} is removed from the file when you save.`}
           initialFocus=".t-cancel"
           foot={<>
-            <button type="button" className="r-btn t-cancel" onClick={() => setDropPage(null)}>Cancel</button>
-            <button type="button" className="r-btn r-btn--danger" onClick={() => deletePage(dropPage)}>Delete page</button>
+            <button type="button" className="gd-btn t-cancel" onClick={() => setDropPage(null)}>Cancel</button>
+            <button type="button" className="gd-btn gd-btn--danger" onClick={() => deletePage(dropPage)}>Delete page</button>
           </>} />
       )}
 
