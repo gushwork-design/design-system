@@ -720,7 +720,8 @@
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "2833b6e37a36ecc1"
+      "fingerprint": "7495c92a0a3d281d",
+      "previewFingerprint": "07ee6aa0ecc7137e"
     },
     "app-shell": {
       "reviewed": "passed",
