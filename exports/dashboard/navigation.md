@@ -18,7 +18,7 @@ The parts people use to get around: the rows and groups in the rail, the account
 
 **Tokens.** `--gd-nav-label`, `--gd-nav-fg-on` (label of the open page and of a hovered row), `--gd-nav-hover`, `--gd-selected-bg`, `--gd-nav-disabled`, `--gd-text-muted`. Height is `--gd-control-h - 4` (32 comfortable, 24 compact); the label has a 20px line height so descenders are not clipped.
 
-**Accessibility.** The open page carries `aria-current="page"`. In the collapsed rail the visible text is removed and `title` supplies the name. Arrow Up and Down, Home and End move between rows.
+**Accessibility.** The open page carries `aria-current="page"`. In the collapsed rail the visible text is removed and a Tooltip (`data-gd-tooltip`, placed right) supplies the name on hover and focus. Arrow Up and Down, Home and End move between rows.
 
 **Provenance.** extracted: `web/shell.css:581-623`.
 

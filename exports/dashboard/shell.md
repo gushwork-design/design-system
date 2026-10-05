@@ -65,7 +65,7 @@ The top block holds the brand, or a workspace switcher when the person belongs t
 
 **Purpose.** The same sidebar at 64 wide, icons only, for people who want the room. Use it when the content is wide (tables, the explorer layout); keep expanded as the default because labels are how people find things.
 
-**What changes.** Labels, counts, carets, the switcher text and the account text are removed visually but stay in the accessibility tree; each row gets a native `title` (set by JS) so the name shows on hover. Group labels become a hairline. Expandable groups hide their children: clicking a group head in the collapsed rail expands the rail first, then opens the group. The account row shows the avatar only and the sign-out action is dropped. The toggle's glyph flips.
+**What changes.** Labels, counts, carets, the switcher text and the account text are removed visually but stay in the accessibility tree; each row gets a Tooltip (`data-gd-tooltip`, placement right, set by JS) so the name shows on hover and keyboard focus. Group labels become a hairline. Expandable groups hide their children: clicking a group head in the collapsed rail expands the rail first, then opens the group. The account row shows the avatar only and the sign-out action is dropped. The toggle's glyph flips.
 
 **Behaviour.** `data-gd-rail-toggle`. The collapsed rules apply only at 768 wide and above; the phone drawer is always expanded.
 

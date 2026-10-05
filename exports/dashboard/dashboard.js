@@ -91,13 +91,16 @@ window.GD = window.GD || {};
     if (remember && rail.hasAttribute('data-gd-persist')) store('gd-rail', c ? 'collapsed' : 'expanded');
     emit(rail, 'gd:rail-toggle', { collapsed: c });
   }
-  /* icon-only rows lose their text, so the label moves into title (a native tooltip) */
+  /* icon-only rows lose their text, so the label moves into a Tooltip (the Feedback component), shown to the right of the
+     rail on hover and keyboard focus. Not a native title: that waits a second, is unstyled and never reaches a screenshot. */
   function titles(rail) {
     var c = rail.getAttribute('data-collapsed') === 'true';
     $$('.gd-nav-item, .gd-ws__trigger, .gd-account__av, .gd-search', rail).forEach(function (el) {
       var txt = $('.gd-nav-item__text, .gd-ws__name, .gd-account__name, .gd-search__label', el.closest('.gd-account') || el);
       if (!txt) return;
-      if (c) el.setAttribute('title', txt.textContent.trim()); else if (el.getAttribute('title') === txt.textContent.trim()) el.removeAttribute('title');
+      var label = txt.textContent.trim();
+      if (c) { el.setAttribute('data-gd-tooltip', label); el.setAttribute('data-gd-tooltip-placement', 'right'); el.removeAttribute('title'); }
+      else if (el.getAttribute('data-gd-tooltip') === label) { el.removeAttribute('data-gd-tooltip'); el.removeAttribute('data-gd-tooltip-placement'); }
     });
   }
 
