@@ -758,6 +758,27 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .rv-cm__tag--note { background: var(--ul-hdr-bg); color: var(--ul-sub); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }
 .rv-cm__tag--reject { background: var(--gw-color-red-alpha-10, rgba(239,68,68,.1)); color: var(--gw-color-red-500); }
 .rv-cm .rv-refs { margin-top: var(--gw-space-8); }
+/* All activity as a log: one line each, details on expansion. */
+.rv-th .rv-tl--log { gap: 0; }
+.rv-log summary, .rv-log__r { list-style: none; display: flex; align-items: center; gap: var(--gw-space-12); min-height: 32px; font: 400 13px/1.4 var(--gw-font-body); color: var(--ul-sub); }
+.rv-log summary { cursor: pointer; border-radius: var(--gw-radius-8); margin: 0 calc(var(--gw-space-8) * -1); padding: 0 var(--gw-space-8); }
+.rv-log summary::-webkit-details-marker { display: none; }
+.rv-log summary:hover { background: var(--ul-ctl-hover); }
+.rv-log summary:focus-visible { outline: var(--gw-focus-ring); outline-offset: 0; }
+.rv-log b { font-weight: 600; color: var(--ul-cell); }
+.rv-log__t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rv-log time { flex: none; font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
+.rv-log__d { width: 8px; height: 8px; flex: none; border-radius: 50%; background: var(--ul-sub); }
+.rv-log__d--ok { background: var(--gw-color-green-500); }
+.rv-log__d--ship { background: var(--gw-color-primary-500); }
+.rv-log__d--warn { background: var(--gw-color-yellow-500); }
+.rv-log__d--bad { background: var(--gw-color-red-500); }
+.rv-log__d--ai { background: transparent; box-shadow: inset 0 0 0 1.5px var(--gw-color-primary-500); }
+.rv-log__d--move { background: transparent; box-shadow: inset 0 0 0 1.5px var(--ul-sub); }
+.rv-log__c { width: 12px; height: 12px; flex: none; color: var(--ul-sub); transition: transform var(--gw-motion-fast); }
+.rv-log details[open] .rv-log__c { transform: rotate(90deg); }
+.rv-log__x { margin: 4px 0 var(--gw-space-12) 20px; padding: var(--gw-space-12) var(--gw-space-16); border-radius: var(--gw-radius-12); background: var(--ul-hdr-bg); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }
+.rv-log__x .rv-cm__b { margin: 0; }
 .rv-tabs { display: flex; align-items: center; gap: var(--gw-space-20); margin: 0 0 var(--gw-space-16); box-shadow: inset 0 -1px 0 var(--ul-hdr-line); }
 .rv-tab { all: unset; box-sizing: border-box; cursor: pointer; padding: var(--gw-space-8) 0; font: 500 13px/1.4 var(--gw-font-body); color: var(--ul-sub); box-shadow: inset 0 -2px 0 transparent; }
 .rv-tab span { margin-left: 2px; font-weight: 400; color: var(--ul-sub); }
@@ -789,9 +810,9 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .rv-cmp { margin-top: var(--gw-space-20); border-radius: var(--gw-radius-12); background: var(--ul-field-bg); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }
 .rv-cmp:focus-within { box-shadow: inset 0 0 0 1px var(--gw-color-black); }
 :root[data-theme="dark"] .rv-cmp:focus-within { box-shadow: inset 0 0 0 1px var(--gw-color-white); }
-.rv-cmp textarea { all: unset; box-sizing: border-box; display: block; width: 100%; min-height: 56px; padding: var(--gw-space-12) var(--gw-space-16) 0; color: var(--ul-field-fg); font: 400 14px/1.5 var(--gw-font-body); white-space: pre-wrap; }
+.rv-cmp textarea { all: unset; box-sizing: border-box; display: block; width: 100%; min-height: 44px; padding: var(--gw-space-12) var(--gw-space-16) 0; color: var(--ul-field-fg); font: 400 14px/1.5 var(--gw-font-body); white-space: pre-wrap; }
 .rv-cmp textarea::placeholder { color: var(--ul-sub); }
-.rv-cmp__bar { display: flex; justify-content: space-between; align-items: center; gap: var(--gw-space-12); padding: var(--gw-space-8) var(--gw-space-8) var(--gw-space-8) var(--gw-space-16); }
+.rv-cmp__bar { display: flex; justify-content: flex-end; align-items: center; gap: var(--gw-space-12); padding: var(--gw-space-8) var(--gw-space-8) var(--gw-space-8) var(--gw-space-16); }
 .rv-th__empty { font: 400 13px/1.5 var(--gw-font-body); color: var(--ul-sub); }
 .rv-rp { margin-top: var(--gw-space-16); display: grid; gap: var(--gw-space-8); }
 .rv-rp .rv-ta { min-height: 64px; }
@@ -1819,6 +1840,29 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     });
     return cms.concat(ev).sort(function (a, b) { return tms(a.at) - tms(b.at); });
   }
+  function shortWhen(v) {
+    var d = new Date(v), now = new Date(); if (isNaN(d)) return '';
+    if (d.toDateString() === now.toDateString()) { var h = d.getHours(); return (h % 12 || 12) + ':' + String(d.getMinutes()).padStart(2, '0') + (h < 12 ? 'am' : 'pm'); }
+    return d.getDate() + ' ' + MON[d.getMonth()] + (d.getFullYear() !== now.getFullYear() ? ', ' + String(d.getFullYear()).slice(2) : '');
+  }
+  function logRow(c) {
+    var kind, txt, det = '';
+    if (c.ev) {
+      kind = c.what === 'approved' ? 'ok' : c.what === 'fixed and published' ? 'ship' : 'move';
+      txt = c.what === 'approved' ? '<b>' + esc(personName(c.by).split(' ')[0] || 'Utsav') + '</b> approved it'
+        : c.what === 'fixed and published' ? '<b>Alfred</b> fixed it in ' + prLink(c.pr)
+        : (c.what === 'spec moved' ? 'Spec moved' : 'Drawing moved') + (c.pr ? ' in ' + prLink(c.pr) : '');
+    } else {
+      var me = c.who === 'owner' ? 'Utsav' : c.who === 'alfred' ? 'Alfred' : (c.by || 'Someone');
+      kind = c.kind === 'reject' ? 'bad' : c.kind === 'rework' ? 'warn' : c.who === 'alfred' ? 'ai' : 'note';
+      txt = '<b>' + esc(me) + '</b> ' + (c.kind === 'rework' ? 'sent it back' : c.kind === 'reject' ? 'rejected it' : c.who === 'alfred' ? (c.blocked ? 'asked you something' : 'commented') : 'replied');
+      var files = c.refs && c.refs.length ? '<div class="rv-refs">' + attHtml(c.refs.map(function (r) { var href = r.replace(/^web\//, '/'); return { name: r.split('/').pop(), type: /\.(png|jpe?g|webp|gif)$/.test(r) ? 'image/x' : '', url: href, href: href }; }), false) + '</div>' : '';
+      det = (c.body ? '<div class="rv-cm__b">' + linkify(c.body) + '</div>' : '') + files;
+    }
+    var line = '<span class="rv-log__d rv-log__d--' + kind + '" aria-hidden="true"></span><span class="rv-log__t">' + txt + '</span><time datetime="' + esc(c.at) + '" title="' + esc(fmtWhen(c.at)) + '">' + esc(shortWhen(c.at)) + '</time>';
+    return det ? '<li class="rv-log"><details><summary>' + line + '<svg class="rv-log__c" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg></summary><div class="rv-log__x">' + det + '</div></details></li>'
+      : '<li class="rv-log"><div class="rv-log__r">' + line + '</div></li>';
+  }
   function prLink(n) { return '<a class="rv-link" href="https://github.com/gushwork-design/design-system/pull/' + n + '" target="_blank" rel="noopener">#' + n + '</a>'; }
   function paintThread(it) {
     var box = $('rv-th'); if (!box || BYID[RV.list[RV.i]] !== it) return;
@@ -1830,12 +1874,9 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     // conversation alone; All activity is every event with the comments in place. One composer under both.
     var tab = RV.tab === 'all' || !talk ? 'all' : 'comments';
     var rows = tab === 'all' ? timeline(it, cms) : cms.slice(), lastCm = cms[cms.length - 1];
-    // Updates from before the conversation started fold into one row, so the thread opens on the first note.
-    var lead = 0; while (tab === 'all' && talk && lead < rows.length && rows[lead].ev) lead++;
-    if (lead === rows.length) lead = 0;
-    var early = RV.early && RV.early[idOf(it)];
-    var html = (lead > 1 && !early ? '<li class="rv-ev rv-ev--more"><button type="button" class="rv-link" id="rv-early">Show ' + lead + ' earlier updates</button></li>' : '') +
-      rows.slice(lead > 1 && !early ? lead : 0).map(function (c) {
+    // All activity is a log (5 Oct 2026, Utsav: "keep activity minimal, less data, keep details on expansion"): one short line
+    // per entry, newest last, and a note, a file or Alfred's message opens only when its line is expanded.
+    var html = tab === 'all' ? rows.map(logRow).join('') : rows.map(function (c) {
       if (c.ev) {
         var txt = c.what === 'approved' ? '<b>' + esc(personName(c.by).split(' ')[0] || 'Utsav') + '</b> approved it'
           : c.what === 'fixed and published' ? '<b>Alfred</b> fixed and published ' + prLink(c.pr)
@@ -1857,15 +1898,15 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       return '<li class="rv-cm rv-cm--' + esc(c.who) + (waiting ? ' is-waiting' : '') + '"><span class="rv-cm__a" aria-hidden="true">' + esc(who.charAt(0)) + '</span><div class="rv-cm__m"><div class="rv-cm__h"><b>' + esc(who) + '</b>' + tags + '<time datetime="' + esc(c.at) + '">' + esc(fmtWhen(c.at)) + '</time></div>' +
         (c.kind ? '<div class="rv-card">' + inner + '</div>' : inner) + '</div></li>';
     }).join('');
-    var reply = owner ? '<div class="rv-cmp"><textarea id="rv-reply" rows="2" maxlength="2000" aria-label="Reply to Alfred" placeholder="Reply to Alfred: answer his question, or say what to do next"></textarea>' +
-      '<div class="rv-cmp__bar"><span class="rv-hint--sm">He starts again with your reply and the whole thread</span><button type="button" class="rv-b rv-b--pass rv-b--sm" id="rv-reply-send" disabled>Send<kbd aria-hidden="true">⌘↵</kbd></button></div></div>' : '';
+    var reply = owner ? '<div class="rv-cmp"><textarea id="rv-reply" rows="2" maxlength="2000" aria-label="Reply to Alfred" placeholder="Reply to Alfred…"></textarea>' +
+      '<div class="rv-cmp__bar"><button type="button" class="rv-b rv-b--pass rv-b--sm" id="rv-reply-send" disabled>Send<kbd aria-hidden="true">⌘↵</kbd></button></div></div>' : '';
     var nAll = (it.activity || []).filter(function (a) { return a.what !== 'sent back' && a.what !== 'rejected'; }).length + cms.length;
     var tabs = '<div class="rv-tabs" role="tablist">' +
       '<button type="button" role="tab" class="rv-tab' + (tab === 'comments' ? ' is-on' : '') + '" aria-selected="' + (tab === 'comments') + '" data-tab="comments">Comments' + (cms.length ? ' <span>' + cms.length + '</span>' : '') + '</button>' +
       '<button type="button" role="tab" class="rv-tab' + (tab === 'all' ? ' is-on' : '') + '" aria-selected="' + (tab === 'all') + '" data-tab="all">All activity' + (nAll ? ' <span>' + nAll + '</span>' : '') + '</button>' +
       '</div>';   // no "On GitHub" link: the drawer holds the whole thread (Utsav, 5 Oct 2026)
     box.innerHTML = tabs +
-      (html ? '<ol class="rv-tl">' + html + '</ol>' : '<p class="rv-th__empty">' + (tab === 'comments' ? 'No comments yet. Your send-back note starts the thread, and Alfred replies after every rework.' : 'Nothing has happened to this item yet.') + '</p>') +
+      (html ? '<ol class="rv-tl' + (tab === 'all' ? ' rv-tl--log' : '') + '">' + html + '</ol>' : '<p class="rv-th__empty">' + (tab === 'comments' ? 'No comments yet. Your send-back note starts the thread, and Alfred replies after every rework.' : 'Nothing has happened to this item yet.') + '</p>') +
       (t.error && tab === 'comments' ? '<p class="rv-th__empty">' + esc(t.error) + '</p>' : '') + (talk ? reply : '');
     box.querySelectorAll('[data-tab]').forEach(function (b) { b.addEventListener('click', function () { RV.tab = b.getAttribute('data-tab'); paintThread(it); }); });
     var more = $('rv-early'); if (more) more.addEventListener('click', function () { RV.early = RV.early || {}; RV.early[idOf(it)] = true; paintThread(it); });
