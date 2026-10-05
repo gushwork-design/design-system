@@ -281,8 +281,8 @@ function GridIcon() {
 function ListIcon() {
   return (<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z" /></svg>);
 }
-function DotsIcon() {
-  return (<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M140,128a12,12,0,1,1-12-12A12,12,0,0,1,140,128Zm56-12a12,12,0,1,0,12,12A12,12,0,0,0,196,116ZM60,116a12,12,0,1,0,12,12A12,12,0,0,0,60,116Z" /></svg>);
+function DotsIcon() {   /* the bold weight: the regular dots read too faint at 16 */
+  return (<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><circle cx="56" cy="128" r="20" /><circle cx="128" cy="128" r="20" /><circle cx="200" cy="128" r="20" /></svg>);
 }
 function CopyIcon() {
   return (<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M216,32H88a8,8,0,0,0-8,8V80H40a8,8,0,0,0-8,8V216a8,8,0,0,0,8,8H168a8,8,0,0,0,8-8V176h40a8,8,0,0,0,8-8V40A8,8,0,0,0,216,32ZM160,208H48V96H160Zm48-48H176V88a8,8,0,0,0-8-8H96V48H208Z" /></svg>);
@@ -291,7 +291,7 @@ function SearchIcon({ className }) {
   return (<svg className={className} viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z" /></svg>);
 }
 function DotsVIcon() {
-  return (<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M140,128a12,12,0,1,1-12-12A12,12,0,0,1,140,128ZM128,72a12,12,0,1,0-12-12A12,12,0,0,0,128,72Zm0,112a12,12,0,1,0,12,12A12,12,0,0,0,128,184Z" /></svg>);
+  return (<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><circle cx="128" cy="56" r="20" /><circle cx="128" cy="128" r="20" /><circle cx="128" cy="200" r="20" /></svg>);
 }
 function OpenIcon() {
   return (<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M224,104a8,8,0,0,1-16,0V59.32l-66.33,66.34a8,8,0,0,1-11.32-11.32L196.68,48H152a8,8,0,0,1,0-16h64a8,8,0,0,1,8,8Zm-40,24a8,8,0,0,0-8,8v72H48V80h72a8,8,0,0,0,0-16H48A16,16,0,0,0,32,80V208a16,16,0,0,0,16,16H176a16,16,0,0,0,16-16V136A8,8,0,0,0,184,128Z" /></svg>);
@@ -329,22 +329,29 @@ function useFixedMenu(open, triggerRef, menuRef, align = 'end') {
   const [style, setStyle] = useState(null);
   useLayoutEffect(() => {
     if (!open) { setStyle(null); return undefined; }
+    // Measured once, at its natural size, before it is shown: the menu used to be placed from a
+    // width taken before its min-width applied, then placed again, which read as a flicker.
     const place = () => {
       const t = triggerRef.current, m = menuRef.current;
       if (!t || !m) return;
       const r = t.getBoundingClientRect();
-      const mh = m.offsetHeight, mw = Math.max(m.offsetWidth, r.width);
-      const below = window.innerHeight - r.bottom;
-      const top = below < mh + 12 && r.top > mh + 12 ? r.top - mh - 4 : r.bottom + 4;
+      const mw = Math.max(m.scrollWidth, m.offsetWidth, r.width);
+      const natural = m.scrollHeight;
+      const below = window.innerHeight - r.bottom - 12, above = r.top - 12;
+      const up = natural > below && above > below;
+      const room = up ? above : below;
+      const h = Math.min(natural, room);
+      const top = up ? r.top - 4 - h : r.bottom + 4;
       let left = align === 'end' ? r.right - mw : r.left;
       left = Math.max(8, Math.min(left, window.innerWidth - mw - 8));
-      setStyle({ position: 'fixed', top, left, right: 'auto', bottom: 'auto', minWidth: r.width, zIndex: 200 });
+      setStyle({ position: 'fixed', top, left, right: 'auto', bottom: 'auto', width: mw, maxHeight: room, zIndex: 200 });
     };
     place();
-    window.addEventListener('resize', place); window.addEventListener('scroll', place, true);
-    return () => { window.removeEventListener('resize', place); window.removeEventListener('scroll', place, true); };
+    window.addEventListener('resize', place);
+    return () => { window.removeEventListener('resize', place); };
   }, [open]);
-  return style || { position: 'fixed', visibility: 'hidden', top: 0, left: 0 };
+  // before the first measure: laid out (so it can be measured) but not seen
+  return style || { position: 'fixed', visibility: 'hidden', top: 0, left: 0, maxHeight: 'none' };
 }
 function Gd({ children }) { return <div className="gd gd-scope">{children}</div>; }
 function GdSearch({ value, onChange, placeholder, className = '' }) {
@@ -1250,6 +1257,7 @@ function App() {
             <GdMenuButton label="File actions" icon={<DotsIcon />} outline sm items={[
               { label: 'New certificate', icon: <PlusIcon />, onClick: () => startNew() },
               { label: 'Make a copy', icon: <CopyIcon />, onClick: duplicateFile },
+              canManage && { label: 'Manage access', icon: <UsersIcon />, onClick: () => setAccessItem(current) },
               { label: 'Take the tour', icon: <CompassIcon />, onClick: () => setTour('cert-editor') },
               'sep',
               { section: 'Appearance' },
@@ -1260,7 +1268,6 @@ function App() {
               { section: 'Help' },
               { label: 'Send an email', icon: <MailIcon />, onClick: () => { location.href = 'mailto:design@gushwork.ai'; } },
               { label: 'Message on Slack', icon: <ChatIcon />, onClick: () => window.open('https://gushwork.slack.com/team/U06UAR183TR', '_blank', 'noopener') },
-              canManage && { label: 'Manage access', icon: <UsersIcon />, onClick: () => setAccessItem(current) },
               canManage && 'sep',
               canManage && { label: 'Delete file', icon: <TrashIcon />, danger: true, onClick: () => setConfirmItem(current) },
             ]} />

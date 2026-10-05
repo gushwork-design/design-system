@@ -1212,9 +1212,16 @@ html:has(script[src*="employee-id-card/app.jsx"]) #root:empty::after { backgroun
    The profile (tool-chrome.js): the hub's mark (shell.js avatarSVG), 24 in the corner cluster,
    40 in its menu, the hub's tile ring in dark. The menu: name, role, address, Sign out.
    ------------------------------------------------------------------------ */
-.t-iconbtn--prof { width: 24px; height: 24px; padding: 0; border-radius: var(--gw-radius-4); }
+.t-iconbtn--prof {
+  width: auto; height: 28px; padding: 0 var(--gw-space-8) 0 var(--gw-space-2);
+  display: inline-flex; align-items: center; gap: var(--gw-space-8);
+  border: 1px solid var(--t-btn-border); border-radius: var(--gw-radius-8);
+  color: var(--t-heading); font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking);
+}
+.t-iconbtn--prof .t-prof__mini { width: 22px; height: 22px; }
+.t-prof__label { white-space: nowrap; max-width: 120px; overflow: hidden; text-overflow: ellipsis; }
 .t-iconbtn--prof[hidden] { display: none; }
-.t-prof__mini { display: block; width: 24px; height: 24px; position: relative; }
+.t-prof__mini { display: block; flex: none; width: 24px; height: 24px; position: relative; }
 .t-prof__mini svg, .t-prof__av svg { width: 100%; height: 100%; display: block; }
 :root[data-theme="dark"] .t-prof__mini::after, :root[data-theme="dark"] .t-prof__av::after {
   content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;

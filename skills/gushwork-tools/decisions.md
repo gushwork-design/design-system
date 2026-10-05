@@ -140,6 +140,9 @@ The email signature creator and the employee ID card generator were redesigned i
     in the Certificate Creator's right panel while a file is open; its menu holds the name, role,
     address and Sign out (Utsav, 5 Oct 2026: "showing user profile is missing in the tool").
 
+42. **The profile shows a name, not only the mark.** The 3x3 mark alone reads as a random icon
+    to anyone who has not met it, so the button is the mark plus the first name (Utsav, 5 Oct 2026).
+
 ## Left open (the owner's call)
 
 - **A third typeface in the signature preview** (Plus Jakarta Sans). In the artefact, not the chrome.
