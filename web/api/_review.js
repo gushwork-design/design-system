@@ -73,7 +73,7 @@ async function signedInEmail(req, res) {
 /* What a reader who is not the owner may see of a decision: the item, the action, when, and the fingerprint it was made against. */
 export function publicState(state) {
   const out = {};
-  for (const [k, r] of Object.entries(state || {})) out[k] = { action: r.action, at: r.at, fp: r.fp, via: r.via };
+  for (const [k, r] of Object.entries(state || {})) out[k] = { action: r.action, at: r.at, fp: r.fp, pfp: r.pfp, via: r.via };
   return out;
 }
 
@@ -111,12 +111,13 @@ export function parseState(flat) {
 export function checkDecision(body, email, now = new Date()) {
   const b = body && typeof body === 'object' ? body : {};
   const scope = String(b.scope || ''), key = String(b.key || ''), action = String(b.action || '');
-  const note = String(b.note || '').trim().slice(0, 500), fp = String(b.fp || '');
+  const note = String(b.note || '').trim().slice(0, 500), fp = String(b.fp || ''), pfp = String(b.pfp || '');
   if (!/^[a-z0-9-]{1,32}$/.test(scope) || !/^[a-z0-9-]{1,80}$/.test(key)) return { ok: false, error: 'Bad item.' };
   if (!ACTIONS.includes(action)) return { ok: false, error: 'Bad action.' };
   if ((action === 'reject' || action === 'rework') && !note) return { ok: false, error: 'Say what is wrong: a note is required.' };
   if (fp && !/^[0-9a-f]{8,64}$/.test(fp)) return { ok: false, error: 'Bad fingerprint.' };
-  return { ok: true, row: { at: now.toISOString(), scope, key, action, note, fp, by: email } };
+  if (pfp && !/^[0-9a-f]{8,64}$/.test(pfp)) return { ok: false, error: 'Bad fingerprint.' };
+  return { ok: true, row: { at: now.toISOString(), scope, key, action, note, fp, pfp, by: email } };
 }
 
 export default async function handler(req, res) {

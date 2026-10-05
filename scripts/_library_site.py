@@ -1316,15 +1316,21 @@ FOUNDATION_VIEW = {"color": "color", "typefaces": "faces", "type": "scale", "typ
                    "ruled": "motion", "slides": "slides"}
 
 
-def review_state(state, rec, fp):
+def review_state(state, rec, fp, pfp=""):
     """The state the Review tab shows. A pass whose source has moved since reads `expired`. A rework whose source
     has moved since the note was written reads `redone`: someone has had a go at it, so it goes back to Waiting
     with a tag. The registry still says `rework` until the owner decides again; nothing is written for `redone`.
-    A rework with no stored fingerprint cannot be compared, so it stays in rework."""
+    A rework with no stored fingerprint cannot be compared, so it stays in rework.
+
+    "Source" is two things. The spec (`fingerprint`: registry entry + doc) and, since 5 Oct 2026, the drawing
+    (`previewFingerprint`: the .frag the reviewer saw). The drawing is compared only when the decision stored one
+    and a drawing exists now, so a decision made before that date behaves exactly as it did."""
     stored = rec.get("fingerprint")
-    if state == "passed" and stored != fp:
+    stored_p = rec.get("previewFingerprint")
+    moved = stored != fp or bool(stored_p and pfp and stored_p != pfp)
+    if state == "passed" and moved:
         return "expired"
-    if state == "rework" and stored and stored != fp:
+    if state == "rework" and ((stored and stored != fp) or (stored_p and pfp and stored_p != pfp)):
         return "redone"
     return state
 
@@ -1354,13 +1360,14 @@ def review_items(reg, groups):
             rec = rblock.get(n) or {}
             rev = CL.review_of(rblock, n)
             fp = CL.component_fingerprint(skey, n, reg)
-            state = review_state(rev["state"], rec, fp)
+            pfp = CL.preview_fingerprint(skey, n)
+            state = review_state(rev["state"], rec, fp, pfp)
             prev = os.path.join(ROOT, "web", "previews", skey, n + ".frag")
             # The ad-page folds have a Figma render each; two are filed under a shorter name.
             stem = {"eyebrow-ad-page": "eyebrow", "footer-with-cta": "footer-cta"}.get(n, n)
             fig = f"/assets/{skey}/{stem}-desktop.png" if os.path.isfile(os.path.join(ROOT, "assets", skey, stem + "-desktop.png")) else ""
             out.append({"scope": skey, "key": n, "label": n, "kind": "component", "surface": stitle,
-                        "state": state, "by": rev["by"], "on": rev["on"], "note": rev["note"], "fp": fp,
+                        "state": state, "by": rev["by"], "on": rev["on"], "note": rev["note"], "fp": fp, "pfp": pfp,
                         "version": e.get("version", ""), "changed": e.get("changed", ""), "doc": e.get("doc", ""),
                         "breaking": bool(e.get("breaking")), "href": f"parts/{skey}/{n}.html",
                         "preview": f"/previews/{skey}/{n}.frag" if os.path.isfile(prev) else "", "figma": fig})

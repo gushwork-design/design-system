@@ -936,6 +936,23 @@ def component_fingerprint(surface, key, reg=None):
     return fingerprint(f"{key}|{entry.get('version','')}|{entry.get('changed','')}|{body}")
 
 
+def preview_fingerprint(surface, key):
+    """The drawing the reviewer was looking at: web/previews/<surface>/<key>.frag. Empty when
+    there is no drawing.
+
+    Kept SEPARATE from component_fingerprint on purpose (5 Oct 2026). The rework routine may
+    edit previews and nothing else, so a rework that only redrew the preview left the
+    fingerprint above untouched and the item could never read "redone" (R45). Folding the
+    preview into that fingerprint would have expired every pass on record at once; a second
+    fingerprint, stored with each decision from now on, compares only where both sides have
+    one, so older decisions keep working and nothing expires retroactively."""
+    p = os.path.join(ROOT, "web", "previews", surface, key + ".frag")
+    if not os.path.isfile(p):
+        return ""
+    with open(p, encoding="utf-8") as fh:
+        return fingerprint(fh.read())
+
+
 # ---------------------------------------------------------------------------
 # 8. The shape of the library
 # ---------------------------------------------------------------------------
