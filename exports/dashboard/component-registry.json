@@ -1104,6 +1104,12 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "52ae019db43d2f2b"
+    },
+    "radio": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "e4bad4a8c7186e02"
     }
   }
 }
