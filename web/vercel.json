@@ -213,6 +213,10 @@
       "destination": "/api/gw?action=slack-events"
     },
     {
+      "source": "/api/bruce-memory",
+      "destination": "/api/gw?action=bruce-memory"
+    },
+    {
       "source": "/api/approvals",
       "destination": "/api/gw?action=approvals"
     },

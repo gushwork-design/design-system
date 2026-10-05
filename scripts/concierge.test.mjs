@@ -7,6 +7,7 @@ import { FAQ, EXAMPLES } from '../web/api/_bruce-faq.js';
 process.env.SLACK_SIGNING_SECRET = 'sig-secret';
 process.env.SLACK_BOT_TOKEN = 'xoxb-test';
 process.env.SLACK_REVIEWER_IDS = 'UOWNER, UOTHER';
+process.env.GW_BRUCE_TRIGGER_URL = 'https://trigger.test/fire'; process.env.GW_BRUCE_TRIGGER_TOKEN = 't';
 process.env.KV_REST_API_URL = 'https://kv.test'; process.env.KV_REST_API_TOKEN = 'k';
 const { default: events } = await import('../web/api/_slack-events.js');
 
@@ -122,6 +123,7 @@ globalThis.fetch = async (url, init = {}) => {
     if (method === 'files.getUploadURLExternal') return send(200, { ok: true, upload_url: 'https://files.slack.test/up/' + body.filename, file_id: 'F-' + body.filename });
     return send(200, { ok: true });
   }
+  if (u.startsWith('https://trigger.test/')) { calls.push({ method: 'FIRE', body: JSON.parse(init.body) }); return send(200, { ok: true }); }
   if (u.startsWith('https://files.slack.test/')) { calls.push({ method: 'PUT', body: { bytes: init.body.length, to: u.split('/').pop() } }); return send(200, {}); }
   throw new Error('unexpected fetch ' + u);
 };
@@ -152,7 +154,7 @@ t('a DM question gets the answer with no thread, and all four fonts in one share
 
 calls.length = 0;
 r = await post(dm('do the second one please', 'UOWNER'));
-t('a reviewer\'s DM that is not a question is ticked AND answered in words, so the tick is never a mystery', [r.body.concierge, calls.map((c) => c.method), calls[1].body.text.includes('9pm')], ['ticked', ['reactions.add', 'chat.postMessage'], true]);
+t('end to end: a DM that is not a file ask gets 👀 and starts Bruce (open to everyone since 5 Oct 2026)', [r.body.concierge, calls.map((c) => c.method)], ['bruce', ['reactions.add', 'FIRE']]);
 
 /* ---- Bruce for Utsav: his DMs start the routine; nobody else's do ---- */
 {
@@ -177,6 +179,21 @@ t('a reviewer\'s DM that is not a question is ticked AND answered in words, so t
   o = await handleMessage(ev('check the routines', 'UUTSAV'), { ...deps, fire: async () => ({ fired: false, why: 'not set' }) });
   t('no trigger configured: Bruce says so in the thread', [o.did, calls.at(-1).method, calls.at(-1).body.thread_ts], ['bruce-failed', 'chat.postMessage', '300.3']);
   ok('greetings stay with the concierge', forBruce(understand('hi', catalog)) === false);
+  // Open to everyone, with a daily cap for everyone but the owner, and memory handed to the run.
+  const runs = {}; const mem = {
+    takeRun: async (u, { uncapped }) => { runs[u] = (runs[u] || 0) + 1; return uncapped ? { allowed: true, used: 0, cap: 3 } : { allowed: runs[u] <= 2, used: runs[u], cap: 2 }; },
+    readNotes: async (u) => (u === 'UUTSAV' ? ['2026-10-05: prefers the original logo colour'] : []), mintToken: (u) => `tok-${u}` };
+  const open = { ...deps, bruceUsers: new Set(), ownerId: 'UUTSAV', memory: mem, fire: async (ev, e, f, extra) => { fired.push({ u: ev.user, ...extra }); return { fired: true }; } };
+  fired.length = 0; calls.length = 0;
+  o = await handleMessage(ev('can you check the publish?', 'UTEAM'), open);
+  t('with no list set, a teammate gets Bruce', [o.did, fired[0].owner, fired[0].memoryToken], ['bruce', false, 'tok-UTEAM']);
+  await handleMessage(ev('and again?', 'UTEAM'), open);
+  calls.length = 0;
+  o = await handleMessage(ev('third one', 'UTEAM'), open);
+  t('past the cap the concierge answers and says why', [o.did, calls.map((c) => c.method), calls[0].body.text.startsWith('You’ve used today’s 2 Bruce runs')], ['capped', ['chat.postMessage'], true]);
+  fired.length = 0;
+  for (let i = 0; i < 4; i++) await handleMessage(ev('check ' + i, 'UUTSAV'), open);
+  t('the owner is never capped, and his notes ride along', [fired.length, fired[0].owner, fired[0].notes], [4, true, ['2026-10-05: prefers the original logo colour']]);
   // A reply under an Alfred ping goes to Alfred; any other thread reply goes to Bruce.
   const sent = [];
   const pingDeps = { ...deps, findPing: async (tok, ch, ts) => (ts === '400.4' ? { issue: 7, scope: 'web', key: 'timeline' } : null), toAlfred: async (p, text) => { sent.push([p.issue, text]); return { ok: true, fired: true }; } };
@@ -203,7 +220,10 @@ t('a reviewer saying thanks gets a reply, not a tick', [r.body.concierge, calls.
 
 calls.length = 0;
 r = await post(dm('do the second one please', 'UASKER'));
-t('the same words from anyone else get the help text', [r.body.concierge, calls[0].method, calls[0].body.text.includes('brand files')], ['answered', 'chat.postMessage', true]);
+t('the same words from a teammate also start Bruce, as a teammate', [r.body.concierge, calls.at(-1).method, calls.at(-1).body.text.includes('role: teammate')], ['bruce', 'FIRE', true]);
+calls.length = 0;
+r = await post(dm('what can you do', 'UASKER'));
+t('"what can you do" stays with the concierge, so a help question never spends a run', [r.body.concierge, calls[0].method, calls[0].body.text.includes('brand files')], ['answered', 'chat.postMessage', true]);
 
 calls.length = 0;
 r = await post(dm('logo', 'UOWNER'));
