@@ -11,7 +11,9 @@
    2. Each certificate (Utsav, 5 Oct 2026). Its creator owns it. `access` says who else sees it:
       `general` is 'tool' (everyone who can open the tool) or 'restricted' (only the people
       listed), `role` is what 'tool' grants ('edit' or 'view'), and `people` names work emails
-      with their own role. Only the owner and hub admins change access or delete. A certificate
+      with their own role. Anyone who can edit a file can change who has access, as in Google
+      Docs (Utsav, 6 Oct 2026); everyone in it can see who has access; only the owner and hub admins
+      delete it. A certificate
       saved before this existed has no `access` and reads as everyone-can-edit, which is what it was.
       The shared-password door has no identity, so it is treated as an admin, the same choice the
       gate itself makes for that session.
@@ -126,7 +128,8 @@ function perms(item, me) {
   const person = (access.people || []).find((p) => p.email === me.email);
   const edit = manage || (person && person.role === 'edit') || (access.general === 'tool' && access.role === 'edit');
   const view = edit || !!person || access.general === 'tool';
-  return { view, edit, manage };
+  // share: change who has access (every editor); manage: delete (the owner and hub admins)
+  return { view, edit, share: edit, manage };
 }
 
 function present(item, me) {
@@ -221,7 +224,7 @@ export default async function handler(req, res) {
           item.updatedAt = now;
         }
         if (body.access !== undefined) {
-          if (!can.manage) return json(res, 403, { error: 'Only the owner can change who has access.' });
+          if (!can.share) return json(res, 403, { error: 'You can view this certificate but not change who has access.' });
           const access = cleanAccess(body.access, prev.savedBy);
           if (typeof access === 'string') return json(res, 400, { error: access });
           item.access = access;

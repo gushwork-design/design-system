@@ -489,7 +489,7 @@ const TOURS = {
     { sel: '.cert-scale .cert-cite', title: 'Paste a whole body copy', text: 'Paste it here and the award and the period turn blue on their own. Triple click selects all of it.' },
     { sel: '.left-col .form-card', title: 'Or use the fields', text: 'Template, starter text, name and body copy. They stay in step with the certificate.' },
     { sel: '.page-strip', title: 'One file, many certificates', text: 'Add a page for each person, duplicate one, or drag to reorder.' },
-    { sel: '.right-col .right-actions', title: 'Save and share', text: 'Save keeps the file for your team; Copy link sends it. The ⋯ menu holds Manage access, Delete, Appearance and Help.' },
+    { sel: '.right-col .right-actions', title: 'Save and share', text: 'Save keeps the file for your team; Copy link sends it. The ⋯ menu holds Manage access (for everyone in the file), Delete, Appearance and Help.' },
     { sel: '.right-col .dl-section', title: 'Download for print', text: 'An A4 PDF for printing, a JPG or a layered PSD, for every page or the ones you pick.' },
     { sel: '.brand-card .brand-link', title: 'Jump between tools', text: 'Right click the logo for the Design Hub and the other tools.' },
   ],
@@ -607,6 +607,8 @@ function accessLine(a) {
 }
 
 function AccessModal({ item, onClose, onSaved }) {
+  // editors change access; everyone else in the file sees it, read-only
+  const canShare = !item.can || item.can.share || item.can.manage;
   const [access, setAccess] = useState(() => JSON.parse(JSON.stringify(item.access || { general: 'tool', role: 'edit', people: [] })));
   const [email, setEmail] = useState('');
   const [role, setRole] = useState('edit');
@@ -631,14 +633,14 @@ function AccessModal({ item, onClose, onSaved }) {
     } catch (e) { setError(e.message); setBusy(false); }
   };
   return (
-    <Modal open onClose={onClose} title={item.data.name ? `Share ${item.data.name}'s certificate` : 'Share this certificate'}
-      desc="Choose who can see and edit this certificate. The tool's own access still applies on top."
-      initialFocus=".acc-add input"
-      foot={<>
+    <Modal open onClose={onClose} title={canShare ? (item.data.name ? `Share ${item.data.name}'s certificate` : 'Share this certificate') : 'Who has access'}
+      desc={canShare ? "Choose who can see and edit this certificate. The tool's own access still applies on top." : 'You can view this certificate. Ask someone who can edit it to change who has access.'}
+      initialFocus={canShare ? '.acc-add input' : '.gd-btn'}
+      foot={canShare ? <>
         <button type="button" className="gd-btn" onClick={onClose}>Cancel</button>
         <button type="button" className="gd-btn gd-btn--primary" onClick={submit} disabled={busy}>{busy ? 'Saving…' : 'Save access'}</button>
-      </>}>
-      <div className="acc-block">
+      </> : <button type="button" className="gd-btn" onClick={onClose}>Close</button>}>
+      {canShare && <div className="acc-block">
         <span className="acc-label">Add people</span>
         <div className="acc-add">
           <label className="gd-input"><input className="gd-input__el" type="email" value={email} placeholder="name@gushwork.ai" aria-label="Work email"
@@ -647,7 +649,7 @@ function AccessModal({ item, onClose, onSaved }) {
           <button type="button" className="gd-btn" onClick={add}>Add</button>
         </div>
         {error && <p className="prop-tip saved-error">{error}</p>}
-      </div>
+      </div>}
 
       <div className="acc-block">
         <span className="acc-label">People with access</span>
@@ -661,8 +663,12 @@ function AccessModal({ item, onClose, onSaved }) {
             <li key={p.email}>
               <span className="acc-avatar" aria-hidden>{who(p.email).slice(0, 1).toUpperCase()}</span>
               <span className="acc-who"><span className="saved-name">{who(p.email)}</span><span className="saved-meta">{fullName(p.email) ? `${fullName(p.email)} · ${p.email}` : p.email}</span></span>
-              <RoleSwitch value={p.role} onChange={(r) => setPerson(p.email, r)} labels={{ view: 'View', edit: 'Edit' }} />
-              <button type="button" className="gd-iconbtn gd-iconbtn--sm" onClick={() => drop(p.email)} aria-label={`Remove ${p.email}`}><CloseIcon /></button>
+              {canShare ? (
+                <>
+                  <RoleSwitch value={p.role} onChange={(r) => setPerson(p.email, r)} labels={{ view: 'View', edit: 'Edit' }} />
+                  <button type="button" className="gd-iconbtn gd-iconbtn--sm" onClick={() => drop(p.email)} aria-label={`Remove ${p.email}`}><CloseIcon /></button>
+                </>
+              ) : <span className="acc-owner">{p.role === 'edit' ? 'Can edit' : 'Can view'}</span>}
             </li>
           ))}
         </ul>
@@ -670,6 +676,9 @@ function AccessModal({ item, onClose, onSaved }) {
 
       <div className="acc-block">
         <span className="acc-label">General access</span>
+        {!canShare ? (
+          <p className="prop-tip">{accessLine(access)}</p>
+        ) : (<>
         <div className="gd-seg acc-general" role="radiogroup">
           <button type="button" role="radio" aria-checked={access.general === 'tool'} className="gd-seg__item"
             onClick={() => setAccess((a) => ({ ...a, general: 'tool' }))}>Everyone with the tool</button>
@@ -682,8 +691,9 @@ function AccessModal({ item, onClose, onSaved }) {
             <RoleSwitch value={access.role} onChange={(r) => setAccess((a) => ({ ...a, role: r }))} />
           </div>
         ) : (
-          <p className="prop-tip">Only you, the people above and hub admins can see it. It disappears from everyone else's list.</p>
+          <p className="prop-tip">Only the owner, the people above and hub admins can see it. It disappears from everyone else's list.</p>
         )}
+              </>)}
       </div>
     </Modal>
   );
@@ -718,7 +728,7 @@ function CardMenu({ it, onOpen, onShare, onCopy, onDelete }) {
     <GdMenuButton label={`More for ${titleOf(it)}`} icon={<DotsVIcon />} sm items={[
       { label: 'Open', icon: <OpenIcon />, onClick: () => onOpen(it) },
       { label: 'Make a copy', icon: <CopyIcon />, onClick: () => onCopy(it) },
-      manage && { label: 'Manage access', icon: <UsersIcon />, onClick: () => onShare(it) },
+      { label: it.can && (it.can.share || it.can.manage) ? 'Manage access' : 'Who has access', icon: <UsersIcon />, onClick: () => onShare(it) },
       manage && 'sep',
       manage && { label: 'Delete', icon: <TrashIcon />, danger: true, onClick: () => onDelete(it) },
     ]} />
@@ -1189,6 +1199,7 @@ function App() {
   };
   const canEdit = !current || !current.can || current.can.edit;
   const canManage = !!(current && (!current.can || current.can.manage));
+  const canShareFile = !!(current && (!current.can || current.can.share || current.can.manage));
   const q = filter.trim().toLowerCase();
   const shown = saved.items.filter((it) => !q || [it.data.name, awardLine(it.data), it.savedBy, it.updatedBy].join(' ').toLowerCase().includes(q));
 
@@ -1324,7 +1335,7 @@ function App() {
             <GdMenuButton label="File actions" icon={<DotsIcon />} outline sm items={[
               { label: 'New certificate', icon: <PlusIcon />, onClick: () => startNew() },
               { label: 'Make a copy', icon: <CopyIcon />, onClick: duplicateFile },
-              canManage && { label: 'Manage access', icon: <UsersIcon />, onClick: () => setAccessItem(current) },
+              current && { label: canShareFile ? 'Manage access' : 'Who has access', icon: <UsersIcon />, onClick: () => setAccessItem(current) },
               { label: 'Take the tour', icon: <CompassIcon />, onClick: () => setTour('cert-editor') },
               'sep',
               { section: 'Appearance' },
