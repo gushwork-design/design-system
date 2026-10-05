@@ -157,6 +157,10 @@ The email signature creator and the employee ID card generator were redesigned i
     download was the macOS viewer's window, not the file (its corner pixels are solid blue); the
     panel was squared by mistake and restored the same day (Utsav, 5 Oct 2026).
 
+47. **Everyone in a file sees who has access; editors change it.** As in Google Docs: editors add
+    people, change roles and general access; viewers open the same dialog read-only ("Who has
+    access"); delete stays with the owner and hub admins (Utsav, 6 Oct 2026).
+
 ## Left open (the owner's call)
 
 - **A third typeface in the signature preview** (Plus Jakarta Sans). In the artefact, not the chrome.
