@@ -1439,7 +1439,9 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
         if (!owner) Object.keys(QSTATE).forEach(function (k) { if (QSTATE[k].via !== 'main') delete QSTATE[k]; });
       }).catch(function () { QSTATE = {}; });
   }
-  function scopeTitle(it) { return it.kind === 'foundation' ? 'Foundations' : it.surface; }
+  // Which library an item belongs to: the table's Library column, the drawer's header and its Library row all read this
+  // (5 Oct 2026). The shared set is held once for web and dashboard (foundation/shared-components.md), so it reads as both.
+  function scopeTitle(it) { return it.kind === 'foundation' ? 'Foundations' : it.scope === 'shared' ? 'Web & Dashboard' : it.surface; }
 
   /* Sorting. A column header is a button; the first click leads with the useful end of the column (biggest, newest or A to Z,
      lowest where lower is better), the second reverses it. Empty values stay last either way, and ties keep the order they were in. */
@@ -1505,7 +1507,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       var e = eff(it), by = e.queued ? 'You, just now' : (it.by ? personName(it.by) : '—');
       return '<div class="ul-row ul-row--d rv-row" role="row" tabindex="0" data-id="' + esc(idOf(it)) + '">' +
         cell('<b style="font-weight:600">' + esc(it.label) + '</b>', '') + txt(scopeTitle(it)) + cell(badgeOf(e.state, e.queued, e.q)) +
-        txt(it.changed || '—', it.changed ? '' : 'ul-c--none', it.changed ? 'Came up for review on this date: the day its spec last moved' : 'No date recorded') + txt(by) +
+        txt(fmtWhen(it.changed) || '—', it.changed ? '' : 'ul-c--none', it.changed ? 'Came up for review on this date: the day its spec last moved' : 'No date recorded') + txt(by) +
         cell('<span class="ds-pv rv-go">Review</span>') + '</div>';
     });
     var revHeads = ['Item', 'Library', 'Status', 'Requested', 'Decided', ''].map(function (h, i) { return REV_SORT[i] ? { html: sortTh('rev', i, h) } : h; });
@@ -1622,6 +1624,18 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     var words = b.split('@')[0].split(/[._\-+]+/).filter(Boolean).map(function (w) { return w.charAt(0).toUpperCase() + w.slice(1); });
     return words.join(' ') || b;
   }
+  // One date format across Review (5 Oct 2026, Utsav: "lets make it simple"): "2 Oct, 26 at 2:12pm", or "2 Oct, 26"
+  // when only the day is known. A bare YYYY-MM-DD is read as that local day, not UTC midnight, so it never slips a day.
+  var MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  function fmtWhen(v) {
+    if (!v) return '';
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v), d = m ? new Date(+m[1], m[2] - 1, +m[3]) : new Date(v);
+    if (isNaN(d)) return String(v);
+    var out = d.getDate() + ' ' + MON[d.getMonth()] + ', ' + String(d.getFullYear()).slice(2);
+    if (m) return out;
+    var h = d.getHours(), mm = String(d.getMinutes()).padStart(2, '0');
+    return out + ' at ' + (h % 12 || 12) + ':' + mm + (h < 12 ? 'am' : 'pm');
+  }
   function detailRow(k, v) { return v ? '<div class="rv-d"><span>' + esc(k) + '</span><b>' + v + '</b></div>' : ''; }
   function drawerEl() {
     var el = $('rv');
@@ -1679,13 +1693,13 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
         : 'It is recorded in the repo at the next Claude session.') +
         (e.q.note ? ' Your note: ' + esc(e.q.note) : '') + ' <button class="rv-link" type="button" id="rv-undo">Undo</button></div>';
     } else if (it.by) {
-      hist = '<div class="rv-note"><b>' + esc(it.state === 'expired' ? 'Approved, then the source moved' : it.state === 'redone' ? 'Redone since you sent it back' : (STATE_LABEL[it.state] || '')) + '</b> · ' + esc(personName(it.by)) + (it.on ? ', ' + esc(it.on) : '') + (it.note ? '<br>' + esc(it.note) : '') + '</div>';
+      hist = '<div class="rv-note"><b>' + esc(it.state === 'expired' ? 'Approved, then the source moved' : it.state === 'redone' ? 'Redone since you sent it back' : (STATE_LABEL[it.state] || '')) + '</b> · ' + esc(personName(it.by)) + (it.on ? ', ' + esc(fmtWhen(it.at || it.on)) : '') + (it.note ? '<br>' + esc(it.note) : '') + '</div>';
     }
     var acts = it.activity || [];
     var actHtml = acts.length ? '<div class="rv-act"><h3>Activity</h3><ol>' + acts.map(function (a) {
       var moved = a.what === 'spec moved' || a.what === 'drawing moved';
       var cls = a.what === 'approved' ? 'is-ok' : a.what === 'sent back' ? 'is-warn' : a.what === 'rejected' ? 'is-bad' : moved ? 'is-move' : 'is-ship';
-      var d = new Date(a.at), when = isNaN(d) ? a.at : d.toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+      var when = fmtWhen(a.at);
       // A pass expires when something else moved its source, often another item's rework in the same doc: say which.
       var what = moved ? (a.what === 'spec moved' ? 'Spec moved' : 'Drawing moved') + (a.pr ? ' in <a class="rv-link" href="https://github.com/gushwork-design/design-system/pull/' + a.pr + '" target="_blank" rel="noopener">#' + a.pr + '</a>' : '')
         : a.pr ? 'Fixed and published in <a class="rv-link" href="https://github.com/gushwork-design/design-system/pull/' + a.pr + '" target="_blank" rel="noopener">#' + a.pr + '</a>'
@@ -1704,8 +1718,8 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     el.innerHTML = '<header class="rv-h"><div class="rv-h__t"><span class="rv-h__s">' + esc(scopeTitle(it)) + ' · ' + (RV.i + 1) + ' of ' + RV.list.length + '</span><h2>' + esc(it.label) + '</h2></div>' +
       '<div class="rv-h__r">' + saveBtn('rv-savenow') + badgeOf(e.state, e.queued, e.q) + '<button type="button" class="rv-x" id="rv-prev" aria-label="Previous" title="Previous (\u2190)"' + (RV.i === 0 ? ' disabled' : '') + '>‹</button><button type="button" class="rv-x" id="rv-next" aria-label="Next" title="Next (\u2192)"' + (RV.i >= RV.list.length - 1 ? ' disabled' : '') + '>›</button><button type="button" class="rv-x" id="rv-close" aria-label="Close" title="Close (Esc)">✕</button></div></header>' +
       '<div class="rv-body" id="rv-body"><section class="rv-sec"><div class="rv-sh"><h3>What it looks like</h3><button type="button" class="rv-ex" id="rv-ex" aria-expanded="false" title="Open the drawer out to see everything (E)"></button></div><div class="rv-vis" id="rv-vis">' + (it.kind === 'foundation' ? ghost() : visualFor(it, null)) + '</div></section>' +
-      '<section class="rv-sec rv-sec--det"><h3>Details</h3><div class="rv-dl">' + detailRow('Kind', esc(it.kind === 'foundation' ? 'Foundation group' : 'Component')) + (it.use ? '<div class="rv-d rv-d--text"><span>Used for</span><p>' + esc(it.use) + '</p></div>' : '') + detailRow('Version', esc(it.version ? 'v' + it.version : '')) +
-      detailRow('Spec last moved', esc(it.changed || '')) + detailRow('Doc', gh ? '<a class="ds-a" href="' + esc(gh) + '" target="_blank" rel="noopener">' + esc(it.doc.split('/').pop()) + '</a>' : '') +
+      '<section class="rv-sec rv-sec--det"><h3>Details</h3><div class="rv-dl">' + detailRow('Kind', esc(it.kind === 'foundation' ? 'Foundation group' : 'Component')) + detailRow('Library', esc(scopeTitle(it))) + (it.use ? '<div class="rv-d rv-d--text"><span>Used for</span><p>' + esc(it.use) + '</p></div>' : '') + detailRow('Version', esc(it.version ? 'v' + it.version : '')) +
+      detailRow('Spec last moved', esc(fmtWhen(it.changed))) + detailRow('Doc', gh ? '<a class="ds-a" href="' + esc(gh) + '" target="_blank" rel="noopener">' + esc(it.doc.split('/').pop()) + '</a>' : '') +
       detailRow('Fingerprint', '<code>' + esc(it.fp) + '</code>') + '</div>' + hist + actHtml + '</section></div>' + foot;
     if (it.kind === 'foundation') tokens().then(function (t) { if (RV.open && BYID[RV.list[RV.i]] === it) { $('rv-vis').innerHTML = visualFor(it, t); settleVis(); } }).catch(function () {});
     var pv = el.querySelector('[data-pv]'); if (pv) mountPreview(pv, it);
