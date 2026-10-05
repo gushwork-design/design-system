@@ -1145,7 +1145,8 @@
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "e4bad4a8c7186e02"
+      "fingerprint": "0ab4bfab50c1f3ec",
+      "previewFingerprint": "b3c14d0cc68e03cd"
     },
     "ring": {
       "reviewed": "passed",
