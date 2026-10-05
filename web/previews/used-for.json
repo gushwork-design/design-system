@@ -90,6 +90,7 @@
  "dashboard/select": "Lets people pick one option from a known list of about three to fifteen, in a form or toolbar",
  "dashboard/session-expired": "Tells people their session has lapsed and brings them back to the same page after sign-in, as a banner or a modal",
  "dashboard/setting-row": "Shows one preference on a settings page, with label and description on the left and its control on the right",
+ "dashboard/shortcut-key": "Shows a control's keyboard shortcut as a small key cap inside the button, after its label, so people can see the key without a separate hint line",
  "dashboard/sidebar": "Provides the main navigation rail down the left of the app, listing grouped top-level destinations with the brand and account at the edges",
  "dashboard/sidebar-collapsed": "Shrinks the sidebar to an icon-only rail when the content is wide, such as tables or the explorer layout",
  "dashboard/sign-in-modal": "Asks people to sign in inside a dialog, for example after clicking a locked row or when a session needs a full re-login",
