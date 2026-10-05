@@ -401,6 +401,15 @@ export async function replyToAlfred(ping, text) {
   return { ok: true, fired: run.fired };
 }
 
+/* One row in Bruce's log (R55 addendum). Waited on, so a function that returns right after does not drop it; never throws. */
+async function log(memory, token, event, extra) {
+  if (!memory || !memory.logRun) return;
+  try {
+    const name = memory.slackName ? await memory.slackName(token, event.user) : event.user;
+    await memory.logRun({ user: event.user, name, thread: !!event.thread_ts, text: event.text || '', ...extra });
+  } catch { /* the log is a nicety; the answer is not */ }
+}
+
 /* Utsav's DMs go to the routine unless the concierge can answer outright: a file, a template or a tool. */
 export function forBruce(u) {
   if (u.greeting || u.thanks || u.help) return false;   // small talk and "what can you do" never spend a run
@@ -433,6 +442,7 @@ export async function handleMessage(event, deps) {
         let out;
         try { out = await toAlfred(ping, event.text || ''); } catch (e) { out = { ok: false, why: 'GitHub refused it' }; }
         if (out.ok) {
+          if (memory) await log(memory, token, event, { role: event.user === (deps.ownerId || '') ? 'owner' : 'teammate', kind: 'to-alfred' });
           try { await slack(token, 'reactions.add', { channel: event.channel, timestamp: event.ts, name: 'white_check_mark' }); } catch { /* the line below says it */ }
           await slack(token, 'chat.postMessage', { channel: event.channel, thread_ts: event.thread_ts, text: out.fired ? 'Passed to Alfred. He’ll answer in the item’s thread, and I’ll let you know.' : 'I put it on the item’s thread, but Alfred didn’t start. He’ll pick it up in the 9pm sweep.' });
           return { did: 'to-alfred' };
@@ -452,6 +462,7 @@ export async function handleMessage(event, deps) {
       if (memory) {
         try { quota = await memory.takeRun(event.user, { uncapped: isOwner }); } catch { /* no count is better than no answer */ }
         if (!quota.allowed) {
+          await log(memory, token, event, { role: isOwner ? 'owner' : 'teammate', kind: 'capped', used: quota.used });
           const reply = compose(u, catalog, event.ts);
           await slack(token, 'chat.postMessage', { channel: event.channel, ...(replyTs !== event.ts ? { thread_ts: replyTs } : {}), unfurl_links: false,
             text: `You’ve used today’s ${quota.cap} Bruce ${quota.cap === 1 ? 'run' : 'runs'}, so I can only do the quick things until tomorrow.\n\n` + reply.text });
@@ -462,6 +473,7 @@ export async function handleMessage(event, deps) {
       }
       try { await slack(token, 'reactions.add', { channel: event.channel, timestamp: event.ts, name: 'eyes' }); } catch { /* the answer matters more */ }
       const run = await fire(event, undefined, undefined, { owner: isOwner, notes, memoryToken });
+      if (memory) await log(memory, token, event, { role: isOwner ? 'owner' : 'teammate', kind: run.fired ? 'run' : 'failed', used: quota.used });
       if (!run.fired) {
         await slack(token, 'chat.postMessage', { channel: event.channel, thread_ts: replyTs, text: `I couldn’t start on that (${run.why}). Check GW_BRUCE_TRIGGER_URL and GW_BRUCE_TRIGGER_TOKEN on the site.` });
         return { did: 'bruce-failed', why: run.why };
