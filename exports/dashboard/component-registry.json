@@ -1457,11 +1457,10 @@
       "previewFingerprint": "4834659d12a9c468"
     },
     "analytics-overview-template": {
-      "reviewed": "rework",
+      "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "6b0643eeed002b76",
-      "note": "save this in templates",
+      "fingerprint": "316f6bc9455675c0",
       "previewFingerprint": "410329c2eabe53a0"
     },
     "shortcut-key": {
