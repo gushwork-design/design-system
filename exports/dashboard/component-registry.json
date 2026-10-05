@@ -973,6 +973,12 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "3856cadf12957aef"
+    },
+    "incident-row": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "9bee967cf3c4e0c7"
     }
   }
 }
