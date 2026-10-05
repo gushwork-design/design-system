@@ -35,9 +35,11 @@
 import { COOKIE, verify, readCookie, sessionSecret } from './_session.js';
 import { isOwner } from './_access.js';
 import { recordViaGithub, recordDirect, explain, checkGithub, refPath, commitRef } from './_review-github.js';
+import { ensureThread, findThread, postComment, ownerComment, readThread, threadTitle, ALFRED } from './_review-thread.js';
 
 const LIST_KEY = 'gw:review-decisions';
 const STATE_KEY = 'gw:review-state';
+const THREAD_KEY = 'gw:review-threads';   // scope/key -> the GitHub issue number of its thread, so it is looked up once
 const MAX_LIST = 500;
 const ACTIONS = ['pass', 'reject', 'rework', 'undo'];
 
@@ -83,6 +85,23 @@ export function refsBrief(refs) {
   return refs && refs.length ? `\nHe attached ${refs.length} reference file${refs.length === 1 ? '' : 's'}; look at ${refs.length === 1 ? 'it' : 'them'} before you start (paths in the repo): ${refs.join(', ')}` : '';
 }
 
+/* What Alfred is started with. A send-back names the item, the note and its files; a reply (row.reply) carries Utsav's
+   answer. Either way the thread is named, so the run reads the whole conversation first. Pure, so it can be tested. */
+export function reworkText(row) {
+  const thread = row.thread ? `\nThread: GitHub issue #${row.thread} ("${threadTitle(row.scope, row.key)}"). Read every comment in it first, and end the run with one comment there as ${ALFRED}.` : '';
+  if (row.reply) return `REPLY on ${row.scope}/${row.key}. Utsav answered in the thread: ${row.reply}` + thread;
+  return `Rework ${row.scope}/${row.key}. Utsav's note: ${row.note}\nThe fingerprint he reviewed: ${row.fp}.` + refsBrief(row.refs) + thread;
+}
+
+/* The item's thread number: from the store, else found on GitHub (and made when `make`), then remembered. */
+async function threadNumber(cfg, token, scope, key, make) {
+  const field = `${scope}/${key}`;
+  try { const [{ result }] = await redis(cfg, [['HGET', THREAD_KEY, field]]); if (result) return Number(result); } catch { /* look it up */ }
+  const n = make ? await ensureThread(token, scope, key) : await findThread(token, scope, key);
+  if (n) { try { await redis(cfg, [['HSET', THREAD_KEY, field, String(n)]]); } catch { /* found again next time */ } }
+  return n;
+}
+
 export async function fireRework(row, env = process.env, f = fetch) {
   const url = env.GW_REWORK_TRIGGER_URL || '', token = env.GW_REWORK_TRIGGER_TOKEN || '';
   if (!url || !token) return { fired: false, why: 'not set' };
@@ -90,7 +109,7 @@ export async function fireRework(row, env = process.env, f = fetch) {
     const r = await f(url, {
       method: 'POST',
       headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json', 'anthropic-beta': 'experimental-cc-routine-2026-04-01', 'anthropic-version': '2023-06-01' },
-      body: JSON.stringify({ text: `Rework ${row.scope}/${row.key}. Utsav's note: ${row.note}\nThe fingerprint he reviewed: ${row.fp}.` + refsBrief(row.refs) }),
+      body: JSON.stringify({ text: reworkText(row) }),
     });
     return r.ok ? { fired: true } : { fired: false, why: `status ${r.status}` };
   } catch { return { fired: false, why: 'unreachable' }; }
@@ -168,6 +187,20 @@ export default async function handler(req, res) {
       try { return json(res, 200, { github: await checkGithub(process.env.GW_GITHUB_TOKEN || '') }); }
       catch { return json(res, 502, { error: 'Could not run the check.' }); }
     }
+    // ?thread=scope/key: the item's conversation with Alfred, read live from GitHub so a new comment shows without a publish.
+    const tq = String((req.query && req.query.thread) || '');
+    if (tq) {
+      const m = /^([a-z0-9-]{1,32})\/([a-z0-9-]{1,80})$/.exec(tq);
+      if (!m) return json(res, 400, { error: 'Bad item.' });
+      const token = process.env.GW_GITHUB_TOKEN || '';
+      if (!token) return json(res, 503, { error: 'Comments need the GitHub token on the site.' });
+      try {
+        const n = await threadNumber(cfg, token, m[1], m[2], false);
+        if (!n) return json(res, 200, { number: null, comments: [] });
+        const t = await readThread(token, m[1], m[2]);
+        return json(res, 200, t);
+      } catch (e) { return json(res, 502, { error: e.status === 403 || e.status === 404 ? 'The site\'s GitHub token cannot read issues yet: give it Issues read and write.' : 'Could not read the thread.' }); }
+    }
     try {
       const [{ result }] = await redis(cfg, [['HGETALL', STATE_KEY]]);
       const state = parseState(result);
@@ -179,6 +212,18 @@ export default async function handler(req, res) {
 
   let body = req.body;
   if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = null; } }
+  if (body && body.action === 'reply') {
+    const scope = String(body.scope || ''), key = String(body.key || ''), text = String(body.text || '').trim().slice(0, 2000);
+    if (!/^[a-z0-9-]{1,32}$/.test(scope) || !/^[a-z0-9-]{1,80}$/.test(key)) return json(res, 400, { error: 'Bad item.' });
+    if (!text) return json(res, 400, { error: 'Write a reply first.' });
+    const token = process.env.GW_GITHUB_TOKEN || '';
+    if (!token) return json(res, 503, { error: 'Comments need the GitHub token on the site.' });
+    let n, comment;
+    try { n = await threadNumber(cfg, token, scope, key, true); comment = await postComment(token, n, ownerComment(text)); }
+    catch (e) { return json(res, 502, { error: e.status === 403 || e.status === 404 ? 'The site\'s GitHub token cannot write issues yet: give it Issues read and write.' : 'Could not post the reply.' }); }
+    const routine = await fireRework({ scope, key, reply: text, thread: n });
+    return json(res, 200, { ok: true, comment, number: n, routine });
+  }
   if (body && body.action === 'attach') {
     const a = checkAttachment(body);
     if (!a.ok) return json(res, 400, { error: a.error });
@@ -238,6 +283,11 @@ export default async function handler(req, res) {
       cmds.unshift(['LPUSH', LIST_KEY, JSON.stringify(row)]);
     }
     await redis(cfg, cmds);
+    // A send-back opens (or continues) the item's thread with the note, so Alfred's answer has somewhere to go.
+    if (row.action === 'rework' && token) {
+      try { row.thread = await threadNumber(cfg, token, row.scope, row.key, true); await postComment(token, row.thread, ownerComment(row.note, row.refs)); }
+      catch { row.threadError = 'Could not post the note to the thread (the GitHub token needs Issues read and write).'; }
+    }
     const routine = row.action === 'rework' ? await fireRework(row) : null;
     return json(res, 200, { ok: true, decision: row, mode: row.via, githubError, routine });
   } catch { return json(res, 502, { error: 'Could not save the decision.' }); }
