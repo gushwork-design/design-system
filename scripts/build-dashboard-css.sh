@@ -49,11 +49,13 @@ reg = {"$comment": [
   "commit that changes its spec; scripts/check-drift.sh reads this and a build's stamp. breaking=true",
   "when an existing build renders WRONG until updated. The review block is written by the review loop."],
   "registryVersion": "2.0.0", "components": dict(sorted(comps.items()))}
+# ensure_ascii=False on purpose: the review loop writes this file too (the site's Save commits straight to main, and review-pass.sh does),
+# both with raw unicode. Escaping the em dash here made every review decision look like "out of date" to --check and stopped a publish.
 old = f"{d}/component-registry.json"
 if os.path.exists(old):
     prev = json.load(open(old))
     if "review" in prev: reg["review"] = prev["review"]
-json.dump(reg, open(f"{out}/component-registry.json", "w"), indent=2); open(f"{out}/component-registry.json", "a").write("\n")
+json.dump(reg, open(f"{out}/component-registry.json", "w"), indent=2, ensure_ascii=False); open(f"{out}/component-registry.json", "a").write("\n")
 print(f"{len(comps)} components")
 PY
 }
