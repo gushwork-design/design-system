@@ -76,8 +76,9 @@ rule the web templates follow.
   the tool's name and a collapse icon. Collapsed, it folds to that same header (`.panel-mini`: logo tile, name, reopen), never to a bare icon. Below 900px it overlays
   the preview.
 - **The header mark is always the Gushwork logo (R44).** Copy the SVG from the ID card's `.brand-card`:
-  the symbol on Brand Blue (`--gw-color-primary-500`, via `.brand-icon__bg`) at 32px, radius 8, a link
-  back to `/internal/tools`. Blue since 5 Oct 2026 (it was Flat Black with a ring in dark). Never a per-tool icon, a generic icon in a coloured tile, or the coloured symbol, and
+  the symbol on Brand Blue (`--gw-color-primary-500`, via `.brand-icon__bg`) at 32px, radius 8. A click on it does nothing; a right click opens the
+  logo menu from `tool-chrome.js` (Design Hub, every tool with the current one checked and the ones
+  this person cannot open locked, All tools). Blue since 5 Oct 2026 (it was Flat Black with a ring in dark). Never a per-tool icon, a generic icon in a coloured tile, or the coloured symbol, and
   the same in any drawing, mock or card that shows a tool's panel.
 - **A full-bleed canvas** with the thing being made on it, centred in the space to the right of the
   panel. No white container box around the artefact.

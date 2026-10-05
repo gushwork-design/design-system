@@ -112,6 +112,13 @@ The email signature creator and the employee ID card generator were redesigned i
     different text: one Award template, with the copy offered as Starter text. The home's first tile
     is Create new, not a blank (Utsav, 5 Oct 2026).
 
+34. **The logo tile is a menu, not a link.** "Clicking the logo should do nothing but right click
+    should give option to go to Design Hub, other tools, show lock for restricted tool" (Utsav,
+    5 Oct 2026). In `tool-chrome.js`, so every tool has it; locks come from `/api/tools`.
+35. **A pasted citation splits itself.** Pasting a whole citation on the certificate or into the
+    Before / After field fills the lead-in, the blue award, the blue period and the close (Utsav,
+    5 Oct 2026). The period anchors it (Q1-4, H1/2, FY, month year, year).
+
 ## Left open (the owner's call)
 
 - **A third typeface in the signature preview** (Plus Jakarta Sans). In the artefact, not the chrome.

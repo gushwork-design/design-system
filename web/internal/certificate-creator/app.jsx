@@ -152,10 +152,10 @@ function PropInput({ value, onChange, placeholder }) {
   );
 }
 
-function PropTextarea({ value, onChange, placeholder, rows = 3 }) {
+function PropTextarea({ value, onChange, placeholder, rows = 3, onPaste }) {
   return (
     <textarea className="prop-input prop-textarea" value={value || ''} placeholder={placeholder} rows={rows}
-      onChange={(e) => onChange(e.target.value)} />
+      onChange={(e) => onChange(e.target.value)} onPaste={onPaste} />
   );
 }
 
@@ -866,7 +866,17 @@ function App() {
   }, [menuOpen]);
 
   const set = (key) => (v) => { setTouched(true); setData((d) => ({ ...d, [key]: v, preset: ['period', 'signature', 'signedBy', 'template'].includes(key) ? d.preset : 'custom' })); };
-  const onEdit = (key, v) => set(key)(v);
+  const onEdit = (key, v) => {
+    if (key === 'citation') { setTouched(true); setData((d) => ({ ...d, ...v, preset: 'custom' })); return; }
+    set(key)(v);
+  };
+  // the panel's citation fields take a whole pasted citation too
+  const pasteCitation = (e) => {
+    const parts = splitCitation(e.clipboardData.getData('text/plain'));
+    if (!parts) return;
+    e.preventDefault();
+    onEdit('citation', parts);
+  };
   const pickPreset = (id) => {
     const p = PRESETS.find((x) => x.id === id);
     if (p) { setTouched(true); setData((d) => fromPreset(p, d)); }
@@ -1096,13 +1106,13 @@ function App() {
 
             <PropSection title="Citation">
               <PropRow label="Before" align="start">
-                <PropTextarea value={data.before} onChange={set('before')} rows={3} placeholder="Text before the award" />
+                <PropTextarea value={data.before} onChange={set('before')} rows={3} placeholder="Text before the award, or paste the whole citation" onPaste={pasteCitation} />
               </PropRow>
               <PropRow label="Award">
                 <PropInput value={data.award} onChange={set('award')} placeholder="Highest ACV of" />
               </PropRow>
               <PropRow label="After" align="start">
-                <PropTextarea value={data.after} onChange={set('after')} rows={2} placeholder="Text after the award" />
+                <PropTextarea value={data.after} onChange={set('after')} rows={2} placeholder="Text after the award" onPaste={pasteCitation} />
               </PropRow>
               <p className="prop-tip">The award and the period print together in blue: <strong>{awardLine(data) || 'nothing yet'}</strong></p>
             </PropSection>
