@@ -202,6 +202,8 @@ the set almost covers. Build it, then declare it. Three conditions, all required
 3. **Mark it in the code**: a comment saying it is new, what it was needed for, and that it is pending
    library review.
 
+**Archived components are not part of the system.** A registry entry whose `review` record says `"reviewed": "rejected"` was rejected and archived (R54 addendum). Do not compose from it, cite it, or reuse its spec as a proposal: build as if it did not exist, and if the screen needs that thing, treat it as a missing element and say so.
+
 **Then notify, every time, without being asked.** If you created or modified any element, tell the user
 before you finish, as **one four-line message block they copy straight into Slack** linking a
 `notices/YYYY-MM-DD-<slug>.md` you commit and push. The format, and the **Worth a decision** section that

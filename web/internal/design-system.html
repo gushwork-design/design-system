@@ -1004,7 +1004,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       (rows.length ? rows.join('') : '<div class="ul-empty"><div class="ul-empty__copy"><h2>' + esc(empty) + '</h2></div></div>') + '</div>';
   }
   function row(cells) { return '<div class="ul-row ul-row--d" role="row">' + cells.join('') + '</div>'; }
-  function review(state) { return '<span class="ul-badge' + (state === 'passed' ? ' ul-badge--ok' : state === 'rejected' ? ' ul-badge--bad' : '') + '">' + (state === 'passed' ? 'approved' : state === 'rejected' ? 'rejected' : 'not reviewed') + '</span>'; }
+  function review(state) { return '<span class="ul-badge' + (state === 'passed' ? ' ul-badge--ok' : state === 'rejected' ? ' ul-badge--bad' : '') + '">' + (state === 'passed' ? 'approved' : state === 'rejected' ? 'archived' : 'not reviewed') + '</span>'; }
   function pills(host, items, cur, on) {
     host.innerHTML = items.map(function (it) { return '<button class="ul-tab" role="tab" data-v="' + esc(it[0]) + '" aria-selected="' + (it[0] === cur) + '">' + esc(it[1]) + '</button>'; }).join('');
     host.querySelectorAll('.ul-tab').forEach(function (b) { b.addEventListener('click', function () { on(b.getAttribute('data-v')); }); });
@@ -1376,7 +1376,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
      Approve, Rework and Reject are buttons. They do not edit the repo (a site cannot, and main needs a reviewed PR):
      they queue the decision (/api/review) and the next Claude session records it with the fingerprint that was
      on screen, so a decision made on something that has since moved is refused rather than applied. */
-  var STATE_LABEL = { pending: 'not reviewed', expired: 'expired', redone: 'redone', passed: 'approved', rejected: 'rejected', rework: 'in rework' };
+  var STATE_LABEL = { pending: 'not reviewed', expired: 'expired', redone: 'redone', passed: 'approved', rejected: 'archived', rework: 'in rework' };
   var STATE_CLASS = { passed: ' ul-badge--ok', rejected: ' ul-badge--bad', expired: ' ul-badge--warn', rework: ' ul-badge--warn' };
   function badgeOf(state, queued, q) {
     var tail = !queued ? '' : q && q.draft ? '<span class="rv-q">not saved</span>' : (q && q.pr && q.pr.url
@@ -1455,7 +1455,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     { get: function (it) { return eff(it).queued ? '9999-12-31' : (it.on || null); }, dir: -1 },
     null
   ];
-  var FILTERS = [['waiting', 'Waiting'], ['rework', 'In rework'], ['passed', 'Approved'], ['rejected', 'Rejected']];
+  var FILTERS = [['waiting', 'Waiting'], ['rework', 'In rework'], ['passed', 'Approved'], ['rejected', 'Archived']];
   function inFilter(it, f) {
     var s = eff(it).state;
     return f === 'waiting' ? (s === 'pending' || s === 'expired' || s === 'redone') : s === f;
