@@ -724,6 +724,8 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .rv-dl { display: flex; flex-direction: column; }
 .rv-d { display: flex; justify-content: space-between; gap: var(--gw-space-16); padding: var(--gw-space-8) 0; box-shadow: inset 0 -1px 0 var(--ul-hdr-line); font: var(--gw-text-body-13-reg, 400 13px/1.5 var(--gw-font-body)); }
 .rv-d:last-child { box-shadow: none; }
+.rv-d--text { flex-direction: column; gap: var(--gw-space-4); }
+.rv-d--text p { margin: 0; color: var(--ul-value); }
 .rv-d span { color: var(--ul-sub); }
 .rv-d b { font-weight: 500; color: var(--ul-value); text-align: right; overflow-wrap: anywhere; }
 .rv-note { padding: var(--gw-space-12) var(--gw-space-16); border-radius: var(--gw-radius-12); background: var(--ul-hdr-bg); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); font: 400 13px/1.5 var(--gw-font-body); color: var(--ul-cell); }
@@ -1426,6 +1428,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   /* Sorting. A column header is a button; the first click leads with the useful end of the column (biggest, newest or A to Z,
      lowest where lower is better), the second reverses it. Empty values stay last either way, and ties keep the order they were in. */
   var SORT = {};
+  SORT.rev = { i: 4, dir: -1 };   // the Review table opens newest decision first; a header click replaces it
   function sortItems(items, defs, st) {
     if (!st || !defs[st.i]) return items;
     var get = defs[st.i].get;
@@ -1477,10 +1480,13 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     pills($('ds-rev-tabs'), FILTERS.map(function (f) { return [f[0], f[1] + ' ' + count(f[0])]; }), RV.filter, function (v) { RV.filter = v; RF.shown = 30; renderReview(d); });
     var q = RF.q.trim().toLowerCase();
     var list = ITEMS.filter(function (it) { return inFilter(it, RV.filter) && (!q || (it.label + ' ' + scopeTitle(it)).toLowerCase().indexOf(q) !== -1); });
+    // Newest first. Behind the Decided sort, anything with no decision yet (never reviewed) keeps the order it was put in, so put the
+    // most recently moved spec first there.
+    list = list.slice().sort(function (a, b) { var x = a.changed || '', y = b.changed || ''; return x < y ? 1 : x > y ? -1 : 0; });
     list = sortItems(list, REV_SORT, SORT.rev);   // the drawer steps through this same order
     $('ds-rev-q').textContent = plural(list.length, 'item');
     var rows = list.slice(0, RF.shown).map(function (it) {
-      var e = eff(it), by = e.queued ? 'You, just now' : (it.by ? it.by + (it.on ? ' · ' + it.on : '') : '—');
+      var e = eff(it), by = e.queued ? 'You, just now' : (it.by ? personName(it.by) : '—');
       return '<div class="ul-row ul-row--d rv-row" role="row" tabindex="0" data-id="' + esc(idOf(it)) + '">' +
         cell('<b style="font-weight:600">' + esc(it.label) + '</b>', '') + txt(scopeTitle(it)) + cell(badgeOf(e.state, e.queued, e.q)) +
         txt(it.changed || '—', it.changed ? '' : 'ul-c--none', it.changed ? 'Came up for review on this date: the day its spec last moved' : 'No date recorded') + txt(by) +
@@ -1590,6 +1596,16 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     if (b) { b.innerHTML = (RV.wide ? COLLAPSE_SVG + 'Collapse' : EXPAND_SVG + 'Expand'); b.setAttribute('aria-expanded', String(RV.wide)); }
     settleVis(); [260, 700].forEach(function (t) { setTimeout(settleVis, t); });
   }
+  /* Who decided, as a name. Records hold an address (utsav.singh@gushwork.ai) or, on the older foundation decisions, the
+     GitHub login. Same rule as the user card in shell.js: with no stored name, one is made from the address. */
+  var LOGIN_NAMES = { 'utsav-gushwork': 'Utsav Singh' };
+  function personName(by) {
+    var b = String(by || '').trim();
+    if (!b) return '';
+    if (LOGIN_NAMES[b.toLowerCase()]) return LOGIN_NAMES[b.toLowerCase()];
+    var words = b.split('@')[0].split(/[._\-+]+/).filter(Boolean).map(function (w) { return w.charAt(0).toUpperCase() + w.slice(1); });
+    return words.join(' ') || b;
+  }
   function detailRow(k, v) { return v ? '<div class="rv-d"><span>' + esc(k) + '</span><b>' + v + '</b></div>' : ''; }
   function drawerEl() {
     var el = $('rv');
@@ -1647,7 +1663,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
         : 'It is recorded in the repo at the next Claude session.') +
         (e.q.note ? ' Your note: ' + esc(e.q.note) : '') + ' <button class="rv-link" type="button" id="rv-undo">Undo</button></div>';
     } else if (it.by) {
-      hist = '<div class="rv-note"><b>' + esc(it.state === 'expired' ? 'Approved, then the source moved' : it.state === 'redone' ? 'Redone since you sent it back' : (STATE_LABEL[it.state] || '')) + '</b> · ' + esc(it.by) + (it.on ? ', ' + esc(it.on) : '') + (it.note ? '<br>' + esc(it.note) : '') + '</div>';
+      hist = '<div class="rv-note"><b>' + esc(it.state === 'expired' ? 'Approved, then the source moved' : it.state === 'redone' ? 'Redone since you sent it back' : (STATE_LABEL[it.state] || '')) + '</b> · ' + esc(personName(it.by)) + (it.on ? ', ' + esc(it.on) : '') + (it.note ? '<br>' + esc(it.note) : '') + '</div>';
     }
     var foot;
     if (!can) foot = '<div class="rv-foot"><span class="rv-hint">Only an owner can approve, rework or reject.</span></div>';
@@ -1661,7 +1677,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     el.innerHTML = '<header class="rv-h"><div class="rv-h__t"><span class="rv-h__s">' + esc(scopeTitle(it)) + ' · ' + (RV.i + 1) + ' of ' + RV.list.length + '</span><h2>' + esc(it.label) + '</h2></div>' +
       '<div class="rv-h__r">' + saveBtn('rv-savenow') + badgeOf(e.state, e.queued, e.q) + '<button type="button" class="rv-x" id="rv-prev" aria-label="Previous" title="Previous (\u2190)"' + (RV.i === 0 ? ' disabled' : '') + '>‹</button><button type="button" class="rv-x" id="rv-next" aria-label="Next" title="Next (\u2192)"' + (RV.i >= RV.list.length - 1 ? ' disabled' : '') + '>›</button><button type="button" class="rv-x" id="rv-close" aria-label="Close" title="Close (Esc)">✕</button></div></header>' +
       '<div class="rv-body" id="rv-body"><section class="rv-sec"><div class="rv-sh"><h3>What it looks like</h3><button type="button" class="rv-ex" id="rv-ex" aria-expanded="false" title="Open the drawer out to see everything (E)"></button></div><div class="rv-vis" id="rv-vis">' + (it.kind === 'foundation' ? ghost() : visualFor(it, null)) + '</div></section>' +
-      '<section class="rv-sec rv-sec--det"><h3>Details</h3><div class="rv-dl">' + detailRow('Kind', esc(it.kind === 'foundation' ? 'Foundation group' : 'Component')) + detailRow('Version', esc(it.version ? 'v' + it.version : '')) +
+      '<section class="rv-sec rv-sec--det"><h3>Details</h3><div class="rv-dl">' + detailRow('Kind', esc(it.kind === 'foundation' ? 'Foundation group' : 'Component')) + (it.use ? '<div class="rv-d rv-d--text"><span>Used for</span><p>' + esc(it.use) + '</p></div>' : '') + detailRow('Version', esc(it.version ? 'v' + it.version : '')) +
       detailRow('Spec last moved', esc(it.changed || '')) + detailRow('Doc', gh ? '<a class="ds-a" href="' + esc(gh) + '" target="_blank" rel="noopener">' + esc(it.doc.split('/').pop()) + '</a>' : '') +
       detailRow('Fingerprint', '<code>' + esc(it.fp) + '</code>') + '</div>' + hist + '</section></div>' + foot;
     if (it.kind === 'foundation') tokens().then(function (t) { if (RV.open && BYID[RV.list[RV.i]] === it) { $('rv-vis').innerHTML = visualFor(it, t); settleVis(); } }).catch(function () {});

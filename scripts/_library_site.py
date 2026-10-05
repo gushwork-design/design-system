@@ -1352,10 +1352,23 @@ def review_state(state, rec, fp, pfp="", fixed=False):
     return state
 
 
+def load_used_for():
+    """web/previews/used-for.json: "surface/key" -> one plain sentence on what the component is used for, shown in the
+    Review drawer's Details. Kept in its own file, not the registry or the doc, because both feed the fingerprint and
+    adding a line to either would expire every pass at once (R45). A component with no entry shows no row."""
+    try:
+        with open(os.path.join(ROOT, "web", "previews", "used-for.json"), encoding="utf-8") as fh:
+            data = json.load(fh)
+        return {k: v.strip() for k, v in data.items() if isinstance(v, str) and v.strip()}
+    except (OSError, ValueError):
+        return {}
+
+
 def review_items(reg, groups):
     """Everything reviewable, with its state, who decided and when, and its current fingerprint. The queue above
     lists only what is waiting; the Review tab needs the whole set to show passed, sent-back and expired too."""
     out = []
+    used = load_used_for()
     fps = CL.group_fingerprints(groups)
     fblock = (reg.get("shared") or {}).get("foundations") or {}
     for g in groups:
@@ -1386,7 +1399,7 @@ def review_items(reg, groups):
             out.append({"scope": skey, "key": n, "label": n, "kind": "component", "surface": stitle,
                         "state": state, "by": rev["by"], "on": rev["on"], "note": rev["note"], "fp": fp, "pfp": pfp,
                         "version": e.get("version", ""), "changed": e.get("changed", ""), "doc": e.get("doc", ""),
-                        "breaking": bool(e.get("breaking")), "href": f"parts/{skey}/{n}.html",
+                        "breaking": bool(e.get("breaking")), "href": f"parts/{skey}/{n}.html", "use": used.get(f"{skey}/{n}", ""),
                         "preview": f"/previews/{skey}/{n}.frag" if os.path.isfile(prev) else "", "figma": fig})
     return out
 
