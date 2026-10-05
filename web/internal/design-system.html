@@ -758,6 +758,27 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .rv-cm__tag--note { background: var(--ul-hdr-bg); color: var(--ul-sub); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }
 .rv-cm__tag--reject { background: var(--gw-color-red-alpha-10, rgba(239,68,68,.1)); color: var(--gw-color-red-500); }
 .rv-cm .rv-refs { margin-top: var(--gw-space-8); }
+/* All activity as a log: one line each, details on expansion. */
+.rv-th .rv-tl--log { gap: 0; }
+.rv-log summary, .rv-log__r { list-style: none; display: flex; align-items: center; gap: var(--gw-space-12); min-height: 32px; font: 400 13px/1.4 var(--gw-font-body); color: var(--ul-sub); }
+.rv-log summary { cursor: pointer; border-radius: var(--gw-radius-8); margin: 0 calc(var(--gw-space-8) * -1); padding: 0 var(--gw-space-8); }
+.rv-log summary::-webkit-details-marker { display: none; }
+.rv-log summary:hover { background: var(--ul-ctl-hover); }
+.rv-log summary:focus-visible { outline: var(--gw-focus-ring); outline-offset: 0; }
+.rv-log b { font-weight: 600; color: var(--ul-cell); }
+.rv-log__t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rv-log time { flex: none; font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
+.rv-log__d { width: 8px; height: 8px; flex: none; border-radius: 50%; background: var(--ul-sub); }
+.rv-log__d--ok { background: var(--gw-color-green-500); }
+.rv-log__d--ship { background: var(--gw-color-primary-500); }
+.rv-log__d--warn { background: var(--gw-color-yellow-500); }
+.rv-log__d--bad { background: var(--gw-color-red-500); }
+.rv-log__d--ai { background: transparent; box-shadow: inset 0 0 0 1.5px var(--gw-color-primary-500); }
+.rv-log__d--move { background: transparent; box-shadow: inset 0 0 0 1.5px var(--ul-sub); }
+.rv-log__c { width: 12px; height: 12px; flex: none; color: var(--ul-sub); transition: transform var(--gw-motion-fast); }
+.rv-log details[open] .rv-log__c { transform: rotate(90deg); }
+.rv-log__x { margin: 4px 0 var(--gw-space-12) 20px; padding: var(--gw-space-12) var(--gw-space-16); border-radius: var(--gw-radius-12); background: var(--ul-hdr-bg); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }
+.rv-log__x .rv-cm__b { margin: 0; }
 .rv-tabs { display: flex; align-items: center; gap: var(--gw-space-20); margin: 0 0 var(--gw-space-16); box-shadow: inset 0 -1px 0 var(--ul-hdr-line); }
 .rv-tab { all: unset; box-sizing: border-box; cursor: pointer; padding: var(--gw-space-8) 0; font: 500 13px/1.4 var(--gw-font-body); color: var(--ul-sub); box-shadow: inset 0 -2px 0 transparent; }
 .rv-tab span { margin-left: 2px; font-weight: 400; color: var(--ul-sub); }
@@ -789,9 +810,9 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .rv-cmp { margin-top: var(--gw-space-20); border-radius: var(--gw-radius-12); background: var(--ul-field-bg); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }
 .rv-cmp:focus-within { box-shadow: inset 0 0 0 1px var(--gw-color-black); }
 :root[data-theme="dark"] .rv-cmp:focus-within { box-shadow: inset 0 0 0 1px var(--gw-color-white); }
-.rv-cmp textarea { all: unset; box-sizing: border-box; display: block; width: 100%; min-height: 56px; padding: var(--gw-space-12) var(--gw-space-16) 0; color: var(--ul-field-fg); font: 400 14px/1.5 var(--gw-font-body); white-space: pre-wrap; }
+.rv-cmp textarea { all: unset; box-sizing: border-box; display: block; width: 100%; min-height: 44px; padding: var(--gw-space-12) var(--gw-space-16) 0; color: var(--ul-field-fg); font: 400 14px/1.5 var(--gw-font-body); white-space: pre-wrap; }
 .rv-cmp textarea::placeholder { color: var(--ul-sub); }
-.rv-cmp__bar { display: flex; justify-content: space-between; align-items: center; gap: var(--gw-space-12); padding: var(--gw-space-8) var(--gw-space-8) var(--gw-space-8) var(--gw-space-16); }
+.rv-cmp__bar { display: flex; justify-content: flex-end; align-items: center; gap: var(--gw-space-12); padding: var(--gw-space-8) var(--gw-space-8) var(--gw-space-8) var(--gw-space-16); }
 .rv-th__empty { font: 400 13px/1.5 var(--gw-font-body); color: var(--ul-sub); }
 .rv-rp { margin-top: var(--gw-space-16); display: grid; gap: var(--gw-space-8); }
 .rv-rp .rv-ta { min-height: 64px; }
@@ -810,6 +831,12 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .rv-act li.is-move::before { background: transparent; box-shadow: inset 0 0 0 1.5px var(--ul-sub); }
 .rv-act b { color: var(--ul-value); font-weight: 600; }
 .rv-act time { display: block; font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
+.rv-tabs + .rv-act { margin-top: 0; }
+.rv-act__more summary { display: inline-flex; margin-top: 2px; cursor: pointer; list-style: none; font: 500 12px/1.4 var(--gw-font-body); color: var(--ul-sub); text-decoration: underline; text-underline-offset: 3px; }
+.rv-act__more summary::-webkit-details-marker { display: none; }
+.rv-act__more summary:hover { color: var(--ul-value); }
+.rv-act__h, .rv-act__more[open] .rv-act__s { display: none; } .rv-act__more[open] .rv-act__h { display: inline; }
+.rv-act__more .rv-refs { margin-top: var(--gw-space-8); }
 .rv-act q { display: block; margin-top: 2px; color: var(--ul-cell); quotes: "\201C" "\201D"; }
 /* The admin's read-only notice at the top of Review: a warning tint and a lock, so it is the first thing read on the tab. */
 .rv-ro { display: flex; align-items: center; gap: var(--gw-space-16); padding: var(--gw-space-16) var(--gw-space-20); border-radius: var(--gw-radius-12);
@@ -1819,6 +1846,29 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     });
     return cms.concat(ev).sort(function (a, b) { return tms(a.at) - tms(b.at); });
   }
+  function shortWhen(v) {
+    var d = new Date(v), now = new Date(); if (isNaN(d)) return '';
+    if (d.toDateString() === now.toDateString()) { var h = d.getHours(); return (h % 12 || 12) + ':' + String(d.getMinutes()).padStart(2, '0') + (h < 12 ? 'am' : 'pm'); }
+    return d.getDate() + ' ' + MON[d.getMonth()] + (d.getFullYear() !== now.getFullYear() ? ', ' + String(d.getFullYear()).slice(2) : '');
+  }
+  /* Activity keeps the original rail (Utsav: "the thread design was nice earlier"): a dot per event on a thin line, what
+     happened in bold, the time under it. A send-back's note and files stay folded until "Show note". */
+  function logRow(c) {
+    var cls, txt, det = '';
+    if (c.ev) {
+      cls = c.what === 'approved' ? 'is-ok' : c.what === 'fixed and published' ? 'is-ship' : 'is-move';
+      txt = c.what === 'approved' ? 'Approved by ' + esc(personName(c.by) || 'Utsav Singh')
+        : c.what === 'fixed and published' ? 'Fixed and published in ' + prLink(c.pr)
+        : (c.what === 'spec moved' ? 'Spec moved' : 'Drawing moved') + (c.pr ? ' in ' + prLink(c.pr) : '');
+    } else {
+      cls = c.kind === 'reject' ? 'is-bad' : 'is-warn';
+      txt = (c.kind === 'reject' ? 'Rejected' : 'Sent back') + ' by Utsav Singh';
+      var files = c.refs && c.refs.length ? '<div class="rv-refs">' + attHtml(c.refs.map(function (r) { var href = r.replace(/^web\//, '/'); return { name: r.split('/').pop(), type: /\.(png|jpe?g|webp|gif)$/.test(r) ? 'image/x' : '', url: href, href: href }; }), false) + '</div>' : '';
+      det = (c.body ? '<q>' + linkify(c.body) + '</q>' : '') + files;
+    }
+    return '<li class="' + cls + '"><b>' + txt + '</b><time datetime="' + esc(c.at) + '">' + esc(fmtWhen(c.at)) + '</time>' +
+      (det ? '<details class="rv-act__more"><summary><span class="rv-act__s">Show note</span><span class="rv-act__h">Hide note</span></summary>' + det + '</details>' : '') + '</li>';
+  }
   function prLink(n) { return '<a class="rv-link" href="https://github.com/gushwork-design/design-system/pull/' + n + '" target="_blank" rel="noopener">#' + n + '</a>'; }
   function paintThread(it) {
     var box = $('rv-th'); if (!box || BYID[RV.list[RV.i]] !== it) return;
@@ -1829,13 +1879,10 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     // Two tabs, as Asana does it (5 Oct 2026, Utsav: "you removed activity, both should be there"): Comments is the
     // conversation alone; All activity is every event with the comments in place. One composer under both.
     var tab = RV.tab === 'all' || !talk ? 'all' : 'comments';
-    var rows = tab === 'all' ? timeline(it, cms) : cms.slice(), lastCm = cms[cms.length - 1];
-    // Updates from before the conversation started fold into one row, so the thread opens on the first note.
-    var lead = 0; while (tab === 'all' && talk && lead < rows.length && rows[lead].ev) lead++;
-    if (lead === rows.length) lead = 0;
-    var early = RV.early && RV.early[idOf(it)];
-    var html = (lead > 1 && !early ? '<li class="rv-ev rv-ev--more"><button type="button" class="rv-link" id="rv-early">Show ' + lead + ' earlier updates</button></li>' : '') +
-      rows.slice(lead > 1 && !early ? lead : 0).map(function (c) {
+    var rows = tab === 'all' ? timeline(it, cms.filter(function (c) { return c.kind; })) : cms.slice(), lastCm = cms[cms.length - 1];   // Activity is a record of events; conversation stays in Comments
+    // All activity is a log (5 Oct 2026, Utsav: "keep activity minimal, less data, keep details on expansion"): one short line
+    // per entry, newest last, and a note, a file or Alfred's message opens only when its line is expanded.
+    var html = tab === 'all' ? rows.map(logRow).join('') : rows.map(function (c) {
       if (c.ev) {
         var txt = c.what === 'approved' ? '<b>' + esc(personName(c.by).split(' ')[0] || 'Utsav') + '</b> approved it'
           : c.what === 'fixed and published' ? '<b>Alfred</b> fixed and published ' + prLink(c.pr)
@@ -1857,16 +1904,16 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       return '<li class="rv-cm rv-cm--' + esc(c.who) + (waiting ? ' is-waiting' : '') + '"><span class="rv-cm__a" aria-hidden="true">' + esc(who.charAt(0)) + '</span><div class="rv-cm__m"><div class="rv-cm__h"><b>' + esc(who) + '</b>' + tags + '<time datetime="' + esc(c.at) + '">' + esc(fmtWhen(c.at)) + '</time></div>' +
         (c.kind ? '<div class="rv-card">' + inner + '</div>' : inner) + '</div></li>';
     }).join('');
-    var reply = owner ? '<div class="rv-cmp"><textarea id="rv-reply" rows="2" maxlength="2000" aria-label="Reply to Alfred" placeholder="Reply to Alfred: answer his question, or say what to do next"></textarea>' +
-      '<div class="rv-cmp__bar"><span class="rv-hint--sm">He starts again with your reply and the whole thread</span><button type="button" class="rv-b rv-b--pass rv-b--sm" id="rv-reply-send" disabled>Send<kbd aria-hidden="true">⌘↵</kbd></button></div></div>' : '';
-    var nAll = (it.activity || []).filter(function (a) { return a.what !== 'sent back' && a.what !== 'rejected'; }).length + cms.length;
+    var reply = owner ? '<div class="rv-cmp"><textarea id="rv-reply" rows="2" maxlength="2000" aria-label="Reply to Alfred" placeholder="Reply to Alfred…"></textarea>' +
+      '<div class="rv-cmp__bar"><button type="button" class="rv-b rv-b--pass rv-b--sm" id="rv-reply-send" disabled>Send<kbd aria-hidden="true">⌘↵</kbd></button></div></div>' : '';
+    var nAll = (it.activity || []).filter(function (a) { return a.what !== 'sent back' && a.what !== 'rejected'; }).length + cms.filter(function (c) { return c.kind; }).length;
     var tabs = '<div class="rv-tabs" role="tablist">' +
       '<button type="button" role="tab" class="rv-tab' + (tab === 'comments' ? ' is-on' : '') + '" aria-selected="' + (tab === 'comments') + '" data-tab="comments">Comments' + (cms.length ? ' <span>' + cms.length + '</span>' : '') + '</button>' +
-      '<button type="button" role="tab" class="rv-tab' + (tab === 'all' ? ' is-on' : '') + '" aria-selected="' + (tab === 'all') + '" data-tab="all">All activity' + (nAll ? ' <span>' + nAll + '</span>' : '') + '</button>' +
+      '<button type="button" role="tab" class="rv-tab' + (tab === 'all' ? ' is-on' : '') + '" aria-selected="' + (tab === 'all') + '" data-tab="all">Activity' + (nAll ? ' <span>' + nAll + '</span>' : '') + '</button>' +
       '</div>';   // no "On GitHub" link: the drawer holds the whole thread (Utsav, 5 Oct 2026)
     box.innerHTML = tabs +
-      (html ? '<ol class="rv-tl">' + html + '</ol>' : '<p class="rv-th__empty">' + (tab === 'comments' ? 'No comments yet. Your send-back note starts the thread, and Alfred replies after every rework.' : 'Nothing has happened to this item yet.') + '</p>') +
-      (t.error && tab === 'comments' ? '<p class="rv-th__empty">' + esc(t.error) + '</p>' : '') + (talk ? reply : '');
+      (html ? (tab === 'all' ? '<div class="rv-act"><ol>' + html + '</ol></div>' : '<ol class="rv-tl">' + html + '</ol>') : '<p class="rv-th__empty">' + (tab === 'comments' ? 'No comments yet. Your send-back note starts the thread, and Alfred replies after every rework.' : 'Nothing has happened to this item yet.') + '</p>') +
+      (t.error && tab === 'comments' ? '<p class="rv-th__empty">' + esc(t.error) + '</p>' : '') + (talk && tab === 'comments' ? reply : '');
     box.querySelectorAll('[data-tab]').forEach(function (b) { b.addEventListener('click', function () { RV.tab = b.getAttribute('data-tab'); paintThread(it); }); });
     var more = $('rv-early'); if (more) more.addEventListener('click', function () { RV.early = RV.early || {}; RV.early[idOf(it)] = true; paintThread(it); });
     var ta = $('rv-reply'), send = $('rv-reply-send');
