@@ -81,33 +81,6 @@
           </div>
         </div>
 
-        <div class="tcard tcard--tpl" data-tool="/internal/templates/analytics-overview">
-          <div class="tcard__well">
-            <div class="tcard__dev">
-              <div class="tcard__bar"><i></i><i></i><i></i></div>
-              <img src="/assets/tools/tpl-analytics-overview.png"
-                   alt="The analytics overview template: a dashboard with a sidebar, four stat cards and a line chart beside a bar chart."
-                   loading="lazy">
-            </div>
-          </div>
-          <div class="tcard__b">
-            <div class="bdgs">
-              <span class="bdg bdg--type">Template</span>
-              <span class="bdg bdg--ghost" data-tool-badge aria-hidden="true"></span>
-              <span class="bdg bdg--on">Active</span>
-            </div>
-            <div class="tcard__t">
-              <h3>Analytics overview</h3>
-              <p>A dashboard screen: a period against the last one, broken down and listed.</p>
-            </div>
-            <div class="tcard__act">
-              <a class="tl-go tl-go--sec" href="/internal/templates/analytics-overview" target="_blank" rel="noopener"><svg viewBox="0 0 256 256" aria-hidden="true"><path d="M247.31,124.76c-.35-.79-8.82-19.58-27.65-38.41C194.57,61.26,162.88,48,128,48S61.43,61.26,36.34,86.35C17.51,105.18,9,124,8.69,124.76a8,8,0,0,0,0,6.5c.35.79,8.82,19.57,27.65,38.4C61.43,194.74,93.12,208,128,208s66.57-13.26,91.66-38.34c18.83-18.83,27.3-37.61,27.65-38.4A8,8,0,0,0,247.31,124.76ZM128,192c-30.78,0-57.67-11.19-79.93-33.25A133.47,133.47,0,0,1,25,128,133.33,133.33,0,0,1,48.07,97.25C70.33,75.19,97.22,64,128,64s57.67,11.19,79.93,33.25A133.46,133.46,0,0,1,231.05,128C223.84,141.46,192.43,192,128,192Zm0-112a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Z"/></svg>Preview
-              </a>
-              <button class="tuse" type="button" data-prompt="Use the Gushwork analytics-overview dashboard template at skills/gushwork-dashboard/templates/analytics-overview/ to build an analytics or reporting screen. Copy the folder to the new project first, then replace the sample copy and figures from the brief I give you next, keep the Sample data badge until real data replaces them, and set the build stamp&#x27;s components list to exactly what the page uses. Keep every value on the design system&#x27;s tokens.">Use with Claude</button>
-            </div>
-          </div>
-        </div>
-
         <div class="tcard tcard--tpl" data-tool="/internal/templates/case-study">
           <div class="tcard__well">
             <div class="tcard__dev">
@@ -266,8 +239,7 @@
   var GROUPS = [
     ['web', 'Web pages', ['ad-page', 'ad-page-signup', 'case-study']],
     ['docs', 'Documents', ['lead-magnet', 'one-pager']],
-    ['slides', 'Slides', ['slide-deck']],
-    ['dashboard', 'Dashboard', ['analytics-overview']]
+    ['slides', 'Slides', ['slide-deck']]
   ];
   var cards = [].slice.call(document.querySelectorAll('.tl-cards > .tcard'));
   var host = document.querySelector('.tl-cards');

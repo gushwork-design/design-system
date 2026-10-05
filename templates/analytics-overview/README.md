@@ -1,4 +1,6 @@
-# Analytics overview template
+# Analytics overview template (archived)
+
+> Archived 5 Oct 2026. Not listed on the hub's Templates page or in the library while a different one is made. The files are kept as they were.
 
 A dashboard screen: how a thing performed over a period, against the previous period, broken down and listed.
 Show-ups overview with invented sample data (every figure is sample, and the page says so with a `Sample data`
