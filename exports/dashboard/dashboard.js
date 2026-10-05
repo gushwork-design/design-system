@@ -118,6 +118,14 @@ window.GD = window.GD || {};
   }
 
   /* -- popovers: theme-menu and workspace-switcher ------------------------------------------- */
+  /* A [data-gd-pop] wrapper is the shell's trigger + menu pair. The filter builder's trigger also carries data-gd-pop (40-tables:
+     filtering.md), as a bare id with no menu, so anything that asks "which popover is this" must skip a wrapper with no menu. */
+  function popWrap(el) {
+    var p = el && el.closest && el.closest('[data-gd-pop]');
+    while (p && !$('[data-gd-pop-menu]', p)) p = p.parentElement && p.parentElement.closest('[data-gd-pop]');
+    return p;
+  }
+  function openPops() { return $$('[data-gd-pop]').filter(function (p) { var m = $('[data-gd-pop-menu]', p); return m && !m.hidden; }); }
   function items(menu) { return $$('[role^="menuitem"]:not([aria-disabled="true"])', menu); }
   function closePops(except) {
     $$('[data-gd-pop]').forEach(function (p) {
@@ -311,7 +319,7 @@ window.GD = window.GD || {};
       var s = $('[data-gd-search-open]'); if (s) { e.preventDefault(); emit(s, 'gd:search-open', {}, true); } return;
     }
     if (e.key === 'Escape') {
-      var pop = t.closest && t.closest('[data-gd-pop]') || $$('[data-gd-pop]').filter(function (p) { return !$('[data-gd-pop-menu]', p).hidden; })[0];
+      var pop = popWrap(t) || openPops()[0];
       if (pop) { closePop(pop, true); return; }
       var app = $('.gd-app[data-nav-open="true"]'); if (app) { setNav(false); var b = $('[data-gd-nav-toggle]', app); if (b) b.focus(); return; }
       var g = t.closest && t.closest('[data-gd-widgets][data-editing="true"]');
@@ -390,8 +398,8 @@ window.GD = window.GD || {};
     el.setAttribute('data-initial', el.value); emit(el, 'gd:title-change', { field: el.getAttribute('data-gd-edit'), value: el.value });
   });
   doc.addEventListener('focusout', function (e) {
-    var p = e.target.closest && e.target.closest('[data-gd-pop]');
-    if (p && !$('[data-gd-pop-menu]', p).hidden && e.relatedTarget && !p.contains(e.relatedTarget)) closePop(p, false);
+    var p = popWrap(e.target), m = p && $('[data-gd-pop-menu]', p);
+    if (m && !m.hidden && e.relatedTarget && !p.contains(e.relatedTarget)) closePop(p, false);
   });
   window.addEventListener('resize', fit);
   try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () { if (pref() === 'system') applyTheme('system', false); }); } catch (e) { /* old browser */ }
@@ -750,7 +758,8 @@ GD.inputs = GD.inputs || {};
   /* ---------------------------------------------------------------- search clear, indeterminate */
   document.addEventListener('click', (e) => {
     const c = e.target.closest('[data-gd-clear]'); if (!c) return;
-    const el = c.closest('.gd-input').querySelector('.gd-input__el'); el.value = ''; el.dispatchEvent(new Event('input', { bubbles: true })); el.focus();
+    const box = c.closest('.gd-input'); if (!box) return;       // the filter builder's Clear filters shares this attribute (40-tables); it is not a search field
+    const el = box.querySelector('.gd-input__el'); if (!el) return; el.value = ''; el.dispatchEvent(new Event('input', { bubbles: true })); el.focus();
   });
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape' || !e.target.matches?.('.gd-input--search .gd-input__el') || !e.target.value) return;
@@ -2023,18 +2032,18 @@ function dataTable(m) {
    ============================================================================ */
 function renderHbar(spec) {
   const items = (spec.items || []).filter((i) => num(i.value));
-  if (spec.state === 'loading' || spec.state === 'error' || !items.length) return frameless(spec, spec.state || 'empty');
+  if (spec.state === 'loading' || spec.state === 'error' || spec.state === 'empty' || !items.length) return frameless(spec, spec.state || 'empty');
   let rows = items.slice(); if (spec.sort !== false) rows.sort((a, b) => b.value - a.value);
   const topN = spec.top || 0; if (topN && rows.length > topN) { const rest = rows.slice(topN).reduce((a, r) => a + r.value, 0); rows = rows.slice(0, topN).concat([{ label: 'Other', value: rest, tone: 'neutral' }]); }
   const mk = mkFmt(spec), total = spec.total != null ? spec.total : items.reduce((a, r) => a + Math.abs(r.value), 0);
   const div = !!spec.diverging || rows.some((r) => r.value < 0);
-  const mx = Math.max(...rows.map((r) => Math.abs(r.value))) || 1, mn = Math.min(0, ...rows.map((r) => r.value)), span = div ? Math.max(Math.abs(mn), Math.max(...rows.map((r) => r.value))) * 2 || 1 : mx;
+  const mxData = Math.max(...rows.map((r) => Math.abs(r.value))) || 1, mx = spec.max > 0 ? spec.max : mxData, mn = Math.min(0, ...rows.map((r) => r.value)), span = div ? Math.max(Math.abs(mn), Math.max(...rows.map((r) => r.value))) * 2 || 1 : mx;
   const share = spec.share !== false;
   const li = rows.map((r) => {
     const col = r.tone ? ' style="--c:' + toneColor(r.tone) + (div ? '' : '') + '"' : '';
     let bar;
     if (div) { const w = Math.abs(r.value) / span * 100, left = r.value < 0 ? 50 - w : 50; bar = '<span class="gd-hbar__bar' + (r.value < 0 ? ' gd-hbar__bar--neg' : '') + '" style="left:' + f1(left) + '%;width:' + f1(w) + '%' + (r.tone ? ';--c:' + toneColor(r.tone) : r.value < 0 ? ';--c:' + TONE[spec.negTone || 'neutral'] : '') + '"></span>'; }
-    else bar = '<span class="gd-hbar__bar" style="width:' + f1(r.value / mx * 100) + '%' + (r.tone ? ';--c:' + toneColor(r.tone) : '') + '"></span>';
+    else bar = '<span class="gd-hbar__bar" style="width:' + f1(Math.min(100, r.value / mx * 100)) + '%' + (r.tone ? ';--c:' + toneColor(r.tone) : '') + '"></span>';
     const inner = '<span class="gd-hbar__label" title="' + esc(r.label) + '">' + esc(r.label) + '</span><span class="gd-hbar__track" aria-hidden="true">' + bar + '</span><span class="gd-hbar__val gd-num">' + esc(mk.full(r.value)) + '</span>' +
       (share ? '<span class="gd-hbar__share gd-num">' + Math.round(Math.abs(r.value) / total * 100) + '%</span>' : '');
     return '<li>' + (r.href ? '<a class="gd-hbar__row" href="' + esc(r.href) + '">' + inner + '</a>' : '<div class="gd-hbar__row">' + inner + '</div>') + '</li>';
@@ -2055,7 +2064,7 @@ function frameless(spec, st, html, cls) {
    ============================================================================ */
 function renderDonut(spec) {
   let items = (spec.items || []).filter((i) => num(i.value) && i.value > 0);
-  if (spec.state === 'loading' || spec.state === 'error' || !items.length) return frameless(spec, spec.state || 'empty');
+  if (spec.state === 'loading' || spec.state === 'error' || spec.state === 'empty' || !items.length) return frameless(spec, spec.state || 'empty');
   const max = spec.max || ceilOf(spec), tot = items.reduce((a, r) => a + r.value, 0);
   const untoned = items.filter((i) => !i.tone);
   if (untoned.length > max) {
@@ -2084,7 +2093,7 @@ function renderDonut(spec) {
    ============================================================================ */
 function renderBreakdown(spec) {
   let segs = (spec.segments || []).filter((s) => num(s.value) && s.value > 0);
-  if (spec.state === 'loading' || spec.state === 'error' || !segs.length) return frameless(spec, spec.state || 'empty');
+  if (spec.state === 'loading' || spec.state === 'error' || spec.state === 'empty' || !segs.length) return frameless(spec, spec.state || 'empty');
   const tot = segs.reduce((a, s) => a + s.value, 0), cnt = segs.filter((s) => !s.tone).length; let k = 0;
   segs = segs.map((s) => Object.assign({}, s, { color: s.tone ? toneColor(s.tone) : cnt === 1 ? TONE.accent : slotColor(Math.min(k++, ceilOf(spec) - 1), spec) }));
   if (cnt > ceilOf(spec)) warnOnce('brk', 'a breakdown bar has more than ' + ceilOf(spec) + ' untoned segments; colours repeat the last slot. Give extra segments tone:"neutral".');
@@ -2179,7 +2188,7 @@ function renderHeat(spec) {
    ============================================================================ */
 function renderFunnel(spec) {
   const st = (spec.steps || []).filter((s) => num(s.value));
-  if (spec.state === 'loading' || spec.state === 'error' || !st.length) return frameless(spec, spec.state || 'empty');
+  if (spec.state === 'loading' || spec.state === 'error' || spec.state === 'empty' || !st.length) return frameless(spec, spec.state || 'empty');
   const mk = mkFmt(spec), first = st[0].value || 1, vert = spec.layout === 'vertical', pct = (x) => (x * 100 >= 10 ? Math.round(x * 100) : Math.round(x * 1000) / 10) + '%';
   const rows = st.map((s, i) => { const prev = i ? st[i - 1].value : s.value; return { s, i, comp: s.value / first, drop: i ? (prev ? 1 - s.value / prev : 0) : 0, lost: i ? prev - s.value : 0, cont: i ? (prev ? s.value / prev : 0) : 1 }; });
   const lastR = rows[rows.length - 1], lostAll = first - lastR.s.value;
@@ -2204,7 +2213,7 @@ function renderFunnel(spec) {
    ============================================================================ */
 function renderUptime(spec) {
   const segs = spec.segments || [];
-  if (spec.state === 'loading' || spec.state === 'error' || !segs.length) return frameless(spec, spec.state || 'empty');
+  if (spec.state === 'loading' || spec.state === 'error' || spec.state === 'empty' || !segs.length) return frameless(spec, spec.state || 'empty');
   const known = segs.filter((s) => s.status !== 'none'), up = known.filter((s) => s.status === 'up').length, deg = known.filter((s) => s.status === 'degraded').length, down = known.filter((s) => s.status === 'down').length;
   const pctv = spec.percent != null ? spec.percent : known.length ? Math.round((known.length - down) / known.length * 10000) / 100 : null; void up;
   const nm = { up: 'Operational', degraded: 'Degraded', down: 'Down', none: 'No data' };
@@ -2699,7 +2708,7 @@ function syncTables(root) {
       const d = doc.createElement('dialog');
       d.className = 'gd-modal gd-modal--sm gd-confirm';
       const id = 'gd-confirm-' + Math.random().toString(36).slice(2, 8);
-      d.setAttribute('aria-labelledby', id + '-t'); d.setAttribute('aria-describedby', id + '-d');
+      d.setAttribute('role', 'alertdialog'); d.setAttribute('aria-labelledby', id + '-t'); d.setAttribute('aria-describedby', id + '-d');
       const items = (o.items || []).map((i) => '<li>' + esc(i) + '</li>').join('');
       const danger = o.danger !== false;
       d.innerHTML = '<div class="gd-modal__head"><h2 class="gd-modal__title" id="' + id + '-t">' + esc(o.title || 'Are you sure?') + '</h2></div>' +

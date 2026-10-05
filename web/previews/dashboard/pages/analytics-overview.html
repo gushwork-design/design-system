@@ -368,10 +368,10 @@
     var top = camps.slice().sort(function (a, b) { return a.cost - b.cost; }).slice(0, 8);
     var cc = { title: 'Cost per show-up by campaign', description: 'Lowest eight, in dollars', size: 'sm', card: true, sort: false, share: false, prefix: '$', format: 'number', items: top.map(function (x) { return { label: x.c.name, value: Math.round(x.cost * 100) / 100 }; }) };
     var rr = camps.slice().sort(function (a, b) { return b.rate - a.rate; }).slice(0, 8);
-    var rc = { title: 'Show rate by campaign', description: 'Highest eight, as a share of booked meetings', size: 'sm', card: true, share: false, unit: '%', items: rr.map(function (x) { return { label: x.c.name, value: Math.round(x.rate * 1000) / 10 }; }) };
+    var rc = { title: 'Show rate by campaign', description: 'Highest eight, as a share of booked meetings', size: 'sm', card: true, share: false, unit: '%', max: 100, items: rr.map(function (x) { return { label: x.c.name, value: Math.round(x.rate * 1000) / 10 }; }) };
     var locs = LOCS.map(function (l) { return { label: l[0], value: Math.round(s.show * l[1]) }; });
     var lc = { title: 'Show-ups by location', description: 'Share of all show-ups in the range', size: 'sm', card: true, items: locs };
-    var lr = { title: 'Show rate by location', description: 'Share of booked meetings that turned up', size: 'sm', card: true, share: false, unit: '%', items: LOCS.map(function (l) { return { label: l[0], value: Math.round(Math.min(97, s.rate * l[3] * 100) * 10) / 10 }; }) };
+    var lr = { title: 'Show rate by location', description: 'Share of booked meetings that turned up', size: 'sm', card: true, share: false, unit: '%', max: 100, items: LOCS.map(function (l) { return { label: l[0], value: Math.round(Math.min(97, s.rate * l[3] * 100) * 10) / 10 }; }) };
     [['cost-camp', cc], ['rate-camp', rc], ['loc', lc], ['loc-rate', lr]].forEach(function (a) {
       var h = $('#ch-' + a[0]); if (charts[a[0]]) GD.charts.update(h, a[1]); else { GD.charts.mount(h, 'hbar', a[1]); charts[a[0]] = 1; }
     });

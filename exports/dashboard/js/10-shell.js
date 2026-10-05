@@ -113,6 +113,14 @@
   }
 
   /* -- popovers: theme-menu and workspace-switcher ------------------------------------------- */
+  /* A [data-gd-pop] wrapper is the shell's trigger + menu pair. The filter builder's trigger also carries data-gd-pop (40-tables:
+     filtering.md), as a bare id with no menu, so anything that asks "which popover is this" must skip a wrapper with no menu. */
+  function popWrap(el) {
+    var p = el && el.closest && el.closest('[data-gd-pop]');
+    while (p && !$('[data-gd-pop-menu]', p)) p = p.parentElement && p.parentElement.closest('[data-gd-pop]');
+    return p;
+  }
+  function openPops() { return $$('[data-gd-pop]').filter(function (p) { var m = $('[data-gd-pop-menu]', p); return m && !m.hidden; }); }
   function items(menu) { return $$('[role^="menuitem"]:not([aria-disabled="true"])', menu); }
   function closePops(except) {
     $$('[data-gd-pop]').forEach(function (p) {
@@ -306,7 +314,7 @@
       var s = $('[data-gd-search-open]'); if (s) { e.preventDefault(); emit(s, 'gd:search-open', {}, true); } return;
     }
     if (e.key === 'Escape') {
-      var pop = t.closest && t.closest('[data-gd-pop]') || $$('[data-gd-pop]').filter(function (p) { return !$('[data-gd-pop-menu]', p).hidden; })[0];
+      var pop = popWrap(t) || openPops()[0];
       if (pop) { closePop(pop, true); return; }
       var app = $('.gd-app[data-nav-open="true"]'); if (app) { setNav(false); var b = $('[data-gd-nav-toggle]', app); if (b) b.focus(); return; }
       var g = t.closest && t.closest('[data-gd-widgets][data-editing="true"]');
@@ -385,8 +393,8 @@
     el.setAttribute('data-initial', el.value); emit(el, 'gd:title-change', { field: el.getAttribute('data-gd-edit'), value: el.value });
   });
   doc.addEventListener('focusout', function (e) {
-    var p = e.target.closest && e.target.closest('[data-gd-pop]');
-    if (p && !$('[data-gd-pop-menu]', p).hidden && e.relatedTarget && !p.contains(e.relatedTarget)) closePop(p, false);
+    var p = popWrap(e.target), m = p && $('[data-gd-pop-menu]', p);
+    if (m && !m.hidden && e.relatedTarget && !p.contains(e.relatedTarget)) closePop(p, false);
   });
   window.addEventListener('resize', fit);
   try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () { if (pref() === 'system') applyTheme('system', false); }); } catch (e) { /* old browser */ }

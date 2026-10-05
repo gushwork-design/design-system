@@ -102,7 +102,7 @@ Provenance. Bar geometry extracted: `web/admin/analytics.html:268-279`; vertical
 
 Purpose. Ranked list: label, bar, value, share. Use for top pages, top keywords, any "which is biggest".
 
-Anatomy. `ol.gd-hbar` > `li` > `.gd-hbar__row` (`label`, `track` > `bar`, `val`, `share`). Bars are 10px (8 compact) with the trailing corners rounded. Rows become `<a>` when an item has `href`.
+Anatomy. `ol.gd-hbar` > `li` > `.gd-hbar__row` (`label`, `track` > `bar`, `val`, `share`). Bars are 10px (8 compact) with the trailing corners rounded. Rows become `<a>` when an item has `href`. The longest bar fills the track unless `max` fixes the scale, which a set of percentages should (`max: 100`), so 67% and 78% do not read as a tie; a value over `max` is clamped.
 
 Options: `top:n` folds the rest into a neutral "Other"; `share:false`; `diverging` (zero axis at 50%); `tone` per item; sorted descending unless `sort:false`.
 

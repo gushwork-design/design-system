@@ -76,6 +76,7 @@
 .gd .gd-select > .gd-input, .gd .gd-combo > .gd-input, .gd .gd-multi-wrap > .gd-input{ width: 100%; }
 .gd button.gd-input{ cursor: pointer; font-feature-settings: normal; }
 .gd button.gd-input:hover, .gd button.gd-input.is-hover, .gd button.gd-input[aria-expanded="true"]{ box-shadow: inset 0 0 0 1px var(--gd-border-focus); }
+.gd button.gd-input:focus-visible{ outline: none; box-shadow: inset 0 0 0 1px var(--gd-border-focus); }   /* R41: a field shows its edge, not the ring; the select trigger is a button, so the shell's button ring had been landing on it */
 .gd button.gd-input:disabled:hover{ box-shadow: inset 0 0 0 1px var(--gd-border-strong); }
 .gd .gd-select__value{ flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .gd .gd-select__value[data-empty]{ color: var(--gd-placeholder); }
@@ -197,7 +198,7 @@
   display: inline-flex; flex-direction: column; width: max-content; max-width: 100%; color: var(--gd-text);
   background: var(--gd-raised-bg); border-radius: var(--gw-radius-16); box-shadow: inset 0 0 0 1px var(--gd-border-strong), var(--gw-shadow-s4);
 }
-.gd .gd-drp--pop{ position: absolute; z-index: 60; top: calc(100% + var(--gw-space-4)); left: 0; }
+.gd .gd-drp--pop{ position: absolute; z-index: 60; top: calc(100% + var(--gw-space-4)); left: 0; max-width: calc(100vw - 2 * var(--gw-space-8)); box-sizing: border-box; }   /* never wider than the screen, so it cannot run off the right edge */
 .gd .gd-drp--pop[hidden]{ display: none; }
 .gd .gd-drp__main{ display: flex; }
 .gd .gd-drp__presets{ flex: none; width: 176px; display: flex; flex-direction: column; gap: 2px; padding: var(--gw-space-12) var(--gw-space-8); box-shadow: inset -1px 0 0 var(--gd-border); }
