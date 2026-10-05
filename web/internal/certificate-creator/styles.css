@@ -549,3 +549,12 @@ html[data-tool-panel="open"] .t-acts { right: calc(var(--t-panel-w) + var(--t-in
 .cert-cite { outline: none; border-radius: 2px; cursor: text; transition: box-shadow var(--gw-motion-fast), background var(--gw-motion-fast); }
 .cert:not([data-exporting]) .cert-cite:focus { box-shadow: 0 0 0 2px var(--gw-color-neutral-400); background: color-mix(in srgb, var(--gw-color-white) 60%, transparent); }
 .cert:not([data-exporting]) .cert-cite:focus .cert-edit:hover { box-shadow: none; }
+
+/* ── First-run tour (the library's coachmark). The step's target gets the brand-blue outline the
+   library gives it (--gd-accent): a tour is a signal, not a control state. ── */
+[data-tour-on] { outline: 2px solid var(--gw-color-primary-500) !important; outline-offset: 4px; border-radius: var(--gw-radius-8); }
+.home-band__head { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-12); }
+/* In the editor, Appearance and Help live in the file menu (⋯), not the canvas corner (Utsav,
+   5 Oct 2026). The Files home keeps the hub's corner controls. */
+html[data-tool-panel="open"] .t-acts, html[data-tool-panel="closed"] .t-acts { display: none; }
+.right-head .gd-menu { max-height: calc(100vh - 80px); }   /* the file menu holds file, Appearance and Help: let it show whole */
