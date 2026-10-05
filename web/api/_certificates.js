@@ -1,5 +1,5 @@
 /* ============================================================================
-   _certificates.js — the award certificate tool's shared saved list.
+   _certificates.js — Certificate Creator's shared files.
 
    Served as /api/certificates, a module behind gw.js like its neighbours, so it costs no new
    function against the Hobby plan's 12.
@@ -40,9 +40,11 @@ const NAMES = 'gw:cert-names';   // email -> the display name from that person's
 const MAX_ITEMS = 1000;
 const MAX_PEOPLE = 50;
 const MAX_TITLE = 120;
+const MAX_PAGES = 50;
 const cleanTitle = (t) => (typeof t === 'string' ? t.trim().slice(0, MAX_TITLE) : '');
-/* Live at /internal/award-certificate since 5 Oct 2026; the old staging path stays so a rule set on it still counts. */
-const TOOL_PATHS = ['/internal/staging/award-certificate', '/internal/award-certificate'];
+/* Certificate Creator lives at /internal/certificate-creator (renamed 5 Oct 2026). The older paths
+   stay listed so a rule set on them before the rename still counts. */
+const TOOL_PATHS = ['/internal/certificate-creator', '/internal/award-certificate', '/internal/staging/award-certificate'];
 const FIELDS = {
   preset: 40, name: 80, headline: 200, before: 400, award: 120, after: 400,
   period: 40, signature: 60, signedBy: 120,
@@ -81,6 +83,14 @@ function clean(raw) {
   }
   out.nameOwnLine = raw.nameOwnLine === true;
   return out;
+}
+
+/* A file's pages: each a certificate's fields. `data` stays the first page, so a file saved
+   before pages existed reads as one page and list views have something to show. */
+function cleanPages(raw) {
+  if (!Array.isArray(raw) || !raw.length) return null;
+  const pages = raw.slice(0, MAX_PAGES).map(clean).filter(Boolean);
+  return pages.length ? pages : null;
 }
 
 /* Returns a valid access object, or a string saying what is wrong. */
@@ -184,7 +194,7 @@ export default async function handler(req, res) {
         const can = perms(prev, me);
         if (!can.view) return json(res, 404, { error: 'That certificate was deleted.' });
         const item = { ...prev };
-        const editing = body.data !== undefined || body.title !== undefined;
+        const editing = body.data !== undefined || body.pages !== undefined || body.title !== undefined;
         if (editing && !can.edit) return json(res, 403, { error: 'You can view this certificate but not edit it.' });
         // clash guard: someone saved after this editor opened the file
         if (editing && !body.force && typeof body.base === 'string' && body.base !== prev.updatedAt) {
@@ -195,10 +205,18 @@ export default async function handler(req, res) {
           item.updatedBy = me.email;
           item.updatedAt = now;
         }
-        if (body.data !== undefined) {
+        if (body.pages !== undefined) {
+          const pages = cleanPages(body.pages);
+          if (!pages) return json(res, 400, { error: 'A file needs at least one page.' });
+          item.pages = pages;
+          item.data = pages[0];
+          item.updatedBy = me.email;
+          item.updatedAt = now;
+        } else if (body.data !== undefined) {
           const data = clean(body.data);
           if (!data) return json(res, 400, { error: 'Nothing to save.' });
           item.data = data;
+          item.pages = [data];
           item.updatedBy = me.email;
           item.updatedAt = now;
         }
@@ -212,13 +230,14 @@ export default async function handler(req, res) {
         return json(res, 200, { item: present(item, me) });
       }
 
-      const data = clean(body.data);
-      if (!data) return json(res, 400, { error: 'Nothing to save.' });
+      const pages = cleanPages(body.pages) || (body.data ? [clean(body.data)].filter(Boolean) : null);
+      if (!pages || !pages.length) return json(res, 400, { error: 'Nothing to save.' });
+      const data = pages[0];
       const r = await pipe(cfg, [['HLEN', KEY]]);
       if ((r[0] && r[0].result) >= MAX_ITEMS) return json(res, 507, { error: 'The list is full. Delete some old certificates first.' });
       const access = body.access ? cleanAccess(body.access, me.email) : DEFAULT_ACCESS;
       if (typeof access === 'string') return json(res, 400, { error: access });
-      const item = { id: newId(), title: cleanTitle(body.title), data, access, savedBy: me.email, savedAt: now, updatedBy: me.email, updatedAt: now };
+      const item = { id: newId(), title: cleanTitle(body.title), data, pages, access, savedBy: me.email, savedAt: now, updatedBy: me.email, updatedAt: now };
       await pipe(cfg, [['HSET', KEY, item.id, JSON.stringify(item)]]);
       return json(res, 200, { item: present(item, me) });
     }

@@ -1300,7 +1300,7 @@ For printing, use the PDF and print at 100% scale (standard CR80, 54 × 85.6 mm)
       <div className="panel-mini" aria-hidden={panelOpen}>
         <a className="brand-link" href="/internal/tools" title="Back to Tools" aria-label="Back to Tools" tabIndex={panelOpen ? -1 : 0}>
           <svg className="brand-icon" width="32" height="32" viewBox="0 0 160 160" fill="none" aria-hidden>
-            <rect width="160" height="160" rx="20" fill="#0D0D0D" />
+            <rect className="brand-icon__bg" width="160" height="160" rx="20" fill="#0070FF" />
             <path d="M116.609 44.5634C117.503 42.3606 115.85 40 113.472 40H49.1429C44.0934 40 40 44.0934 40 49.1429V106.778C40 112.018 45.1708 115.683 49.9603 113.557C80.8494 99.8449 104.378 74.7075 116.609 44.5634Z" fill="white" />
             <path d="M72.5161 120C71.4022 120 70.9357 118.553 71.8259 117.884C94.9007 100.527 111.434 75.8047 118.766 48.0522C118.94 47.3915 120 47.5162 120 48.1995V110.857C120 115.907 115.907 120 110.857 120H72.5161Z" fill="white" />
           </svg>
@@ -1315,7 +1315,7 @@ For printing, use the PDF and print at 100% scale (standard CR80, 54 × 85.6 mm)
         <header className="brand-card">
           <a className="brand-link" href="/internal/tools" title="Back to Tools" aria-label="Back to Tools">
           <svg className="brand-icon" width="32" height="32" viewBox="0 0 160 160" fill="none" aria-hidden>
-            <rect width="160" height="160" rx="20" fill="#0D0D0D" />
+            <rect className="brand-icon__bg" width="160" height="160" rx="20" fill="#0070FF" />
             <path d="M116.609 44.5634C117.503 42.3606 115.85 40 113.472 40H49.1429C44.0934 40 40 44.0934 40 49.1429V106.778C40 112.018 45.1708 115.683 49.9603 113.557C80.8494 99.8449 104.378 74.7075 116.609 44.5634Z" fill="white" />
             <path d="M72.5161 120C71.4022 120 70.9357 118.553 71.8259 117.884C94.9007 100.527 111.434 75.8047 118.766 48.0522C118.94 47.3915 120 47.5162 120 48.1995V110.857C120 115.907 115.907 120 110.857 120H72.5161Z" fill="white" />
           </svg>
