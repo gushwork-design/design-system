@@ -917,6 +917,12 @@
       "reviewedOn": "2026-10-05",
       "fingerprint": "5dd526b9eb6f2abb",
       "note": "spacing looks odd on left, beside \"Add filter\""
+    },
+    "filter-chip": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "3a6e16d533aeff7e"
     }
   }
 }
