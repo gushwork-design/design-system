@@ -105,7 +105,7 @@ The first row's lead is "Where", the rest "And". Field types are `text` (contain
 
 **States.** Tab: rest, hover, selected (`--gd-selected-bg`), focus. Save segment: ghost button; while naming, an input with a 1px focus edge replaces it.
 
-**Behaviour.** Tabs are `role="tab"`, so 20-actions provides roving focus, arrow keys and `aria-selected` and fires `gd:tab`; the host swaps the filters. Save segment turns into a name field: Enter adds and selects the tab (no count, because none is known yet) and fires `gd:viewsave {name, filters}` with the current chips; Esc or blur on an empty field cancels.
+**Behaviour.** Tabs are `role="tab"`, so 20-actions provides roving focus, arrow keys and `aria-selected` and fires `gd:tab`; the host swaps the filters with `GD.tables.setFilters(chips, list)`, and `gd:viewsave` carries the segment's `filters` so the host can store them. Save segment turns into a name field: Enter adds and selects the tab (no count, because none is known yet) and fires `gd:viewsave {name, filters}` with the current chips; Esc or blur on an empty field cancels.
 
 **Tokens.** `--gd-selected-bg`, `--gd-ctl-hover`, `--gd-text-muted`, `--gd-control-h`.
 

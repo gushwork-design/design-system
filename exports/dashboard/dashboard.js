@@ -997,7 +997,7 @@ GD.inputs = GD.inputs || {};
        [data-gd-logs-live] [data-gd-logs-wrap] [data-gd-logs-expandall] [data-gd-logs-older] [data-gd-logs-jump]; rows [data-gd-expand] aria-expanded.
      data-gd-hist                     histogram. Drag (or Shift+Arrow, Enter) selects a range and fires gd:range {from,to,fromIndex,toIndex}. Esc or [data-gd-hist-clear] clears.
    Events (bubble): gd:sort gd:selection gd:expand gd:columns gd:rowaction gd:page gd:search gd:filters gd:viewsave gd:range gd:logs gd:<data-gd-emit>
-   API: GD.tables.setState(view, 'loading|empty|error|noresults'|null) · .refresh(table) · .selected(table) · .clearSelection(table)
+   API: GD.tables.setState(view, 'loading|empty|error|noresults'|null) · .setFilters(chipsEl, [{id,field,label,op,value}]) · .refresh(table) · .selected(table) · .clearSelection(table)
    ============================================================================ */
 window.GD = window.GD || {};
 (() => {
@@ -1223,11 +1223,20 @@ window.GD = window.GD || {};
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const X = '<svg viewBox="0 0 256 256" width="10" height="10" fill="currentColor" aria-hidden="true"><path d="M208.49,191.51a12,12,0,0,1-17,17L128,145,64.49,208.49a12,12,0,0,1-17-17L111,128,47.51,64.49a12,12,0,0,1,17-17L128,111l63.51-63.52a12,12,0,0,1,17,17L145,128Z"/></svg>';
   const chipsEl = (el) => el.closest('[data-gd-chips]') || $(el.closest('[data-gd-fbuilder]')?.dataset.gdChipsFor || '[data-gd-chips]');
-  const filtersOf = (c) => $$('.gd-chip', c).map((x) => ({ id: x.dataset.gdFid, field: x.dataset.field, op: x.dataset.op, value: x.dataset.value }));
+  const filtersOf = (c) => $$('.gd-chip', c).map((x) => ({ id: x.dataset.gdFid, field: x.dataset.field, label: ($('.gd-chip__f', x) || {}).textContent, op: x.dataset.op, value: x.dataset.value }));
   function chipHtml(f) {
     const label = `${f.label || f.field} ${f.op} ${f.value}`;
     return `<span class="gd-chip" data-gd-fid="${esc(f.id)}" data-field="${esc(f.field)}" data-op="${esc(f.op)}" data-value="${esc(f.value)}"><span class="gd-chip__f">${esc(f.label || f.field)}</span><span class="gd-chip__op">${esc(f.op)}</span><span class="gd-chip__v">${esc(f.value)}</span><button class="gd-chip__x" type="button" data-gd-chip-remove aria-label="Remove filter ${esc(label)}">${X}</button></span>`;
   }
+  /* The host swaps the filters (a saved segment, a preset): replace every chip with `list` ([{id, field, label, op, value}], the shape
+     gd:viewsave carries) and let the rest of the table follow, exactly as if the builder's Apply had been pressed. */
+  T.setFilters = (c, list) => {
+    if (!c) return;
+    $$('.gd-chip', c).forEach((x) => x.remove());
+    const clr = $('[data-gd-chips-clear]', c), html = (list || []).map(chipHtml).join('');
+    if (html) { clr ? clr.insertAdjacentHTML('beforebegin', html) : c.insertAdjacentHTML('beforeend', html); }
+    chipsChanged(c);
+  };
   function chipsChanged(c) {
     const n = $$('.gd-chip', c).length; c.hidden = n === 0;
     const clr = $('[data-gd-chips-clear]', c); if (clr) clr.hidden = n < 2;
@@ -1293,7 +1302,7 @@ window.GD = window.GD || {};
         return { id: r.dataset.gdFid, field: f.value, label: fld ? fld.label : f.value, op: $('[data-gd-f="op"]', r).value, value: v.value.trim() };
       });
       if (bad) { bad.focus(); return; }
-      if (c) { $$('.gd-chip', c).forEach((x) => x.remove()); const clr = $('[data-gd-chips-clear]', c); const html = list.map(chipHtml).join(''); clr ? clr.insertAdjacentHTML('beforebegin', html) : c.insertAdjacentHTML('beforeend', html); chipsChanged(c); }
+      if (c) T.setFilters(c, list);
       closePop(true);
     }
   });
