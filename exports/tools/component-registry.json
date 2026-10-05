@@ -49,7 +49,7 @@
       "changed": "2026-10-05",
       "breaking": false,
       "doc": "components.md",
-      "note": "A shared list of saved work in its own panel below the editor: open, current, delete with one confirm. First used by the award certificate."
+      "note": "A shared list of saved work in its own panel, bottom right: open, current, delete with one confirm. First used by the award certificate."
     }
   },
   "review": {

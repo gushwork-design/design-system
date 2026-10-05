@@ -168,17 +168,16 @@ html:has(script[src*="award-certificate/app.jsx"]) #root:empty::after {
 .saved-error { color: var(--t-danger); }
 .tb-pill button:disabled:not(.btn-primary) { cursor: default; color: var(--t-label); }
 
-/* ── Two panels: the editor on top, Saved below it (Utsav, 5 Oct 2026) ──
-   Saved is a second tool-panel: the same inset, width, radius, border and shadow, pinned to the
-   bottom and sized by its list (at most 40% of the screen, then it scrolls). The editor's bottom
-   edge sits 12 above it; app.jsx writes Saved's height into --t-saved-h. */
-.app { --t-saved-h: 0px; }
-.app .left-col {
-  bottom: calc(var(--t-inset) + var(--t-saved-h) + var(--gw-space-12));
-  height: calc(100vh - var(--t-inset) * 3 - var(--t-saved-h));
-}
+/* ── Saved: its own panel, bottom right (Utsav, 5 Oct 2026) ──
+   A second tool-panel: the same inset, width, radius, border and shadow, pinned to the bottom-right
+   corner and sized by its list (at most 40% of the screen, then it scrolls). The preview and the
+   bar centre between the two panels, so the sheet is never under it. Both panels collapse together. */
+.app { --t-offset-r: calc(var(--t-panel-w) + var(--t-inset) * 2); }
+.app[data-panel="closed"] { --t-offset-r: 0px; }
+.app .preview-col { padding-right: calc(var(--t-offset-r) + 32px); transition: padding 280ms cubic-bezier(.22, 1, .36, 1); }
+.app .floating-toolbar { left: calc((100vw + var(--t-offset) - var(--t-offset-r)) / 2); }
 .saved-panel {
-  position: fixed; left: var(--t-inset); bottom: var(--t-inset); z-index: 40;
+  position: fixed; right: var(--t-inset); bottom: var(--t-inset); z-index: 40;
   width: var(--t-panel-w); max-height: 40vh;
   display: flex; flex-direction: column; overflow: hidden;
   background: var(--t-panel-bg);
@@ -190,9 +189,13 @@ html:has(script[src*="award-certificate/app.jsx"]) #root:empty::after {
 .saved-panel .saved-section { min-height: 0; flex: 1 1 auto; }
 .saved-panel .saved-list { max-height: none; flex: 1 1 auto; min-height: 0; }
 .app[data-panel="closed"] .saved-panel {
-  transform: translateX(calc(-100% - var(--t-inset) - 8px));
+  transform: translateX(calc(100% + var(--t-inset) + 8px));
   opacity: 0; visibility: hidden; pointer-events: none;
   transition: transform 280ms cubic-bezier(.22, 1, .36, 1), opacity 200ms ease, visibility 0s linear 280ms;
 }
-@media (max-width: 900px) { .app[data-panel="open"] .saved-panel { box-shadow: var(--gw-shadow-s4); } }
-@media (prefers-reduced-motion: reduce) { .saved-panel { transition: none; } }
+@media (max-width: 900px) {
+  .app { --t-offset-r: 0px; }
+  .app .floating-toolbar { left: 50%; }
+  .app[data-panel="open"] .saved-panel { box-shadow: var(--gw-shadow-s4); }
+}
+@media (prefers-reduced-motion: reduce) { .saved-panel, .app .preview-col { transition: none; } }

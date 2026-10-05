@@ -223,7 +223,6 @@ function App() {
   const certRef = useRef(null);
   const stageRef = useRef(null);
   const savedRef = useRef(null);
-  const appRef = useRef(null);
   const menuRef = useRef(null);
 
   // the real logo file, inlined so the PDF can draw its paths
@@ -255,23 +254,13 @@ function App() {
     });
   }, [loadList]);
 
-  // the editor panel ends 12 above the Saved panel, whatever height the list has
-  useLayoutEffect(() => {
-    const el = savedRef.current, app = appRef.current;
-    if (!el || !app) return undefined;
-    const sync = () => app.style.setProperty('--t-saved-h', el.offsetHeight + 'px');
-    sync();
-    const ro = new ResizeObserver(sync);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
-
   // fit the A4 sheet into the space right of the panel, above the bar
   useLayoutEffect(() => {
     const el = stageRef.current;
     if (!el) return undefined;
     const fit = () => {
-      const w = el.clientWidth - 64;
+      const cs = getComputedStyle(el);
+      const w = el.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
       const h = window.innerHeight - 56 - 112;
       setScale(Math.max(0.3, Math.min(w / CERT.W, h / CERT.H, 1.2)));
     };
@@ -393,7 +382,7 @@ function App() {
   ];
 
   return (
-    <div className="app" ref={appRef} data-panel={panelOpen ? 'open' : 'closed'}>
+    <div className="app" data-panel={panelOpen ? 'open' : 'closed'}>
       <button type="button" className="panel-reopen" onClick={() => setPanelOpen(true)} aria-label="Open editor panel" title="Open editor panel">
         <SidebarIcon />
       </button>

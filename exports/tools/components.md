@@ -77,13 +77,13 @@ and never as an unlabelled wait.
 
 ## tool-saved-list
 
-A shared list of saved work in **its own panel, below the editor panel** (Utsav, 5 Oct 2026). First used by the award certificate
+A shared list of saved work in **its own panel, bottom right** (Utsav, 5 Oct 2026). First used by the award certificate
 generator (`web/internal/staging/award-certificate/`), where HR's saved certificates are shared
 through `/api/certificates`. **New, pending review.**
 
 | Property | Value |
 |---|---|
-| Panel | a second `tool-panel`: inset 12, 360 wide, radius 20, the same border and shadow, pinned to the bottom, sized by its list up to 40% of the screen; the editor panel ends 12 above it; both collapse together |
+| Panel | a second `tool-panel`: inset 12, 360 wide, radius 20, the same border and shadow, pinned to the bottom-right corner, sized by its list up to 40% of the screen; the preview and the action pill centre between the two panels; both collapse together |
 | Section head | "Saved" in the section title style; a 28 tall outlined "New certificate" button right, shown only while an item is open |
 | Row | padding 4, radius 12, 4 apart; a 4 padded open button holding the name (`body-14-med`) and a meta line (`body-12-reg`, `--t-label`): award · who, date |
 | Current | `--t-field-bg` with a 1px `--t-field-border` |
