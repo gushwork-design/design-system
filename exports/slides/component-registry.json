@@ -187,6 +187,13 @@
       "reviewedOn": "2026-10-05",
       "fingerprint": "25aaac7d1d3af43c",
       "note": "preview is not there"
+    },
+    "content-card": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "df19f555ed19ee09",
+      "note": "preview is not there"
     }
   }
 }
