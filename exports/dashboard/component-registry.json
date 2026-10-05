@@ -780,6 +780,13 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "bf09e81111d51a97"
+    },
+    "card": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "90326f5bfc358f93",
+      "note": "the compact density card is brealing, export button can be at top right corner (keeping padding)"
     }
   }
 }
