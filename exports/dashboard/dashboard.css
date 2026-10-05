@@ -428,13 +428,13 @@
 .gd-widget-grid__banner-a { display: flex; gap: var(--gw-space-8); flex: none; }
 .gd-widget-grid__stage { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--gd-gap); align-items: start; }
 .gd-widget-grid[data-editing="true"] .gd-widget-grid__stage { grid-template-columns: minmax(0, 1fr) 280px; }
-.gd-widget-grid__canvas { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gd-gap); align-items: start; min-width: 0; }
+.gd-widget-grid__canvas { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gd-gap); align-items: stretch;   /* items in a row share one height, so the heading stays at the top and the content sits at the bottom, with the gap between them left as space */ min-width: 0; }
 .gd-widget-grid__item { grid-column: span 6; position: relative; min-width: 0; display: flex; flex-direction: column; background: var(--gd-card-bg); border: 1px solid var(--gd-border); border-radius: var(--gw-radius-12); }
 .gd-widget-grid__item[data-size="s"] { grid-column: span 4; } .gd-widget-grid__item[data-size="m"] { grid-column: span 6; }
 .gd-widget-grid__item[data-size="l"] { grid-column: span 8; } .gd-widget-grid__item[data-size="full"] { grid-column: span 12; }
 .gd-widget-grid__head { display: flex; align-items: center; gap: var(--gw-space-8); padding: var(--gd-card-pad) var(--gd-card-pad) 0; }   /* top padding = side padding; the heading no longer floats in a tall bar */
 .gd-widget-grid__title { flex: 1; min-width: 0; margin: 0; font: var(--gw-text-body-14-sem); letter-spacing: var(--gw-text-body-14-sem-tracking); color: var(--gd-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.gd-widget-grid__body { padding: var(--gw-space-12) var(--gd-card-pad) var(--gd-card-pad); min-height: calc(var(--gd-row-h) * 2); }
+.gd-widget-grid__body { padding: var(--gw-space-12) var(--gd-card-pad) var(--gd-card-pad); min-height: calc(var(--gd-row-h) * 2); flex: 1; display: flex; flex-direction: column; justify-content: flex-end; }
 .gd-widget-grid__handle, .gd-widget-grid__size, .gd-widget-grid__remove { display: none; }
 .gd-widget-grid[data-editing="true"] .gd-widget-grid__handle { display: grid; }
 .gd-widget-grid[data-editing="true"] .gd-widget-grid__size { display: inline-flex; }
@@ -1481,8 +1481,8 @@
 .gd-card--flush > .gd-card__head { padding: var(--gd-card-pad); }
 .gd-card--flush > .gd-card__body { padding: 0 var(--gd-card-pad) var(--gd-card-pad); }
 .gd-card--flush > .gd-card__body--bleed { padding: 0; }
-.gd-card__head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--gd-gap); min-height: 24px; flex-wrap: wrap; }   /* actions pin to the top right; they only drop below the title when the card is too narrow for both */
-.gd-card__titles { flex: 1 1 160px; display: flex; flex-direction: column; gap: var(--gw-space-2); min-width: 0; }
+.gd-card__head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--gd-gap); min-height: 24px; flex-wrap: wrap; }   /* actions pin to the top right; they only drop below the title when the card is too narrow for both. The title block asks for 120, not 160, so the compact card (about 240 wide) keeps Export beside the title */
+.gd-card__titles { flex: 1 1 120px; display: flex; flex-direction: column; gap: var(--gw-space-2); min-width: 0; }
 .gd-card__title { margin: 0; font: var(--gw-text-body-16-sem); letter-spacing: var(--gw-text-body-16-sem-tracking); color: var(--gd-text); }
 .gd-card__desc { margin: 0; font: var(--gw-text-body-14-reg); letter-spacing: var(--gw-text-body-14-reg-tracking); color: var(--gd-text-muted); }
 .gd-card__actions { flex: none; display: flex; align-items: center; gap: var(--gw-space-8); margin-left: auto; }
