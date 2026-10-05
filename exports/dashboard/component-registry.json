@@ -1030,6 +1030,12 @@
       "reviewedOn": "2026-10-05",
       "fingerprint": "982961bc319168d8",
       "note": "there are random squares in the grid, fix them if cant remove"
+    },
+    "menu": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "8f731a8d392e3da4"
     }
   }
 }
