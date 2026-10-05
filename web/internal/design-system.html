@@ -743,6 +743,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .rv-act li.is-warn::before { background: var(--gw-color-yellow-500); }
 .rv-act li.is-bad::before { background: var(--gw-color-red-500); }
 .rv-act li.is-ship::before { background: var(--gw-color-primary-500); }
+.rv-act li.is-move::before { background: transparent; box-shadow: inset 0 0 0 1.5px var(--ul-sub); }
 .rv-act b { color: var(--ul-value); font-weight: 600; }
 .rv-act time { display: block; font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
 .rv-act q { display: block; margin-top: 2px; color: var(--ul-cell); quotes: "\201C" "\201D"; }
@@ -1682,9 +1683,12 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     }
     var acts = it.activity || [];
     var actHtml = acts.length ? '<div class="rv-act"><h3>Activity</h3><ol>' + acts.map(function (a) {
-      var cls = a.what === 'approved' ? 'is-ok' : a.what === 'sent back' ? 'is-warn' : a.what === 'rejected' ? 'is-bad' : 'is-ship';
+      var moved = a.what === 'spec moved' || a.what === 'drawing moved';
+      var cls = a.what === 'approved' ? 'is-ok' : a.what === 'sent back' ? 'is-warn' : a.what === 'rejected' ? 'is-bad' : moved ? 'is-move' : 'is-ship';
       var d = new Date(a.at), when = isNaN(d) ? a.at : d.toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-      var what = a.pr ? 'Fixed and published in <a class="rv-link" href="https://github.com/gushwork-design/design-system/pull/' + a.pr + '" target="_blank" rel="noopener">#' + a.pr + '</a>'
+      // A pass expires when something else moved its source, often another item's rework in the same doc: say which.
+      var what = moved ? (a.what === 'spec moved' ? 'Spec moved' : 'Drawing moved') + (a.pr ? ' in <a class="rv-link" href="https://github.com/gushwork-design/design-system/pull/' + a.pr + '" target="_blank" rel="noopener">#' + a.pr + '</a>' : '')
+        : a.pr ? 'Fixed and published in <a class="rv-link" href="https://github.com/gushwork-design/design-system/pull/' + a.pr + '" target="_blank" rel="noopener">#' + a.pr + '</a>'
         : esc(a.what.charAt(0).toUpperCase() + a.what.slice(1)) + (a.by ? ' by ' + esc(personName(a.by)) : '');
       return '<li class="' + cls + '"><b>' + what + '</b><time datetime="' + esc(a.at) + '">' + esc(when) + '</time>' + (a.note ? '<q>' + esc(a.note) + '</q>' : '') + '</li>';
     }).join('') + '</ol></div>' : '';

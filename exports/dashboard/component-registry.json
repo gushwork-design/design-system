@@ -705,200 +705,200 @@
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "40375e7748ce2dd3",
+      "fingerprint": "5a41d49eed752480",
       "previewFingerprint": "d4a6b4145b6d3a6a"
     },
     "account-row": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "fcc0ffe42a9c1a0e",
+      "fingerprint": "98afe4aca6fb3db0",
       "previewFingerprint": "249198dadce2403d"
     },
     "action-button": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "912910ae26b5e3dc",
+      "fingerprint": "636bbaf179fc8805",
       "previewFingerprint": "d37ac498e879e680"
     },
     "activity-timeline": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "7495c92a0a3d281d",
+      "fingerprint": "45700f1e6a15033e",
       "previewFingerprint": "07ee6aa0ecc7137e"
     },
     "app-shell": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "3e4313588b2f50d1",
+      "fingerprint": "1ddd776d4fadc449",
       "previewFingerprint": "9ad4332151fd9e22"
     },
     "area-chart": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "90a7ac1323ca85a5",
+      "fingerprint": "17242ad2a091eb10",
       "previewFingerprint": "8767f09b24ecd2e8"
     },
     "avatar": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "3f0a16eddedf6855",
+      "fingerprint": "43b8bbb4728068f5",
       "previewFingerprint": "f6cb6754ea637134"
     },
     "avatar-group": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "7c176640e7731e11",
+      "fingerprint": "8ff8440efac8c54d",
       "previewFingerprint": "7a6a210cbfd6270d"
     },
     "banner": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "93a038b529d25b23",
+      "fingerprint": "47b27f08313c5b0d",
       "previewFingerprint": "85c79c9ba5fb6bc6"
     },
     "bar-chart": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "3dd2cb9140ecebbe",
+      "fingerprint": "44a417b8aecaf47a",
       "previewFingerprint": "4d81d89759696dc3"
     },
     "board": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "9577e161e2e587e6",
+      "fingerprint": "3f7f495a8ecfa5c3",
       "previewFingerprint": "c4ae905e7703e951"
     },
     "breadcrumbs": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "42b8e5f2c1823316",
+      "fingerprint": "1f45729c37196399",
       "previewFingerprint": "249dc21a2dc82fac"
     },
     "breakdown-bar": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "fe1e8583ecc88f38",
+      "fingerprint": "51b670396cffa36d",
       "previewFingerprint": "e7c1f36f72c9f0a3"
     },
     "bulk-action-bar": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "6d7b1cbea7c8e3fe",
+      "fingerprint": "9ac813d07b9086b2",
       "previewFingerprint": "c6a4d320327f93ee"
     },
     "card": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "14c9e1d8a220282c",
+      "fingerprint": "7bc21bceab30b1d7",
       "previewFingerprint": "9a9b5d4be9e153b6"
     },
     "chart-frame": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "9e49f04544033ee0",
+      "fingerprint": "f727f41820424428",
       "previewFingerprint": "35fd337265b97c19"
     },
     "chart-tooltip": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "75dcda66813be172",
+      "fingerprint": "6fd3930467a0569c",
       "previewFingerprint": "dd77a99db24165b8"
     },
     "checkbox": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "4a6349e6249e19cc",
+      "fingerprint": "a62e686a9fafd393",
       "previewFingerprint": "a89950b3422855e6"
     },
     "checklist": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "54e3fe55adddc598",
+      "fingerprint": "f38988f011922ddb",
       "previewFingerprint": "83d449f1d87fdaab"
     },
     "coachmark": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "8bd1d9ff657f0116"
+      "fingerprint": "511d5e6a2fe03c16"
     },
     "column-menu": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "f2593ecf6da3a0bb",
+      "fingerprint": "4de6e4e4fbe649a6",
       "previewFingerprint": "47288681527102c9"
     },
     "combobox": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "b330ca701947be64",
+      "fingerprint": "6b923b4940b329d8",
       "previewFingerprint": "f1d64a0d3626ce67"
     },
     "command-palette": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "336e5ba1858986bc"
+      "fingerprint": "75c7f5206730b017"
     },
     "confirm-dialog": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "c8aa2647f0598c03"
+      "fingerprint": "1b33c1cf38bccf23"
     },
     "content-panel": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "cf0c870ae8d40d13",
+      "fingerprint": "f545a8b249a3a659",
       "previewFingerprint": "8956715143f3ccba"
     },
     "data-table": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "ba314f26718a1788",
+      "fingerprint": "5b957606d44e7461",
       "previewFingerprint": "afd408b238274c93"
     },
     "date-range-picker": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "14f3597756dd3358",
+      "fingerprint": "a243e02cef70cbfe",
       "previewFingerprint": "8dd4f6dec438f72a"
     },
     "datetime-field": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "6b92099083d0cdf2",
+      "fingerprint": "f01becb6c2636ff7",
       "previewFingerprint": "f375b58be3a59172"
     },
     "delta-pill": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "20b993d9e62b9d58",
+      "fingerprint": "300a9a50544373b4",
       "previewFingerprint": "6069893e410ef30d"
     },
     "detail-view": {
@@ -911,549 +911,549 @@
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "20021635aa9bb9be"
+      "fingerprint": "0695b4b36e6d8376"
     },
     "donut-chart": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "52ee1f8c6fe31b83",
+      "fingerprint": "cf45de35d1c0f1c5",
       "previewFingerprint": "69194c195a016322"
     },
     "drawer": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "5d4ce604ca0cba31"
+      "fingerprint": "3794750da28c6532"
     },
     "empty-state": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "7f065a7ec2e5680e",
+      "fingerprint": "843ed7bf3ad127f9",
       "previewFingerprint": "5bb8b19b2e8e08dc"
     },
     "explorer-layout": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "1e5e3b17099528ed",
+      "fingerprint": "baac8bf0a052b45f",
       "previewFingerprint": "58fec5677c3dba48"
     },
     "filter-builder": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "1d3dfb59d8ba7151",
+      "fingerprint": "bd6b6f50e1192537",
       "previewFingerprint": "d976f1f6c8eb2e0d"
     },
     "filter-chip": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "93c14913c1300efa",
+      "fingerprint": "d16fd2c5006c961d",
       "previewFingerprint": "558602399f902290"
     },
     "form-field": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "ffa1716d60814ae1",
+      "fingerprint": "ae6c305b585e60e2",
       "previewFingerprint": "006752413ac3d17f"
     },
     "form-section": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "6cb30e3f94c0922c",
+      "fingerprint": "55baf60f47183569",
       "previewFingerprint": "7243f0f41df0af93"
     },
     "funnel": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "5ce63bc2b34f6033",
+      "fingerprint": "528b5c676166edad",
       "previewFingerprint": "eee7025a3dbe24a7"
     },
     "google-button": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "824513558f293802",
+      "fingerprint": "8b670a30a8fa2e00",
       "previewFingerprint": "925b0b188bdebbbd"
     },
     "heatmap": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "426b5bdfef1df913",
+      "fingerprint": "fa2a8bb72a6217fb",
       "previewFingerprint": "d4b296433e79deb6"
     },
     "histogram": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "b31de08f73ac2364",
+      "fingerprint": "4cf16196e4c978a0",
       "previewFingerprint": "e9f85335f628b995"
     },
     "horizontal-bar-chart": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "d53155683d6501d7",
+      "fingerprint": "638004092ff82776",
       "previewFingerprint": "8b5786b408a9d5de"
     },
     "icon-button": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "1c56c71f99642f13",
+      "fingerprint": "889cf71c38c19189",
       "previewFingerprint": "b564587d15b8027c"
     },
     "incident-row": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "dac4d00dd6cee540",
+      "fingerprint": "6709b9a5064e8208",
       "previewFingerprint": "95f0e45694e8e178"
     },
     "info-hint": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "55505b249e85b7e6",
+      "fingerprint": "2318e0fe144fc2eb",
       "previewFingerprint": "c18d77ba97ef502e"
     },
     "issue-summary": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "89d25ac6f950bf49",
+      "fingerprint": "79d67b3a3b2c182b",
       "previewFingerprint": "d45969da7e6be322"
     },
     "key-value-list": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "8998343e48981044",
+      "fingerprint": "319f51d8de3c1dc2",
       "previewFingerprint": "1f8c0f8a461ba573"
     },
     "legend": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "0b37d620b5a2a35c",
+      "fingerprint": "0c05985716daa9c3",
       "previewFingerprint": "78cc999e1f6dcf30"
     },
     "legend-table": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "74f57a8b98bfab9e",
+      "fingerprint": "4e0d8fb524903562",
       "previewFingerprint": "5702d27f4be5141e"
     },
     "line-chart": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "76e8356ea0b507ff",
+      "fingerprint": "e0ea03d4e8c4d809",
       "previewFingerprint": "5e71b06b18d9f49d"
     },
     "log-viewer": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "fe9fabd987119fc3",
+      "fingerprint": "d46c7c500d546238",
       "previewFingerprint": "45008eace9130fe3"
     },
     "login-screen": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "11c6ee0377b30d84",
+      "fingerprint": "27c15fb9e4a764f1",
       "previewFingerprint": "1a92a5f6403ff5cd"
     },
     "menu": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "748fb1d63da86ac9",
+      "fingerprint": "1e2e826fa1a7329b",
       "previewFingerprint": "96a4187e7957d485"
     },
     "metric-strip": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "48ccb03c44153d68",
+      "fingerprint": "d1998351470247fd",
       "previewFingerprint": "5a50738636c22de2"
     },
     "modal": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "393968a8d5c27df5",
+      "fingerprint": "23593c3e1cc65ae4",
       "previewFingerprint": "9be07fee528d9e9e"
     },
     "multi-select": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "4492f50dcd96154a",
+      "fingerprint": "7840208ad6b4de07",
       "previewFingerprint": "8abd539082d91257"
     },
     "nav-group": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "adba27cf37b95d63",
+      "fingerprint": "25c5538ffe474d13",
       "previewFingerprint": "2f54516c6533cdc3"
     },
     "nav-item": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "ee11e9cfed3efde7",
+      "fingerprint": "01d68b69007d9142",
       "previewFingerprint": "80a1b15624643439"
     },
     "page-header": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "9fce7354c7bb8957",
+      "fingerprint": "783d8b52b2a7c197",
       "previewFingerprint": "ff9678039ad333ed"
     },
     "page-layout": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "b3bf2d7f4f71d901",
+      "fingerprint": "6aa86eb6469297dc",
       "previewFingerprint": "f62876dd58180c64"
     },
     "pagination": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "063a7ea8ff667f20",
+      "fingerprint": "8e512b38cf99134d",
       "previewFingerprint": "b42dd9ca8dc90738"
     },
     "period-select": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "99c6e8219a5a57e9",
+      "fingerprint": "165e2594abf3935f",
       "previewFingerprint": "cda3843807c4ce93"
     },
     "popover": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "ed37bc1ef14d5872"
+      "fingerprint": "ffc112b8576717e7"
     },
     "progress-bar": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "05435faf2374efb4",
+      "fingerprint": "3118a7fbeba372cb",
       "previewFingerprint": "fe37c3277e9e584d"
     },
     "radio": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "0ab4bfab50c1f3ec",
+      "fingerprint": "279bf4382ad731c5",
       "previewFingerprint": "b3c14d0cc68e03cd"
     },
     "ring": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "f32682cd4a72756a",
+      "fingerprint": "159396fdd6b75db5",
       "previewFingerprint": "20cebb5b83d1c037"
     },
     "row-actions-menu": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "3021bfa7694564a8",
+      "fingerprint": "ce55059d5c9ecc5a",
       "previewFingerprint": "a63c0aeebc4c82db"
     },
     "row-selection": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "d1548efa7741f20a",
+      "fingerprint": "69122cbac3018a02",
       "previewFingerprint": "de167baa2a38613c"
     },
     "saved-views": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "12a574e7c870891b",
+      "fingerprint": "92eccd2632fafc97",
       "previewFingerprint": "1ffea9a7542de82f"
     },
     "search-field": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "c33b7f881feb9ba5",
+      "fingerprint": "8322a87ba02c2a17",
       "previewFingerprint": "b69a5e8a1bdb3402"
     },
     "search-trigger": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "780af4d1bcbe6ec7",
+      "fingerprint": "7d850a3b54bb9a80",
       "previewFingerprint": "53fe40e15fe5d22f"
     },
     "segmented-control": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "7f2b8642d5c16bec",
+      "fingerprint": "49646d140b5b2b27",
       "previewFingerprint": "a8749aabdbd28351"
     },
     "query-builder": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "e0f52e7a909c225c",
+      "fingerprint": "93b5fe25bb8527ee",
       "previewFingerprint": "f23d6e3163445471"
     },
     "select": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "ed610e69273bb5b5",
+      "fingerprint": "8b26144863fda844",
       "previewFingerprint": "5810cde713465a3a"
     },
     "session-expired": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "61fb2a6704111505",
+      "fingerprint": "79fe67f8c961f035",
       "previewFingerprint": "909fa92d14785f2b"
     },
     "setting-row": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "994f394bd48c5848",
+      "fingerprint": "b5f4873ea1db18a5",
       "previewFingerprint": "98a663a302727f10"
     },
     "sidebar": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "aa4b89bca4ddaa6b",
+      "fingerprint": "e7195b0b3d59d8b6",
       "previewFingerprint": "80ce4d3972e932b6"
     },
     "sidebar-collapsed": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "cd80f97d2ef08bdd",
+      "fingerprint": "8c4abca511b05450",
       "previewFingerprint": "3046298aba4f990f"
     },
     "sign-in-modal": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "7ef246fd3a78afd4",
+      "fingerprint": "9516715d64910358",
       "previewFingerprint": "25490e97b077a31a"
     },
     "skeleton": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "3762a357ee897926",
+      "fingerprint": "3bb534c86551efbe",
       "previewFingerprint": "7112f536797fe5af"
     },
     "sparkline": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "0d894fcc84524641",
+      "fingerprint": "9833e62da79557a1",
       "previewFingerprint": "e6615ee0bb461f25"
     },
     "split-button": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "d012f6f645e571c7",
+      "fingerprint": "dbd0b622947502d1",
       "previewFingerprint": "2755d761c69a0b51"
     },
     "stat-card": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "c0920dcaf2d62eda",
+      "fingerprint": "1bb2e2575b1d70c2",
       "previewFingerprint": "8c02a9bc62418882"
     },
     "status-banner": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "21e68086fdbc089e",
+      "fingerprint": "504ae7f89ca57fde",
       "previewFingerprint": "77d2b9ab2b41ad91"
     },
     "status-dot": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "84ad17fe895edb73",
+      "fingerprint": "1459ba9f40c39786",
       "previewFingerprint": "c0fd02259a23ca45"
     },
     "status-list": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "3c80d41013726447",
+      "fingerprint": "8db96d9bb8403888",
       "previewFingerprint": "9fe4504b7839d2d9"
     },
     "sub-nav": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "fdc0a12d5e556e3d",
+      "fingerprint": "2688d681f699ad82",
       "previewFingerprint": "94320d300a3539bc"
     },
     "table-cell-types": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "f57653431f65a1cc",
+      "fingerprint": "2be898ff70e2ee5e",
       "previewFingerprint": "144e7be72ce8a5f9"
     },
     "table-states": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "421e814a22606d09",
+      "fingerprint": "0126fa060712850c",
       "previewFingerprint": "3f440539632b8130"
     },
     "table-toolbar": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "51f9a47fe63f4ab9",
+      "fingerprint": "44c9626d5325c58c",
       "previewFingerprint": "6a67e8e4de945733"
     },
     "tabs-pill": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "19f39b4a245c4e6c",
+      "fingerprint": "a2d260f52c6ac4e8",
       "previewFingerprint": "cd439066c376334c"
     },
     "tabs-underline": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "6954b9178c3cbbdb",
+      "fingerprint": "e9efbf5925bd78a8",
       "previewFingerprint": "bbe13c82c0663d65"
     },
     "tag": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "2b4111399fac20d9",
+      "fingerprint": "9730e5d347dce66a",
       "previewFingerprint": "970a536412a7d39b"
     },
     "text-input": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "5ff23177bb3ab8bb",
+      "fingerprint": "845bd4e9a3c70836",
       "previewFingerprint": "450c9808c96fa1cb"
     },
     "textarea": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "b28d88ce4cbf9a55",
+      "fingerprint": "80210883ea6b867c",
       "previewFingerprint": "b6a9019ec8aaaacd"
     },
     "theme-menu": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "3c57aef983afd33c",
+      "fingerprint": "2a3eb60de76fa17e",
       "previewFingerprint": "c2b18cf82c2db924"
     },
     "time-range-bar": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "f42ff5d11c62aaba",
+      "fingerprint": "a328b29c7f6ed3eb",
       "previewFingerprint": "b2c238296d3e3328"
     },
     "timezone-select": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "5e2ffd8010c217c7",
+      "fingerprint": "786a61a0cdbd37fb",
       "previewFingerprint": "e55437d1236e550e"
     },
     "toast": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "05a65aa0c6a2ef9b",
+      "fingerprint": "ef3d68c28dc3430f",
       "previewFingerprint": "842ad1864e4d1eeb"
     },
     "toggle": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "21a949de87beaaef",
+      "fingerprint": "0012b35c19d84c94",
       "previewFingerprint": "675be6215865ee70"
     },
     "tooltip": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "b045cb102000d0c1"
+      "fingerprint": "73168d8426005ac3"
     },
     "topbar": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "f870742356bcbe84",
+      "fingerprint": "8d5ed4ce9ceb9f92",
       "previewFingerprint": "5eeabbdd5d4a52d1"
     },
     "unavailable-state": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "c04770e232d0720c",
+      "fingerprint": "26506eb94d3436c4",
       "previewFingerprint": "63d7c14d0c9461e1"
     },
     "unsaved-changes-bar": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "ad2a4ac6aedcd23e",
+      "fingerprint": "6c26186e2462193f",
       "previewFingerprint": "9750d82563c931c4"
     },
     "uptime-bar": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "d0c58f032fc01dce",
+      "fingerprint": "a99d654bf47ee180",
       "previewFingerprint": "40caaf527506fa58"
     },
     "widget-grid": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "de40be1838225e4d",
+      "fingerprint": "089642ad99334e9c",
       "previewFingerprint": "6ae9f32a7df0a3c8"
     },
     "workspace-switcher": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "d4ba1f82dd37ffa1",
+      "fingerprint": "85b3161fc7d72463",
       "previewFingerprint": "4834659d12a9c468"
     },
     "analytics-overview-template": {
@@ -1467,7 +1467,7 @@
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "ad80096e0c840a94",
+      "fingerprint": "225c1933f37bd984",
       "previewFingerprint": "97c3a2ac1deea9ca"
     }
   }
