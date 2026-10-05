@@ -748,6 +748,13 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .rv-foot--col .rv-acts { justify-content: flex-end; }
 .rv-hint { font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
 .rv-hint kbd { font: inherit; font-weight: 500; color: var(--ul-value); }
+/* The shortcut sits inside its button as a quiet key cap: same text colour at lower strength, on a faint tint of the button. */
+.rv-b kbd { margin-left: var(--gw-space-8); padding: 0 var(--gw-space-4); min-width: 18px; height: 18px; display: inline-grid; place-items: center; border-radius: var(--gw-radius-4); font: var(--gw-text-body-12-med); letter-spacing: 0; opacity: .55; background: color-mix(in srgb, currentColor 14%, transparent); vertical-align: 1px; }
+.rv-b { display: inline-flex; align-items: center; }
+.rv-b--sm kbd { display: none; }
+@media (hover: none) { .rv-b kbd { display: none; } .rv-b:has(> kbd) { padding-right: var(--gw-space-16); } }   /* no keyboard on touch, so no key caps */
+/* the cap is a filled shape, so inset it: its gap to the right edge equals its gap above and below (button 36 high, cap 18 high) */
+.rv-b:has(> kbd) { padding-right: calc((36px - 18px) / 2); }
 .rv-lab { font: 500 13px/1.4 var(--gw-font-body); color: var(--ul-value); }
 .rv-ta { width: 100%; box-sizing: border-box; padding: var(--gw-space-12); border: 0; border-radius: var(--gw-radius-12); resize: vertical; background: var(--ul-field-bg); color: var(--ul-field-fg); font: 400 14px/1.5 var(--gw-font-body); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }
 .rv-ta:focus-visible { outline: none; box-shadow: inset 0 0 0 1px var(--gw-color-black); }   /* the edge, not the ring (R41) */
@@ -783,6 +790,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   #ds-rev-table .ul-row > :nth-child(2), #ds-rev-table .ul-row > :nth-child(4), #ds-rev-table .ul-row > :nth-child(5) { display: none; }
   .rv-h { padding: var(--gw-space-16); } .rv-body { padding: var(--gw-space-16); } .rv-foot { padding: var(--gw-space-12) var(--gw-space-16); }
   .rv-hint { display: none; }
+  .rv-b kbd { display: none; } .rv-b:has(> kbd) { padding-right: var(--gw-space-16); }
   .rv-ex { display: none; } .rv--wide { width: 100vw; }
 }
 .rv-row .rv-go { margin: 0; height: 28px; }
@@ -1645,13 +1653,12 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     else if (RV.mode === 'rework' || RV.mode === 'reject') {
       foot = '<div class="rv-foot rv-foot--col"><label class="rv-lab" for="rv-note">' + (RV.mode === 'rework' ? 'What needs fixing? This goes to the next Claude session as the brief.' : 'Why is this rejected?') + '</label>' +
         '<textarea id="rv-note" class="rv-ta" rows="4" maxlength="500" placeholder="' + (RV.mode === 'rework' ? 'The labels bind raw white, they should use the neutral-900 token.' : 'It duplicates the card and nothing uses it.') + '"></textarea>' +
-        '<div class="rv-acts"><button type="button" class="rv-b rv-b--ghost" id="rv-cancel">Cancel</button><button type="button" class="rv-b rv-b--' + (RV.mode === 'reject' ? 'bad' : 'warn') + '" id="rv-send" disabled>' + (RV.mode === 'rework' ? 'Send back' : 'Reject') + '</button></div><span class="rv-hint"><kbd>\u2318</kbd> <kbd>\u21b5</kbd> send · <kbd>Esc</kbd> cancel</span></div>';
+        '<div class="rv-acts"><button type="button" class="rv-b rv-b--ghost" id="rv-cancel" aria-keyshortcuts="Escape">Cancel<kbd aria-hidden="true">Esc</kbd></button><button type="button" class="rv-b rv-b--' + (RV.mode === 'reject' ? 'bad' : 'warn') + '" id="rv-send" disabled aria-keyshortcuts="Meta+Enter">' + (RV.mode === 'rework' ? 'Send back' : 'Reject') + '<kbd aria-hidden="true">\u2318\u21b5</kbd></button></div></div>';
     } else {
-      foot = '<div class="rv-foot"><div class="rv-acts"><button type="button" class="rv-b rv-b--pass" id="rv-pass">Approve</button><button type="button" class="rv-b rv-b--ghost" id="rv-rework">Rework</button><button type="button" class="rv-b rv-b--ghost" id="rv-reject">Reject</button></div>' +
-        '<span class="rv-hint"><kbd>A</kbd> approve · <kbd>R</kbd> rework · <kbd>X</kbd> reject · <kbd>\u2318</kbd> <kbd>S</kbd> save · <kbd>\u2190</kbd> <kbd>\u2192</kbd> move · <kbd>Esc</kbd> close</span></div>';
+      foot = '<div class="rv-foot"><div class="rv-acts"><button type="button" class="rv-b rv-b--pass" id="rv-pass" aria-keyshortcuts="A">Approve<kbd aria-hidden="true">A</kbd></button><button type="button" class="rv-b rv-b--ghost" id="rv-rework" aria-keyshortcuts="R">Rework<kbd aria-hidden="true">R</kbd></button><button type="button" class="rv-b rv-b--ghost" id="rv-reject" aria-keyshortcuts="X">Reject<kbd aria-hidden="true">X</kbd></button></div></div>';
     }
     el.innerHTML = '<header class="rv-h"><div class="rv-h__t"><span class="rv-h__s">' + esc(scopeTitle(it)) + ' · ' + (RV.i + 1) + ' of ' + RV.list.length + '</span><h2>' + esc(it.label) + '</h2></div>' +
-      '<div class="rv-h__r">' + saveBtn('rv-savenow') + badgeOf(e.state, e.queued, e.q) + '<button type="button" class="rv-x" id="rv-prev" aria-label="Previous"' + (RV.i === 0 ? ' disabled' : '') + '>‹</button><button type="button" class="rv-x" id="rv-next" aria-label="Next"' + (RV.i >= RV.list.length - 1 ? ' disabled' : '') + '>›</button><button type="button" class="rv-x" id="rv-close" aria-label="Close">✕</button></div></header>' +
+      '<div class="rv-h__r">' + saveBtn('rv-savenow') + badgeOf(e.state, e.queued, e.q) + '<button type="button" class="rv-x" id="rv-prev" aria-label="Previous" title="Previous (\u2190)"' + (RV.i === 0 ? ' disabled' : '') + '>‹</button><button type="button" class="rv-x" id="rv-next" aria-label="Next" title="Next (\u2192)"' + (RV.i >= RV.list.length - 1 ? ' disabled' : '') + '>›</button><button type="button" class="rv-x" id="rv-close" aria-label="Close" title="Close (Esc)">✕</button></div></header>' +
       '<div class="rv-body" id="rv-body"><section class="rv-sec"><div class="rv-sh"><h3>What it looks like</h3><button type="button" class="rv-ex" id="rv-ex" aria-expanded="false" title="Open the drawer out to see everything (E)"></button></div><div class="rv-vis" id="rv-vis">' + (it.kind === 'foundation' ? ghost() : visualFor(it, null)) + '</div></section>' +
       '<section class="rv-sec rv-sec--det"><h3>Details</h3><div class="rv-dl">' + detailRow('Kind', esc(it.kind === 'foundation' ? 'Foundation group' : 'Component')) + detailRow('Version', esc(it.version ? 'v' + it.version : '')) +
       detailRow('Spec last moved', esc(it.changed || '')) + detailRow('Doc', gh ? '<a class="ds-a" href="' + esc(gh) + '" target="_blank" rel="noopener">' + esc(it.doc.split('/').pop()) + '</a>' : '') +
@@ -1682,8 +1689,8 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
   function saveBtn(id) {
     var n = Object.keys(DRAFTS).length;
     if (!owner || !(n || SAVING)) return '';
-    return SAVING ? '<button type="button" class="rv-b rv-b--pass rv-b--sm" id="' + id + '" aria-busy="true">' + savingLabel() + '</button>'
-      : '<button type="button" class="rv-b rv-b--pass rv-b--sm" id="' + id + '">Save ' + n + '</button>';
+    return SAVING ? '<button type="button" class="rv-b rv-b--pass rv-b--sm" id="' + id + '" aria-busy="true" title="Save (\u2318S)">' + savingLabel() + '</button>'
+      : '<button type="button" class="rv-b rv-b--pass rv-b--sm" id="' + id + '" title="Save (\u2318S)">Save ' + n + '</button>';
   }
   /* Stage a decision. It shows everywhere in the Review tab as not saved; nothing is sent until Save. */
   function stage(it, action, note) {
