@@ -276,6 +276,13 @@
       "reviewedOn": "2026-10-05",
       "fingerprint": "f2c4006add28e3b9",
       "previewFingerprint": "4570415d8697da77"
+    },
+    "client-logos": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "e44887d9ea1e6b51",
+      "previewFingerprint": "4e14b3c705353d69"
     }
   }
 }
