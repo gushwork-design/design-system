@@ -153,8 +153,9 @@ The email signature creator and the employee ID card generator were redesigned i
     a short confirm (Edit the signatory? / Yes, unlock), read-only fields and a non-editable
     signature on the sheet until then; it locks again for each file (Utsav, 5 Oct 2026).
 
-46. **The certificate's panel is square.** Figma draws it at radius 20; it is 0 on screen, in the
-    thumbnails and in every download (Utsav, 5 Oct 2026: "please fix them into sharp corners").
+46. **The white panel keeps its radius 20; the page is square.** A report of rounded corners in a
+    download was the macOS viewer's window, not the file (its corner pixels are solid blue); the
+    panel was squared by mistake and restored the same day (Utsav, 5 Oct 2026).
 
 ## Left open (the owner's call)
 

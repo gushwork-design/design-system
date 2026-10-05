@@ -26,7 +26,7 @@ const CERT = {
   gridOut: '#F7F8F9',         //           outer stop = the panel
   gridOpacity: 0.7,           // measured 66:5
   panelInset: 10,             // 66:4 at 10,10, 575 × 728, radius 20
-  panelW: 575, panelH: 728, panelR: 0,   // square (Utsav, 5 Oct 2026; Figma draws 20): preview, thumbnails and every download
+  panelW: 575, panelH: 728, panelR: 20,   // as Figma; the page itself (the blue frame) is square
   pad: 40,                    // 79:140 at 40,40 inside the panel, 495 wide
   colW: 495, innerW: 460,     // 66:7 is 460 wide
   gapHead: 80,                // 66:6 → 66:7: 210 tall at 0, next at 290
