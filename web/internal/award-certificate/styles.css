@@ -305,3 +305,4 @@ html[data-tool-panel="open"] .t-acts { right: calc(var(--t-panel-w) + var(--t-in
 }
 @media (prefers-reduced-motion: reduce) { .right-col, .app .preview-col { transition: none; } }
 .prop-segmented { display: inline-flex; align-items: center; }
+.prop-segmented.acc-general { display: grid; grid-template-columns: 1fr 1fr; width: 100%; }
