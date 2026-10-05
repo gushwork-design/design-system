@@ -247,6 +247,9 @@ function checks(ctx) {
   add(I, 'trigger', 'Rework routine trigger', async () => (has(env, 'GW_REWORK_TRIGGER_URL') && has(env, 'GW_REWORK_TRIGGER_TOKEN'))
     ? c(I, 'trigger', 'Rework routine trigger', 'ok', 'Set. A rework starts the routine at once.')
     : c(I, 'trigger', 'Rework routine trigger', 'warn', 'Not set, so a rework waits for the nightly run.', 'Set GW_REWORK_TRIGGER_URL and GW_REWORK_TRIGGER_TOKEN from the routine\'s API trigger.'));
+  add(I, 'bruce', 'Bruce in Slack', async () => (has(env, 'GW_BRUCE_TRIGGER_URL') && has(env, 'GW_BRUCE_TRIGGER_TOKEN') && (has(env, 'BRUCE_USER_IDS') || has(env, 'OWNER_SLACK_ID')))
+    ? c(I, 'bruce', 'Bruce in Slack', 'ok', 'Set. A DM from you starts the Bruce routine; everyone else gets the concierge.')
+    : c(I, 'bruce', 'Bruce in Slack', 'warn', 'Not set, so Bruce only answers as the concierge.', 'Set GW_BRUCE_TRIGGER_URL and GW_BRUCE_TRIGGER_TOKEN from the Bruce routine\'s API trigger, and OWNER_SLACK_ID (or BRUCE_USER_IDS).'));
 
   // ---- upkeep
   add(U, 'prs', 'Open pull requests', async () => {
