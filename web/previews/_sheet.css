@@ -215,3 +215,6 @@ outline:2px solid #0070ff66;outline-offset:2px}
 
 .rvp{display:flex;flex-direction:column;gap:16px}
 .rvmore{margin-top:14px}.rvmore>summary{cursor:pointer;font:600 13px/1.4 var(--body,Inter,sans-serif);color:var(--ink2);padding:8px 0}.rvmore[open]>summary{margin-bottom:10px}
+
+/* sidebar-collapsed: the tooltip sits to the right of the rail icon, a plain pill with no arrow (Utsav's reference, 5 Oct). */
+.gd .gd-tooltip[data-placement="right"]::after { display: none; }
