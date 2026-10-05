@@ -1098,6 +1098,12 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "ed37bc1ef14d5872"
+    },
+    "progress-bar": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "52ae019db43d2f2b"
     }
   }
 }
