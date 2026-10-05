@@ -703,11 +703,10 @@
       "previewFingerprint": "d4a6b4145b6d3a6a"
     },
     "account-row": {
-      "reviewed": "rework",
+      "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "1d04fe53f5b5c993",
-      "note": "truccate the name, or use Priya R. instead - do not break in 2 lines",
+      "fingerprint": "fcc0ffe42a9c1a0e",
       "previewFingerprint": "249198dadce2403d"
     },
     "action-button": {
