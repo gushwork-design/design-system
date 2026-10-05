@@ -189,6 +189,82 @@ function EditableText({ value, onChange, editable, placeholder, ...rest }) {
 /* The name always runs into the headline on its first line (Utsav, 5 Oct 2026); nameOwnLine is
    kept in saved files but no longer read. */
 
+/* The citation as ONE editing surface (Utsav, 5 Oct 2026: "three clicks should select the entire
+   text"). Four runs live inside it, each a data-field span in its own colour: before, award, period,
+   after. A triple click selects the whole citation; typing inside a run edits that run; anything
+   that replaces runs (typing or pasting over a selection that crosses them) is read back as one
+   text and split again by splitCitation, or kept as the lead-in when there is no period to anchor
+   on. React does not render its children: the DOM is written from the fields while it is not
+   focused, so the caret never jumps. */
+const CITE_RUNS = [
+  { key: 'before', text: 'body',     ph: 'Text before the award' },
+  { key: 'award',  text: 'bodySemi', ph: 'Award' },
+  { key: 'period', text: 'bodySemi', ph: 'Period' },
+  { key: 'after',  text: 'body',     ph: 'text after the award' },
+];
+function citeHTML(d) {
+  const esc = (v) => String(v || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return CITE_RUNS.map((r) => {
+    const semi = r.text === 'bodySemi';
+    const style = semi ? `font-family:${CERT_FONT.bodySemi.replace(/"/g, "'")};font-weight:600;color:${CERT.blue}` : `color:${CERT.grey}`;
+    return `<span class="cert-edit" data-field="${r.key}" data-text="${r.text}" data-ph="${r.ph}" style="${style}">${esc(d[r.key])}</span>`;
+  }).join(' ');
+}
+function readCitation(el) {
+  const spans = {};
+  el.querySelectorAll('[data-field]').forEach((sp) => { spans[sp.getAttribute('data-field')] = sp.textContent; });
+  const intact = CITE_RUNS.every((r) => r.key in spans) && el.querySelectorAll('[data-field]').length === 4;
+  // text typed outside the runs, or runs merged away: read the whole thing and split it again
+  const stray = [...el.childNodes].some((n) => n.nodeType === 3 && n.nodeValue.trim());
+  if (intact && !stray) return Object.fromEntries(CITE_RUNS.map((r) => [r.key, noTrail(spans[r.key])]));
+  const all = noTrail(el.textContent).replace(/[^\S\n]+/g, ' ').trim();
+  return splitCitation(all) || { before: all, award: '', period: '', after: '' };
+}
+function CitationEditor({ data, onEdit, style }) {
+  const ref = React.useRef(null);
+  const sig = CITE_RUNS.map((r) => data[r.key] || '').join('\u0001');
+  React.useLayoutEffect(() => {
+    const el = ref.current;
+    if (el && document.activeElement !== el) el.innerHTML = citeHTML(data);
+  }, [sig]);
+  const commit = () => onEdit('citation', readCitation(ref.current));
+  return (
+    <p
+      ref={ref}
+      data-layer="Citation"
+      className="cert-cite"
+      contentEditable
+      suppressContentEditableWarning
+      spellCheck={false}
+      style={style}
+      onInput={commit}
+      onKeyDown={(e) => {
+        if (e.key !== 'Enter') return;
+        e.preventDefault();
+        if (e.shiftKey) document.execCommand('insertText', false, '\n');
+        else e.currentTarget.blur();
+      }}
+      onPaste={(e) => {
+        e.preventDefault();
+        const text = e.clipboardData.getData('text/plain');
+        const parts = splitCitation(text);
+        const sel = window.getSelection();
+        const whole = sel && sel.rangeCount && ref.current && sel.toString().replace(/\s+/g, ' ').trim() === ref.current.textContent.replace(/\s+/g, ' ').trim();
+        const empty = !ref.current.textContent.trim();
+        if (parts && (whole || empty || text.length > 40)) {
+          // a whole citation: fill all four runs, then leave editing so the runs redraw
+          onEdit('citation', parts);
+          ref.current.innerHTML = citeHTML({ ...data, ...parts });
+          ref.current.blur();
+          return;
+        }
+        document.execCommand('insertText', false, text.replace(/[^\S\n]+/g, ' '));
+      }}
+      onBlur={() => { commit(); if (ref.current) ref.current.innerHTML = citeHTML({ ...data, ...readCitation(ref.current) }); }}
+    />
+  );
+}
+
 /* data-layer names one PSD layer each; data-text marks a run the PDF
    exporter draws as live text (font key → certificate-export.js). */
 /* trims spaces, never a line break someone put there on purpose */
@@ -276,31 +352,20 @@ function Certificate({ data, logoSvg, certRef, onEdit }) {
         </h2>
 
         <div style={{ width: CERT.innerW, display: 'flex', flexDirection: 'column', gap: CERT.gapBody }}>
+          {editable ? (
+            <CitationEditor data={data} onEdit={onEdit} style={{
+              margin: 0, fontFamily: CERT_FONT.body, fontWeight: 400, fontSize: 14,
+              lineHeight: 1.72, letterSpacing: 0, color: CERT.grey, whiteSpace: 'pre-line',
+            }} />
+          ) : (
           <p
             data-layer="Citation"
-            onPasteCapture={editable ? (e) => {
-              const parts = splitCitation(e.clipboardData.getData('text/plain'));
-              if (!parts) return;
-              e.preventDefault(); e.stopPropagation();
-              if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
-              onEdit('citation', parts);
-            } : undefined}
             style={{
               margin: 0, fontFamily: CERT_FONT.body, fontWeight: 400, fontSize: 14,
               lineHeight: 1.72, letterSpacing: 0, color: CERT.grey, whiteSpace: 'pre-line',
             }}
           >
-            {editable ? (
-              <>
-                <EditableText editable value={data.before} onChange={ed('before')} placeholder="Text before the award" data-text="body" style={{ color: CERT.grey }} />
-                {' '}
-                <EditableText editable value={data.award} onChange={ed('award')} placeholder="Award" data-text="bodySemi" style={{ fontFamily: CERT_FONT.bodySemi, fontWeight: 600, color: CERT.blue }} />
-                {' '}
-                <EditableText editable value={data.period} onChange={ed('period')} placeholder="Period" data-text="bodySemi" style={{ fontFamily: CERT_FONT.bodySemi, fontWeight: 600, color: CERT.blue }} />
-                {' '}
-                <EditableText editable value={data.after} onChange={ed('after')} placeholder="text after the award" data-text="body" style={{ color: CERT.grey }} />
-              </>
-            ) : (
+            {(
               <>
                 {before && <span data-text="body" style={{ color: CERT.grey }}>{before}</span>}
                 {before && award && ' '}
@@ -310,6 +375,7 @@ function Certificate({ data, logoSvg, certRef, onEdit }) {
               </>
             )}
           </p>
+          )}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: CERT.gapSig, alignItems: 'flex-start' }}>
             <div

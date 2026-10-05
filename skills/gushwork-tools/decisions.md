@@ -123,6 +123,10 @@ The email signature creator and the employee ID card generator were redesigned i
     in the panel's fields), a Shift + Return is a line break the sheet, the thumbnails and every
     export keep; Return alone still finishes editing (Utsav, 5 Oct 2026).
 
+37. **The citation is one text.** A triple click selects the whole citation, not its first run;
+    typing or pasting over it is split again into the lead-in, the blue award and period, and the
+    close (Utsav, 5 Oct 2026: "selection just selects first part, that's confusing").
+
 ## Left open (the owner's call)
 
 - **A third typeface in the signature preview** (Plus Jakarta Sans). In the artefact, not the chrome.
