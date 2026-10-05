@@ -54,6 +54,13 @@
       "reviewedOn": "2026-10-05",
       "fingerprint": "53ed9d5504985b6d",
       "previewFingerprint": "a0c491405537fae2"
+    },
+    "document": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "d3d9a5c3ada48ad0",
+      "previewFingerprint": "d486763d766e4f6d"
     }
   }
 }
