@@ -43,6 +43,13 @@
       "breaking": false,
       "doc": "components.md",
       "note": "How a long job reports beside the control it belongs to: spinner, percentage, Done, Failed."
+    },
+    "tool-saved-list": {
+      "version": "2.0.0",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "components.md",
+      "note": "A shared list of saved work in its own panel, bottom right: open, current, delete with one confirm. First used by the award certificate."
     }
   },
   "review": {

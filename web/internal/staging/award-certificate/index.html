@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- gushwork-build:{"pluginVersion":"2.0.0","surface":"tools","createdBy":"Utsav Singh","createdAt":"2026-10-05","registry":"https://design.gushwork.ai/exports/tools/component-registry.json","changelog":"https://design.gushwork.ai/internal/changelog","components":["tool-panel","tool-action-pill","tool-chrome"]}
+     Award certificate generator. HR fills in the recipient and the award, picks one of the four
+     Figma certificates as a start (GW-HR-requests, 78:51), and downloads it for print as a
+     vector A4 PDF, a 300 dpi JPG or a layered PSD. Staging first, per the hub's rule. -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=1100" />
+    <meta name="robots" content="noindex" />
+    <base href="/internal/staging/award-certificate/" />
+    <title>Award Certificate Generator</title>
+    <meta name="description" content="Make a Gushwork award certificate and download it for print: A4 PDF, 300 dpi JPG or layered PSD." />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3QgeD0iMC41IiB5PSIwLjUiIHdpZHRoPSI0NyIgaGVpZ2h0PSI0NyIgcng9IjcuNSIgZmlsbD0iIzBEMEQwRCI+PC9yZWN0Pgo8cmVjdCB4PSIwLjUiIHk9IjAuNSIgd2lkdGg9IjQ3IiBoZWlnaHQ9IjQ3IiByeD0iNy41IiBzdHJva2U9IiM0RDU0NUMiPjwvcmVjdD4KPHBhdGggZD0iTTM0Ljk4MjYgMTMuMzY5QzM1LjI1MDggMTIuNzA4MiAzNC43NTQ5IDEyIDM0LjA0MTcgMTJIMTQuNzQyOUMxMy4yMjggMTIgMTIgMTMuMjI4IDEyIDE0Ljc0MjlWMzIuMDMzM0MxMiAzMy42MDU0IDEzLjU1MTIgMzQuNzA0OSAxNC45ODgxIDM0LjA2N0MyNC4yNTQ4IDI5Ljk1MzUgMzEuMzEzNSAyMi40MTIyIDM0Ljk4MjYgMTMuMzY5WiIgZmlsbD0id2hpdGUiPjwvcGF0aD4KPHBhdGggZD0iTTIxLjc1NDggMzZDMjEuNDIwNyAzNiAyMS4yODA3IDM1LjU2NTkgMjEuNTQ3OCAzNS4zNjUxQzI4LjQ3MDIgMzAuMTU4IDMzLjQzMDEgMjIuNzQxNCAzNS42Mjk3IDE0LjQxNTdDMzUuNjgyMSAxNC4yMTc1IDM2IDE0LjI1NDkgMzYgMTQuNDU5OVYzMy4yNTcxQzM2IDM0Ljc3MiAzNC43NzIgMzYgMzMuMjU3MSAzNkgyMS43NTQ4WiIgZmlsbD0id2hpdGUiPjwvcGF0aD4KPC9zdmc+" />
+
+    <link rel="stylesheet" href="/internal/staging/award-certificate/styles.css?v=4" />
+    <link rel="stylesheet" href="/foundation/tokens.css" />
+    <link rel="stylesheet" href="/internal/tool-shell.css?v=29" />
+    <script>try{var c=localStorage.getItem('gw-theme-choice'),t=c==='dark'||c==='light'?c:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
+    <script src="/internal/tool-chrome.js?v=3" defer></script>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <!-- pinned React + Babel, as the other tools -->
+    <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+    <!-- exports: JPG + PSD layers (html-to-image), vector PDF (pdf-lib + fontkit), PSD (ag-psd) -->
+    <script src="https://unpkg.com/html-to-image@1.11.13/dist/html-to-image.js"></script>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://unpkg.com/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.min.js"></script>
+    <script src="https://unpkg.com/ag-psd@31.0.2/dist/bundle.js"></script>
+    <script src="/internal/staging/award-certificate/certificate-export.js?v=2"></script>
+
+    <script type="text/babel" src="/internal/staging/award-certificate/certificate.jsx?v=2"></script>
+    <script type="text/babel" src="/internal/staging/award-certificate/app.jsx?v=5"></script>
+  </body>
+</html>

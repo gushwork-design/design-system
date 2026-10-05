@@ -1,0 +1,201 @@
+/* ─────────────────────────────────────────────────────────────────
+   Award certificate generator — base layout only.
+   /internal/tool-shell.css loads after this and skins every control;
+   this file gives the shell's classes their structure (the older tools
+   carry the same structure in their own styles.css, with literals — a
+   new tool starts from tokens). The certificate styles itself inline.
+   ───────────────────────────────────────────────────────────────── */
+
+/* The certificate's faces: static cuts of the brand fonts (see
+   certificate.jsx). The chrome uses tokens.css's own Vert and Inter. */
+@font-face {
+  font-family: 'Vert Grotesk Display Static';
+  src: url('/internal/staging/award-certificate/assets/fonts/VertGroteskDisplay-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Inter Static';
+  src: url('/internal/staging/award-certificate/assets/fonts/Inter-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Inter Static SemiBold';
+  src: url('/internal/staging/award-certificate/assets/fonts/Inter-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: block;
+}
+/* The signature face Figma draws with (66:10). Not in tokens.css; vendored in
+   /fonts, as on Homepage Neo's testimonial. */
+@font-face {
+  font-family: 'Balfontheim';
+  src: url('/fonts/Balfontheim-Signature.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; }
+body { -webkit-font-smoothing: antialiased; }
+
+/* panel */
+.left-col { display: flex; flex-direction: column; }
+.brand-card { display: flex; align-items: center; }
+.brand-card h1 { margin: 0; }
+.form-card { display: flex; flex-direction: column; overflow: hidden; }
+.form-card .form { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; overflow-y: auto; scrollbar-width: thin; }
+.prop-section { display: flex; flex-direction: column; }
+.prop-section-head h3 { margin: 0; }
+.prop-rows { display: flex; flex-direction: column; }
+.prop-row { display: grid; align-items: center; }
+.prop-row--start { align-items: start; }
+.prop-control { display: flex; min-width: 0; }
+.prop-input { width: 100%; min-width: 0; outline: none; }
+.prop-textarea { display: block; line-height: 20px; }
+.prop-tip { margin: 0; color: var(--t-label); }
+.gw-switch { display: block; }
+
+.prop-dropdown { position: relative; width: 100%; }
+.prop-dropdown-trigger { width: 100%; display: flex; align-items: center; justify-content: space-between; cursor: pointer; text-align: left; }
+.prop-dropdown-value { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.prop-dropdown-caret { flex-shrink: 0; transition: transform var(--gw-motion-fast); }
+.prop-dropdown.open .prop-dropdown-caret { transform: rotate(180deg); }
+.prop-dropdown-menu {
+  position: absolute; top: calc(100% + var(--gw-space-4)); left: 0; right: 0; z-index: 30;
+  display: flex; flex-direction: column;
+}
+.prop-dropdown-item {
+  width: 100%; display: flex; align-items: center; justify-content: space-between;
+  background: transparent; border: 0; cursor: pointer; text-align: left;
+}
+.prop-dropdown-item-label { flex: 1; min-width: 0; display: flex; align-items: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+/* preview */
+.preview-col {
+  display: flex; align-items: flex-start; justify-content: center;
+  padding-top: 56px; padding-right: 32px; padding-bottom: 112px;
+  min-width: 0; height: 100vh; overflow: auto;
+}
+.cert-stage { display: flex; flex-direction: column; align-items: center; gap: var(--gw-space-16); }
+.cert-scale-wrap { position: relative; }
+.cert-scale { position: absolute; top: 0; left: 0; transform-origin: 0 0; box-shadow: var(--gw-shadow-s4); }
+.cert-caption { margin: 0; font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); color: var(--t-label); }
+.cert-caption.is-warn { color: var(--t-danger); }
+/* a sheet on the black canvas needs no ring: its frame is blue */
+
+/* PSD capture: one layer at a time, the rest hidden (certificate-export.js) */
+.cert[data-solo] { background: transparent !important; }
+.cert[data-solo] [data-layer] { visibility: hidden; }
+.cert[data-solo] [data-layer][data-on] { visibility: visible; }
+
+/* the floating bar */
+.floating-toolbar {
+  position: fixed; z-index: 400;
+  transform: translateX(-50%);
+  display: flex;
+}
+.tb-pill { display: flex; align-items: center; }
+.tb-pill button {
+  display: inline-flex; align-items: center; white-space: nowrap; cursor: pointer;
+  transition: background var(--gw-motion-fast), color var(--gw-motion-fast);
+}
+.tb-pill button:disabled { cursor: progress; }
+.split-button { position: relative; display: inline-flex; }
+.split-menu {
+  position: absolute; left: 0; bottom: calc(100% + var(--gw-space-12));
+  min-width: 260px; padding: var(--gw-space-4);
+  display: flex; flex-direction: column; z-index: 30;
+}
+.split-menu-item { display: flex; width: 100%; border: 0; text-align: left; cursor: pointer; }
+
+/* ghost while React loads: the sheet, at the preview's fitted height */
+html:has(script[src*="award-certificate/app.jsx"]) #root:empty::after {
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 595 842'%3E%3Crect width='595' height='842' fill='%23e7e8e9' fill-opacity='.45'/%3E%3Crect x='10' y='10' width='575' height='728' rx='20' fill='%23e7e8e9' fill-opacity='.7'/%3E%3Crect x='50' y='60' width='300' height='50' rx='8' fill='%23e7e8e9'/%3E%3Crect x='50' y='130' width='420' height='50' rx='8' fill='%23e7e8e9'/%3E%3Crect x='50' y='300' width='440' height='14' rx='4' fill='%23e7e8e9'/%3E%3Crect x='50' y='326' width='380' height='14' rx='4' fill='%23e7e8e9'/%3E%3Crect x='50' y='400' width='130' height='34' rx='6' fill='%23e7e8e9'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='42' viewBox='0 0 300 42'%3E%3Crect width='300' height='42' rx='12' fill='%23e7e8e9' fill-opacity='.6'/%3E%3Crect x='6' y='6' width='120' height='30' rx='8' fill='%23e7e8e9'/%3E%3Crect x='150' y='6' width='144' height='30' rx='8' fill='%23e7e8e9'/%3E%3C/svg%3E");
+  background-size: auto calc(100vh - 168px), 300px 42px;
+  background-position: center 56px, center calc(100% - 24px);
+}
+:root[data-theme="dark"]:has(script[src*="award-certificate/app.jsx"]) #root:empty::after {
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 595 842'%3E%3Crect width='595' height='842' fill='%23262a2e' fill-opacity='.45'/%3E%3Crect x='10' y='10' width='575' height='728' rx='20' fill='%23262a2e' fill-opacity='.7'/%3E%3Crect x='50' y='60' width='300' height='50' rx='8' fill='%23262a2e'/%3E%3Crect x='50' y='130' width='420' height='50' rx='8' fill='%23262a2e'/%3E%3Crect x='50' y='300' width='440' height='14' rx='4' fill='%23262a2e'/%3E%3Crect x='50' y='326' width='380' height='14' rx='4' fill='%23262a2e'/%3E%3Crect x='50' y='400' width='130' height='34' rx='6' fill='%23262a2e'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='42' viewBox='0 0 300 42'%3E%3Crect width='300' height='42' rx='12' fill='%23262a2e' fill-opacity='.6'/%3E%3Crect x='6' y='6' width='120' height='30' rx='8' fill='%23262a2e'/%3E%3Crect x='150' y='6' width='144' height='30' rx='8' fill='%23262a2e'/%3E%3C/svg%3E");
+}
+.copy-btn-wrap { position: relative; display: inline-flex; }
+
+/* ── Saved: the shared list (new piece, registered for review as tool-saved-list) ──
+   Rows follow the panel's own family: 8 radius inside the 16 section padding, the shell's
+   neutral hover, the current item on the field fill with the field hairline. No blue for state. */
+.saved-head { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-8); }
+.saved-new {
+  height: 28px; padding: 0 var(--gw-space-8);
+  background: transparent; border: 1px solid var(--t-btn-border); border-radius: var(--gw-radius-8);
+  color: var(--t-heading); font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking);
+  cursor: pointer; transition: background var(--gw-motion-fast);
+}
+.saved-new:hover { background: var(--t-hover); }
+.saved-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--gw-space-4); max-height: 248px; overflow-y: auto; scrollbar-width: thin; }
+.saved-row {
+  display: flex; align-items: center; gap: var(--gw-space-4);
+  padding: var(--gw-space-4); border: 1px solid transparent; border-radius: var(--gw-radius-12);
+  transition: background var(--gw-motion-fast);
+}
+.saved-row:hover { background: var(--t-hover); }
+.saved-row.is-on { background: var(--t-field-bg); border-color: var(--t-field-border); }
+.saved-open {
+  flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--gw-space-2);
+  padding: var(--gw-space-4) var(--gw-space-4); background: transparent; border: 0; border-radius: var(--gw-radius-8);
+  text-align: left; cursor: pointer; color: var(--t-heading);
+}
+.saved-name { font: var(--gw-text-body-14-med); letter-spacing: var(--gw-text-body-14-med-tracking); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.saved-meta { font: var(--gw-text-body-12-reg); letter-spacing: var(--gw-text-body-12-reg-tracking); color: var(--t-label); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.saved-del {
+  flex: none; height: 28px; min-width: 28px; padding: 0 var(--gw-space-8);
+  display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: 0; border-radius: var(--gw-radius-8);
+  color: var(--t-label); font: var(--gw-text-body-12-med); cursor: pointer;
+  opacity: 0; transition: opacity var(--gw-motion-fast), background var(--gw-motion-fast), color var(--gw-motion-fast);
+}
+.saved-del svg { width: 16px; height: 16px; display: block; }
+.saved-row:hover .saved-del, .saved-del.is-confirm { opacity: 1; }
+.saved-del:hover { background: var(--t-hover); color: var(--t-heading); }
+.saved-del.is-confirm { color: var(--t-danger); background: var(--t-danger-bg); }
+.saved-error { color: var(--t-danger); }
+.tb-pill button:disabled:not(.btn-primary) { cursor: default; color: var(--t-label); }
+
+/* ── Saved: its own panel, bottom right (Utsav, 5 Oct 2026) ──
+   A second tool-panel: the same inset, width, radius, border and shadow, pinned to the bottom-right
+   corner and sized by its list (at most 40% of the screen, then it scrolls). The preview and the
+   bar centre between the two panels, so the sheet is never under it. Both panels collapse together. */
+.app { --t-offset-r: calc(var(--t-panel-w) + var(--t-inset) * 2); }
+.app[data-panel="closed"] { --t-offset-r: 0px; }
+.app .preview-col { padding-right: calc(var(--t-offset-r) + 32px); transition: padding 280ms cubic-bezier(.22, 1, .36, 1); }
+.app .floating-toolbar { left: calc((100vw + var(--t-offset) - var(--t-offset-r)) / 2); }
+.saved-panel {
+  position: fixed; right: var(--t-inset); bottom: var(--t-inset); z-index: 40;
+  width: var(--t-panel-w); max-height: 40vh;
+  display: flex; flex-direction: column; overflow: hidden;
+  background: var(--t-panel-bg);
+  border: 1px solid var(--t-panel-border);
+  border-radius: var(--gw-radius-20);
+  box-shadow: var(--gw-shadow-s3);
+  transition: transform 280ms cubic-bezier(.22, 1, .36, 1), opacity 200ms ease, visibility 0s linear 0s;
+}
+.saved-panel .saved-section { min-height: 0; flex: 1 1 auto; }
+.saved-panel .saved-list { max-height: none; flex: 1 1 auto; min-height: 0; }
+.app[data-panel="closed"] .saved-panel {
+  transform: translateX(calc(100% + var(--t-inset) + 8px));
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transition: transform 280ms cubic-bezier(.22, 1, .36, 1), opacity 200ms ease, visibility 0s linear 280ms;
+}
+@media (max-width: 900px) {
+  .app { --t-offset-r: 0px; }
+  .app .floating-toolbar { left: 50%; }
+  .app[data-panel="open"] .saved-panel { box-shadow: var(--gw-shadow-s4); }
+}
+@media (prefers-reduced-motion: reduce) { .saved-panel, .app .preview-col { transition: none; } }

@@ -1,0 +1,230 @@
+/* ─────────────────────────────────────────────────────────────────
+   The award certificate — the artefact this tool makes.
+
+   Measured from Figma, GW-HR-requests (zHTZS5OtI6Ed4kiASzcTOe), section
+   78:51, card 66:3, 5 Oct 2026. A4 portrait at 72 dpi: 595 × 842, which
+   is 1 CSS px = 1 pt, so the PDF exporter reads positions straight off
+   this DOM.
+
+   Inline styles on purpose: the tool shell must never reach into the
+   artefact (gushwork-tools, "the artefact is not the chrome"), and the
+   JPG / PSD exporters clone it exactly as drawn.
+
+   Colour: the PRINT palette (Utsav, 5 Oct 2026). Figma draws the frame
+   in screen blue #0070FF; the certificate is printed, so it takes
+   Brandeis Blue #0072CE / Pantone 285 C, as the ID card does (decisions
+   §20). All three exports write it as RGB #0072CE.
+   ───────────────────────────────────────────────────────────────── */
+
+const CERT = {
+  W: 595, H: 842,
+  blue: '#0072CE',            // print palette: Brandeis Blue, Pantone 285 C
+  black: '#0D0D0D',           // Flat Black (--gw-color-black)
+  panel: '#F7F8F9',           // --gw-color-neutral-25, measured 66:4
+  grey: '#4D545C',            // --gw-color-neutral-800, measured 66:8 / 66:11
+  gridIn: '#E9EAEE',          // measured: grid stroke gradient, centre stop (66:5)
+  gridOut: '#F7F8F9',         //           outer stop = the panel
+  gridOpacity: 0.7,           // measured 66:5
+  panelInset: 10,             // 66:4 at 10,10, 575 × 728, radius 20
+  panelW: 575, panelH: 728, panelR: 20,
+  pad: 40,                    // 79:140 at 40,40 inside the panel, 495 wide
+  colW: 495, innerW: 460,     // 66:7 is 460 wide
+  gapHead: 80,                // 66:6 → 66:7: 210 tall at 0, next at 290
+  gapBody: 40,                // 66:7 item spacing
+  gapSig: 10,                 // 66:9 item spacing
+  logoX: 40, logoY: 778, logoH: 24,   // 66:12, centred in the 104 blue foot
+  // the grid's radial gradient, as Figma exports it (userSpace, panel coords)
+  gridGradient: 'translate(437.5 653) rotate(-118.727) scale(586.715 855.769)',
+};
+
+/* Static cuts of the brand fonts, so the preview, the JPG/PSD capture and
+   the PDF all use the very same files (a PDF cannot embed a variable font
+   at a chosen weight). Cut from fonts/*.ttf with fontTools' instancer. */
+const CERT_FONT = {
+  display: "'Vert Grotesk Display Static', 'Vert Grotesk Display', sans-serif",
+  body: "'Inter Static', 'Inter', sans-serif",
+  bodySemi: "'Inter Static SemiBold', 'Inter', sans-serif",
+  sig: "'Balfontheim', cursive",
+};
+
+/* The 20 px lattice: Figma draws it as 1073 stroked 20 × 20 cells, rotated
+   −90°, so the lines fall on every multiple of 20 across the panel. */
+function gridPath() {
+  let d = '';
+  for (let x = 0; x <= 580; x += 20) d += `M${x} 0V740`;
+  for (let y = 0; y <= 740; y += 20) d += `M0 ${y}H580`;
+  return d;
+}
+const GRID_D = gridPath();
+
+const PRESETS = [
+  {
+    id: 'powerhouse',
+    label: 'Powerhouse',
+    name: 'Sukruti',
+    nameOwnLine: true,
+    headline: 'brings the energy everyone borrows.',
+    before: 'Strong on every metric & stronger for everyone around her. Recognized as the',
+    award: 'Powerhouse of',
+    after: 'for setting the standard in consistency and spirit.',
+  },
+  {
+    id: 'highest-acv',
+    label: 'Highest ACV',
+    name: 'Ajith',
+    nameOwnLine: false,
+    headline: 'landed the whales.',
+    before: 'You defined quality over quantity. Recognized for',
+    award: 'Highest ACV of',
+    after: 'and for setting the standard in high-value selling.',
+  },
+  {
+    id: 'rookie',
+    label: 'Rookie of the month',
+    name: 'Mugil',
+    nameOwnLine: false,
+    headline: 'skipped the learning curve',
+    before: 'You made day one look like year one. Recognized as',
+    award: 'Rookie of the Month for',
+    after: 'and for setting the standard in growth and execution.',
+  },
+  {
+    id: 'outbound',
+    label: 'Top outbound conversion',
+    name: 'Abhinav',
+    nameOwnLine: false,
+    headline: 'never let a lead go quiet.',
+    before: 'You turned every conversation into an opportunity. Recognized for',
+    award: 'Top Outbound Conversion for',
+    after: 'and for setting the standard in conversion excellence.',
+  },
+];
+
+const SIGNATORY_DEFAULT = { signature: 'Nayrhit B.', signedBy: 'Nayrhit, CEO, Gushwork' };
+
+function awardLine(d) {
+  return [d.award, d.period].map((s) => (s || '').trim()).filter(Boolean).join(' ');
+}
+
+/* data-layer names one PSD layer each; data-text marks a run the PDF
+   exporter draws as live text (font key → certificate-export.js). */
+function Certificate({ data, logoSvg, certRef }) {
+  const name = (data.name || '').trim();
+  const headline = (data.headline || '').trim();
+  const award = awardLine(data);
+  const before = (data.before || '').trim();
+  const after = (data.after || '').trim();
+
+  return (
+    <div
+      ref={certRef}
+      className="cert"
+      style={{
+        position: 'relative', width: CERT.W, height: CERT.H, overflow: 'hidden',
+        background: CERT.blue, boxSizing: 'border-box',
+      }}
+    >
+      <div data-layer="Background" style={{ position: 'absolute', inset: 0, background: CERT.blue }} />
+
+      <div
+        data-layer="Panel"
+        style={{
+          position: 'absolute', left: CERT.panelInset, top: CERT.panelInset,
+          width: CERT.panelW, height: CERT.panelH, borderRadius: CERT.panelR,
+          background: CERT.panel,
+        }}
+      />
+
+      <svg
+        data-layer="Grid"
+        width={CERT.panelW} height={CERT.panelH}
+        viewBox={`0 0 ${CERT.panelW} ${CERT.panelH}`}
+        style={{ position: 'absolute', left: CERT.panelInset, top: CERT.panelInset, display: 'block' }}
+        aria-hidden="true"
+      >
+        <defs>
+          <radialGradient id="cert-grid-g" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform={CERT.gridGradient}>
+            <stop stopColor={CERT.gridIn} />
+            <stop offset="1" stopColor={CERT.gridOut} />
+          </radialGradient>
+          <clipPath id="cert-grid-clip">
+            <rect width={CERT.panelW} height={CERT.panelH} rx={CERT.panelR} />
+          </clipPath>
+        </defs>
+        <g clipPath="url(#cert-grid-clip)" opacity={CERT.gridOpacity}>
+          <path d={GRID_D} stroke="url(#cert-grid-g)" strokeWidth="1" fill="none" />
+        </g>
+      </svg>
+
+      <div
+        className="cert-col"
+        style={{
+          position: 'absolute',
+          left: CERT.panelInset + CERT.pad, top: CERT.panelInset + CERT.pad,
+          width: CERT.colW, display: 'flex', flexDirection: 'column', gap: CERT.gapHead,
+        }}
+      >
+        <h2
+          data-layer="Headline"
+          style={{
+            margin: 0, fontFamily: CERT_FONT.display, fontWeight: 700, fontSize: 58,
+            lineHeight: 1.2, letterSpacing: 0, color: CERT.black, overflowWrap: 'break-word',
+          }}
+        >
+          {name && <span data-text="display" style={{ color: CERT.blue }}>{name}</span>}
+          {name && headline && (data.nameOwnLine ? <br /> : ' ')}
+          {headline && <span data-text="display" style={{ color: CERT.black }}>{headline}</span>}
+        </h2>
+
+        <div style={{ width: CERT.innerW, display: 'flex', flexDirection: 'column', gap: CERT.gapBody }}>
+          <p
+            data-layer="Citation"
+            style={{
+              margin: 0, fontFamily: CERT_FONT.body, fontWeight: 400, fontSize: 14,
+              lineHeight: 1.72, letterSpacing: 0, color: CERT.grey,
+            }}
+          >
+            {before && <span data-text="body" style={{ color: CERT.grey }}>{before}</span>}
+            {before && award && ' '}
+            {award && <span data-text="bodySemi" style={{ fontFamily: CERT_FONT.bodySemi, fontWeight: 600, color: CERT.blue }}>{award}</span>}
+            {(before || award) && after && ' '}
+            {after && <span data-text="body" style={{ color: CERT.grey }}>{after}</span>}
+          </p>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: CERT.gapSig, alignItems: 'flex-start' }}>
+            <div
+              data-layer="Signature"
+              style={{
+                marginLeft: -2, fontFamily: CERT_FONT.sig, fontWeight: 400, fontSize: 40,
+                lineHeight: 1, letterSpacing: '-0.002em', color: CERT.black, whiteSpace: 'nowrap',
+                minHeight: 40,
+              }}
+            >
+              <span data-text="sig">{data.signature}</span>
+            </div>
+            <div
+              data-layer="Signed by"
+              style={{
+                fontFamily: CERT_FONT.body, fontWeight: 400, fontSize: 12, lineHeight: 1.2,
+                letterSpacing: 0, color: CERT.grey, whiteSpace: 'nowrap', minHeight: 14,
+              }}
+            >
+              <span data-text="body">{data.signedBy}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        data-layer="Logo"
+        style={{
+          position: 'absolute', left: CERT.logoX, top: CERT.logoY,
+          height: CERT.logoH, width: (CERT.logoH * 421) / 80, lineHeight: 0,
+        }}
+        dangerouslySetInnerHTML={{ __html: logoSvg || '' }}
+      />
+    </div>
+  );
+}
+
+Object.assign(window, { CERT, CERT_FONT, PRESETS, SIGNATORY_DEFAULT, Certificate, awardLine, GRID_D });
