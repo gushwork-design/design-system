@@ -312,6 +312,14 @@
       "fingerprint": "4536b249e9d40501",
       "previewFingerprint": "40fae7f4376402ca",
       "note": "new footer design being used"
+    },
+    "testimonial": {
+      "reviewed": "rejected",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "7f7e932161b58e16",
+      "previewFingerprint": "7fd9ae925f62afe4",
+      "note": "new design in the templates"
     }
   }
 }
