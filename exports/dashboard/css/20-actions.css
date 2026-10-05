@@ -50,15 +50,15 @@
 .gd .gd-btn--primary:hover, .gd .gd-btn--primary.is-hover{ background: var(--gd-ink-hover); }
 
 /* SHORTCUT KEY CAP (R53). A keyboard shortcut is shown inside the control it triggers, after the label, never in a separate
-   hint line. The cap is the label's own colour at lower strength on a faint tint of the button, so it reads on primary,
+   hint line. The cap is the label's own colour at half strength on a faint 8% tint of it (the quiet chip the outline Rework button shows in light, on every button), so it reads on primary,
    outline, ghost and danger alike. It is a filled shape, so the button's right padding is inset until the cap's gap to the
    edge equals its gap above and below. Hidden on touch and on narrow screens, where there is no keyboard to press. */
-.gd .gd-kbd{ margin-left: var(--gw-space-8); min-width: 18px; height: 18px; padding: 0 var(--gw-space-4); display: inline-grid; place-items: center; flex: none; border-radius: var(--gw-radius-4); background: color-mix(in srgb, currentColor 14%, transparent); opacity: .55; font: var(--gw-text-body-12-med); letter-spacing: 0; }
-.gd .gd-btn:has(> .gd-kbd){ padding-right: calc((var(--gd-control-h) - 18px) / 2); }
-.gd .gd-btn--sm .gd-kbd{ display: none; }
+.gd .gd-btn__key{ margin-left: var(--gw-space-8); min-width: 18px; height: 18px; padding: 0 var(--gw-space-4); display: inline-grid; place-items: center; flex: none; border-radius: var(--gw-radius-4); background: color-mix(in srgb, currentColor 8%, transparent); opacity: .5; font: var(--gw-text-body-12-med); letter-spacing: 0; }
+.gd .gd-btn:has(> .gd-btn__key){ padding-right: calc((var(--gd-control-h) - 18px) / 2); }
+.gd .gd-btn--sm .gd-btn__key{ display: none; }
 @media (hover: none), (max-width: 767px){
-  .gd .gd-kbd{ display: none; }
-  .gd .gd-btn:has(> .gd-kbd){ padding-right: var(--gw-space-16); }
+  .gd .gd-btn__key{ display: none; }
+  .gd .gd-btn:has(> .gd-btn__key){ padding-right: var(--gw-space-16); }
 }
 .gd .gd-btn--ghost{ box-shadow: none; }
 .gd .gd-btn--danger{ color: var(--gd-tone-bad-fg); box-shadow: inset 0 0 0 1px var(--gd-danger); }  /* red label + red edge on the neutral shape; the confirm dialog carries the weight */
