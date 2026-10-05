@@ -917,7 +917,8 @@
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "8bf2011ff642ad84"
+      "fingerprint": "7f065a7ec2e5680e",
+      "previewFingerprint": "5bb8b19b2e8e08dc"
     },
     "explorer-layout": {
       "reviewed": "passed",
