@@ -837,10 +837,14 @@
 .gd .gd-combo__toggle{ flex: none; width: 20px; height: 20px; display: grid; place-items: center; padding: 0; border: 0; background: none; color: var(--gd-text-muted); cursor: pointer; }
 
 /* multi-select: chips inside the shell */
-.gd .gd-input--multi{ height: auto; min-height: var(--gd-control-h); flex-wrap: wrap; gap: var(--gw-space-4); padding: 3px var(--gw-space-8) 3px var(--gw-space-8); cursor: text; }
+.gd .gd-input--multi{ --_chip-h: min(22px, calc(var(--gd-control-h) - 6px)); position: relative; height: auto; min-height: var(--gd-control-h); flex-wrap: wrap; gap: var(--gw-space-4);
+  /* top and bottom padding is what centres a single chip row in the control; keeping it when the chips wrap stops the rows crowding the edge. The right padding clears the arrow. */
+  padding: calc((var(--gd-control-h) - var(--_chip-h)) / 2) calc(var(--gw-space-8) + 12px + var(--gw-space-8)) calc((var(--gd-control-h) - var(--_chip-h)) / 2) var(--gw-space-8); cursor: text; }
+/* the arrow is pinned top right, level with the first row, however many rows the chips make */
+.gd .gd-input--multi > .gd-input__caret{ position: absolute; right: var(--gw-space-8); top: calc((var(--gd-control-h) - 12px) / 2); }
 .gd .gd-input--multi .gd-input__el{ flex: 1 1 72px; min-width: 72px; height: 22px; }
 .gd .gd-input__chip{
-  display: inline-flex; align-items: center; gap: var(--gw-space-4); height: min(22px, calc(var(--gd-control-h) - 6px)); padding: 0 2px 0 var(--gw-space-8);
+  display: inline-flex; align-items: center; gap: var(--gw-space-4); height: var(--_chip-h, min(22px, calc(var(--gd-control-h) - 6px))); padding: 0 2px 0 var(--gw-space-8);
   border-radius: var(--gw-radius-4); background: var(--gd-sunken-bg); color: var(--gd-text); box-shadow: inset 0 0 0 1px var(--gd-border-strong);
   font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); white-space: nowrap; max-width: 100%;
 }
