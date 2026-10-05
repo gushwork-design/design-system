@@ -143,6 +143,10 @@ The email signature creator and the employee ID card generator were redesigned i
 42. **The profile shows a name, not only the mark.** The 3x3 mark alone reads as a random icon
     to anyone who has not met it, so the button is the mark plus the first name (Utsav, 5 Oct 2026).
 
+43. **Ghost buttons for the panel's quiet controls.** "All files" and the collapse / reopen buttons
+    have no border at rest, only the hover fill; the collapse icon is 16 (was 12) so it still reads
+    without its frame (Utsav, 5 Oct 2026).
+
 ## Left open (the owner's call)
 
 - **A third typeface in the signature preview** (Plus Jakarta Sans). In the artefact, not the chrome.

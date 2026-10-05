@@ -24,7 +24,7 @@ The floating, collapsible panel a tool keeps its controls in.
 | Light fill | white |
 | Dark fill | black, hairline `neutral/900` |
 | Header | the 32 Gushwork logo on **Brand Blue** (`--gw-color-primary-500`, radius 8; blue since 5 Oct 2026) with no click action: a right click opens the **logo menu** (Design Hub; each tool, the current one checked, any the viewer cannot open greyed with a lock; All tools; the hub's `t-menu`, 248 wide, at the pointer), the tool's name in Vert Grotesk Display 16, collapse button right; padding 12 12 12 16, a hairline beneath |
-| Collapse button | 24 square, radius 4, 12 icon |
+| Collapse button | 28 square, radius 8, a **ghost** (no border, the hover fill), 16 icon |
 | Collapsed | the panel folds to its own header, `.panel-mini`: the logo tile (linked to Tools), the tool's name and the reopen button (28, outlined), floating where the panel was, inset 12; padding 12 12 12 16, gap 12, radius 20 (8 + 12), the panel's fill, border and `s3`. Utsav, 5 Oct 2026: the tool keeps its logo and name while the preview has the screen |
 
 **Rules (R44).** The header mark is always the Gushwork logo tile, the same SVG the tools carry in
