@@ -561,3 +561,28 @@ html[data-tool-panel="open"] .t-acts, html[data-tool-panel="closed"] .t-acts { d
 /* "All files" is a way back, not an action: no border, the hover fill only (Utsav, 5 Oct 2026) */
 .saved-new.right-back { border-color: transparent; padding-left: var(--gw-space-4); }
 .saved-new.right-back:hover { background: var(--t-hover); }
+
+/* ── Signed by, locked until asked (after the ID card generator's locked fields) ── */
+.lock-head { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-8); }
+.lock-chip--section {
+  position: static; display: inline-flex; align-items: center; gap: var(--gw-space-4);
+  height: 24px; padding: 0 var(--gw-space-8);
+  border: 1px solid var(--t-field-border); border-radius: var(--gw-radius-8);
+  background: var(--t-panel-bg); color: var(--t-label);
+  font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); cursor: pointer;
+}
+.lock-chip--section svg { width: 12px; height: 12px; }
+.lock-chip--section .lock-chip-label { display: inline-block; max-width: 0; overflow: hidden; white-space: nowrap; opacity: 0; transition: max-width 180ms ease, opacity 140ms ease; }
+.lockable-field.is-locked:hover .lock-chip-label, .lock-chip--section:focus-visible .lock-chip-label, .lock-chip--section[aria-expanded="true"] .lock-chip-label { max-width: 120px; opacity: 1; }
+.lock-chip--section:hover { color: var(--t-heading); background: var(--t-hover); }
+.lockable-field.is-locked .prop-input[readonly] { cursor: default; }
+.lock-confirm {
+  display: flex; flex-direction: column; gap: var(--gw-space-8);
+  padding: var(--gw-space-12); border: 1px solid var(--t-panel-border); border-radius: var(--gw-radius-12);
+  background: var(--t-field-bg);
+}
+.lock-confirm p { margin: 0; font: var(--gw-text-body-12-reg); letter-spacing: var(--gw-text-body-12-reg-tracking); color: var(--t-text); }
+.lock-confirm__acts { display: flex; justify-content: flex-end; gap: var(--gw-space-8); }
+.lock-confirm__acts .r-btn { height: 32px; border-radius: var(--gw-radius-8); }
+/* on the sheet, the locked signature is not a click target */
+.cert-scale [data-layer="Signature"] span:not(.cert-edit), .cert-scale [data-layer="Signed by"] span:not(.cert-edit) { cursor: default; }

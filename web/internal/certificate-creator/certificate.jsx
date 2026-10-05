@@ -26,7 +26,7 @@ const CERT = {
   gridOut: '#F7F8F9',         //           outer stop = the panel
   gridOpacity: 0.7,           // measured 66:5
   panelInset: 10,             // 66:4 at 10,10, 575 × 728, radius 20
-  panelW: 575, panelH: 728, panelR: 20,
+  panelW: 575, panelH: 728, panelR: 0,   // square (Utsav, 5 Oct 2026; Figma draws 20): preview, thumbnails and every download
   pad: 40,                    // 79:140 at 40,40 inside the panel, 495 wide
   colW: 495, innerW: 460,     // 66:7 is 460 wide
   gapHead: 80,                // 66:6 → 66:7: 210 tall at 0, next at 290
@@ -216,7 +216,8 @@ function readCitation(el) {
   const intact = CITE_RUNS.every((r) => r.key in spans) && el.querySelectorAll('[data-field]').length === 4;
   // text typed outside the runs, or runs merged away: read the whole thing and split it again
   const stray = [...el.childNodes].some((n) => n.nodeType === 3 && n.nodeValue.trim());
-  if (intact && !stray) return Object.fromEntries(CITE_RUNS.map((r) => [r.key, noTrail(spans[r.key])]));
+  // spaces at a run's edges are dropped: the runs are joined by one space, so an edge space doubled it
+  if (intact && !stray) return Object.fromEntries(CITE_RUNS.map((r) => [r.key, trimSpaces(noTrail(spans[r.key]))]));
   const all = noTrail(el.textContent).replace(/[^\S\n]+/g, ' ').trim();
   return splitCitation(all) || { before: all, award: '', period: '', after: '' };
 }
@@ -270,7 +271,7 @@ function CitationEditor({ data, onEdit, style }) {
 /* trims spaces, never a line break someone put there on purpose */
 function trimSpaces(v) { return String(v || '').replace(/^[ \t]+|[ \t]+$/g, ''); }
 
-function Certificate({ data, logoSvg, certRef, onEdit }) {
+function Certificate({ data, logoSvg, certRef, onEdit, signLocked = false }) {
   const editable = !!onEdit;
   const ed = (key) => (v) => onEdit && onEdit(key, v);
   const name = trimSpaces(data.name);
@@ -389,7 +390,7 @@ function Certificate({ data, logoSvg, certRef, onEdit }) {
                 minHeight: 40,
               }}
             >
-              <EditableText editable={editable} value={data.signature} onChange={ed('signature')} placeholder="Signature" data-text="sig" />
+              <EditableText editable={editable && !signLocked} value={data.signature} onChange={ed('signature')} placeholder="Signature" data-text="sig" />
             </div>
             <div
               data-layer="Signed by"
@@ -398,7 +399,7 @@ function Certificate({ data, logoSvg, certRef, onEdit }) {
                 letterSpacing: 0, color: CERT.grey, whiteSpace: 'nowrap', minHeight: 14,
               }}
             >
-              <EditableText editable={editable} value={data.signedBy} onChange={ed('signedBy')} placeholder="Name, role, Gushwork" data-text="body" />
+              <EditableText editable={editable && !signLocked} value={data.signedBy} onChange={ed('signedBy')} placeholder="Name, role, Gushwork" data-text="body" />
             </div>
           </div>
         </div>
