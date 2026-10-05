@@ -114,8 +114,8 @@
 .gd-card--flush > .gd-card__head { padding: var(--gd-card-pad); }
 .gd-card--flush > .gd-card__body { padding: 0 var(--gd-card-pad) var(--gd-card-pad); }
 .gd-card--flush > .gd-card__body--bleed { padding: 0; }
-.gd-card__head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--gd-gap); min-height: 24px; flex-wrap: wrap; }   /* actions pin to the top right; they only drop below the title when the card is too narrow for both */
-.gd-card__titles { flex: 1 1 160px; display: flex; flex-direction: column; gap: var(--gw-space-2); min-width: 0; }
+.gd-card__head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--gd-gap); min-height: 24px; flex-wrap: wrap; }   /* actions pin to the top right; they only drop below the title when the card is too narrow for both. The title block asks for 120, not 160, so the compact card (about 240 wide) keeps Export beside the title */
+.gd-card__titles { flex: 1 1 120px; display: flex; flex-direction: column; gap: var(--gw-space-2); min-width: 0; }
 .gd-card__title { margin: 0; font: var(--gw-text-body-16-sem); letter-spacing: var(--gw-text-body-16-sem-tracking); color: var(--gd-text); }
 .gd-card__desc { margin: 0; font: var(--gw-text-body-14-reg); letter-spacing: var(--gw-text-body-14-reg-tracking); color: var(--gd-text-muted); }
 .gd-card__actions { flex: none; display: flex; align-items: center; gap: var(--gw-space-8); margin-left: auto; }
