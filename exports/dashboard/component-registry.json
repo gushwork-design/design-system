@@ -750,6 +750,12 @@
       "reviewedOn": "2026-10-05",
       "fingerprint": "a1a03716c3a46bbb",
       "note": "the action button placment seems off, it can be low the text"
+    },
+    "bar-chart": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "0d88f1f2a693144d"
     }
   }
 }
