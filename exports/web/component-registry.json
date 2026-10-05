@@ -326,8 +326,8 @@
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
       "fingerprint": "b011f54c631f2238",
-      "previewFingerprint": "e4fcaef85b7efc64",
-      "note": "1. in desktop the tooltips are coming offplaced.\n2. in mobile is taking too much space, week 1 can be above the placed above the main text frame - and lets not repeat in tooltip"
+      "previewFingerprint": "6e6d5deb4786bda7",
+      "note": "gap above tooltip is incosistent"
     },
     "video": {
       "reviewed": "passed",
