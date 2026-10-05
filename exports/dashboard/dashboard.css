@@ -1448,6 +1448,7 @@
 .gd-delta__arrow { width: 8px; height: 7px; flex: none; background: currentColor; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
 .gd-delta__arrow[data-dir="down"] { clip-path: polygon(0 0, 100% 0, 50% 100%); }
 .gd-delta__arrow[data-dir="flat"] { height: 2px; clip-path: none; border-radius: 1px; }
+.gd-delta + .gd-delta__vs { margin-left: var(--gw-space-4); }                                   /* 4px between the pill and its comparison text */
 .gd-delta__vs { font: var(--gw-text-body-12-reg); letter-spacing: var(--gw-text-body-12-reg-tracking); color: var(--gd-text-muted); white-space: nowrap; }
 .gd-delta--sm { height: 16px; padding: 0 var(--gw-space-4); font-size: 12px; line-height: 16px; gap: var(--gw-space-2); }  /* table cell: fits the compact row */
 .gd-delta--sm .gd-delta__arrow { width: 7px; height: 6px; }
@@ -2189,13 +2190,11 @@ a.gd-hbar__row:hover, a.gd-hbar__row.is-hover { background: var(--gd-hover-bg); 
 .gd .gd-banner__icon svg { width: 16px; height: 16px; display: block; }
 .gd .gd-banner__body { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: var(--gw-space-2); }
 .gd .gd-banner__title { color: var(--gd-text); font: var(--gw-text-body-14-sem); letter-spacing: var(--gw-text-body-14-sem-tracking); }
-.gd .gd-banner__actions { flex: none; display: flex; align-items: center; gap: var(--gw-space-8); align-self: center; }
+.gd .gd-banner { flex-wrap: wrap; }
+.gd .gd-banner .gd-fb-close { order: 2; margin-left: auto; }
+/* the action sits under the text, in line with it (icon 16 + gap), at every width */
+.gd .gd-banner__actions { order: 3; flex: 0 0 calc(100% - 16px - var(--gd-gap)); margin-left: calc(16px + var(--gd-gap)); display: flex; align-items: center; gap: var(--gw-space-8); }
 .gd .gd-banner code { font-size: .92em; }
-@media (max-width: 559px) {   /* actions drop to their own row under the text */
-  .gd .gd-banner { flex-wrap: wrap; }
-  .gd .gd-banner .gd-fb-close { order: 2; margin-left: auto; }
-  .gd .gd-banner__actions { order: 3; flex-basis: 100%; align-self: flex-start; }
-}
 
 /* ---- empty state ---------------------------------------------------------- */
 .gd .gd-empty {

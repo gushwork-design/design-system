@@ -458,7 +458,7 @@ a.cat-name{color:var(--gw-color-primary-600);text-decoration:none}
   &lt;div class=&quot;gd-banner__actions&quot;&gt;&lt;button class=&quot;gd-btn gd-btn--outline gd-btn--sm&quot;&gt;Connect Gmail&lt;/button&gt;&lt;/div&gt;
   &lt;button class=&quot;gd-fb-close&quot; data-gd-dismiss aria-label=&quot;Dismiss&quot;&gt;…&lt;/button&gt;
 &lt;/div&gt;</code></pre>
-<p><b>Variants.</b> Neutral is the hub's <code>.ac-note</code>. Tinted kinds follow the toast rule (tinted in light, neutral with a coloured icon in dark). Omit the close button for a banner that must stay (a read-only or permissions notice). Under 560px the actions drop under the text.</p>
+<p><b>Variants.</b> Neutral is the hub's <code>.ac-note</code>. Tinted kinds follow the toast rule (tinted in light, neutral with a coloured icon in dark). Omit the close button for a banner that must stay (a read-only or permissions notice). The actions sit under the text, in line with it, at every width.</p>
 <p><b>States.</b> Rest; close hover; hidden after dismiss. With <code>data-gd-banner-key</code> the dismissal persists in localStorage and the banner is hidden on load.</p>
 <p><b>Tokens.</b> Padding <code>--gd-gap</code> / <code>--gd-card-pad</code>, <code>--gw-radius-12</code>, <code>--gd-fb-*</code>.</p>
 <p><b>Accessibility.</b> <code>role=&quot;status&quot;</code>; use <code>role=&quot;alert&quot;</code> for error. The close has a label. A banner never moves focus.</p>
