@@ -1315,7 +1315,8 @@
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "64a6018ef52b0ae4"
+      "fingerprint": "51f9a47fe63f4ab9",
+      "previewFingerprint": "6a67e8e4de945733"
     },
     "tabs-pill": {
       "reviewed": "passed",
