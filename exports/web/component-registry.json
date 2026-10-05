@@ -219,7 +219,7 @@
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-04",
-      "fingerprint": "5754443d8a35c21c"
+      "fingerprint": "cb392797cf0b2749"
     },
     "client-avatar": {
       "reviewed": "passed",
@@ -267,7 +267,7 @@
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "276ce8fa0099fa31",
+      "fingerprint": "df0aacba0b029908",
       "previewFingerprint": "668202067994ec2b"
     },
     "hero": {
@@ -281,35 +281,35 @@
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "e44887d9ea1e6b51",
+      "fingerprint": "5d23d18c3d59fdf9",
       "previewFingerprint": "4e14b3c705353d69"
     },
     "eyebrow": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "c08345e8361fe036",
+      "fingerprint": "c95561be01ce7d09",
       "previewFingerprint": "084bc81f00a03af9"
     },
     "inline-input": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "7bf0ee686f4f43ef",
+      "fingerprint": "eb030b38fb1c4395",
       "previewFingerprint": "6866305f326ac1f4"
     },
     "input-fields": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "9176bb841fa18c0d",
+      "fingerprint": "5c49058af9c32c23",
       "previewFingerprint": "6866305f326ac1f4"
     },
     "page-build": {
       "reviewed": "rejected",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "4536b249e9d40501",
+      "fingerprint": "b76f6a3847613853",
       "previewFingerprint": "40fae7f4376402ca",
       "note": "new footer design being used"
     },

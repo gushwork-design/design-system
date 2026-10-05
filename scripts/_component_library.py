@@ -923,17 +923,56 @@ def group_fingerprints(groups=None):
     return out
 
 
+def doc_section(body, key):
+    """The part of a shared spec doc that is about `key`: the doc's preamble (everything above the first `##`, the
+    rules every component in the doc shares) plus the `##`/`###` section whose heading names the key, up to the next
+    heading at the same level or higher. Returns None when no heading names it, and the caller hashes the whole doc,
+    exactly as before (5 Oct 2026). A heading names the key when its slug is the key, starts with "<key>-", or is
+    "the-<key>"."""
+    lines = body.splitlines()
+    heads = [(i, len(m.group(1)), re.sub(r"[^a-z0-9]+", "-", m.group(2).lower()).strip("-"))
+             for i, ln in enumerate(lines) for m in [re.match(r"^(#{2,3}) (.+?)\s*$", ln)] if m]
+    if not heads:
+        return None
+    hit = next((h for h in heads if h[2] == key or h[2].startswith(key + "-") or h[2] == "the-" + key), None)
+    if not hit:
+        return None
+    end = next((i for i, lvl, _ in heads if i > hit[0] and lvl <= hit[1]), len(lines))
+    return "\n".join(lines[:heads[0][0]] + lines[hit[0]:end])
+
+
+def spec_fingerprint(key, entry, body):
+    """The fingerprint of one component's spec, from its registry entry and its doc's text. Pure, so the review
+    backfill can compute it at any past revision."""
+    part = doc_section(body, key)
+    return fingerprint(f"{key}|{entry.get('version','')}|{entry.get('changed','')}|{body if part is None else part}")
+
+
+def legacy_spec_fingerprint(key, entry, body):
+    """The fingerprint before 5 Oct 2026: the WHOLE doc. Kept only so the backfill can find the revision an old
+    decision was made against."""
+    return fingerprint(f"{key}|{entry.get('version','')}|{entry.get('changed','')}|{body}")
+
+
+def component_doc_path(surface, entry):
+    base = "foundation" if surface == "shared" else os.path.join("exports", surface)
+    doc = entry.get("doc", "")
+    return os.path.join(base, doc) if doc else ""
+
+
 def component_fingerprint(surface, key, reg=None):
-    """A component's spec doc plus its registry entry. Re-measuring the doc, or
-    bumping the version, expires the pass."""
+    """A component's spec: its registry entry plus ITS OWN section of the doc (and the doc's shared preamble).
+    Re-measuring that section, or bumping the version, expires the pass. Until 5 Oct 2026 this hashed the whole doc,
+    so a rework of one component in a shared doc (navigation.md holds eight) expired all its neighbours' passes;
+    Utsav: "do both, and restore the expired ones to approved". A component whose doc has no heading naming it
+    still hashes the whole doc."""
     reg = reg or load_registries()
     block = (reg.get(surface) or {})
     entry = (block.get("components") or {}).get(key) or {}
-    base = "foundation" if surface == "shared" else os.path.join("exports", surface)
-    doc = entry.get("doc", "")
-    path = os.path.join(ROOT, base, doc) if doc else ""
+    rel = component_doc_path(surface, entry)
+    path = os.path.join(ROOT, rel) if rel else ""
     body = open(path, encoding="utf-8").read() if path and os.path.isfile(path) else ""
-    return fingerprint(f"{key}|{entry.get('version','')}|{entry.get('changed','')}|{body}")
+    return spec_fingerprint(key, entry, body)
 
 
 def rework_record_path(surface, key):
