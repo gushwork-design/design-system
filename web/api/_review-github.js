@@ -242,7 +242,15 @@ export async function checkGithub(token) {
   await run('Remove it again', () => gh(token, repo(`/git/refs/heads/${name}`), { method: 'DELETE' }));
   const prs = await run('Read pull requests', () => gh(token, repo('/pulls?state=open&per_page=1')));
   if (prs.e) return out('The token can change the repository but not use pull requests. Set Pull requests to "Read and write" on the token.');
-  return out('Connected. Approve will open or update a pull request for the decisions.');
+  // The rework threads with Alfred (5 Oct 2026) are issues. Writing is tested without writing anything: an issue with no title
+  // is refused as invalid (422) only once the token is allowed to make issues; without the permission GitHub says 403 first.
+  const iss = await run('Write issues (comments with Alfred)', async () => {
+    try { await gh(token, repo('/issues'), { method: 'POST', body: JSON.stringify({}) }); }
+    catch (e) { if (e.status === 422) return true; throw e; }
+    return true;
+  });
+  if (iss.e) return out('Decisions work, but comments with Alfred do not: set Issues to "Read and write" on the token.');
+  return out('Connected. Approve will open or update a pull request for the decisions, and comments with Alfred work.');
 }
 
 /* Where a reference file attached to a decision lives: next to the item's drawing, one folder per item. `stamp` keeps
