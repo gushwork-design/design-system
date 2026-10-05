@@ -831,6 +831,12 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
 .rv-act li.is-move::before { background: transparent; box-shadow: inset 0 0 0 1.5px var(--ul-sub); }
 .rv-act b { color: var(--ul-value); font-weight: 600; }
 .rv-act time { display: block; font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
+.rv-tabs + .rv-act { margin-top: 0; }
+.rv-act__more summary { display: inline-flex; margin-top: 2px; cursor: pointer; list-style: none; font: 500 12px/1.4 var(--gw-font-body); color: var(--ul-sub); text-decoration: underline; text-underline-offset: 3px; }
+.rv-act__more summary::-webkit-details-marker { display: none; }
+.rv-act__more summary:hover { color: var(--ul-value); }
+.rv-act__h, .rv-act__more[open] .rv-act__s { display: none; } .rv-act__more[open] .rv-act__h { display: inline; }
+.rv-act__more .rv-refs { margin-top: var(--gw-space-8); }
 .rv-act q { display: block; margin-top: 2px; color: var(--ul-cell); quotes: "\201C" "\201D"; }
 /* The admin's read-only notice at the top of Review: a warning tint and a lock, so it is the first thing read on the tab. */
 .rv-ro { display: flex; align-items: center; gap: var(--gw-space-16); padding: var(--gw-space-16) var(--gw-space-20); border-radius: var(--gw-radius-12);
@@ -1845,23 +1851,23 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     if (d.toDateString() === now.toDateString()) { var h = d.getHours(); return (h % 12 || 12) + ':' + String(d.getMinutes()).padStart(2, '0') + (h < 12 ? 'am' : 'pm'); }
     return d.getDate() + ' ' + MON[d.getMonth()] + (d.getFullYear() !== now.getFullYear() ? ', ' + String(d.getFullYear()).slice(2) : '');
   }
+  /* Activity keeps the original rail (Utsav: "the thread design was nice earlier"): a dot per event on a thin line, what
+     happened in bold, the time under it. A send-back's note and files stay folded until "Show note". */
   function logRow(c) {
-    var kind, txt, det = '';
+    var cls, txt, det = '';
     if (c.ev) {
-      kind = c.what === 'approved' ? 'ok' : c.what === 'fixed and published' ? 'ship' : 'move';
-      txt = c.what === 'approved' ? '<b>' + esc(personName(c.by).split(' ')[0] || 'Utsav') + '</b> approved it'
-        : c.what === 'fixed and published' ? '<b>Alfred</b> fixed it in ' + prLink(c.pr)
+      cls = c.what === 'approved' ? 'is-ok' : c.what === 'fixed and published' ? 'is-ship' : 'is-move';
+      txt = c.what === 'approved' ? 'Approved by ' + esc(personName(c.by) || 'Utsav Singh')
+        : c.what === 'fixed and published' ? 'Fixed and published in ' + prLink(c.pr)
         : (c.what === 'spec moved' ? 'Spec moved' : 'Drawing moved') + (c.pr ? ' in ' + prLink(c.pr) : '');
     } else {
-      var me = c.who === 'owner' ? 'Utsav' : c.who === 'alfred' ? 'Alfred' : (c.by || 'Someone');
-      kind = c.kind === 'reject' ? 'bad' : c.kind === 'rework' ? 'warn' : c.who === 'alfred' ? 'ai' : 'note';
-      txt = '<b>' + esc(me) + '</b> ' + (c.kind === 'rework' ? 'sent it back' : c.kind === 'reject' ? 'rejected it' : c.who === 'alfred' ? (c.blocked ? 'asked you something' : 'commented') : 'replied');
+      cls = c.kind === 'reject' ? 'is-bad' : 'is-warn';
+      txt = (c.kind === 'reject' ? 'Rejected' : 'Sent back') + ' by Utsav Singh';
       var files = c.refs && c.refs.length ? '<div class="rv-refs">' + attHtml(c.refs.map(function (r) { var href = r.replace(/^web\//, '/'); return { name: r.split('/').pop(), type: /\.(png|jpe?g|webp|gif)$/.test(r) ? 'image/x' : '', url: href, href: href }; }), false) + '</div>' : '';
-      det = (c.body ? '<div class="rv-cm__b">' + linkify(c.body) + '</div>' : '') + files;
+      det = (c.body ? '<q>' + linkify(c.body) + '</q>' : '') + files;
     }
-    var line = '<span class="rv-log__d rv-log__d--' + kind + '" aria-hidden="true"></span><span class="rv-log__t">' + txt + '</span><time datetime="' + esc(c.at) + '" title="' + esc(fmtWhen(c.at)) + '">' + esc(shortWhen(c.at)) + '</time>';
-    return det ? '<li class="rv-log"><details><summary>' + line + '<svg class="rv-log__c" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg></summary><div class="rv-log__x">' + det + '</div></details></li>'
-      : '<li class="rv-log"><div class="rv-log__r">' + line + '</div></li>';
+    return '<li class="' + cls + '"><b>' + txt + '</b><time datetime="' + esc(c.at) + '">' + esc(fmtWhen(c.at)) + '</time>' +
+      (det ? '<details class="rv-act__more"><summary><span class="rv-act__s">Show note</span><span class="rv-act__h">Hide note</span></summary>' + det + '</details>' : '') + '</li>';
   }
   function prLink(n) { return '<a class="rv-link" href="https://github.com/gushwork-design/design-system/pull/' + n + '" target="_blank" rel="noopener">#' + n + '</a>'; }
   function paintThread(it) {
@@ -1906,7 +1912,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
       '<button type="button" role="tab" class="rv-tab' + (tab === 'all' ? ' is-on' : '') + '" aria-selected="' + (tab === 'all') + '" data-tab="all">Activity' + (nAll ? ' <span>' + nAll + '</span>' : '') + '</button>' +
       '</div>';   // no "On GitHub" link: the drawer holds the whole thread (Utsav, 5 Oct 2026)
     box.innerHTML = tabs +
-      (html ? '<ol class="rv-tl' + (tab === 'all' ? ' rv-tl--log' : '') + '">' + html + '</ol>' : '<p class="rv-th__empty">' + (tab === 'comments' ? 'No comments yet. Your send-back note starts the thread, and Alfred replies after every rework.' : 'Nothing has happened to this item yet.') + '</p>') +
+      (html ? (tab === 'all' ? '<div class="rv-act"><ol>' + html + '</ol></div>' : '<ol class="rv-tl">' + html + '</ol>') : '<p class="rv-th__empty">' + (tab === 'comments' ? 'No comments yet. Your send-back note starts the thread, and Alfred replies after every rework.' : 'Nothing has happened to this item yet.') + '</p>') +
       (t.error && tab === 'comments' ? '<p class="rv-th__empty">' + esc(t.error) + '</p>' : '') + (talk && tab === 'comments' ? reply : '');
     box.querySelectorAll('[data-tab]').forEach(function (b) { b.addEventListener('click', function () { RV.tab = b.getAttribute('data-tab'); paintThread(it); }); });
     var more = $('rv-early'); if (more) more.addEventListener('click', function () { RV.early = RV.early || {}; RV.early[idOf(it)] = true; paintThread(it); });
