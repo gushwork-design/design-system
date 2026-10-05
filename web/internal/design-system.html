@@ -1873,7 +1873,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     // Two tabs, as Asana does it (5 Oct 2026, Utsav: "you removed activity, both should be there"): Comments is the
     // conversation alone; All activity is every event with the comments in place. One composer under both.
     var tab = RV.tab === 'all' || !talk ? 'all' : 'comments';
-    var rows = tab === 'all' ? timeline(it, cms) : cms.slice(), lastCm = cms[cms.length - 1];
+    var rows = tab === 'all' ? timeline(it, cms.filter(function (c) { return c.kind; })) : cms.slice(), lastCm = cms[cms.length - 1];   // Activity is a record of events; conversation stays in Comments
     // All activity is a log (5 Oct 2026, Utsav: "keep activity minimal, less data, keep details on expansion"): one short line
     // per entry, newest last, and a note, a file or Alfred's message opens only when its line is expanded.
     var html = tab === 'all' ? rows.map(logRow).join('') : rows.map(function (c) {
@@ -1900,14 +1900,14 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     }).join('');
     var reply = owner ? '<div class="rv-cmp"><textarea id="rv-reply" rows="2" maxlength="2000" aria-label="Reply to Alfred" placeholder="Reply to Alfred…"></textarea>' +
       '<div class="rv-cmp__bar"><button type="button" class="rv-b rv-b--pass rv-b--sm" id="rv-reply-send" disabled>Send<kbd aria-hidden="true">⌘↵</kbd></button></div></div>' : '';
-    var nAll = (it.activity || []).filter(function (a) { return a.what !== 'sent back' && a.what !== 'rejected'; }).length + cms.length;
+    var nAll = (it.activity || []).filter(function (a) { return a.what !== 'sent back' && a.what !== 'rejected'; }).length + cms.filter(function (c) { return c.kind; }).length;
     var tabs = '<div class="rv-tabs" role="tablist">' +
       '<button type="button" role="tab" class="rv-tab' + (tab === 'comments' ? ' is-on' : '') + '" aria-selected="' + (tab === 'comments') + '" data-tab="comments">Comments' + (cms.length ? ' <span>' + cms.length + '</span>' : '') + '</button>' +
-      '<button type="button" role="tab" class="rv-tab' + (tab === 'all' ? ' is-on' : '') + '" aria-selected="' + (tab === 'all') + '" data-tab="all">All activity' + (nAll ? ' <span>' + nAll + '</span>' : '') + '</button>' +
+      '<button type="button" role="tab" class="rv-tab' + (tab === 'all' ? ' is-on' : '') + '" aria-selected="' + (tab === 'all') + '" data-tab="all">Activity' + (nAll ? ' <span>' + nAll + '</span>' : '') + '</button>' +
       '</div>';   // no "On GitHub" link: the drawer holds the whole thread (Utsav, 5 Oct 2026)
     box.innerHTML = tabs +
       (html ? '<ol class="rv-tl' + (tab === 'all' ? ' rv-tl--log' : '') + '">' + html + '</ol>' : '<p class="rv-th__empty">' + (tab === 'comments' ? 'No comments yet. Your send-back note starts the thread, and Alfred replies after every rework.' : 'Nothing has happened to this item yet.') + '</p>') +
-      (t.error && tab === 'comments' ? '<p class="rv-th__empty">' + esc(t.error) + '</p>' : '') + (talk ? reply : '');
+      (t.error && tab === 'comments' ? '<p class="rv-th__empty">' + esc(t.error) + '</p>' : '') + (talk && tab === 'comments' ? reply : '');
     box.querySelectorAll('[data-tab]').forEach(function (b) { b.addEventListener('click', function () { RV.tab = b.getAttribute('data-tab'); paintThread(it); }); });
     var more = $('rv-early'); if (more) more.addEventListener('click', function () { RV.early = RV.early || {}; RV.early[idOf(it)] = true; paintThread(it); });
     var ta = $('rv-reply'), send = $('rv-reply-send');
