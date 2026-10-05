@@ -320,6 +320,13 @@
       "reviewedOn": "2026-10-05",
       "fingerprint": "83ce89d08d99fd8c",
       "note": "preview is not there"
+    },
+    "step-card": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "518ec94d3ed2c280",
+      "note": "preview is not there"
     }
   }
 }
