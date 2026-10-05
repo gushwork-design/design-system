@@ -285,7 +285,7 @@ a.gd-hbar__row:hover, a.gd-hbar__row.is-hover { background: var(--gd-hover-bg); 
 .gd-heat__cell[data-l="5"] { background: var(--gd-seq-5); box-shadow: none; }
 .gd-heat__cell[data-l="x"] { visibility: hidden; }                     /* outside the date range */
 .gd-heat__cell:hover, .gd-heat__cell.is-hover, .gd-heat__cell[data-on] { box-shadow: 0 0 0 2px var(--gd-text); position: relative; z-index: 1; }
-.gd-heat__cell:focus-visible { outline: var(--gw-focus-ring); }
+.gd-heat__cell:focus-visible { outline: 1px solid light-dark(var(--gw-color-black), var(--gw-color-white)); }   /* black on light, white on dark, 1px: a ring that reads on every step of the scale */
 .gd-heat__key { display: flex; align-items: center; justify-content: flex-end; gap: var(--gw-space-4); font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
 .gd-heat__key i { width: 12px; height: 12px; border-radius: var(--gw-radius-4); background: var(--gd-sunken-bg); box-shadow: inset 0 0 0 1px var(--gd-border); }
 .gd-heat__key i[data-l="1"] { background: var(--gd-seq-1); box-shadow: none; } .gd-heat__key i[data-l="2"] { background: var(--gd-seq-2); box-shadow: none; }
