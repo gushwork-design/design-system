@@ -1053,12 +1053,11 @@
       "fingerprint": "08dc7ed1893234b9"
     },
     "login-screen": {
-      "reviewed": "rework",
+      "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
       "reviewedOn": "2026-10-05",
-      "fingerprint": "982961bc319168d8",
-      "note": "there are random squares in the grid, fix them if cant remove",
-      "previewFingerprint": "cb67abb14ad7be67"
+      "fingerprint": "11c6ee0377b30d84",
+      "previewFingerprint": "1a92a5f6403ff5cd"
     },
     "menu": {
       "reviewed": "passed",
