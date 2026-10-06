@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- Title and description are a PROPOSAL, awaiting sign-off (web skill: derived copy goes to the requester before staging). -->
-<title>Agent Store for manufacturers and distributors | Gushwork</title>
+<title>Agent Store v2: tabs and a package panel | Gushwork</title>
 <meta name="description" content="Pick the agents that handle quotes, orders, purchasing, cash and paperwork for your team, then build a package with the tier that fits.">
-<link rel="icon" href="assets/logo/gushwork-symbol-original.svg">
-<base href="/internal/staging/agent-store/">
+<link rel="icon" href="/internal/staging/agent-store/assets/logo/gushwork-symbol-original.svg">
+<base href="/internal/staging/agent-store-v2/">
 <meta name="robots" content="noindex, nofollow">
 <link rel="stylesheet" href="/foundation/tokens.css">
 <!-- gushwork-build:{"pluginVersion":"2.0.0","surface":"web","createdBy":"utsav.singh@gushwork.ai","createdAt":"2026-10-06","registry":"https://gushwork-design.vercel.app/exports/web/component-registry.json","changelog":"https://gushwork-design.vercel.app/preview/changelog-sheet.html","components":["navbar","button","eyebrow","badge","footer"]} -->
@@ -39,7 +39,7 @@ a{color:inherit;text-decoration:none}
 .btn .i{font-size:16px}
 
 /* ---------- navbar: transparent over the hero, ad-page neutral-25 + 1px neutral-100 once scrolled ---------- */
-.navbar{position:fixed;top:0;left:0;right:0;z-index:50;height:60px;background:transparent;border-bottom:1px solid transparent;transition:background-color .4s,border-color .4s}
+.navbar{position:absolute;top:0;left:0;right:0;z-index:50;height:60px;background:transparent;border-bottom:1px solid transparent;transition:background-color .4s,border-color .4s}
 .navbar[data-scrolled]{background:var(--gw-color-neutral-25);border-bottom-color:var(--gw-color-neutral-100)}
 .navbar .in{width:min(1240px,calc(100% - 32px));margin:0 auto;height:100%;display:flex;align-items:center;justify-content:space-between}
 .navbar .logo{position:relative;display:block;width:115.76px;height:22px}
@@ -67,7 +67,7 @@ a{color:inherit;text-decoration:none}
 /* Figma 136:13549: PROGRESSIVE background blur, radius 8 (about 4px in CSS) at the left edge easing to 0 by 82% of the 863px shade.
    Built as four masked copies of the photo, lightest underneath, so the blur grows toward the left without compounding. */
 .hero .blur{position:absolute;inset:0}
-.hero .blur i{position:absolute;inset:0;display:block;background:url(assets/hero.jpg) 50% 30%/cover no-repeat}
+.hero .blur i{position:absolute;inset:0;display:block;background:url(/internal/staging/agent-store/assets/hero.jpg) 50% 30%/cover no-repeat}
 .hero .blur i:nth-child(1){filter:blur(1px);-webkit-mask-image:linear-gradient(to right,#000 .7%,transparent 49%);mask-image:linear-gradient(to right,#000 .7%,transparent 49%)}
 .hero .blur i:nth-child(2){filter:blur(2px);-webkit-mask-image:linear-gradient(to right,#000 .7%,transparent 41%);mask-image:linear-gradient(to right,#000 .7%,transparent 41%)}
 .hero .blur i:nth-child(3){filter:blur(3px);-webkit-mask-image:linear-gradient(to right,#000 .7%,transparent 31%);mask-image:linear-gradient(to right,#000 .7%,transparent 31%)}
@@ -289,11 +289,92 @@ main{padding-top:var(--gw-space-24)}
 .footer{background:var(--gw-color-black);border-radius:var(--gw-radius-8) var(--gw-radius-8) 0 0;padding:var(--gw-space-16);padding-bottom:calc(var(--gw-space-16) + env(safe-area-inset-bottom,0px));display:flex;justify-content:center}
 .footer .legal{font:var(--gw-text-body-12-med);line-height:12px;letter-spacing:var(--gw-text-body-12-med-tracking);color:var(--gw-color-neutral-600)}
 
+/* ---------- v2: underlined category tabs with search on the right, sticky package panel on the left ---------- */
+main{padding-top:0}
+.tabbar{position:sticky;top:60px;z-index:25;display:flex;align-items:flex-end;gap:var(--gw-space-16);background:var(--gw-color-neutral-50);border-bottom:1px solid var(--gw-color-neutral-100)}
+.tabs{display:flex;flex:1;min-width:0;gap:var(--gw-space-4);overflow-x:auto;scrollbar-width:none;-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent)}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;display:inline-flex;align-items:center;gap:var(--gw-space-8);height:48px;padding:0 var(--gw-space-12);font:var(--gw-text-body-14-med);letter-spacing:var(--gw-text-body-14-med-tracking);color:var(--gw-color-neutral-600);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tab .n{font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking);color:var(--gw-color-neutral-400)}
+.tab:hover{color:var(--gw-color-black)}
+.tab.on{color:var(--gw-color-black);border-bottom-color:var(--gw-color-black)}
+.tab.on .n{color:var(--gw-color-neutral-500)}
+.tabbar .search{flex:none;width:260px;height:36px;margin:0 0 var(--gw-space-8)}
+.sec{scroll-margin-top:128px}
+.sec:first-of-type{margin-top:var(--gw-space-32)}
+/* the package panel: always on the left, under the industry picker */
+.sum .lst{display:flex;flex-direction:column;gap:var(--gw-space-2);max-height:208px;overflow:auto}
+.sum .it{display:flex;align-items:center;gap:var(--gw-space-8);min-height:32px}
+.sum .it .f{width:24px;height:24px;border-radius:50%;margin:0;border:0;flex:none}
+.sum .it>span:not(.f){flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font:var(--gw-text-body-14-med);letter-spacing:var(--gw-text-body-14-med-tracking)}
+.sum .it button{width:24px;height:24px;border-radius:var(--gw-radius-8);display:grid;place-items:center;font-size:12px;color:var(--gw-color-neutral-500);flex:none}
+.sum .it button:hover{background:var(--gw-color-neutral-50);color:var(--gw-color-black)}
+.sum .en{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);color:var(--gw-color-neutral-600)}
+.sum .tiers{display:flex;flex-direction:column;gap:var(--gw-space-4)}
+.sum .tr{display:flex;justify-content:space-between;align-items:center;height:28px;padding:0 var(--gw-space-8);border-radius:var(--gw-radius-8);border:1px solid transparent;font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking);color:var(--gw-color-neutral-600)}
+.sum .tr b{font-weight:600}
+.sum .tr.best{background:var(--gw-color-primary-25);border-color:var(--gw-color-primary-100);color:var(--gw-color-primary-700)}
+.sum .tot small{display:block;font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-600)}
+.sum .tot b{font:var(--gw-text-h6-bold)}
+.sum .tot b span{font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-600)}
+.sum .btn:disabled{background:var(--gw-color-neutral-200);color:var(--gw-color-white);box-shadow:none;cursor:default}
+.sum .btn:disabled:hover{background:var(--gw-color-neutral-200)}
+
+/* ---------- v2c: 100px page margins and a bigger package panel ---------- */
+.col{width:min(1240px,calc(100% - 32px));padding-left:0;padding-right:0}
+.shell{grid-template-columns:minmax(0,1fr) 320px}
+#railmain{width:320px}
+.ddlist{width:320px}
+.sum{padding:var(--gw-space-20);gap:var(--gw-space-16);border-radius:var(--gw-radius-16)}
+.sum .h b{font:var(--gw-text-body-16-sem);letter-spacing:var(--gw-text-body-16-sem-tracking)}
+.sum .h small{font:var(--gw-text-body-14-med)}
+.sum .en{font:var(--gw-text-body-16-reg);letter-spacing:var(--gw-text-body-16-reg-tracking)}
+.sum .lst{max-height:300px;gap:var(--gw-space-4)}
+.sum .it{min-height:40px;gap:var(--gw-space-12)}
+.sum .it .f{width:32px;height:32px}
+.sum .it>span:not(.f){font:var(--gw-text-body-16-med);letter-spacing:var(--gw-text-body-16-med-tracking)}
+.sum .it button{width:28px;height:28px;font-size:14px}
+.sum .mtr{height:8px}
+.sum .ln{font:var(--gw-text-body-14-med);letter-spacing:var(--gw-text-body-14-med-tracking)}
+.sum .tr{height:36px;padding:0 var(--gw-space-12);font:var(--gw-text-body-14-med);letter-spacing:var(--gw-text-body-14-med-tracking)}
+.sum .tot small{font:var(--gw-text-body-14-med)}
+.sum .tot b{font:var(--gw-text-h5-bold)}
+.sum .tot b span{font:var(--gw-text-body-14-med)}
+.sum .btn{height:44px;padding:16px 20px;font:var(--gw-text-button-16)}
+.sum .clr{font:var(--gw-text-body-14-med)}
+/* ---------- v2b: sticky bar across the column (tabs + industry), package panel on the right, no search, navbar scrolls away ---------- */
+.col{padding-top:var(--gw-space-80)}
+.tabbar{position:sticky;top:0;z-index:25;display:flex;align-items:flex-end;gap:var(--gw-space-16);background:var(--gw-color-neutral-50);border-bottom:1px solid var(--gw-color-neutral-100)}
+.tabs{display:flex;flex:1;min-width:0;gap:0;overflow-x:auto;scrollbar-width:none;-webkit-mask-image:none;mask-image:none}
+.tab{padding:0 var(--gw-space-8);gap:var(--gw-space-4)}
+#railmain{flex:none;width:320px;margin-bottom:var(--gw-space-8)}
+.ddbtn{height:36px;gap:var(--gw-space-8)}
+.ddbtn .dl{font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking);color:var(--gw-color-neutral-500);flex:none}
+.ddbtn .dv{flex:1;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ddlist{left:auto;right:0;width:320px}
+.shell{grid-template-columns:minmax(0,1fr) 320px;padding-top:0}
+.shell>.rail{grid-column:2;grid-row:1;top:72px;max-height:calc(100vh - 96px);padding-top:var(--gw-space-32)}
+.shell>main{grid-column:1;grid-row:1}
+.search{display:none}
+.filterbtn{display:none!important}
+.sec{scroll-margin-top:80px}
+.sec:first-of-type{margin-top:var(--gw-space-32)}
+main{padding-top:0}
 /* desktop uses the rail summary card; the bar is for narrower screens */
 @media(min-width:1001px){.pkgbar{display:none}}
 
 /* ---------- phone ---------- */
 @media(max-width:1000px){
+ .col{display:flex;flex-direction:column;padding-top:var(--gw-space-16)}
+ .tabbar{display:contents}
+ #railmain{order:-1;width:100%;margin:0 0 var(--gw-space-12)}
+ .shell{grid-template-columns:minmax(0,1fr)}
+ .ddbtn{height:44px}
+ .ddlist{left:0;right:0;width:auto}
+ .tabs{-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent);position:sticky;top:0;z-index:25;background:var(--gw-color-neutral-50);border-bottom:1px solid var(--gw-color-neutral-100)}
+ .shell{grid-template-columns:minmax(0,1fr)}
+ .shell>.rail,.shell>main{grid-column:auto;grid-row:auto}
+ .sec{scroll-margin-top:72px}
  .edge{display:none}
  .adlg .ph .nv .step{display:inline-flex}
  .adlg .up{grid-template-columns:200px minmax(0,1fr);gap:var(--gw-space-24)}
@@ -337,29 +418,31 @@ main{padding-top:var(--gw-space-24)}
 
 <header class="navbar" id="nav">
  <div class="in">
-  <a class="logo" href="#" aria-label="Gushwork home"><img class="lg-w" src="assets/logo/gushwork-logo-white.svg" alt="Gushwork"><img class="lg-o" src="assets/logo/gushwork-logo-original.svg" alt=""></a>
+  <a class="logo" href="#" aria-label="Gushwork home"><img class="lg-w" src="/internal/staging/agent-store/assets/logo/gushwork-logo-white.svg" alt="Gushwork"><img class="lg-o" src="/internal/staging/agent-store/assets/logo/gushwork-logo-original.svg" alt=""></a>
   <a class="login" href="#">Login</a>
  </div>
 </header>
 
 <section class="hero" aria-label="Gushwork Agents">
- <img class="bg" src="assets/hero.jpg" alt="">
+ <img class="bg" src="/internal/staging/agent-store/assets/hero.jpg" alt="">
  <div class="blur" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
  <div class="shade" aria-hidden="true"></div>
  <div class="tx"><h1>Gushwork Agents</h1><p>Only pay for agents that work for you.</p></div>
 </section>
 
 <div class="col">
+ <div class="tabbar" id="tabbar">
+  <div class="tabs" id="tabs" role="tablist" aria-label="Categories"></div>
+  <div id="railmain"></div>
+ </div>
  <div class="shell">
-  <aside class="rail" id="rail" aria-label="Filters"><div id="railmain"></div><div id="pkgcard"></div></aside>
+  <aside class="rail" id="rail" aria-label="Your package"><div id="pkgcard"></div></aside>
   <main>
-   <div class="search">
-    <i class="i" style="--m:url(assets/icons/magnifying-glass-regular.svg)"></i>
-    <input id="q" type="search" placeholder="Search agents, bundles, jobs..." aria-label="Search agents" autocomplete="off">
-    <button class="iconbtn" id="qclear" type="button" aria-label="Clear search" hidden><i class="i" style="--m:url(assets/icons/x-bold.svg)"></i></button>
-    <span class="kbd" id="kbd"><i class="i" style="--m:url(assets/icons/command-regular.svg)"></i>K</span>
+   <div class="search" hidden>
+    <input id="q" type="search" aria-label="Search agents" autocomplete="off">
+    <button id="qclear" type="button" hidden></button>
+    <span id="kbd"></span>
    </div>
-   <button class="btn out sm filterbtn" id="filterbtn" type="button" style="margin-top:12px"><i class="i" style="--m:url(assets/icons/sliders-horizontal-regular.svg)"></i>Filters</button>
    <div id="results"></div>
   </main>
  </div>
@@ -370,11 +453,11 @@ main{padding-top:var(--gw-space-24)}
 </footer>
 
 <div class="pkgbar" id="pkgbar" role="region" aria-label="Your package"></div>
-<div class="amodal" id="amodal"><div class="adwrap"><button class="edge l" data-prev aria-label="Previous agent"><i class="i" style="--m:url(assets/icons/arrow-left-bold.svg)"></i></button><div class="adlg" id="adlg" role="dialog" aria-modal="true" aria-label="Agent details"></div><button class="edge r" data-next aria-label="Next agent"><i class="i" style="--m:url(assets/icons/arrow-right-bold.svg)"></i></button></div></div>
+<div class="amodal" id="amodal"><div class="adwrap"><button class="edge l" data-prev aria-label="Previous agent"><i class="i" style="--m:url(/internal/staging/agent-store/assets/icons/arrow-left-bold.svg)"></i></button><div class="adlg" id="adlg" role="dialog" aria-modal="true" aria-label="Agent details"></div><button class="edge r" data-next aria-label="Next agent"><i class="i" style="--m:url(/internal/staging/agent-store/assets/icons/arrow-right-bold.svg)"></i></button></div></div>
 <div class="modal" id="modal"><div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Package builder"></div></div>
 <div class="toast" id="toast" role="status"></div>
 
-<script src="data/agents.js"></script>
+<script src="/internal/staging/agent-store/data/agents.js"></script>
 <script>
 (function(){
 const D = window.AGENT_DATA, $ = s => document.querySelector(s);
@@ -384,13 +467,13 @@ const ONE = {"seo-agent": "Ranks on Google and AI search", "paid-ad-agent": "Run
 const TIERS = [{name:'Starter',agents:3,price:600,credits:1000},{name:'Growth',agents:6,price:1100,credits:2500},{name:'Scale',agents:12,price:2100,credits:6000}];
 const INDUSTRIES = [['Manufacturer','Manufacturers'],['Distributor','Distributors'],['Home services'],['Compliance services'],['Legal services'],['IT services'],['Logistics & trucking'],['Healthcare'],['Construction'],['Real estate'],['Hospitality'],['Financial services'],['Education']];
 // Card descriptions: taken from the Agent Store HTML (blurb and steps), trimmed to fit three lines (about 80-100 characters) so every card runs to a similar length. Agents not listed use their blurb as is.
-const CARD = {"paid-ad-agent": "Runs Meta, Google and ChatGPT ads daily within a monthly budget until cost per lead hits target.", "quote-chaser": "Follows up on every open quote until it is won, lost with a reason, or expired after 3 touches.", "margin-guard": "Checks every quote before it goes out and flags lines priced below floor or on stale cost.", "win-back": "Finds accounts that went quiet, works out why, and drafts tailored outreach to restart orders.", "date-keeper": "Works out a realistic ship date for every order line and sends the acknowledgment.", "returns-desk": "Handles customer returns by policy, issues the credit, and recovers it from the vendor.", "unbilled-sweeper": "Lists everything that shipped but was never invoiced, every day, with its value and reason.", "seo-agent": "Writes and publishes pages for what buyers search, and tracks rankings in Google and AI search.", "email-marketing-agent": "Builds segments from your lead lists, writes campaigns and nurture sequences, and sends them.", "front-desk": "Reads every sales and orders email, tags it as RFQ, PO, change or return, and gives it an owner.", "reorder-scout": "Spots overdue repeat parts, products and blanket orders and sends the buyer a ready requote.", "po-checker": "Compares each customer PO to the quote and flags price, revision, date and terms differences.", "cost-watch": "Loads vendor price increases on time and lists the quotes and prices that now lose margin.", "compliance-desk": "Answers customer compliance questionnaires and supplier setup packets, and chases suppliers."};
+const CARD = {"paid-ad-agent": "Runs Meta, Google and ChatGPT ads daily within a monthly budget until cost per lead hits target.", "quote-chaser": "Follows up on every open quote until it is won, lost with a reason, or expired after 3 touches.", "margin-guard": "Checks every quote before it goes out and flags lines priced below floor or on stale cost.", "win-back": "Finds accounts that went quiet, works out why, and drafts tailored outreach to restart orders.", "date-keeper": "Works out a realistic ship date for every order line and sends the acknowledgment.", "returns-desk": "Handles customer returns by policy, issues the credit, and recovers it from the vendor.", "unbilled-sweeper": "Lists everything that shipped but was never invoiced, every day, with its value and reason.", "seo-agent": "Writes and publishes pages for what buyers search, and tracks rankings in Google and AI search.", "email-marketing-agent": "Builds segments from your lead lists, writes campaigns and nurture sequences, and sends them.", "front-desk": "Reads every sales and orders email, tags it as RFQ, PO, change or return, and gives it an owner.", "reorder-scout": "Spots overdue repeat parts, products and blanket orders and sends the buyer a ready requote.", "po-checker": "Compares each customer PO to the quote and flags price, revision, date and terms differences.", "cost-watch": "Loads vendor price increases on time and lists the quotes and prices that now lose margin.", "compliance-desk": "Answers customer compliance questionnaires and supplier setup packets, and chases suppliers.", "order-entry": "Enters emailed and PDF POs as sales orders and sends only unclear lines to a CSR.", "buy-planner": "Drafts the POs and work orders that cover demand each night, for the buyer to approve.", "bill-checker": "Captures vendor bills, matches them to the PO and receipt, and disputes overbilling.", "hold-release": "Recommends release for every held order and sends the customer a pay link."};
 const STEP_LABELS = ['Trigger','Reads','Decides','Does','Approval'];
 const S = {spy:D.bundles[0].id,q:'',type:'any',cat:'any',ind:'Manufacturer',sel:{},open:null,vol:{},builder:false};
 const fmt = n => '$'+n.toLocaleString('en-US');
 const esc = s => String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const ic = (n,w='regular') => `<i class="i" style="--m:url(assets/icons/${n}-${w}.svg)"></i>`;
-const img = a => `assets/nuggets/${a.nugget||'plain'}.png`;
+const ic = (n,w='regular') => `<i class="i" style="--m:url(/internal/staging/agent-store/assets/icons/${n}-${w}.svg)"></i>`;
+const img = a => `/internal/staging/agent-store/assets/nuggets/${a.nugget||'plain'}.png`;
 const bundleOf = a => D.bundles.find(b=>b.name===a.bundle);
 const fitsInd = a => /Both/i.test(a.fits||'') || (a.fits||'').includes(S.ind);
 const perItem = a => a.free ? 'Free, fair use up to 3,000 emails' : a.luxury ? 'From $1,000 / mo' : `${a.credits} credit${a.credits>1?'s':''} per ${a.item}`;
@@ -425,13 +508,12 @@ const selected = () => D.agents.filter(a=>S.sel[a.id]&&fitsInd(a));
 
 /* ---- render ---- */
 function renderRail(){
-  const p=pool();
-  $('#railmain').innerHTML = `
-   <div class="rgroup"><h2>Industry</h2><div class="dd" id="dd"><button class="ddbtn" id="ddbtn" type="button" aria-haspopup="listbox" aria-expanded="false"><span>${esc((INDUSTRIES.find(x=>x[0]===S.ind)||[])[1]||S.ind)}</span>${ic('caret-down','bold')}</button><ul class="ddlist" id="ddlist" role="listbox" aria-label="Industry" hidden>${INDUSTRIES.map(([v,l])=>`<li role="option" data-ind="${esc(v)}" aria-selected="${v===S.ind}" ${l?'':'aria-disabled="true"'}>${esc(l||v)}${v===S.ind?ic('check','bold'):''}</li>`).join('')}</ul></div></div>
-   <div class="rgroup"><h2>Category</h2>
-    ${D.bundles.map(b=>{const n=p.filter(a=>a.bundle===b.name).length;return `<button class="ritem ${S.spy===b.id?'on':''}" data-jump="${b.id}">${ic(ICON[b.id]||'package')}${esc(b.name)}<span class="n">${n}</span></button>`}).join('')}
-    <button class="ritem ${S.spy==='build'?'on':''}" data-jump="build">${ic('sparkle')}Build your own agent<span class="n">Soon</span></button>
-   </div>`;
+  $('#railmain').innerHTML = `<div class="dd" id="dd"><button class="ddbtn" id="ddbtn" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Industry"><span class="dl">Industry</span><span class="dv">${esc((INDUSTRIES.find(x=>x[0]===S.ind)||[])[1]||S.ind)}</span>${ic('caret-down','bold')}</button><ul class="ddlist" id="ddlist" role="listbox" aria-label="Industry" hidden>${INDUSTRIES.map(([v,l])=>`<li role="option" data-ind="${esc(v)}" aria-selected="${v===S.ind}" ${l?'':'aria-disabled="true"'}>${esc(l||v)}${v===S.ind?ic('check','bold'):''}</li>`).join('')}</ul></div>`;
+}
+function renderTabs(){
+  const list=visible(), el=$('#tabs');if(!el)return;
+  let h=D.bundles.map(b=>({b,n:list.filter(a=>a.bundle===b.name).length})).filter(x=>x.n).map(({b,n})=>`<button class="tab ${S.spy===b.id?'on':''}" role="tab" data-jump="${b.id}">${esc(b.name)}<span class="n">${n}</span></button>`).join('');
+  el.innerHTML=h;
 }
 function card(a){
   const on=!!S.sel[a.id];
@@ -449,21 +531,22 @@ function renderResults(){
     const ids=agents.filter(a=>!a.free).map(a=>a.id), allIn=ids.length>0&&ids.every(id=>S.sel[id]);
     h+=`<section class="sec" id="b-${b.id}"><div class="sec-h"><h2>${esc(b.name)}${b.luxury?'<span class="pill-prem">Premium</span>':''}</h2>${ids.length?`<button class="btn sm bundle ${allIn?'done':''}" data-bundle="${b.id}" aria-pressed="${allIn}">${ic(allIn?'check':'plus','bold')}${allIn?'Added':'Add whole bundle'}</button>`:''}</div><div class="grid">${agents.map(a=>card(a)).join('')}</div></section>`;
   });
-  if(!S.q.trim()) h+=`<section class="sec" id="b-build"><div class="sec-h"><h2>Build your own agent<span class="badge">Coming soon</span></h2></div><div class="empty" style="margin-top:0"><div class="badgeic">${ic('sparkle')}</div><p>This is coming soon.</p></div></section>`;
+  if(false) h+=`<section class="sec" id="b-build"><div class="sec-h"><h2>Build your own agent<span class="badge">Coming soon</span></h2></div><div class="empty" style="margin-top:0"><div class="badgeic">${ic('sparkle')}</div><p>This is coming soon.</p></div></section>`;
   if(!secs.length) h=`<div class="empty"><div class="badgeic">${ic('magnifying-glass')}</div><h2>No agents match</h2><p>Try a different word, or clear the search.</p><button class="btn out sm" data-reset>Clear search</button></div>`;
   $('#results').innerHTML=h;
+  renderTabs();
   onScroll();
 }
 function renderCard(l){
   const c=$('#pkgcard');if(!c)return;
-  if(!l.length){c.innerHTML='';return;}
-  const p=pricing(l), pct=p.n?Math.min(100,Math.round(p.n/p.best.agents*100)):0;
-  c.innerHTML=`<div class="sum"><div class="h"><b>Your package</b><small>${l.length} agent${l.length>1?'s':''}</small></div>
-   <div class="stk">${l.slice(0,7).map(a=>`<span class="f"><img src="${img(a)}" alt=""></span>`).join('')}${l.length>7?`<span class="f">+${l.length-7}</span>`:''}</div>
-   <div><div class="mtr"><i style="width:${pct}%"></i></div><div class="ln" style="margin-top:6px"><span>${esc(p.agentNote)}</span></div></div>
-   <div class="ln"><span>${esc(p.name)}</span><b>${fmt(p.best.cost)} / mo</b></div>
+  const has=l.length>0, p=pricing(l), pct=has&&p.n?Math.min(100,Math.round(p.n/p.best.agents*100)):0;
+  c.innerHTML=`<div class="sum"><div class="h"><b>Your package</b><small>${l.length} agent${l.length===1?'':'s'}</small></div>
+   ${has?`<div class="lst">${l.map(a=>`<div class="it"><span class="f"><img src="${img(a)}" alt=""></span><span>${esc(a.name)}</span><button data-add="${a.id}" aria-label="Remove ${esc(a.name)}">${ic('x','bold')}</button></div>`).join('')}</div>`:`<p class="en">Add agents to build a package. The tier and price update as you go.</p>`}
+   ${has?`<div><div class="mtr"><i style="width:${pct}%"></i></div><div class="ln" style="margin-top:6px"><span>${esc(p.agentNote)}</span></div></div>`:''}
+   <div class="tiers">${p.opts.map(o=>`<div class="tr ${has&&o===p.best?'best':''}"><span>${o.name} · ${o.agents} agents</span><b>${fmt(o.price)}</b></div>`).join('')}</div>
+   ${has?`<div class="tot"><small>${esc(p.name)}</small><b>${fmt(p.best.cost)} <span>/ mo</span></b></div>`:''}
    ${p.lux.length?`<div class="ln"><span>Priced separately</span><b>+ ${fmt(p.lux.length*1000)}+</b></div>`:''}
-   <button class="btn sm" data-builder>Build package ${ic('arrow-right','bold')}</button><button class="clr" data-clear>Clear</button></div>`;
+   <button class="btn sm" data-builder ${has?'':'disabled'}>Build package ${ic('arrow-right','bold')}</button>${has?`<button class="clr" data-clear>Clear</button>`:''}</div>`;
 }
 function renderBar(){
   const l=selected(), bar=$('#pkgbar');
@@ -590,7 +673,6 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){if(S.builder){S.builder=false;renderBuilder();}else if(S.open){S.open=null;renderPanel();}return;}
   if(S.open&&!S.builder&&!typing&&(e.key==='ArrowLeft'||e.key==='ArrowRight')){e.preventDefault();step(e.key==='ArrowRight'?1:-1);return;}
   if((e.key==='Enter'||e.key===' ')&&e.target.matches('.card[data-open]')){e.preventDefault();S.open=e.target.dataset.open;renderPanel(true);return;}
-  if((e.key==='k'&&(e.metaKey||e.ctrlKey))||(e.key==='/'&&!typing)){e.preventDefault();$('#q').focus();}
 });
 $('#q').addEventListener('input',e=>{S.q=e.target.value;renderResults();});
 document.addEventListener('input',e=>{if(e.target.dataset&&e.target.dataset.mvol){S.vol[e.target.dataset.mvol]=e.target.value;updVol(e.target.dataset.mvol,false);return;}
@@ -601,11 +683,10 @@ function onScroll(){
   if(tick)return;tick=true;
   requestAnimationFrame(()=>{
     tick=false;
-    if(scrollY>32)navEl.setAttribute('data-scrolled','');else navEl.removeAttribute('data-scrolled');
     const secs=[...document.querySelectorAll('.sec')];let cur=secs.length?secs[0].id.slice(2):'';
-    if(secs.length&&secs[0].getBoundingClientRect().top<=110){secs.forEach(x=>{if(x.getBoundingClientRect().top<=110)cur=x.id.slice(2);});}
+    if(secs.length&&secs[0].getBoundingClientRect().top<=100){secs.forEach(x=>{if(x.getBoundingClientRect().top<=100)cur=x.id.slice(2);});}
     if(secs.length&&innerHeight+scrollY>=document.documentElement.scrollHeight-4)cur=secs[secs.length-1].id.slice(2);
-    if(cur!==S.spy){S.spy=cur;document.querySelectorAll('.ritem[data-jump]').forEach(r=>r.classList.toggle('on',r.dataset.jump===cur));}
+    if(cur!==S.spy){S.spy=cur;document.querySelectorAll('[data-jump]').forEach(r=>r.classList.toggle('on',r.dataset.jump===cur));const at=document.querySelector('.tab.on'),st=$('#tabs');if(at&&st)st.scrollTo({left:Math.max(0,at.offsetLeft-st.clientWidth/2+at.clientWidth/2),behavior:'smooth'});}
   });
 }
 addEventListener('scroll',onScroll,{passive:true});
