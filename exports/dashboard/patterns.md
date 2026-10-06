@@ -1,6 +1,6 @@
 # Patterns
 
-Composition recipes that tie the dashboard set together: which components, in which order, for the screens a heavy analytics tool or web app is made of, and what each screen does when it is loading, empty, partly broken, stale, filtered to nothing or off limits. This is guidance, not code. Component names are the registry keys; the doc that owns each is in brackets (`shell.md`, `navigation.md`, `actions.md`, `inputs.md`, `tables.md`, `filtering.md`, `data-display.md`, `detail.md`, `charts.md`, `feedback.md`, `overlays.md`). Set `data-density="compact"` on the page region for dense screens; every recipe holds in both densities.
+Composition recipes that tie the dashboard set together: which components, in which order, for the screens a heavy analytics tool or web app is made of, and what each screen does when it is loading, empty, partly broken, stale, filtered to nothing or off limits. This is guidance, not code. Component names are the registry keys; the doc that owns each is in brackets (`shell.md`, `navigation.md`, `actions.md`, `inputs.md`, `tables.md`, `filtering.md`, `data-display.md`, `detail.md`, `charts.md`, `feedback.md`, `overlays.md`). Every recipe is built comfortable and holds in both densities; compact is set on the page region only when the user asks for it (R57).
 
 ## Ground rules for every page
 

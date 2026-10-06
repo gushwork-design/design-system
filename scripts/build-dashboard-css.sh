@@ -6,6 +6,7 @@
 #   exports/dashboard/registry-parts/*.json   -> exports/dashboard/component-registry.json
 #   skills/gushwork-dashboard/templates/analytics-overview/ -> web/previews/dashboard/pages/ (the review drawer's copy)
 #                                                          -> templates/analytics-overview/ (the templates folder's copy)
+#   skills/gushwork-dashboard/templates/support-ops-app/    -> web/previews/dashboard/pages/support-ops-app/ (the review drawer's copy of the five pages)
 #
 # Edit the PARTIALS, never the built files: the next run overwrites them. Partials are joined in
 # filename order, so the number prefix is the cascade order (00 base, 10 shell, 20 actions, ...).
@@ -28,6 +29,16 @@ page_preview() {  # $1 = output file
 # The same template, shipped beside the other documents and pages in templates/ (templates/<name>/ is where a person
 # looks first). The skill's copy is the source; this one is generated from it with the links re-based two levels
 # deep (templates/analytics-overview/ -> the repo root), so the two cannot drift. The README beside it is hand-written.
+# The multi-page support operations template: the same links-made-absolute and blanked-stamp treatment, applied to every
+# page, with the scripts and data file copied beside them so the pages still run as a set.
+APP=skills/gushwork-dashboard/templates/support-ops-app
+app_preview() {  # $1 = output dir
+  rm -rf "$1"; mkdir -p "$1"
+  cp "$APP"/*.js "$1"/
+  for f in "$APP"/*.html; do
+    perl -pe 's#\.\./\.\./\.\./\.\./foundation/#/foundation/#g; s#\.\./\.\./\.\./\.\./exports/#/exports/#g; s#"registry":"https://[^"]*"#"registry":""#' "$f" > "$1/$(basename "$f")"
+  done
+}
 templates_copy() {  # $1 = output file
   mkdir -p "$(dirname "$1")"
   perl -pe 's#\.\./\.\./\.\./\.\./foundation/#../../foundation/#g; s#\.\./\.\./\.\./\.\./exports/#../../exports/#g' "$TPL" > "$1"
@@ -77,11 +88,15 @@ case "${1:-}" in
     page_preview "$tmp/page.html"
     cmp -s "$tmp/page.html" web/previews/dashboard/pages/analytics-overview.html \
       || { echo "web/previews/dashboard/pages/analytics-overview.html is out of date — run: bash scripts/build-dashboard-css.sh" >&2; exit 1; }
+    app_preview "$tmp/app"
+    diff -rq "$tmp/app" web/previews/dashboard/pages/support-ops-app >/dev/null 2>&1 \
+      || { echo "web/previews/dashboard/pages/support-ops-app is out of date — run: bash scripts/build-dashboard-css.sh" >&2; exit 1; }
     templates_copy "$tmp/tpl.html"
     cmp -s "$tmp/tpl.html" templates/analytics-overview/analytics-overview.html \
       || { echo "templates/analytics-overview/analytics-overview.html is out of date — run: bash scripts/build-dashboard-css.sh" >&2; exit 1; }
     echo "$D built files are current." ;;
   "") build "$D"; page_preview web/previews/dashboard/pages/analytics-overview.html
+      app_preview web/previews/dashboard/pages/support-ops-app
       templates_copy templates/analytics-overview/analytics-overview.html
       echo "built $D/dashboard.css, dashboard.js, component-registry.json, and the template preview" ;;
   *) echo "usage: $0 [--check]" >&2; exit 2 ;;

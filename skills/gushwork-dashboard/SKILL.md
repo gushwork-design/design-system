@@ -60,7 +60,7 @@ Three tiers of numbers, because "never invent a number" is unfollowable for page
    will use. Do not start from memory of what a Gushwork dashboard looks like.
 2. **Ask with options and wait.** One `AskUserQuestion` call, never a paragraph and never across several turns.
 3. **State your read in a few lines before building**: the headline numbers, the sections in order, which
-   recipe in `patterns.md` you are following, density. Cheap to correct as a sentence, expensive after markup.
+   recipe in `patterns.md` you are following. Cheap to correct as a sentence, expensive after markup.
 4. **Build the shell first and verify it alone.** `app-shell`, locked to the viewport, one scroll region.
    Confirm the rail does not scroll away before anything goes in the panel.
 5. **Fill the page from the recipe, component by component.**
@@ -78,8 +78,9 @@ system can do.
 | **One page or many?** (ask first) | `A single page` · `A few pages` · `A full app` with a grouped rail | Whether the rail is navigation or just chrome, the most expensive thing to get wrong |
 | **What will they do with it?** | `Monitor` — is it on track · `Explore` — slice and compare · `Act` — work a list · `Configure` — settings and records | The recipe: overview, explorer, list with filters, settings or detail |
 | **What is it accountable for?** | the two or three metrics you inferred, each as an option | Which numbers lead; everything else is supporting |
-| **How dense?** | `Comfortable` · `Compact` for heavy analytics | `data-density` on the page |
 | **Is there real data yet?** | `Yes, connected` · `Yes, I'll paste it` · `Not yet, use samples` | Whether the header carries a `Sample data` Badge |
+
+**Density is not a question.** Build comfortable (`data-density="comfortable"`, the default). Do not offer compact, do not recommend it, and do not choose it because a screen is dense or a table is long. Use `data-density="compact"` only when the user asks for it in their own words (R57).
 
 **Infer before you ask.** "Show-ups over the week" already says the metric is a show rate and the grain is
 daily; offer that as the first option rather than asking from scratch. **Skip any question the request
@@ -153,6 +154,11 @@ pending a ruling.
 10. **No emoji. No bare coloured status dots; use a Badge.** Sentence case. Product action labels are plain
     verbs (`Export`, `Add campaign`, `Save changes`); the `Book a Demo` marketing rule does not apply.
     Replace every placeholder with real copy.
+11. **Tabs for the views of a page; a rail submenu only when it must.** The rail is flat: one row per page. Sibling views of
+    one page (the three reports, companies and people) are `tabs-underline` in its header, up to about five or six. Use an expandable
+    `nav-group` only when a section has more sibling pages than fit as tabs, when its children are things people create (saved
+    reports, projects), or when each child is a full page with its own header and actions. A settings area with many forms takes
+    `sub-nav`; counted filters over one list take `saved-views` (R58).
 12. **One underlined tab row per page (R59).** Never stack two. When a page's sections have sections of
     their own, the upper level is a rail submenu (the expandable `nav-group`) and only the lower level is
     `tabs-underline`. A single level of views stays tabs, in a flat rail.
@@ -161,8 +167,9 @@ pending a ruling.
 
 The target is analytics and web apps with a lot on the screen. So:
 
-- **Pick density deliberately.** `data-density="compact"` for tables of hundreds of rows and screens with
-  many charts; comfortable for settings and detail. Do not mix within a region.
+- **Comfortable unless asked.** Heavy screens are built comfortable too. `data-density="compact"` is for when
+  the user asks for it, never a default and never a recommendation (R57). When it is asked for, do not mix
+  densities within a region.
 - **One page, one job.** If a fourth headline metric appears, the page is trying to do two jobs; propose a
   second page in one line.
 - **Filters are state.** A filtered-to-nothing table says so and offers to clear (`table-states`); the active

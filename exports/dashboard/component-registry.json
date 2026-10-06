@@ -560,6 +560,12 @@
       "breaking": false,
       "doc": "navigation.md"
     },
+    "support-ops-app-template": {
+      "version": "2.0.1",
+      "changed": "2026-10-06",
+      "breaking": false,
+      "doc": "templates.md"
+    },
     "table-cell-types": {
       "version": "2.0.1",
       "changed": "2026-10-05",
