@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- Title and description are a PROPOSAL, awaiting sign-off (web skill: derived copy goes to the requester before staging). -->
-<title>Agent Store v2: tabs and a package panel | Gushwork</title>
+<title>Agent Store v3: pill toggle and a package panel | Gushwork</title>
 <meta name="description" content="Pick the agents that handle quotes, orders, purchasing, cash and paperwork for your team, then build a package with the tier that fits.">
 <link rel="icon" href="/internal/staging/agent-store/assets/logo/gushwork-symbol-original.svg">
-<base href="/internal/staging/agent-store-v2/">
+<base href="/internal/staging/agent-store-v3/">
 <meta name="robots" content="noindex, nofollow">
 <link rel="stylesheet" href="/foundation/tokens.css">
 <!-- gushwork-build:{"pluginVersion":"2.0.0","surface":"web","createdBy":"utsav.singh@gushwork.ai","createdAt":"2026-10-06","registry":"https://gushwork-design.vercel.app/exports/web/component-registry.json","changelog":"https://gushwork-design.vercel.app/preview/changelog-sheet.html","components":["navbar","button","eyebrow","badge","footer"]} -->
@@ -360,6 +360,18 @@ main{padding-top:0}
 .sec{scroll-margin-top:80px}
 .sec:first-of-type{margin-top:var(--gw-space-32)}
 main{padding-top:0}
+/* ---------- v3: the category tabs become a pill toggle (white capsule, black active pill) ---------- */
+.tabbar{align-items:center;padding:var(--gw-space-12) 0;border-bottom:0;justify-content:space-between}
+.tabs{flex:0 1 auto;gap:0;background:var(--gw-color-white);border:1px solid var(--gw-color-neutral-100);border-radius:var(--gw-radius-full);padding:var(--gw-space-4);box-shadow:var(--gw-shadow-s2)}
+.tab{height:36px;padding:0 var(--gw-space-12);gap:var(--gw-space-8);border-radius:var(--gw-radius-full);border-bottom:0;margin-bottom:0;color:var(--gw-color-neutral-700)}
+.tab:hover{color:var(--gw-color-black)}
+.tab.on{background:var(--gw-color-black);color:var(--gw-color-white);border-bottom:0}
+.tab .n{color:var(--gw-color-neutral-400)}
+.tab.on .n{color:var(--gw-color-neutral-300)}
+#railmain{margin-bottom:0}
+.ddbtn{background:var(--gw-color-white)}
+.sec{scroll-margin-top:92px}
+.shell>.rail{top:84px;max-height:calc(100vh - 108px)}
 /* desktop uses the rail summary card; the bar is for narrower screens */
 @media(min-width:1001px){.pkgbar{display:none}}
 
@@ -410,6 +422,11 @@ main{padding-top:0}
  .sheet{border-radius:var(--gw-radius-20) var(--gw-radius-20) 0 0;max-height:94vh}
  .vrow{grid-template-columns:28px 1fr 72px 52px}
  .sheet .mf .btn{flex:1}
+}
+@media(max-width:1000px){
+ .tabs{background:var(--gw-color-white);border:1px solid var(--gw-color-neutral-100);border-radius:var(--gw-radius-full);top:8px;margin:0 0 var(--gw-space-12);box-shadow:var(--gw-shadow-s2);position:sticky}
+ .tab{height:36px}
+ .sec{scroll-margin-top:72px}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>

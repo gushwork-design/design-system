@@ -90,7 +90,7 @@ the original.
 
 ## Version 2 (`/internal/staging/agent-store-v2`)
 
-Same page, cards, modal and builder; a different frame, at Utsav's request. Version 1 stays live beside it.
+Same page, cards, modal and builder; a different frame, at Utsav's request. Version 1 stays live beside it. Both versions use **100px page margins** (a 1240px column on 1440) and the right-hand package panel is **320px wide** with larger type, 32px mascots, 36px tier rows and a 44px `Build package` button. The "Build your own agent" tab and section are removed from version 2 and version 3.
 
 ### `agent-category-tabs`
 
@@ -113,6 +113,15 @@ agents it lists them (24px round mascot, name, a remove control), then the slots
 `--gw-color-primary-100` stroke), the recommended tier and monthly total in `--gw-text-h6-bold`, "Priced
 separately" for premium agents, `Build package` and `Clear` (with the same Undo toast). Hidden on phone, where
 the bottom bar takes over.
+
+## Version 3 (`/internal/staging/agent-store-v3`)
+
+Version 2 with one change: the category tabs become a **pill toggle**, `agent-category-toggle`. A white capsule
+(1px `--gw-color-neutral-100` stroke, `--gw-radius-full`, `--gw-shadow-s2`, 4px padding) holds a pill per category:
+36px high, 12px side padding, `--gw-text-body-14-med` in `--gw-color-neutral-700`, a count in
+`--gw-color-neutral-400`. **The pill in view is `--gw-color-black` with white text.** Pills still scroll to their
+section and the active one follows you down the page. The industry dropdown sits at the right end of the bar, above
+the package panel, with a white fill. From the pill toggle on the Agent Store idea board.
 
 ## Known gaps
 
