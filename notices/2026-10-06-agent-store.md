@@ -40,3 +40,6 @@ The industry picker is a styled custom dropdown instead of the native select, an
 
 ## Update, 6 Oct 2026 (two-part modal)
 The quick view body is now two parts, at Utsav's request: picture and description with the volume stepper and add button on top, How it works with the talk track, fits and proof slot below.
+
+## Update, 6 Oct 2026 (package card)
+The package bag moves from a floating bar to a summary card in the rail on desktop (option P2 of `agent-store/package-bar-wireframes.html`); the floating bar remains on phone. Defaults taken where Utsav only picked P2: slots and tier price shown, premium agents' price shown separately, Clear with a short Undo. The slots meter and Undo are new behaviour.
