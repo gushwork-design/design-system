@@ -34,3 +34,6 @@ Navbar is transparent over the hero and goes to the ad-page neutral-25 with a 1p
 
 ## Update, 6 Oct 2026 (quick view)
 The agent modal follows store quick-view patterns, drawn first in `agent-store/modal-wireframes.html` and chosen as layout A with edge arrows. New behaviour: a monthly volume stepper that feeds the builder's estimator. The unit and bundle are no longer repeated, and the left column is filled with the talk track, fits and proof slot. The pairs strip is not built: the hand-off order is not in the data.
+
+## Update, 6 Oct 2026 (dropdown)
+The industry picker is a styled custom dropdown instead of the native select, and focus rings are removed everywhere on the page at Utsav's request. Keyboard users get no visible focus on this page; flagging it so the next reviewer is not surprised.
