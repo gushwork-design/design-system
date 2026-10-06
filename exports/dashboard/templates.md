@@ -85,7 +85,7 @@ page's build stamp `components` list to exactly what it uses, and delete the pag
   Response times) → a `horizontal-bar-chart` or `breakdown-bar` → a `data-table` with `progress-bar` cells.
 - **Explorer.** `explorer-layout` in a `data-fill` panel body → `period-select` → `query-builder` → a chart → a results table. Editing
   the query marks the result out of date; Run query redraws. More than three groups fold into Other.
-- **Tickets.** `tabs-underline` for the views, with counts → `table-toolbar` (search, `filter-builder`, `column-menu`, Export) → `filter-chip`s →
+- **Tickets.** `tabs-underline` for the views, with counts (the toolbar and table sit on the page itself, the table's own frame being the only container, with no outer card) → `table-toolbar` (search, `filter-builder`, `column-menu`, Export) → `filter-chip`s →
   `data-table` with `row-selection`, `row-actions-menu` → `pagination` → `bulk-action-bar` → `table-states` → `drawer` → `modal`
   with `form-field` errors → `confirm-dialog`.
 - **Ticket.** `breadcrumbs`, a small `page-header` with a status Badge, a menu and one primary action → `tabs-underline` → a reply

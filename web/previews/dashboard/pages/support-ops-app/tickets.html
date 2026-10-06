@@ -85,12 +85,8 @@
             </div>
           </header>
 
-          <section class="gd-card gd-card--flush" aria-labelledby="list-title">
-            <div class="gd-card__head">
-              <div class="gd-card__titles"><h2 class="gd-card__title" id="list-title">All tickets</h2><p class="gd-card__desc" id="list-desc">Newest first</p></div>
-            </div>
-            <div class="gd-card__body">
-            <div class="gd-tbar">
+          <div style="display:flex;flex-direction:column;gap:var(--gd-gap)">
+            <div class="gd-tbar" style="padding-inline:0">
               <div class="gd-tbar__g">
                 <label class="gd-tbar__search"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"/></svg><input type="search" placeholder="Search tickets" aria-label="Search tickets" data-gd-search data-gd-for="#tickets"><button class="gd-tbar__clear" type="button" aria-label="Clear search" data-gd-search-clear hidden><svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button></label>
                 <div class="gd-pop">
@@ -127,7 +123,7 @@
 
             <div class="gd-chips" id="chips" data-gd-chips hidden><button class="gd-btn gd-btn--link gd-btn--sm" type="button" data-gd-chips-clear>Clear filters</button></div>
 
-            <div class="gd-tview gd-tview--flush">
+            <div class="gd-tview">
               <div class="gd-table-wrap">
                 <div class="gd-table gd-table--sticky-select" id="tickets" role="table" aria-label="Tickets"
                      style="--gd-cols:var(--gd-sel-w) minmax(210px,2fr) minmax(132px,1.2fr) 88px 92px minmax(100px,0.8fr) minmax(124px,1fr) 104px 96px 48px; --gd-table-min:1040px">
@@ -179,8 +175,7 @@
               <button class="gd-bulk__btn gd-bulk__btn--danger" type="button" data-bulk="remove"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"/></svg>Delete</button>
               <button class="gd-bulk__btn gd-bulk__btn--icon" type="button" aria-label="Clear selection" data-gd-bulk-clear><svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button>
             </div>
-            </div>
-          </section>
+          </div>
 
           <div class="gd-menu gd-menu--end" id="row-menu" role="menu" data-gd-row-menu hidden>
         <button class="gd-menu__item" type="button" role="menuitem" data-gd-action="quick"><span class="gd-menu__text">Quick view</span></button>

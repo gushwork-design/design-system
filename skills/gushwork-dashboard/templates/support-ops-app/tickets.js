@@ -65,7 +65,6 @@
     var rows = $$('[data-gd-id]', body), cnt = { all: rows.length, Open: 0, Pending: 0, Resolved: 0, Urgent: 0 };
     rows.forEach(function (r) { cnt[r.dataset.status]++; if (r.dataset.priority === 'Urgent') cnt.Urgent++; });
     $$('#viewtabs [data-view]').forEach(function (b) { var n = $('[data-n]', b); if (n && cnt[b.dataset.view] != null) n.textContent = cnt[b.dataset.view]; });
-    $('#list-desc').textContent = all + (all === 1 ? ' ticket' : ' tickets') + ', newest first. A reload brings back every change.';
   }
   document.addEventListener('gd:search', function () { setTimeout(applyAll, 0); });
   document.addEventListener('gd:filters', function () { setTimeout(applyAll, 0); });
