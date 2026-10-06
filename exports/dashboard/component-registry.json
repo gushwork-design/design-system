@@ -863,8 +863,9 @@
     "confirm-dialog": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
-      "reviewedOn": "2026-10-05",
-      "fingerprint": "1b33c1cf38bccf23"
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "606297411c3d3c0a",
+      "previewFingerprint": "fbb0f6c6896de662"
     },
     "content-panel": {
       "reviewed": "passed",
