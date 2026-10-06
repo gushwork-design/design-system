@@ -249,15 +249,12 @@ export function ownerMention() {
 }
 
 export const HELP = [
-  'I build things and send the brand files. Things people ask me for:',
-  '• something made: a landing page, one-pager, deck or banner. You get a link and a screenshot',
-  '• logos, like “white logo svg” or “dark symbol png”',
-  '• the color sheet, or swatches for Adobe or macOS',
-  '• fonts, and the design tokens (CSS, JSON, SCSS, Tailwind)',
-  '• templates: ad page, case study, lead magnet, one-pager',
-  '• tools: the email signature creator and the ID card generator',
-  '• basics: how to sign in, install the Claude plugin, update it, or who to ask',
-  'For a build, say who it’s for, the offer and the call to action. Say thanks, or react with a thumbs up, when we’re done.',
+  'I build pages and hand out the brand files. Some things to try:',
+  '• “Build a one-pager for …” and you get a link and a screenshot back',
+  '• “White logo svg”, “the fonts” or “brand colours”',
+  '• “Which template for a case study?”',
+  '• “How do I install the Claude plugin?”',
+  'For a build, tell me who it’s for, the offer and the call to action, and I’ll handle the rest. Say thanks when we’re done and I’ll take the hint.',
 ].join('\n');
 
 const link = (path, label) => `<${SITE}${path}|${label}>`;
