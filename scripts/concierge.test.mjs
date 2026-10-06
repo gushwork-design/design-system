@@ -41,7 +41,7 @@ a = ask('templates');                                ok('templates: live ones li
 a = ask('slide deck');                               ok('slides: not ready, no prompt', a.r.text.includes('isn’t ready yet') && !a.r.text.includes('```'));
 a = ask('email signature');                          ok('email signature tool', a.u.parts[0]?.type === 'tools' && a.r.text.includes('Email signature creator'));
 a = ask('id card generator');                        ok('ID card tool', a.u.parts[0]?.type === 'tools' && a.r.text.includes('ID card'));
-a = ask('make me a landing page for our new product'); ok('a design request is declined plainly and pointed at templates, no files', a.u.designRequest && /isn’t something I do|don’t design/.test(a.r.text) && a.r.text.includes('Ad landing page') && a.r.files.length === 0);
+a = ask('make me a landing page for our new product'); ok('a design request is pointed at a DM build and pointed at templates, no files', a.u.designRequest && /I build these in a DM|DM me the brief/.test(a.r.text) && a.r.text.includes('Ad landing page') && a.r.files.length === 0);
 a = ask('generate an email signature for me');       ok('"generate an email signature" is the tool, not a refusal', !a.u.designRequest && a.u.parts[0]?.type === 'tools');
 a = ask('how do I install the claude plugin');       ok('plugin question → plugin page', a.r.text.includes('claude-plugin'));
 a = ask('logo and color sheet');                     ok('two things at once', a.names.some((n) => n.endsWith('.pdf')) && a.names.some((n) => n.endsWith('.svg')), JSON.stringify(a.names));
@@ -83,7 +83,7 @@ a = ask('white logo');                               ok('asking for a file is st
 /* ---- who Bruce is, and what the hub is not ---- */
 const who = FAQ.find((f) => f.id === 'bruce').answer(() => '').join(' ');
 ok('Bruce says he is the design agent for Gushwork', who.includes('I’m Bruce, the design agent for Gushwork'), who);
-ok('Bruce says he does not design YET, and that Utsav built him', who.includes('I don’t design things myself yet') && who.includes('Utsav built me'), who);
+ok('Bruce says he builds things, and that Utsav built him', who.includes('I also build things') && who.includes('Utsav built me'), who);
 a = ask('who are you');                              ok('"who are you" gets that answer', a.u.parts[0]?.faq?.id === 'bruce');
 const about = FAQ.find((f) => f.id === 'about').answer(() => '').join(' ');
 ok('the hub answer says it is a subdomain and not the Gushwork website, which is gushwork.ai', about.includes('subdomain') && about.includes('not the Gushwork website') && about.includes('gushwork.ai'), about);
