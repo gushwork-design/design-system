@@ -10,7 +10,7 @@ design.gushwork.ai and does one job for the team. Two exist, the **email signatu
 **employee ID card generator**. They were redesigned together on 1–3 Oct 2026 into one shell, and
 every decision from that work is written down so the next tool does not re-decide it.
 
-Announce at the start: **"Using the Gushwork tools skill — v2.0.0, updated 5 Oct 2026."**
+Announce at the start: **"Using the Gushwork tools skill — v2.0.1, updated 6 Oct 2026."**
 
 ## First: is there a better skill?
 
