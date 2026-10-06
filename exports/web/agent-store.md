@@ -11,9 +11,10 @@ The page has no template, by Utsav's call.
 
 ## Page frame (from the Figma, not registered separately)
 
-Black 60px navbar with the white logo and a white `Login` button, in a 1240 column. A 460px hero with a
-photo, a left black shade (`--gw-color-neutral-alpha-50-black`; Figma binds a raw 60% black with no token)
-and `Heading/h1` plus `Body/body-20-med`, rounded `--gw-radius-20` at the bottom. Below it a 1200 column of
+A 60px navbar in a 1240 column with the logo and a `Login` button. It is **transparent over the hero** (white logo, white button) and, once the page has scrolled 32px, fades over 0.4s to the ad-page navbar: `--gw-color-neutral-25` with a 1px `--gw-color-neutral-100` bottom stroke, the original logo and a `Black` button. It is the page's only navigation. A 460px hero with a
+photo, a left shade of 863px (`--gw-color-neutral-alpha-50-black` to transparent; Figma binds a raw 60% black
+with no token) over a PROGRESSIVE blur (Figma radius 8, about 4px in CSS, easing to 0 by 82% across; built as
+four masked copies of the photo) and `Heading/h1` plus `Body/body-20-med`, rounded `--gw-radius-20` at the bottom. The page ends with the short ad-page footer: a black bar, `--gw-radius-8` top corners, padding `--gw-space-16`, one centred line `© 2026 Gushwork | All Rights Reserved` in `--gw-text-body-12-med`, `--gw-color-neutral-600` (as the ad pages ship it; R9 asks for neutral-400). Below the hero a 1200 column of
 a 240 rail, a 48 gap and a 912 main area, 80px under the hero, on `--gw-color-neutral-50`.
 
 ## `agent-card`
@@ -40,7 +41,7 @@ becomes `--gw-color-primary-500` with white text and a check, reading `Added`; c
 
 ## `agent-filter-rail`
 
-A 240px sticky column. An `Industry` label (`--gw-text-body-12-med`, `--gw-color-neutral-600`) over a 44px
+A 240px sticky column. **Rows are tabs that scroll to their section; every section stays on the page.** The row of the section in view is highlighted as you scroll. Search filters the cards across all sections and drops empty sections. An `Industry` label (`--gw-text-body-12-med`, `--gw-color-neutral-600`) over a 44px
 select (`--gw-color-neutral-25`, 1px `--gw-color-neutral-100`, `--gw-radius-8`). Then `Category`: 36px rows,
 `--gw-text-body-14-med`, a 16px icon and a count in `--gw-color-neutral-500`. The selected row is white with a
 1px `--gw-color-neutral-100` stroke and `--gw-shadow-s2`; the others carry a `--gw-color-neutral-50` stroke so
@@ -49,10 +50,14 @@ where the count would be. On phone the rail sits behind a `Filters` button.
 
 ## `agent-listing-panel`
 
-A 520px side panel (bottom sheet at 92vh on phone) over the grid. Header with the bundle `badge` and a close
-control; the mascot, price line (blue for premium), blurb and the five-step list; a `Talk track` block
-(`--gw-color-primary-25`, always visible) with the pain to listen for and the discovery question; a facts grid;
-a dashed proof slot reserved for real results; and one full-width `Black` button, `Add to package`.
+A **centered modal**, 880px wide at most (a bottom sheet at 94vh on phone), over a `--gw-color-neutral-alpha-50-black`
+backdrop. The header holds the bundle `badge`, the position (`4 of 31`), **previous and next arrows** that step
+through the agents in page order (they respect the search and wrap round), and a close control. Left column:
+the mascot, price line (blue for premium), blurb and the five-step list. Right column: a `Talk track` block
+(`--gw-color-primary-25`, always visible) with the pain to listen for and the discovery question, a facts
+grid, and a dashed proof slot reserved for real results. A white footer holds one full-width `Black` button,
+`Add to package`. Left and right arrow keys step, Escape or a click on the backdrop closes, and the page behind
+does not scroll.
 
 ## `agent-package-bar`
 

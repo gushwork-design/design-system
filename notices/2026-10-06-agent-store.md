@@ -28,3 +28,6 @@ which have no documented figure and are the builder's choice.
 - Card add button radius 5.33px (no token); built as `--gw-radius-4`.
 - Title-case labels in Figma are sentence case on the page (voice rule).
 - One-liners and the `Soon` marker on Build your own agent are not in the file.
+
+## Update, 6 Oct 2026 (second pass)
+Navbar is transparent over the hero and goes to the ad-page neutral-25 with a 1px neutral-100 stroke on scroll. Hero shade has Figma's progressive blur (built from masked photo copies; the blur radius has no token). Rail rows scroll to sections instead of filtering. The agent panel is now a centered modal with previous and next. The Brand footer is replaced by the short ad-page footer (copyright line only, neutral-600 as the ad pages ship it).
