@@ -43,3 +43,6 @@ The quick view body is now two parts, at Utsav's request: picture and descriptio
 
 ## Update, 6 Oct 2026 (package card)
 The package bag moves from a floating bar to a summary card in the rail on desktop (option P2 of `agent-store/package-bar-wireframes.html`); the floating bar remains on phone. Defaults taken where Utsav only picked P2: slots and tier price shown, premium agents' price shown separately, Clear with a short Undo. The slots meter and Undo are new behaviour.
+
+## Update, 6 Oct 2026 (version 2)
+A second page, `/internal/staging/agent-store-v2`, shares the first page's images and data and changes the frame: underlined category tabs with search on the right of the row (`agent-category-tabs`) and an always-visible sticky package builder panel on the left (`agent-package-panel`). Both are new and pending review.

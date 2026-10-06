@@ -1,0 +1,659 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Title and description are a PROPOSAL, awaiting sign-off (web skill: derived copy goes to the requester before staging). -->
+<title>Agent Store v2: tabs and a package panel | Gushwork</title>
+<meta name="description" content="Pick the agents that handle quotes, orders, purchasing, cash and paperwork for your team, then build a package with the tier that fits.">
+<link rel="icon" href="/internal/staging/agent-store/assets/logo/gushwork-symbol-original.svg">
+<base href="/internal/staging/agent-store-v2/">
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="/foundation/tokens.css">
+<!-- gushwork-build:{"pluginVersion":"2.0.0","surface":"web","createdBy":"utsav.singh@gushwork.ai","createdAt":"2026-10-06","registry":"https://gushwork-design.vercel.app/exports/web/component-registry.json","changelog":"https://gushwork-design.vercel.app/preview/changelog-sheet.html","components":["navbar","button","eyebrow","badge","footer"]} -->
+<!-- NEW, pending library review (layout pass, no template by Utsav's call, 6 Oct 2026): marketplace filter rail, agent listing card, featured card, listing side panel, package bar, package builder modal. Composed from tokens only. -->
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--gw-color-neutral-50);color:var(--gw-color-black);font:var(--gw-text-body-16-reg);letter-spacing:var(--gw-text-body-16-reg-tracking);-webkit-font-smoothing:antialiased;}
+body.lock{overflow:hidden}
+img{display:block;max-width:100%}
+[hidden]{display:none!important}
+html,body{overflow-x:clip}
+button,select,input{font:inherit;color:inherit;letter-spacing:inherit}
+button{background:none;border:0;cursor:pointer;text-align:inherit}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:none}
+.i{display:inline-block;width:1em;height:1em;background:currentColor;-webkit-mask:var(--m) center/contain no-repeat;mask:var(--m) center/contain no-repeat;flex:none}
+.col{max-width:var(--gw-content-width,1240px);margin:0 auto;padding:0 var(--gw-space-24)}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--gw-space-8);height:44px;padding:16px 20px;border-radius:var(--gw-radius-8);font:var(--gw-text-button-16);background:var(--gw-color-black);color:var(--gw-color-white);box-shadow:var(--gw-shadow-s2);white-space:nowrap}
+.btn:hover{background:var(--gw-color-neutral-900)}
+.btn.sm{height:36px;padding:8px 12px;font:var(--gw-text-button-14)}
+.btn.out{background:transparent;color:var(--gw-color-black);box-shadow:inset 0 0 0 2px var(--gw-color-neutral-100)}
+.btn.out:hover{background:var(--gw-color-neutral-25)}
+.btn.text{background:transparent;color:var(--gw-color-black);box-shadow:none}
+.btn.text:hover{background:var(--gw-color-neutral-50)}
+.btn.wide{width:100%}
+.btn .i{font-size:16px}
+
+/* ---------- navbar: transparent over the hero, ad-page neutral-25 + 1px neutral-100 once scrolled ---------- */
+.navbar{position:fixed;top:0;left:0;right:0;z-index:50;height:60px;background:transparent;border-bottom:1px solid transparent;transition:background-color .4s,border-color .4s}
+.navbar[data-scrolled]{background:var(--gw-color-neutral-25);border-bottom-color:var(--gw-color-neutral-100)}
+.navbar .in{width:min(1240px,calc(100% - 32px));margin:0 auto;height:100%;display:flex;align-items:center;justify-content:space-between}
+.navbar .logo{position:relative;display:block;width:115.76px;height:22px}
+.navbar .logo img{position:absolute;left:0;top:0;height:22px;width:auto;transition:opacity .4s}
+.navbar .logo .lg-o{opacity:0}
+.navbar[data-scrolled] .logo .lg-o{opacity:1}
+.navbar[data-scrolled] .logo .lg-w{opacity:0}
+.login{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:36px;padding:2px var(--gw-space-12);border-radius:var(--gw-radius-8);background:var(--gw-color-white);border:.888px solid var(--gw-color-neutral-alpha-10-white);color:var(--gw-color-black);font:var(--gw-text-body-14-med);letter-spacing:var(--gw-text-body-14-med-tracking);transition:background-color .4s,color .4s}
+.login:hover{background:var(--gw-color-neutral-50)}
+.navbar[data-scrolled] .login{background:var(--gw-color-black);color:var(--gw-color-white)}
+.navbar[data-scrolled] .login:hover{background:var(--gw-color-neutral-900)}
+
+/* ---------- atoms ---------- */
+.badge{display:inline-flex;align-items:center;gap:var(--gw-space-4);height:22px;padding:2px 8px;border-radius:var(--gw-radius-full);font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking);background:var(--gw-color-neutral-50);color:var(--gw-color-neutral-700);white-space:nowrap}
+.badge.k{background:var(--gw-color-black);color:var(--gw-color-white)}
+.badge.o{background:var(--gw-color-white);box-shadow:inset 0 0 0 1px var(--gw-color-neutral-100)}
+.pill-prem{display:inline-flex;align-items:center;justify-content:center;height:24px;padding:4px var(--gw-space-8);border-radius:var(--gw-radius-full);background:var(--gw-color-primary-25);border:.5px solid var(--gw-color-primary-100);font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking);color:var(--gw-color-primary-500)}
+.iconbtn{width:32px;height:32px;border-radius:var(--gw-radius-8);display:inline-flex;align-items:center;justify-content:center;font-size:16px;color:var(--gw-color-neutral-700)}
+.iconbtn:hover{background:var(--gw-color-neutral-50);color:var(--gw-color-black)}
+
+/* ---------- hero (Figma 136:11175) ---------- */
+.hero{position:relative;height:460px;border-radius:0 0 var(--gw-radius-20) var(--gw-radius-20);overflow:hidden;background:var(--gw-color-primary-500)}
+.hero .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 30%}
+.hero .shade{position:absolute;left:0;bottom:0;width:863px;max-width:100%;height:462px}
+/* Figma 136:13549: PROGRESSIVE background blur, radius 8 (about 4px in CSS) at the left edge easing to 0 by 82% of the 863px shade.
+   Built as four masked copies of the photo, lightest underneath, so the blur grows toward the left without compounding. */
+.hero .blur{position:absolute;inset:0}
+.hero .blur i{position:absolute;inset:0;display:block;background:url(/internal/staging/agent-store/assets/hero.jpg) 50% 30%/cover no-repeat}
+.hero .blur i:nth-child(1){filter:blur(1px);-webkit-mask-image:linear-gradient(to right,#000 .7%,transparent 49%);mask-image:linear-gradient(to right,#000 .7%,transparent 49%)}
+.hero .blur i:nth-child(2){filter:blur(2px);-webkit-mask-image:linear-gradient(to right,#000 .7%,transparent 41%);mask-image:linear-gradient(to right,#000 .7%,transparent 41%)}
+.hero .blur i:nth-child(3){filter:blur(3px);-webkit-mask-image:linear-gradient(to right,#000 .7%,transparent 31%);mask-image:linear-gradient(to right,#000 .7%,transparent 31%)}
+.hero .blur i:nth-child(4){filter:blur(4px);-webkit-mask-image:linear-gradient(to right,#000 .7%,transparent 18%);mask-image:linear-gradient(to right,#000 .7%,transparent 18%)}
+.hero .shade{background:linear-gradient(to left,transparent 10.405%,var(--gw-color-neutral-alpha-50-black) 104.11%)}
+.hero .tx{position:absolute;left:max(16px,calc((100% - 1240px)/2));right:16px;top:calc(50% + 14px);transform:translateY(-50%);display:flex;flex-direction:column;gap:var(--gw-space-20)}
+.hero h1{font:var(--gw-text-h1);letter-spacing:var(--gw-text-h1-tracking);color:var(--gw-color-white)}
+.hero p{font:var(--gw-text-body-20-med);letter-spacing:var(--gw-text-body-20-med-tracking);color:var(--gw-color-neutral-alpha-80-white)}
+
+/* ---------- shell: 240 rail + 48 gap + 912 main in a 1200 column ---------- */
+.col{width:min(1200px,calc(100% - 32px));margin:0 auto}
+.shell{display:grid;grid-template-columns:240px minmax(0,1fr);gap:var(--gw-space-48);padding-top:var(--gw-space-80);padding-bottom:var(--gw-space-120)}
+.rail{position:sticky;top:76px;align-self:start;display:flex;flex-direction:column;gap:var(--gw-space-24);max-height:calc(100vh - 92px);overflow:auto;padding-bottom:var(--gw-space-16);scroll-margin-top:76px}
+.rgroup{display:flex;flex-direction:column;gap:var(--gw-space-4)}
+.rgroup h2{font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking);color:var(--gw-color-neutral-600);padding:0 var(--gw-space-12) var(--gw-space-4)}
+.ritem{display:flex;align-items:center;gap:var(--gw-space-8);height:36px;padding:0 var(--gw-space-12);border-radius:var(--gw-radius-8);border:1px solid var(--gw-color-neutral-50);font:var(--gw-text-body-14-med);letter-spacing:var(--gw-text-body-14-med-tracking);color:var(--gw-color-neutral-700);width:100%}
+.ritem .i{font-size:16px}
+.ritem .n{margin-left:auto;font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking);color:var(--gw-color-neutral-500)}
+.ritem:hover{color:var(--gw-color-black)}
+.ritem.on{background:var(--gw-color-white);border-color:var(--gw-color-neutral-100);color:var(--gw-color-black);box-shadow:var(--gw-shadow-s2)}
+.dd{position:relative}
+.ddbtn{display:flex;align-items:center;justify-content:space-between;width:100%;height:44px;padding:0 11px 0 var(--gw-space-12);border-radius:var(--gw-radius-8);border:1px solid var(--gw-color-neutral-100);background:var(--gw-color-neutral-25);font:var(--gw-text-body-14-med);letter-spacing:var(--gw-text-body-14-med-tracking);color:var(--gw-color-black)}
+.ddbtn .i{font-size:16px;color:var(--gw-color-neutral-700);transition:transform .2s}
+.ddbtn[aria-expanded=true] .i{transform:rotate(180deg)}
+.ddlist{position:absolute;left:0;right:0;top:calc(100% + var(--gw-space-4));z-index:30;list-style:none;background:var(--gw-color-white);border:1px solid var(--gw-color-neutral-100);border-radius:var(--gw-radius-12);box-shadow:var(--gw-shadow-s4);padding:var(--gw-space-4);max-height:340px;overflow:auto}
+.ddlist[hidden]{display:none}
+.ddlist li{display:flex;align-items:center;justify-content:space-between;gap:var(--gw-space-8);height:36px;padding:0 var(--gw-space-12);border-radius:var(--gw-radius-8);font:var(--gw-text-body-14-med);letter-spacing:var(--gw-text-body-14-med-tracking);color:var(--gw-color-black);cursor:pointer}
+.ddlist li:hover,.ddlist li.act{background:var(--gw-color-neutral-50)}
+.ddlist li .i{font-size:14px}
+.ddlist li[aria-disabled=true]{color:var(--gw-color-neutral-400);cursor:default}
+.ddlist li[aria-disabled=true]:hover{background:transparent}
+.filterbtn{display:none}
+#railmain{display:flex;flex-direction:column;gap:var(--gw-space-24)}
+/* package summary card (P2): sits under the categories in the sticky rail on desktop; phone uses the bottom bar */
+.sum{background:var(--gw-color-white);border:1px solid var(--gw-color-neutral-100);border-radius:var(--gw-radius-12);box-shadow:var(--gw-shadow-s2);padding:var(--gw-space-12);display:flex;flex-direction:column;gap:var(--gw-space-12);animation:pop .22s cubic-bezier(.22,1,.36,1)}
+.sum .h{display:flex;justify-content:space-between;align-items:center}
+.sum .h b{font:var(--gw-text-body-14-sem);letter-spacing:var(--gw-text-body-14-sem-tracking)}
+.sum .h small{font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking);color:var(--gw-color-neutral-500)}
+.sum .stk{display:flex;flex-wrap:wrap;row-gap:var(--gw-space-4)}
+.sum .stk .f{width:28px;height:28px;border-radius:50%;border:2px solid var(--gw-color-white);margin-left:-8px;background:var(--gw-color-neutral-100);overflow:hidden;display:grid;place-items:center;font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-700)}
+.sum .stk .f:first-child{margin-left:0}
+.sum .stk .f img{width:100%;height:100%;object-fit:cover}
+.sum .mtr{height:6px;border-radius:var(--gw-radius-full);background:var(--gw-color-neutral-100);overflow:hidden}
+.sum .mtr i{display:block;height:100%;background:var(--gw-color-primary-500);border-radius:var(--gw-radius-full);transition:width .3s}
+.sum .ln{display:flex;justify-content:space-between;gap:var(--gw-space-8);font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking);color:var(--gw-color-neutral-600)}
+.sum .ln b{font-weight:600;color:var(--gw-color-black)}
+.sum .btn{width:100%}
+.sum .clr{align-self:center;font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-600);padding:var(--gw-space-4) var(--gw-space-8);border-radius:var(--gw-radius-8)}
+.sum .clr:hover{color:var(--gw-color-black);background:var(--gw-color-neutral-50)}
+@media(max-width:1000px){#pkgcard{display:none}}
+.toast .undo{margin-left:var(--gw-space-12);font:var(--gw-text-button-14);color:var(--gw-color-white);background:var(--gw-color-neutral-alpha-20-white);padding:var(--gw-space-4) var(--gw-space-8);border-radius:var(--gw-radius-8)}
+main{padding-top:var(--gw-space-24)}
+
+/* ---------- search ---------- */
+.search{display:flex;align-items:center;gap:var(--gw-space-12);height:44px;padding:0 var(--gw-space-12);border-radius:var(--gw-radius-8);border:1px solid var(--gw-color-neutral-100);background:var(--gw-color-neutral-25)}
+.search>.i{font-size:16px;color:var(--gw-color-neutral-700)}
+.search input{flex:1;border:0;outline:0;background:transparent;font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);min-width:0;color:var(--gw-color-black)}
+.search input::placeholder{color:var(--gw-color-neutral-500)}
+.kbd{display:inline-flex;align-items:center;gap:var(--gw-space-2);background:var(--gw-color-neutral-50);border-radius:var(--gw-radius-4);padding:var(--gw-space-4);font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-400)}
+.kbd .i{font-size:12px}
+
+/* ---------- sections ---------- */
+.sec{margin-top:var(--gw-space-40);scroll-margin-top:84px}
+.search{scroll-margin-top:84px}
+.search input::-webkit-search-cancel-button,.search input::-webkit-search-decoration{-webkit-appearance:none;display:none}
+.sec-h{display:flex;align-items:center;justify-content:space-between;gap:var(--gw-space-12);margin-bottom:var(--gw-space-16)}
+.sec-h h2{font:var(--gw-text-h7);letter-spacing:var(--gw-text-h7-tracking);display:flex;align-items:center;gap:var(--gw-space-12);flex-wrap:wrap}
+.btn.bundle{background:transparent;color:var(--gw-color-black);box-shadow:inset 0 0 0 1.5px var(--gw-color-neutral-100)}
+.btn.bundle:hover{background:var(--gw-color-neutral-25)}
+.btn.bundle.done,.btn.bundle.done:hover{background:var(--gw-color-primary-500);color:var(--gw-color-white);box-shadow:none}
+.btn.bundle.done:hover{background:var(--gw-color-primary-600)}
+
+/* ---------- cards (Figma 136:12873) ---------- */
+.grid{display:grid;gap:var(--gw-space-12);grid-template-columns:repeat(3,minmax(0,1fr))}
+.card{position:relative;display:flex;flex-direction:column;gap:var(--gw-space-16);background:var(--gw-color-white);border:1px solid var(--gw-color-neutral-100);border-radius:var(--gw-radius-12);padding:var(--gw-space-16);cursor:pointer;transition:border-color .15s}
+.card:hover{border-color:var(--gw-color-neutral-250)}
+.card.prem{border-color:var(--gw-color-primary-100);box-shadow:var(--gw-shadow-s2)}
+.card.prem:hover{border-color:var(--gw-color-primary-200)}
+.card .top{display:flex;gap:var(--gw-space-12);align-items:center}
+.card .tile{position:relative;width:60px;height:60px;border-radius:var(--gw-radius-8);border:.5px solid var(--gw-color-neutral-100);overflow:hidden;flex:none;background:var(--gw-color-neutral-50)}
+.card .tile img{position:absolute;left:50%;top:50%;width:70px;height:70px;max-width:none;transform:translate(-50%,-50%);object-fit:cover}
+.card .tx{display:flex;flex-direction:column;gap:var(--gw-space-4);min-width:0;flex:1}
+.card h3{font:var(--gw-text-body-16-sem);letter-spacing:var(--gw-text-body-16-sem-tracking);color:var(--gw-color-black);padding-right:var(--gw-space-12)}
+.card .one{font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking);color:var(--gw-color-neutral-400)}
+.card .desc{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);color:var(--gw-color-neutral-600);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.card .one.price,.price-prem{color:var(--gw-color-primary-500)}
+.add{position:absolute;top:12px;right:12px;width:24px;height:24px;border-radius:var(--gw-radius-4);background:var(--gw-color-neutral-25);border:.5px solid var(--gw-color-neutral-100);display:grid;place-items:center;font-size:12px;color:var(--gw-color-neutral-700)}
+.add:hover{background:var(--gw-color-neutral-50)}
+.add.live,.add.live:hover{background:var(--gw-color-primary-500);border-color:var(--gw-color-neutral-100);color:var(--gw-color-white)}
+.empty{margin-top:var(--gw-space-48);display:flex;flex-direction:column;align-items:center;text-align:center;gap:var(--gw-space-12);padding:var(--gw-space-60) var(--gw-space-24);border:1px dashed var(--gw-color-neutral-200);border-radius:var(--gw-radius-20)}
+.empty .badgeic{width:48px;height:48px;border-radius:var(--gw-radius-12);background:var(--gw-color-white);border:1px solid var(--gw-color-neutral-100);display:grid;place-items:center;font-size:22px;color:var(--gw-color-neutral-600)}
+.empty h2{font:var(--gw-text-h7-bold)}
+.empty p{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-700)}
+
+/* ---------- listing panel ---------- */
+.amodal{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:var(--gw-space-24);background:var(--gw-color-neutral-alpha-50-black)}
+.amodal.on{display:flex}
+.adwrap{position:relative;width:min(820px,100%)}
+.adlg{width:100%;max-height:calc(100vh - 48px);display:flex;flex-direction:column;background:var(--gw-color-neutral-25);border-radius:var(--gw-radius-20);box-shadow:var(--gw-shadow-s4);overflow:hidden;animation:pop .22s cubic-bezier(.22,1,.36,1)}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+/* N1: large round arrows outside the modal on desktop; header arrows on narrower screens */
+.edge{position:absolute;top:50%;width:44px;height:44px;margin-top:-22px;border-radius:50%;background:var(--gw-color-white);box-shadow:var(--gw-shadow-s3);display:grid;place-items:center;font-size:18px;color:var(--gw-color-black);z-index:2}
+.edge:hover{background:var(--gw-color-neutral-50)}
+.edge.l{left:-60px}.edge.r{right:-60px}
+.adlg .ph{display:flex;align-items:center;gap:var(--gw-space-12);padding:var(--gw-space-12) var(--gw-space-16);border-bottom:1px solid var(--gw-color-neutral-100)}
+.adlg .ph .pos{font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking);color:var(--gw-color-neutral-500)}
+.adlg .ph .nv{margin-left:auto;display:flex;gap:var(--gw-space-4);align-items:center}
+.adlg .ph .nv .step{display:none}
+.adlg .pb{flex:1;overflow:auto;display:flex;flex-direction:column}
+.adlg .up{display:grid;grid-template-columns:240px minmax(0,1fr);gap:var(--gw-space-32);padding:var(--gw-space-24);align-items:center}
+.adlg .lo{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:var(--gw-space-32);padding:var(--gw-space-24);background:var(--gw-color-white);border-top:1px solid var(--gw-color-neutral-100);align-items:start}
+.adlg .lr{display:flex;flex-direction:column;gap:var(--gw-space-16);min-width:0}
+.adlg .himg{width:100%;aspect-ratio:1;border-radius:var(--gw-radius-16);overflow:hidden;background:var(--gw-color-neutral-50)}
+.adlg .himg img{width:100%;height:100%;object-fit:cover}
+.adlg .info{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.adlg .info h2{font:var(--gw-text-h6-bold)}
+.adlg .info .price{font:var(--gw-text-body-14-med);color:var(--gw-color-neutral-700);margin-top:var(--gw-space-4)}
+.adlg .info .price.price-prem{color:var(--gw-color-primary-500)}
+.adlg .vol{display:flex;align-items:center;justify-content:space-between;gap:var(--gw-space-12);background:var(--gw-color-white);border:1px solid var(--gw-color-neutral-100);border-radius:var(--gw-radius-12);padding:var(--gw-space-8) var(--gw-space-8) var(--gw-space-8) var(--gw-space-16)}
+.adlg .vol small{display:block;font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-600)}
+.adlg .vol b{font:var(--gw-text-body-14-sem)}
+.adlg .stp{display:flex;align-items:center;gap:var(--gw-space-4)}
+.adlg .stp button{width:32px;height:32px;border-radius:var(--gw-radius-8);box-shadow:inset 0 0 0 1px var(--gw-color-neutral-100);display:grid;place-items:center;font-size:14px;color:var(--gw-color-neutral-700)}
+.adlg .stp button:hover{background:var(--gw-color-neutral-50);color:var(--gw-color-black)}
+.adlg .stp input{width:64px;height:32px;border:0;background:transparent;text-align:center;font:var(--gw-text-body-14-sem);outline:0;-moz-appearance:textfield}
+.adlg .stp input::-webkit-outer-spin-button,.adlg .stp input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.adlg details.stepsd{padding-top:0}
+.adlg details.stepsd summary{list-style:none;display:flex;justify-content:space-between;align-items:center;padding:0 0 var(--gw-space-12);font:var(--gw-text-body-14-sem);cursor:pointer}
+.adlg details.stepsd summary::-webkit-details-marker{display:none}
+.adlg details.stepsd summary .i{font-size:14px;transition:transform .2s}
+.adlg details.stepsd[open] summary .i{transform:rotate(180deg)}
+.adlg .proof{flex:1;min-height:56px}
+.adlg .fits{display:flex;align-items:center;justify-content:space-between;background:var(--gw-color-white);border:1px solid var(--gw-color-neutral-100);border-radius:var(--gw-radius-12);padding:var(--gw-space-12) var(--gw-space-16)}
+.adlg .fits small{font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-600)}
+.adlg .fits span{font:var(--gw-text-body-14-sem)}
+.adlg .pf{padding:var(--gw-space-16) var(--gw-space-24);border-top:1px solid var(--gw-color-neutral-100);background:var(--gw-color-white);display:flex;gap:var(--gw-space-12);align-items:center}
+.p-id{display:flex;gap:var(--gw-space-16);align-items:center}
+.p-id .face{width:96px;height:96px;border-radius:var(--gw-radius-16);overflow:hidden;flex:none}
+.p-id .face img{width:100%;height:100%;object-fit:cover}
+.p-id h2{font:var(--gw-text-h6-bold);margin:0 0 var(--gw-space-8)}
+.p-id .price{font:var(--gw-text-body-14-med);color:var(--gw-color-neutral-700)}
+.p-id .price.price-prem{color:var(--gw-color-primary-500)}
+.p-blurb{font:var(--gw-text-body-16-reg);color:var(--gw-color-neutral-900)}
+.block h3{font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-600);margin-bottom:var(--gw-space-12);letter-spacing:var(--gw-text-body-12-med-tracking)}
+.steps{list-style:none;display:flex;flex-direction:column;position:relative}
+.steps li{display:grid;grid-template-columns:76px 1fr;gap:var(--gw-space-12);padding:var(--gw-space-12) 0;border-top:1px solid var(--gw-color-neutral-100);font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-900)}
+.steps li:first-child{border-top:0;padding-top:0}
+.steps li b{font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-600);padding-top:2px}
+.facts{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--gw-space-8)}
+.fact{background:var(--gw-color-white);border:1px solid var(--gw-color-neutral-100);border-radius:var(--gw-radius-12);padding:var(--gw-space-12)}
+.fact small{display:block;font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-600);margin-bottom:2px}
+.fact span{font:var(--gw-text-body-14-sem)}
+.rep{background:var(--gw-color-primary-25);border:1px solid var(--gw-color-primary-100);border-radius:var(--gw-radius-12);padding:var(--gw-space-16);display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.rep h3{display:flex;gap:var(--gw-space-8);align-items:center;color:var(--gw-color-primary-700);margin:0;font:var(--gw-text-body-12-med)}
+.rep .q small{display:block;font:var(--gw-text-body-12-med);color:var(--gw-color-primary-700);margin-bottom:2px}
+.rep .q p{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-900)}
+.rep .q.ask p{font-weight:500}
+.proof{border:1px dashed var(--gw-color-neutral-200);border-radius:var(--gw-radius-12);padding:var(--gw-space-16);font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-600);display:flex;gap:var(--gw-space-8);align-items:center}
+
+/* ---------- package bar ---------- */
+.pkgbar{position:fixed;left:50%;bottom:var(--gw-space-24);transform:translate(-50%,200%);visibility:hidden;z-index:40;display:flex;align-items:center;gap:var(--gw-space-16);background:var(--gw-color-black);color:#fff;border-radius:var(--gw-radius-16);padding:var(--gw-space-12) var(--gw-space-12) var(--gw-space-12) var(--gw-space-16);box-shadow:var(--gw-shadow-s4);transition:transform .35s cubic-bezier(.22,1,.36,1);width:min(640px,calc(100vw - 32px))}
+.pkgbar.on{transform:translate(-50%,0);visibility:visible}
+.stack{display:flex;flex:none}
+.stack .f{width:32px;height:32px;border-radius:50%;border:2px solid var(--gw-color-black);margin-left:-10px;background:var(--gw-color-neutral-100);overflow:hidden;display:grid;place-items:center}
+.stack .f:first-child{margin-left:0}
+.stack .f img{width:100%;height:100%;object-fit:cover}
+.stack .more{background:var(--gw-color-neutral-850);color:#fff;font:var(--gw-text-body-12-med)}
+.pkgbar .tx{display:flex;flex-direction:column;min-width:0;flex:1}
+.pkgbar .tx b{font:var(--gw-text-body-14-sem);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pkgbar .tx>span{font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-300);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pkgbar .tx b .lg{display:inline}
+.pkgbar .btn{background:var(--gw-color-white);color:var(--gw-color-black)}
+.pkgbar .btn:hover{background:var(--gw-color-neutral-50)}
+.pkgbar .clear{color:var(--gw-color-neutral-300);font:var(--gw-text-button-14);padding:8px}
+.pkgbar .clear:hover{color:#fff}
+
+/* ---------- builder modal ---------- */
+.modal{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;padding:var(--gw-space-24);background:var(--gw-color-neutral-alpha-50-black)}
+.modal.on{display:flex}
+.sheet{background:var(--gw-color-neutral-25);border-radius:var(--gw-radius-20);box-shadow:var(--gw-shadow-s4);width:min(960px,100%);max-height:calc(100vh - 48px);display:flex;flex-direction:column;overflow:hidden}
+.sheet .mh{display:flex;justify-content:space-between;gap:var(--gw-space-16);padding:var(--gw-space-24) var(--gw-space-24) var(--gw-space-16)}
+.sheet .mh small{font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-600)}
+.sheet .mh h2{font:var(--gw-text-h6-bold);margin:var(--gw-space-4) 0}
+.sheet .mh p{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-700);max-width:64ch}
+.sheet .mb{padding:0 var(--gw-space-24) var(--gw-space-24);overflow:auto;display:flex;flex-direction:column;gap:var(--gw-space-16)}
+.sheet .mf{display:flex;justify-content:flex-end;gap:var(--gw-space-12);padding:var(--gw-space-16) var(--gw-space-24);border-top:1px solid var(--gw-color-neutral-100);background:var(--gw-color-white)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gw-space-12)}
+.stat{background:var(--gw-color-white);border:1px solid var(--gw-color-neutral-100);border-radius:var(--gw-radius-12);padding:var(--gw-space-16)}
+.stat small{font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-600)}
+.stat b{display:block;font:var(--gw-text-h6-bold);margin:var(--gw-space-4) 0}
+.stat span{font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-600)}
+.nudge{display:flex;gap:var(--gw-space-8);align-items:center;background:var(--gw-color-primary-25);border:1px solid var(--gw-color-primary-100);border-radius:var(--gw-radius-12);padding:var(--gw-space-12) var(--gw-space-16);font:var(--gw-text-body-14-med);color:var(--gw-color-primary-800)}
+.nudge.warn{background:var(--gw-color-yellow-25);border-color:var(--gw-color-yellow-100);color:var(--gw-color-yellow-800)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:var(--gw-space-16)}
+.pane{background:var(--gw-color-white);border:1px solid var(--gw-color-neutral-100);border-radius:var(--gw-radius-12);padding:var(--gw-space-16);display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.pane h3{font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-600)}
+.trow{display:flex;align-items:center;justify-content:space-between;gap:var(--gw-space-12);padding:var(--gw-space-12);border:1px solid var(--gw-color-neutral-100);border-radius:var(--gw-radius-8)}
+.trow.best{border-color:var(--gw-color-primary-500);background:var(--gw-color-primary-25)}
+.trow b{font:var(--gw-text-body-14-sem);display:flex;gap:var(--gw-space-8);align-items:center}
+.trow small{display:block;font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-600);margin-top:2px}
+.trow .c{font:var(--gw-text-body-14-sem);white-space:nowrap}
+.sepr{display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.sepr .l{display:flex;align-items:center;gap:var(--gw-space-8);font:var(--gw-text-body-14-med)}
+.sepr .l img{width:28px;height:28px;border-radius:50%;background:var(--gw-color-neutral-50);object-fit:cover}
+.sepr .l small{margin-left:auto;font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-600)}
+.vrow{display:grid;grid-template-columns:28px 1fr 84px 64px;gap:var(--gw-space-12);align-items:center}
+.vrow img{width:28px;height:28px;border-radius:50%;background:var(--gw-color-neutral-50);object-fit:cover}
+.vrow .nm{font:var(--gw-text-body-14-med);line-height:1.2}
+.vrow .nm small{display:block;font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-600);font-weight:400}
+.vrow input{height:36px;width:100%;border-radius:var(--gw-radius-8);border:1px solid var(--gw-color-neutral-100);background:var(--gw-color-white);padding:0 var(--gw-space-8);font:var(--gw-text-body-14-med);text-align:right}
+.vrow input:disabled{background:var(--gw-color-neutral-50);color:var(--gw-color-neutral-400)}
+.vrow .u{text-align:right;font:var(--gw-text-body-14-sem)}
+.est{display:flex;justify-content:space-between;font:var(--gw-text-body-14-sem);padding-top:var(--gw-space-12);border-top:1px solid var(--gw-color-neutral-100)}
+.fine{font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-600);font-weight:400}
+.toast{position:fixed;left:50%;bottom:var(--gw-space-24);transform:translate(-50%,200%);z-index:90;background:var(--gw-color-neutral-900);color:#fff;font:var(--gw-text-body-14-med);padding:var(--gw-space-12) var(--gw-space-16);border-radius:var(--gw-radius-12);transition:transform .3s;max-width:calc(100vw - 32px)}
+.toast.on{transform:translate(-50%,0)}
+
+/* ---------- footer: the short ad-page footer (copyright line only) ---------- */
+.footer{background:var(--gw-color-black);border-radius:var(--gw-radius-8) var(--gw-radius-8) 0 0;padding:var(--gw-space-16);padding-bottom:calc(var(--gw-space-16) + env(safe-area-inset-bottom,0px));display:flex;justify-content:center}
+.footer .legal{font:var(--gw-text-body-12-med);line-height:12px;letter-spacing:var(--gw-text-body-12-med-tracking);color:var(--gw-color-neutral-600)}
+
+/* ---------- v2: underlined category tabs with search on the right, sticky package panel on the left ---------- */
+main{padding-top:0}
+.tabbar{position:sticky;top:60px;z-index:25;display:flex;align-items:flex-end;gap:var(--gw-space-16);background:var(--gw-color-neutral-50);border-bottom:1px solid var(--gw-color-neutral-100)}
+.tabs{display:flex;flex:1;min-width:0;gap:var(--gw-space-4);overflow-x:auto;scrollbar-width:none;-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent)}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;display:inline-flex;align-items:center;gap:var(--gw-space-8);height:48px;padding:0 var(--gw-space-12);font:var(--gw-text-body-14-med);letter-spacing:var(--gw-text-body-14-med-tracking);color:var(--gw-color-neutral-600);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tab .n{font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking);color:var(--gw-color-neutral-400)}
+.tab:hover{color:var(--gw-color-black)}
+.tab.on{color:var(--gw-color-black);border-bottom-color:var(--gw-color-black)}
+.tab.on .n{color:var(--gw-color-neutral-500)}
+.tabbar .search{flex:none;width:260px;height:36px;margin:0 0 var(--gw-space-8)}
+.sec{scroll-margin-top:128px}
+.sec:first-of-type{margin-top:var(--gw-space-32)}
+/* the package panel: always on the left, under the industry picker */
+.sum .lst{display:flex;flex-direction:column;gap:var(--gw-space-2);max-height:208px;overflow:auto}
+.sum .it{display:flex;align-items:center;gap:var(--gw-space-8);min-height:32px}
+.sum .it .f{width:24px;height:24px;border-radius:50%;margin:0;border:0;flex:none}
+.sum .it>span:not(.f){flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font:var(--gw-text-body-14-med);letter-spacing:var(--gw-text-body-14-med-tracking)}
+.sum .it button{width:24px;height:24px;border-radius:var(--gw-radius-8);display:grid;place-items:center;font-size:12px;color:var(--gw-color-neutral-500);flex:none}
+.sum .it button:hover{background:var(--gw-color-neutral-50);color:var(--gw-color-black)}
+.sum .en{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);color:var(--gw-color-neutral-600)}
+.sum .tiers{display:flex;flex-direction:column;gap:var(--gw-space-4)}
+.sum .tr{display:flex;justify-content:space-between;align-items:center;height:28px;padding:0 var(--gw-space-8);border-radius:var(--gw-radius-8);border:1px solid transparent;font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking);color:var(--gw-color-neutral-600)}
+.sum .tr b{font-weight:600}
+.sum .tr.best{background:var(--gw-color-primary-25);border-color:var(--gw-color-primary-100);color:var(--gw-color-primary-700)}
+.sum .tot small{display:block;font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-600)}
+.sum .tot b{font:var(--gw-text-h6-bold)}
+.sum .tot b span{font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-600)}
+.sum .btn:disabled{background:var(--gw-color-neutral-200);color:var(--gw-color-white);box-shadow:none;cursor:default}
+.sum .btn:disabled:hover{background:var(--gw-color-neutral-200)}
+
+/* desktop uses the rail summary card; the bar is for narrower screens */
+@media(min-width:1001px){.pkgbar{display:none}}
+
+/* ---------- phone ---------- */
+@media(max-width:1000px){
+ main{display:flex;flex-direction:column}
+ .tabbar{display:contents}
+ .tabbar .search{order:-2;width:100%;height:44px;margin:0 0 var(--gw-space-12)}
+ .filterbtn{order:-1}
+ .tabs{position:sticky;top:60px;z-index:25;order:0;background:var(--gw-color-neutral-50);border-bottom:1px solid var(--gw-color-neutral-100);margin-top:var(--gw-space-12)}
+ .sec{scroll-margin-top:124px}
+ .edge{display:none}
+ .adlg .ph .nv .step{display:inline-flex}
+ .adlg .up{grid-template-columns:200px minmax(0,1fr);gap:var(--gw-space-24)}
+ .adlg .lo{gap:var(--gw-space-24)}
+ .shell{grid-template-columns:minmax(0,1fr);gap:var(--gw-space-16);padding-top:var(--gw-space-24)}
+ main{padding-top:0}
+ .rail{display:none;position:static;max-height:none;padding:var(--gw-space-16);background:var(--gw-color-white);border:1px solid var(--gw-color-neutral-100);border-radius:var(--gw-radius-16)}
+ .rail.open{display:flex}
+ .filterbtn{display:inline-flex}
+ .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .stats,.two-col{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:700px){
+ .hero{height:340px}
+ .hero h1{font:var(--gw-text-h4);letter-spacing:var(--gw-text-h4-tracking)}
+ .hero p{font:var(--gw-text-body-16-med);letter-spacing:var(--gw-text-body-16-med-tracking)}
+ .sec-h{flex-wrap:wrap;align-items:flex-start}
+ .sec-h h2{flex-basis:100%}
+ .sec-h .btn{width:100%}
+ .grid{grid-template-columns:minmax(0,1fr)}
+ .amodal{padding:0;align-items:flex-end}
+ .adwrap{width:100%}
+ .adlg{max-height:94vh;border-radius:var(--gw-radius-20) var(--gw-radius-20) 0 0}
+ .adlg .up{grid-template-columns:minmax(0,1fr);gap:var(--gw-space-16);justify-items:stretch;padding:var(--gw-space-16)}
+ .adlg .himg{max-width:180px;justify-self:center}
+ .adlg .lo{grid-template-columns:minmax(0,1fr);gap:var(--gw-space-16);padding:var(--gw-space-16)}
+ .adlg details.stepsd,.adlg .rep,.adlg .fits,.adlg .proof{flex:none}
+ .pkgbar{bottom:var(--gw-space-12)}
+ .pkgbar .stack{display:none}
+ .pkgbar .tx b .lg{display:none}
+ .pkgbar{gap:var(--gw-space-8)}
+ .modal{padding:0;align-items:flex-end}
+ .sheet{border-radius:var(--gw-radius-20) var(--gw-radius-20) 0 0;max-height:94vh}
+ .vrow{grid-template-columns:28px 1fr 72px 52px}
+ .sheet .mf .btn{flex:1}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="navbar" id="nav">
+ <div class="in">
+  <a class="logo" href="#" aria-label="Gushwork home"><img class="lg-w" src="/internal/staging/agent-store/assets/logo/gushwork-logo-white.svg" alt="Gushwork"><img class="lg-o" src="/internal/staging/agent-store/assets/logo/gushwork-logo-original.svg" alt=""></a>
+  <a class="login" href="#">Login</a>
+ </div>
+</header>
+
+<section class="hero" aria-label="Gushwork Agents">
+ <img class="bg" src="/internal/staging/agent-store/assets/hero.jpg" alt="">
+ <div class="blur" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+ <div class="shade" aria-hidden="true"></div>
+ <div class="tx"><h1>Gushwork Agents</h1><p>Only pay for agents that work for you.</p></div>
+</section>
+
+<div class="col">
+ <div class="shell">
+  <aside class="rail" id="rail" aria-label="Filters"><div id="railmain"></div><div id="pkgcard"></div></aside>
+  <main>
+   <div class="tabbar" id="tabbar">
+    <div class="tabs" id="tabs" role="tablist" aria-label="Categories"></div>
+    <div class="search">
+     <i class="i" style="--m:url(/internal/staging/agent-store/assets/icons/magnifying-glass-regular.svg)"></i>
+     <input id="q" type="search" placeholder="Search agents..." aria-label="Search agents" autocomplete="off">
+     <button class="iconbtn" id="qclear" type="button" aria-label="Clear search" hidden><i class="i" style="--m:url(/internal/staging/agent-store/assets/icons/x-bold.svg)"></i></button>
+     <span class="kbd" id="kbd"><i class="i" style="--m:url(/internal/staging/agent-store/assets/icons/command-regular.svg)"></i>K</span>
+    </div>
+   </div>
+   <button class="btn out sm filterbtn" id="filterbtn" type="button" style="margin-top:12px"><i class="i" style="--m:url(/internal/staging/agent-store/assets/icons/sliders-horizontal-regular.svg)"></i>Industry</button>
+   <div id="results"></div>
+  </main>
+ </div>
+</div>
+
+<footer class="footer">
+ <small class="legal">&copy; 2026 Gushwork | All Rights Reserved</small>
+</footer>
+
+<div class="pkgbar" id="pkgbar" role="region" aria-label="Your package"></div>
+<div class="amodal" id="amodal"><div class="adwrap"><button class="edge l" data-prev aria-label="Previous agent"><i class="i" style="--m:url(/internal/staging/agent-store/assets/icons/arrow-left-bold.svg)"></i></button><div class="adlg" id="adlg" role="dialog" aria-modal="true" aria-label="Agent details"></div><button class="edge r" data-next aria-label="Next agent"><i class="i" style="--m:url(/internal/staging/agent-store/assets/icons/arrow-right-bold.svg)"></i></button></div></div>
+<div class="modal" id="modal"><div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Package builder"></div></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="/internal/staging/agent-store/data/agents.js"></script>
+<script>
+(function(){
+const D = window.AGENT_DATA, $ = s => document.querySelector(s);
+const ICON = {'generate-more-leads':'megaphone','lead-to-quote':'funnel','order-desk':'clipboard-text','purchasing':'shopping-cart','cash':'coins','quality-and-paperwork':'seal-check'};
+// One-liners are drafted from each agent's blurb for this layout pass, for review. Not in the source data.
+const ONE = {"seo-agent": "Ranks on Google and AI search", "paid-ad-agent": "Runs Meta, Google, ChatGPT ads", "email-marketing-agent": "Turns lists into campaigns", "front-desk": "Tags every sales and PO email", "lead-chaser": "Answers every lead in a day", "quote-builder": "Drafts priced quotes from RFQs", "quote-chaser": "Follows up on every open quote", "margin-guard": "Flags low-margin quotes", "reorder-scout": "Finds overdue repeat orders", "win-back": "Wakes up quiet accounts", "catalog-builder": "Sets up your item catalog", "po-checker": "Checks each PO vs the quote", "order-entry": "Enters POs as sales orders", "change-desk": "Handles changes and cancels", "date-keeper": "Confirms a ship date per line", "heads-up": "Warns customers before delays", "returns-desk": "Handles returns and credits", "vendor-quote-runner": "Gets supplier prices and dates", "buy-planner": "Drafts POs for approval", "po-expediter": "Chases late supplier POs", "cost-watch": "Tracks vendor price increases", "bill-checker": "Matches vendor bills to POs", "freight-desk": "Prices and audits your freight", "rebate-claimer": "Claims rebates you are owed", "invoice-pre-flight": "Fixes invoices before sending", "unbilled-sweeper": "Finds shipments never invoiced", "collector": "Chases overdue invoices", "hold-release": "Reviews held orders", "cash-desk": "Applies payments to invoices", "rev-catcher": "Catches drawing revisions", "quality-desk": "Writes up nonconformances", "cert-desk": "Checks certs, builds packets", "compliance-desk": "Answers compliance requests"};
+const TIERS = [{name:'Starter',agents:3,price:600,credits:1000},{name:'Growth',agents:6,price:1100,credits:2500},{name:'Scale',agents:12,price:2100,credits:6000}];
+const INDUSTRIES = [['Manufacturer','Manufacturers'],['Distributor','Distributors'],['Home services'],['Compliance services'],['Legal services'],['IT services'],['Logistics & trucking'],['Healthcare'],['Construction'],['Real estate'],['Hospitality'],['Financial services'],['Education']];
+// Card descriptions: taken from the Agent Store HTML (blurb and steps), trimmed to fit three lines (about 80-100 characters) so every card runs to a similar length. Agents not listed use their blurb as is.
+const CARD = {"paid-ad-agent": "Runs Meta, Google and ChatGPT ads daily within a monthly budget until cost per lead hits target.", "quote-chaser": "Follows up on every open quote until it is won, lost with a reason, or expired after 3 touches.", "margin-guard": "Checks every quote before it goes out and flags lines priced below floor or on stale cost.", "win-back": "Finds accounts that went quiet, works out why, and drafts tailored outreach to restart orders.", "date-keeper": "Works out a realistic ship date for every order line and sends the acknowledgment.", "returns-desk": "Handles customer returns by policy, issues the credit, and recovers it from the vendor.", "unbilled-sweeper": "Lists everything that shipped but was never invoiced, every day, with its value and reason.", "seo-agent": "Writes and publishes pages for what buyers search, and tracks rankings in Google and AI search.", "email-marketing-agent": "Builds segments from your lead lists, writes campaigns and nurture sequences, and sends them.", "front-desk": "Reads every sales and orders email, tags it as RFQ, PO, change or return, and gives it an owner.", "reorder-scout": "Spots overdue repeat parts, products and blanket orders and sends the buyer a ready requote.", "po-checker": "Compares each customer PO to the quote and flags price, revision, date and terms differences.", "cost-watch": "Loads vendor price increases on time and lists the quotes and prices that now lose margin.", "compliance-desk": "Answers customer compliance questionnaires and supplier setup packets, and chases suppliers."};
+const STEP_LABELS = ['Trigger','Reads','Decides','Does','Approval'];
+const S = {spy:D.bundles[0].id,q:'',type:'any',cat:'any',ind:'Manufacturer',sel:{},open:null,vol:{},builder:false};
+const fmt = n => '$'+n.toLocaleString('en-US');
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ic = (n,w='regular') => `<i class="i" style="--m:url(/internal/staging/agent-store/assets/icons/${n}-${w}.svg)"></i>`;
+const img = a => `/internal/staging/agent-store/assets/nuggets/${a.nugget||'plain'}.png`;
+const bundleOf = a => D.bundles.find(b=>b.name===a.bundle);
+const fitsInd = a => /Both/i.test(a.fits||'') || (a.fits||'').includes(S.ind);
+const perItem = a => a.free ? 'Free, fair use up to 3,000 emails' : a.luxury ? 'From $1,000 / mo' : `${a.credits} credit${a.credits>1?'s':''} per ${a.item}`;
+const pool = () => D.agents.filter(fitsInd);
+const matchQ = a => { const q=S.q.trim().toLowerCase(); return !q || [a.name,a.blurb,a.pain,a.question,a.bundle].join(' ').toLowerCase().includes(q); };
+const matchType = () => true;
+const matchCat = a => S.cat==='any' || bundleOf(a).id===S.cat;
+const visible = () => pool().filter(a=>matchQ(a)&&matchType(a)&&matchCat(a));
+const filtered = () => S.q.trim() || S.cat!=='any';
+
+/* ---- pricing: ported unchanged from the original file ---- */
+function pricing(list){
+  const core=list.filter(a=>!a.free&&!a.luxury), lux=list.filter(a=>a.luxury), n=core.length;
+  const opts=TIERS.map(t=>{const extra=Math.max(0,n-t.agents);return {...t,extra,cost:t.price+175*extra,total:t.credits+350*extra};});
+  let best=opts[0]; opts.forEach(o=>{ if(o.cost<best.cost||(o.cost===best.cost&&o.agents>best.agents)) best=o; });
+  const bi=opts.indexOf(best), next=opts[bi+1];
+  const nudge = next && next.price-best.cost<=150 && next.price>best.cost ? `Upgrade to ${next.name} for ${fmt(next.price-best.cost)} more and get ${next.agents} agents and ${next.credits.toLocaleString()} credits.` : '';
+  const rows=list.filter(a=>!a.luxury).map(a=>{const v=+S.vol[a.id]||0, used=v*(a.credits||0);return {a,volume:S.vol[a.id]??'',used:a.free?'—':used.toLocaleString(),usedN:used,disabled:a.free,perItem:a.free?'fair use · 3,000 emails':`${a.credits} credit${a.credits>1?'s':''} per ${a.item}`};});
+  const estimated=rows.reduce((s,r)=>s+r.usedN,0);
+  const packsN=Math.max(0,Math.ceil((estimated-best.total)/1000));
+  const luxTotal=lux.length*1000;
+  return {best,opts,n,lux,rows,estimated,
+    name:best.name+(best.extra?` + ${best.extra} extra`:''),
+    summary:`${n} agent${n===1?'':'s'} selected, ${best.agents} included in ${best.name}${best.extra?`, ${best.extra} extra at $175 each`:''}.${lux.length?` Plus ${lux.length} lead-gen agent${lux.length>1?'s':''} priced separately.`:''}`,
+    monthly:fmt(best.cost)+(lux.length?` + ${fmt(luxTotal)}+`:''), annual:fmt((best.cost+luxTotal)*12)+(lux.length?'+':''),
+    agentCount:`${n} / ${best.agents}`, agentNote:best.extra?`${best.extra} extra agent${best.extra>1?'s':''} at $175 each`:n<best.agents?`${best.agents-n} slot${best.agents-n>1?'s':''} still open`:'All slots used',
+    credits:best.total.toLocaleString(),
+    estNote:estimated?`${estimated.toLocaleString()} estimated from volumes below`:'Enter volumes to estimate usage',
+    nudge, packs:packsN?`Over by ${(estimated-best.total).toLocaleString()} credits: ${packsN} credit pack${packsN>1?'s':''} needed, ${fmt(packsN*150)} / mo at $150 per 1,000.`:''};
+}
+const selected = () => D.agents.filter(a=>S.sel[a.id]&&fitsInd(a));
+
+/* ---- render ---- */
+function renderRail(){
+  $('#railmain').innerHTML = `
+   <div class="rgroup"><h2>Industry</h2><div class="dd" id="dd"><button class="ddbtn" id="ddbtn" type="button" aria-haspopup="listbox" aria-expanded="false"><span>${esc((INDUSTRIES.find(x=>x[0]===S.ind)||[])[1]||S.ind)}</span>${ic('caret-down','bold')}</button><ul class="ddlist" id="ddlist" role="listbox" aria-label="Industry" hidden>${INDUSTRIES.map(([v,l])=>`<li role="option" data-ind="${esc(v)}" aria-selected="${v===S.ind}" ${l?'':'aria-disabled="true"'}>${esc(l||v)}${v===S.ind?ic('check','bold'):''}</li>`).join('')}</ul></div></div>`;
+}
+function renderTabs(){
+  const list=visible(), el=$('#tabs');if(!el)return;
+  let h=D.bundles.map(b=>({b,n:list.filter(a=>a.bundle===b.name).length})).filter(x=>x.n).map(({b,n})=>`<button class="tab ${S.spy===b.id?'on':''}" role="tab" data-jump="${b.id}">${esc(b.name)}<span class="n">${n}</span></button>`).join('');
+  if(!S.q.trim()) h+=`<button class="tab ${S.spy==='build'?'on':''}" role="tab" data-jump="build">Build your own agent<span class="n">Soon</span></button>`;
+  el.innerHTML=h;
+}
+function card(a){
+  const on=!!S.sel[a.id];
+  return `<article class="card ${a.luxury?'prem':''} ${on?'sel':''}" data-open="${a.id}" tabindex="0" role="button" aria-label="Open ${esc(a.name)}">
+    <div class="top"><div class="tile"><img src="${img(a)}" alt=""></div><div class="tx"><h3>${esc(a.name)}</h3>${a.luxury?`<span class="one price">${esc(perItem(a))}</span>`:`<span class="one">${esc(ONE[a.id]||'')}</span>`}</div></div>
+    <p class="desc">${esc(CARD[a.id]||a.blurb)}</p>
+    <button class="add ${on?'live':''}" data-add="${a.id}" aria-label="${on?'Remove':'Add'} ${esc(a.name)} ${on?'from':'to'} package" aria-pressed="${on}">${ic(on?'check':'plus','bold')}</button></article>`;
+}
+function renderResults(){
+  $('#qclear').hidden = !S.q; $('#kbd').style.display = S.q?'none':'';
+  const list=visible();
+  let h='';
+  const secs=D.bundles.map(b=>({b,agents:list.filter(a=>a.bundle===b.name)})).filter(s=>s.agents.length);
+  secs.forEach(({b,agents})=>{
+    const ids=agents.filter(a=>!a.free).map(a=>a.id), allIn=ids.length>0&&ids.every(id=>S.sel[id]);
+    h+=`<section class="sec" id="b-${b.id}"><div class="sec-h"><h2>${esc(b.name)}${b.luxury?'<span class="pill-prem">Premium</span>':''}</h2>${ids.length?`<button class="btn sm bundle ${allIn?'done':''}" data-bundle="${b.id}" aria-pressed="${allIn}">${ic(allIn?'check':'plus','bold')}${allIn?'Added':'Add whole bundle'}</button>`:''}</div><div class="grid">${agents.map(a=>card(a)).join('')}</div></section>`;
+  });
+  if(!S.q.trim()) h+=`<section class="sec" id="b-build"><div class="sec-h"><h2>Build your own agent<span class="badge">Coming soon</span></h2></div><div class="empty" style="margin-top:0"><div class="badgeic">${ic('sparkle')}</div><p>This is coming soon.</p></div></section>`;
+  if(!secs.length) h=`<div class="empty"><div class="badgeic">${ic('magnifying-glass')}</div><h2>No agents match</h2><p>Try a different word, or clear the search.</p><button class="btn out sm" data-reset>Clear search</button></div>`;
+  $('#results').innerHTML=h;
+  renderTabs();
+  onScroll();
+}
+function renderCard(l){
+  const c=$('#pkgcard');if(!c)return;
+  const has=l.length>0, p=pricing(l), pct=has&&p.n?Math.min(100,Math.round(p.n/p.best.agents*100)):0;
+  c.innerHTML=`<div class="sum"><div class="h"><b>Your package</b><small>${l.length} agent${l.length===1?'':'s'}</small></div>
+   ${has?`<div class="lst">${l.map(a=>`<div class="it"><span class="f"><img src="${img(a)}" alt=""></span><span>${esc(a.name)}</span><button data-add="${a.id}" aria-label="Remove ${esc(a.name)}">${ic('x','bold')}</button></div>`).join('')}</div>`:`<p class="en">Add agents to build a package. The tier and price update as you go.</p>`}
+   ${has?`<div><div class="mtr"><i style="width:${pct}%"></i></div><div class="ln" style="margin-top:6px"><span>${esc(p.agentNote)}</span></div></div>`:''}
+   <div class="tiers">${p.opts.map(o=>`<div class="tr ${has&&o===p.best?'best':''}"><span>${o.name} · ${o.agents} agents</span><b>${fmt(o.price)}</b></div>`).join('')}</div>
+   ${has?`<div class="tot"><small>${esc(p.name)}</small><b>${fmt(p.best.cost)} <span>/ mo</span></b></div>`:''}
+   ${p.lux.length?`<div class="ln"><span>Priced separately</span><b>+ ${fmt(p.lux.length*1000)}+</b></div>`:''}
+   <button class="btn sm" data-builder ${has?'':'disabled'}>Build package ${ic('arrow-right','bold')}</button>${has?`<button class="clr" data-clear>Clear</button>`:''}</div>`;
+}
+function renderBar(){
+  const l=selected(), bar=$('#pkgbar');
+  renderCard(l);
+  if(!l.length){bar.classList.remove('on');bar.innerHTML='';return;}
+  const p=pricing(l), shown=l.slice(0,4);
+  bar.innerHTML=`<div class="stack">${shown.map(a=>`<span class="f"><img src="${img(a)}" alt=""></span>`).join('')}${l.length>4?`<span class="f more">+${l.length-4}</span>`:''}</div>
+   <div class="tx"><b>${l.length} agent${l.length>1?'s':''}<span class="lg"> in your package</span></b><span>${esc(p.name)} · ${p.monthly} / mo</span></div>
+   <button class="clear" data-clear>Clear</button><button class="btn sm" data-builder>Build package ${ic('arrow-right','bold')}</button>`;
+  requestAnimationFrame(()=>bar.classList.add('on'));
+}
+function syncLock(){document.body.classList.toggle('lock',!!(S.open||S.builder));}
+// Page order of the agents on screen (respects the search), used by next and previous.
+function order(){
+  const mk=l=>D.bundles.flatMap(b=>l.filter(a=>a.bundle===b.name)).map(a=>a.id);
+  const o=mk(visible()); return o.includes(S.open)?o:mk(pool());
+}
+function step(d){const o=order(),i=o.indexOf(S.open);if(i<0)return;S.open=o[(i+d+o.length)%o.length];renderPanel(true);}
+function updVol(id,setInput){
+  const a=D.agents.find(x=>x.id===id),v=+S.vol[id]||0;
+  const c=$('#adlg [data-mcred]');if(c)c.textContent=v?`about ${(v*a.credits).toLocaleString()} credits`:'Set a volume to estimate credits';
+  const inp=$('#adlg [data-mvol]');if(setInput&&inp)inp.value=v||'';
+}
+function renderPanel(fresh){
+  const m=$('#amodal'), a=D.agents.find(x=>x.id===S.open);
+  if(!a){m.classList.remove('on');syncLock();return;}
+  const old=$('#adlg .pb'), keep=(!fresh&&old)?old.scrollTop:0;
+  const o=order(), i=o.indexOf(a.id), on=!!S.sel[a.id], b=bundleOf(a);
+  const v=+S.vol[a.id]||0, vol=!a.free&&!a.luxury;
+  $('#adlg').innerHTML=`<div class="ph"><span class="badge">${esc(a.bundle)}</span><span class="pos">${i+1} of ${o.length}</span><div class="nv"><button class="iconbtn step" data-prev aria-label="Previous agent">${ic('arrow-left','bold')}</button><button class="iconbtn step" data-next aria-label="Next agent">${ic('arrow-right','bold')}</button><button class="iconbtn" data-close aria-label="Close">${ic('x','bold')}</button></div></div>
+  <div class="pb">
+   <div class="up">
+    <div class="himg"><img src="${img(a)}" alt=""></div>
+    <div class="info"><div><h2>${esc(a.name)}</h2><div class="price${a.luxury?' price-prem':''}">${esc(perItem(a))}</div></div>
+     <p class="p-blurb">${esc(a.blurb)}</p>
+     ${vol?`<div class="vol"><div><small>Monthly volume</small><b data-mcred>${v?`about ${(v*a.credits).toLocaleString()} credits`:'Set a volume to estimate credits'}</b></div><div class="stp"><button data-vstep="-1" data-vid="${a.id}" aria-label="Fewer per month">${ic('minus','bold')}</button><input type="number" min="0" inputmode="numeric" value="${v||''}" placeholder="0" data-mvol="${a.id}" aria-label="Monthly volume for ${esc(a.name)}"><button data-vstep="1" data-vid="${a.id}" aria-label="More per month">${ic('plus','bold')}</button></div></div>`:''}
+     ${a.luxury?`<div class="vol"><div><small>Pricing</small><b>Priced alone, outside the package tiers</b></div></div>`:''}
+     <button class="btn wide ${on?'out':''}" data-add="${a.id}">${ic(on?'check':'plus','bold')}${on?'Added, remove from package':'Add to package'}</button>
+    </div>
+   </div>
+   <div class="lo">
+    <details class="stepsd" ${innerWidth>700?'open':''}><summary>How it works${ic('caret-down','bold')}</summary><ol class="steps">${a.steps.map((t,k)=>`<li><b>${STEP_LABELS[k]||''}</b><span>${esc(t)}</span></li>`).join('')}</ol></details>
+    <div class="lr">
+     <div class="rep"><h3>${ic('handshake')}Talk track</h3><div class="q"><small>Pain to listen for</small><p>${esc(a.pain)}</p></div><div class="q ask"><small>Discovery question</small><p>“${esc(a.question)}”</p></div></div>
+     <div class="fits"><small>Fits</small><span>${esc(a.fits)}</span></div>
+     <div class="proof">${ic('sparkle')}Proof slot, held open until there are real customer results to show here.</div>
+    </div>
+   </div>
+  </div>`;
+  $('#adlg .pb').scrollTop=keep;
+  if(!m.classList.contains('on')){m.classList.add('on');$('#adlg [data-close]').focus({preventScroll:true});}
+  syncLock();
+}
+function renderBuilder(keep){
+  const m=$('#modal');
+  if(!S.builder){m.classList.remove('on');syncLock();return;}
+  const l=selected(); if(!l.length){S.builder=false;return renderBuilder();}
+  const p=pricing(l);
+  $('#sheet').innerHTML=`<div class="mh"><div><small>Package for ${S.ind==='Distributor'?'a distributor':'a manufacturer'}</small><h2>${esc(p.name)}</h2><p>${esc(p.summary)}</p></div><button class="iconbtn" data-bclose aria-label="Close">${ic('x','bold')}</button></div>
+  <div class="mb">
+   <div class="stats"><div class="stat"><small>Monthly</small><b>${p.monthly}</b><span>${p.annual} annual contract value</span></div><div class="stat"><small>Agents</small><b>${p.agentCount}</b><span>${esc(p.agentNote)}</span></div><div class="stat"><small>Credits per month</small><b>${p.credits}</b><span>${esc(p.estNote)}</span></div></div>
+   ${p.nudge?`<div class="nudge">${ic('arrow-fat-line-up','bold')}${esc(p.nudge)}</div>`:''}
+   <div class="two-col">
+    <div class="pane"><h3>Compare tiers</h3>${p.opts.map(o=>`<div class="trow ${o===p.best?'best':''}"><div><b>${o.name}${o===p.best?'<span class="badge k">Best price</span>':''}</b><small>${o.agents} agents · ${o.credits.toLocaleString()} credits${o.extra?` · +${o.extra} extra`:''}</small></div><span class="c">${fmt(o.cost)} / mo</span></div>`).join('')}
+     ${p.lux.length?`<h3 style="margin-top:4px">Priced separately</h3><div class="sepr">${p.lux.map(a=>`<div class="l"><img src="${img(a)}" alt="">${esc(a.name)}<small>from $1,000 / mo</small></div>`).join('')}</div>`:''}</div>
+    <div class="pane"><h3>Credit estimator · monthly volume</h3>${p.rows.map(r=>`<div class="vrow"><img src="${img(r.a)}" alt=""><div class="nm">${esc(r.a.name)}<small>${esc(r.perItem)}</small></div><input type="number" min="0" inputmode="numeric" data-vol="${r.a.id}" value="${esc(r.volume)}" ${r.disabled?'disabled':''} aria-label="Monthly volume for ${esc(r.a.name)}"><span class="u">${r.used}</span></div>`).join('')}
+     <div class="est"><span>Estimated credits</span><span>${p.estimated.toLocaleString()} / ${p.credits}</span></div>
+     ${p.packs?`<div class="nudge warn">${ic('warning','bold')}${esc(p.packs)}</div>`:''}
+     <p class="fine">Credits are pooled and reset monthly. Admin alerted at 80%; packs auto-added at 100% up to the cap.</p></div>
+   </div>
+  </div>
+  <div class="mf"><button class="btn out" data-bclose>Keep editing</button><button class="btn" data-proposal>Send proposal ${ic('paper-plane-tilt','bold')}</button></div>`;
+  m.classList.add('on');syncLock();
+  if(keep){const e=document.querySelector(`[data-vol="${keep.id}"]`);if(e){e.focus();try{e.setSelectionRange(keep.pos,keep.pos)}catch(_){}}}
+}
+function renderAll(){renderRail();renderResults();renderBar();renderPanel();renderBuilder();}
+let tt; function toast(t,label,fn){
+  const e=$('#toast');e.textContent=t;
+  if(label){const b=document.createElement('button');b.className='undo';b.textContent=label;b.onclick=()=>{fn();e.classList.remove('on');};e.appendChild(b);}
+  e.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('on'),label?5000:2800);
+}
+
+/* ---- events ---- */
+function closeDD(){const l=$('#ddlist'),b=$('#ddbtn');if(l)l.hidden=true;if(b)b.setAttribute('aria-expanded','false');document.querySelectorAll('#ddlist li.act').forEach(x=>x.classList.remove('act'));}
+function openDD(){const l=$('#ddlist'),b=$('#ddbtn');if(!l)return;l.hidden=false;b.setAttribute('aria-expanded','true');}
+function ddMove(d){const items=[...document.querySelectorAll('#ddlist li:not([aria-disabled=true])')];if(!items.length)return;let i=items.findIndex(x=>x.classList.contains('act'));if(i<0)i=items.findIndex(x=>x.getAttribute('aria-selected')==='true');items.forEach(x=>x.classList.remove('act'));i=(i+d+items.length)%items.length;items[i].classList.add('act');items[i].scrollIntoView({block:'nearest'});}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('#dd'))closeDD();
+  const dd=e.target.closest('#ddbtn,[data-ind]');
+  if(dd){
+    if(dd.id==='ddbtn'){$('#ddlist').hidden?openDD():closeDD();return;}
+    if(dd.getAttribute('aria-disabled')==='true')return;
+    S.ind=dd.dataset.ind;S.open=null;renderAll();return;
+  }
+  const t=e.target.closest('[data-add],[data-open],[data-jump],[data-vstep],[data-bundle],[data-close],[data-prev],[data-next],[data-clear],[data-builder],[data-bclose],[data-proposal],[data-reset],#filterbtn,#qclear,#amodal,#modal');
+  if(!t) return;
+  if(t.dataset.add){e.stopPropagation();const id=t.dataset.add;S.sel[id]?delete S.sel[id]:S.sel[id]=true;renderResults();renderBar();if(S.open)renderPanel();return;}
+  if(t.dataset.open){S.open=t.dataset.open;renderPanel(true);return;}
+  if(t.dataset.jump){const id=t.dataset.jump;const el=document.getElementById('b-'+id);$('#rail').classList.remove('open');if(el)el.scrollIntoView({behavior:'smooth',block:'start'});return;}
+  if('bundle' in t.dataset){const b=D.bundles.find(x=>x.id===t.dataset.bundle);const ids=visible().filter(a=>a.bundle===b.name&&!a.free).map(a=>a.id);const allIn=ids.every(id=>S.sel[id]);ids.forEach(id=>allIn?delete S.sel[id]:S.sel[id]=true);renderResults();renderBar();return;}
+  if(t.dataset.vstep){const id=t.dataset.vid;S.vol[id]=String(Math.max(0,(+S.vol[id]||0)+(+t.dataset.vstep)*50));updVol(id,true);return;}
+  if('prev' in t.dataset){step(-1);return;}
+  if('next' in t.dataset){step(1);return;}
+  if('close' in t.dataset){S.open=null;renderPanel();return;}
+  if(t.id==='amodal'&&e.target===t){S.open=null;renderPanel();return;}
+  if('clear' in t.dataset){const prev=S.sel;S.sel={};renderResults();renderBar();if(S.open)renderPanel();toast('Package cleared','Undo',()=>{S.sel=prev;renderResults();renderBar();if(S.open)renderPanel();});return;}
+  if('builder' in t.dataset){S.builder=true;renderBuilder();return;}
+  if('bclose' in t.dataset){S.builder=false;renderBuilder();return;}
+  if(t.id==='modal'&&e.target===t){S.builder=false;renderBuilder();return;}
+  if('proposal' in t.dataset){toast('Send proposal is not wired up in this layout pass, as in the original file.');return;}
+  if('reset' in t.dataset){S.q='';$('#q').value='';renderResults();return;}
+  if(t.id==='filterbtn'){const r=$('#rail');r.classList.toggle('open');if(r.classList.contains('open'))r.scrollIntoView({block:'start'});return;}
+  if(t.id==='qclear'){S.q='';$('#q').value='';renderResults();$('#q').focus();return;}
+});
+document.addEventListener('keydown',e=>{
+  const typing=/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName);
+  const ddOpen=$('#ddlist')&&!$('#ddlist').hidden;
+  if(ddOpen){
+    if(e.key==='Escape'){closeDD();$('#ddbtn').focus();return;}
+    if(e.key==='ArrowDown'){e.preventDefault();ddMove(1);return;}
+    if(e.key==='ArrowUp'){e.preventDefault();ddMove(-1);return;}
+    if(e.key==='Enter'||e.key===' '){const a=$('#ddlist li.act');if(a){e.preventDefault();S.ind=a.dataset.ind;S.open=null;renderAll();return;}}
+  }
+  if(e.key==='Escape'){if(S.builder){S.builder=false;renderBuilder();}else if(S.open){S.open=null;renderPanel();}return;}
+  if(S.open&&!S.builder&&!typing&&(e.key==='ArrowLeft'||e.key==='ArrowRight')){e.preventDefault();step(e.key==='ArrowRight'?1:-1);return;}
+  if((e.key==='Enter'||e.key===' ')&&e.target.matches('.card[data-open]')){e.preventDefault();S.open=e.target.dataset.open;renderPanel(true);return;}
+  if((e.key==='k'&&(e.metaKey||e.ctrlKey))||(e.key==='/'&&!typing)){e.preventDefault();$('#q').focus();}
+});
+$('#q').addEventListener('input',e=>{S.q=e.target.value;renderResults();});
+document.addEventListener('input',e=>{if(e.target.dataset&&e.target.dataset.mvol){S.vol[e.target.dataset.mvol]=e.target.value;updVol(e.target.dataset.mvol,false);return;}
+  if(e.target.dataset&&e.target.dataset.vol){const pos=e.target.selectionStart;S.vol[e.target.dataset.vol]=e.target.value;renderBuilder({id:e.target.dataset.vol,pos});}});
+/* navbar goes solid on scroll (ad-page rule: after 32px); the rail follows the section in view */
+const navEl=$('#nav');let tick=false;
+function onScroll(){
+  if(tick)return;tick=true;
+  requestAnimationFrame(()=>{
+    tick=false;
+    if(scrollY>32)navEl.setAttribute('data-scrolled','');else navEl.removeAttribute('data-scrolled');
+    const secs=[...document.querySelectorAll('.sec')];let cur=secs.length?secs[0].id.slice(2):'';
+    if(secs.length&&secs[0].getBoundingClientRect().top<=150){secs.forEach(x=>{if(x.getBoundingClientRect().top<=150)cur=x.id.slice(2);});}
+    if(secs.length&&innerHeight+scrollY>=document.documentElement.scrollHeight-4)cur=secs[secs.length-1].id.slice(2);
+    if(cur!==S.spy){S.spy=cur;document.querySelectorAll('[data-jump]').forEach(r=>r.classList.toggle('on',r.dataset.jump===cur));const at=document.querySelector('.tab.on'),st=$('#tabs');if(at&&st)st.scrollTo({left:Math.max(0,at.offsetLeft-st.clientWidth/2+at.clientWidth/2),behavior:'smooth'});}
+  });
+}
+addEventListener('scroll',onScroll,{passive:true});
+renderAll();
+onScroll();
+})();
+</script>
+</body>
+</html>
