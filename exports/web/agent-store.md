@@ -88,6 +88,30 @@ volume field per agent. **The pricing maths is the original file's, unchanged:**
 credit packs $150 per 1,000; lead-gen agents priced alone from $1,000. `Send proposal` is not wired, as in
 the original.
 
+## Version 2 (`/internal/staging/agent-store-v2`)
+
+Same page, cards, modal and builder; a different frame, at Utsav's request.
+
+### `agent-category-tabs`
+
+Replaces the category rows in the rail. A sticky row (`top: 60px`, under the navbar, on the page ground) of
+**underlined tabs**: 48px high, `--gw-text-body-14-med`, `--gw-color-neutral-600`, a count in
+`--gw-color-neutral-400`, and a 2px `--gw-color-black` underline on the tab in view. Tabs still scroll to their
+section and every section stays on the page. **Search sits at the right of the same row**, 260px by 36px. The
+strip scrolls sideways with a fade at its right edge when the tabs do not fit, and scrolls the active tab into
+view. While searching, tabs with no matches disappear and the counts become match counts. On phone, search sits
+on top and the tab strip stays sticky.
+
+### `agent-package-panel`
+
+Replaces the rail summary card. A sticky panel on the left under the industry picker, **always visible**, empty
+at first ("Add agents to build a package. The tier and price update as you go.") with a disabled `Build package`.
+With agents it lists them (24px round mascot, name, a remove control), then the slots meter and note, a **tier
+ladder** (Starter, Growth, Scale with their base prices, the best price lit in `--gw-color-primary-25` with a
+`--gw-color-primary-100` stroke), the recommended tier and monthly total in `--gw-text-h6-bold`, "Priced
+separately" for premium agents, `Build package` and `Clear` (with the same Undo toast). Hidden on phone, where
+the bottom bar takes over.
+
 ## Known gaps
 
 - None of the six is a Figma component yet.
