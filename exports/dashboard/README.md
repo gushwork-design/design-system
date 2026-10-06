@@ -63,9 +63,10 @@ Fonts (Vert Grotesk Display, Inter) and icons come from the plugin, not from thi
   alias of one declared in `css/`. A value with no token is a finding to report, never one to invent.
 - **Theme.** `color-scheme` plus `light-dark()`: each alias is declared once, and there is no
   per-theme block to forget. A component never hard-codes a theme.
-- **Density.** `data-density="compact"` on `.gd` (or any region) is the switch for dense analytics
-  screens. Heights, paddings and gaps flow from `--gd-control-h`, `--gd-row-h`, `--gd-head-h`,
-  `--gd-cell-px`, `--gd-gap` and `--gd-card-pad`. Build for both.
+- **Density.** Comfortable is the default. `data-density="compact"` on `.gd` (or any region) is used only
+  when the user asks for it, never recommended and never chosen for a screen because it is dense (R57).
+  Heights, paddings and gaps flow from `--gd-control-h`, `--gd-row-h`, `--gd-head-h`,
+  `--gd-cell-px`, `--gd-gap` and `--gd-card-pad`, so both work.
 - **Blue carries data and status; black carries interaction state.** A button is never a blue fill.
 - **Destructive is a red label on a neutral shape.** The same outlined button or menu row with red
   text. Never a red fill. A confirm dialog names exactly what will be lost and focuses Cancel.

@@ -102,6 +102,7 @@
  "dashboard/status-dot": "Marks which series or state a label belongs to with a small coloured dot, used inside a badge, a chart legend or a stat card label",
  "dashboard/status-list": "Lists services or components with a status each, and lets people expand a row to see detail like uptime or the last incident",
  "dashboard/sub-nav": "Gives a settings-style area a secondary menu down the left side, listing sibling pages like Profile, Security and API keys beside the content",
+ "dashboard/support-ops-app-template": "Starts a whole multi-page product app, with a flat rail, tabbed views and nine pages (overview, reports, explorer, lists, a record page, team, settings), on one shared set of sample data",
  "dashboard/table-cell-types": "Provides the standard cell shapes a data table uses, such as text, so every table prints its rows and columns the same way",
  "dashboard/table-states": "Shows what a table displays when it has no rows: loading, empty, error, or no results for the current filter, inside the same table frame",
  "dashboard/table-toolbar": "Sits in one row above a table with search, filter, columns, view switch and export, so people can narrow or reshape the data",

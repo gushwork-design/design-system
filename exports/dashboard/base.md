@@ -32,7 +32,7 @@ inline script before first paint so there is no flash.
 | Interaction | `--gd-hover-bg`, `--gd-selected-bg`, `--gd-nav-label`, `--gd-ink` / `--gd-ink-fg` / `--gd-ink-hover` (the primary action: black in light, inverted in dark), `--gd-disabled-fg`, `--gd-scrim` |
 | Signal | `--gd-accent`, `--gd-good`, `--gd-warn`, `--gd-danger` (fills and edges; small text uses `--gd-tone-*-fg`) |
 
-**Density.** The single switch for heavy dashboards. Comfortable is the default.
+**Density.** The single density switch. Comfortable is the default and the only one built unless the user asks for compact (R57).
 
 | Variable | Comfortable | Compact | Drives |
 |---|---|---|---|
@@ -43,9 +43,9 @@ inline script before first paint so there is no flash.
 | `--gd-gap` | 16px | 12px | gaps between cards and controls |
 | `--gd-card-pad` | 20px | 16px | card padding |
 
-Use compact for tables of hundreds of rows and screens with many charts; comfortable for settings and
-detail. Do not mix them inside one region. Set it on a region (`<section data-density="compact">`) to
-densify only that region.
+Comfortable is what is built. Compact is used only when the user asks for it (R57): it is never the default
+and never recommended, however dense the screen. When it is asked for, do not mix the two inside one region;
+set it on a region (`<section data-density="compact">`) to densify only that region.
 
 **Focus and motion.** Keyboard focus is a ring (`--gw-focus-ring`) on `:focus-visible` only; a text field
 shows a 1px edge (`--gd-border-focus`) instead, because a browser counts a click into a text field as keyboard
