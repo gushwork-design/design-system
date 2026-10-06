@@ -74,8 +74,8 @@
       "doc": "charts.md"
     },
     "board": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "feedback.md"
     },
@@ -99,8 +99,8 @@
       "doc": "notice.md"
     },
     "bulk-action-bar": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "tables.md"
     },
@@ -141,8 +141,8 @@
       "doc": "overlays.md"
     },
     "column-menu": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "tables.md"
     },
@@ -159,8 +159,8 @@
       "doc": "overlays.md"
     },
     "confirm-dialog": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "overlays.md"
     },
@@ -171,8 +171,8 @@
       "doc": "shell.md"
     },
     "data-table": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "tables.md"
     },
@@ -207,14 +207,14 @@
       "doc": "overlays.md"
     },
     "donut-chart": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "charts.md"
     },
     "drawer": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "overlays.md"
     },
@@ -231,14 +231,14 @@
       "doc": "shell.md"
     },
     "filter-builder": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "filtering.md"
     },
     "filter-chip": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "filtering.md"
     },
@@ -255,8 +255,8 @@
       "doc": "inputs.md"
     },
     "funnel": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "charts.md"
     },
@@ -291,8 +291,8 @@
       "doc": "actions.md"
     },
     "incident-row": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "data-display.md"
     },
@@ -321,8 +321,8 @@
       "doc": "data-display.md"
     },
     "legend-table": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "charts.md"
     },
@@ -333,8 +333,8 @@
       "doc": "charts.md"
     },
     "log-viewer": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "tables.md"
     },
@@ -345,20 +345,20 @@
       "doc": "auth.md"
     },
     "menu": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "actions.md"
     },
     "metric-strip": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "data-display.md"
     },
     "modal": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "overlays.md"
     },
@@ -387,14 +387,14 @@
       "doc": "shell.md"
     },
     "page-layout": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "shell.md"
     },
     "pagination": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "tables.md"
     },
@@ -417,8 +417,8 @@
       "doc": "data-display.md"
     },
     "query-builder": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "inputs.md"
     },
@@ -435,20 +435,20 @@
       "doc": "data-display.md"
     },
     "row-actions-menu": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "tables.md"
     },
     "row-selection": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "tables.md"
     },
     "saved-views": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "filtering.md"
     },
@@ -465,8 +465,8 @@
       "doc": "navigation.md"
     },
     "segmented-control": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "actions.md"
     },
@@ -477,14 +477,14 @@
       "doc": "inputs.md"
     },
     "session-expired": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "auth.md"
     },
     "setting-row": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "inputs.md"
     },
@@ -507,8 +507,8 @@
       "doc": "shell.md"
     },
     "sign-in-modal": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "auth.md"
     },
@@ -531,8 +531,8 @@
       "doc": "actions.md"
     },
     "stat-card": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "data-display.md"
     },
@@ -561,26 +561,26 @@
       "doc": "navigation.md"
     },
     "table-cell-types": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "tables.md"
     },
     "table-states": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "tables.md"
     },
     "table-toolbar": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "filtering.md"
     },
     "tabs-pill": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "actions.md"
     },
@@ -621,8 +621,8 @@
       "doc": "navigation.md"
     },
     "time-range-bar": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "inputs.md"
     },
@@ -639,8 +639,8 @@
       "doc": "feedback.md"
     },
     "toggle": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "inputs.md"
     },
@@ -675,8 +675,8 @@
       "doc": "charts.md"
     },
     "widget-grid": {
-      "version": "2.0.1",
-      "changed": "2026-10-05",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
       "doc": "shell.md"
     },
