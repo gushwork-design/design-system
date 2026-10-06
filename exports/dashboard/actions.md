@@ -85,6 +85,8 @@ Track `--gd-track-bg` with a 1px inset edge so 28px tabs still fit; selected is 
 
 **Use** for page-level sections (Overview / Members / Billing), sticky under the page header. **Not** for in-page view switches.
 
+**One row per page (R59).** Never stack two underlined rows. If a page's sections each have sections of their own, the upper level is a rail submenu (`nav-group`, see `navigation.md`) and only the lower level is `tabs-underline`. The hub's Design System page does this: Library, Review and Workflow are the submenu, Foundations, Web pages, Slides and the rest are the one underlined row.
+
 Anatomy: same roles as tabs pill with `.gd-tabs--underline`; a hairline runs full width and a 2px ink bar sits under the selected tab. Overflow scrolls horizontally with the scrollbar hidden. States: rest `--gd-text-muted`, hover and selected `--gd-text`, focus ring inside the tab, disabled. Same JS and events as tabs pill. Provenance: extracted `web/admin/access-control.html:24-32` (`.ac-tabbar`, `.ac-tab`).
 
 ## Period select
