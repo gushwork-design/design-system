@@ -362,14 +362,41 @@ async function uploadFiles(token, root, channel, threadTs, files) {
   return done.length;
 }
 
+/* The agent pane (R55 addendum, 6 Oct 2026). A conversation there is a thread in Bruce's DM, so a message with a thread_ts
+   is one of two things: a reply in an older DM thread, or an agent session. Both want the same handling, except that the
+   pane shows a status line while he works. The status is set when a run starts; the run sets it back to active when it
+   answers, and a concierge answer clears it here. agents.sessions.setStatus does not clear itself. Never throws. */
+const AGENT_PROMPTS = [
+  { title: 'Send me the logo', message: 'Send me the Gushwork logo, svg and png' },
+  { title: 'Brand colours and fonts', message: 'Send me the brand colours and fonts' },
+  { title: 'Build a one-pager', message: 'Build a one-pager. Audience: ... Offer: ... Call to action: ...' },
+  { title: 'Which template do I use?', message: 'Which template should I use for a ...' },
+];
+export async function suggestPrompts(token, channel) {
+  try { await slack(token, 'assistant.threads.setSuggestedPrompts', { channel_id: channel, title: 'What do you need?', prompts: AGENT_PROMPTS }); return 'set'; }
+  catch (e) { return 'failed: ' + String(e.message || e).slice(0, 80); }
+}
+export async function setStatus(token, event, status) {
+  if (!event.thread_ts) return false;
+  try { await slack(token, 'agents.sessions.setStatus', { status, channel_id: event.channel, thread_ts: event.thread_ts }); return true; }
+  catch { return false; }
+}
+/* What the person was looking at when they asked, from app_context on the message (a channel, a thread, a canvas). */
+export function contextOf(event) {
+  const ents = (event.app_context && event.app_context.entities) || [];
+  return ents.map((e) => `${String(e.type || '').split('/').pop()} ${e.value || ''}`.trim()).filter(Boolean).slice(0, 3).join(', ');
+}
+
 /* Start the Bruce routine for one of Utsav's DMs. The routine reads the thread itself (conversations.replies) and answers
    in it; this only hands over where to answer and what was said. Never throws. */
 export async function fireBruce(event, env = process.env, f = fetch, extra = {}) {
   const url = env.GW_BRUCE_TRIGGER_URL || '', token = env.GW_BRUCE_TRIGGER_TOKEN || '';
   if (!url || !token) return { fired: false, why: 'not set' };
   const notes = (extra.notes || []).length ? ['memory (your notes on this person, newest first):', ...extra.notes.map((n) => `- ${n}`)] : ['memory: nothing yet'];
+  const ctx = contextOf(event);
   const text = [`Slack DM from <@${event.user}>.`, `user: ${event.user}`, `role: ${extra.owner ? 'owner' : 'teammate'}`, `channel: ${event.channel}`, `thread_ts: ${event.thread_ts || event.ts}`, `message_ts: ${event.ts}`,
-    `in_thread: ${event.thread_ts ? 'yes' : 'no'}`, ...(extra.memoryToken ? [`memory_token: ${extra.memoryToken}`] : []), ...notes, `message:`, String(event.text || '').slice(0, 4000)].join('\n');
+    `in_thread: ${event.thread_ts ? 'yes' : 'no'}`, `agent_session: ${extra.agent ? 'yes' : 'no'}`, ...(ctx ? [`looking_at: ${ctx}`] : []),
+    ...(extra.memoryToken ? [`memory_token: ${extra.memoryToken}`] : []), ...notes, `message:`, String(event.text || '').slice(0, 4000)].join('\n');
   try {
     const r = await f(url, {
       method: 'POST',
@@ -423,7 +450,8 @@ export function forBruce(u) {
  * so the caller can still answer 200 and Slack does not retry.
  */
 export async function handleMessage(event, deps) {
-  const { token, root, owners = new Set(), bruceUsers = new Set(), ownerId = '', fire = fireBruce, findPing = pingOf, toAlfred = replyToAlfred, memory = null } = deps;
+  const { token, root, owners = new Set(), bruceUsers = new Set(), ownerId = '', fire = fireBruce, findPing = pingOf, toAlfred = replyToAlfred, memory = null, agent = false } = deps;
+  const inPane = agent && !!event.thread_ts;   // an agent-pane session is a thread in the DM
   // Bruce is open to everyone in a DM (Utsav, 5 Oct 2026); BRUCE_USER_IDS, when set, narrows it to a list again.
   const mayAskBruce = (id) => bruceUsers.size ? bruceUsers.has(id) : true;
   const isDm = event.type === 'message';
@@ -466,15 +494,18 @@ export async function handleMessage(event, deps) {
           const reply = compose(u, catalog, event.ts);
           await slack(token, 'chat.postMessage', { channel: event.channel, ...(replyTs !== event.ts ? { thread_ts: replyTs } : {}), unfurl_links: false,
             text: `You’ve used today’s ${quota.cap} Bruce ${quota.cap === 1 ? 'run' : 'runs'}, so I can only do the quick things until tomorrow.\n\n` + reply.text });
+          if (inPane) await setStatus(token, event, 'active');
           return { did: 'capped', used: quota.used };
         }
         try { notes = await memory.readNotes(event.user); } catch { /* fine without */ }
         try { memoryToken = memory.mintToken(event.user); } catch { /* fine without */ }
       }
-      const run = await fire(event, undefined, undefined, { owner: isOwner, notes, memoryToken });
+      if (inPane) await setStatus(token, event, 'processing');   // the pane's "working" line; the run sets it back to active
+      const run = await fire(event, undefined, undefined, { owner: isOwner, notes, memoryToken, agent: inPane });
       if (memory) await log(memory, token, event, { role: isOwner ? 'owner' : 'teammate', kind: run.fired ? 'run' : 'failed', used: quota.used });
       if (!run.fired) {
         await slack(token, 'chat.postMessage', { channel: event.channel, thread_ts: replyTs, text: `I couldn’t start on that (${run.why}). Check GW_BRUCE_TRIGGER_URL and GW_BRUCE_TRIGGER_TOKEN on the site.` });
+        if (inPane) await setStatus(token, event, 'active');
         return { did: 'bruce-failed', why: run.why };
       }
       return { did: 'bruce' };
