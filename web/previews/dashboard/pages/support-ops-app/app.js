@@ -20,9 +20,11 @@
   /* ---- the rail: the row for this page is current, and its group is open. A page may name another page's row with
      data-nav on <body> (a ticket sits under Tickets); a row with a query or hash matches on that too (tickets.html?view=Open). ---- */
   function markNav() {
-    var path = document.body.dataset.nav || location.pathname.split('/').pop() || 'index.html', links = $$('.gd-sidebar a.gd-nav-item[href]'), best = null;
+    // a host with clean URLs serves tickets.html as /tickets, so both sides are compared without .html
+    var bare = function (v) { return v.replace(/\.html(?=$|[?#])/, ''); };
+    var path = bare(document.body.dataset.nav || location.pathname.split('/').pop() || 'index.html'), links = $$('.gd-sidebar a.gd-nav-item[href]'), best = null;
     var tries = [path + location.search + location.hash, path + location.search, path];
-    tries.forEach(function (want) { if (!best) links.forEach(function (a) { if (!best && a.getAttribute('href') === want) best = a; }); });
+    tries.forEach(function (want) { if (!best) links.forEach(function (a) { if (!best && bare(a.getAttribute('href')) === want) best = a; }); });
     links.forEach(function (a) { if (a === best) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
     if (best) { var items = best.closest('.gd-nav-group__items'); if (items && items.hidden) { items.hidden = false; var head = $('[aria-controls="' + items.id + '"]'); if (head) head.setAttribute('aria-expanded', 'true'); } }
   }
