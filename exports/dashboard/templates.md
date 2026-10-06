@@ -58,7 +58,7 @@ specific to support.
 | Analytics, Overview | `index.html`, `overview.js` | none (Monitor recipe) |
 | Analytics, Reports | `reports.html`, `reports.js` | Weekly summary, Response times, Satisfaction (`?report=`) |
 | Analytics, Explorer | `explorer.html`, `explorer.js` | none (query panel, chart and table) |
-| Support, Tickets | `tickets.html`, `tickets.js` | none in the header: the list has saved views with counts (All, Open, Pending, Resolved, Urgent; `?view=`), a quick-view drawer and a new-ticket dialog |
+| Support, Tickets | `tickets.html`, `tickets.js` | All tickets, Open, Pending, Resolved, Urgent, each with its count (`?view=`); the list has a quick-view drawer and a new-ticket dialog |
 | (opened from a ticket) | `ticket.html`, `ticket.js` (`?id=`) | Activity, Related tickets; a not-found state |
 | Support, Customers | `customers.html`, `customers.js` | Companies, People (`?view=`) |
 | Support, Help center | `help.html`, `help.js` | Articles, Categories (`?view=`); Articles has saved views and row actions |
@@ -68,8 +68,8 @@ specific to support.
 
 **The rail and the tabs.** The rail is flat, as on the design hub: three labelled groups, one row per page, no submenus. The views
 inside a page are `tabs-underline` in its header (`gd-page-header__tabs`). A tab changes the view in place and keeps the address in step
-(`reports.html?report=response`), so a reload or a shared link lands on the same view; `app.js` `bindTabs` does this. Tickets keeps
-`saved-views` because those are counted filters over one list, and Settings keeps its own `sub-nav` because that is the component for a
+(`reports.html?report=response`), so a reload or a shared link lands on the same view; `app.js` `bindTabs` does this. Tickets' views carry their counts in the tabs. The Help center's articles keep
+`saved-views`, a second row of counted filters under the page's one underlined row (R59), and Settings keeps its own `sub-nav` because that is the component for a
 settings area. The rail, topbar and account row are the same markup on every page, so a change to them is made in every file.
 
 **How to use.** Copy the folder to the new project and edit the copy. Do not reference another built dashboard.
@@ -85,7 +85,7 @@ page's build stamp `components` list to exactly what it uses, and delete the pag
   Response times) → a `horizontal-bar-chart` or `breakdown-bar` → a `data-table` with `progress-bar` cells.
 - **Explorer.** `explorer-layout` in a `data-fill` panel body → `period-select` → `query-builder` → a chart → a results table. Editing
   the query marks the result out of date; Run query redraws. More than three groups fold into Other.
-- **Tickets.** `saved-views` with counts → `table-toolbar` (search, `filter-builder`, `column-menu`, Export) → `filter-chip`s →
+- **Tickets.** `tabs-underline` for the views, with counts → `table-toolbar` (search, `filter-builder`, `column-menu`, Export) → `filter-chip`s →
   `data-table` with `row-selection`, `row-actions-menu` → `pagination` → `bulk-action-bar` → `table-states` → `drawer` → `modal`
   with `form-field` errors → `confirm-dialog`.
 - **Ticket.** `breadcrumbs`, a small `page-header` with a status Badge, a menu and one primary action → `tabs-underline` → a reply

@@ -10,7 +10,7 @@
 <style>html, body { margin: 0; overflow: hidden; } /* the shell owns the viewport; the UA body margin otherwise offsets and overflows it by 8px */</style>
 <!-- gushwork-build:{"pluginVersion":"2.0.1","createdBy":"Claude Code (support-ops-app template)","createdAt":"6 Oct 2026","surface":"dashboard",
   "registry":"",
-  "changelog":"https://gushwork-design.vercel.app/changelog-sheet","components":["app-shell","sidebar","nav-item","nav-group","account-row","theme-menu","topbar","content-panel","page-header","page-layout","segmented-control","saved-views","table-toolbar","filter-chip","filter-builder","column-menu","data-table","table-cell-types","row-selection","bulk-action-bar","row-actions-menu","pagination","table-states","menu","action-button","checkbox","empty-state","modal","form-field","text-input","textarea","select","drawer","key-value-list","confirm-dialog","toast","theme-and-density","sidebar-collapsed","tooltip"]} -->
+  "changelog":"https://gushwork-design.vercel.app/changelog-sheet","components":["app-shell","sidebar","nav-item","nav-group","account-row","theme-menu","topbar","content-panel","page-header","page-layout","tabs-underline","segmented-control","table-toolbar","filter-chip","filter-builder","column-menu","data-table","table-cell-types","row-selection","bulk-action-bar","row-actions-menu","pagination","table-states","menu","action-button","checkbox","empty-state","modal","form-field","text-input","textarea","select","drawer","key-value-list","confirm-dialog","toast","theme-and-density","sidebar-collapsed","tooltip"]} -->
 </head>
 <body class="gd" data-density="comfortable" data-nav="tickets.html">
 <div class="gd-app">
@@ -76,6 +76,13 @@
                 <button type="button" class="gd-btn gd-btn--primary" data-gd-modal-open="#new-ticket"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg>New ticket</button>
               </div>
             </div>
+            <div class="gd-tabs gd-tabs--underline gd-page-header__tabs" role="tablist" aria-label="Ticket views" id="viewtabs">
+              <button type="button" class="gd-tabs__tab" role="tab" aria-selected="true" tabindex="0" data-view="all">All tickets <span class="gd-tabs__count" data-n></span></button>
+              <button type="button" class="gd-tabs__tab" role="tab" aria-selected="false" tabindex="-1" data-view="Open">Open <span class="gd-tabs__count" data-n></span></button>
+              <button type="button" class="gd-tabs__tab" role="tab" aria-selected="false" tabindex="-1" data-view="Pending">Pending <span class="gd-tabs__count" data-n></span></button>
+              <button type="button" class="gd-tabs__tab" role="tab" aria-selected="false" tabindex="-1" data-view="Resolved">Resolved <span class="gd-tabs__count" data-n></span></button>
+              <button type="button" class="gd-tabs__tab" role="tab" aria-selected="false" tabindex="-1" data-view="Urgent">Urgent <span class="gd-tabs__count" data-n></span></button>
+            </div>
           </header>
 
           <section class="gd-card gd-card--flush" aria-labelledby="list-title">
@@ -83,15 +90,6 @@
               <div class="gd-card__titles"><h2 class="gd-card__title" id="list-title">All tickets</h2><p class="gd-card__desc" id="list-desc">Newest first</p></div>
             </div>
             <div class="gd-card__body">
-            <div class="gd-views" role="tablist" aria-label="Saved views" id="views">
-              <button class="gd-views__tab" type="button" role="tab" aria-selected="true" tabindex="0" data-view="all">All tickets <span class="gd-views__n" data-n></span></button>
-              <button class="gd-views__tab" type="button" role="tab" aria-selected="false" tabindex="-1" data-view="Open">Open <span class="gd-views__n" data-n></span></button>
-              <button class="gd-views__tab" type="button" role="tab" aria-selected="false" tabindex="-1" data-view="Pending">Pending <span class="gd-views__n" data-n></span></button>
-              <button class="gd-views__tab" type="button" role="tab" aria-selected="false" tabindex="-1" data-view="Resolved">Resolved <span class="gd-views__n" data-n></span></button>
-              <button class="gd-views__tab" type="button" role="tab" aria-selected="false" tabindex="-1" data-view="Urgent">Urgent <span class="gd-views__n" data-n></span></button>
-              <button class="gd-btn gd-btn--ghost gd-btn--sm" type="button" data-gd-views-save>Save segment</button>
-            </div>
-
             <div class="gd-tbar">
               <div class="gd-tbar__g">
                 <label class="gd-tbar__search"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"/></svg><input type="search" placeholder="Search tickets" aria-label="Search tickets" data-gd-search data-gd-for="#tickets"><button class="gd-tbar__clear" type="button" aria-label="Clear search" data-gd-search-clear hidden><svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button></label>
