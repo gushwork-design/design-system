@@ -739,8 +739,8 @@
 .gd .gd-tabs--pill .gd-tabs__tab{ height: calc(var(--gd-control-h) - 2 * var(--gd-pill-pad)); padding: 0 var(--gw-space-12); border-radius: var(--gw-radius-8);
   font: var(--gw-text-button-12); color: var(--gd-nav-label); }
 .gd .gd-tabs--pill .gd-tabs__tab:hover, .gd .gd-tabs--pill .gd-tabs__tab.is-hover{ background: var(--gd-track-hover); }
-.gd .gd-tabs--pill .gd-tabs__tab[aria-selected="true"]{ background: var(--gd-ink); color: var(--gd-ink-fg); }
-.gd .gd-tabs--pill .gd-tabs__tab[aria-selected="true"] .gd-tabs__count{ color: inherit; opacity: .7; }
+.gd .gd-tabs--pill .gd-tabs__tab[aria-selected="true"], .gd .gd-tabs--pill .gd-tabs__tab[aria-checked="true"]{ background: var(--gd-ink); color: var(--gd-ink-fg); }   /* aria-checked: the period select is a radiogroup */
+.gd .gd-tabs--pill .gd-tabs__tab[aria-selected="true"] .gd-tabs__count, .gd .gd-tabs--pill .gd-tabs__tab[aria-checked="true"] .gd-tabs__count{ color: inherit; opacity: .7; }
 .gd .gd-tabs--pill .gd-tabs__tab[aria-disabled="true"]:hover{ background: none; }
 /* underline: page-level sections on a full-width hairline */
 .gd .gd-tabs--underline{ display: flex; gap: var(--gw-space-24); overflow-x: auto; scrollbar-width: none; box-shadow: inset 0 -1px 0 var(--gd-border); }
@@ -750,6 +750,23 @@
 .gd .gd-tabs--underline .gd-tabs__tab[aria-selected="true"]::after{ content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; border-radius: 2px 2px 0 0; background: var(--gd-ink); }
 .gd .gd-tabs--underline .gd-tabs__tab:focus-visible{ outline-offset: -2px; }
 .gd .gd-tabs__panel[hidden]{ display: none; }
+
+/* --- a selected state that moves ----------------------------------------------------------------------------------------------
+   In a segmented control, the period pills, the underline tabs and the saved views, choosing another option slides the selected
+   fill to it instead of swapping it, over --gw-motion-fast (which the reduced-motion preference turns to 0). js/20-actions.js sets
+   data-gd-slide on the group and measures the selected item into --gd-sx/-sy/-sw/-sh/-sr; the group's ::before is the fill. Without
+   the script the items draw their own selected state as before. Nothing else moves: this is the one place a state change has
+   somewhere to travel. */
+.gd [data-gd-slide]{ position: relative; }
+.gd [data-gd-slide]::before{ content: ""; position: absolute; left: 0; top: 0; width: var(--gd-sw, 0px); height: var(--gd-sh, 0px); border-radius: var(--gd-sr, 0);
+  transform: translate(var(--gd-sx, 0px), var(--gd-sy, 0px)); background: var(--gd-slide-bg); pointer-events: none; z-index: 0; }
+.gd [data-gd-slide="on"]::before{ transition: transform var(--gw-motion-fast), width var(--gw-motion-fast), height var(--gw-motion-fast); }
+.gd [data-gd-slide] > *{ position: relative; z-index: 1; }
+.gd .gd-seg[data-gd-slide], .gd .gd-views[data-gd-slide]{ --gd-slide-bg: var(--gd-selected-bg); }
+.gd .gd-tabs--pill[data-gd-slide], .gd .gd-tabs--underline[data-gd-slide]{ --gd-slide-bg: var(--gd-ink); }
+.gd .gd-seg[data-gd-slide] .gd-seg__item[aria-checked="true"], .gd .gd-views[data-gd-slide] .gd-views__tab[aria-selected="true"],
+.gd .gd-tabs--pill[data-gd-slide] .gd-tabs__tab[aria-selected="true"], .gd .gd-tabs--pill[data-gd-slide] .gd-tabs__tab[aria-checked="true"]{ background: none; }
+.gd .gd-tabs--underline[data-gd-slide] .gd-tabs__tab[aria-selected="true"]::after{ display: none; }
 
 /* --- period select: the pill track holding a period set; also the 'common case' control -- */
 .gd .gd-period{ display: inline-flex; align-items: center; gap: var(--gw-space-8); }

@@ -149,4 +149,37 @@ GD.actions = GD.actions || {};
   });
   A.select = select;
   A.current = () => open;
+
+  /* ---- a selected state that moves ---------------------------------------------------------------------------------------------
+     The sliding fill in a segmented control, the period pills, the underline tabs and the saved views (css/20-actions.css). This only
+     measures: the selected item's box goes into custom properties on the group, and the CSS animates the change. */
+  const SLIDE = '.gd-seg[role="radiogroup"], .gd-tabs--pill, .gd-tabs--underline, .gd-views';
+  const SELECTED = ':scope > [aria-checked="true"], :scope > [aria-selected="true"]';
+  const ro = typeof ResizeObserver === 'function' ? new ResizeObserver((es) => es.forEach((e) => measure(e.target))) : null;
+  function measure(g) {
+    const s = g.querySelector(SELECTED);
+    if (g.offsetWidth === 0) return;                                  // hidden (a closed panel): measured again when it shows, by the observer
+    if (!s) { g.style.setProperty('--gd-sw', '0px'); return; }
+    const line = g.matches('.gd-tabs--underline'), set = (k, v) => g.style.setProperty(k, v);
+    set('--gd-sx', s.offsetLeft + 'px'); set('--gd-sw', s.offsetWidth + 'px');
+    set('--gd-sy', (line ? s.offsetTop + s.offsetHeight - 2 : s.offsetTop) + 'px'); set('--gd-sh', (line ? 2 : s.offsetHeight) + 'px');
+    set('--gd-sr', line ? '2px 2px 0 0' : getComputedStyle(s).borderRadius);
+  }
+  function slideInit(root) {
+    (root || document).querySelectorAll(SLIDE).forEach((g) => {
+      if (g.hasAttribute('data-gd-slide') || !g.closest('.gd')) return;
+      g.setAttribute('data-gd-slide', 'init'); measure(g);              // placed at once, with no transition...
+      setTimeout(() => g.setAttribute('data-gd-slide', 'on'), 60);       // ...and animating from the next change on (a timer, not a frame: a hidden tab runs no frames)
+      if (ro) ro.observe(g);
+    });
+  }
+  new MutationObserver((ms) => {
+    const gs = new Set(); ms.forEach((m) => { const g = m.target.closest && m.target.closest(SLIDE); if (g && g.hasAttribute('data-gd-slide')) gs.add(g); });
+    gs.forEach(measure);
+  }).observe(document, { attributes: true, subtree: true, attributeFilter: ['aria-selected', 'aria-checked'] });
+  new MutationObserver(() => slideInit()).observe(document, { childList: true, subtree: true });
+  const all = () => document.querySelectorAll('[data-gd-slide]').forEach(measure);
+  window.addEventListener('resize', all); if (document.fonts && document.fonts.ready) document.fonts.ready.then(all);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => slideInit()); else slideInit();
+  A.slide = slideInit;
 })();

@@ -440,11 +440,13 @@ function altText(m) {
 }
 function dataTable(m) {
   if (m.spec.table === false || m.n * (m.wf ? 3 : m.vis.length) > 400) return '';
-  if (m.wf) return '<table class="gd-sr"><caption>' + esc(m.spec.title || 'Waterfall') + '</caption><thead><tr><th>Step</th><th>Change</th><th>Running total</th></tr></thead><tbody>' +
-    m.wfRows.map((r) => '<tr><th>' + esc(r.label) + '</th><td>' + esc(m.mk.full(r.kind === 'total' ? r.b : r.v)) + '</td><td>' + esc(m.mk.full(r.cum)) + '</td></tr>').join('') + '</tbody></table>';
-  let t = '<table class="gd-sr"><caption>' + esc(m.spec.title || 'Chart data') + '</caption><thead><tr><th>' + esc(m.spec.xTitle || 'Period') + '</th>' + m.vis.map((s) => '<th>' + esc(s.name || 'Series') + '</th>').join('') + '</tr></thead><tbody>';
+  // The wrapper is what is visually hidden: a <table> ignores a 1px height and clip, so on its own it kept its full height and
+  // stretched the scroll area of whatever held the chart (the Explorer's chart pane scrolled by 700px for nothing).
+  if (m.wf) return '<div class="gd-sr"><table><caption>' + esc(m.spec.title || 'Waterfall') + '</caption><thead><tr><th>Step</th><th>Change</th><th>Running total</th></tr></thead><tbody>' +
+    m.wfRows.map((r) => '<tr><th>' + esc(r.label) + '</th><td>' + esc(m.mk.full(r.kind === 'total' ? r.b : r.v)) + '</td><td>' + esc(m.mk.full(r.cum)) + '</td></tr>').join('') + '</tbody></table></div>';
+  let t = '<div class="gd-sr"><table><caption>' + esc(m.spec.title || 'Chart data') + '</caption><thead><tr><th>' + esc(m.spec.xTitle || 'Period') + '</th>' + m.vis.map((s) => '<th>' + esc(s.name || 'Series') + '</th>').join('') + '</tr></thead><tbody>';
   for (let i = 0; i < m.n; i++) t += '<tr><th>' + esc(m.titles[i]) + '</th>' + m.vis.map((s) => { const v = m.V(s, i); return '<td>' + (v == null ? 'no data' : esc(m.mk.full(v))) + '</td>'; }).join('') + '</tr>';
-  return t + '</tbody></table>';
+  return t + '</tbody></table></div>';
 }
 
 /* ============================================================================
