@@ -1364,3 +1364,12 @@ Asked by Utsav, 6 Oct 2026, looking at the Design System page: "lets use submenu
 - **Pending review.** The submenu is the dashboard's expandable `nav-group` drawn in the hub rail, the first place the hub uses it, so `nav-group` returns to Waiting.
 - **Where it is written.** `exports/dashboard/actions.md` (Tabs underline), `exports/dashboard/navigation.md` (Nav group) and rule 12 of `skills/gushwork-dashboard/SKILL.md`.
 
+
+## R60 — a drawing never carries style the shipped component lacks
+Asked by Utsav, 6 Oct 2026, after the collapsed rail's tooltip: they approved a white pill with a hairline, no arrow and a 4px gap in the Library drawer, and the dashboard shipped a dark bubble with an arrow and a 6px gap. "How does that happen, are all components coming right, this creates a doubt and gap." Then, on text weight: "is it same as component lib?" and "yes add it".
+
+- **What happened.** A review pass covers a component's spec text and its drawing, not the shipped CSS or JS. The 5 Oct rework styled the tooltip in `web/previews/_sheet.css`, the stylesheet only the drawing loads, and the shipped component got the generic tooltip the same afternoon. Nothing compared the two, so what was approved never shipped.
+- **The rule.** `web/previews/_sheet.css` is for the drawing's own layout (stages, captions, grids). It never styles a shipped component class (`.gd-*`). A look belongs in `exports/dashboard/css/` first; the drawing then shows the shipped component.
+- **The guardrail.** `scripts/check-drawing-parity.sh` fails when the preview sheet styles a `.gd-*` class, and lists the classes a dashboard drawing uses that have no shipped rule. It is wired into `scripts/hooks/pre-push` as a warning, like the checks around it. Not checked: a pixel comparison of every drawing against its shipped render, other surfaces, and behaviour.
+- **The tooltip, fixed.** The approved look is the `gd-tooltip--rail` variant in `60-feedback.css`: Body/body-14-med, white with a hairline in light and dark in dark, no arrow, 4px from the row (`data-gd-tooltip-variant="rail"`, set by `10-shell.js`, read by `60-feedback.js`). The drawing is unchanged. No spec text or version moved, so the pass stands.
+- **Text smoothing, fixed.** The hub and the drawings render with `-webkit-font-smoothing: antialiased`; the dashboard set did not set it, so a dashboard built outside the hub drew every glyph heavier on macOS than the Library shows. `.gd` now sets it. Every dashboard's text is slightly lighter, as the Library has always shown it.
