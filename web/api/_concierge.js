@@ -249,14 +249,15 @@ export function ownerMention() {
 }
 
 export const HELP = [
-  'I can send you the brand files and point you to the right template or tool. Things people ask me for:',
+  'I build things and send the brand files. Things people ask me for:',
+  '• something made: a landing page, one-pager, deck or banner. You get a link and a screenshot',
   '• logos, like “white logo svg” or “dark symbol png”',
   '• the color sheet, or swatches for Adobe or macOS',
   '• fonts, and the design tokens (CSS, JSON, SCSS, Tailwind)',
   '• templates: ad page, case study, lead magnet, one-pager',
   '• tools: the email signature creator and the ID card generator',
   '• basics: how to sign in, install the Claude plugin, update it, or who to ask',
-  'I don’t design things myself yet. If you need something made, I’ll hand you the template and the prompt to run with Claude.',
+  'For a build, say who it’s for, the offer and the call to action. Say thanks, or react with a thumbs up, when we’re done.',
 ].join('\n');
 
 const link = (path, label) => `<${SITE}${path}|${label}>`;
@@ -308,7 +309,7 @@ export function compose(u, catalog, seedText = '') {
   let files = [];
   let linked = false;
   const pagesDone = new Set();
-  if (u.designRequest) texts.push(pick(['I don’t design things myself yet, and I’d rather not guess at the brand. What I can do is give you the right starting point to run with Claude.', 'Making designs isn’t something I do yet. I can hand you the template and the prompt, and Claude can take it from there.'], seed));
+  if (u.designRequest) texts.push(pick(['I build these in a DM with me. Tell me who it’s for, the offer and the call to action. Meanwhile, here’s the starting point if you’d rather run it with Claude.', 'DM me the brief and I’ll build it: who it’s for, the offer, the call to action. Here’s the template too, if you’d rather run it with Claude.'], seed));
   const parts = u.designRequest && !u.parts.some((p) => p.type === 'templates')
     ? [...u.parts, { type: 'templates', entries: catalog.filter((x) => x.kind === 'template'), all: true }] : u.parts;
   for (const p of parts) {

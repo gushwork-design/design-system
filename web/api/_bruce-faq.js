@@ -213,7 +213,7 @@ export const FAQ = [
     words: ['bruce', 'you', 'bot', 'assistant', 'who', 'are', 'yourself', 'name', 'about', 'what', 'do', 'can', 'built', 'capable'],
     strong: ['bot', 'assistant', 'yourself'],
     answer: () => [
-      'I’m Bruce, the design agent for Gushwork. I send the brand files, point you to the right template or tool, and answer basic questions about the hub. I don’t design things myself yet. When something needs making, I’ll hand you the template and the prompt to run with Claude.',
+      'I’m Bruce, the design agent for Gushwork. I send the brand files, point you to the right template or tool, and answer basic questions about the hub. I also build things: DM me a brief for a landing page, one-pager, deck or banner and you get a link and a screenshot back.',
       'Utsav built me, and designing is the next thing I’ll learn.',
     ],
   },
