@@ -68,9 +68,16 @@ header only. On phone the parts stack into one column.
 
 ## `agent-package-bar`
 
-A fixed bar, `--gw-color-black`, `--gw-radius-16`, `--gw-shadow-s4`, 24px above the bottom edge, at most 640
-wide. Up to four mascots (32px, round) with a `+N` overflow, the count, the recommended tier and monthly
-price, `Clear`, and a white `Small` button `Build package`. Slides in when the first agent is added.
+The package bag, in two forms that read the same selection. **Desktop: a summary card** in the sticky rail,
+under the categories (chosen from the package bar wireframes, option P2). White, 1px `--gw-color-neutral-100`,
+`--gw-radius-12`, `--gw-shadow-s2`, padding `--gw-space-12`. It holds: `Your package` and the agent count; a
+row of mascots (28px, round, white ring, `+N` after seven); a 6px meter in `--gw-color-primary-500` showing the
+tier's slots, with a line under it ("All slots used", "2 slots still open" or "2 extra agents at $175 each");
+the recommended tier and its monthly price; "Priced separately" with the premium agents' total when any are
+selected; a `Small` `Black` button `Build package`; and a `Clear` link. It appears with the first agent and
+leaves when the package is empty. **Phone and narrow screens (1000px and below): a bottom bar**, `--gw-color-black`,
+`--gw-radius-16`, `--gw-shadow-s4`, with the count, the tier and price, `Clear` and a white `Build package`
+button. `Clear` empties the package and shows a five-second `Undo` toast that restores it.
 
 ## `agent-package-builder`
 

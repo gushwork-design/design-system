@@ -100,6 +100,25 @@ a{color:inherit;text-decoration:none}
 .ddlist li[aria-disabled=true]{color:var(--gw-color-neutral-400);cursor:default}
 .ddlist li[aria-disabled=true]:hover{background:transparent}
 .filterbtn{display:none}
+#railmain{display:flex;flex-direction:column;gap:var(--gw-space-24)}
+/* package summary card (P2): sits under the categories in the sticky rail on desktop; phone uses the bottom bar */
+.sum{background:var(--gw-color-white);border:1px solid var(--gw-color-neutral-100);border-radius:var(--gw-radius-12);box-shadow:var(--gw-shadow-s2);padding:var(--gw-space-12);display:flex;flex-direction:column;gap:var(--gw-space-12);animation:pop .22s cubic-bezier(.22,1,.36,1)}
+.sum .h{display:flex;justify-content:space-between;align-items:center}
+.sum .h b{font:var(--gw-text-body-14-sem);letter-spacing:var(--gw-text-body-14-sem-tracking)}
+.sum .h small{font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking);color:var(--gw-color-neutral-500)}
+.sum .stk{display:flex;flex-wrap:wrap;row-gap:var(--gw-space-4)}
+.sum .stk .f{width:28px;height:28px;border-radius:50%;border:2px solid var(--gw-color-white);margin-left:-8px;background:var(--gw-color-neutral-100);overflow:hidden;display:grid;place-items:center;font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-700)}
+.sum .stk .f:first-child{margin-left:0}
+.sum .stk .f img{width:100%;height:100%;object-fit:cover}
+.sum .mtr{height:6px;border-radius:var(--gw-radius-full);background:var(--gw-color-neutral-100);overflow:hidden}
+.sum .mtr i{display:block;height:100%;background:var(--gw-color-primary-500);border-radius:var(--gw-radius-full);transition:width .3s}
+.sum .ln{display:flex;justify-content:space-between;gap:var(--gw-space-8);font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking);color:var(--gw-color-neutral-600)}
+.sum .ln b{font-weight:600;color:var(--gw-color-black)}
+.sum .btn{width:100%}
+.sum .clr{align-self:center;font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-600);padding:var(--gw-space-4) var(--gw-space-8);border-radius:var(--gw-radius-8)}
+.sum .clr:hover{color:var(--gw-color-black);background:var(--gw-color-neutral-50)}
+@media(max-width:1000px){#pkgcard{display:none}}
+.toast .undo{margin-left:var(--gw-space-12);font:var(--gw-text-button-14);color:var(--gw-color-white);background:var(--gw-color-neutral-alpha-20-white);padding:var(--gw-space-4) var(--gw-space-8);border-radius:var(--gw-radius-8)}
 main{padding-top:var(--gw-space-24)}
 
 /* ---------- search ---------- */
@@ -270,6 +289,9 @@ main{padding-top:var(--gw-space-24)}
 .footer{background:var(--gw-color-black);border-radius:var(--gw-radius-8) var(--gw-radius-8) 0 0;padding:var(--gw-space-16);padding-bottom:calc(var(--gw-space-16) + env(safe-area-inset-bottom,0px));display:flex;justify-content:center}
 .footer .legal{font:var(--gw-text-body-12-med);line-height:12px;letter-spacing:var(--gw-text-body-12-med-tracking);color:var(--gw-color-neutral-600)}
 
+/* desktop uses the rail summary card; the bar is for narrower screens */
+@media(min-width:1001px){.pkgbar{display:none}}
+
 /* ---------- phone ---------- */
 @media(max-width:1000px){
  .edge{display:none}
@@ -329,7 +351,7 @@ main{padding-top:var(--gw-space-24)}
 
 <div class="col">
  <div class="shell">
-  <aside class="rail" id="rail" aria-label="Filters"></aside>
+  <aside class="rail" id="rail" aria-label="Filters"><div id="railmain"></div><div id="pkgcard"></div></aside>
   <main>
    <div class="search">
     <i class="i" style="--m:url(assets/icons/magnifying-glass-regular.svg)"></i>
@@ -404,7 +426,7 @@ const selected = () => D.agents.filter(a=>S.sel[a.id]&&fitsInd(a));
 /* ---- render ---- */
 function renderRail(){
   const p=pool();
-  $('#rail').innerHTML = `
+  $('#railmain').innerHTML = `
    <div class="rgroup"><h2>Industry</h2><div class="dd" id="dd"><button class="ddbtn" id="ddbtn" type="button" aria-haspopup="listbox" aria-expanded="false"><span>${esc((INDUSTRIES.find(x=>x[0]===S.ind)||[])[1]||S.ind)}</span>${ic('caret-down','bold')}</button><ul class="ddlist" id="ddlist" role="listbox" aria-label="Industry" hidden>${INDUSTRIES.map(([v,l])=>`<li role="option" data-ind="${esc(v)}" aria-selected="${v===S.ind}" ${l?'':'aria-disabled="true"'}>${esc(l||v)}${v===S.ind?ic('check','bold'):''}</li>`).join('')}</ul></div></div>
    <div class="rgroup"><h2>Category</h2>
     ${D.bundles.map(b=>{const n=p.filter(a=>a.bundle===b.name).length;return `<button class="ritem ${S.spy===b.id?'on':''}" data-jump="${b.id}">${ic(ICON[b.id]||'package')}${esc(b.name)}<span class="n">${n}</span></button>`}).join('')}
@@ -432,8 +454,20 @@ function renderResults(){
   $('#results').innerHTML=h;
   onScroll();
 }
+function renderCard(l){
+  const c=$('#pkgcard');if(!c)return;
+  if(!l.length){c.innerHTML='';return;}
+  const p=pricing(l), pct=p.n?Math.min(100,Math.round(p.n/p.best.agents*100)):0;
+  c.innerHTML=`<div class="sum"><div class="h"><b>Your package</b><small>${l.length} agent${l.length>1?'s':''}</small></div>
+   <div class="stk">${l.slice(0,7).map(a=>`<span class="f"><img src="${img(a)}" alt=""></span>`).join('')}${l.length>7?`<span class="f">+${l.length-7}</span>`:''}</div>
+   <div><div class="mtr"><i style="width:${pct}%"></i></div><div class="ln" style="margin-top:6px"><span>${esc(p.agentNote)}</span></div></div>
+   <div class="ln"><span>${esc(p.name)}</span><b>${fmt(p.best.cost)} / mo</b></div>
+   ${p.lux.length?`<div class="ln"><span>Priced separately</span><b>+ ${fmt(p.lux.length*1000)}+</b></div>`:''}
+   <button class="btn sm" data-builder>Build package ${ic('arrow-right','bold')}</button><button class="clr" data-clear>Clear</button></div>`;
+}
 function renderBar(){
   const l=selected(), bar=$('#pkgbar');
+  renderCard(l);
   if(!l.length){bar.classList.remove('on');bar.innerHTML='';return;}
   const p=pricing(l), shown=l.slice(0,4);
   bar.innerHTML=`<div class="stack">${shown.map(a=>`<span class="f"><img src="${img(a)}" alt=""></span>`).join('')}${l.length>4?`<span class="f more">+${l.length-4}</span>`:''}</div>
@@ -506,7 +540,11 @@ function renderBuilder(keep){
   if(keep){const e=document.querySelector(`[data-vol="${keep.id}"]`);if(e){e.focus();try{e.setSelectionRange(keep.pos,keep.pos)}catch(_){}}}
 }
 function renderAll(){renderRail();renderResults();renderBar();renderPanel();renderBuilder();}
-let tt; function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('on'),2800);}
+let tt; function toast(t,label,fn){
+  const e=$('#toast');e.textContent=t;
+  if(label){const b=document.createElement('button');b.className='undo';b.textContent=label;b.onclick=()=>{fn();e.classList.remove('on');};e.appendChild(b);}
+  e.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('on'),label?5000:2800);
+}
 
 /* ---- events ---- */
 function closeDD(){const l=$('#ddlist'),b=$('#ddbtn');if(l)l.hidden=true;if(b)b.setAttribute('aria-expanded','false');document.querySelectorAll('#ddlist li.act').forEach(x=>x.classList.remove('act'));}
@@ -531,7 +569,7 @@ document.addEventListener('click',e=>{
   if('next' in t.dataset){step(1);return;}
   if('close' in t.dataset){S.open=null;renderPanel();return;}
   if(t.id==='amodal'&&e.target===t){S.open=null;renderPanel();return;}
-  if('clear' in t.dataset){S.sel={};renderResults();renderBar();if(S.open)renderPanel();return;}
+  if('clear' in t.dataset){const prev=S.sel;S.sel={};renderResults();renderBar();if(S.open)renderPanel();toast('Package cleared','Undo',()=>{S.sel=prev;renderResults();renderBar();if(S.open)renderPanel();});return;}
   if('builder' in t.dataset){S.builder=true;renderBuilder();return;}
   if('bclose' in t.dataset){S.builder=false;renderBuilder();return;}
   if(t.id==='modal'&&e.target===t){S.builder=false;renderBuilder();return;}
