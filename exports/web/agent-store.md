@@ -90,24 +90,26 @@ the original.
 
 ## Version 2 (`/internal/staging/agent-store-v2`)
 
-Same page, cards, modal and builder; a different frame, at Utsav's request.
+Same page, cards, modal and builder; a different frame, at Utsav's request. Version 1 stays live beside it.
 
 ### `agent-category-tabs`
 
-Replaces the category rows in the rail. A sticky row (`top: 60px`, under the navbar, on the page ground) of
-**underlined tabs**: 48px high, `--gw-text-body-14-med`, `--gw-color-neutral-600`, a count in
-`--gw-color-neutral-400`, and a 2px `--gw-color-black` underline on the tab in view. Tabs still scroll to their
-section and every section stays on the page. **Search sits at the right of the same row**, 260px by 36px. The
-strip scrolls sideways with a fade at its right edge when the tabs do not fit, and scrolls the active tab into
-view. While searching, tabs with no matches disappear and the counts become match counts. On phone, search sits
-on top and the tab strip stays sticky.
+One sticky bar across the whole 1200 column (`top: 0`, on the page ground, 1px `--gw-color-neutral-100` underneath).
+The **navbar is not sticky**: it sits over the hero and scrolls away with the page, so the bar is the only thing
+that stays. On the left, **every category as an underlined tab**, all visible with no sideways scrolling at 1440:
+48px high, `--gw-text-body-14-med`, `--gw-color-neutral-600`, a count in `--gw-color-neutral-400`, and a 2px
+`--gw-color-black` underline on the tab in view. Tabs scroll to their section and every section stays on the page;
+the active tab follows you as you scroll. On the right of the bar sits the **industry dropdown** (184px, the same
+custom list as version 1, with an inline "Industry" label). **Search is hidden** in this version; the markup is
+kept so it can come back. On phone the industry picker and the tab strip stack and the strip stays sticky, with a
+fade when it scrolls sideways.
 
 ### `agent-package-panel`
 
-Replaces the rail summary card. A sticky panel on the left under the industry picker, **always visible**, empty
-at first ("Add agents to build a package. The tier and price update as you go.") with a disabled `Build package`.
-With agents it lists them (24px round mascot, name, a remove control), then the slots meter and note, a **tier
-ladder** (Starter, Growth, Scale with their base prices, the best price lit in `--gw-color-primary-25` with a
+The package builder, **sticky in the right column** (`top: 72px`, under the bar), always visible: empty at first
+("Add agents to build a package. The tier and price update as you go.") with a disabled `Build package`. With
+agents it lists them (24px round mascot, name, a remove control), then the slots meter and note, a **tier ladder**
+(Starter, Growth, Scale with their base prices, the best price lit in `--gw-color-primary-25` with a
 `--gw-color-primary-100` stroke), the recommended tier and monthly total in `--gw-text-h6-bold`, "Priced
 separately" for premium agents, `Build package` and `Clear` (with the same Undo toast). Hidden on phone, where
 the bottom bar takes over.

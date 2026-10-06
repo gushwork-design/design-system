@@ -39,7 +39,7 @@ a{color:inherit;text-decoration:none}
 .btn .i{font-size:16px}
 
 /* ---------- navbar: transparent over the hero, ad-page neutral-25 + 1px neutral-100 once scrolled ---------- */
-.navbar{position:fixed;top:0;left:0;right:0;z-index:50;height:60px;background:transparent;border-bottom:1px solid transparent;transition:background-color .4s,border-color .4s}
+.navbar{position:absolute;top:0;left:0;right:0;z-index:50;height:60px;background:transparent;border-bottom:1px solid transparent;transition:background-color .4s,border-color .4s}
 .navbar[data-scrolled]{background:var(--gw-color-neutral-25);border-bottom-color:var(--gw-color-neutral-100)}
 .navbar .in{width:min(1240px,calc(100% - 32px));margin:0 auto;height:100%;display:flex;align-items:center;justify-content:space-between}
 .navbar .logo{position:relative;display:block;width:115.76px;height:22px}
@@ -320,17 +320,38 @@ main{padding-top:0}
 .sum .btn:disabled{background:var(--gw-color-neutral-200);color:var(--gw-color-white);box-shadow:none;cursor:default}
 .sum .btn:disabled:hover{background:var(--gw-color-neutral-200)}
 
+/* ---------- v2b: sticky bar across the column (tabs + industry), package panel on the right, no search, navbar scrolls away ---------- */
+.col{padding-top:var(--gw-space-80)}
+.tabbar{position:sticky;top:0;z-index:25;display:flex;align-items:flex-end;gap:var(--gw-space-16);background:var(--gw-color-neutral-50);border-bottom:1px solid var(--gw-color-neutral-100)}
+.tabs{display:flex;flex:1;min-width:0;gap:0;overflow-x:auto;scrollbar-width:none;-webkit-mask-image:none;mask-image:none}
+.tab{padding:0 var(--gw-space-8);gap:var(--gw-space-4)}
+#railmain{flex:none;width:184px;margin-bottom:var(--gw-space-8)}
+.ddbtn{height:36px;gap:var(--gw-space-8)}
+.ddbtn .dl{font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking);color:var(--gw-color-neutral-500);flex:none}
+.ddbtn .dv{flex:1;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ddlist{left:auto;right:0;width:240px}
+.shell{grid-template-columns:minmax(0,1fr) 240px;padding-top:0}
+.shell>.rail{grid-column:2;grid-row:1;top:72px;max-height:calc(100vh - 96px);padding-top:var(--gw-space-32)}
+.shell>main{grid-column:1;grid-row:1}
+.search{display:none}
+.filterbtn{display:none!important}
+.sec{scroll-margin-top:80px}
+.sec:first-of-type{margin-top:var(--gw-space-32)}
+main{padding-top:0}
 /* desktop uses the rail summary card; the bar is for narrower screens */
 @media(min-width:1001px){.pkgbar{display:none}}
 
 /* ---------- phone ---------- */
 @media(max-width:1000px){
- main{display:flex;flex-direction:column}
+ .col{display:flex;flex-direction:column;padding-top:var(--gw-space-16)}
  .tabbar{display:contents}
- .tabbar .search{order:-2;width:100%;height:44px;margin:0 0 var(--gw-space-12)}
- .filterbtn{order:-1}
- .tabs{position:sticky;top:60px;z-index:25;order:0;background:var(--gw-color-neutral-50);border-bottom:1px solid var(--gw-color-neutral-100);margin-top:var(--gw-space-12)}
- .sec{scroll-margin-top:124px}
+ #railmain{order:-1;width:100%;margin:0 0 var(--gw-space-12)}
+ .ddbtn{height:44px}
+ .ddlist{left:0;right:0;width:auto}
+ .tabs{-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent);position:sticky;top:0;z-index:25;background:var(--gw-color-neutral-50);border-bottom:1px solid var(--gw-color-neutral-100)}
+ .shell{grid-template-columns:minmax(0,1fr)}
+ .shell>.rail,.shell>main{grid-column:auto;grid-row:auto}
+ .sec{scroll-margin-top:72px}
  .edge{display:none}
  .adlg .ph .nv .step{display:inline-flex}
  .adlg .up{grid-template-columns:200px minmax(0,1fr);gap:var(--gw-space-24)}
@@ -387,19 +408,18 @@ main{padding-top:0}
 </section>
 
 <div class="col">
+ <div class="tabbar" id="tabbar">
+  <div class="tabs" id="tabs" role="tablist" aria-label="Categories"></div>
+  <div id="railmain"></div>
+ </div>
  <div class="shell">
-  <aside class="rail" id="rail" aria-label="Filters"><div id="railmain"></div><div id="pkgcard"></div></aside>
+  <aside class="rail" id="rail" aria-label="Your package"><div id="pkgcard"></div></aside>
   <main>
-   <div class="tabbar" id="tabbar">
-    <div class="tabs" id="tabs" role="tablist" aria-label="Categories"></div>
-    <div class="search">
-     <i class="i" style="--m:url(/internal/staging/agent-store/assets/icons/magnifying-glass-regular.svg)"></i>
-     <input id="q" type="search" placeholder="Search agents..." aria-label="Search agents" autocomplete="off">
-     <button class="iconbtn" id="qclear" type="button" aria-label="Clear search" hidden><i class="i" style="--m:url(/internal/staging/agent-store/assets/icons/x-bold.svg)"></i></button>
-     <span class="kbd" id="kbd"><i class="i" style="--m:url(/internal/staging/agent-store/assets/icons/command-regular.svg)"></i>K</span>
-    </div>
+   <div class="search" hidden>
+    <input id="q" type="search" aria-label="Search agents" autocomplete="off">
+    <button id="qclear" type="button" hidden></button>
+    <span id="kbd"></span>
    </div>
-   <button class="btn out sm filterbtn" id="filterbtn" type="button" style="margin-top:12px"><i class="i" style="--m:url(/internal/staging/agent-store/assets/icons/sliders-horizontal-regular.svg)"></i>Industry</button>
    <div id="results"></div>
   </main>
  </div>
@@ -465,8 +485,7 @@ const selected = () => D.agents.filter(a=>S.sel[a.id]&&fitsInd(a));
 
 /* ---- render ---- */
 function renderRail(){
-  $('#railmain').innerHTML = `
-   <div class="rgroup"><h2>Industry</h2><div class="dd" id="dd"><button class="ddbtn" id="ddbtn" type="button" aria-haspopup="listbox" aria-expanded="false"><span>${esc((INDUSTRIES.find(x=>x[0]===S.ind)||[])[1]||S.ind)}</span>${ic('caret-down','bold')}</button><ul class="ddlist" id="ddlist" role="listbox" aria-label="Industry" hidden>${INDUSTRIES.map(([v,l])=>`<li role="option" data-ind="${esc(v)}" aria-selected="${v===S.ind}" ${l?'':'aria-disabled="true"'}>${esc(l||v)}${v===S.ind?ic('check','bold'):''}</li>`).join('')}</ul></div></div>`;
+  $('#railmain').innerHTML = `<div class="dd" id="dd"><button class="ddbtn" id="ddbtn" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Industry"><span class="dl">Industry</span><span class="dv">${esc((INDUSTRIES.find(x=>x[0]===S.ind)||[])[1]||S.ind)}</span>${ic('caret-down','bold')}</button><ul class="ddlist" id="ddlist" role="listbox" aria-label="Industry" hidden>${INDUSTRIES.map(([v,l])=>`<li role="option" data-ind="${esc(v)}" aria-selected="${v===S.ind}" ${l?'':'aria-disabled="true"'}>${esc(l||v)}${v===S.ind?ic('check','bold'):''}</li>`).join('')}</ul></div>`;
 }
 function renderTabs(){
   const list=visible(), el=$('#tabs');if(!el)return;
@@ -632,7 +651,6 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){if(S.builder){S.builder=false;renderBuilder();}else if(S.open){S.open=null;renderPanel();}return;}
   if(S.open&&!S.builder&&!typing&&(e.key==='ArrowLeft'||e.key==='ArrowRight')){e.preventDefault();step(e.key==='ArrowRight'?1:-1);return;}
   if((e.key==='Enter'||e.key===' ')&&e.target.matches('.card[data-open]')){e.preventDefault();S.open=e.target.dataset.open;renderPanel(true);return;}
-  if((e.key==='k'&&(e.metaKey||e.ctrlKey))||(e.key==='/'&&!typing)){e.preventDefault();$('#q').focus();}
 });
 $('#q').addEventListener('input',e=>{S.q=e.target.value;renderResults();});
 document.addEventListener('input',e=>{if(e.target.dataset&&e.target.dataset.mvol){S.vol[e.target.dataset.mvol]=e.target.value;updVol(e.target.dataset.mvol,false);return;}
@@ -643,9 +661,8 @@ function onScroll(){
   if(tick)return;tick=true;
   requestAnimationFrame(()=>{
     tick=false;
-    if(scrollY>32)navEl.setAttribute('data-scrolled','');else navEl.removeAttribute('data-scrolled');
     const secs=[...document.querySelectorAll('.sec')];let cur=secs.length?secs[0].id.slice(2):'';
-    if(secs.length&&secs[0].getBoundingClientRect().top<=150){secs.forEach(x=>{if(x.getBoundingClientRect().top<=150)cur=x.id.slice(2);});}
+    if(secs.length&&secs[0].getBoundingClientRect().top<=100){secs.forEach(x=>{if(x.getBoundingClientRect().top<=100)cur=x.id.slice(2);});}
     if(secs.length&&innerHeight+scrollY>=document.documentElement.scrollHeight-4)cur=secs[secs.length-1].id.slice(2);
     if(cur!==S.spy){S.spy=cur;document.querySelectorAll('[data-jump]').forEach(r=>r.classList.toggle('on',r.dataset.jump===cur));const at=document.querySelector('.tab.on'),st=$('#tabs');if(at&&st)st.scrollTo({left:Math.max(0,at.offsetLeft-st.clientWidth/2+at.clientWidth/2),behavior:'smooth'});}
   });
