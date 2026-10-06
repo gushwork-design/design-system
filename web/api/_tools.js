@@ -18,7 +18,7 @@ const TOOLS = [
   '/internal/email-signature', '/internal/employee-id-card', '/internal/certificate-creator',
   /* The five templates. Each is the preview page under /internal/templates/, so a rule set on
      one gates that preview, and a rule on /internal/templates gates the list and all five. */
-  '/internal/templates/ad-page', '/internal/templates/ad-page-signup', '/internal/templates/case-study',
+  '/internal/templates/ad-page', '/internal/templates/ad-page-signup', '/internal/templates/support-ops-app', '/internal/templates/case-study',
   '/internal/templates/lead-magnet', '/internal/templates/slide-deck'
 ];
 
