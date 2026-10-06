@@ -4,8 +4,9 @@ Built 6 Oct 2026. Files: `web/internal/staging/agent-store/`, `exports/web/agent
 `web/previews/web/agent-*.frag`, five entries in `exports/web/component-registry.json`.
 
 ## Created
-Five elements, all pending review: `agent-card`, `agent-filter-rail`, `agent-listing-panel`,
-`agent-package-bar`, `agent-package-builder`. The library has no marketplace listing, filter rail,
+Six elements, all pending review: `agent-card`, `agent-section-header`, `agent-filter-rail`,
+`agent-listing-panel`, `agent-package-bar`, `agent-package-builder`. Redesigned on 6 Oct 2026 to Utsav's Figma
+(`1m3ozYgQqR6KFYGb8eVRy3`, node `136:9794`); the card, rail and section header are measured from it. The library has no marketplace listing, filter rail,
 side panel or cart pattern. Specs in `exports/web/agent-store.md`. Composed from tokens plus the existing
 `badge`, `button`, `eyebrow`, Brand `navbar` and `footer` (footer with CTA and marquee off).
 
@@ -21,3 +22,9 @@ Colour, type, radius, shadow and spacing are all `--gw-*` tokens. Nothing new wa
 or ramps. The page links `/foundation/tokens.css` and uses only Vert Grotesk Display and Inter.
 Not on a token: layout dimensions (232px rail, 520px panel, 104px and 168px mascot tiles, 640px bar),
 which have no documented figure and are the builder's choice.
+
+## Deviations from the Figma
+- Hero shade: Figma binds a raw 60% black (no token); built with `--gw-color-neutral-alpha-50-black`.
+- Card add button radius 5.33px (no token); built as `--gw-radius-4`.
+- Title-case labels in Figma are sentence case on the page (voice rule).
+- One-liners and the `Soon` marker on Build your own agent are not in the file.
