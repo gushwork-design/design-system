@@ -1478,6 +1478,13 @@
       "reviewedOn": "2026-10-05",
       "fingerprint": "225c1933f37bd984",
       "previewFingerprint": "97c3a2ac1deea9ca"
+    },
+    "support-ops-app-template": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "ce893bef9441dc32",
+      "previewFingerprint": "1c70de60470b7b89"
     }
   }
 }
