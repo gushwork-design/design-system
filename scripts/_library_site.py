@@ -434,8 +434,9 @@ def chrome(page, extra_css=""):
                 continue
             q = f"{label} {note}".lower()
             n = f"<span>{esc(note)}</span>" if note else ""
+            on_attr = ' class="on"' if on else ""
             rows.append(f'<a href="{esc(link)}" data-q="{esc(q)}"'
-                        f'{" class=\"on\"" if on else ""}>{esc(label)}{n}</a>')
+                        f'{on_attr}>{esc(label)}{n}</a>')
         rail = (f'<nav class="lb-rail"><div class="lb-rail__t">'
                 f'{esc(page.rail_title)}</div>{"".join(rows)}</nav>')
     toc = ""
@@ -446,10 +447,11 @@ def chrome(page, extra_css=""):
 
     head = ""
     if page.title:
+        lede = f'<p class="lede">{esc(page.lede)}</p>' if page.lede else ""
+        chips = f'<div class="lb-row">{page.chips}</div>' if page.chips else ""
+        meta = f'<div class="lb-meta">{page.meta}</div>' if page.meta else ""
         head = (f'<div class="lb-h"><h1>{esc(page.title)}</h1>'
-                f'{f"<p class=\"lede\">{esc(page.lede)}</p>" if page.lede else ""}'
-                f'{f"<div class=\"lb-row\">{page.chips}</div>" if page.chips else ""}'
-                f'{f"<div class=\"lb-meta\">{page.meta}</div>" if page.meta else ""}</div>')
+                f'{lede}{chips}{meta}</div>')
 
     if page.wide:
         body = f'<div class="lb-wrap">{page.body}</div>'
@@ -1297,11 +1299,12 @@ def build_review(queue, reg, gaps):
     rows = []
     for scope, key, label, path, n, unit in queue:
         cnt = f"{n} {unit}" if n else ""
+        cnt_html = f'<br><span class="lb-meta">{esc(cnt)}</span>' if cnt else ""
         rows.append(
             f'<tr><td><a href="{esc(path)}.html" '
             f'style="color:var(--gw-color-primary-600);text-decoration:none">'
             f'<b>{esc(label)}</b></a>'
-            f'{f"<br><span class=\"lb-meta\">{esc(cnt)}</span>" if cnt else ""}</td>'
+            f'{cnt_html}</td>'
             f'<td>{esc(scope)}</td>'
             f'<td><code>bash scripts/review-pass.sh {esc(scope)} {esc(key)}</code></td>'
             f'</tr>')
