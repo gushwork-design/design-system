@@ -79,9 +79,9 @@ page's build stamp `components` list to exactly what it uses, and delete the pag
 (a rail row that goes nowhere is a dead control).
 
 **What the pages are made of.**
-- **Overview.** `page-header` with the density switch and Export → `banner` → `time-range-bar` → four `stat-card`s with
+- **Overview.** `page-header` with the density switch and Export → `time-range-bar` (a plain container, not the sticky filter slot, so it scrolls with the page) → four `stat-card`s with
   `delta-pill`s and sparklines → `line-chart` → `horizontal-bar-chart` → `breakdown-bar` → a `data-table` of what needs attention.
-- **Reports.** `tabs-underline` for the three reports → `period-select` → four `stat-card`s with `delta-pill`s → a `bar-chart` or `line-chart` (with a target line on
+- **Reports.** `tabs-underline` for the three reports → `period-select` (also a plain container, not sticky) → four `stat-card`s with `delta-pill`s → a `bar-chart` or `line-chart` (with a target line on
   Response times) → a `horizontal-bar-chart` or `breakdown-bar` → a `data-table` with `progress-bar` cells.
 - **Explorer.** `explorer-layout` in a `data-fill` panel body → `period-select` → `query-builder` → a chart → a results table. Editing
   the query marks the result out of date; Run query redraws. More than three groups fold into Other.
@@ -115,5 +115,5 @@ asynchronous), a command palette behind the search trigger, a company or person 
 
 **Tokens.** None of its own. Everything comes from the components it uses.
 
-**Provenance.** NEW, pending library review (R43), registered as `support-ops-app-template`. Not listed on the hub's public
-Templates page: adding its card there is the step that makes it live, and it waits for a pass.
+**Provenance.** NEW, pending library review (R43), registered as `support-ops-app-template`. Listed on the hub's Templates page
+under Dashboard, with a live preview at `/internal/templates/support-ops-app` (the same files the review drawer shows).
