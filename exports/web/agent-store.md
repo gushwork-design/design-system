@@ -22,8 +22,8 @@ a 240 rail, a 48 gap and a 912 main area, 80px under the hero, on `--gw-color-ne
 296 × auto. White, 1px `--gw-color-neutral-100`, `--gw-radius-12`, padding `--gw-space-16`, gap 16.
 Top row: a 60px mascot tile (`--gw-radius-8`, 0.5px `--gw-color-neutral-100`, the image at 70px, centred and
 clipped) then the name (`--gw-text-body-16-sem`) over a one-liner (`--gw-text-body-12-med`,
-`--gw-color-neutral-400`). Below: the description, `--gw-text-body-14-reg` in `--gw-color-neutral-600`, four
-lines. A 24px add button sits at top 12, right 12: `--gw-color-neutral-25`, 0.5px stroke, a 12px plus.
+`--gw-color-neutral-400`). Below: the description, `--gw-text-body-14-reg` in `--gw-color-neutral-600`, three
+lines, never a fourth. A 24px add button sits at top 12, right 12: `--gw-color-neutral-25`, 0.5px stroke, a 12px plus.
 
 - **Selected:** only the button changes, to `--gw-color-primary-500` with a white check. The card does not.
 - **Premium:** border `--gw-color-primary-100` and `--gw-shadow-s2`, and the one-liner slot carries the price,
@@ -41,7 +41,7 @@ becomes `--gw-color-primary-500` with white text and a check, reading `Added`; c
 
 ## `agent-filter-rail`
 
-A 240px sticky column. **Rows are tabs that scroll to their section; every section stays on the page.** The row of the section in view is highlighted as you scroll. Search filters the cards across all sections and drops empty sections. An `Industry` label (`--gw-text-body-12-med`, `--gw-color-neutral-600`) over a 44px
+A 240px sticky column. The industry picker is a **custom dropdown**, not the browser's: the trigger is the 44px `--gw-color-neutral-25` field, and the list is a white `--gw-radius-12` panel with `--gw-shadow-s4`, 36px rows in `--gw-text-body-14-med`, a hover fill of `--gw-color-neutral-50`, a check on the selected industry and unavailable industries in `--gw-color-neutral-400`. Arrow keys, Enter and Escape work. The page has **no focus styling**, by Utsav's call. **Rows are tabs that scroll to their section; every section stays on the page.** The row of the section in view is highlighted as you scroll. Search filters the cards across all sections and drops empty sections. An `Industry` label (`--gw-text-body-12-med`, `--gw-color-neutral-600`) over a 44px
 select (`--gw-color-neutral-25`, 1px `--gw-color-neutral-100`, `--gw-radius-8`). Then `Category`: 36px rows,
 `--gw-text-body-14-med`, a 16px icon and a count in `--gw-color-neutral-500`. The selected row is white with a
 1px `--gw-color-neutral-100` stroke and `--gw-shadow-s2`; the others carry a `--gw-color-neutral-50` stroke so
