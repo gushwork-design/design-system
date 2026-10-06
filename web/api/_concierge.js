@@ -379,6 +379,11 @@ export async function suggestPrompts(token, channel) {
   try { await slack(token, 'assistant.threads.setSuggestedPrompts', { channel_id: channel, title: 'What do you need?', prompts: AGENT_PROMPTS }); return 'set'; }
   catch (e) { return 'failed: ' + String(e.message || e).slice(0, 80); }
 }
+export async function setTyping(token, event) {
+  if (!event.thread_ts) return false;
+  try { await slack(token, 'assistant.threads.setStatus', { channel_id: event.channel, thread_ts: event.thread_ts, status: 'is typing…' }); return true; }
+  catch { return false; }
+}
 export async function setStatus(token, event, status) {
   if (!event.thread_ts) return false;
   try { await slack(token, 'agents.sessions.setStatus', { status, channel_id: event.channel, thread_ts: event.thread_ts }); return true; }
@@ -527,7 +532,8 @@ export async function handleMessage(event, deps) {
         try { notes = await memory.readNotes(event.user); } catch { /* fine without */ }
         try { memoryToken = memory.mintToken(event.user); } catch { /* fine without */ }
       }
-      if (inPane) await setStatus(token, event, 'processing');   // the pane's "working" line; the run sets it back to active
+      // "Bruce is typing…" rather than the session's "Stop Bruce" spinner (Utsav, 6 Oct 2026). Slack clears it when Bruce posts.
+      if (inPane && !(await setTyping(token, event))) await setStatus(token, event, 'processing');
       const run = await fire(event, undefined, undefined, { owner: isOwner, notes, memoryToken, agent: inPane });
       if (memory) await log(memory, token, event, { role: isOwner ? 'owner' : 'teammate', kind: run.fired ? 'run' : 'failed', used: quota.used });
       if (!run.fired) {

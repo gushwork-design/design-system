@@ -188,14 +188,14 @@ t('end to end: a DM that is not a file ask starts Bruce, no reaction and is logg
     const pane = ev('build me a banner', 'UUTSAV', { thread_ts: '700.7', ts: '700.7', app_context: { entities: [{ type: 'slack#/types/channel_id', value: 'C07C4DELAGZ' }] } });
     const paneDeps = { ...deps, agent: true, findPing: async () => null };   /* a threaded message is first checked against Alfred's pings; not one here */
     o = await handleMessage(pane, { ...paneDeps, fire: async (e, _a, _b, extra) => { fired.push(extra); return { fired: true }; } });
-    t('a pane message sets the status to processing and tells the run it is an agent session', [o.did, calls.map((c) => c.method), calls[0].body.status, calls[0].body.thread_ts, fired[0].agent], ['bruce', ['agents.sessions.setStatus'], 'processing', '700.7', true]);
+    t('a pane message shows "is typing…" and tells the run it is an agent session', [o.did, calls.map((c) => c.method), calls[0].body.status, calls[0].body.thread_ts, fired[0].agent], ['bruce', ['assistant.threads.setStatus'], 'is typing…', '700.7', true]);
     ok('the channel the person was looking at rides along', contextOf(pane) === 'channel_id C07C4DELAGZ');
     calls.length = 0;
     o = await handleMessage(ev('build me a banner', 'UUTSAV', { ts: '701.1' }), { ...deps, agent: true, fire: async () => ({ fired: true }) });
     t('a plain top-level DM is not a pane session: no status call', [o.did, calls.length], ['bruce', 0]);
     calls.length = 0;
     o = await handleMessage(pane, { ...paneDeps, fire: async () => ({ fired: false, why: 'not set' }) });
-    t('a failed start clears the status again', calls.map((c) => c.method + ':' + (c.body.status || '')), ['agents.sessions.setStatus:processing', 'chat.postMessage:', 'agents.sessions.setStatus:active']);
+    t('a failed start clears the status again', calls.map((c) => c.method + ':' + (c.body.status || '')), ['assistant.threads.setStatus:is typing…', 'chat.postMessage:', 'agents.sessions.setStatus:active']);
   }
   // Open to everyone, with a daily cap for everyone but the owner, and memory handed to the run.
   const logged = [];
