@@ -451,7 +451,7 @@ export async function handleMessage(event, deps) {
         return { did: 'to-alfred-failed' };
       }
     }
-    // Utsav's own DM: Bruce proper. A 👀 says it was picked up; the routine answers in the thread.
+    // Utsav's own DM: Bruce proper. No reaction (they filled the Slack activity inbox, 6 Oct 2026); the routine answers in the thread.
     // In a thread he is already talking to Bruce in, every follow-up is for Bruce, even one that names a logo or a font:
     // "the logo should be in original color" is a brief, not a file request. The concierge shortcut is for top-level DMs only.
     if (isDm && mayAskBruce(event.user) && (event.thread_ts || forBruce(u))) {
@@ -471,7 +471,6 @@ export async function handleMessage(event, deps) {
         try { notes = await memory.readNotes(event.user); } catch { /* fine without */ }
         try { memoryToken = memory.mintToken(event.user); } catch { /* fine without */ }
       }
-      try { await slack(token, 'reactions.add', { channel: event.channel, timestamp: event.ts, name: 'eyes' }); } catch { /* the answer matters more */ }
       const run = await fire(event, undefined, undefined, { owner: isOwner, notes, memoryToken });
       if (memory) await log(memory, token, event, { role: isOwner ? 'owner' : 'teammate', kind: run.fired ? 'run' : 'failed', used: quota.used });
       if (!run.fired) {

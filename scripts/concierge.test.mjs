@@ -155,7 +155,7 @@ t('a DM question gets the answer with no thread, and all four fonts in one share
 calls.length = 0;
 r = await post(dm('do the second one please', 'UOWNER'));
 const routing = function () { return calls.map((c) => c.method).filter((m) => m.indexOf('users.info') !== 0); };   /* the log's name lookup is not routing */
-t('end to end: a DM that is not a file ask gets 👀, starts Bruce and is logged (open to everyone since 5 Oct 2026)', [r.body.concierge, routing(), calls.some((c) => c.method.indexOf('users.info') === 0)], ['bruce', ['reactions.add', 'FIRE'], true]);
+t('end to end: a DM that is not a file ask starts Bruce, no reaction and is logged (open to everyone since 5 Oct 2026)', [r.body.concierge, routing(), calls.some((c) => c.method.indexOf('users.info') === 0)], ['bruce', ['FIRE'], true]);
 
 /* ---- Bruce for Utsav: his DMs start the routine; nobody else's do ---- */
 {
@@ -166,7 +166,7 @@ t('end to end: a DM that is not a file ask gets 👀, starts Bruce and is logged
   const deps = { token: 'xoxb-test', root: '.', owners: new Set(['UUTSAV']), bruceUsers: new Set(['UUTSAV']), fire };
   calls.length = 0;
   let o = await handleMessage(ev('why did the publish fail last night?'), deps);
-  t('Utsav asking a real question: 👀, the routine starts, no canned reply', [o.did, calls.map((c) => c.method), calls[0].body.name, fired.length], ['bruce', ['reactions.add'], 'eyes', 1]);
+  t('Utsav asking a real question: no reaction, the routine starts, no canned reply', [o.did, calls.map((c) => c.method), fired.length], ['bruce', [], 1]);
   calls.length = 0;
   o = await handleMessage(ev('send me the white logo svg'), deps);
   t('Utsav asking for a file still gets it instantly from the concierge', [o.did, fired.length], ['answered', 1]);
@@ -209,7 +209,7 @@ t('end to end: a DM that is not a file ask gets 👀, starts Bruce and is logged
   t('a reply in any other thread is for Bruce', [o.did, sent.length], ['bruce', 1]);
   calls.length = 0;
   o = await handleMessage(ev('the logo should be in original color', 'UUTSAV', { thread_ts: '500.5', ts: '502.1' }), pingDeps);
-  t('a follow-up in a Bruce thread that names a logo still goes to Bruce, not the file concierge', [o.did, calls.map((c) => c.method)], ['bruce', ['reactions.add']]);
+  t('a follow-up in a Bruce thread that names a logo still goes to Bruce, not the file concierge', [o.did, calls.map((c) => c.method)], ['bruce', []]);
   calls.length = 0;
   o = await handleMessage(ev('do it', 'UUTSAV', { thread_ts: '400.4', ts: '402.1' }), { ...pingDeps, toAlfred: async () => ({ ok: false, why: 'the site has no GitHub token' }) });
   t('if it cannot reach Alfred it says so', [o.did, calls.at(-1).body.text.includes('no GitHub token')], ['to-alfred-failed', true]);
