@@ -31,3 +31,6 @@ which have no documented figure and are the builder's choice.
 
 ## Update, 6 Oct 2026 (second pass)
 Navbar is transparent over the hero and goes to the ad-page neutral-25 with a 1px neutral-100 stroke on scroll. Hero shade has Figma's progressive blur (built from masked photo copies; the blur radius has no token). Rail rows scroll to sections instead of filtering. The agent panel is now a centered modal with previous and next. The Brand footer is replaced by the short ad-page footer (copyright line only, neutral-600 as the ad pages ship it).
+
+## Update, 6 Oct 2026 (quick view)
+The agent modal follows store quick-view patterns, drawn first in `agent-store/modal-wireframes.html` and chosen as layout A with edge arrows. New behaviour: a monthly volume stepper that feeds the builder's estimator. The unit and bundle are no longer repeated, and the left column is filled with the talk track, fits and proof slot. The pairs strip is not built: the hand-off order is not in the data.

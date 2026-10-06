@@ -139,14 +139,43 @@ main{padding-top:var(--gw-space-24)}
 /* ---------- listing panel ---------- */
 .amodal{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:var(--gw-space-24);background:var(--gw-color-neutral-alpha-50-black)}
 .amodal.on{display:flex}
-.adlg{width:min(880px,100%);max-height:calc(100vh - 48px);display:flex;flex-direction:column;background:var(--gw-color-neutral-25);border-radius:var(--gw-radius-20);box-shadow:var(--gw-shadow-s4);overflow:hidden;animation:pop .22s cubic-bezier(.22,1,.36,1)}
+.adwrap{position:relative;width:min(820px,100%)}
+.adlg{width:100%;max-height:calc(100vh - 48px);display:flex;flex-direction:column;background:var(--gw-color-neutral-25);border-radius:var(--gw-radius-20);box-shadow:var(--gw-shadow-s4);overflow:hidden;animation:pop .22s cubic-bezier(.22,1,.36,1)}
 @keyframes pop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+/* N1: large round arrows outside the modal on desktop; header arrows on narrower screens */
+.edge{position:absolute;top:50%;width:44px;height:44px;margin-top:-22px;border-radius:50%;background:var(--gw-color-white);box-shadow:var(--gw-shadow-s3);display:grid;place-items:center;font-size:18px;color:var(--gw-color-black);z-index:2}
+.edge:hover{background:var(--gw-color-neutral-50)}
+.edge.l{left:-60px}.edge.r{right:-60px}
 .adlg .ph{display:flex;align-items:center;gap:var(--gw-space-12);padding:var(--gw-space-12) var(--gw-space-16);border-bottom:1px solid var(--gw-color-neutral-100)}
 .adlg .ph .pos{font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking);color:var(--gw-color-neutral-500)}
 .adlg .ph .nv{margin-left:auto;display:flex;gap:var(--gw-space-4);align-items:center}
-.adlg .ph .nv .iconbtn.sep{margin-left:var(--gw-space-8)}
-.adlg .pb{flex:1;overflow:auto;padding:var(--gw-space-24);display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:var(--gw-space-32);align-items:start}
-.adlg .cl,.adlg .cr{display:flex;flex-direction:column;gap:var(--gw-space-24);min-width:0}
+.adlg .ph .nv .step{display:none}
+.adlg .pb{flex:1;overflow:auto;padding:var(--gw-space-24);display:grid;grid-template-columns:300px minmax(0,1fr);gap:var(--gw-space-32);align-items:stretch}
+.adlg .cl,.adlg .cr{display:flex;flex-direction:column;gap:var(--gw-space-16);min-width:0}
+.adlg .himg{width:100%;aspect-ratio:1;border-radius:var(--gw-radius-16);overflow:hidden;background:var(--gw-color-neutral-50)}
+.adlg .himg img{width:100%;height:100%;object-fit:cover}
+.adlg .info{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.adlg .info h2{font:var(--gw-text-h6-bold)}
+.adlg .info .price{font:var(--gw-text-body-14-med);color:var(--gw-color-neutral-700);margin-top:var(--gw-space-4)}
+.adlg .info .price.price-prem{color:var(--gw-color-primary-500)}
+.adlg .vol{display:flex;align-items:center;justify-content:space-between;gap:var(--gw-space-12);background:var(--gw-color-white);border:1px solid var(--gw-color-neutral-100);border-radius:var(--gw-radius-12);padding:var(--gw-space-8) var(--gw-space-8) var(--gw-space-8) var(--gw-space-16)}
+.adlg .vol small{display:block;font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-600)}
+.adlg .vol b{font:var(--gw-text-body-14-sem)}
+.adlg .stp{display:flex;align-items:center;gap:var(--gw-space-4)}
+.adlg .stp button{width:32px;height:32px;border-radius:var(--gw-radius-8);box-shadow:inset 0 0 0 1px var(--gw-color-neutral-100);display:grid;place-items:center;font-size:14px;color:var(--gw-color-neutral-700)}
+.adlg .stp button:hover{background:var(--gw-color-neutral-50);color:var(--gw-color-black)}
+.adlg .stp input{width:64px;height:32px;border:0;background:transparent;text-align:center;font:var(--gw-text-body-14-sem);outline:0;-moz-appearance:textfield}
+.adlg .stp input::-webkit-outer-spin-button,.adlg .stp input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.adlg .stp input:focus{box-shadow:0 0 0 2px var(--gw-color-primary-alpha-10);border-radius:var(--gw-radius-8)}
+.adlg details.stepsd{border-top:1px solid var(--gw-color-neutral-100);padding-top:var(--gw-space-4)}
+.adlg details.stepsd summary{list-style:none;display:flex;justify-content:space-between;align-items:center;padding:var(--gw-space-12) 0;font:var(--gw-text-body-14-sem);cursor:pointer}
+.adlg details.stepsd summary::-webkit-details-marker{display:none}
+.adlg details.stepsd summary .i{font-size:14px;transition:transform .2s}
+.adlg details.stepsd[open] summary .i{transform:rotate(180deg)}
+.adlg .proof{flex:1;min-height:56px}
+.adlg .fits{display:flex;align-items:center;justify-content:space-between;background:var(--gw-color-white);border:1px solid var(--gw-color-neutral-100);border-radius:var(--gw-radius-12);padding:var(--gw-space-12) var(--gw-space-16)}
+.adlg .fits small{font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-600)}
+.adlg .fits span{font:var(--gw-text-body-14-sem)}
 .adlg .pf{padding:var(--gw-space-16) var(--gw-space-24);border-top:1px solid var(--gw-color-neutral-100);background:var(--gw-color-white);display:flex;gap:var(--gw-space-12);align-items:center}
 .p-id{display:flex;gap:var(--gw-space-16);align-items:center}
 .p-id .face{width:96px;height:96px;border-radius:var(--gw-radius-16);overflow:hidden;flex:none}
@@ -236,6 +265,9 @@ main{padding-top:var(--gw-space-24)}
 
 /* ---------- phone ---------- */
 @media(max-width:1000px){
+ .edge{display:none}
+ .adlg .ph .nv .step{display:inline-flex}
+ .adlg .pb{grid-template-columns:260px minmax(0,1fr);gap:var(--gw-space-24)}
  .shell{grid-template-columns:minmax(0,1fr);gap:var(--gw-space-16);padding-top:var(--gw-space-24)}
  main{padding-top:0}
  .rail{display:none;position:static;max-height:none;padding:var(--gw-space-16);background:var(--gw-color-white);border:1px solid var(--gw-color-neutral-100);border-radius:var(--gw-radius-16)}
@@ -253,8 +285,17 @@ main{padding-top:var(--gw-space-24)}
  .sec-h .btn{width:100%}
  .grid{grid-template-columns:minmax(0,1fr)}
  .amodal{padding:0;align-items:flex-end}
- .adlg{width:100%;max-height:94vh;border-radius:var(--gw-radius-20) var(--gw-radius-20) 0 0}
- .adlg .pb{grid-template-columns:minmax(0,1fr);gap:var(--gw-space-24)}
+ .adwrap{width:100%}
+ .adlg{max-height:94vh;border-radius:var(--gw-radius-20) var(--gw-radius-20) 0 0}
+ .adlg .pb{display:flex;flex-direction:column;gap:var(--gw-space-16)}
+ .adlg .cl,.adlg .cr{display:contents}
+ .adlg .himg,.adlg .info,.adlg details.stepsd,.adlg .rep,.adlg .fits{flex:none}
+ .adlg .himg{order:1;max-width:200px;align-self:center}
+ .adlg .info{order:2}
+ .adlg details.stepsd{order:3}
+ .adlg .rep{order:4}
+ .adlg .fits{order:5}
+ .adlg .proof{order:6;flex:none}
  .pkgbar{bottom:var(--gw-space-12)}
  .pkgbar .stack{display:none}
  .pkgbar .tx b .lg{display:none}
@@ -304,7 +345,7 @@ main{padding-top:var(--gw-space-24)}
 </footer>
 
 <div class="pkgbar" id="pkgbar" role="region" aria-label="Your package"></div>
-<div class="amodal" id="amodal"><div class="adlg" id="adlg" role="dialog" aria-modal="true" aria-label="Agent details"></div></div>
+<div class="amodal" id="amodal"><div class="adwrap"><button class="edge l" data-prev aria-label="Previous agent"><i class="i" style="--m:url(assets/icons/arrow-left-bold.svg)"></i></button><div class="adlg" id="adlg" role="dialog" aria-modal="true" aria-label="Agent details"></div><button class="edge r" data-next aria-label="Next agent"><i class="i" style="--m:url(assets/icons/arrow-right-bold.svg)"></i></button></div></div>
 <div class="modal" id="modal"><div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Package builder"></div></div>
 <div class="toast" id="toast" role="status"></div>
 
@@ -405,25 +446,35 @@ function order(){
   const o=mk(visible()); return o.includes(S.open)?o:mk(pool());
 }
 function step(d){const o=order(),i=o.indexOf(S.open);if(i<0)return;S.open=o[(i+d+o.length)%o.length];renderPanel(true);}
+function updVol(id,setInput){
+  const a=D.agents.find(x=>x.id===id),v=+S.vol[id]||0;
+  const c=$('#adlg [data-mcred]');if(c)c.textContent=v?`about ${(v*a.credits).toLocaleString()} credits`:'Set a volume to estimate credits';
+  const inp=$('#adlg [data-mvol]');if(setInput&&inp)inp.value=v||'';
+}
 function renderPanel(fresh){
   const m=$('#amodal'), a=D.agents.find(x=>x.id===S.open);
   if(!a){m.classList.remove('on');syncLock();return;}
   const old=$('#adlg .pb'), keep=(!fresh&&old)?old.scrollTop:0;
   const o=order(), i=o.indexOf(a.id), on=!!S.sel[a.id], b=bundleOf(a);
-  $('#adlg').innerHTML=`<div class="ph"><span class="badge">${esc(a.bundle)}</span><span class="pos">${i+1} of ${o.length}</span><div class="nv"><button class="iconbtn" data-prev aria-label="Previous agent">${ic('arrow-left','bold')}</button><button class="iconbtn" data-next aria-label="Next agent">${ic('arrow-right','bold')}</button><button class="iconbtn sep" data-close aria-label="Close">${ic('x','bold')}</button></div></div>
+  const v=+S.vol[a.id]||0, vol=!a.free&&!a.luxury;
+  $('#adlg').innerHTML=`<div class="ph"><span class="badge">${esc(a.bundle)}</span><span class="pos">${i+1} of ${o.length}</span><div class="nv"><button class="iconbtn step" data-prev aria-label="Previous agent">${ic('arrow-left','bold')}</button><button class="iconbtn step" data-next aria-label="Next agent">${ic('arrow-right','bold')}</button><button class="iconbtn" data-close aria-label="Close">${ic('x','bold')}</button></div></div>
   <div class="pb">
    <div class="cl">
-    <div class="p-id"><div class="face"><img src="${img(a)}" alt=""></div><div><h2>${esc(a.name)}</h2><div class="price${a.luxury?' price-prem':''}">${esc(perItem(a))}</div></div></div>
-    <p class="p-blurb">${esc(a.blurb)}</p>
-    <div class="block"><h3>How it works</h3><ol class="steps">${a.steps.map((t,k)=>`<li><b>${STEP_LABELS[k]||''}</b><span>${esc(t)}</span></li>`).join('')}</ol></div>
-   </div>
-   <div class="cr">
+    <div class="himg"><img src="${img(a)}" alt=""></div>
     <div class="rep"><h3>${ic('handshake')}Talk track</h3><div class="q"><small>Pain to listen for</small><p>${esc(a.pain)}</p></div><div class="q ask"><small>Discovery question</small><p>“${esc(a.question)}”</p></div></div>
-    <div class="block"><h3>Details</h3><div class="facts"><div class="fact"><small>Fits</small><span>${esc(a.fits)}</span></div><div class="fact"><small>Bundle</small><span>${esc(b.name)}</span></div><div class="fact"><small>Counted as</small><span>${esc(a.item)}</span></div><div class="fact"><small>Cost</small><span>${esc(perItem(a))}</span></div></div></div>
+    <div class="fits"><small>Fits</small><span>${esc(a.fits)}</span></div>
     <div class="proof">${ic('sparkle')}Proof slot, held open until there are real customer results to show here.</div>
    </div>
-  </div>
-  <div class="pf"><button class="btn wide ${on?'out':''}" data-add="${a.id}">${ic(on?'check':'plus','bold')}${on?'Added, remove from package':'Add to package'}</button></div>`;
+   <div class="cr">
+    <div class="info"><div><h2>${esc(a.name)}</h2><div class="price${a.luxury?' price-prem':''}">${esc(perItem(a))}</div></div>
+     <p class="p-blurb">${esc(a.blurb)}</p>
+     ${vol?`<div class="vol"><div><small>Monthly volume</small><b data-mcred>${v?`about ${(v*a.credits).toLocaleString()} credits`:'Set a volume to estimate credits'}</b></div><div class="stp"><button data-vstep="-1" data-vid="${a.id}" aria-label="Fewer per month">${ic('minus','bold')}</button><input type="number" min="0" inputmode="numeric" value="${v||''}" placeholder="0" data-mvol="${a.id}" aria-label="Monthly volume for ${esc(a.name)}"><button data-vstep="1" data-vid="${a.id}" aria-label="More per month">${ic('plus','bold')}</button></div></div>`:''}
+     ${a.luxury?`<div class="vol"><div><small>Pricing</small><b>Priced alone, outside the package tiers</b></div></div>`:''}
+     <button class="btn wide ${on?'out':''}" data-add="${a.id}">${ic(on?'check':'plus','bold')}${on?'Added, remove from package':'Add to package'}</button>
+    </div>
+    <details class="stepsd" ${innerWidth>700?'open':''}><summary>How it works${ic('caret-down','bold')}</summary><ol class="steps">${a.steps.map((t,k)=>`<li><b>${STEP_LABELS[k]||''}</b><span>${esc(t)}</span></li>`).join('')}</ol></details>
+   </div>
+  </div>`;
   $('#adlg .pb').scrollTop=keep;
   if(!m.classList.contains('on')){m.classList.add('on');$('#adlg [data-close]').focus({preventScroll:true});}
   syncLock();
@@ -455,12 +506,13 @@ let tt; function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('o
 
 /* ---- events ---- */
 document.addEventListener('click',e=>{
-  const t=e.target.closest('[data-add],[data-open],[data-jump],[data-bundle],[data-close],[data-prev],[data-next],[data-clear],[data-builder],[data-bclose],[data-proposal],[data-reset],#filterbtn,#qclear,#amodal,#modal');
+  const t=e.target.closest('[data-add],[data-open],[data-jump],[data-vstep],[data-bundle],[data-close],[data-prev],[data-next],[data-clear],[data-builder],[data-bclose],[data-proposal],[data-reset],#filterbtn,#qclear,#amodal,#modal');
   if(!t) return;
   if(t.dataset.add){e.stopPropagation();const id=t.dataset.add;S.sel[id]?delete S.sel[id]:S.sel[id]=true;renderResults();renderBar();if(S.open)renderPanel();return;}
   if(t.dataset.open){S.open=t.dataset.open;renderPanel(true);return;}
   if(t.dataset.jump){const id=t.dataset.jump;const el=id==='all'?$('.search'):document.getElementById('b-'+id);$('#rail').classList.remove('open');if(el)el.scrollIntoView({behavior:'smooth',block:'start'});return;}
   if('bundle' in t.dataset){const b=D.bundles.find(x=>x.id===t.dataset.bundle);const ids=visible().filter(a=>a.bundle===b.name&&!a.free).map(a=>a.id);const allIn=ids.every(id=>S.sel[id]);ids.forEach(id=>allIn?delete S.sel[id]:S.sel[id]=true);renderResults();renderBar();return;}
+  if(t.dataset.vstep){const id=t.dataset.vid;S.vol[id]=String(Math.max(0,(+S.vol[id]||0)+(+t.dataset.vstep)*50));updVol(id,true);return;}
   if('prev' in t.dataset){step(-1);return;}
   if('next' in t.dataset){step(1);return;}
   if('close' in t.dataset){S.open=null;renderPanel();return;}
@@ -483,7 +535,8 @@ document.addEventListener('keydown',e=>{
 });
 $('#q').addEventListener('input',e=>{S.q=e.target.value;renderResults();});
 document.addEventListener('change',e=>{if(e.target.id==='ind'){S.ind=e.target.value;S.open=null;renderAll();}});
-document.addEventListener('input',e=>{if(e.target.dataset&&e.target.dataset.vol){const pos=e.target.selectionStart;S.vol[e.target.dataset.vol]=e.target.value;renderBuilder({id:e.target.dataset.vol,pos});}});
+document.addEventListener('input',e=>{if(e.target.dataset&&e.target.dataset.mvol){S.vol[e.target.dataset.mvol]=e.target.value;updVol(e.target.dataset.mvol,false);return;}
+  if(e.target.dataset&&e.target.dataset.vol){const pos=e.target.selectionStart;S.vol[e.target.dataset.vol]=e.target.value;renderBuilder({id:e.target.dataset.vol,pos});}});
 /* navbar goes solid on scroll (ad-page rule: after 32px); the rail follows the section in view */
 const navEl=$('#nav');let tick=false;
 function onScroll(){
