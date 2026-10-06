@@ -35,8 +35,12 @@ APP=skills/gushwork-dashboard/templates/support-ops-app
 app_preview() {  # $1 = output dir
   rm -rf "$1"; mkdir -p "$1"
   cp "$APP"/*.js "$1"/
+  # The hub serves pages with clean URLs and no trailing slash (web/vercel.json), so a folder's index.html is served at the bare
+  # folder URL and every relative script and link then resolves one folder up. The review copy therefore has no index.html:
+  # the Overview is overview.html, and the links to it say so. The template itself keeps index.html.
   for f in "$APP"/*.html; do
-    perl -pe 's#\.\./\.\./\.\./\.\./foundation/#/foundation/#g; s#\.\./\.\./\.\./\.\./exports/#/exports/#g; s#"registry":"https://[^"]*"#"registry":""#' "$f" > "$1/$(basename "$f")"
+    out="$1/$(basename "$f")"; [ "$(basename "$f")" = "index.html" ] && out="$1/overview.html"
+    perl -pe 's#\.\./\.\./\.\./\.\./foundation/#/foundation/#g; s#\.\./\.\./\.\./\.\./exports/#/exports/#g; s#"registry":"https://[^"]*"#"registry":""#; s#(href|data-nav)="index\.html"#$1="overview.html"#g' "$f" > "$out"
   done
 }
 templates_copy() {  # $1 = output file

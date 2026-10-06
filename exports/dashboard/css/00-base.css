@@ -24,6 +24,9 @@
 :root[data-theme="dark"]  { color-scheme: dark; }
 
 .gd, .gd *, .gd *::before, .gd *::after { box-sizing: border-box; }
+/* Text smoothing, as the hub (web/shell.css) and the review drawings (web/previews/_sheet.css) both render it. Without it a dashboard
+   built outside the hub draws every glyph heavier on macOS than the Library shows (found 6 Oct 2026, R60). */
+.gd { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 
 .gd {
   /* --- surfaces ----------------------------------------------------------- */

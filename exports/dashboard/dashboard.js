@@ -99,8 +99,8 @@ window.GD = window.GD || {};
       var txt = $('.gd-nav-item__text, .gd-ws__name, .gd-account__name, .gd-search__label', el.closest('.gd-account') || el);
       if (!txt) return;
       var label = txt.textContent.trim();
-      if (c) { el.setAttribute('data-gd-tooltip', label); el.setAttribute('data-gd-tooltip-placement', 'right'); el.removeAttribute('title'); }
-      else if (el.getAttribute('data-gd-tooltip') === label) { el.removeAttribute('data-gd-tooltip'); el.removeAttribute('data-gd-tooltip-placement'); }
+      if (c) { el.setAttribute('data-gd-tooltip', label); el.setAttribute('data-gd-tooltip-placement', 'right'); el.setAttribute('data-gd-tooltip-variant', 'rail'); el.removeAttribute('title'); }
+      else if (el.getAttribute('data-gd-tooltip') === label) { el.removeAttribute('data-gd-tooltip'); el.removeAttribute('data-gd-tooltip-placement'); el.removeAttribute('data-gd-tooltip-variant'); }
     });
   }
 
@@ -2552,7 +2552,7 @@ function syncTables(root) {
    confirm        GD.confirm({title, message, items, confirmLabel, cancelLabel, danger}) -> Promise<boolean>;
                   [data-gd-confirm="Title"] [data-gd-confirm-body] [data-gd-confirm-label] on a button intercepts its click
    tooltip        [data-gd-tooltip="text"]  or rich: [data-gd-tooltip-title] [data-gd-tooltip-body] [data-gd-tooltip-meta];
-                  [data-gd-tooltip-placement="top|bottom|left|right"]
+                  [data-gd-tooltip-placement="top|bottom|left|right"]  [data-gd-tooltip-variant="rail"] (the collapsed sidebar's plain pill, 4px away)
    popover        [data-gd-popover="#id"] on the trigger toggles a .gd-popover (hidden attr); Esc, outside click, focus-out close
    (dock sections use [data-gd-toggle] + aria-controls, handled by 50-data.js)
    docked panel   .gd-dock[data-gd-dock="id"] (+ data-gd-min / data-gd-max), [data-gd-dock-resize] (role=separator),
@@ -2759,14 +2759,15 @@ function syncTables(root) {
     clearTimeout(tipTimer); clearTimeout(tipHide);
     const el = tipEl(), title = t.getAttribute('data-gd-tooltip-title'), body = t.getAttribute('data-gd-tooltip-body'), meta = t.getAttribute('data-gd-tooltip-meta');
     const rich = !!(title || body || meta);
-    el.className = 'gd-tooltip' + (rich ? ' gd-tooltip--rich' : '');
+    const variant = t.getAttribute('data-gd-tooltip-variant');          // 'rail': the collapsed sidebar's own tooltip
+    el.className = 'gd-tooltip' + (rich ? ' gd-tooltip--rich' : '') + (variant ? ' gd-tooltip--' + variant : '');
     el.innerHTML = rich
       ? (title ? '<span class="gd-tooltip__title">' + esc(title) + '</span>' : '') + (body ? '<span class="gd-tooltip__body">' + esc(body) + '</span>' : '') + (meta ? '<span class="gd-tooltip__meta">' + esc(meta) + '</span>' : '')
       : esc(t.getAttribute('data-gd-tooltip'));
     if (tipTarget && tipTarget !== t) tipTarget.removeAttribute('aria-describedby');
     tipTarget = t; t.setAttribute('aria-describedby', el.id);
     toTop(el);
-    place(el, t, t.getAttribute('data-gd-tooltip-placement') || 'top', 6);
+    place(el, t, t.getAttribute('data-gd-tooltip-placement') || 'top', variant === 'rail' ? 4 : 6);
   }
   function hideTip() {
     clearTimeout(tipTimer); clearTimeout(tipHide);

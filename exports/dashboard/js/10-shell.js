@@ -94,8 +94,8 @@
       var txt = $('.gd-nav-item__text, .gd-ws__name, .gd-account__name, .gd-search__label', el.closest('.gd-account') || el);
       if (!txt) return;
       var label = txt.textContent.trim();
-      if (c) { el.setAttribute('data-gd-tooltip', label); el.setAttribute('data-gd-tooltip-placement', 'right'); el.removeAttribute('title'); }
-      else if (el.getAttribute('data-gd-tooltip') === label) { el.removeAttribute('data-gd-tooltip'); el.removeAttribute('data-gd-tooltip-placement'); }
+      if (c) { el.setAttribute('data-gd-tooltip', label); el.setAttribute('data-gd-tooltip-placement', 'right'); el.setAttribute('data-gd-tooltip-variant', 'rail'); el.removeAttribute('title'); }
+      else if (el.getAttribute('data-gd-tooltip') === label) { el.removeAttribute('data-gd-tooltip'); el.removeAttribute('data-gd-tooltip-placement'); el.removeAttribute('data-gd-tooltip-variant'); }
     });
   }
 

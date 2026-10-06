@@ -183,6 +183,15 @@
 /* side placements (the collapsed rail uses right): a 6 x 10 arrow on the facing edge, centred on the target */
 .gd .gd-tooltip[data-placement="right"]::after { left: auto; right: 100%; top: var(--gd-arrow-y, 50%); margin: -5px 0 0; width: 6px; height: 10px; clip-path: polygon(100% 0, 100% 100%, 0 50%); }
 .gd .gd-tooltip[data-placement="left"]::after { left: 100%; top: var(--gd-arrow-y, 50%); margin: -5px 0 0; width: 6px; height: 10px; clip-path: polygon(0 0, 0 100%, 100% 50%); }
+/* The collapsed sidebar's tooltip, as approved on 5 Oct 2026 (sidebar-collapsed rework): a plain pill, no arrow, 4px from the row
+   (60-feedback.js), Body/body-14-med, white with a hairline in light and dark in dark. It lived only in the review drawing's own
+   sheet (web/previews/_sheet.css) until 6 Oct, so the shipped component drew the generic tooltip instead of the approved one. */
+.gd .gd-tooltip.gd-tooltip--rail {
+  font: var(--gw-text-body-14-med); letter-spacing: var(--gw-text-body-14-med-tracking);
+  background: light-dark(var(--gw-color-white), var(--gw-color-neutral-900)); color: light-dark(var(--gw-color-black), var(--gw-color-white));
+  box-shadow: 0 0 0 1px light-dark(var(--gw-color-neutral-200), var(--gw-color-neutral-850)), var(--gw-shadow-s2);
+}
+.gd .gd-tooltip.gd-tooltip--rail::after { display: none; }
 .gd .gd-tooltip--static { position: relative; inset: auto; display: inline-block; }   /* documentation only */
 .gd .gd-tooltip--rich { max-width: 280px; padding: var(--gw-space-8) var(--gw-space-12); display: flex; flex-direction: column; gap: var(--gw-space-4); }
 .gd .gd-tooltip--rich:popover-open, .gd .gd-tooltip--rich.gd-tooltip--static { display: flex; }
