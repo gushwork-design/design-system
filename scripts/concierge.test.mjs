@@ -180,6 +180,22 @@ t('end to end: a DM that is not a file ask starts Bruce, no reaction and is logg
   o = await handleMessage(ev('check the routines', 'UUTSAV'), { ...deps, fire: async () => ({ fired: false, why: 'not set' }) });
   t('no trigger configured: Bruce says so in the thread', [o.did, calls.at(-1).method, calls.at(-1).body.thread_ts], ['bruce-failed', 'chat.postMessage', '300.3']);
   ok('greetings stay with the concierge', forBruce(understand('hi', catalog)) === false);
+  // The agent pane (6 Oct 2026): a session is a thread in the DM; a status line replaces the reaction, and the run is told.
+  {
+    const { contextOf } = await import('../web/api/_concierge.js');
+    fired.length = 0; calls.length = 0;
+    const pane = ev('build me a banner', 'UUTSAV', { thread_ts: '700.7', ts: '700.7', app_context: { entities: [{ type: 'slack#/types/channel_id', value: 'C07C4DELAGZ' }] } });
+    const paneDeps = { ...deps, agent: true, findPing: async () => null };   /* a threaded message is first checked against Alfred's pings; not one here */
+    o = await handleMessage(pane, { ...paneDeps, fire: async (e, _a, _b, extra) => { fired.push(extra); return { fired: true }; } });
+    t('a pane message sets the status to processing and tells the run it is an agent session', [o.did, calls.map((c) => c.method), calls[0].body.status, calls[0].body.thread_ts, fired[0].agent], ['bruce', ['agents.sessions.setStatus'], 'processing', '700.7', true]);
+    ok('the channel the person was looking at rides along', contextOf(pane) === 'channel_id C07C4DELAGZ');
+    calls.length = 0;
+    o = await handleMessage(ev('build me a banner', 'UUTSAV', { ts: '701.1' }), { ...deps, agent: true, fire: async () => ({ fired: true }) });
+    t('a plain top-level DM is not a pane session: no status call', [o.did, calls.length], ['bruce', 0]);
+    calls.length = 0;
+    o = await handleMessage(pane, { ...paneDeps, fire: async () => ({ fired: false, why: 'not set' }) });
+    t('a failed start clears the status again', calls.map((c) => c.method + ':' + (c.body.status || '')), ['agents.sessions.setStatus:processing', 'chat.postMessage:', 'agents.sessions.setStatus:active']);
+  }
   // Open to everyone, with a daily cap for everyone but the owner, and memory handed to the run.
   const logged = [];
   const runs = {}; const mem = { logRun: async (r) => { logged.push(r); return true; }, slackName: async (t, u) => 'Name of ' + u,
@@ -258,6 +274,14 @@ t('a Slack error is answered 200 with the error, so Slack does not retry', [r.co
 failMethod = '';
 
 calls.length = 0;
+calls.length = 0;
+r = await post({ type: 'event_callback', event_id: 'EvH1', event: { type: 'app_home_opened', user: 'UASKER', channel: 'D77', tab: 'messages' } });
+t('opening the agent pane sets the suggested prompts', [r.code, r.body.prompts, calls[0].method, calls[0].body.channel_id, calls[0].body.prompts.length], [200, 'set', 'assistant.threads.setSuggestedPrompts', 'D77', 4]);
+calls.length = 0;
+r = await post({ type: 'event_callback', event_id: 'EvH2', event: { type: 'app_home_opened', user: 'UASKER', channel: 'D77', tab: 'home' } });
+t('the Home tab is not the pane', [r.body.ignored, calls.length], ['not the agent pane', 0]);
+r = await post({ type: 'event_callback', event_id: 'EvS1', event: { type: 'agent_session_stopped', channel: 'D77' } });
+t('a stop press is acknowledged and dropped', [r.code, r.body.ignored], [200, 'agent_session_stopped']);
 r = await post({ type: 'event_callback', event_id: 'Ev9', event: { type: 'reaction_added', reaction: 'white_check_mark', user: 'UOWNER', item: { ts: '1.1' } } });
 t('the ✅ review loop still takes its own path', [r.code, calls.length], [200, 0]);
 

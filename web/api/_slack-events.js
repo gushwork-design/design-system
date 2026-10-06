@@ -123,6 +123,22 @@ export default async function handler(req, res) {
 
   const event = payload.event || {};
 
+  /* AGENT MODE (R55 addendum, 6 Oct 2026). With Slack's Agents feature on, Bruce also lives in the agent pane. Each
+     conversation there is a thread in his DM, so the message.im path below already carries it; these are the extra events.
+     Opening the pane (app_home_opened, tab messages) gets the suggested prompts. The rest are acknowledged and dropped:
+     a stop button press cannot stop a cloud run that has already started, and a renamed session needs nothing from us. */
+  if (event.type === 'app_home_opened') {
+    if (req.headers['x-slack-retry-num']) return res.status(200).json({ ok: true, ignored: 'retry' });
+    const token = process.env.SLACK_BOT_TOKEN;
+    if (!token || event.tab !== 'messages' || !event.channel) return res.status(200).json({ ok: true, ignored: 'not the agent pane' });
+    const { suggestPrompts } = await import('./_concierge.js');
+    const did = await suggestPrompts(token, event.channel);
+    return res.status(200).json({ ok: true, prompts: did });
+  }
+  if (event.type === 'app_context_changed' || event.type === 'agent_session_stopped' || event.type === 'agent_session_title_changed') {
+    return res.status(200).json({ ok: true, ignored: event.type });
+  }
+
   /* BRUCE THE CONCIERGE (see _concierge.js). The same Slack app answers people who @Bruce in a channel or DM him: it hands
      over brand assets and points at templates and tools. No model is called. Slack redelivers an event it thinks was not
      acknowledged in 3 seconds, so retries are acknowledged and dropped, and the event id is remembered for an hour. */
@@ -142,7 +158,7 @@ export default async function handler(req, res) {
     // Empty = everyone may DM Bruce (5 Oct 2026). A list narrows it.
     const bruceUsers = new Set(String(process.env.BRUCE_USER_IDS || '').split(',').map((x) => x.trim()).filter(Boolean));
     const memory = await import('./_bruce-memory.js');
-    const out = await handleMessage(event, { token, root: process.cwd(), owners, bruceUsers, ownerId: String(process.env.OWNER_SLACK_ID || '').trim(), memory });
+    const out = await handleMessage(event, { token, root: process.cwd(), owners, bruceUsers, ownerId: String(process.env.OWNER_SLACK_ID || '').trim(), memory, agent: true });
     if (out.did === 'error') console.warn('[concierge]', out.error);
     return res.status(200).json({ ok: true, concierge: out.did });
   }
