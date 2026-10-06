@@ -38,12 +38,19 @@ a{color:inherit;text-decoration:none}
 .btn.wide{width:100%}
 .btn .i{font-size:16px}
 
-/* ---------- navbar (black, Figma 136:12649) ---------- */
-.navbar{position:fixed;top:0;left:0;right:0;z-index:50;height:60px;background:var(--gw-color-black)}
+/* ---------- navbar: transparent over the hero, ad-page neutral-25 + 1px neutral-100 once scrolled ---------- */
+.navbar{position:fixed;top:0;left:0;right:0;z-index:50;height:60px;background:transparent;border-bottom:1px solid transparent;transition:background-color .4s,border-color .4s}
+.navbar[data-scrolled]{background:var(--gw-color-neutral-25);border-bottom-color:var(--gw-color-neutral-100)}
 .navbar .in{width:min(1240px,calc(100% - 32px));margin:0 auto;height:100%;display:flex;align-items:center;justify-content:space-between}
-.navbar .logo img{height:22px;width:auto}
-.login{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:36px;padding:2px var(--gw-space-12);border-radius:var(--gw-radius-8);background:var(--gw-color-white);border:.888px solid var(--gw-color-neutral-alpha-10-white);color:var(--gw-color-black);font:var(--gw-text-body-14-med);letter-spacing:var(--gw-text-body-14-med-tracking)}
+.navbar .logo{position:relative;display:block;width:115.76px;height:22px}
+.navbar .logo img{position:absolute;left:0;top:0;height:22px;width:auto;transition:opacity .4s}
+.navbar .logo .lg-o{opacity:0}
+.navbar[data-scrolled] .logo .lg-o{opacity:1}
+.navbar[data-scrolled] .logo .lg-w{opacity:0}
+.login{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:36px;padding:2px var(--gw-space-12);border-radius:var(--gw-radius-8);background:var(--gw-color-white);border:.888px solid var(--gw-color-neutral-alpha-10-white);color:var(--gw-color-black);font:var(--gw-text-body-14-med);letter-spacing:var(--gw-text-body-14-med-tracking);transition:background-color .4s,color .4s}
 .login:hover{background:var(--gw-color-neutral-50)}
+.navbar[data-scrolled] .login{background:var(--gw-color-black);color:var(--gw-color-white)}
+.navbar[data-scrolled] .login:hover{background:var(--gw-color-neutral-900)}
 
 /* ---------- atoms ---------- */
 .badge{display:inline-flex;align-items:center;gap:var(--gw-space-4);height:22px;padding:2px 8px;border-radius:var(--gw-radius-full);font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking);background:var(--gw-color-neutral-50);color:var(--gw-color-neutral-700);white-space:nowrap}
@@ -56,7 +63,16 @@ a{color:inherit;text-decoration:none}
 /* ---------- hero (Figma 136:11175) ---------- */
 .hero{position:relative;height:460px;border-radius:0 0 var(--gw-radius-20) var(--gw-radius-20);overflow:hidden;background:var(--gw-color-primary-500)}
 .hero .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 30%}
-.hero .shade{position:absolute;left:0;bottom:0;width:863px;max-width:100%;height:462px;background:linear-gradient(to left,transparent 10.405%,var(--gw-color-neutral-alpha-50-black) 104.11%)}
+.hero .shade{position:absolute;left:0;bottom:0;width:863px;max-width:100%;height:462px}
+/* Figma 136:13549: PROGRESSIVE background blur, radius 8 (about 4px in CSS) at the left edge easing to 0 by 82% of the 863px shade.
+   Built as four masked copies of the photo, lightest underneath, so the blur grows toward the left without compounding. */
+.hero .blur{position:absolute;inset:0}
+.hero .blur i{position:absolute;inset:0;display:block;background:url(assets/hero.jpg) 50% 30%/cover no-repeat}
+.hero .blur i:nth-child(1){filter:blur(1px);-webkit-mask-image:linear-gradient(to right,#000 .7%,transparent 49%);mask-image:linear-gradient(to right,#000 .7%,transparent 49%)}
+.hero .blur i:nth-child(2){filter:blur(2px);-webkit-mask-image:linear-gradient(to right,#000 .7%,transparent 41%);mask-image:linear-gradient(to right,#000 .7%,transparent 41%)}
+.hero .blur i:nth-child(3){filter:blur(3px);-webkit-mask-image:linear-gradient(to right,#000 .7%,transparent 31%);mask-image:linear-gradient(to right,#000 .7%,transparent 31%)}
+.hero .blur i:nth-child(4){filter:blur(4px);-webkit-mask-image:linear-gradient(to right,#000 .7%,transparent 18%);mask-image:linear-gradient(to right,#000 .7%,transparent 18%)}
+.hero .shade{background:linear-gradient(to left,transparent 10.405%,var(--gw-color-neutral-alpha-50-black) 104.11%)}
 .hero .tx{position:absolute;left:max(16px,calc((100% - 1240px)/2));right:16px;top:calc(50% + 14px);transform:translateY(-50%);display:flex;flex-direction:column;gap:var(--gw-space-20)}
 .hero h1{font:var(--gw-text-h1);letter-spacing:var(--gw-text-h1-tracking);color:var(--gw-color-white)}
 .hero p{font:var(--gw-text-body-20-med);letter-spacing:var(--gw-text-body-20-med-tracking);color:var(--gw-color-neutral-alpha-80-white)}
@@ -88,7 +104,9 @@ main{padding-top:var(--gw-space-24)}
 .kbd .i{font-size:12px}
 
 /* ---------- sections ---------- */
-.sec{margin-top:var(--gw-space-40)}
+.sec{margin-top:var(--gw-space-40);scroll-margin-top:84px}
+.search{scroll-margin-top:84px}
+.search input::-webkit-search-cancel-button,.search input::-webkit-search-decoration{-webkit-appearance:none;display:none}
 .sec-h{display:flex;align-items:center;justify-content:space-between;gap:var(--gw-space-12);margin-bottom:var(--gw-space-16)}
 .sec-h h2{font:var(--gw-text-h7);letter-spacing:var(--gw-text-h7-tracking);display:flex;align-items:center;gap:var(--gw-space-12);flex-wrap:wrap}
 .btn.bundle{background:transparent;color:var(--gw-color-black);box-shadow:inset 0 0 0 1.5px var(--gw-color-neutral-100)}
@@ -119,13 +137,17 @@ main{padding-top:var(--gw-space-24)}
 .empty p{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-700)}
 
 /* ---------- listing panel ---------- */
-.scrim{position:fixed;inset:0;z-index:60;background:var(--gw-color-neutral-alpha-50-black);opacity:0;pointer-events:none;transition:opacity .25s}
-.scrim.on{opacity:1;pointer-events:auto}
-.panel{position:fixed;top:0;right:0;bottom:0;z-index:61;width:min(520px,100vw);background:var(--gw-color-neutral-25);box-shadow:var(--gw-shadow-s4);transform:translateX(100%);transition:transform .3s cubic-bezier(.22,1,.36,1);display:flex;flex-direction:column}
-.panel.on{transform:none}
-.panel .ph{display:flex;align-items:center;justify-content:space-between;padding:var(--gw-space-12) var(--gw-space-16);border-bottom:1px solid var(--gw-color-neutral-100);background:var(--gw-color-neutral-25)}
-.panel .pb{flex:1;overflow:auto;padding:var(--gw-space-24);display:flex;flex-direction:column;gap:var(--gw-space-24)}
-.panel .pf{padding:var(--gw-space-16) var(--gw-space-24);border-top:1px solid var(--gw-color-neutral-100);background:var(--gw-color-white);display:flex;gap:var(--gw-space-12);align-items:center}
+.amodal{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:var(--gw-space-24);background:var(--gw-color-neutral-alpha-50-black)}
+.amodal.on{display:flex}
+.adlg{width:min(880px,100%);max-height:calc(100vh - 48px);display:flex;flex-direction:column;background:var(--gw-color-neutral-25);border-radius:var(--gw-radius-20);box-shadow:var(--gw-shadow-s4);overflow:hidden;animation:pop .22s cubic-bezier(.22,1,.36,1)}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+.adlg .ph{display:flex;align-items:center;gap:var(--gw-space-12);padding:var(--gw-space-12) var(--gw-space-16);border-bottom:1px solid var(--gw-color-neutral-100)}
+.adlg .ph .pos{font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking);color:var(--gw-color-neutral-500)}
+.adlg .ph .nv{margin-left:auto;display:flex;gap:var(--gw-space-4);align-items:center}
+.adlg .ph .nv .iconbtn.sep{margin-left:var(--gw-space-8)}
+.adlg .pb{flex:1;overflow:auto;padding:var(--gw-space-24);display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:var(--gw-space-32);align-items:start}
+.adlg .cl,.adlg .cr{display:flex;flex-direction:column;gap:var(--gw-space-24);min-width:0}
+.adlg .pf{padding:var(--gw-space-16) var(--gw-space-24);border-top:1px solid var(--gw-color-neutral-100);background:var(--gw-color-white);display:flex;gap:var(--gw-space-12);align-items:center}
 .p-id{display:flex;gap:var(--gw-space-16);align-items:center}
 .p-id .face{width:96px;height:96px;border-radius:var(--gw-radius-16);overflow:hidden;flex:none}
 .p-id .face img{width:100%;height:100%;object-fit:cover}
@@ -135,7 +157,7 @@ main{padding-top:var(--gw-space-24)}
 .p-blurb{font:var(--gw-text-body-16-reg);color:var(--gw-color-neutral-900)}
 .block h3{font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-600);margin-bottom:var(--gw-space-12);letter-spacing:var(--gw-text-body-12-med-tracking)}
 .steps{list-style:none;display:flex;flex-direction:column;position:relative}
-.steps li{display:grid;grid-template-columns:88px 1fr;gap:var(--gw-space-12);padding:var(--gw-space-12) 0;border-top:1px solid var(--gw-color-neutral-100);font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-900)}
+.steps li{display:grid;grid-template-columns:76px 1fr;gap:var(--gw-space-12);padding:var(--gw-space-12) 0;border-top:1px solid var(--gw-color-neutral-100);font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-900)}
 .steps li:first-child{border-top:0;padding-top:0}
 .steps li b{font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-600);padding-top:2px}
 .facts{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--gw-space-8)}
@@ -208,21 +230,9 @@ main{padding-top:var(--gw-space-24)}
 .toast{position:fixed;left:50%;bottom:var(--gw-space-24);transform:translate(-50%,200%);z-index:90;background:var(--gw-color-neutral-900);color:#fff;font:var(--gw-text-body-14-med);padding:var(--gw-space-12) var(--gw-space-16);border-radius:var(--gw-radius-12);transition:transform .3s;max-width:calc(100vw - 32px)}
 .toast.on{transform:translate(-50%,0)}
 
-/* ---------- footer (Brand, Show CTA off, marquee off) ---------- */
-.foot{background:var(--gw-color-black);border-radius:var(--gw-radius-20) var(--gw-radius-20) 0 0;margin:0 var(--gw-space-16);padding-top:var(--gw-space-80);color:var(--gw-color-neutral-400)}
-.foot .in{max-width:1240px;margin:0 auto;padding:0 var(--gw-space-24);display:flex;flex-direction:column;gap:var(--gw-space-80)}
-.foot .top{display:flex;justify-content:space-between;gap:var(--gw-space-60);flex-wrap:wrap}
-.foot .brand{display:flex;flex-direction:column;gap:var(--gw-space-24);max-width:600px}
-.foot .brand img{height:24px;align-self:flex-start}
-.foot .addr{font:var(--gw-text-body-12-reg,400 12px/1.5 var(--gw-font-body));color:var(--gw-color-neutral-600);display:flex;flex-direction:column;gap:var(--gw-space-12)}
-.foot .cols{display:flex;gap:var(--gw-space-60);flex-wrap:wrap}
-.foot .cols h3{font:var(--gw-text-body-12-sem,600 12px/16px var(--gw-font-body));color:var(--gw-color-neutral-200);margin-bottom:var(--gw-space-20)}
-.foot .cols ul{list-style:none;display:flex;flex-direction:column;gap:var(--gw-space-12)}
-.foot .cols a{font:var(--gw-text-body-14-med)}
-.foot .cols a:hover{color:#fff}
-.foot .bot{border-top:1px solid var(--gw-color-neutral-850);padding:var(--gw-space-24) 0 var(--gw-space-32);display:flex;justify-content:space-between;gap:var(--gw-space-16);flex-wrap:wrap;font:var(--gw-text-body-12-med)}
-.foot .bot .l{color:var(--gw-color-neutral-700)}
-.foot .bot .r{display:flex;gap:var(--gw-space-24);color:var(--gw-color-neutral-600)}
+/* ---------- footer: the short ad-page footer (copyright line only) ---------- */
+.footer{background:var(--gw-color-black);border-radius:var(--gw-radius-8) var(--gw-radius-8) 0 0;padding:var(--gw-space-16);padding-bottom:calc(var(--gw-space-16) + env(safe-area-inset-bottom,0px));display:flex;justify-content:center}
+.footer .legal{font:var(--gw-text-body-12-med);line-height:12px;letter-spacing:var(--gw-text-body-12-med-tracking);color:var(--gw-color-neutral-600)}
 
 /* ---------- phone ---------- */
 @media(max-width:1000px){
@@ -242,8 +252,9 @@ main{padding-top:var(--gw-space-24)}
  .sec-h h2{flex-basis:100%}
  .sec-h .btn{width:100%}
  .grid{grid-template-columns:minmax(0,1fr)}
- .panel{width:100vw;top:auto;height:92vh;border-radius:var(--gw-radius-20) var(--gw-radius-20) 0 0;transform:translateY(100%)}
- .panel.on{transform:none}
+ .amodal{padding:0;align-items:flex-end}
+ .adlg{width:100%;max-height:94vh;border-radius:var(--gw-radius-20) var(--gw-radius-20) 0 0}
+ .adlg .pb{grid-template-columns:minmax(0,1fr);gap:var(--gw-space-24)}
  .pkgbar{bottom:var(--gw-space-12)}
  .pkgbar .stack{display:none}
  .pkgbar .tx b .lg{display:none}
@@ -252,23 +263,23 @@ main{padding-top:var(--gw-space-24)}
  .sheet{border-radius:var(--gw-radius-20) var(--gw-radius-20) 0 0;max-height:94vh}
  .vrow{grid-template-columns:28px 1fr 72px 52px}
  .sheet .mf .btn{flex:1}
- .foot .top,.foot .cols{flex-direction:column}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
 
-<header class="navbar">
+<header class="navbar" id="nav">
  <div class="in">
-  <a class="logo" href="#" aria-label="Gushwork home"><img src="assets/logo/gushwork-logo-white.svg" alt="Gushwork"></a>
+  <a class="logo" href="#" aria-label="Gushwork home"><img class="lg-w" src="assets/logo/gushwork-logo-white.svg" alt="Gushwork"><img class="lg-o" src="assets/logo/gushwork-logo-original.svg" alt=""></a>
   <a class="login" href="#">Login</a>
  </div>
 </header>
 
 <section class="hero" aria-label="Gushwork Agents">
  <img class="bg" src="assets/hero.jpg" alt="">
- <div class="shade"></div>
+ <div class="blur" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+ <div class="shade" aria-hidden="true"></div>
  <div class="tx"><h1>Gushwork Agents</h1><p>Only pay for agents that work for you.</p></div>
 </section>
 
@@ -288,26 +299,12 @@ main{padding-top:var(--gw-space-24)}
  </div>
 </div>
 
-<footer class="foot">
- <div class="in">
-  <div class="top">
-   <div class="brand">
-    <img src="assets/logo/gushwork-logo-white.svg" alt="Gushwork">
-    <div class="addr"><span>Regents Inc, 16192 Coastal Hwy, Lewes, DE 19958, United States</span><span>Delfin Technologies India Pvt Ltd, 578, 9th A Main Rd, Indiranagar, Bengaluru, Karnataka 560038, India</span><span>+1 (888) 451 5522 · growth@gushwork.ai</span></div>
-   </div>
-   <div class="cols">
-    <div><h3>Platform</h3><ul><li><a href="#">Brand Memory</a></li><li><a href="#">Page Creation Engine</a></li><li><a href="#">AI-First CMS</a></li><li><a href="#">Leads Dashboard</a></li><li><a href="#">Analytics</a></li></ul></div>
-    <div><h3>Solutions</h3><ul><li><a href="#">AI Search Agent</a></li><li><a href="#">Lead Conversion</a></li><li><a href="#">Paid Boost</a></li></ul></div>
-    <div><h3>Company</h3><ul><li><a href="#">Pricing</a></li><li><a href="#">Customers</a></li><li><a href="#">Careers</a></li><li><a href="#">Announcements</a></li><li><a href="#">Alternatives</a></li></ul></div>
-   </div>
-  </div>
-  <div class="bot"><span class="l">© 2026 Gushwork. All rights reserved.</span><span class="r"><a href="#">Privacy</a><a href="#">Terms</a></span></div>
- </div>
+<footer class="footer">
+ <small class="legal">&copy; 2026 Gushwork | All Rights Reserved</small>
 </footer>
 
 <div class="pkgbar" id="pkgbar" role="region" aria-label="Your package"></div>
-<div class="scrim" id="scrim"></div>
-<aside class="panel" id="panel" aria-label="Agent details" aria-hidden="true"></aside>
+<div class="amodal" id="amodal"><div class="adlg" id="adlg" role="dialog" aria-modal="true" aria-label="Agent details"></div></div>
 <div class="modal" id="modal"><div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Package builder"></div></div>
 <div class="toast" id="toast" role="status"></div>
 
@@ -320,8 +317,10 @@ const ICON = {'generate-more-leads':'megaphone','lead-to-quote':'funnel','order-
 const ONE = {"seo-agent": "Ranks on Google and AI search", "paid-ad-agent": "Runs Meta, Google, ChatGPT ads", "email-marketing-agent": "Turns lists into campaigns", "front-desk": "Tags every sales and PO email", "lead-chaser": "Answers every lead in a day", "quote-builder": "Drafts priced quotes from RFQs", "quote-chaser": "Follows up on every open quote", "margin-guard": "Flags low-margin quotes", "reorder-scout": "Finds overdue repeat orders", "win-back": "Wakes up quiet accounts", "catalog-builder": "Sets up your item catalog", "po-checker": "Checks each PO vs the quote", "order-entry": "Enters POs as sales orders", "change-desk": "Handles changes and cancels", "date-keeper": "Confirms a ship date per line", "heads-up": "Warns customers before delays", "returns-desk": "Handles returns and credits", "vendor-quote-runner": "Gets supplier prices and dates", "buy-planner": "Drafts POs for approval", "po-expediter": "Chases late supplier POs", "cost-watch": "Tracks vendor price increases", "bill-checker": "Matches vendor bills to POs", "freight-desk": "Prices and audits your freight", "rebate-claimer": "Claims rebates you are owed", "invoice-pre-flight": "Fixes invoices before sending", "unbilled-sweeper": "Finds shipments never invoiced", "collector": "Chases overdue invoices", "hold-release": "Reviews held orders", "cash-desk": "Applies payments to invoices", "rev-catcher": "Catches drawing revisions", "quality-desk": "Writes up nonconformances", "cert-desk": "Checks certs, builds packets", "compliance-desk": "Answers compliance requests"};
 const TIERS = [{name:'Starter',agents:3,price:600,credits:1000},{name:'Growth',agents:6,price:1100,credits:2500},{name:'Scale',agents:12,price:2100,credits:6000}];
 const INDUSTRIES = [['Manufacturer','Manufacturers'],['Distributor','Distributors'],['Home services'],['Compliance services'],['Legal services'],['IT services'],['Logistics & trucking'],['Healthcare'],['Construction'],['Real estate'],['Hospitality'],['Financial services'],['Education']];
+// Card descriptions: taken from the Agent Store HTML (blurb and steps), trimmed or extended to about 100-125 characters so every card runs to a similar length. Agents not listed use their blurb as is.
+const CARD = {"paid-ad-agent": "Runs Meta, Google and ChatGPT ads daily against a monthly budget, adjusting bids until cost per qualified lead hits target.", "quote-chaser": "Follows up on every open quote from the rep's mailbox until it is won, lost with a reason, or expired after 3 touches.", "margin-guard": "Checks every quote before it goes out and flags lines priced below floor, on stale cost, or missing freight.", "win-back": "Finds accounts that went quiet, works out why, and drafts tailored outreach, with rep approval on key accounts.", "catalog-builder": "Sets up new items with full specs, images and descriptions from manufacturer data, ready for the content team to approve.", "order-entry": "Reads emailed and PDF POs and enters them as sales orders, sending only unclear lines to a CSR within 15 minutes.", "change-desk": "Answers order change and cancel requests with the real cost and new date, then updates the order and logs the reason.", "date-keeper": "Sends an order acknowledgment with a realistic ship date for every line, and decides when to split, wait or substitute.", "heads-up": "Tells customers about a delay or backorder before they call, with a new date and options such as a substitute.", "returns-desk": "Handles customer returns by policy, issues the RMA and credit, and recovers the credit from the vendor.", "po-expediter": "Chases suppliers on late and unconfirmed POs for a ship date, and shows which customer orders are at risk.", "freight-desk": "Prices freight on quotes, audits carrier bills, and files damage and shortage claims before their deadlines.", "invoice-pre-flight": "Fixes each invoice to match the customer's AP rules, so it is accepted the first time and not short-paid.", "unbilled-sweeper": "Lists everything that shipped but was never invoiced, every day, with the dollar value and the reason.", "cash-desk": "Applies incoming payments to invoices the same day and resolves every short payment or deduction with proof.", "rev-catcher": "Catches customer drawing revisions, prices the impact, and asks for a revised PO before affected jobs move.", "quality-desk": "Writes up nonconformances, sends supplier corrective-action requests, and recovers the cost from the supplier.", "cert-desk": "Checks incoming mill certs against the PO, holds bad lots, and builds the cert packet for each shipment."};
 const STEP_LABELS = ['Trigger','Reads','Decides','Does','Approval'];
-const S = {q:'',type:'any',cat:'any',ind:'Manufacturer',sel:{},open:null,vol:{},builder:false};
+const S = {spy:'all',q:'',type:'any',cat:'any',ind:'Manufacturer',sel:{},open:null,vol:{},builder:false};
 const fmt = n => '$'+n.toLocaleString('en-US');
 const esc = s => String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const ic = (n,w='regular') => `<i class="i" style="--m:url(assets/icons/${n}-${w}.svg)"></i>`;
@@ -364,21 +363,20 @@ function renderRail(){
   $('#rail').innerHTML = `
    <div class="rgroup"><h2>Industry</h2><div class="select"><select id="ind" aria-label="Industry">${INDUSTRIES.map(([v,l])=>`<option value="${esc(v)}" ${v===S.ind?'selected':''} ${l?'':'disabled'}>${esc(l||v)}</option>`).join('')}</select>${ic('caret-down','bold')}</div></div>
    <div class="rgroup"><h2>Category</h2>
-    <button class="ritem ${S.cat==='any'?'on':''}" data-cat="any">${ic('list-bullets')}All agents<span class="n">${p.length}</span></button>
-    ${D.bundles.map(b=>{const n=p.filter(a=>a.bundle===b.name).length;return `<button class="ritem ${S.cat===b.id?'on':''}" data-cat="${b.id}">${ic(ICON[b.id]||'package')}${esc(b.name)}<span class="n">${n}</span></button>`}).join('')}
-    <button class="ritem ${S.cat==='build'?'on':''}" data-cat="build">${ic('sparkle')}Build your own agent<span class="n">Soon</span></button>
+    <button class="ritem ${S.spy==='all'?'on':''}" data-jump="all">${ic('list-bullets')}All agents<span class="n">${p.length}</span></button>
+    ${D.bundles.map(b=>{const n=p.filter(a=>a.bundle===b.name).length;return `<button class="ritem ${S.spy===b.id?'on':''}" data-jump="${b.id}">${ic(ICON[b.id]||'package')}${esc(b.name)}<span class="n">${n}</span></button>`}).join('')}
+    <button class="ritem ${S.spy==='build'?'on':''}" data-jump="build">${ic('sparkle')}Build your own agent<span class="n">Soon</span></button>
    </div>`;
 }
 function card(a){
   const on=!!S.sel[a.id];
   return `<article class="card ${a.luxury?'prem':''} ${on?'sel':''}" data-open="${a.id}" tabindex="0" role="button" aria-label="Open ${esc(a.name)}">
     <div class="top"><div class="tile"><img src="${img(a)}" alt=""></div><div class="tx"><h3>${esc(a.name)}</h3>${a.luxury?`<span class="one price">${esc(perItem(a))}</span>`:`<span class="one">${esc(ONE[a.id]||'')}</span>`}</div></div>
-    <p class="desc">${esc(a.blurb)}</p>
+    <p class="desc">${esc(CARD[a.id]||a.blurb)}</p>
     <button class="add ${on?'live':''}" data-add="${a.id}" aria-label="${on?'Remove':'Add'} ${esc(a.name)} ${on?'from':'to'} package" aria-pressed="${on}">${ic(on?'check':'plus','bold')}</button></article>`;
 }
 function renderResults(){
   $('#qclear').hidden = !S.q; $('#kbd').style.display = S.q?'none':'';
-  if(S.cat==='build'){ $('#results').innerHTML=`<div class="empty"><div class="badgeic">${ic('sparkle')}</div><h2>Build your own agent</h2><p>This is coming soon.</p><button class="btn out sm" data-reset>Back to all agents</button></div>`; return; }
   const list=visible();
   let h='';
   const secs=D.bundles.map(b=>({b,agents:list.filter(a=>a.bundle===b.name)})).filter(s=>s.agents.length);
@@ -386,8 +384,10 @@ function renderResults(){
     const ids=agents.filter(a=>!a.free).map(a=>a.id), allIn=ids.length>0&&ids.every(id=>S.sel[id]);
     h+=`<section class="sec" id="b-${b.id}"><div class="sec-h"><h2>${esc(b.name)}${b.luxury?'<span class="pill-prem">Premium</span>':''}</h2>${ids.length?`<button class="btn sm bundle ${allIn?'done':''}" data-bundle="${b.id}" aria-pressed="${allIn}">${ic(allIn?'check':'plus','bold')}${allIn?'Added':'Add whole bundle'}</button>`:''}</div><div class="grid">${agents.map(a=>card(a)).join('')}</div></section>`;
   });
-  if(!secs.length) h+=`<div class="empty"><div class="badgeic">${ic('magnifying-glass')}</div><h2>No agents match</h2><p>Try a different word, or clear the search.</p><button class="btn out sm" data-reset>Clear search</button></div>`;
+  if(!S.q.trim()) h+=`<section class="sec" id="b-build"><div class="sec-h"><h2>Build your own agent<span class="badge">Coming soon</span></h2></div><div class="empty" style="margin-top:0"><div class="badgeic">${ic('sparkle')}</div><p>This is coming soon.</p></div></section>`;
+  if(!secs.length) h=`<div class="empty"><div class="badgeic">${ic('magnifying-glass')}</div><h2>No agents match</h2><p>Try a different word, or clear the search.</p><button class="btn out sm" data-reset>Clear search</button></div>`;
   $('#results').innerHTML=h;
+  onScroll();
 }
 function renderBar(){
   const l=selected(), bar=$('#pkgbar');
@@ -398,25 +398,39 @@ function renderBar(){
    <button class="clear" data-clear>Clear</button><button class="btn sm" data-builder>Build package ${ic('arrow-right','bold')}</button>`;
   requestAnimationFrame(()=>bar.classList.add('on'));
 }
-function renderPanel(){
-  const a=D.agents.find(x=>x.id===S.open), el=$('#panel');
-  if(!a){el.classList.remove('on');el.setAttribute('aria-hidden','true');$('#scrim').classList.toggle('on',S.builder);return;}
-  const on=!!S.sel[a.id], b=bundleOf(a);
-  el.innerHTML=`<div class="ph"><span class="badge">${esc(a.bundle)}</span><button class="iconbtn" data-close aria-label="Close">${ic('x','bold')}</button></div>
+function syncLock(){document.body.classList.toggle('lock',!!(S.open||S.builder));}
+// Page order of the agents on screen (respects the search), used by next and previous.
+function order(){
+  const mk=l=>D.bundles.flatMap(b=>l.filter(a=>a.bundle===b.name)).map(a=>a.id);
+  const o=mk(visible()); return o.includes(S.open)?o:mk(pool());
+}
+function step(d){const o=order(),i=o.indexOf(S.open);if(i<0)return;S.open=o[(i+d+o.length)%o.length];renderPanel(true);}
+function renderPanel(fresh){
+  const m=$('#amodal'), a=D.agents.find(x=>x.id===S.open);
+  if(!a){m.classList.remove('on');syncLock();return;}
+  const old=$('#adlg .pb'), keep=(!fresh&&old)?old.scrollTop:0;
+  const o=order(), i=o.indexOf(a.id), on=!!S.sel[a.id], b=bundleOf(a);
+  $('#adlg').innerHTML=`<div class="ph"><span class="badge">${esc(a.bundle)}</span><span class="pos">${i+1} of ${o.length}</span><div class="nv"><button class="iconbtn" data-prev aria-label="Previous agent">${ic('arrow-left','bold')}</button><button class="iconbtn" data-next aria-label="Next agent">${ic('arrow-right','bold')}</button><button class="iconbtn sep" data-close aria-label="Close">${ic('x','bold')}</button></div></div>
   <div class="pb">
-   <div class="p-id"><div class="face"><img src="${img(a)}" alt=""></div><div><h2>${esc(a.name)}</h2><div class="price${a.luxury?' price-prem':''}">${esc(perItem(a))}</div></div></div>
-   <p class="p-blurb">${esc(a.blurb)}</p>
-   <div class="block"><h3>How it works</h3><ol class="steps">${a.steps.map((t,i)=>`<li><b>${STEP_LABELS[i]||''}</b><span>${esc(t)}</span></li>`).join('')}</ol></div>
-   <div class="rep"><h3>${ic('handshake')}Talk track</h3><div class="q"><small>Pain to listen for</small><p>${esc(a.pain)}</p></div><div class="q ask"><small>Discovery question</small><p>“${esc(a.question)}”</p></div></div>
-   <div class="block"><h3>Details</h3><div class="facts"><div class="fact"><small>Fits</small><span>${esc(a.fits)}</span></div><div class="fact"><small>Bundle</small><span>${esc(b.name)}</span></div><div class="fact"><small>Counted as</small><span>${esc(a.item)}</span></div><div class="fact"><small>Cost</small><span>${esc(perItem(a))}</span></div></div></div>
-   <div class="proof">${ic('sparkle')}Proof slot, held open until there are real customer results to show here.</div>
+   <div class="cl">
+    <div class="p-id"><div class="face"><img src="${img(a)}" alt=""></div><div><h2>${esc(a.name)}</h2><div class="price${a.luxury?' price-prem':''}">${esc(perItem(a))}</div></div></div>
+    <p class="p-blurb">${esc(a.blurb)}</p>
+    <div class="block"><h3>How it works</h3><ol class="steps">${a.steps.map((t,k)=>`<li><b>${STEP_LABELS[k]||''}</b><span>${esc(t)}</span></li>`).join('')}</ol></div>
+   </div>
+   <div class="cr">
+    <div class="rep"><h3>${ic('handshake')}Talk track</h3><div class="q"><small>Pain to listen for</small><p>${esc(a.pain)}</p></div><div class="q ask"><small>Discovery question</small><p>“${esc(a.question)}”</p></div></div>
+    <div class="block"><h3>Details</h3><div class="facts"><div class="fact"><small>Fits</small><span>${esc(a.fits)}</span></div><div class="fact"><small>Bundle</small><span>${esc(b.name)}</span></div><div class="fact"><small>Counted as</small><span>${esc(a.item)}</span></div><div class="fact"><small>Cost</small><span>${esc(perItem(a))}</span></div></div></div>
+    <div class="proof">${ic('sparkle')}Proof slot, held open until there are real customer results to show here.</div>
+   </div>
   </div>
   <div class="pf"><button class="btn wide ${on?'out':''}" data-add="${a.id}">${ic(on?'check':'plus','bold')}${on?'Added, remove from package':'Add to package'}</button></div>`;
-  el.classList.add('on');el.setAttribute('aria-hidden','false');$('#scrim').classList.add('on');
+  $('#adlg .pb').scrollTop=keep;
+  if(!m.classList.contains('on')){m.classList.add('on');$('#adlg [data-close]').focus({preventScroll:true});}
+  syncLock();
 }
 function renderBuilder(keep){
   const m=$('#modal');
-  if(!S.builder){m.classList.remove('on');document.body.classList.remove('lock');return;}
+  if(!S.builder){m.classList.remove('on');syncLock();return;}
   const l=selected(); if(!l.length){S.builder=false;return renderBuilder();}
   const p=pricing(l);
   $('#sheet').innerHTML=`<div class="mh"><div><small>Package for ${S.ind==='Distributor'?'a distributor':'a manufacturer'}</small><h2>${esc(p.name)}</h2><p>${esc(p.summary)}</p></div><button class="iconbtn" data-bclose aria-label="Close">${ic('x','bold')}</button></div>
@@ -433,7 +447,7 @@ function renderBuilder(keep){
    </div>
   </div>
   <div class="mf"><button class="btn out" data-bclose>Keep editing</button><button class="btn" data-proposal>Send proposal ${ic('paper-plane-tilt','bold')}</button></div>`;
-  m.classList.add('on');document.body.classList.add('lock');
+  m.classList.add('on');syncLock();
   if(keep){const e=document.querySelector(`[data-vol="${keep.id}"]`);if(e){e.focus();try{e.setSelectionRange(keep.pos,keep.pos)}catch(_){}}}
 }
 function renderAll(){renderRail();renderResults();renderBar();renderPanel();renderBuilder();}
@@ -441,33 +455,51 @@ let tt; function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('o
 
 /* ---- events ---- */
 document.addEventListener('click',e=>{
-  const t=e.target.closest('[data-add],[data-open],[data-type],[data-cat],[data-bundle],[data-close],[data-clear],[data-builder],[data-bclose],[data-proposal],[data-reset],#filterbtn,#qclear,#scrim,#modal');
+  const t=e.target.closest('[data-add],[data-open],[data-jump],[data-bundle],[data-close],[data-prev],[data-next],[data-clear],[data-builder],[data-bclose],[data-proposal],[data-reset],#filterbtn,#qclear,#amodal,#modal');
   if(!t) return;
   if(t.dataset.add){e.stopPropagation();const id=t.dataset.add;S.sel[id]?delete S.sel[id]:S.sel[id]=true;renderResults();renderBar();if(S.open)renderPanel();return;}
-  if(t.dataset.open){S.open=t.dataset.open;renderPanel();$('#panel .iconbtn')?.focus({preventScroll:true});return;}
-  if(t.dataset.type){S.type=t.dataset.type;renderRail();renderResults();return;}
-  if(t.dataset.cat){S.cat=t.dataset.cat;renderRail();renderResults();return;}
+  if(t.dataset.open){S.open=t.dataset.open;renderPanel(true);return;}
+  if(t.dataset.jump){const id=t.dataset.jump;const el=id==='all'?$('.search'):document.getElementById('b-'+id);$('#rail').classList.remove('open');if(el)el.scrollIntoView({behavior:'smooth',block:'start'});return;}
   if('bundle' in t.dataset){const b=D.bundles.find(x=>x.id===t.dataset.bundle);const ids=visible().filter(a=>a.bundle===b.name&&!a.free).map(a=>a.id);const allIn=ids.every(id=>S.sel[id]);ids.forEach(id=>allIn?delete S.sel[id]:S.sel[id]=true);renderResults();renderBar();return;}
+  if('prev' in t.dataset){step(-1);return;}
+  if('next' in t.dataset){step(1);return;}
   if('close' in t.dataset){S.open=null;renderPanel();return;}
+  if(t.id==='amodal'&&e.target===t){S.open=null;renderPanel();return;}
   if('clear' in t.dataset){S.sel={};renderResults();renderBar();if(S.open)renderPanel();return;}
   if('builder' in t.dataset){S.builder=true;renderBuilder();return;}
   if('bclose' in t.dataset){S.builder=false;renderBuilder();return;}
   if(t.id==='modal'&&e.target===t){S.builder=false;renderBuilder();return;}
   if('proposal' in t.dataset){toast('Send proposal is not wired up in this layout pass, as in the original file.');return;}
-  if('reset' in t.dataset){S.q='';S.type='any';S.cat='any';$('#q').value='';renderRail();renderResults();return;}
-    if(t.id==='filterbtn'){const r=$('#rail');r.classList.toggle('open');if(r.classList.contains('open'))r.scrollIntoView({block:'start'});return;}
+  if('reset' in t.dataset){S.q='';$('#q').value='';renderResults();return;}
+  if(t.id==='filterbtn'){const r=$('#rail');r.classList.toggle('open');if(r.classList.contains('open'))r.scrollIntoView({block:'start'});return;}
   if(t.id==='qclear'){S.q='';$('#q').value='';renderResults();$('#q').focus();return;}
-  if(t.id==='scrim'){if(S.open){S.open=null;renderPanel();}return;}
 });
 document.addEventListener('keydown',e=>{
+  const typing=/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName);
   if(e.key==='Escape'){if(S.builder){S.builder=false;renderBuilder();}else if(S.open){S.open=null;renderPanel();}return;}
-  if((e.key==='Enter'||e.key===' ')&&e.target.matches('.card[data-open]')){e.preventDefault();S.open=e.target.dataset.open;renderPanel();return;}
-  if((e.key==='k'&&(e.metaKey||e.ctrlKey))||(e.key==='/'&&!/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName))){e.preventDefault();$('#q').focus();}
+  if(S.open&&!S.builder&&!typing&&(e.key==='ArrowLeft'||e.key==='ArrowRight')){e.preventDefault();step(e.key==='ArrowRight'?1:-1);return;}
+  if((e.key==='Enter'||e.key===' ')&&e.target.matches('.card[data-open]')){e.preventDefault();S.open=e.target.dataset.open;renderPanel(true);return;}
+  if((e.key==='k'&&(e.metaKey||e.ctrlKey))||(e.key==='/'&&!typing)){e.preventDefault();$('#q').focus();}
 });
 $('#q').addEventListener('input',e=>{S.q=e.target.value;renderResults();});
 document.addEventListener('change',e=>{if(e.target.id==='ind'){S.ind=e.target.value;S.open=null;renderAll();}});
 document.addEventListener('input',e=>{if(e.target.dataset&&e.target.dataset.vol){const pos=e.target.selectionStart;S.vol[e.target.dataset.vol]=e.target.value;renderBuilder({id:e.target.dataset.vol,pos});}});
+/* navbar goes solid on scroll (ad-page rule: after 32px); the rail follows the section in view */
+const navEl=$('#nav');let tick=false;
+function onScroll(){
+  if(tick)return;tick=true;
+  requestAnimationFrame(()=>{
+    tick=false;
+    if(scrollY>32)navEl.setAttribute('data-scrolled','');else navEl.removeAttribute('data-scrolled');
+    const secs=[...document.querySelectorAll('.sec')];let cur='all';
+    if(secs.length&&secs[0].getBoundingClientRect().top<=110){secs.forEach(x=>{if(x.getBoundingClientRect().top<=110)cur=x.id.slice(2);});}
+    if(secs.length&&innerHeight+scrollY>=document.documentElement.scrollHeight-4)cur=secs[secs.length-1].id.slice(2);
+    if(cur!==S.spy){S.spy=cur;document.querySelectorAll('.ritem[data-jump]').forEach(r=>r.classList.toggle('on',r.dataset.jump===cur));}
+  });
+}
+addEventListener('scroll',onScroll,{passive:true});
 renderAll();
+onScroll();
 })();
 </script>
 </body>
