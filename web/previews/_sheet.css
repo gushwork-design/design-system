@@ -232,8 +232,3 @@ outline:2px solid #0070ff66;outline-offset:2px}
 .rvp{display:flex;flex-direction:column;gap:16px}
 .rvmore{margin-top:14px}.rvmore>summary{cursor:pointer;font:600 13px/1.4 var(--body,Inter,sans-serif);color:var(--ink2);padding:8px 0}.rvmore[open]>summary{margin-bottom:10px}
 
-/* sidebar-collapsed: the tooltip sits 4px right of the hovered row, a plain pill with no arrow (Utsav's reference, 5 Oct).
-   Its surface follows the theme: white in light, dark in dark (Utsav, 5 Oct rework). */
-.gd .gd-tooltip[data-placement="right"]::after { display: none; }
-.gd .gd-tooltip.gd-tooltip--rail { font: var(--gw-text-body-14-med); letter-spacing: var(--gw-text-body-14-med-tracking); background: var(--gw-color-white); color: var(--gw-color-black); box-shadow: 0 0 0 1px var(--gw-color-neutral-200), var(--gw-shadow-s2); }
-.g-dark .gd .gd-tooltip.gd-tooltip--rail { background: var(--gw-color-neutral-900); color: var(--gw-color-white); box-shadow: 0 0 0 1px var(--gw-color-neutral-850); }
