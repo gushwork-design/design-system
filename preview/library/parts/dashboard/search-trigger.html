@@ -445,7 +445,7 @@ a.cat-name{color:var(--gw-color-primary-600);text-decoration:none}
 <p><b>Accessibility.</b> The open page carries <code>aria-current=&quot;page&quot;</code>. In the collapsed rail the visible text is removed and a Tooltip (<code>data-gd-tooltip</code>, placed right) supplies the name on hover and focus. Arrow Up and Down, Home and End move between rows.</p>
 <p><b>Provenance.</b> extracted: <code>web/shell.css:581-623</code>.</p>
 <h3 id="account-row">Nav group</h3>
-<p><b>Purpose.</b> A labelled set of nav items, and, new, a group a person can expand to reveal nested items. Use the labelled group to divide a rail into areas. Use the expandable group for a destination that has sub-pages (Reports with its own reports); keep it to one level. Hub groups are flat.</p>
+<p><b>Purpose.</b> A labelled set of nav items, and, new, a group a person can expand to reveal nested items. Use the labelled group to divide a rail into areas. Use the expandable group for a destination that has sub-pages (Reports with its own reports); keep it to one level. Hub groups are flat, with one use of the expandable group (R59): the Design System row opens to Library, Review and Workflow while its page is open, because that page has underlined tabs of its own and a page never stacks two underlined rows.</p>
 <p><b>Anatomy.</b></p>
 <pre class="md-pre"><code>&lt;div class=&quot;gd-nav-group&quot; role=&quot;group&quot; aria-label=&quot;Workspace&quot;&gt;
   &lt;div class=&quot;gd-nav-group__label&quot;&gt;Workspace&lt;/div&gt; …nav-items…
@@ -459,7 +459,7 @@ a.cat-name{color:var(--gw-color-primary-600);text-decoration:none}
 <p>Children sit under a 1px guide line and carry no icon.</p>
 <p><b>Behaviour.</b> <code>data-gd-group-toggle</code> toggles <code>aria-expanded</code> and <code>hidden</code> on the controlled list. Enter and Space toggle; Arrow Right opens and Arrow Left closes the focused head. On load, a group holding the current page opens itself. The caret turns 90 degrees from the state. In the collapsed rail the children are hidden and a click expands the rail first.</p>
 <p><b>Tokens.</b> <code>--gd-text-muted</code> (label), <code>--gd-border-strong</code> (guide), the nav item tokens. The label is 12px medium, sentence case. Groups are <code>--gd-gap - 4</code> apart.</p>
-<p><b>Provenance.</b> flat group extracted: <code>web/shell.css:564-579, 1819-1826</code>. Expandable group NEW: reference Mobbin Linear, Notion. Pending library review.</p>
+<p><b>Provenance.</b> flat group extracted: <code>web/shell.css:564-579, 1819-1826</code>. Expandable group NEW: reference Mobbin Linear, Notion; first used in the hub rail for Design System (<code>web/shell.js</code> <code>children</code>, <code>web/shell.css</code> <code>.gw-navsub</code>). Pending library review.</p>
 <h3 id="workspace-switcher">Account row</h3>
 <p><b>Purpose.</b> Who is signed in, pinned at the foot of the rail. Use it for the signed-in person with their role and one action (sign out). Do not use it as a navigation row or for a team list.</p>
 <p><b>Anatomy.</b></p>

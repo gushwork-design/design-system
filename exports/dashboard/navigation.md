@@ -24,7 +24,7 @@ The parts people use to get around: the rows and groups in the rail, the account
 
 ## Nav group
 
-**Purpose.** A labelled set of nav items, and, new, a group a person can expand to reveal nested items. Use the labelled group to divide a rail into areas. Use the expandable group for a destination that has sub-pages (Reports with its own reports); keep it to one level. Hub groups are flat.
+**Purpose.** A labelled set of nav items, and, new, a group a person can expand to reveal nested items. Use the labelled group to divide a rail into areas. Use the expandable group for a destination that has sub-pages (Reports with its own reports); keep it to one level. Hub groups are flat, with one use of the expandable group (R59): the Design System row opens to Library, Review and Workflow while its page is open, because that page has underlined tabs of its own and a page never stacks two underlined rows.
 
 **Anatomy.**
 ```html
@@ -44,7 +44,7 @@ Children sit under a 1px guide line and carry no icon.
 
 **Tokens.** `--gd-text-muted` (label), `--gd-border-strong` (guide), the nav item tokens. The label is 12px medium, sentence case. Groups are `--gd-gap - 4` apart.
 
-**Provenance.** flat group extracted: `web/shell.css:564-579, 1819-1826`. Expandable group NEW: reference Mobbin Linear, Notion. Pending library review.
+**Provenance.** flat group extracted: `web/shell.css:564-579, 1819-1826`. Expandable group NEW: reference Mobbin Linear, Notion; first used in the hub rail for Design System (`web/shell.js` `children`, `web/shell.css` `.gw-navsub`). Pending library review.
 
 ## Account row
 

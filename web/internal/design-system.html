@@ -494,10 +494,7 @@ body[data-gw-page="design-system"] .sg__main > * { min-width: 0; }
    the right, so the two controls read as different things. */
 .an-bar { position: sticky; top: 0; z-index: 6; background: var(--s-panel-bg); margin-top: calc(var(--gw-space-8) * -1); padding-top: var(--gw-space-8); align-self: stretch; display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-16); box-shadow: inset 0 -1px 0 var(--ul-hdr-line); }
 @media (max-width: 767px) { .an-bar { top: 76px; } }
-/* The library's category bar is the second bar: it sticks under the first (48 tall: 8 above, 40 of tabs), so
-   Library / Review / Workflow stays on top and the categories stay in reach while a long list scrolls. */
-.ds-cats { top: 48px; z-index: 5; margin-top: 0; padding-top: 0; }
-@media (max-width: 767px) { .ds-cats { top: 124px; } }
+/* The category bar (Foundations, Web pages, …) is the page's only underlined bar now, so it takes the plain .an-bar stick. */
 .sg__main .an-bar > .an-tabs { display: flex; gap: var(--gw-space-24); height: auto; padding: 0; border-radius: 0; background: none; box-shadow: none; }
 /* "Hide my activity": a small switch in the topbar-icon family (no stroke on the label, a filled track when on). */
 .an-me { display: inline-flex; align-items: center; gap: var(--gw-space-8); cursor: pointer; user-select: none; font: var(--gw-text-body-12-med); color: var(--ul-sub); }
@@ -1053,13 +1050,8 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     <!-- What this page is and how it is managed, under the header rule as the other pages open. -->
     <p class="ds-intro">The Design System is where Gushwork&rsquo;s design decisions are kept: the foundations, the components and the templates that everything we make is built from. It is managed here too. New and changed items wait in Review until the owner approves, reworks or rejects them, and only what is approved reaches the Library and the skills.</p>
 
-    <div class="an-bar">
-      <div class="ul-tabs an-tabs" id="ds-tabs" role="tablist" aria-label="Design system">
-        <button class="ul-tab" role="tab" data-tab="library" aria-selected="true">Library</button>
-        <button class="ul-tab" role="tab" data-tab="review" id="ds-tab-review" aria-selected="false">Review</button>
-        <button class="ul-tab" role="tab" data-tab="workflow" aria-selected="false">Workflow</button>
-      </div>
-    </div>
+    <!-- Library, Review and Workflow are the submenu under Design System in the rail (shell.js), so the first
+         row of underlined tabs is gone: two underlined rows stacked looked odd (Utsav, 6 Oct 2026, R59). -->
 
     <section class="ds-panel" id="ds-library" role="tabpanel">
       <p class="ds-lead">Library shows everything approved for building with Gushwork: the foundations (colour, type, spacing, radius), the components, and the templates to start from.</p>
@@ -2312,11 +2304,10 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
     }
     if (name === 'review' && parts[1] && parts[2]) { PENDING_OPEN = parts[1] + '/' + parts.slice(2).join('/'); if (reviewData) setTimeout(openPending, 0); }
     TABS.forEach(function (t) { $('ds-' + t).hidden = t !== name; });
-    document.querySelectorAll('#ds-tabs .ul-tab').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-tab') === name)); });
     if (push) { try { history.replaceState(null, '', '#' + name); } catch (e) { location.hash = name; } }
+    window.dispatchEvent(new Event('gw:view'));   /* the rail's submenu follows (shell.js) */
     me.then(function () { start(name); });
   }
-  document.querySelectorAll('#ds-tabs .ul-tab').forEach(function (b) { b.addEventListener('click', function () { show(b.getAttribute('data-tab'), true); }); });
   window.addEventListener('hashchange', function () { show(location.hash.slice(1), false); });
   /* Review and Workflow are for admins. Everyone internal sees the tabs, and anyone who is not an admin gets an "Admin access
      required" alert in place of the content. Admins see Review read-only; only the owner can approve, rework or reject. */

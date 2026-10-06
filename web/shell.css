@@ -624,6 +624,10 @@
   :root:not([data-theme="light"]) .gw-navitem:hover { color: var(--gw-color-neutral-100); }
 }
 .gw-navitem:focus-visible { outline: var(--gw-focus-ring); outline-offset: -2px; }
+/* NEW, pending library review (the dashboard's expandable nav-group, drawn here for the hub rail): the children of a
+   row sit under a 1px guide line, indented, with no icon. One level only. */
+.gw-navsub { display: flex; flex-direction: column; margin: var(--gw-space-2) 0 var(--gw-space-2) var(--gw-space-16); padding-left: var(--gw-space-8); border-left: 1px solid var(--s-nav-sel); }
+.gw-navitem--sub { padding-left: var(--gw-space-8); }
 
 /* lock badge 683:5282 — 24x24, pad 4, r4, Lock / LockOpen Regular 16 in
    Neutral/400. The tinted chip is gone: at 16px the glyph carries itself, and

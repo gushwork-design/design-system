@@ -159,6 +159,9 @@ pending a ruling.
     `nav-group` only when a section has more sibling pages than fit as tabs, when its children are things people create (saved
     reports, projects), or when each child is a full page with its own header and actions. A settings area with many forms takes
     `sub-nav`; counted filters over one list take `saved-views` (R58).
+12. **One underlined tab row per page (R59).** Never stack two. When a page's sections have sections of
+    their own, the upper level is a rail submenu (the expandable `nav-group`) and only the lower level is
+    `tabs-underline`. A single level of views stays tabs, in a flat rail.
 
 ## Heavy dashboards
 
