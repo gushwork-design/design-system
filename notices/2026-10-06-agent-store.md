@@ -37,3 +37,6 @@ The agent modal follows store quick-view patterns, drawn first in `agent-store/m
 
 ## Update, 6 Oct 2026 (dropdown)
 The industry picker is a styled custom dropdown instead of the native select, and focus rings are removed everywhere on the page at Utsav's request. Keyboard users get no visible focus on this page; flagging it so the next reviewer is not surprised.
+
+## Update, 6 Oct 2026 (two-part modal)
+The quick view body is now two parts, at Utsav's request: picture and description with the volume stepper and add button on top, How it works with the talk track, fits and proof slot below.

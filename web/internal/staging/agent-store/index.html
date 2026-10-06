@@ -157,8 +157,10 @@ main{padding-top:var(--gw-space-24)}
 .adlg .ph .pos{font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking);color:var(--gw-color-neutral-500)}
 .adlg .ph .nv{margin-left:auto;display:flex;gap:var(--gw-space-4);align-items:center}
 .adlg .ph .nv .step{display:none}
-.adlg .pb{flex:1;overflow:auto;padding:var(--gw-space-24);display:grid;grid-template-columns:300px minmax(0,1fr);gap:var(--gw-space-32);align-items:stretch}
-.adlg .cl,.adlg .cr{display:flex;flex-direction:column;gap:var(--gw-space-16);min-width:0}
+.adlg .pb{flex:1;overflow:auto;display:flex;flex-direction:column}
+.adlg .up{display:grid;grid-template-columns:240px minmax(0,1fr);gap:var(--gw-space-32);padding:var(--gw-space-24);align-items:center}
+.adlg .lo{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:var(--gw-space-32);padding:var(--gw-space-24);background:var(--gw-color-white);border-top:1px solid var(--gw-color-neutral-100);align-items:start}
+.adlg .lr{display:flex;flex-direction:column;gap:var(--gw-space-16);min-width:0}
 .adlg .himg{width:100%;aspect-ratio:1;border-radius:var(--gw-radius-16);overflow:hidden;background:var(--gw-color-neutral-50)}
 .adlg .himg img{width:100%;height:100%;object-fit:cover}
 .adlg .info{display:flex;flex-direction:column;gap:var(--gw-space-12)}
@@ -173,8 +175,8 @@ main{padding-top:var(--gw-space-24)}
 .adlg .stp button:hover{background:var(--gw-color-neutral-50);color:var(--gw-color-black)}
 .adlg .stp input{width:64px;height:32px;border:0;background:transparent;text-align:center;font:var(--gw-text-body-14-sem);outline:0;-moz-appearance:textfield}
 .adlg .stp input::-webkit-outer-spin-button,.adlg .stp input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-.adlg details.stepsd{border-top:1px solid var(--gw-color-neutral-100);padding-top:var(--gw-space-4)}
-.adlg details.stepsd summary{list-style:none;display:flex;justify-content:space-between;align-items:center;padding:var(--gw-space-12) 0;font:var(--gw-text-body-14-sem);cursor:pointer}
+.adlg details.stepsd{padding-top:0}
+.adlg details.stepsd summary{list-style:none;display:flex;justify-content:space-between;align-items:center;padding:0 0 var(--gw-space-12);font:var(--gw-text-body-14-sem);cursor:pointer}
 .adlg details.stepsd summary::-webkit-details-marker{display:none}
 .adlg details.stepsd summary .i{font-size:14px;transition:transform .2s}
 .adlg details.stepsd[open] summary .i{transform:rotate(180deg)}
@@ -272,7 +274,8 @@ main{padding-top:var(--gw-space-24)}
 @media(max-width:1000px){
  .edge{display:none}
  .adlg .ph .nv .step{display:inline-flex}
- .adlg .pb{grid-template-columns:260px minmax(0,1fr);gap:var(--gw-space-24)}
+ .adlg .up{grid-template-columns:200px minmax(0,1fr);gap:var(--gw-space-24)}
+ .adlg .lo{gap:var(--gw-space-24)}
  .shell{grid-template-columns:minmax(0,1fr);gap:var(--gw-space-16);padding-top:var(--gw-space-24)}
  main{padding-top:0}
  .rail{display:none;position:static;max-height:none;padding:var(--gw-space-16);background:var(--gw-color-white);border:1px solid var(--gw-color-neutral-100);border-radius:var(--gw-radius-16)}
@@ -292,15 +295,10 @@ main{padding-top:var(--gw-space-24)}
  .amodal{padding:0;align-items:flex-end}
  .adwrap{width:100%}
  .adlg{max-height:94vh;border-radius:var(--gw-radius-20) var(--gw-radius-20) 0 0}
- .adlg .pb{display:flex;flex-direction:column;gap:var(--gw-space-16)}
- .adlg .cl,.adlg .cr{display:contents}
- .adlg .himg,.adlg .info,.adlg details.stepsd,.adlg .rep,.adlg .fits{flex:none}
- .adlg .himg{order:1;max-width:200px;align-self:center}
- .adlg .info{order:2}
- .adlg details.stepsd{order:3}
- .adlg .rep{order:4}
- .adlg .fits{order:5}
- .adlg .proof{order:6;flex:none}
+ .adlg .up{grid-template-columns:minmax(0,1fr);gap:var(--gw-space-16);justify-items:stretch;padding:var(--gw-space-16)}
+ .adlg .himg{max-width:180px;justify-self:center}
+ .adlg .lo{grid-template-columns:minmax(0,1fr);gap:var(--gw-space-16);padding:var(--gw-space-16)}
+ .adlg details.stepsd,.adlg .rep,.adlg .fits,.adlg .proof{flex:none}
  .pkgbar{bottom:var(--gw-space-12)}
  .pkgbar .stack{display:none}
  .pkgbar .tx b .lg{display:none}
@@ -463,20 +461,22 @@ function renderPanel(fresh){
   const v=+S.vol[a.id]||0, vol=!a.free&&!a.luxury;
   $('#adlg').innerHTML=`<div class="ph"><span class="badge">${esc(a.bundle)}</span><span class="pos">${i+1} of ${o.length}</span><div class="nv"><button class="iconbtn step" data-prev aria-label="Previous agent">${ic('arrow-left','bold')}</button><button class="iconbtn step" data-next aria-label="Next agent">${ic('arrow-right','bold')}</button><button class="iconbtn" data-close aria-label="Close">${ic('x','bold')}</button></div></div>
   <div class="pb">
-   <div class="cl">
+   <div class="up">
     <div class="himg"><img src="${img(a)}" alt=""></div>
-    <div class="rep"><h3>${ic('handshake')}Talk track</h3><div class="q"><small>Pain to listen for</small><p>${esc(a.pain)}</p></div><div class="q ask"><small>Discovery question</small><p>“${esc(a.question)}”</p></div></div>
-    <div class="fits"><small>Fits</small><span>${esc(a.fits)}</span></div>
-    <div class="proof">${ic('sparkle')}Proof slot, held open until there are real customer results to show here.</div>
-   </div>
-   <div class="cr">
     <div class="info"><div><h2>${esc(a.name)}</h2><div class="price${a.luxury?' price-prem':''}">${esc(perItem(a))}</div></div>
      <p class="p-blurb">${esc(a.blurb)}</p>
      ${vol?`<div class="vol"><div><small>Monthly volume</small><b data-mcred>${v?`about ${(v*a.credits).toLocaleString()} credits`:'Set a volume to estimate credits'}</b></div><div class="stp"><button data-vstep="-1" data-vid="${a.id}" aria-label="Fewer per month">${ic('minus','bold')}</button><input type="number" min="0" inputmode="numeric" value="${v||''}" placeholder="0" data-mvol="${a.id}" aria-label="Monthly volume for ${esc(a.name)}"><button data-vstep="1" data-vid="${a.id}" aria-label="More per month">${ic('plus','bold')}</button></div></div>`:''}
      ${a.luxury?`<div class="vol"><div><small>Pricing</small><b>Priced alone, outside the package tiers</b></div></div>`:''}
      <button class="btn wide ${on?'out':''}" data-add="${a.id}">${ic(on?'check':'plus','bold')}${on?'Added, remove from package':'Add to package'}</button>
     </div>
+   </div>
+   <div class="lo">
     <details class="stepsd" ${innerWidth>700?'open':''}><summary>How it works${ic('caret-down','bold')}</summary><ol class="steps">${a.steps.map((t,k)=>`<li><b>${STEP_LABELS[k]||''}</b><span>${esc(t)}</span></li>`).join('')}</ol></details>
+    <div class="lr">
+     <div class="rep"><h3>${ic('handshake')}Talk track</h3><div class="q"><small>Pain to listen for</small><p>${esc(a.pain)}</p></div><div class="q ask"><small>Discovery question</small><p>“${esc(a.question)}”</p></div></div>
+     <div class="fits"><small>Fits</small><span>${esc(a.fits)}</span></div>
+     <div class="proof">${ic('sparkle')}Proof slot, held open until there are real customer results to show here.</div>
+    </div>
    </div>
   </div>`;
   $('#adlg .pb').scrollTop=keep;

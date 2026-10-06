@@ -56,14 +56,15 @@ close. **Previous and next are 44px round white buttons outside the modal's left
 (`--gw-shadow-s3`); below 1000px they move into the header. They step through the agents in page order,
 respect the search and wrap round; left and right arrow keys do the same.
 
-Left column (300px): the mascot as a square picture, the `Talk track` block (`--gw-color-primary-25`, always
-visible), a `Fits` row and the dashed proof slot, which stretches to match the right column. Right column: name
-(`--gw-text-h6-bold`), cost line (blue for premium), blurb, a **monthly volume stepper** (for agents with a credit
-cost: minus, a typed number and plus, in steps of 50, with "about N credits"; the value is the same one the
-package builder's estimator uses), a full-width `Black` `Add to package`, and `How it works` as a `details`
-element, open on desktop and closed on phone. Premium agents show a "Priced alone, outside the package tiers" note
-in place of the stepper; the free agent has neither. Nothing is stated twice: the unit appears in the cost line
-only, and the bundle appears in the header only.
+The body has **two stacked parts**. The **upper part** is the picture (a 240px square) beside the name, cost line
+(blue for premium), blurb, the **monthly volume stepper** (for agents with a credit cost: minus, a typed number
+and plus, in steps of 50, with "about N credits"; the value is the same one the package builder's estimator
+uses) and a full-width `Black` `Add to package`. Premium agents show a "Priced alone, outside the package tiers"
+note in place of the stepper; the free agent has neither. The **lower part** sits on white, under a 1px
+`--gw-color-neutral-100` rule: `How it works` as a `details` element (open on desktop, closed on phone) on the
+left, and on the right the `Talk track` block (`--gw-color-primary-25`, always visible), a `Fits` row and the
+dashed proof slot. Nothing is stated twice: the unit appears in the cost line only, and the bundle appears in the
+header only. On phone the parts stack into one column.
 
 ## `agent-package-bar`
 
