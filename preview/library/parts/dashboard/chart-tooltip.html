@@ -491,6 +491,7 @@ a.cat-name{color:var(--gw-color-primary-600);text-decoration:none}
 <p>States: rest, hover or focus on a slice or legend row (others dim to 30%, the centre shows that slice), loading, empty, error.</p>
 <p>Accessibility. The figure is <code>role=&quot;img&quot;</code> with every slice and percentage in its label; legend rows are focusable and mirror the hover.</p>
 <p>Provenance. Extracted: <code>web/admin/analytics.html:330-345</code>, <code>:1445-1475</code>. Palette follows R11 (the hub does not; see finding 2).</p>
+<p><b>Phone.</b> The legend moves under the ring and takes the full width.</p>
 <h3 id="sparkline">Breakdown bar</h3>
 <p>Purpose. One horizontal bar split into proportions, read at a glance: a split, a status mix. Use when there are two to four parts and no axis is needed.</p>
 <p>Anatomy. <code>figure.gd-brk</code> &gt; <code>.gd-brk__bar</code> (12px pill, 2px gaps, flex weights) + <code>ul.gd-brk__key</code> (percent, label). <code>.gd-brk--lg</code> is 16px.</p>
@@ -513,6 +514,7 @@ a.cat-name{color:var(--gw-color-primary-600);text-decoration:none}
 <p>Anatomy. <code>.gd-funnel</code> &gt; ordered list. Horizontal: label, track with fill, count, percent of first step; between rows &quot;63% continue, 870 left (37% drop-off)&quot;. Vertical (<code>layout:'vertical'</code>): columns, a hatched ghost of the previous step behind each fill, then count, label, continue and left. An abandonment row (&quot;Abandoned before Paid&quot;) closes it. <code>table:true</code> adds step, count, completion, drop-off, in the data table's look: no header fill, a small uppercase muted header over a strong rule, a hairline under every row, hover <code>--gd-row-hover</code>, first column in <code>--gd-text</code>.</p>
 <p>Accessibility. A list whose text carries every figure; fills are decorative.</p>
 <p>Provenance. NEW: not in the hub (Mobbin Calendly horizontal, Google Analytics vertical steps).</p>
+<p><b>Phone.</b> Each step's label gets its own line, with the bar and its figures under it, so a long step name is read in full.</p>
 <h3 id="legend-table">Chart tooltip</h3>
 <p>Purpose. The cursor tooltip every chart uses: a header, a row per series, an optional total, an optional note. Not for explaining a control; use the shared tooltip for that.</p>
 <p>Anatomy. <code>.gd-tip</code> &gt; <code>__h</code> (bold head, muted <code>__n</code> note), <code>__r</code> rows (swatch, <code>__k</code>, <code>__v</code> tabular), <code>__t</code> total after a dashed rule. <code>GD.charts.tipHTML({head,note,rows,total})</code> builds it; <code>.gd-tip--static</code> places it in flow. The surface is the sunken fill with a 1px <code>--gd-tip-line</code> edge and shadow S2, 12px text (the hub used 10).</p>
@@ -525,6 +527,7 @@ a.cat-name{color:var(--gw-color-primary-600);text-decoration:none}
 <p>States: rest, row hover (also isolates the series on the chart), hidden (<code>data-off</code>, muted, dimmed dot), focus-visible on the checkbox.</p>
 <p>Accessibility. The checkbox is labelled &quot;Show &lt;series&gt;&quot;; names are row headers. The last visible series cannot be unticked; the box reverts.</p>
 <p>Provenance. NEW: not in the hub (Mobbin Amplitude, Substack).</p>
+<p><b>Phone.</b> Cell padding tightens to 8 and the first column wraps.</p>
 <h3>Uptime bar</h3>
 <p>Purpose. Status over a run of days or hours: a strip of segments, green, amber, red, grey for no data, with the percentage.</p>
 <p>Anatomy. <code>figure.gd-uptime</code> &gt; head (name, percentage), <code>.gd-uptime__bar</code> of <code>.gd-uptime__seg[data-st]</code>, foot (start, end labels), tooltip. Percentage is periods not down over periods with data, or <code>percent</code> when supplied.</p>
