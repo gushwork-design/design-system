@@ -923,8 +923,9 @@
     "drawer": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
-      "reviewedOn": "2026-10-05",
-      "fingerprint": "3794750da28c6532"
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "d468689db8072ebf",
+      "previewFingerprint": "3d4fd92d1a42d281"
     },
     "empty-state": {
       "reviewed": "passed",
