@@ -49,3 +49,6 @@ A second page, `/internal/staging/agent-store-v2`, shares the first page's image
 
 ## Update, 6 Oct 2026 (version 2, second pass)
 Version 2 now has the package panel on the right, search hidden, a navbar that scrolls away (no sticky navbar) and one sticky bar across the column holding every category tab plus the industry dropdown. Version 1 is unchanged.
+
+## Update, 6 Oct 2026 (version 2 margins, version 3)
+Version 2 and 3 use 100px margins and a 320px package panel, with "Build your own agent" removed. Version 3 (`/internal/staging/agent-store-v3`) turns the category tabs into a pill toggle (`agent-category-toggle`, pending review). Version 1 is unchanged.
