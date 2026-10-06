@@ -16,7 +16,7 @@
 @media (max-width: 767px) {
   .gd {
     /* ---- shell: sticky bars give the screen back --------------------------------------------- */
-    .gd-page__filters { position: static; margin: 0; padding: 0; }                 /* range and group-by scroll away with the page */
+    .gd-page__filters { position: static; margin: 0; padding: 0; box-shadow: none; }                 /* range and group-by scroll away with the page */
 
     /* ---- segmented control and range bar ------------------------------------------------------ */
     .gd-seg { display: flex; width: 100%; overflow-x: auto; scrollbar-width: none; }
