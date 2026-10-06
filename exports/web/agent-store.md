@@ -50,14 +50,20 @@ where the count would be. On phone the rail sits behind a `Filters` button.
 
 ## `agent-listing-panel`
 
-A **centered modal**, 880px wide at most (a bottom sheet at 94vh on phone), over a `--gw-color-neutral-alpha-50-black`
-backdrop. The header holds the bundle `badge`, the position (`4 of 31`), **previous and next arrows** that step
-through the agents in page order (they respect the search and wrap round), and a close control. Left column:
-the mascot, price line (blue for premium), blurb and the five-step list. Right column: a `Talk track` block
-(`--gw-color-primary-25`, always visible) with the pain to listen for and the discovery question, a facts
-grid, and a dashed proof slot reserved for real results. A white footer holds one full-width `Black` button,
-`Add to package`. Left and right arrow keys step, Escape or a click on the backdrop closes, and the page behind
-does not scroll.
+A store-style **quick view**: a centered modal, 820px wide at most, over a `--gw-color-neutral-alpha-50-black`
+backdrop (a bottom sheet at 94vh on phone). The header holds the bundle `badge`, the position (`4 of 31`) and
+close. **Previous and next are 44px round white buttons outside the modal's left and right edges on desktop**
+(`--gw-shadow-s3`); below 1000px they move into the header. They step through the agents in page order,
+respect the search and wrap round; left and right arrow keys do the same.
+
+Left column (300px): the mascot as a square picture, the `Talk track` block (`--gw-color-primary-25`, always
+visible), a `Fits` row and the dashed proof slot, which stretches to match the right column. Right column: name
+(`--gw-text-h6-bold`), cost line (blue for premium), blurb, a **monthly volume stepper** (for agents with a credit
+cost: minus, a typed number and plus, in steps of 50, with "about N credits"; the value is the same one the
+package builder's estimator uses), a full-width `Black` `Add to package`, and `How it works` as a `details`
+element, open on desktop and closed on phone. Premium agents show a "Priced alone, outside the package tiers" note
+in place of the stepper; the free agent has neither. Nothing is stated twice: the unit appears in the cost line
+only, and the bundle appears in the header only.
 
 ## `agent-package-bar`
 
