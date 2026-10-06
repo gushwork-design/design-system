@@ -121,6 +121,7 @@ globalThis.fetch = async (url, init = {}) => {
     calls.push({ method, body });
     if (failMethod === method) return send(200, { ok: false, error: 'boom' });
     if (method === 'files.getUploadURLExternal') return send(200, { ok: true, upload_url: 'https://files.slack.test/up/' + body.filename, file_id: 'F-' + body.filename });
+    if (method === 'conversations.replies') return send(200, { ok: true, messages: [{ ts: body.ts, thread_ts: '900.9' }] });
     return send(200, { ok: true });
   }
   if (u.startsWith('https://trigger.test/')) { calls.push({ method: 'FIRE', body: JSON.parse(init.body) }); return send(200, { ok: true }); }
@@ -237,6 +238,31 @@ t('a reviewer saying hi gets a greeting, not a tick', [r.body.concierge, calls.m
 calls.length = 0;
 r = await post(dm('thanks', 'UOWNER'));
 t('a reviewer saying thanks gets a reply, not a tick', [r.body.concierge, calls.map((c) => c.method)], ['answered', ['chat.postMessage']]);
+
+/* ---- ending a conversation (6 Oct 2026) ---- */
+for (const q of ['thanks', 'thank you!', 'ok cool', 'perfect, thanks', 'got it', '👍', 'that\'s all for now']) {
+  calls.length = 0;
+  r = await post(dm(q, 'UASKER', { thread_ts: '900.9', ts: '905.1' }));
+  t(`"${q}" in a Bruce thread closes it: a tick, the pane cleared, no run`, [r.body.concierge, calls.map((c) => c.method).filter((m) => !m.startsWith('users.info'))], ['closed', ['reactions.add', 'agents.sessions.setStatus']]);
+}
+for (const q of ['thanks, now make it blue', 'ok but where is the logo?', 'cool, do the second one']) {
+  calls.length = 0;
+  r = await post(dm(q, 'UASKER', { thread_ts: '900.9', ts: '905.2' }));
+  ok(`"${q}" carries an ask, so it is not a close`, r.body.concierge !== 'closed', r.body.concierge);
+}
+const react = (reaction, extra = {}) => ({ type: 'event_callback', event_id: 'Ev' + Math.random(), event: { type: 'reaction_added', user: 'UASKER', reaction, item_user: 'UBRUCE', item: { type: 'message', channel: 'D1', ts: '903.3' }, ...extra } });
+calls.length = 0;
+r = await post(react('+1'));
+t('a 👍 on Bruce\'s message in a DM closes the session silently', [r.body.concierge, calls.map((c) => c.method).filter((m) => !m.startsWith('users.info')), calls.find((c) => c.method === 'agents.sessions.setStatus').body], ['closed', ['conversations.replies', 'agents.sessions.setStatus'], { status: 'active', channel_id: 'D1', thread_ts: '900.9' }]);
+calls.length = 0;
+r = await post(react('+1', { item_user: 'UASKER' }));
+t('a 👍 on their own message is not a close', [r.body.concierge, calls.length], ['ignored', 0]);
+calls.length = 0;
+r = await post(react('eyes'));
+t('any other emoji is not a close', [r.body.concierge, calls.length], ['ignored', 0]);
+calls.length = 0;
+r = await post(react('white_check_mark', { item: { type: 'message', channel: 'C9', ts: '1.1' } }));
+ok('a ✅ in a channel still goes to the review loop, not the close', r.body.concierge === undefined);
 
 calls.length = 0;
 r = await post(dm('do the second one please', 'UASKER'));

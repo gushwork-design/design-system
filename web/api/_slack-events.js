@@ -163,6 +163,18 @@ export default async function handler(req, res) {
     return res.status(200).json({ ok: true, concierge: out.did });
   }
 
+  // A thumbs-up (or ✅, 🙏) on one of Bruce's messages in a DM ends that conversation (6 Oct 2026). Review notices live in
+  // channels, so a DM reaction never collides with the ✅ loop below.
+  if (event.type === 'reaction_added' && event.item && /^D/.test(event.item.channel || '')) {
+    const token = process.env.SLACK_BOT_TOKEN;
+    if (!token || req.headers['x-slack-retry-num']) return res.status(200).json({ ok: true, ignored: 'dm reaction' });
+    const { closeOnReaction } = await import('./_concierge.js');
+    const memory = await import('./_bruce-memory.js');
+    let closed = false;
+    try { closed = await closeOnReaction(token, event, memory); } catch { /* a missed close is harmless */ }
+    return res.status(200).json({ ok: true, concierge: closed ? 'closed' : 'ignored' });
+  }
+
   // Anything that is not an approval reaction is ignored — quietly, and with a 200 so Slack
   // does not retry it. reaction_removed is deliberately not handled: the reverse of a pass
   // is an explicit --reject with a note, not a silently removed emoji.
