@@ -14,6 +14,7 @@
 display_information:
   name: Bruce
   description: Design Assistant
+  long_description: "Bruce is Gushwork's design agent. He works from the Gushwork design system, so everything he makes is on brand.\r\n\r\n*Ask him for*\r\n• Brand files: the logo in any colour and format, the colours, the fonts, the tokens\r\n• Something built: a landing page, one-pager, deck or banner. You get a link and a screenshot, not a file to fix\r\n• Which template to use, and the prompt to use it with Claude\r\n\r\n*Good to know*\r\n• Keep requests simple: say who it's for, the offer and the call to action\r\n• Designs are made for screens. Ask for a PDF if you need one\r\n• Three builds a day each. Files and quick answers don't count\r\n• He can't delete or change templates. He'll pass that on to Utsav\r\n• Say thanks, or react 👍 to his last message, to wrap up"
   background_color: "#0d0d0d"
 features:
   # Agent mode (R55 addendum, 6 Oct 2026): Bruce in Slack's agent pane. Turn on "Agents" in the app settings as well.

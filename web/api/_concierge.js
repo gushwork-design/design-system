@@ -226,7 +226,10 @@ export function understand(text, catalog) {
     if (pages.length) parts.push({ type: 'pages', entries: pages.filter((r) => r.s === pages[0].s).map((r) => r.x) });
   }
   const designRequest = has(words, DESIGN_VERBS) && !parts.some((p) => p.type === 'tools' || p.type === 'assets' || p.type === 'faq');
-  return { parts, designRequest, help, greeting: greetingOnly, thanks: thanksOnly };
+  // A message that only wraps things up ("thanks", "ok cool", "perfect", a lone 👍). Ends a Bruce thread without a run.
+  const closing = !parts.length && !designRequest && raw.length <= 60 && !/\?/.test(raw) &&
+    (thanksOnly || /^(ok(ay)?|k|cool|great|perfect|nice|done|got it|sounds good|all good|that'?s (all|it)|bye|lgtm|works|looks good|:\+1:|:thumbsup:|:ok_hand:|:pray:|👍|🙏|👌)( (thanks|cool|great|perfect|done|for now))*[.! ]*$/.test(raw));
+  return { parts, designRequest, help, greeting: greetingOnly, thanks: thanksOnly, closing };
 }
 
 /* ---------------------------------------------------------------- writing the answer */
@@ -381,6 +384,22 @@ export async function setStatus(token, event, status) {
   try { await slack(token, 'agents.sessions.setStatus', { status, channel_id: event.channel, thread_ts: event.thread_ts }); return true; }
   catch { return false; }
 }
+/* A 👍 (or ✅, 🙏, 👌) from a person on one of Bruce's messages in their DM ends that conversation: the pane's working line
+   is cleared and nothing is posted. Returns true when it was a close. */
+export const CLOSE_EMOJI = new Set(['+1', 'thumbsup', 'white_check_mark', 'heavy_check_mark', 'pray', 'ok_hand', 'raised_hands', 'heart']);
+export async function closeOnReaction(token, event, memory = null) {
+  const item = event.item || {};
+  if (!CLOSE_EMOJI.has(String(event.reaction || '').replace(/::skin-tone-\d$/, '')) || item.type !== 'message' || !/^D/.test(item.channel || '')) return false;
+  if (!event.item_user || event.item_user === event.user) return false;   // only a reaction on Bruce's message, not their own
+  let threadTs = '';
+  try {
+    const r = await slack(token, 'conversations.replies', { channel: item.channel, ts: item.ts, limit: 1 });
+    threadTs = (r.messages && r.messages[0] && r.messages[0].thread_ts) || '';
+  } catch { /* top-level message: nothing to clear */ }
+  if (threadTs) await setStatus(token, { channel: item.channel, thread_ts: threadTs }, 'active');
+  if (memory) await log(memory, token, { user: event.user, channel: item.channel, ts: item.ts, thread_ts: threadTs, text: ':' + event.reaction + ':' }, { kind: 'closed' });
+  return true;
+}
 /* What the person was looking at when they asked, from app_context on the message (a channel, a thread, a canvas). */
 export function contextOf(event) {
   const ents = (event.app_context && event.app_context.entities) || [];
@@ -462,6 +481,14 @@ export async function handleMessage(event, deps) {
   const asked = u.parts.length > 0 || u.designRequest || u.greeting || u.thanks || u.help;
   const threadTs = isDm ? event.thread_ts : event.thread_ts || event.ts;
   try {
+    // "Thanks", "ok cool", 👍 in a Bruce thread ends the conversation (Utsav, 6 Oct 2026): a ✅ on their message, the pane's
+    // working line cleared, and no run spent, Bruce's or Alfred's. A closing word with a real ask in it is not a close.
+    if (isDm && mayAskBruce(event.user) && event.thread_ts && u.closing) {
+      try { await slack(token, 'reactions.add', { channel: event.channel, timestamp: event.ts, name: 'white_check_mark' }); } catch { /* the close still counts */ }
+      if (inPane) await setStatus(token, event, 'active');
+      if (memory) await log(memory, token, event, { role: event.user === ownerId ? 'owner' : 'teammate', kind: 'closed' });
+      return { did: 'closed' };
+    }
     // His reply under an Alfred ping is for Alfred.
     if (isDm && mayAskBruce(event.user) && event.thread_ts) {
       let ping = null;
