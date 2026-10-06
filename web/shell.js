@@ -112,7 +112,14 @@
         /* The Component Library, the Catalogue and the Review Gate are one page with three tabs. It moved from Admin to
            this group on 3 Oct 2026 so that everyone internal can use the Library; the Review and Workflow tabs inside it
            show an "admin access required" alert to anyone who is not an admin. */
-        { label: 'Design System', href: '/internal/design-system', icon: 'shapes' }
+        /* Library, Review and Workflow are a submenu under this row (Utsav, 6 Oct 2026, replacing the first row of
+           underlined tabs: two underlined rows stacked looked odd). The submenu opens while the page is open. */
+        { label: 'Design System', href: '/internal/design-system', icon: 'shapes',
+          children: [
+            { label: 'Library',  key: 'library' },
+            { label: 'Review',   key: 'review' },
+            { label: 'Workflow', key: 'workflow' }
+          ] }
       ]
     },
     /* Staging is drawn as its own group in 683:5282 because it is a GTM
@@ -356,10 +363,40 @@
 
     /* A locked row is a button, not a link — it opens the modal instead of
        walking into a redirect. */
-    return locked
+    /* A row with children is a link to its page and, while that page is open, a submenu under it. The open child
+       carries the selected fill and aria-current; the parent row does not, so one row reads as open. */
+    var open = !locked && item.children && isCurrent(item.href);
+    if (open) cur = '';
+    var row = locked
       ? '<button class="gw-navitem" type="button" data-locked="' + esc(item.href) + '"' + cur + '>' + inner + '</button>'
       : '<a class="gw-navitem" href="' + esc(item.href) + '"' + cur + '>' + inner + '</a>';
+    if (!open) return row;
+    var now = subKey(item);
+    return row + '<div class="gw-navsub" role="group" aria-label="' + esc(item.label) + '">' +
+      item.children.map(function (c) {
+        return '<a class="gw-navitem gw-navitem--sub" href="' + esc(item.href + '#' + c.key) + '" data-sub="' + esc(c.key) + '"' +
+          (c.key === now ? ' aria-current="page"' : '') + '><span class="gw-navitem__text">' + esc(c.label) + '</span></a>';
+      }).join('') + '</div>';
   }
+
+  /* Which child is open: the first segment of the address hash, or the first child when there is none. */
+  function subKey(item) {
+    var k = (location.hash || '').slice(1).split('/')[0];
+    return item.children.some(function (c) { return c.key === k; }) ? k : item.children[0].key;
+  }
+  /* The page switches its view with history.replaceState, which fires no hashchange, so it announces the change
+     itself with a `gw:view` event; a typed address or the back button still fires hashchange. */
+  function syncSub() {
+    var subs = document.querySelectorAll('.gw-navitem--sub');
+    if (!subs.length) return;
+    var k = (location.hash || '').slice(1).split('/')[0], keys = [].map.call(subs, function (a) { return a.getAttribute('data-sub'); });
+    if (keys.indexOf(k) === -1) k = keys[0];
+    [].forEach.call(subs, function (a) {
+      if (a.getAttribute('data-sub') === k) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+    });
+  }
+  window.addEventListener('hashchange', syncSub);
+  window.addEventListener('gw:view', syncSub);
 
   /* A label and two rows, drawn as ghosts: stands in for the groups that only some people get. */
   function ghostGroupHTML() {

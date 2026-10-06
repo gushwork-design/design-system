@@ -153,6 +153,9 @@ pending a ruling.
 10. **No emoji. No bare coloured status dots; use a Badge.** Sentence case. Product action labels are plain
     verbs (`Export`, `Add campaign`, `Save changes`); the `Book a Demo` marketing rule does not apply.
     Replace every placeholder with real copy.
+12. **One underlined tab row per page (R59).** Never stack two. When a page's sections have sections of
+    their own, the upper level is a rail submenu (the expandable `nav-group`) and only the lower level is
+    `tabs-underline`. A single level of views stays tabs, in a flat rail.
 
 ## Heavy dashboards
 
