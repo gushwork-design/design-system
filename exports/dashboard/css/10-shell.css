@@ -260,7 +260,8 @@
 .gd-page > * { min-width: 0; }
 .gd-page--measure { max-width: calc(800px + var(--gd-page-px) * 2); }
 .gd-page--fill { flex: 1 1 auto; min-height: 0; padding-bottom: 0; gap: 0; }
-.gd-page__filters { position: sticky; z-index: 5; top: calc(var(--gd-s-head) + var(--gd-s-tabs)); background: var(--gd-panel-bg); padding: var(--gd-gap) 0; margin: calc(var(--gd-gap) * -1) 0; }
+.gd-page__filters { position: sticky; z-index: 5; top: calc(var(--gd-s-head) + var(--gd-s-tabs)); background: var(--gd-panel-bg); padding: var(--gd-gap) 0; margin: calc(var(--gd-gap) * -1) 0;
+  box-shadow: inset 0 -1px 0 var(--gd-border); }   /* a hairline under the sticky strip, as the tab strip has, so content scrolling beneath it is not read as part of it (6 Oct 2026) */
 .gd-page__split { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: calc(var(--gd-gap) * 2.5); align-items: start; }
 .gd-page__split > .gd-subnav { position: sticky; top: calc(var(--gd-s-head) + var(--gd-s-tabs)); }
 .gd-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gd-gap); }
