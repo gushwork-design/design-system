@@ -77,6 +77,8 @@ Rules of thumb. If the user must answer before anything else, Modal (Confirm dia
 
 **Provenance.** Extracted from `web/admin/analytics.html:311-320` (`.ul-dlg`); sizes from the old measured modal (480 wide).
 
+**Phone.** A modal rises from the bottom edge as a full-width sheet with rounded top corners and at most 92% of the screen height. Its buttons stack full width, the primary on top. References: Mobbin Revolut, Monzo.
+
 ## Confirm dialog
 
 **Purpose.** Confirms a destructive or irreversible action. The weight of the decision sits here, not on the trigger: the trigger button is the neutral outlined shape with a red label (never a red fill).
@@ -88,6 +90,8 @@ Rules of thumb. If the user must answer before anything else, Modal (Confirm dia
 **Copy.** Name exactly what will be lost and whether it can be undone. Reversible actions do not get a dialog: do them and offer Undo in a toast.
 
 **Provenance.** NEW: not in the hub, reference Mobbin Linear and GitHub delete confirmations, pending library review.
+
+**Phone.** Same sheet as Modal; Cancel sits under the destructive action.
 
 ## Drawer
 
@@ -104,6 +108,8 @@ Rules of thumb. If the user must answer before anything else, Modal (Confirm dia
 **Tokens.** `--gd-raised-bg`, `--gd-border`, `--gd-card-pad`, `--gd-scrim`.
 
 **Provenance.** Extracted from `web/internal/design-system.html:664-772` (`.rv`, `.rv-scrim`, `.rv-h`, `.rv-body`, `.rv-foot`).
+
+**Phone.** The drawer is the full width of the screen, wide or not; its footer buttons stack.
 
 ## Docked panel
 

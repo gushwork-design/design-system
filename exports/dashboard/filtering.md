@@ -32,6 +32,8 @@ Buttons are `gd-btn` and the view switcher is the actions author's `gd-seg`; the
 
 **Provenance.** Extracted: `.ul-tools`, `.ul-input` (analytics.html:281-290). New: the columns, view-switcher and export slots, filter count.
 
+**Phone.** Search takes its own line; Filter, Columns, the view switch and Export sit two to a row, full width.
+
 ## Filter chip
 
 **Purpose.** One applied filter, shown as "field operator value" with a remove control. Use it to make the current narrowing visible and individually removable. Do not use it as a tag (tag is the data author's) or as a toggle.
@@ -53,6 +55,8 @@ Chips sit in a `.gd-chips` container (`data-gd-chips`) that also holds `Clear fi
 **Accessibility.** The remove button's label spells out the whole filter. The chip text reads as a sentence.
 
 **Provenance.** NEW, Mobbin Neon, Aboard. Pending library review.
+
+**Phone.** Chips scroll on one line instead of wrapping into a block.
 
 ## Filter builder
 
@@ -88,6 +92,8 @@ The first row's lead is "Where", the rest "And". Field types are `text` (contain
 
 **Provenance.** NEW, Mobbin Neon, Aboard. Pending library review.
 
+**Phone.** The builder opens as a sheet at the bottom of the screen. Each rule is two lines: Where, field and remove; then operator and value.
+
 ## Saved views
 
 **Purpose.** Named, counted segments of one table (All, Hot, Archived) that switch the whole filter state at once, plus a way to save the current filters as a new one. Use it when a table has recurring slices; for a single mode switch use tabs-pill or segmented-control.
@@ -110,3 +116,5 @@ The first row's lead is "Where", the rest "And". Field types are `text` (contain
 **Tokens.** `--gd-selected-bg`, `--gd-ctl-hover`, `--gd-text-muted`, `--gd-control-h`.
 
 **Provenance.** NEW, Mobbin Aboard. Pending library review.
+
+**Phone.** The tabs scroll on one line.

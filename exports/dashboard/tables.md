@@ -51,6 +51,8 @@ Columns come from one custom property, `--gd-cols`, set on the table. Use a fixe
 
 **Provenance.** Extracted: `web/admin/analytics.html:362-428,457`, `access-control.html:105-157`. New: sticky header and first column, `--gd-cols`, totals, tree, grouped headers, rank, lazy. Mobbin: Semrush, Causal, Substack, Mixpanel. Pending library review.
 
+**Phone** (767 and below, `90-phone.css`). A table does not scroll sideways. Each row becomes a card: the strong cell is the title, every other column is a label above its value in two columns, the select box sits top right, the row menu bottom right. The header row becomes a strip of sort chips headed "Sort". Cells get their labels from the header (`data-label`, set by `40-tables.js`; set it yourself to override). A table that must stay wide (heat cells, grouped headers) keeps its scroll and its pinned first column, or opts out with `data-gd-phone="scroll"`. References: Mobbin Stripe, Linear, Mercury.
+
 ## Table cell types
 
 **Purpose.** The cell shapes a data table uses, with exact markup so every table prints them identically. Use these; do not invent a cell per screen.
@@ -76,6 +78,8 @@ Columns come from one custom property, `--gd-cols`, set on the table. Use a fixe
 
 **Provenance.** Extracted: `.ul-c`, `.ul-badge`, `.ul-c--who`, `.ul-c--out a` (analytics.html:378-397). New: avatar and name, progress, sparkline, heat. Mobbin: Mixpanel, Fresha.
 
+**Phone.** Each cell type reads as a label above its value inside the row card (see Data table). Avatar and sparkline cells keep their shape; the sparkline shrinks to 96.
+
 ## Row selection
 
 **Purpose.** Pick rows to act on in bulk. Use it when a table has bulk actions. Do not add a checkbox column to a read-only table.
@@ -89,6 +93,8 @@ Columns come from one custom property, `--gd-cols`, set on the table. Use a fixe
 **Accessibility.** Every checkbox has a label naming its row. The selected state is carried by the checkbox and `aria-selected`, never colour alone.
 
 **Tokens.** `--gd-row-selected`, `--gd-sel-w`. **Provenance.** NEW, Mobbin Calendly, Midday. The old data-table ruling (primary/alpha-10) is kept; the hub draws no selected row.
+
+**Phone.** The select box moves to the top right of the row card, a 48 square target. The select-all box is the first chip in the sort strip.
 
 ## Bulk action bar
 
@@ -115,6 +121,8 @@ It is an ink pill (`--gd-ink` fill, inverts in dark). Default is `position: stic
 
 **Provenance.** NEW, Mobbin Calendly, Midday, Aboard.
 
+**Phone.** The bar stays pinned and wraps; it never exceeds the screen width.
+
 ## Column menu
 
 **Purpose.** Show and hide columns. Use it on tables with more than about six columns. Do not use it to reorder.
@@ -124,6 +132,8 @@ It is an ink pill (`--gd-ink` fill, inverts in dark). Default is `position: stic
 **Behaviour.** Toggling writes `--gd-cols` (the original tracks are read once, hidden ones dropped) and sets `hidden` on that column's cells in every row. Paired-control guard: when one column is left, its item becomes `aria-disabled="true"` and cannot be unchecked, so the table is never empty. Fixed columns (checkbox, actions) have no item. `gd:columns {visible}` fires.
 
 **Tokens.** From `gd-menu`. **Accessibility.** `menuitemcheckbox` with `aria-checked`; keyboard from 20-actions. **Provenance.** NEW, Mobbin Midday, Neon.
+
+**Phone.** Hiding a column has no effect while rows are cards, which show every column; the menu still works for a table that has opted into scrolling. Menu rows are 44 tall.
 
 ## Row actions menu
 
@@ -136,6 +146,8 @@ It is an ink pill (`--gd-ink` fill, inverts in dark). Default is `position: stic
 **Behaviour.** The menu is placed fixed by 20-actions so the scroller never clips it. Choosing an item fires `gd:rowaction {action, row, id}` on the row (`id` from the row's `data-gd-id`).
 
 **Accessibility.** 44px hit area (a pseudo-element) without growing the row; Esc closes and returns focus. **Provenance.** Extracted: `.ac-icbtn` (access-control.html:188-196), menu from 20-actions.
+
+**Phone.** The trigger sits bottom right of the row card; menu rows are 44 tall and the menu never exceeds the screen width.
 
 ## Pagination
 
@@ -151,6 +163,8 @@ It is an ink pill (`--gd-ink` fill, inverts in dark). Default is `position: stic
 
 **Provenance.** Extracted: `.ul-pg` (analytics.html:459-461), `.ac-pg` (access-control.html:82-91). New: items per page, first and last, jump input. Mobbin Semrush.
 
+**Phone.** The range and the page size share the first line, the page controls the second; the words "Items per page" are dropped (the menu keeps its label for screen readers).
+
 ## Table states
 
 **Purpose.** What a table shows when it has no rows to show: loading, empty, error, no results for the current filter. Each is a state of the same frame, not a separate screen.
@@ -162,6 +176,8 @@ It is an ink pill (`--gd-ink` fill, inverts in dark). Default is `position: stic
 **Rules.** Loading sets `aria-busy="true"` on the table. Counts and the pager are removed in loading and error (`[data-gd-count]`), never zeroed. A zero that was actually read ("Archived 0") stays. The empty and error badges are rounded squares. Error is `role="alert"`.
 
 **Behaviour.** `GD.tables.setState(view, state)`; a search that hides every row switches to `noresults` automatically when that block exists. **Provenance.** Extracted: loading rows (analytics.html:1585-1586), empty (`.ul-empty`). New: error, no-results.
+
+**Phone.** Loading, empty, error and no-results states render under the sort strip at full width.
 
 ## Log viewer
 
@@ -194,6 +210,8 @@ A 4px severity bar is the row's first grid track, coloured by `data-level` (`deb
 **Accessibility.** Rows are focusable and open with Enter or Space; the scroller is focusable for keyboard scrolling; live state is a labelled toggle button.
 
 **Provenance.** NEW, Mobbin Railway, Cloudflare, Supabase, Modal, Okta, Sentry.
+
+**Phone.** The header row is hidden. Each entry is the severity bar, then time, level and service on one line, with the message wrapped beneath it. The detail list stacks key above value. The select variant keeps its 640 minimum and scrolls.
 
 ## Histogram
 

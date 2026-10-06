@@ -58,6 +58,8 @@ States: unchecked (edge), hover (edge darkens), checked and indeterminate (ink f
 
 Anatomy: `label.gd-toggle` > `input[type=checkbox][role=switch]` + `.gd-toggle__track` + optional label text. Sizes: 44x24 default; `--xs` 36x20 for section headers, table rows and toolbars (and automatic in compact density). On is `--gd-ink`, never blue; Off is `--gd-track-off`; the knob is `--gd-knob` and turns `--gd-ink-fg` when On. States: hover, focus ring on the track, disabled. Provenance: extracted `analytics.html:503-512` (`.an-me`, drawn 28x16 there, which is off the 36x20 / 44x24 ramp; the ramp wins), sizes from old controls.md.
 
+**Phone.** The hit area is 44 tall around the 24 tall track. A toggle with a label spans the row, label left, track right, so it can never run off the edge.
+
 ## Form field
 
 **Use** to give any control a label, help text, an optional marker and an error. Anatomy: `.gd-field[data-state=error|warn]` > `.gd-field__label` (with `.gd-field__req` or `.gd-field__opt`), the control, `.gd-field__help`, `.gd-field__error[role=alert]`.
@@ -70,6 +72,8 @@ Anatomy: `label.gd-toggle` > `input[type=checkbox][role=switch]` + `.gd-toggle__
 ## Setting row
 
 **Use** for one preference: label and description on the left, the control on the right. Anatomy: `.gd-setting` > `.gd-setting__text` (`.gd-setting__label`, `.gd-setting__desc`) + `.gd-setting__control`. Rows divide with a hairline; `--top` aligns the control to the first line; below 640px the control stacks under the text. Controls inside get a 240px field width. Provenance: NEW, not in the hub; reference Mobbin Clerk and Squarespace settings; pending library review.
+
+**Phone.** Label and description sit above their control, except a lone toggle, which stays on the right of the label.
 
 ## Form section
 
@@ -93,6 +97,8 @@ Range drawing: seven contiguous 1fr columns; the fill is a band behind the cells
 
 Behaviour: any change emits `gd:range {preset,from,to,days,granularity,compare,live}` on the bar (the one event the screen listens to). Hour granularity disables above 7 days and falls back to Day; Cancel on the picker returns to the previous preset. Wraps on narrow widths. Provenance: NEW, composite, not in the hub; reference Mixpanel, Amplitude, Square, Hotjar, Cloudflare and Railway; pending library review.
 
+**Phone.** The bar stacks: the range switch takes the full width and every option shares it (no sideways scroll to find 30D), group by and compare share a row, and Live sits on its own line. References: Mobbin Mixpanel, Amplitude.
+
 ## Datetime field
 
 **Use** where an exact moment is needed (event filters, scheduled sends). Anatomy: `.gd-datetime` > a date `.gd-input` (native `input[type=date]`), a time `.gd-input` (`input[type=time]`) and a timezone select. Native inputs keep the platform pickers and keyboard entry; the shell gives them the field edge, so they follow density and theme. Provenance: NEW, not in the hub; reference Mobbin Okta system log; pending library review.
@@ -108,3 +114,5 @@ Behaviour: any change emits `gd:range {preset,from,to,days,granularity,compare,l
 Anatomy: `.gd-qb[data-gd-qb]` > `.gd-qb__sec[data-gd-qb-sec=name][data-max]` rows (Visualize, Metric, Filter, Group by, Sort by), each with `.gd-qb__label` and `.gd-qb__body` holding `.gd-qb__chip` select chips (`.gd-qb__val` opens the section's menu, `.gd-qb__x` removes) and a ghost Add button (`data-gd-qb-add`, `data-gd-menu`) next to the section's `.gd-menu`. The Visualize row is a segmented control (the chart type switcher). Footer: Save as…, Compare queries, Run query (`data-gd-qb-action`).
 
 Behaviour: picking from the menu adds a chip or replaces the one that opened it; chosen values are disabled in the menu; `data-max` hides Add at the limit. Emits `gd:query {query}` (`{visualize:[…],metric:[…],…}`) on every change and `gd:query-action {action,query}` for the footer. Provenance: NEW, not in the hub; reference Mobbin Sentry, Mixpanel, Amplitude and Google Analytics Explorations; pending library review.
+
+**Phone.** The footer wraps and Run query takes the full width.

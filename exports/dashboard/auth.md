@@ -78,6 +78,8 @@ The mark is the real one: the paths of `assets/logo/gushwork-symbol-white.svg`, 
 
 **Provenance.** extracted: web/shell.css:805-960 (`.gw-modal`). The hub draws this in a top-level fixed overlay at z-index 100; here it is a native dialog on the shared layering.
 
+**Phone.** Same sheet as Modal.
+
 ## Access denied screen
 
 **Purpose.** The visitor is signed in but this page is not for them. Use it instead of a blank page or a redirect loop. Do not use it for a signed-out visitor (that is Login screen) or for a record they cannot see inside an otherwise allowed page (that is the in-page no-access empty state, `.gd-empty--no-access`).
@@ -107,3 +109,5 @@ The mark is the real one: the paths of `assets/logo/gushwork-symbol-white.svg`, 
 **Tokens.** `--gd-fb-warning-*`, `--gd-sunken-bg`, `--gd-text`, `--gw-radius-12`. z-index per the shared layering (dialog 90).
 
 **Provenance.** NEW: not in the hub — reference Mobbin Linear / Intercom / Google Docs "session expired". Pending library review.
+
+**Phone.** Same sheet as Modal.

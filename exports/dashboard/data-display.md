@@ -32,6 +32,8 @@ Rules that apply to the whole set: a figure that can change carries `gd-num` (ta
 
 **Tokens.** Padding is `--gd-card-pad` minus 4 (16 comfortable, the hub metric card; 12 compact, the hub stat card); min height `--gd-row-h` x 2 + 12; value is 500 28px display, no token (R15), kept at 28 in compact. **Accessibility.** Give the delta pill its screen-reader text (see Delta pill); put the spark's meaning in `aria-label` or hide it with `aria-hidden`. **Provenance.** extracted: `analytics.html:198-216`; comparison and hint slots NEW.
 
+**Phone.** Tiles pair up two to a row. The sparkline drops under the figure, and a long name wraps to two lines instead of truncating.
+
 ## Metric strip
 
 **Purpose.** A row of KPIs that are also tabs: selecting one changes the chart below. Use when 3 to 6 metrics share one chart area. Do not use for unrelated KPIs (use stat cards).
@@ -41,6 +43,8 @@ Rules that apply to the whole set: a figure that can change carries `gd-num` (ta
 **States.** Rest, hover, selected (`aria-selected`: sunken fill plus 2px `--gd-ink` underline), disabled (`aria-disabled`). Overflows horizontally below 144px per item.
 
 **Behaviour.** Click, Left/Right (wrapping), Home, End select and move focus; roving `tabindex`; fires `gd:metric-select {id}`; shows and hides panels named by `aria-controls`. **Accessibility.** Standard tabs pattern. **Provenance.** NEW: reference Mobbin Squarespace, Fresha; pending library review.
+
+**Phone.** The strip scrolls sideways and snaps; each metric is about 44% wide so the next one peeks in.
 
 ## Delta pill
 
@@ -121,6 +125,8 @@ Rules that apply to the whole set: a figure that can change carries `gd-num` (ta
 ## Incident row
 
 **Purpose.** One entry in an incident history: title, status, duration, relative time. **Anatomy.** `ul.gd-incident-list` > `li.gd-incident-row[data-status][data-state=ongoing|resolved]` > status icon, `__main` (`__title`, `__sub`), a badge ("Investigating", "Resolved"), `__duration`, `<time class="__time">`. With a link title add `--link` for hover. An ongoing incident shows its duration in the status colour; resolved is muted and its badge is green. Columns are fixed so rows align. **Provenance.** NEW; same references as Status list.
+
+**Phone.** Two columns: the status icon, then title, subtitle, badge, duration and time stacked under it.
 
 ## Issue summary
 

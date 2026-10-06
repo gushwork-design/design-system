@@ -126,6 +126,8 @@ Accessibility. The figure is `role="img"` with every slice and percentage in its
 
 Provenance. Extracted: `web/admin/analytics.html:330-345`, `:1445-1475`. Palette follows R11 (the hub does not; see finding 2).
 
+**Phone.** The legend moves under the ring and takes the full width.
+
 ## Breakdown bar
 
 Purpose. One horizontal bar split into proportions, read at a glance: a split, a status mix. Use when there are two to four parts and no axis is needed.
@@ -170,6 +172,8 @@ Accessibility. A list whose text carries every figure; fills are decorative.
 
 Provenance. NEW: not in the hub (Mobbin Calendly horizontal, Google Analytics vertical steps).
 
+**Phone.** Each step's label gets its own line, with the bar and its figures under it, so a long step name is read in full.
+
 ## Chart tooltip
 
 Purpose. The cursor tooltip every chart uses: a header, a row per series, an optional total, an optional note. Not for explaining a control; use the shared tooltip for that.
@@ -193,6 +197,8 @@ States: rest, row hover (also isolates the series on the chart), hidden (`data-o
 Accessibility. The checkbox is labelled "Show <series>"; names are row headers. The last visible series cannot be unticked; the box reverts.
 
 Provenance. NEW: not in the hub (Mobbin Amplitude, Substack).
+
+**Phone.** Cell padding tightens to 8 and the first column wraps.
 
 ## Uptime bar
 

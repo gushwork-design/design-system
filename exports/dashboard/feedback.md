@@ -124,3 +124,5 @@ Aliases added in `60-feedback.css`: `--gd-fb-{info,success,warning,error}-{bg,li
 **Accessibility.** Cards are focusable; the move shortcuts are listed in the page help. A column is a labelled region.
 
 **Provenance.** NEW: not in the hub, reference Mobbin Trello, ClickUp, Wrike, pending library review.
+
+**Phone.** Columns are about 85% of the screen wide and snap, so the next column peeks in.

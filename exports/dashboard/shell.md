@@ -108,6 +108,8 @@ The top block holds the brand, or a workspace switcher when the person belongs t
 
 **Accessibility.** The filter bar slot needs a name from its contents; do not make the sticky strips cover focused content: scroll-padding is the consumer's to set if rows are tall. **Provenance.** extracted: `web/shell.css:2005-2008, 2124-2220` and the sticky strips from `analytics.html:499` and `access-control.html:24`; the 12-column grid is NEW (the hub has fixed 800 + 220 and 1120 columns).
 
+**Phone.** In a 12 column grid a span of 1 to 3 pairs up two to a row (stat tiles); anything spanning 4 or more takes the full width. Until 6 Oct 2026 spans 4 to 6 also went half width, which squeezed charts and cards into a column of 150. The sticky filter bar scrolls away with the page.
+
 ## Page header
 
 **Purpose.** The title block of a page: title, description, actions and, optionally, breadcrumbs above and a tab strip below. Use one per page. Do not use it for a section inside a page; that is a section header (cards).
@@ -170,6 +172,8 @@ The header is `display: contents` so the tab strip is a child of `.gd-page` and 
 **Persistence.** The component stores nothing. Each change fires `gd:layout` with `{reason, widgets: [{id, size}]}` in order; the app saves it. Adding fires a cancelable `gd:widget-add`; if the app does not handle it, a `<template data-gd-widget-template="id">` in the grid is cloned.
 
 **Tokens.** `--gd-card-bg`, `--gd-border`, `--gd-border-strong`, `--gd-border-focus`, `--gd-sunken-bg`, `--gd-ink`, `--gd-ink-fg`, `--gd-card-pad`, `--gd-gap`. **Provenance.** NEW: not in the hub, reference Mobbin Xero, Aboard, Evernote, Zoho CRM, Salesforce. Pending library review.
+
+**Phone.** Every widget is full width except size S, which pairs up.
 
 ## Explorer layout
 
