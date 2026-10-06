@@ -366,7 +366,7 @@ const INDUSTRIES = [['Manufacturer','Manufacturers'],['Distributor','Distributor
 // Card descriptions: taken from the Agent Store HTML (blurb and steps), trimmed to fit three lines (about 80-100 characters) so every card runs to a similar length. Agents not listed use their blurb as is.
 const CARD = {"paid-ad-agent": "Runs Meta, Google and ChatGPT ads daily within a monthly budget until cost per lead hits target.", "quote-chaser": "Follows up on every open quote until it is won, lost with a reason, or expired after 3 touches.", "margin-guard": "Checks every quote before it goes out and flags lines priced below floor or on stale cost.", "win-back": "Finds accounts that went quiet, works out why, and drafts tailored outreach to restart orders.", "date-keeper": "Works out a realistic ship date for every order line and sends the acknowledgment.", "returns-desk": "Handles customer returns by policy, issues the credit, and recovers it from the vendor.", "unbilled-sweeper": "Lists everything that shipped but was never invoiced, every day, with its value and reason.", "seo-agent": "Writes and publishes pages for what buyers search, and tracks rankings in Google and AI search.", "email-marketing-agent": "Builds segments from your lead lists, writes campaigns and nurture sequences, and sends them.", "front-desk": "Reads every sales and orders email, tags it as RFQ, PO, change or return, and gives it an owner.", "reorder-scout": "Spots overdue repeat parts, products and blanket orders and sends the buyer a ready requote.", "po-checker": "Compares each customer PO to the quote and flags price, revision, date and terms differences.", "cost-watch": "Loads vendor price increases on time and lists the quotes and prices that now lose margin.", "compliance-desk": "Answers customer compliance questionnaires and supplier setup packets, and chases suppliers."};
 const STEP_LABELS = ['Trigger','Reads','Decides','Does','Approval'];
-const S = {spy:'all',q:'',type:'any',cat:'any',ind:'Manufacturer',sel:{},open:null,vol:{},builder:false};
+const S = {spy:D.bundles[0].id,q:'',type:'any',cat:'any',ind:'Manufacturer',sel:{},open:null,vol:{},builder:false};
 const fmt = n => '$'+n.toLocaleString('en-US');
 const esc = s => String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const ic = (n,w='regular') => `<i class="i" style="--m:url(assets/icons/${n}-${w}.svg)"></i>`;
@@ -409,7 +409,6 @@ function renderRail(){
   $('#rail').innerHTML = `
    <div class="rgroup"><h2>Industry</h2><div class="dd" id="dd"><button class="ddbtn" id="ddbtn" type="button" aria-haspopup="listbox" aria-expanded="false"><span>${esc((INDUSTRIES.find(x=>x[0]===S.ind)||[])[1]||S.ind)}</span>${ic('caret-down','bold')}</button><ul class="ddlist" id="ddlist" role="listbox" aria-label="Industry" hidden>${INDUSTRIES.map(([v,l])=>`<li role="option" data-ind="${esc(v)}" aria-selected="${v===S.ind}" ${l?'':'aria-disabled="true"'}>${esc(l||v)}${v===S.ind?ic('check','bold'):''}</li>`).join('')}</ul></div></div>
    <div class="rgroup"><h2>Category</h2>
-    <button class="ritem ${S.spy==='all'?'on':''}" data-jump="all">${ic('list-bullets')}All agents<span class="n">${p.length}</span></button>
     ${D.bundles.map(b=>{const n=p.filter(a=>a.bundle===b.name).length;return `<button class="ritem ${S.spy===b.id?'on':''}" data-jump="${b.id}">${ic(ICON[b.id]||'package')}${esc(b.name)}<span class="n">${n}</span></button>`}).join('')}
     <button class="ritem ${S.spy==='build'?'on':''}" data-jump="build">${ic('sparkle')}Build your own agent<span class="n">Soon</span></button>
    </div>`;
@@ -525,7 +524,7 @@ document.addEventListener('click',e=>{
   if(!t) return;
   if(t.dataset.add){e.stopPropagation();const id=t.dataset.add;S.sel[id]?delete S.sel[id]:S.sel[id]=true;renderResults();renderBar();if(S.open)renderPanel();return;}
   if(t.dataset.open){S.open=t.dataset.open;renderPanel(true);return;}
-  if(t.dataset.jump){const id=t.dataset.jump;const el=id==='all'?$('.search'):document.getElementById('b-'+id);$('#rail').classList.remove('open');if(el)el.scrollIntoView({behavior:'smooth',block:'start'});return;}
+  if(t.dataset.jump){const id=t.dataset.jump;const el=document.getElementById('b-'+id);$('#rail').classList.remove('open');if(el)el.scrollIntoView({behavior:'smooth',block:'start'});return;}
   if('bundle' in t.dataset){const b=D.bundles.find(x=>x.id===t.dataset.bundle);const ids=visible().filter(a=>a.bundle===b.name&&!a.free).map(a=>a.id);const allIn=ids.every(id=>S.sel[id]);ids.forEach(id=>allIn?delete S.sel[id]:S.sel[id]=true);renderResults();renderBar();return;}
   if(t.dataset.vstep){const id=t.dataset.vid;S.vol[id]=String(Math.max(0,(+S.vol[id]||0)+(+t.dataset.vstep)*50));updVol(id,true);return;}
   if('prev' in t.dataset){step(-1);return;}
@@ -565,7 +564,7 @@ function onScroll(){
   requestAnimationFrame(()=>{
     tick=false;
     if(scrollY>32)navEl.setAttribute('data-scrolled','');else navEl.removeAttribute('data-scrolled');
-    const secs=[...document.querySelectorAll('.sec')];let cur='all';
+    const secs=[...document.querySelectorAll('.sec')];let cur=secs.length?secs[0].id.slice(2):'';
     if(secs.length&&secs[0].getBoundingClientRect().top<=110){secs.forEach(x=>{if(x.getBoundingClientRect().top<=110)cur=x.id.slice(2);});}
     if(secs.length&&innerHeight+scrollY>=document.documentElement.scrollHeight-4)cur=secs[secs.length-1].id.slice(2);
     if(cur!==S.spy){S.spy=cur;document.querySelectorAll('.ritem[data-jump]').forEach(r=>r.classList.toggle('on',r.dataset.jump===cur));}
