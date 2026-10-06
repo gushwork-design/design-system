@@ -1,4 +1,4 @@
-/* Tickets: a list with saved views, search, filters, columns, selection, bulk actions, a quick-view drawer and a new-ticket
+/* Tickets: a list with views as underline tabs, search, filters, columns, selection, bulk actions, a quick-view drawer and a new-ticket
    dialog. Rows are drawn from data.js. Nothing is stored: a reload brings every ticket back, and the page says so wherever
    it matters. Replace render and the actions with calls to your own API. */
 (function () {
@@ -49,7 +49,7 @@
   var ticketOf = function (row) { return S.ticketById(row.dataset.gdId); };
 
   /* ---- view + search + filter chips, applied together --------------------------------------------- */
-  var view = 'all', SAVED = {};
+  var view = 'all';
   var VIEWS = { all: function () { return true; }, Open: function (r) { return r.dataset.status === 'Open'; }, Pending: function (r) { return r.dataset.status === 'Pending'; }, Resolved: function (r) { return r.dataset.status === 'Resolved'; }, Urgent: function (r) { return r.dataset.priority === 'Urgent'; } };
   function chipFilters() { return $$('#chips .gd-chip').map(function (c) { return { field: c.dataset.field, op: c.dataset.op, value: c.dataset.value }; }); }
   function matches(row, f) { var v = row.dataset[f.field]; return f.op === 'is not' ? v !== f.value : v === f.value; }
@@ -64,31 +64,16 @@
     if (!all) GD.tables.setState(tview, 'empty'); else if (tview.dataset.state === 'empty') GD.tables.setState(tview, null);
     var rows = $$('[data-gd-id]', body), cnt = { all: rows.length, Open: 0, Pending: 0, Resolved: 0, Urgent: 0 };
     rows.forEach(function (r) { cnt[r.dataset.status]++; if (r.dataset.priority === 'Urgent') cnt.Urgent++; });
-    $$('#views [data-view]').forEach(function (b) { var n = $('[data-n]', b); if (n && cnt[b.dataset.view] != null) n.textContent = cnt[b.dataset.view]; });
-    $('#list-desc').textContent = all + (all === 1 ? ' ticket' : ' tickets') + ', newest first. A reload brings back every change.';
+    $$('#viewtabs [data-view]').forEach(function (b) { var n = $('[data-n]', b); if (n && cnt[b.dataset.view] != null) n.textContent = cnt[b.dataset.view]; });
   }
   document.addEventListener('gd:search', function () { setTimeout(applyAll, 0); });
   document.addEventListener('gd:filters', function () { setTimeout(applyAll, 0); });
-  document.addEventListener('gd:tab', function (e) {
-    var t = e.detail && e.detail.tab; if (!t || !t.closest || !t.closest('#views')) return;
-    var was = view; view = t.dataset.view || 'all'; $('[data-gd-pager]').dataset.gdPage = 1;
-    // the rail's submenu row for this view follows the tab, and the address keeps the view so a reload or a shared link lands on it
-    if (VIEWS[view] && !SAVED[view]) { history.replaceState(null, '', view === 'all' ? 'tickets.html' : 'tickets.html?view=' + encodeURIComponent(view)); U.markNav(); }
-    if (SAVED[view]) GD.tables.setFilters($('#chips'), SAVED[view]);          // a saved segment brings its own filters back
-    else if (SAVED[was]) GD.tables.setFilters($('#chips'), []);               // leaving one takes them away again
-    applyAll();
-  });
   document.addEventListener('gd:clear-filters', function () {
     $$('#chips [data-gd-chip-remove]').forEach(function (b) { b.click(); });
     var i = $('[data-gd-search]'); i.value = ''; $('[data-gd-search-clear]').hidden = true;
-    view = 'all'; $$('#views [role="tab"]').forEach(function (b) { var on = b.dataset.view === 'all'; b.setAttribute('aria-selected', on); b.tabIndex = on ? 0 : -1; });
+    view = 'all'; $('#viewtabs [data-view="all"]').click();
     applyAll();
   });
-  document.addEventListener('gd:viewsave', function (e) {
-    var t = $$('#views [role="tab"]').pop(); if (t) { t.dataset.view = t.dataset.value; SAVED[t.dataset.value] = e.detail.filters || []; view = t.dataset.view; }
-    U.toast('Segment saved: ' + e.detail.name, 'success');
-  });
-
   /* ---- export -------------------------------------------------------------------------------------- */
   function csv(rows) {
     var head = ['ID', 'Subject', 'Requester', 'Company', 'Priority', 'Status', 'Queue', 'Assignee', 'Created', 'First response (min)'];
@@ -171,6 +156,8 @@
   document.addEventListener('gd:new-ticket', function () { GD.feedback.open(dlg); });
 
   renderRows();
-  var want = U.param('view');                                                       // tickets.html?view=Open, from the rail
-  if (want && want !== 'all' && VIEWS[want]) $('#views [data-view="' + want + '"]').click();
+  // The tabs choose the view and keep the address in step (tickets.html?view=Open), so a reload or a shared link lands on it.
+  var want = U.param('view'); if (!VIEWS[want]) want = 'all';
+  view = U.bindTabs('view', want, 'all', function (v) { view = v; $('[data-gd-pager]').dataset.gdPage = 1; applyAll(); });
+  applyAll();
 })();
