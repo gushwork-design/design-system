@@ -3,7 +3,7 @@
 
     python3 scripts/template-previews.py <outdir>
 
-Writes <outdir>/<slug>/index.html for ad-page, ad-page-signup, case-study, slide-deck, lead-magnet and one-pager — the
+Writes <outdir>/<slug>/index.html for ad-page, ad-page-signup, support-ops-app, case-study, slide-deck, lead-magnet and one-pager — the
 templates' own HTML, not a screenshot of it. Two things are done to each copy, and nothing else:
 
   1. Paths. The templates reference ../../fonts and ../../../../assets from where they live in
@@ -155,6 +155,20 @@ def main(out):
     viewer = ('<style>@media screen{body{padding:32px 0}.page{margin:0 auto 32px;'
               'box-shadow:var(--gw-shadow-s3)}}</style>\n')
     write(out, 'lead-magnet', t.replace('</head>', viewer + '</head>', 1))
+    # Support operations app: a multi-page dashboard. build-dashboard-css.sh writes its served copy (links absolute, the stamp's
+    # registry URL blanked) to web/previews/dashboard/pages/support-ops-app/; the route serves the same files, so it shows exactly
+    # what the review drawer shows. The site uses clean URLs with no trailing slash, so a folder's index.html is served at the bare
+    # folder URL and its relative scripts would resolve one folder up: the route's index.html therefore only forwards to overview.
+    src = ROOT / 'web/previews/dashboard/pages/support-ops-app'
+    dst = out / 'support-ops-app'
+    dst.mkdir(parents=True, exist_ok=True)
+    for f in sorted(src.iterdir()):
+        text = f.read_text(encoding='utf-8')
+        (dst / f.name).write_text(noindex(text) if f.suffix == '.html' else text, encoding='utf-8')
+    (dst / 'index.html').write_text(('<!doctype html><meta charset="utf-8"><meta name="robots" content="noindex"><title>Support operations app</title>'
+        '<meta http-equiv="refresh" content="0; url=/internal/templates/support-ops-app/overview">'
+        '<a href="/internal/templates/support-ops-app/overview">Open the support operations app</a>'), encoding='utf-8')
+    print('  templates/support-ops-app/ (' + str(len(list(dst.iterdir()))) + ' files)')
     # One-pager: screen-first single page. Its own assets/ sit beside it, so the route needs a base.
     t = sitepaths((ROOT / 'templates/one-pager/one-pager.html').read_text(encoding='utf-8'), 2)
     t = t.replace('<meta charset="utf-8">', '<meta charset="utf-8">\n<base href="/internal/templates/one-pager/">', 1)
