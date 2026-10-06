@@ -46,3 +46,6 @@ The package bag moves from a floating bar to a summary card in the rail on deskt
 
 ## Update, 6 Oct 2026 (version 2)
 A second page, `/internal/staging/agent-store-v2`, shares the first page's images and data and changes the frame: underlined category tabs with search on the right of the row (`agent-category-tabs`) and an always-visible sticky package builder panel on the left (`agent-package-panel`). Both are new and pending review.
+
+## Update, 6 Oct 2026 (version 2, second pass)
+Version 2 now has the package panel on the right, search hidden, a navbar that scrolls away (no sticky navbar) and one sticky bar across the column holding every category tab plus the industry dropdown. Version 1 is unchanged.
