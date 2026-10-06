@@ -22,8 +22,8 @@ a 240 rail, a 48 gap and a 912 main area, 80px under the hero, on `--gw-color-ne
 296 × auto. White, 1px `--gw-color-neutral-100`, `--gw-radius-12`, padding `--gw-space-16`, gap 16.
 Top row: a 60px mascot tile (`--gw-radius-8`, 0.5px `--gw-color-neutral-100`, the image at 70px, centred and
 clipped) then the name (`--gw-text-body-16-sem`) over a one-liner (`--gw-text-body-12-med`,
-`--gw-color-neutral-400`). Below: the description, `--gw-text-body-14-reg` in `--gw-color-neutral-600`, four
-lines. A 24px add button sits at top 12, right 12: `--gw-color-neutral-25`, 0.5px stroke, a 12px plus.
+`--gw-color-neutral-400`). Below: the description, `--gw-text-body-14-reg` in `--gw-color-neutral-600`, three
+lines, never a fourth. A 24px add button sits at top 12, right 12: `--gw-color-neutral-25`, 0.5px stroke, a 12px plus.
 
 - **Selected:** only the button changes, to `--gw-color-primary-500` with a white check. The card does not.
 - **Premium:** border `--gw-color-primary-100` and `--gw-shadow-s2`, and the one-liner slot carries the price,
