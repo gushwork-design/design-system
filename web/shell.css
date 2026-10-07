@@ -820,30 +820,27 @@
    not over a page you cannot read. The scrim becomes the opaque page ground and
    carries the same grid the /login screen uses, so the two entry points match.
    The in-site case — a locked row clicked from the sidebar — keeps the scrim. */
-.gw-modal--solo { background: var(--s-page-bg, var(--gw-color-neutral-25)); }
+.gw-modal--solo { background: var(--gw-color-neutral-25); }
+:root[data-theme="dark"] .gw-modal--solo { background: var(--s-page-bg); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .gw-modal--solo { background: var(--s-page-bg); } }
 .gw-modal .gw-login__grid { display: none; }
 .gw-modal--solo .gw-login__grid { display: block; }
-/* Matched to 763:2222. ONE layer, not two: the lines and the filled cells live
-   in the same SVG, drawn on the same 48.977px lattice the exported cells sit on
-   (origin x=0.906 y=0.679 inside the asset). Tiling CSS lines separately put the
-   grid on its own origin while the centred cells kept theirs, and the two
-   lattices read as a second grid. The /login screen keeps its own 40px pattern. */
-.gw-modal--solo .gw-login__grid {
-  background: url('/assets/login-backdrop.svg') center center / 1765px 1226px no-repeat;
-}
-:root[data-theme="dark"] .gw-modal--solo .gw-login__grid { opacity: .3; }
-/* The hand-placed cells are redundant once the asset carries them. */
+/* Dashboard sign-in (exports/dashboard/auth.md): the plain 40px lattice from the base .gw-login__grid rule, not the
+   763:2222 SVG. No filled cells: the approved login-screen drawing has none (Utsav, rework note 5 Oct). */
 .gw-modal--solo .gw-login__cell { display: none; }
 .gw-modal__box {
-  width: 100%; max-width: 496px;
-  padding: var(--gw-space-60) var(--gw-space-40);
+  width: 100%; max-width: 480px;
+  padding: var(--gw-space-40) var(--gw-space-32);
   border-radius: var(--gw-radius-24);
-  background: var(--s-card-bg);
-  border: 1px solid var(--s-card-border);
+  /* The dashboard card surface (--gd-raised-bg / --gd-border-strong): white on neutral-200 in light, neutral-900 on neutral-850 in dark. */
+  background: var(--gw-color-white);
+  border: 1px solid var(--gw-color-neutral-200);
   box-shadow: var(--gw-shadow-s4);
   text-align: center;
   position: relative;
 }
+:root[data-theme="dark"] .gw-modal__box { background: var(--gw-color-neutral-900); border-color: var(--gw-color-neutral-850); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .gw-modal__box { background: var(--gw-color-neutral-900); border-color: var(--gw-color-neutral-850); } }
 .gw-modal__x {
   position: absolute; top: var(--gw-space-12); right: var(--gw-space-12);
   width: 28px; height: 28px;
@@ -857,17 +854,14 @@
   width: 60px; height: 60px; margin: 0 auto var(--gw-space-20);
   display: grid; place-items: center;
   border-radius: 15px;
-  /* Black, per 763:2599 — this supersedes the 15 Sep Primary/500 + Primary/600
-     chip, which was chosen before any drawing existed for this modal. */
-  background: var(--gw-color-black);
-  /* The outline the owner pages' logo chip has (Neutral/800), so a black chip on the dark modal still has an edge. */
-  box-shadow: inset 0 0 0 1px var(--gw-color-neutral-800);
+  background: var(--gw-color-primary-500);
+  box-shadow: inset 0 0 0 1.875px var(--gw-color-primary-600);
 }
 .gw-modal__chip svg { width: 30px; height: 30px; display: block; }
 .gw-modal__title {
-  margin: 0 0 8px;
+  margin: 0 0 10px;
   font: var(--gw-text-h5);
-  letter-spacing: 0;
+  letter-spacing: var(--gw-text-h5-tracking);
   color: var(--s-heading);
 }
 .gw-modal__dest {
@@ -1315,14 +1309,17 @@
   width: 480px;
   max-width: 100%;
   padding: var(--gw-space-40) var(--gw-space-32);
-  background: var(--s-card-bg);
-  border: 1px solid var(--s-card-border);
+  /* The dashboard card surface (--gd-raised-bg / --gd-border-strong), same as .gw-modal__box. */
+  background: var(--gw-color-white);
+  border: 1px solid var(--gw-color-neutral-200);
   border-radius: var(--gw-radius-24);
   box-shadow: var(--gw-shadow-s4);
   display: flex;
   flex-direction: column;
   gap: var(--gw-space-40);   /* 621:5094 container gap */
 }
+:root[data-theme="dark"] .gw-login__card { background: var(--gw-color-neutral-900); border-color: var(--gw-color-neutral-850); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .gw-login__card { background: var(--gw-color-neutral-900); border-color: var(--gw-color-neutral-850); } }
 
 .gw-login__head {
   display: flex;
@@ -1384,13 +1381,13 @@
   justify-content: center;
   gap: var(--gw-space-8);
   width: 100%;
-  height: 64px;
-  padding: var(--gw-space-16) var(--gw-space-20) var(--gw-space-16) var(--gw-space-24);
+  height: 48px;
+  padding: 0 var(--gw-space-16) 0 var(--gw-space-20);
   border: 1px solid var(--gw-color-neutral-200);
-  border-radius: var(--gw-radius-16);
+  border-radius: var(--gw-radius-12);
   background: var(--gw-color-white);
   color: var(--gw-color-black);
-  font: var(--gw-text-button-16);
+  font: var(--gw-text-button-14);
   text-decoration: none;
   box-shadow: var(--gw-shadow-s3);
   transition: box-shadow var(--gw-motion-fast);
