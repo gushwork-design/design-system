@@ -11,9 +11,13 @@
       is left exactly as it was written.
    3. Never leave a number half-counted. A hidden tab runs no animation frames, so a timer writes the
       final figure after the count would have ended.
-   4. Nothing runs for someone who asked for reduced motion. It must never throw into the page. */
+   4. Nothing runs for someone who asked for reduced motion, or when printing. It must never throw into the page.
+   5. A count that has ended stays ended. The frame loop stops when the timer writes the final figure, and its
+      clock starts at its own first frame, not at performance.now(): a headless render with a virtual clock
+      (scripts that print a report to PDF) gives frames a different time base, and a loop that kept running past
+      the final write once left a report's KPIs at 11 times their value (found 8 Oct 2026, fixed the same day). */
   try {
-    if (!window.matchMedia || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!window.matchMedia || matchMedia('(prefers-reduced-motion: reduce)').matches || matchMedia('print').matches) return;
     const SEL = '.gd-stat-card__value, .gd-metric-strip__value';
     const FIG = /^([^\d\-.,\s]{0,3})(-?\d{1,3}(?:,\d{3})+|-?\d+)(\.\d+)?([^\d.,\s]{0,3})$/;
     const seen = new Map();                                   // card label -> the figure last shown
@@ -36,20 +40,27 @@
       return (host ? host.id : '') + '|' + (lab ? lab.textContent.trim() : '');
     }
     function run(el) {
-      if (el.__gdBusy) return;
+      // A write that is not ours while a count is running means the page drew a newer figure: stop the old count
+      // (its final write would otherwise put the stale figure back) and start a new one from where this one aimed.
+      if (el.__gdBusy) { if (el.textContent === el.__gdLast) return; el.__gdCancel(); }
       const txt = el.textContent, p = parse(txt); if (!p) return;
       const k = keyOf(el), prev = seen.has(k) ? seen.get(k) : 0;
       seen.set(k, p.n);
       if (prev === p.n) return;
-      el.__gdBusy = true;
-      const t0 = performance.now();
-      const done = function () { el.textContent = txt; el.__gdBusy = false; };
-      const timer = setTimeout(done, DUR + 250);
-      (function frame(t) {
-        const f = Math.min(1, (t - t0) / DUR), e = 1 - Math.pow(1 - f, 3);
-        el.textContent = show(p, prev + (p.n - prev) * e);
-        if (f < 1) requestAnimationFrame(frame); else { clearTimeout(timer); done(); }
-      })(t0);
+      const put = function (t) { el.__gdLast = t; el.textContent = t; };
+      let live = true, t0 = null, timer = 0;
+      const stop = function () { clearTimeout(timer); live = false; el.__gdBusy = false; };
+      const done = function () { stop(); put(txt); };        // the final figure, whether or not frames ever come
+      el.__gdBusy = true; el.__gdCancel = stop;
+      timer = setTimeout(done, DUR + 250);
+      put(show(p, prev));                                     // no flash of the final figure before the first frame
+      requestAnimationFrame(function frame(t) {
+        if (!live) return;
+        if (t0 === null) t0 = t;
+        const f = Math.min(1, Math.max(0, (t - t0) / DUR)), e = 1 - Math.pow(1 - f, 3);
+        put(show(p, prev + (p.n - prev) * e));
+        if (f < 1) requestAnimationFrame(frame); else done();
+      });
     }
     new MutationObserver(function (ms) {
       ms.forEach(function (m) {
