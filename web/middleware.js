@@ -25,7 +25,7 @@
 import { COOKIE, verify, readCookie, sessionSecret, authModes, GATE_ENABLED }
   from './api/_session.js';
 import { loadRules, decide } from './api/_access.js';
-import { recordVisit, recordPublicView } from './api/_log-visit.js';
+import { recordVisit } from './api/_log-visit.js';
 
 export const config = {
   matcher: ['/internal/:path*', '/admin/:path*', '/library', '/library/:path*', '/previews/:path*', '/agents', '/agents/:path*']
