@@ -75,12 +75,8 @@ export function defaultRules() {
          /admin rule it covers this path and this line is never added, so the page
          is admin-tier at the edge and the OWNER check that really holds is the one in
          api/_usage-log.js, which the data cannot be read without. */
-<<<<<<< HEAD
-      { path: '/admin/usage-log', access: 'owner', groups: [], people: [] },
-=======
       { path: '/admin/analytics', access: 'owner', groups: [], people: [] },
       { path: '/admin/system-health', access: 'owner', groups: [], people: [] },
->>>>>>> origin/main
       /* Ad landers are public on purpose. An ad page's whole job is to be
          pasted into Slack, sent to a client and run as paid media, and a
          social card cannot render from behind the gate: the scraper fetching
