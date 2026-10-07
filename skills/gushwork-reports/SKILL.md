@@ -166,7 +166,7 @@ A report is shared, so check what a stranger will see, in the browser:
 
 A report is a static file that outlives the session that made it. Every build carries a `gushwork-build:{…}` comment
 naming the plugin version, who built it, when and the components it uses, exactly as for a dashboard
-(`exports/dashboard/notice.md`). List only components the file really uses.
+(`exports/dashboard/notice.md`). List only components the file really uses, and only from the dashboard registry: the shared ones (the Badge, the logo, icons) live in the shared registry, and a stamp that lists one reports it as "removed from the system".
 
 ## Source of truth
 

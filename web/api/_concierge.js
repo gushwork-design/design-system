@@ -53,6 +53,7 @@ const TEMPLATES = [
   ['ad-page-signup', 'Sign-up ad page', 'Illustrated-hero landing page with a one-click sign-up, for paid ads.', ['ad', 'ads', 'signup', 'landing', 'lander', 'page', 'illustrated']],
   ['case-study', 'Case study page', 'One customer story, told as a page.', ['case', 'study', 'customer', 'story', 'page']],
   ['lead-magnet', 'Lead magnet', 'Print-ready PDF that sits behind an ad.', ['lead', 'magnet', 'pdf', 'guide', 'ebook', 'document']],
+  ['growth-report', 'Growth report', 'A one-page report: a verdict, headline numbers, charts and tables, shared as a link or a PDF.', ['report', 'reports', 'growth', 'analytics', 'weekly', 'readout', 'summary']],
   ['one-pager', 'One-pager', 'One page on why customers trust Gushwork.', ['one-pager', 'pager', 'document', 'sheet']],
   ['slide-deck', 'Slide deck', 'The base for every Gushwork deck.', ['slide', 'slides', 'deck', 'presentation', 'pitch', 'sales']],
 ];
