@@ -513,6 +513,13 @@
       "reviewedOn": "2026-10-07",
       "fingerprint": "866aca9af3e60091",
       "previewFingerprint": "1bea86c3109ecba8"
+    },
+    "shortcut-key-cap": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-07",
+      "fingerprint": "af96b8e2cb58c578",
+      "previewFingerprint": "3f80ccd86bd7004f"
     }
   }
 }
