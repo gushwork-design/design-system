@@ -58,7 +58,9 @@ never in swapping the brand's parts.
 
 The concept, the layout, the motion, the copy (within voice), the illustration. A game can be a game.
 An animation can be wild. What it cannot do is use a different logo, a different typeface or a
-different blue while doing it.
+different blue while doing it. If the piece reuses product UI (a button, a tab row, a menu), that UI
+moves the way `foundation/motion.md` says, and any movement still stands down under
+`prefers-reduced-motion`.
 
 If the person **explicitly asks** for a look that breaks these — "make it pixel-art", "use a neon
 palette" — do it, and say plainly in one line that it is off the Gushwork system. Do not apply an

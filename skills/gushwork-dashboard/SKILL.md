@@ -34,6 +34,7 @@ then `/reload-plugins` in the chat.
 | Standing rulings | `DECISIONS.md` |
 | Voice, casing, banned words | `foundation/voice.md` |
 | Focus, hover, click targets, sample data | `foundation/states.md` |
+| **Motion — entrance, press, the tab line, overlays, counting numbers** | `foundation/motion.md` |
 | Text fields (shared with web) | `foundation/text-field.md` |
 | Icons, Gushwork logo, shared Badge | `foundation/shared-components.md` |
 | Declaring anything you had to build yourself | `foundation/new-component-notice.md` |
@@ -139,7 +140,12 @@ pending a ruling.
    `foundation/output-targets.md`).
 4. **Every interactive element has a keyboard ring; text fields show their edge instead.** Nothing that is
    not interactive gets a hover, a cursor or a ring (`foundation/states.md`).
-5. **A drawn affordance must work.** Every `data-gd-*` hook in your markup must have a handler in
+5. **Motion comes from the hub shell; add none of your own.** A dashboard built in the hub already enters,
+   presses, glides its underlined tabs, opens its overlays and counts its whole-number KPIs
+   (`foundation/motion.md`, `web/shell.css`, `web/shell.js`). Use the shell's classes (`.ul-tab` rows in a
+   `role="tablist"`, `.ul-num`, `.gw-iconbtn`); do not write `@keyframes`, a `transition: all`, or a
+   global `:active` scale. A control that should press in joins the named list in `shell.css`.
+6. **A drawn affordance must work.** Every `data-gd-*` hook in your markup must have a handler in
    `dashboard.js`; every `<button>` must do something. Ship the affordance only if the function exists.
 6. **A quantity that cannot be read is removed, never zeroed.** A `0` that means "not loaded" reads as "we
    got no leads". Loading is a skeleton of the real layout; failure is per card, with a retry, never a

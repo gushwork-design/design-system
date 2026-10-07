@@ -66,6 +66,10 @@ the outputs, who can reach it.
 3. `decisions.md` in this folder — each decision, who made it, and why.
 4. One existing tool end to end: `web/internal/employee-id-card/` (index.html, app.jsx, styles.css).
 5. `foundation/tokens.css`, `foundation/voice.md`, `DECISIONS.md` (R41 on focus, R16 on the dark toggle).
+6. `foundation/motion.md` (R64). A tool page loads `tool-shell.css`, **not** `shell.css`, so it does not
+   get the hub's entrance and press rules for free: add the ones it needs from that file, keep to
+   `opacity` and `transform`, 8px and 320ms, inside `prefers-reduced-motion: no-preference`. A tool
+   that already slides its panels keeps that.
 
 Do not copy one tool into another. A new tool starts from the shell and a blank `app.jsx`, the same
 rule the web templates follow.

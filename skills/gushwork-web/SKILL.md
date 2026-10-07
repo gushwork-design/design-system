@@ -33,6 +33,7 @@ then `/reload-plugins` in the chat.
 | **Text fields — shared with dashboard, all 14 variants** | `foundation/text-field.md` |
 | Declaring anything you had to build yourself | `foundation/new-component-notice.md` |
 | **What to emit — React or static HTML** | `foundation/output-targets.md` |
+| **Motion — entrance, press, menus and modals arriving** | `foundation/motion.md` |
 | **Page templates — start here before composing from scratch** | `templates/` |
 
 ### The rulings that bite on this surface
@@ -389,6 +390,10 @@ These sit above the individual component rules.
 - **Content column is `--gw-content-width` (1240) inside a 1440 page**, centred with
   `--gw-content-margin` (100px). Not `--gw-bp-content-width` — that variable holds 1400 and is
   not the content column. Ruled 6 Aug 2026; see `RECONCILIATION.md`.
+- **Motion is opt-in and small.** Entrance, hover and press on buttons and cards, and menus and modals
+  arriving, as `foundation/motion.md` rules them: only `opacity` and `transform`, 8px and 320ms at most,
+  everything inside `prefers-reduced-motion: no-preference`, and nothing on a page inside the hub shell
+  (it already has it). No new easing, no motion library.
 - **Eyebrows are black by default.** `Color=Default` is black and is what you use.
   `Color=Blue` is **only when asked** — do not reach for the blue eyebrow because it looks
   better against a heading. Blue accents are earned, not decorative.
