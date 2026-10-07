@@ -823,20 +823,16 @@
 .gw-modal--solo { background: var(--s-page-bg, var(--gw-color-neutral-25)); }
 .gw-modal .gw-login__grid { display: none; }
 .gw-modal--solo .gw-login__grid { display: block; }
-/* Clean grid background for modal: subtle lines only, no asset. */
+/* Matched to 763:2222. ONE layer, not two: the lines and the filled cells live
+   in the same SVG, drawn on the same 48.977px lattice the exported cells sit on
+   (origin x=0.906 y=0.679 inside the asset). Tiling CSS lines separately put the
+   grid on its own origin while the centred cells kept theirs, and the two
+   lattices read as a second grid. The /login screen keeps its own 40px pattern. */
 .gw-modal--solo .gw-login__grid {
-  background-image:
-    linear-gradient(0deg, var(--gw-color-neutral-100) 1px, transparent 1px),
-    linear-gradient(90deg, var(--gw-color-neutral-100) 1px, transparent 1px);
-  background-size: 40px 40px;
-  background-position: 0 0;
+  background: url('/assets/login-backdrop.svg') center center / 1765px 1226px no-repeat;
 }
-:root[data-theme="dark"] .gw-modal--solo .gw-login__grid {
-  background-image:
-    linear-gradient(0deg, var(--gw-color-neutral-900) 1px, transparent 1px),
-    linear-gradient(90deg, var(--gw-color-neutral-900) 1px, transparent 1px);
-}
-/* The hand-placed cells are redundant. */
+:root[data-theme="dark"] .gw-modal--solo .gw-login__grid { opacity: .3; }
+/* The hand-placed cells are redundant once the asset carries them. */
 .gw-modal--solo .gw-login__cell { display: none; }
 .gw-modal__box {
   width: 100%; max-width: 420px;
