@@ -501,18 +501,30 @@ body[data-gw-page="analytics"] .sg__main > * { min-width: 0; }
 .an-bar { position: sticky; top: 0; z-index: 6; background: var(--s-panel-bg); margin-top: calc(var(--gw-space-8) * -1); padding-top: var(--gw-space-8); align-self: stretch; display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-16); box-shadow: inset 0 -1px 0 var(--ul-hdr-line); }
 @media (max-width: 767px) { .an-bar { top: 76px; } }
 .sg__main .an-bar > .an-tabs { display: flex; gap: var(--gw-space-24); height: auto; padding: 0; border-radius: 0; background: none; box-shadow: none; }
-/* "Hide my activity": a small switch in the topbar-icon family (no stroke on the label, a filled track when on). */
-.an-hide { display: flex; align-items: center; gap: var(--gw-space-16); flex-wrap: wrap; }
-.an-me { display: inline-flex; align-items: center; gap: var(--gw-space-8); cursor: pointer; user-select: none; font: var(--gw-text-body-12-med); color: var(--ul-sub); }
-.an-me:hover { color: var(--ul-value); }
-.an-me input { position: absolute; opacity: 0; width: 0; height: 0; }
-.an-me__sw { position: relative; width: 28px; height: 16px; border-radius: 999px; background: var(--ul-hdr-line); transition: background var(--gw-motion-fast); }
-.an-me__sw::after { content: ''; position: absolute; left: 2px; top: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--gw-color-white); box-shadow: 0 1px 2px rgba(0, 0, 0, .25); transition: transform var(--gw-motion-fast); }
-.an-me input:checked + .an-me__sw { background: var(--ul-tab-on-bg); }
-.an-me input:checked + .an-me__sw::after { background: var(--ul-tab-on-fg); box-shadow: none; }
-.an-me input:checked + .an-me__sw::after { transform: translateX(12px); }
-.an-me input:checked ~ .an-me__t { color: var(--ul-value); }
-.an-me input:focus-visible + .an-me__sw { outline: var(--gw-focus-ring); outline-offset: 2px; }
+/* "Hide my activity" and "Hide public visitors": the library Toggle (gd-toggle, 36x20), rules copied from
+   exports/dashboard/css/30-inputs.css. The library's colour aliases map onto this page's own ink tokens. */
+.an-hide { display: flex; align-items: center; gap: var(--gw-space-16); flex-wrap: wrap;
+  --gd-text: var(--ul-sub); --gd-ink: var(--ul-tab-on-bg); --gd-ink-fg: var(--ul-tab-on-fg);
+  --gd-ink-hover: color-mix(in srgb, var(--ul-tab-on-bg), var(--ul-tab-on-fg) 15%);
+  --gd-track-off: var(--ul-hdr-line); --gd-knob: var(--gw-color-white); --gd-disabled-ink: var(--ul-sub); }
+.an-hide .gd-toggle:hover, .an-hide .gd-toggle:has(input:checked) { --gd-text: var(--ul-value); }
+/* --- toggle: On is ink, never blue ---------------------------------------- */
+.an-hide .gd-toggle{ --tg-w: 44px; --tg-h: 24px; --tg-k: 16px; --tg-pad: 4px; position: relative; display: inline-flex; align-items: center; gap: var(--gw-space-8); cursor: pointer; font: var(--gw-text-body-14-med); color: var(--gd-text); user-select: none; }
+.an-hide .gd-toggle--xs { --tg-w: 36px; --tg-h: 20px; --tg-k: 12px; }
+.an-hide .gd-toggle--xs{ font: var(--gw-text-body-12-med); }
+.an-hide .gd-toggle input{ position: absolute; width: 1px; height: 1px; opacity: 0; margin: 0; }
+.an-hide .gd-toggle__track{ position: relative; flex: none; width: var(--tg-w); height: var(--tg-h); border-radius: var(--gw-radius-full); background: var(--gd-track-off); transition: background var(--gw-motion-fast); }
+.an-hide .gd-toggle__track::after{
+  content: ""; position: absolute; left: var(--tg-pad); top: var(--tg-pad); width: var(--tg-k); height: var(--tg-k); border-radius: 50%;
+  background: var(--gd-knob); box-shadow: var(--gw-shadow-s2); transition: transform var(--gw-motion-fast), background var(--gw-motion-fast);
+}
+.an-hide .gd-toggle:hover input:not(:checked, :disabled) + .gd-toggle__track, .an-hide .gd-toggle.is-hover input:not(:checked) + .gd-toggle__track{ background: color-mix(in srgb, var(--gd-track-off), var(--gd-text) 14%); }
+.an-hide .gd-toggle input:checked + .gd-toggle__track{ background: var(--gd-ink); }
+.an-hide .gd-toggle:hover input:checked:not(:disabled) + .gd-toggle__track, .an-hide .gd-toggle.is-hover input:checked + .gd-toggle__track{ background: var(--gd-ink-hover); }
+.an-hide .gd-toggle input:checked + .gd-toggle__track::after{ transform: translateX(calc(var(--tg-w) - var(--tg-k) - 2 * var(--tg-pad))); background: var(--gd-ink-fg); box-shadow: none; }
+.an-hide .gd-toggle input:focus-visible + .gd-toggle__track{ outline: var(--gw-focus-ring); outline-offset: var(--gw-focus-offset); }
+.an-hide .gd-toggle:has(input:disabled){ color: var(--gd-disabled-ink); cursor: not-allowed; }
+.an-hide .gd-toggle input:disabled + .gd-toggle__track{ opacity: .5; }
 .sg__main .an-bar .an-tabs .ul-tab { position: relative; height: 40px; padding: 0 2px; border-radius: 0; background: none; color: var(--ul-sub); font: var(--gw-text-body-14-med); }
 .sg__main .an-bar .an-tabs .ul-tab:hover { background: none; color: var(--ul-value); }
 .sg__main .an-bar .an-tabs .ul-tab[aria-selected="true"] { background: none; color: var(--ul-value); }
@@ -547,15 +559,15 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
         <button class="ul-tab" role="tab" data-tab="bruce" aria-selected="false">Bruce</button>
       </div>
       <div class="an-hide">
-      <label class="an-me" id="an-me" title="Leaves your own rows, and the design@gushwork.ai account's, out of every tab">
-        <input type="checkbox" id="an-me-box">
-        <span class="an-me__sw" aria-hidden="true"></span>
-        <span class="an-me__t">Hide my activity</span>
+      <label class="gd-toggle gd-toggle--xs" id="an-me" title="Leaves your own rows, and the design@gushwork.ai account's, out of every tab">
+        <input type="checkbox" role="switch" id="an-me-box">
+        <span class="gd-toggle__track" aria-hidden="true"></span>
+        <span class="gd-toggle__t">Hide my activity</span>
       </label>
-      <label class="an-me" id="an-pub" title="Leaves out visits from people who are not signed in">
-        <input type="checkbox" id="an-pub-box">
-        <span class="an-me__sw" aria-hidden="true"></span>
-        <span class="an-me__t">Hide public visitors</span>
+      <label class="gd-toggle gd-toggle--xs" id="an-pub" title="Leaves out visits from people who are not signed in">
+        <input type="checkbox" role="switch" id="an-pub-box">
+        <span class="gd-toggle__track" aria-hidden="true"></span>
+        <span class="gd-toggle__t">Hide public visitors</span>
       </label>
       </div>
     </div>
