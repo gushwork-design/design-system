@@ -919,7 +919,7 @@ function renderResults(){
   const secs=D.bundles.map(b=>({b,agents:list.filter(a=>a.bundle===b.name)})).filter(s=>s.agents.length);
   secs.forEach(({b,agents})=>{
     const ids=agents.map(a=>a.id), allIn=ids.length>0&&ids.every(id=>S.sel[id]);
-    h+=`<section class="sec" id="b-${b.id}"><div class="sec-h"><h2>${esc(b.name)}${b.luxury?'<span class="pill-prem">Premium</span>':''}</h2>${ids.length?`<button class="btn sm bundle ${allIn?'done':''}" data-bundle="${b.id}" aria-pressed="${allIn}">${ic(allIn?'check':'plus','bold')}${allIn?'Bundle added':'Add whole bundle'}</button>`:''}</div><div class="grid">${agents.map(a=>card(a)).join('')}</div></section>`;
+    h+=`<section class="sec" id="b-${b.id}"><div class="sec-h"><h2>${esc(b.name)}${b.luxury?'<span class="pill-prem">Premium</span>':''}</h2>${ids.length?`<button class="btn sm bundle ${allIn?'done':''}" data-bundle="${b.id}" aria-pressed="${allIn}">${allIn?ic('check-heavy','bold'):ic('plus','bold')}${allIn?'Bundle added':'Add whole bundle'}</button>`:''}</div><div class="grid">${agents.map(a=>card(a)).join('')}</div></section>`;
   });
   if(false) h+=`<section class="sec" id="b-build"><div class="sec-h"><h2>Build your own agent<span class="badge">Coming soon</span></h2></div><div class="empty" style="margin-top:0"><div class="badgeic">${ic('sparkle')}</div><p>This is coming soon.</p></div></section>`;
   if(!secs.length) h=`<div class="empty"><div class="badgeic">${ic('magnifying-glass')}</div><h2>No agents match</h2><p>Try a different word, or clear the search.</p><button class="btn out sm" data-reset>Clear search</button></div>`;
