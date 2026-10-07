@@ -14,7 +14,7 @@ replaced, and two elements first registered for this page (`drop-bundle-rail`, `
 
 | Part of the page | Library piece it uses |
 |---|---|
-| Search at the top | dashboard `search-field` (`gd-input--search`, with its own clear button) |
+| Search at the top | dashboard `search-field` (`gd-input--search`, with its own clear button). The `⌘K` hint is the `search-trigger`'s key cap (`gd-search__key`); it reads `Ctrl K` off a Mac, hides while the field is focused or has text, and is hidden on touch. The page sets `data-gd-palette-off`, so the library's own `⌘K` command palette does not open over the page's search. |
 | Create new agent, Download picture, Copy link, Request new picture | dashboard `action-button` (`gd-btn`, primary and outline) |
 | Copy link and Download on a card, the close button | dashboard `icon-button` (`gd-iconbtn--outline`, `data-tip`) |
 | Status filter, and the bundle strip on a phone | dashboard `tabs-pill`, with counts |
