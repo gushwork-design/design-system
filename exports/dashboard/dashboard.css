@@ -758,6 +758,7 @@
    the script the items draw their own selected state as before. Nothing else moves: this is the one place a state change has
    somewhere to travel. */
 .gd [data-gd-slide]{ position: relative; }
+.gd .gd-page-header__tabs[data-gd-slide]{ position: sticky; }   /* the page tab strip stays pinned; sticky is as good an anchor for the sliding mark (fix 7 Oct 2026) */
 .gd [data-gd-slide]::before{ content: ""; position: absolute; left: 0; top: 0; width: var(--gd-sw, 0px); height: var(--gd-sh, 0px); border-radius: var(--gd-sr, 0);
   transform: translate(var(--gd-sx, 0px), var(--gd-sy, 0px)); background: var(--gd-slide-bg); pointer-events: none; z-index: 0; }
 .gd [data-gd-slide="on"]::before{ transition: transform var(--gw-motion-fast), width var(--gw-motion-fast), height var(--gw-motion-fast); }
