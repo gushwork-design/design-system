@@ -77,6 +77,9 @@ export function defaultRules() {
          api/_usage-log.js, which the data cannot be read without. */
       { path: '/admin/analytics', access: 'owner', groups: [], people: [] },
       { path: '/admin/system-health', access: 'owner', groups: [], people: [] },
+      /* Drop Studio (staging): the owner only for now. Marketing joins through Access Control (a named
+         group or people) once the accounts are known. Decided 8 Oct 2026: "start phase 1 with the owner gate". */
+      { path: '/internal/staging/drop-studio', access: 'owner', groups: [], people: [] },
       /* Ad landers are public on purpose. An ad page's whole job is to be
          pasted into Slack, sent to a client and run as paid media, and a
          social card cannot render from behind the gate: the scraper fetching
