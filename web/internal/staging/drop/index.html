@@ -1,0 +1,328 @@
+<!doctype html>
+<!-- gushwork-build:{"pluginVersion":"2.0.1","surface":"web","createdBy":"utsav.singh@gushwork.ai","createdAt":"2026-10-07","components":[]} -->
+<!-- Drops showcase. LAYOUT PASS from the Figma "Drops — Concept board" (file 1m3ozYgQqR6KFYGb8eVRy3, section 283:18609):
+     1st Direction = frame 271:18527, 2nd Direction = frame 219:15967. One page, the two directions are the tab.
+     The Figma board's own header, concept row, tab list and footer are kept as drawn.
+     NOT BUILT YET (second pass, per layout-before-polish): motion, og card, favicon, per-fold visual QA.
+
+     NEW / OFF-SYSTEM, disclosed, pending library review:
+       - the pill tab list (Figma "Tab List - Categories") has no web registry entry
+       - cream #faf4eb card ground on the two character sketches (Figma value, in no palette)
+       - 100px display title and Medium 44px section headings (no token on the display ramp)
+     Image crops reproduce the Figma crops as drawn. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<base href="/internal/staging/drop/">
+<title>Drops, a family of agents | Gushwork</title>
+<meta name="description" content="Drops are Gushwork's family of AI agents. Each has its own role and personality, with a shared visual identity that ties the family together.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="/foundation/tokens.css">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+[hidden]{display:none!important}
+body{
+  margin:0;
+  background:var(--gw-color-neutral-25);
+  color:var(--gw-color-neutral-800);
+  font:var(--gw-text-body-18-reg);
+  letter-spacing:var(--gw-text-body-18-reg-tracking);
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,p,figure{margin:0}
+img{display:block}
+
+/* page: ground is full-bleed, only the column is capped (1340 = the Figma board's content width) */
+.board{
+  max-width:1500px;
+  margin:0 auto;
+  padding:var(--gw-space-80) var(--gw-space-80) var(--gw-space-20);
+  display:flex;flex-direction:column;gap:100px;
+}
+
+/* masthead */
+.masthead{display:flex;flex-direction:column;gap:var(--gw-space-40)}
+.masthead h1{
+  font:700 clamp(44px,7.4vw,100px)/1.2 var(--gw-font-display);   /* 100px: no token on the display ramp */
+  color:var(--gw-color-black);
+}
+.masthead h1 .soft{font-weight:500;color:var(--gw-color-neutral-500)}
+.masthead h1 .gap{margin-right:.24em}
+.rule{height:2px;margin:0;border:0;background:var(--gw-color-neutral-100)}
+
+.content{display:flex;flex-direction:column;gap:var(--gw-space-80)}
+
+/* section copy */
+.copy{display:flex;flex-direction:column;gap:var(--gw-space-20);max-width:1000px}
+.copy h2{
+  font:var(--gw-text-h3);letter-spacing:var(--gw-text-h3-tracking);
+  font-weight:500;line-height:normal;          /* Figma: Medium 44, line-height auto. Not on the ramp (h3 is 700) */
+  color:var(--gw-color-black);
+}
+.copy p{color:var(--gw-color-neutral-800)}
+.copy p .blue{color:var(--gw-color-primary-500)}
+
+/* image cards */
+.card{
+  position:relative;overflow:hidden;
+  background:var(--gw-color-neutral-50);
+  border:1px solid var(--gw-color-neutral-100);
+  border-radius:var(--gw-radius-16);
+}
+.card.cream{background:var(--drop-cream)}
+.card img.fill{position:absolute;max-width:none}
+.card img.cover{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+:root{--drop-cream:#faf4eb}
+
+/* concept row: three crops of one concept board */
+.concept{display:flex;flex-direction:column;gap:60px}
+.crops{display:grid;grid-template-columns:399fr 450.5fr 450.5fr;gap:var(--gw-space-20)}
+.crops .card{background:transparent}
+.crops .c1{aspect-ratio:399/366}
+.crops .c2,.crops .c3{aspect-ratio:450.5/366}
+.crops img{position:absolute;max-width:none}
+.c1 img{width:303.53%;height:258.2%;left:-11.07%;top:-73.63%}
+.c2 img{width:500.33%;height:497.09%;left:-187.95%;top:-141.75%}
+.c3 img{width:500.33%;height:467.58%;left:-187.95%;top:-232.42%}
+
+/* tab list */
+.direction{display:flex;flex-direction:column;gap:60px}
+.tabs{
+  position:sticky;top:var(--gw-space-20);z-index:10;   /* stays in view while the direction below scrolls */
+  display:flex;padding:var(--gw-space-4);
+  background:var(--gw-color-white);
+  border:1px solid var(--gw-color-neutral-100);
+  border-radius:var(--gw-radius-full);
+  box-shadow:var(--gw-shadow-s2);
+}
+.tab{
+  all:unset;box-sizing:border-box;cursor:pointer;
+  flex:1 1 0;min-width:0;
+  display:flex;align-items:center;justify-content:center;
+  padding:16px var(--gw-space-16);
+  border-radius:var(--gw-radius-full);
+  font:500 18px/1 var(--gw-font-body);
+  color:var(--gw-color-neutral-700);
+  white-space:nowrap;
+}
+.tab[aria-selected="true"]{background:var(--gw-color-black);color:var(--gw-color-white)}
+.tab:focus-visible{outline:2px solid var(--gw-color-primary-500);outline-offset:2px}
+
+.panel{display:flex;flex-direction:column;gap:var(--gw-space-80)}
+.section{display:flex;flex-direction:column;gap:60px}
+
+/* character: portrait + blueprint */
+.pair{display:grid;grid-template-columns:493fr 827fr;gap:var(--gw-space-20)}
+.pair .portrait{aspect-ratio:493/404}
+.pair .sketch{min-height:0}
+.sketch img.fill{mix-blend-mode:multiply}
+
+/* dimension line beside each blueprint */
+.dim{position:absolute;width:0;display:flex;align-items:center;justify-content:center}
+.dim::before{content:"";position:absolute;inset:0 -.5px;width:1px;background:var(--gw-color-neutral-700)}
+.dim i{position:absolute;left:-4px;width:9px;height:1px;background:var(--gw-color-neutral-700)}
+.dim i.t{top:0}.dim i.b{bottom:0}
+.dim span{
+  position:relative;padding:2px 10px;background:var(--drop-cream);
+  font:var(--gw-text-body-18-reg);letter-spacing:var(--gw-text-body-18-reg-tracking);
+  color:var(--gw-color-neutral-900);white-space:nowrap;
+}
+
+/* direction 1 character art (boxes are % of the card, as cropped in Figma) */
+.d1 .portrait .crop{position:absolute;width:102.23%;height:110.15%;left:-1.22%;top:-4.96%;overflow:hidden}
+.d1 .portrait .crop img{position:absolute;left:0;top:0;width:156.91%;height:100.02%;max-width:none}
+.d1 .sketch img.fill{width:77.27%;height:113.12%;left:11.24%;top:-6.8%;object-fit:cover}
+.d1 .dim{left:8.34%;top:15.09%;height:72.28%}
+
+/* direction 2 character art */
+.d2 .portrait img.fill{width:103.25%;height:103.22%;left:50%;top:50%;transform:translate(-50%,-50%);object-fit:cover}
+.d2 .sketch img.fill{width:68.32%;height:77.72%;left:15.72%;top:10.89%;object-position:bottom}
+.d2 .dim{left:10.68%;top:20.54%;height:53.71%}
+
+/* outfits & accessories */
+.outfits{display:flex;flex-direction:column;gap:var(--gw-space-20)}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gw-space-20)}
+.trio .card{aspect-ratio:433.33/400}
+.wide{aspect-ratio:1340/500}
+.q1 img,.q2 img,.q3 img,.u1 img,.u2 img,.tall img{object-fit:cover}
+.q1 img{width:125.08%;height:111.25%;left:calc(50% - 5.69%);top:50.12%;transform:translate(-50%,-50%)}
+.q2 img{width:140.54%;height:124.75%;left:50%;top:53.62%;transform:translate(-50%,-50%)}
+.q3 img{width:127.85%;height:113.25%;left:50%;top:50.12%;transform:translate(-50%,-50%)}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:var(--gw-space-20)}
+.duo .card{aspect-ratio:660/480}
+.u1 img{width:116.97%;height:107.29%;left:calc(50% - 3.41%);top:50.1%;transform:translate(-50%,-50%)}
+.u2{border:0}
+.u2 img{width:120.91%;height:106.67%;left:-9.55%;top:51.04%;transform:translateY(-50%)}
+.tall{aspect-ratio:1340/760}
+.tall img{width:101.94%;height:119.74%;left:-1.94%;top:51.44%;transform:translateY(-50%)}
+
+.o1 img{width:125.31%;height:111%;left:50%;top:50%;transform:translate(-50%,-50%);object-fit:cover}
+.o2 img{width:118.6%;height:105%;left:-9.54%;top:-.23%;object-fit:cover}
+.o3 img{width:119.5%;height:106%;left:-10.08%;top:-3.23%;object-fit:cover}
+.wide img.fill{width:193.66%;height:212.8%;left:calc(50% - 9.81%);top:-80.8%;transform:translateX(-50%)}
+
+/* footer */
+.foot{
+  display:flex;justify-content:center;padding:var(--gw-space-16);
+  border-radius:var(--gw-radius-8) var(--gw-radius-8) 0 0;
+  font:var(--gw-text-body-14-med);letter-spacing:var(--gw-text-body-14-med-tracking);
+  color:var(--gw-color-neutral-400);
+}
+
+/* tablet and phone */
+@media (max-width:900px){
+  .board{padding:var(--gw-space-40) var(--gw-space-20) var(--gw-space-16);gap:60px}
+  .content{gap:60px}
+  .concept{gap:40px}
+  .direction{gap:40px}
+  .panel{gap:60px}
+  .section{gap:40px}
+  .masthead h1 .gap{display:block;margin-right:0}
+  .copy h2{font-size:32px}
+  .crops{grid-template-columns:1fr 1fr}
+  .crops .c1{grid-column:1/-1}
+  .pair{grid-template-columns:1fr}
+  .pair .sketch{aspect-ratio:827/404}
+  .trio,.duo{grid-template-columns:1fr}
+  .tall{aspect-ratio:4/5}
+  .tall img{inset:0;left:0;top:0;transform:none;width:100%;height:100%}
+  .tabs{top:var(--gw-space-12)}
+  .tab{font-size:16px;padding:14px 8px}
+  .wide{aspect-ratio:4/3}
+  .wide img.fill{inset:0;left:0;top:0;transform:none;width:100%;height:100%;object-fit:cover;object-position:62% 78%}
+}
+</style>
+</head>
+<body>
+<main class="board">
+
+  <header class="masthead">
+    <h1><span class="gap">Drops.</span><span class="soft">Family of agents<br>from Gushwork.</span></h1>
+    <hr class="rule">
+  </header>
+
+  <div class="content">
+
+    <section class="concept" aria-labelledby="concept-h">
+      <div class="copy">
+        <h2 id="concept-h">The concept</h2>
+        <p><span class="blue">Inspired by water droplets, Drops brings Gushwork’s family of AI agents to life.</span> Each agent has its own role and personality, while sharing a common visual identity that connects it to the larger family.</p>
+      </div>
+      <div class="crops">
+        <figure class="card c1"><img src="img/concept-sprite.jpg" alt="Real water droplets on textured paper" decoding="async"></figure>
+        <figure class="card c2"><img src="img/concept-sprite.jpg" alt="The droplets reduced to flat grey silhouettes" decoding="async"></figure>
+        <figure class="card c3"><img src="img/concept-sprite.jpg" alt="The same silhouettes with eyes and mouths, now characters" decoding="async"></figure>
+      </div>
+    </section>
+
+    <div class="direction">
+      <div class="tabs" role="tablist" aria-label="Design direction">
+        <button class="tab" role="tab" id="tab-1" aria-controls="panel-1" aria-selected="true">1st Direction</button>
+        <button class="tab" role="tab" id="tab-2" aria-controls="panel-2" aria-selected="false" tabindex="-1">2nd Direction</button>
+      </div>
+
+      <!-- 1st Direction: Figma frame 271:18527 -->
+      <div class="panel d1" role="tabpanel" id="panel-1" aria-labelledby="tab-1">
+        <section class="section" aria-label="The character">
+          <div class="copy">
+            <h2>The character</h2>
+            <p>A soft, rounded silhouette, closely paired ivory eyes and a gentle smile make Drop feel friendly and approachable. Its powder-blue satin silicone finish adds a tactile quality, while short arms and small feet keep the form simple and recognizable.</p>
+          </div>
+          <div class="pair">
+            <figure class="card portrait">
+              <div class="crop"><img src="img/d1-character.jpg" alt="A soft blue, rounded Drop character standing on a cream surface" decoding="async"></div>
+            </figure>
+            <figure class="card cream sketch">
+              <img class="fill" src="img/d1-sketch.png" alt="Front and three-quarter blueprint of the blue Drop, six feet tall" decoding="async">
+              <div class="dim"><i class="t"></i><i class="b"></i><span>6 ft</span></div>
+            </figure>
+          </div>
+        </section>
+
+        <section class="section" aria-label="Outfits and accessories">
+          <div class="copy">
+            <h2>Outfits &amp; accessories</h2>
+            <p>Each agent’s role comes to life through its equipment. SEO Drop carries a magnifying glass and leather briefcase, Boost/Paid Ad Drop takes flight with a twin rocket pack, and Email Marketing Drop holds campaign envelopes. These props distinguish each specialist while preserving the same familiar character.</p>
+          </div>
+          <div class="outfits">
+            <div class="trio">
+              <figure class="card q1"><img class="fill" src="img/d1-outfit-1.jpg" alt="A blue Drop holding a magnifying glass beside a leather briefcase, the SEO Drop" decoding="async" loading="lazy"></figure>
+              <figure class="card q2"><img class="fill" src="img/d1-outfit-2.jpg" alt="A blue Drop wearing a twin rocket pack, the Boost and Paid Ad Drop" decoding="async" loading="lazy"></figure>
+              <figure class="card q3"><img class="fill" src="img/d1-outfit-3.jpg" alt="A blue Drop holding campaign envelopes, the Email Marketing Drop" decoding="async" loading="lazy"></figure>
+            </div>
+            <div class="duo">
+              <figure class="card u1"><img class="fill" src="img/d1-duo-1.jpg" alt="Blue Drops at work, shown side by side" decoding="async" loading="lazy"></figure>
+              <figure class="card u2"><img class="fill" src="img/d1-duo-2.jpg" alt="A blue Drop out in the world" decoding="async" loading="lazy"></figure>
+            </div>
+            <figure class="card tall"><img class="fill" src="img/d1-wide.jpg" alt="A blue Drop in a real setting" decoding="async" loading="lazy"></figure>
+          </div>
+        </section>
+      </div>
+
+      <!-- 2nd Direction: Figma frame 219:15967 -->
+      <div class="panel d2" role="tabpanel" id="panel-2" aria-labelledby="tab-2" hidden>
+        <section class="section" aria-label="The character">
+          <div class="copy">
+            <h2>The character</h2>
+            <p>Their naturally varied shapes and sizes become characters through eyes, mouths and personality. Drops are Gushwork’s family of AI agents—each working in a different area for you, with its own strengths and a shared identity.</p>
+          </div>
+          <div class="pair">
+            <figure class="card portrait">
+              <img class="fill" src="img/d2-character.jpg" alt="A cream, round Drop with large dark eyes and a small smile" decoding="async" loading="lazy">
+            </figure>
+            <figure class="card cream sketch">
+              <img class="fill" src="img/d2-sketch.png" alt="Three-quarter and front blueprint of the cream Drop, one foot tall" decoding="async" loading="lazy">
+              <div class="dim"><i class="t"></i><i class="b"></i><span>1 ft</span></div>
+            </figure>
+          </div>
+        </section>
+
+        <section class="section" aria-label="Outfits and accessories">
+          <div class="copy">
+            <h2>Outfits &amp; accessories</h2>
+            <p>Their naturally varied shapes and sizes become characters through eyes, mouths and personality. Drops are Gushwork’s family of AI agents—each working in a different area for you, with its own strengths and a shared identity.</p>
+          </div>
+          <div class="outfits">
+            <div class="trio">
+              <figure class="card o1"><img class="fill" src="img/d2-outfit-1.jpg" alt="A Drop holding a magnifying glass beside a leather briefcase" decoding="async" loading="lazy"></figure>
+              <figure class="card o2"><img class="fill" src="img/d2-outfit-2.jpg" alt="A Drop wearing a small rocket pack, flame lit" decoding="async" loading="lazy"></figure>
+              <figure class="card o3"><img class="fill" src="img/d2-outfit-3.jpg" alt="A Drop with a megaphone and a blue messenger bag" decoding="async" loading="lazy"></figure>
+            </div>
+            <figure class="card wide"><img class="fill" src="img/d2-wide.jpg" alt="A Drop in a café, looking at a phone between two people queuing at the counter" decoding="async" loading="lazy"></figure>
+          </div>
+        </section>
+      </div>
+    </div>
+
+  </div>
+
+  <footer class="foot">© 2026 Gushwork | All Rights Reserved</footer>
+</main>
+
+<script>
+(function(){
+  var tabs=[].slice.call(document.querySelectorAll('[role="tab"]'));
+  function show(i,focus){
+    tabs.forEach(function(t,j){
+      var on=i===j;
+      t.setAttribute('aria-selected',on);
+      t.tabIndex=on?0:-1;
+      document.getElementById(t.getAttribute('aria-controls')).hidden=!on;
+    });
+    if(focus)tabs[i].focus();
+    try{history.replaceState(null,'','#direction-'+(i+1))}catch(e){}
+  }
+  tabs.forEach(function(t,i){
+    t.addEventListener('click',function(){show(i)});
+    t.addEventListener('keydown',function(e){
+      var n=e.key==='ArrowRight'?(i+1)%tabs.length:e.key==='ArrowLeft'?(i+tabs.length-1)%tabs.length:e.key==='Home'?0:e.key==='End'?tabs.length-1:-1;
+      if(n>-1){e.preventDefault();show(n,true)}
+    });
+  });
+  if(location.hash==='#direction-2')show(1);
+})();
+</script>
+</body>
+</html>
