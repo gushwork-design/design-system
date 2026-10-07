@@ -64,9 +64,6 @@
     var byQ = {}; S.QUEUES.forEach(function (q) { byQ[q] = 0; });
     P.cur.forEach(function (r) { S.QUEUES.forEach(function (q) { byQ[q] += r.queue[q]; }); });
     put($('#ch-queue'), 'hbar', { title: 'Tickets by queue', description: 'Created in the range', size: 'sm', card: true, items: S.QUEUES.map(function (q) { return { label: q, value: byQ[q] }; }) });
-    var pr = { Urgent: 0, High: 0, Normal: 0, Low: 0 }; openTickets().forEach(function (t) { pr[t.priority]++; });
-    var tone = { Urgent: 'danger', High: 'warn', Normal: 'accent', Low: 'neutral' };
-    put($('#ch-priority'), 'breakdown', { title: 'Open backlog by priority', description: 'Open and pending tickets right now', size: 'sm', card: true, segments: S.PRIORITIES.map(function (p) { return { label: p, value: pr[p], tone: tone[p] }; }) });
   }
 
   /* ---- needs attention ---------------------------------------------------------------------------------- */

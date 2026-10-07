@@ -101,21 +101,19 @@
               </div></div>
 
               <div class="gd-settings__sec" id="sec-members" hidden><div style="display:flex;flex-direction:column;gap:calc(var(--gd-gap)*1.5)">
-                <section class="gd-formsec" aria-labelledby="mem-title">
-                  <div class="gd-formsec__head" style="display:flex;align-items:flex-start;justify-content:space-between;gap:var(--gd-gap)">
+                <section aria-labelledby="mem-title" style="display:flex;flex-direction:column;gap:var(--gd-gap)">
+                  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:var(--gd-gap)">
                     <div><h2 class="gd-formsec__title" id="mem-title">Members</h2><p class="gd-formsec__desc" id="mem-desc"></p></div>
                     <button type="button" class="gd-btn gd-btn--outline" data-gd-modal-open="#invite"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M256,136a8,8,0,0,1-8,8H232v16a8,8,0,0,1-16,0V144H200a8,8,0,0,1,0-16h16V112a8,8,0,0,1,16,0v16h16A8,8,0,0,1,256,136Zm-57.87,58.85a8,8,0,0,1-12.26,10.3C165.75,181.19,138.09,168,108,168s-57.75,13.19-77.87,37.15a8,8,0,0,1-12.25-10.3c14.94-17.78,33.52-30.41,54.17-37.17a68,68,0,1,1,71.9,0C164.6,164.44,183.18,177.07,198.13,194.85ZM108,152a52,52,0,1,0-52-52A52.06,52.06,0,0,0,108,152Z"/></svg>Invite member</button>
                   </div>
-                  <div class="gd-formsec__body" style="padding:0">
-                    <div class="gd-tview gd-tview--flush">
-                      <div class="gd-table-wrap">
-                        <div class="gd-table" id="members" role="table" aria-label="Members" style="--gd-cols:minmax(220px,2fr) minmax(200px,2fr) 110px 110px 130px 48px; --gd-table-min:760px">
-                          <div class="gd-table__row gd-table__row--head" role="row">
-                            <div class="gd-table__th" role="columnheader" aria-sort="ascending" data-gd-col="name"><button class="gd-table__sort" type="button" data-gd-sort>Name <svg width="12" height="12" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M117.66,170.34a8,8,0,0,1,0,11.32l-32,32a8,8,0,0,1-11.32,0l-32-32a8,8,0,0,1,11.32-11.32L72,188.69V48a8,8,0,0,1,16,0V188.69l18.34-18.35A8,8,0,0,1,117.66,170.34ZM213.66,85.66a8,8,0,0,1-11.32,0L184,67.31V208a8,8,0,0,1-16,0V67.31l-18.34,18.35a8,8,0,0,1-11.32-11.32l32-32a8,8,0,0,1,11.32,0l32,32A8,8,0,0,1,213.66,85.66Z"/></svg></button></div><div class="gd-table__th" role="columnheader" data-gd-col="email">Email</div><div class="gd-table__th" role="columnheader" data-gd-col="role">Role</div><div class="gd-table__th" role="columnheader" data-gd-col="status">Status</div><div class="gd-table__th gd-table__th--num" role="columnheader" data-gd-col="active">Last active</div>
-                            <div class="gd-table__th" role="columnheader"><span class="gd-sr">Actions</span></div>
-                          </div>
-                          <div class="gd-table__body" role="rowgroup"></div>
+                  <div class="gd-tview">
+                    <div class="gd-table-wrap">
+                      <div class="gd-table" id="members" role="table" aria-label="Members" style="--gd-cols:minmax(220px,2fr) minmax(200px,2fr) 110px 110px 130px 48px; --gd-table-min:760px">
+                        <div class="gd-table__row gd-table__row--head" role="row">
+                          <div class="gd-table__th" role="columnheader" aria-sort="ascending" data-gd-col="name"><button class="gd-table__sort" type="button" data-gd-sort>Name <svg width="12" height="12" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M117.66,170.34a8,8,0,0,1,0,11.32l-32,32a8,8,0,0,1-11.32,0l-32-32a8,8,0,0,1,11.32-11.32L72,188.69V48a8,8,0,0,1,16,0V188.69l18.34-18.35A8,8,0,0,1,117.66,170.34ZM213.66,85.66a8,8,0,0,1-11.32,0L184,67.31V208a8,8,0,0,1-16,0V67.31l-18.34,18.35a8,8,0,0,1-11.32-11.32l32-32a8,8,0,0,1,11.32,0l32,32A8,8,0,0,1,213.66,85.66Z"/></svg></button></div><div class="gd-table__th" role="columnheader" data-gd-col="email">Email</div><div class="gd-table__th" role="columnheader" data-gd-col="role">Role</div><div class="gd-table__th" role="columnheader" data-gd-col="status">Status</div><div class="gd-table__th gd-table__th--num" role="columnheader" data-gd-col="active">Last active</div>
+                          <div class="gd-table__th" role="columnheader"><span class="gd-sr">Actions</span></div>
                         </div>
+                        <div class="gd-table__body" role="rowgroup"></div>
                       </div>
                     </div>
                   </div>

@@ -10,7 +10,7 @@
 <style>html, body { margin: 0; overflow: hidden; } /* the shell owns the viewport; the UA body margin otherwise offsets and overflows it by 8px */</style>
 <!-- gushwork-build:{"pluginVersion":"2.0.1","createdBy":"Claude Code (support-ops-app template)","createdAt":"6 Oct 2026","surface":"dashboard",
   "registry":"",
-  "changelog":"https://gushwork-design.vercel.app/changelog-sheet","components":["app-shell","sidebar","nav-item","nav-group","account-row","theme-menu","topbar","content-panel","page-header","page-layout","time-range-bar","date-range-picker","segmented-control","select","stat-card","delta-pill","status-dot","sparkline","chart-frame","line-chart","legend","horizontal-bar-chart","breakdown-bar","chart-tooltip","card","data-table","table-cell-types","action-button","toast","theme-and-density","sidebar-collapsed","tooltip"]} -->
+  "changelog":"https://gushwork-design.vercel.app/changelog-sheet","components":["app-shell","sidebar","nav-item","nav-group","account-row","theme-menu","topbar","content-panel","page-header","page-layout","time-range-bar","date-range-picker","segmented-control","select","stat-card","delta-pill","status-dot","sparkline","chart-frame","line-chart","legend","horizontal-bar-chart","chart-tooltip","card","data-table","table-cell-types","action-button","toast","theme-and-density","sidebar-collapsed","tooltip"]} -->
 </head>
 <body class="gd" data-density="comfortable" data-nav="overview.html">
 <div class="gd-app">
@@ -111,11 +111,10 @@
               </div>
             </div>
 
-            <div class="gd-span-8" id="ch-line"></div>
-            <div class="gd-span-4" id="ch-queue"></div>
+            <div class="gd-span-12" id="ch-line"></div>
+            <div class="gd-span-12" id="ch-queue"></div>
 
-            <div class="gd-span-4" id="ch-priority"></div>
-            <section class="gd-card gd-card--flush gd-span-8" aria-labelledby="attn-title">
+            <section class="gd-card gd-card--flush gd-span-12" aria-labelledby="attn-title">
               <div class="gd-card__head">
                 <div class="gd-card__titles"><h2 class="gd-card__title" id="attn-title">Needs attention</h2><p class="gd-card__desc">Urgent and high priority tickets still open, oldest first</p></div>
                 <div class="gd-card__actions"><a class="gd-btn gd-btn--sm" href="tickets.html">View all tickets</a></div>

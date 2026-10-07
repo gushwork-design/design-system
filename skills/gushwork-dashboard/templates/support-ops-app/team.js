@@ -41,11 +41,8 @@
       { name: 'Over 80% loaded', value: hot, meta: '<span class="gd-stat-card__compare">People near capacity</span>' },
       { name: 'Urgent and high', value: urgent, meta: '<span class="gd-stat-card__compare">Open, assigned</span>' }
     ]);
-    $('#ch-load').hidden = false; $('#ch-mix').hidden = false;
+    $('#ch-load').hidden = false;
     GD.charts.mount($('#ch-load'), 'hbar', { title: 'Open tickets by agent', description: 'Right now', size: 'sm', card: true, sort: true, share: false, max: S.CAPACITY, items: st.map(function (a) { return { label: a.agent.name, value: a.open }; }) });
-    var mix = { Urgent: 0, High: 0, Normal: 0, Low: 0 }; st.forEach(function (a) { Object.keys(mix).forEach(function (k) { mix[k] += a.byPriority[k]; }); });
-    var tone = { Urgent: 'danger', High: 'warn', Normal: 'accent', Low: 'neutral' };
-    GD.charts.mount($('#ch-mix'), 'breakdown', { title: 'What the team is carrying', description: 'Open tickets by priority', size: 'sm', card: true, segments: S.PRIORITIES.map(function (p) { return { label: p, value: mix[p], tone: tone[p] }; }) });
     var head = setTable([['name', 'Agent', 'minmax(200px,2fr)', 'ascending'], ['open', 'Open', '90px', 'num'], ['cap', 'Capacity', '110px', 'num'], ['hi', 'Urgent and high', '150px', 'num'], ['load', 'Load', 'minmax(170px,1.3fr)', 'num']], 'Workload');
     table.innerHTML = head + '<div class="gd-table__body" role="rowgroup">' + st.map(function (a) {
       return '<div class="gd-table__row" role="row">' + U.cell('flex', 'name', U.who(a.agent.name, a.presence), ' data-gd-value="' + U.esc(a.agent.name) + '"') + U.cell('num', 'open', a.open) + U.cell('num', 'cap', a.capacity) + U.cell('num', 'hi', a.byPriority.Urgent + a.byPriority.High) + U.cell('flex gd-table__prog', 'load', U.meter(a.load), ' data-gd-value="' + a.load + '"') + '</div>';
@@ -54,7 +51,7 @@
   }
 
   function show(v) {
-    view = v; $('#ch-load').hidden = true; $('#ch-mix').hidden = true; $('#ch-load').innerHTML = ''; $('#ch-mix').innerHTML = '';   // only Workload has charts
+    view = v; $('#ch-load').hidden = true; $('#ch-load').innerHTML = '';   // only Workload has the chart
     (view === 'workload' ? workload : agents)();
     document.title = (view === 'workload' ? 'Workload' : 'Agents') + ' - Team - Gushwork';
   }
