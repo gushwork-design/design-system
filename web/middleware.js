@@ -28,7 +28,7 @@ import { loadRules, decide } from './api/_access.js';
 import { recordVisit, recordPublicView } from './api/_log-visit.js';
 
 export const config = {
-  matcher: ['/internal/:path*', '/admin/:path*', '/library', '/library/:path*', '/previews/:path*', '/agents']
+  matcher: ['/internal/:path*', '/admin/:path*', '/library', '/library/:path*', '/previews/:path*', '/agents', '/agents/:path*']
 };
 
 /* ── THE GATE IS ON, 15 Sep 2026 ─────────────────────────────────────────────
@@ -180,28 +180,8 @@ function isPageView(request, url) {
   return (h.get('accept') || '').indexOf('text/html') !== -1;
 }
 
-/* ── /agents is public, and counted ─────────────────────────────────────────
-   The Agent Store, live at /agents (Utsav, 7 Oct 2026: "make it live at /agents", "track the visits"). Anyone
-   with the link can open it; the matcher lists the bare /agents only, so its images, scripts and data never
-   come through here. Each page view is written to the same visit log as the gated pages, as '(public visitor)'
-   (api/_log-visit.js), skipping link-preview bots and crawlers. This runs BEFORE the gate switch so a gate that
-   is off does not stop the counting. */
-const NOT_A_PERSON = /bot|crawl|spider|slurp|preview|headless|facebookexternalhit|Slack|WhatsApp|Discord|Telegram|Skype/i;
-
-async function countPublicView(request, url, context) {
-  if (!isPageView(request, url)) return;
-  if (NOT_A_PERSON.test(request.headers.get('user-agent') || '')) return;
-  const logged = recordPublicView(url.pathname);
-  if (context && typeof context.waitUntil === 'function') context.waitUntil(logged);
-  else await logged;
-}
-
 export default async function middleware(request, context) {
   const url = new URL(request.url);
-  if (url.pathname === '/agents' || url.pathname === '/agents/') {
-    await countPublicView(request, url, context);
-    return undefined;
-  }
 
   /* Returning undefined continues to the next handler, which serves the file. */
   if (!GATE_ENABLED) return undefined;
