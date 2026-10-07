@@ -520,6 +520,13 @@
       "reviewedOn": "2026-10-07",
       "fingerprint": "af96b8e2cb58c578",
       "previewFingerprint": "3f80ccd86bd7004f"
+    },
+    "agent-category-tabs": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-07",
+      "fingerprint": "b5bed69e61c0088d",
+      "previewFingerprint": "ed73422e767fd57d"
     }
   }
 }
