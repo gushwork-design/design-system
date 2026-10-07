@@ -31,7 +31,9 @@ body{font-family:var(--gw-font-body);background:var(--gw-color-neutral-100);-web
 .bar{display:flex;align-items:center;padding:12px 24px;flex:none}
 .bar--top{justify-content:space-between}
 .bar--foot{gap:6px}
-.bar img{display:block}
+.bar-logo{display:block;width:95px;height:18px;background:var(--gw-color-neutral-500); /* the logo file as a mask, so it takes the grey; 421:80 is its own aspect */
+  -webkit-mask:url("../../assets/logo/gushwork-logo-dark.svg") left center/contain no-repeat;
+          mask:url("../../assets/logo/gushwork-logo-dark.svg") left center/contain no-repeat}
 .bar-tab,.bar-line{font:500 10px/1 var(--gw-font-body);color:var(--gw-color-neutral-500);white-space:nowrap}
 .bar-mark{width:12px;height:12px;background:var(--gw-color-neutral-500);
   -webkit-mask:url("../../assets/logo/gushwork-symbol-original.svg") center/contain no-repeat;
@@ -109,7 +111,7 @@ body{font-family:var(--gw-font-body);background:var(--gw-color-neutral-100);-web
 <div class="sheet">
 
   <div class="bar bar--top">
-    <img src="../../assets/logo/gushwork-logo-dark.svg" alt="Gushwork" height="18">
+    <span class="bar-logo" role="img" aria-label="Gushwork"></span>
     <span class="bar-tab">Gushwork For You</span>
   </div>
 
