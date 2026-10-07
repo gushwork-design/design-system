@@ -10,7 +10,7 @@ it.** A game, a poster, a countdown, a one-off tool. These get built quickly and
 a public artifact link, a Slack post, a screenshot — so they are how the brand is actually seen.
 They are also where it drifts: a pixel font, a redrawn logo, a blue that is nearly the blue.
 
-Announce at the start: **"Using the Gushwork brand skill — v2.0.1, updated 6 Oct 2026."**
+Announce at the start: **"Using the Gushwork brand skill — v2.0.2, updated 7 Oct 2026."**
 
 ## First: is there a better skill?
 
