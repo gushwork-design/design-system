@@ -168,4 +168,4 @@ The dashboard's R53 pattern on the web surface: the key sits **inside its contro
   sentence case per `foundation/voice.md`.
 - The page `<title>` and description are proposals awaiting sign-off.
 - No favicon set or social card yet: layout pass only, and `/internal/*` cannot be scraped anyway.
-- AI Marketplace: Paid Ad Agent's modal description and the wording of `agent-saving-line` are my drafts; the Distributor popular picks are my pick; only SEO, Paid Ad and Email Marketing have Figma art, every other tile is gray.
+- AI Marketplace: Paid Ad Agent's modal description and the wording of `agent-saving-line` are my drafts; the Distributor popular picks are my pick; all 33 agents now have fur-mascot art (Utsav's drop of 7 Oct), one picture each, filling the tile.
