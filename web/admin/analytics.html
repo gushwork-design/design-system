@@ -502,6 +502,7 @@ body[data-gw-page="analytics"] .sg__main > * { min-width: 0; }
 @media (max-width: 767px) { .an-bar { top: 76px; } }
 .sg__main .an-bar > .an-tabs { display: flex; gap: var(--gw-space-24); height: auto; padding: 0; border-radius: 0; background: none; box-shadow: none; }
 /* "Hide my activity": a small switch in the topbar-icon family (no stroke on the label, a filled track when on). */
+.an-hide { display: flex; align-items: center; gap: var(--gw-space-16); flex-wrap: wrap; }
 .an-me { display: inline-flex; align-items: center; gap: var(--gw-space-8); cursor: pointer; user-select: none; font: var(--gw-text-body-12-med); color: var(--ul-sub); }
 .an-me:hover { color: var(--ul-value); }
 .an-me input { position: absolute; opacity: 0; width: 0; height: 0; }
@@ -545,11 +546,18 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
         <button class="ul-tab" role="tab" data-tab="visits" aria-selected="false">Visits</button>
         <button class="ul-tab" role="tab" data-tab="bruce" aria-selected="false">Bruce</button>
       </div>
-      <label class="an-me" id="an-me" title="Leaves your own rows out of every tab">
+      <div class="an-hide">
+      <label class="an-me" id="an-me" title="Leaves your own rows, and the design@gushwork.ai account's, out of every tab">
         <input type="checkbox" id="an-me-box">
         <span class="an-me__sw" aria-hidden="true"></span>
         <span class="an-me__t">Hide my activity</span>
       </label>
+      <label class="an-me" id="an-pub" title="Leaves out visits from people who are not signed in">
+        <input type="checkbox" id="an-pub-box">
+        <span class="an-me__sw" aria-hidden="true"></span>
+        <span class="an-me__t">Hide public visitors</span>
+      </label>
+      </div>
     </div>
 
     <section class="an-panel" id="an-insights" role="tabpanel">
@@ -782,11 +790,18 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
 
 <script>
 /* Shared by the three tabs: the signed-in owner's own address, and the switch that leaves it out. */
-window.anMe = { on: false, email: '' };
+window.anMe = { on: false, pub: false, email: '', shared: ['design@gushwork.ai'] };
 window.anMe.ready = fetch('/api/auth/me', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : {}; })
   .then(function (j) { window.anMe.email = String((j && j.email) || '').trim().toLowerCase(); }).catch(function () {});
 window.anHide = function (rows) {
-  return window.anMe.on && window.anMe.email ? rows.filter(function (r) { return String(r.email || '').toLowerCase() !== window.anMe.email; }) : rows;
+  var m = window.anMe;
+  if (!m.on && !m.pub) return rows;
+  return rows.filter(function (r) {
+    var e = String(r.email || '').toLowerCase();
+    if (m.pub && e === '(public visitor)') return false;
+    if (m.on && (e === m.email || m.shared.indexOf(e) > -1)) return false;
+    return true;
+  });
 };
 window.__anRefilter = {};
 </script>
@@ -2456,11 +2471,20 @@ window.__anRefilter = {};
   var box = document.getElementById('an-me-box'), KEY = 'gw-analytics-hide-me';
   try { window.anMe.on = localStorage.getItem(KEY) === '1'; } catch (e) {}
   box.checked = window.anMe.on;
-  window.anMe.ready.then(function () { if (window.anMe.email) document.getElementById('an-me').title = 'Leaves out rows from ' + window.anMe.email; });
+  window.anMe.ready.then(function () { if (window.anMe.email) document.getElementById('an-me').title = 'Leaves out rows from ' + [window.anMe.email].concat(window.anMe.shared.filter(function (e) { return e !== window.anMe.email; })).join(' and '); });
+  function refilter() { Object.keys(started).forEach(function (t) { if (window.__anRefilter[t]) window.__anRefilter[t](); }); }
   box.addEventListener('change', function () {
     window.anMe.on = box.checked;
     try { localStorage.setItem(KEY, box.checked ? '1' : '0'); } catch (e) {}
-    Object.keys(started).forEach(function (t) { if (window.__anRefilter[t]) window.__anRefilter[t](); });
+    refilter();
+  });
+  var pbox = document.getElementById('an-pub-box'), PKEY = 'gw-analytics-hide-public';
+  try { window.anMe.pub = localStorage.getItem(PKEY) === '1'; } catch (e) {}
+  pbox.checked = window.anMe.pub;
+  pbox.addEventListener('change', function () {
+    window.anMe.pub = pbox.checked;
+    try { localStorage.setItem(PKEY, pbox.checked ? '1' : '0'); } catch (e) {}
+    refilter();
   });
   show(location.hash.slice(1), false);
 })();
