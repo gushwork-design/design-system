@@ -1353,8 +1353,7 @@
 
     if (m.google) {
       body += '<a class="gw-modal__btn" data-google-btn href="/api/auth/login">' +
-        GOOGLE_G + '<span>Continue with Google</span>' +
-        '<span class="gw-modal__btnarrow">' + icon('arrow-right') + '</span></a>';
+        GOOGLE_G + '<span>Continue with Google</span></a>';
     }
     /* 683:4911 is Google and nothing else — no divider, no password field, no
        line under the button. Utsav 16 Sep, revising the 15 Sep call to show
