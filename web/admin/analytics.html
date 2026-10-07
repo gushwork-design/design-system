@@ -713,6 +713,20 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
     <div id="vs-app">
       <div class="ul-metrics" id="vs-metrics"></div>
 
+      <!-- Recent first (Utsav, 7 Oct 2026: it is the part he opens this tab for), then People and Pages. -->
+      <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="vs-h-recent">
+        <div class="ul-sh">
+          <div class="ul-sh__t"><h2 id="vs-h-recent">Recent</h2><span class="ul-sh__q" id="vs-q-recent"></span></div>
+          <div class="ul-tools">
+            <label class="ul-input"><span class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Search recent visits</span>
+              <span id="vs-i-search"></span>
+              <input id="vs-search" type="search" placeholder="Search person or page" autocomplete="off"></label>
+          </div>
+        </div>
+        <div class="ul-scroll vs-t" id="vs-recent"></div>
+        <div class="vs-more" id="vs-more"></div>
+      </section>
+
       <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="vs-h-people">
         <div class="ul-sh"><div class="ul-sh__t"><h2 id="vs-h-people">People</h2><span class="ul-sh__q" id="vs-q-people"></span></div></div>
         <div class="ul-scroll vs-t" id="vs-people"></div>
@@ -723,11 +737,6 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
         <div class="ul-scroll vs-t" id="vs-pages"></div>
       </section>
 
-      <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="vs-h-recent">
-        <div class="ul-sh"><div class="ul-sh__t"><h2 id="vs-h-recent">Recent</h2><span class="ul-sh__q" id="vs-q-recent"></span></div></div>
-        <div class="ul-scroll vs-t" id="vs-recent"></div>
-        <div class="vs-more" id="vs-more"></div>
-      </section>
     </div>
 
   </section>
@@ -2035,7 +2044,7 @@ window.__anRefilter = {};
     return last.replace(/[-_]+/g, ' ').replace(/^./, function (c) { return c.toUpperCase(); });
   }
 
-  var S = { status: 'loading', rows: [], period: '30', area: 'All', shown: 25, busy: false, fetchedAt: 0 };
+  var S = { status: 'loading', rows: [], period: '30', area: 'All', q: '', shown: 25, busy: false, fetchedAt: 0 };
 
   function parse(raw) {
     var out = [];
@@ -2180,14 +2189,20 @@ window.__anRefilter = {};
         { get: function (g) { return pageName(g.path); }, dir: 1 }, { get: function (g) { return areaOf(g.path); }, dir: 1 },
         { get: function (g) { return g.views; }, dir: -1 }, { get: function (g) { return Object.keys(g.who).length; }, dir: -1 }, { get: function (g) { return g.last.getTime(); }, dir: -1 }]);
 
-    var recent = rows.slice().sort(function (a, b) { return b.at - a.at; });
+    /* The search box filters this table only: person, page name or path, and the event ("Opened" or "Signed in"). */
+    var q = S.q.trim().toLowerCase();
+    var recent = rows.slice().sort(function (a, b) { return b.at - a.at; }).filter(function (r) {
+      if (!q) return true;
+      var evt = r.kind === 'signin' ? 'signed in' : 'opened';
+      return (r.email + ' ' + (r.kind === 'signin' ? '' : pageName(r.path) + ' ' + r.path) + ' ' + evt).toLowerCase().indexOf(q) !== -1;
+    });
     $('vs-q-recent').textContent = sortNote('recent', ['When', 'Person', 'Page', 'Event'], 'newest first') + ', ' + plural(recent.length, 'event');
     paged('vs-recent', 'recent', '160px minmax(180px,1.4fr) minmax(200px,2fr) 110px', ['When', 'Person', 'Page', 'Event'],
       recent, function (r) {
         var evt = r.kind === 'signin' ? 'Signed in' + (r.via === 'password' ? ' (password)' : '') : 'Opened';
         return '<div class="ul-row ul-row--d" role="row">' + cell(fmtWhen(r.at), '', r.at.toISOString()) + whoCell(r.email, isNew(r.email)) +
           cell(r.kind === 'signin' ? '—' : pageName(r.path), '', r.path) + cell(evt) + '</div>';
-      }, 'No visits in this view', [
+      }, q ? 'No recent visits match that search' : 'No visits in this view', [
         { get: function (r) { return r.at.getTime(); }, dir: -1 }, { get: function (r) { return r.email; }, dir: 1 },
         { get: function (r) { return r.kind === 'signin' ? null : pageName(r.path); }, dir: 1 },
         { get: function (r) { return r.kind === 'signin' ? 'Signed in' : 'Opened'; }, dir: 1 }]);
@@ -2262,6 +2277,8 @@ window.__anRefilter = {};
   }
 
   $('vs-refresh').innerHTML = icon('arrow-clockwise');
+  $('vs-i-search').innerHTML = icon('magnifying-glass');
+  $('vs-search').addEventListener('input', function (e) { S.q = e.target.value; PG.recent = 1; renderAll(); });
   $('vs-area-tabs').innerHTML = AREAS.map(function (a) { return '<button class="ul-tab" role="tab" data-area="' + a + '" aria-selected="' + (a === 'All') + '">' + a + '</button>'; }).join('');
   ROOT.querySelectorAll('.ul-tab').forEach(function (b) {
     b.addEventListener('click', function () {
