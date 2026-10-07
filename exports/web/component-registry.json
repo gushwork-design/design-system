@@ -535,6 +535,14 @@
       "fingerprint": "bf1ab9cf544b4656",
       "previewFingerprint": "4ece323a0202898f",
       "note": "i've updated this, check and fix"
+    },
+    "agent-filter-rail": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-07",
+      "fingerprint": "c4007984432572eb",
+      "previewFingerprint": "f081f6b5de5738de",
+      "note": "i've updated this, check and fix"
     }
   }
 }
