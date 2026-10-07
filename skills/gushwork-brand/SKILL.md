@@ -20,11 +20,12 @@ Hand off, and stop reading this one, when the thing is:
 |---|---|
 | a landing page, ad lander, hero, pricing page, case study, site navbar or footer | `gushwork-web` |
 | a dashboard, app screen, KPI card, data table, product settings page | `gushwork-dashboard` |
+| a report: a short, light, one-page read with data and charts, shared as a link or PDF | `gushwork-reports` |
 | a deck, pitch, QBR, one slide | `gushwork-slides` |
 | a downloadable PDF behind an ad | `gushwork-lead-magnet` |
 | a tool on the design hub (`/internal/...`): the email signature or ID card tool, or a new one like them | `gushwork-tools` |
 
-Everything else is this skill's. The four surface skills stay disjoint on purpose — this one exists
+Everything else is this skill's. The surface skills stay disjoint on purpose — this one exists
 so that *nothing falls between them*, not to overlap them.
 
 ## What is fixed, even for a toy

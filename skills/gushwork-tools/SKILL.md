@@ -18,6 +18,7 @@ Announce at the start: **"Using the Gushwork tools skill — v2.0.3, updated 7 O
 |---|---|
 | a landing page, ad lander, hero, pricing page, site navbar or footer | `gushwork-web` |
 | a logged-in product screen, KPI card, data table (not a tool the team opens from the hub) | `gushwork-dashboard` |
+| a report: a one-page read with data and charts | `gushwork-reports` |
 | a deck, pitch, one slide | `gushwork-slides` |
 | a downloadable PDF behind an ad | `gushwork-lead-magnet` |
 | a hub tool, or a change to the email signature or ID card tool | this skill |
