@@ -61,15 +61,19 @@ export const config = {
 
 function forbidden(email) {
   return new Response(
-    '<!doctype html><meta charset="utf-8"><title>Admins only</title>' +
+    '<!doctype html><meta charset="utf-8"><title>Not your tier</title>' +
     '<link rel="stylesheet" href="/foundation/tokens.css">' +
-    '<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--gw-color-neutral-25);font-family:Inter,system-ui,sans-serif}.card{max-width:420px;padding:48px 32px;background:#fff;border:1px solid var(--gw-color-neutral-100);border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.08);text-align:center}.icon{width:56px;height:56px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;background:var(--gw-color-primary-50);border-radius:12px;color:var(--gw-color-primary-500)}.icon svg{width:32px;height:32px}h1{font:var(--gw-text-h3);margin:0 0 8px;color:var(--gw-color-black)}p{font:var(--gw-text-body-16-reg);margin:0 0 24px;color:var(--gw-color-neutral-600)}a{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 20px;background:var(--gw-color-primary-500);border:none;border-radius:8px;color:#fff;text-decoration:none;font:var(--gw-text-button-16);cursor:pointer;transition:background-color 0.2s}a:hover{background:var(--gw-color-primary-600)}</style>' +
-    '<div class="card">' +
-    '<div class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg></div>' +
-    '<h1>Admins only</h1>' +
-    '<p>This page is limited to the design system admins. You are signed in as ' + String(email || '').replace(/[<>&"]/g, '') + '.</p>' +
-    '<a href="/">Back to Gushwork Design</a>' +
-    '</div>',
+    '<body style="margin:0;min-height:100vh;display:grid;place-items:center;' +
+    'background:var(--gw-color-neutral-25);font-family:Inter,system-ui,sans-serif;' +
+    'color:var(--gw-color-neutral-900)">' +
+    '<div style="max-width:420px;padding:32px;background:#fff;border-radius:16px;' +
+    'border:1px solid var(--gw-color-neutral-100);text-align:center">' +
+    '<h1 style="margin:0 0 8px;font-size:22px">Admins only</h1>' +
+    '<p style="margin:0 0 24px;font-size:14px;color:var(--gw-color-neutral-600)">' +
+    'This page is limited to the design system admins. ' +
+    'You are signed in as ' + String(email || '').replace(/[<>&"]/g, '') + '.</p>' +
+    '<a href="/" style="font-size:14px;color:var(--gw-color-primary-500)">' +
+    'Back to Gushwork Design</a></div></body>',
     { status: 403, headers: { 'Content-Type': 'text/html; charset=utf-8' } }
   );
 }
