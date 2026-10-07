@@ -467,6 +467,14 @@
       "reviewedOn": "2026-10-07",
       "fingerprint": "327c53d99f0dccfb",
       "previewFingerprint": "029584b3700e70b8"
+    },
+    "agent-listing-panel": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-07",
+      "fingerprint": "e91e2ec29cf9a996",
+      "previewFingerprint": "95ddfc69c70d0e37",
+      "note": "i've updated this in the file, check and updated"
     }
   }
 }
