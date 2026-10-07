@@ -76,8 +76,9 @@
     "tool-chrome": {
       "reviewed": "passed",
       "reviewedBy": "utsav.singh@gushwork.ai",
-      "reviewedOn": "2026-10-03",
-      "fingerprint": "7f27b2c3509302d0"
+      "reviewedOn": "2026-10-07",
+      "fingerprint": "ca84800be2723bdf",
+      "previewFingerprint": "01981fd97e246ad0"
     },
     "tool-panel": {
       "reviewed": "passed",
