@@ -18,6 +18,8 @@ ROOT="$(cd ../../../.. && pwd)"
 TMP="$(mktemp -d)"; TMPHTML=".render-tmp.html"
 trap 'rm -rf "$TMP" "$TMPHTML"' EXIT
 
+# --force-prefers-reduced-motion: a PDF is a still. The dashboard's entrance and counting KPIs stand down, so a report
+# is never printed mid-animation (the counting figures once printed at 11 times their value, 8 Oct 2026).
 # the stylesheet copy: the phone breakpoint off, and its repo-relative url() (the logo mask) made absolute
 sed -E "s/max-width: *767px/max-width: 0px/g; s#url\(\"\.\./\.\./assets/#url(\"file://$ROOT/assets/#g" \
   "$ROOT/exports/dashboard/dashboard.css" > "$TMP/dashboard.print.css"
@@ -29,7 +31,7 @@ try() {
   # the page: pointed at the throwaway stylesheet, with this height as its page size (it overrides the stylesheet's default)
   # (the stamp's registry URL is blanked too, so a PDF never carries the "design has moved on" notice)
   sed "s#../../../../exports/dashboard/dashboard.css#file://$TMP/dashboard.print.css#; s#\"registry\":\"https://[^\"]*\"#\"registry\":\"\"#; s#</head>#<style>@page{size:1200px ${1}px;margin:0}</style></head>#" "$FILE" > "$TMPHTML"
-  "$CHROME" --headless=new --disable-gpu --no-pdf-header-footer --allow-file-access-from-files \
+  "$CHROME" --headless=new --disable-gpu --force-prefers-reduced-motion --no-pdf-header-footer --allow-file-access-from-files \
     --window-size=1280,1000 --run-all-compositor-stages-before-draw --virtual-time-budget=8000 --hide-scrollbars \
     --print-to-pdf="$OUT" "file://$PWD/$TMPHTML" >/dev/null 2>&1
   pages "$OUT"
