@@ -21,6 +21,7 @@
 export const LIST_KEY = 'gw:visits';
 export const MAX_ROWS = 5000;
 export const SHARED_PASSWORD = '(shared password)';
+export const PUBLIC_VISITOR = '(public visitor)';
 const DEDUPE_SECONDS = 1800;
 
 function store() {
@@ -58,6 +59,21 @@ export async function recordVisit({ email, path, kind = 'view', via = '' }) {
     }
     const row = { at: new Date().toISOString(), email: who, path: p, kind };
     if (via) row.via = via;
+    await pipe(cfg, [['LPUSH', LIST_KEY, JSON.stringify(row)], ['LTRIM', LIST_KEY, '0', String(MAX_ROWS - 1)]]);
+  } catch {
+    /* A missing row is the whole cost of a failure here. */
+  }
+}
+
+/* A page that is public on purpose (today only /agents) has no session, so the row says so. Written on every
+   view, with no 30-minute dedupe: nobody is identified, so a person and a refresh cannot be told apart and the
+   count is page views, not people. Still no IP address, user agent or referrer. Same list, same 5000-row bound,
+   so the Visits tab reads it with no new code. Callers hand the promise to waitUntil. */
+export async function recordPublicView(path) {
+  try {
+    const cfg = store();
+    if (!cfg) return;
+    const row = { at: new Date().toISOString(), email: PUBLIC_VISITOR, path: cleanPath(path), kind: 'view' };
     await pipe(cfg, [['LPUSH', LIST_KEY, JSON.stringify(row)], ['LTRIM', LIST_KEY, '0', String(MAX_ROWS - 1)]]);
   } catch {
     /* A missing row is the whole cost of a failure here. */
