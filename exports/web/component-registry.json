@@ -453,6 +453,13 @@
       "reviewedOn": "2026-10-07",
       "fingerprint": "ac3a705fc183f824",
       "previewFingerprint": "bba6dbab7e273265"
+    },
+    "agent-store-hero": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-07",
+      "fingerprint": "461748cf085fb9dd",
+      "previewFingerprint": "19b121367477c94c"
     }
   }
 }
