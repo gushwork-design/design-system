@@ -736,6 +736,14 @@ main{padding-top:0}
 .adlg .himg{border:1px solid var(--gw-color-neutral-100)}
 .sum .it .f,.sum .pkr .f,.sheet .pkr .f,.sheet .th{border:.5px solid var(--gw-color-neutral-100)}
 .add.live .i{font-size:14px}
+/* volume fields: typed digits read in full black, the box answers hover and typing */
+.sheet .ar-v input,.adlg .stp input{color:var(--gw-color-black);transition:border-color .15s,box-shadow .15s,background-color .15s}
+.sheet .ar-v input::placeholder,.adlg .stp input::placeholder{color:var(--gw-color-neutral-400)}
+.sheet .ar-v input:hover{border-color:var(--gw-color-neutral-300);background:var(--gw-color-neutral-25)}
+.sheet .ar-v input:focus{outline:0;border-color:var(--gw-color-black);background:var(--gw-color-white);box-shadow:0 0 0 3px var(--gw-color-neutral-alpha-10-black)}
+.sheet .ar-v:focus-within{color:var(--gw-color-neutral-700)}
+.adlg .stp input:hover{background:var(--gw-color-neutral-25);border-radius:var(--gw-radius-8)}
+.adlg .stp input:focus{outline:0;background:var(--gw-color-white);border-radius:var(--gw-radius-8);box-shadow:inset 0 0 0 1px var(--gw-color-black),0 0 0 3px var(--gw-color-neutral-alpha-10-black)}
 /* ---------- motion: small and quick ---------- */
 .card{transition:border-color .15s,box-shadow .2s,transform .2s cubic-bezier(.22,1,.36,1),opacity .45s ease}
 .card:hover{transform:translateY(-2px)}
