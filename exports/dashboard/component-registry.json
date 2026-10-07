@@ -1523,6 +1523,13 @@
       "reviewedOn": "2026-10-07",
       "fingerprint": "7bfb80a31dc64e91",
       "previewFingerprint": "89692778da8808d8"
+    },
+    "report-frame": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-07",
+      "fingerprint": "cb7f99a73ff901aa",
+      "previewFingerprint": "34a8ec2529ec4a76"
     }
   }
 }
