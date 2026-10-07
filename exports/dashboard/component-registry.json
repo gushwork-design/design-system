@@ -1509,6 +1509,13 @@
       "reviewedOn": "2026-10-06",
       "fingerprint": "ce893bef9441dc32",
       "previewFingerprint": "1c70de60470b7b89"
+    },
+    "definition-tile": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-07",
+      "fingerprint": "be146d79c8570e64",
+      "previewFingerprint": "f0b2d2c02ee19893"
     }
   }
 }
