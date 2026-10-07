@@ -1983,15 +1983,18 @@
   'use strict';
   try {
     if (!window.matchMedia || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    /* Animation frames stop in a hidden tab (a background tab, a pane that is not showing), so the one-off setup work
+       below falls back to a timer there instead of waiting for a frame that may not come until someone looks. */
+    function later(fn) { if (document.hidden) setTimeout(fn, 30); else requestAnimationFrame(fn); }
 
-    /* One indicator per underlined tab row (.an-bar .an-tabs). It is placed with transform only, and a row
+    /* One indicator per underlined tab row (.an-bar .an-tabs on the dashboards, .tl-tabs on Templates). It is placed with transform only, and a row
        it has not yet placed itself in gets no transition, so the first paint never slides in from the left. */
     function place(row) {
       var ind = row.querySelector(':scope > .gw-tab-ind');
-      var tab = row.querySelector('.ul-tab[aria-selected="true"]');
+      var tab = row.querySelector('[role="tab"][aria-selected="true"]');
       if (!ind || !tab || !tab.offsetWidth) return;                     /* hidden panel: try again when it is shown */
       ind.style.transform = 'translateX(' + tab.offsetLeft + 'px) scaleX(' + tab.offsetWidth + ')';
-      if (row.getAttribute('data-gw-ind') !== 'on') requestAnimationFrame(function () { row.setAttribute('data-gw-ind', 'on'); });
+      if (row.getAttribute('data-gw-ind') !== 'on') later(function () { row.setAttribute('data-gw-ind', 'on'); });
     }
     function attach(row) {
       if (!row.querySelector(':scope > .gw-tab-ind')) {
@@ -1999,6 +2002,7 @@
         row.appendChild(ind);
       }
       if (!row.hasAttribute('data-gw-ind')) row.setAttribute('data-gw-ind', 'off');
+      if (getComputedStyle(row).position === 'static') row.style.position = 'relative';   /* the indicator is placed inside it */
       if (!row.__gwInd) {
         row.__gwInd = true;
         new MutationObserver(function (list) {
@@ -2014,9 +2018,9 @@
     var scanQueued = false;
     function scan() {
       scanQueued = false;
-      [].forEach.call(document.querySelectorAll('.an-bar .an-tabs'), attach);
+      [].forEach.call(document.querySelectorAll('.an-bar .an-tabs, .tl-tabs'), attach);
     }
-    function queueScan() { if (!scanQueued) { scanQueued = true; requestAnimationFrame(scan); } }
+    function queueScan() { if (!scanQueued) { scanQueued = true; later(scan); } }
 
     /* KPI numbers (.ul-num) count up once. The page redraws them on every refresh and search keystroke, so the
        last value each one showed is remembered by where it sits and its label: unchanged means still, changed
@@ -2037,6 +2041,7 @@
       if (from === to || to > 1e7) return;
       var start = null, dur = 600;
       el.style.fontVariantNumeric = 'tabular-nums';
+      setTimeout(function () { el.textContent = txt; }, dur + 250);   /* never leave a number mid-count if frames stalled */
       (function frame(t) {
         if (start === null) start = t;
         var p = Math.min(1, (t - start) / dur), e = 1 - Math.pow(1 - p, 3);
