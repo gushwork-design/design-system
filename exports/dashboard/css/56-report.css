@@ -7,6 +7,11 @@
                        Mobbin Toggl Track, Fresha, Gumloop (a shareable page with a header, not an app shell).
    report-source-line  Reference: Mobbin Gumloop ("Snapshot from ... Loaded ..."), Fresha ("Last updated").
    definition-tile     Reference: Mobbin Sprig ("Report details"). Borrows the empty state's rounded-square badge geometry.
+   summary-block       Added 7 Oct 2026 (owner's pick: a card with a status Badge, a headline, a paragraph and key points). It replaces
+                       the banner as a report's verdict: a banner is for a condition that persists, a verdict is a finding.
+                       Reference: Mobbin Sprig ("AI Insights" summary), Arcade (the chart title that states the finding).
+   generate-report-dialog  Composed from the modal, form field, select, checkbox and action button; no CSS of its own. Behaviour in
+                       js/57-report.js. See reports.md.
 
    A report is one scrolling page with no rail, so the app shell does not apply. The frame takes the shell's container NAME
    (gd-app) so the dashboard's phone reflow (span-3 tiles pair up, gutter 20, full-width actions) works inside it without a
@@ -61,6 +66,29 @@
 /* A short list inside a card: limits, notes. The system has no list component, so this is the one rule for it. */
 .gd .gd-report__list { margin: var(--gw-space-8) 0 0; padding-left: var(--gw-space-20); display: flex; flex-direction: column; gap: var(--gw-space-8); }
 
+/* ---- summary-block ------------------------------------------------------- */
+.gd .gd-summary { display: flex; flex-direction: column; gap: var(--gd-gap); }
+.gd .gd-summary__head { display: flex; align-items: center; flex-wrap: wrap; gap: var(--gw-space-12); }
+.gd .gd-summary__title { margin: 0; font: var(--gw-text-h7-bold); color: var(--gd-text); text-wrap: balance; }
+.gd .gd-summary__text { margin: 0; max-width: 72ch; font: var(--gw-text-body-16-reg); color: var(--gd-text-body); }
+.gd .gd-summary__points { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.gd .gd-summary__point {
+  display: grid; grid-template-columns: 16px minmax(0, 1fr); align-items: start; column-gap: var(--gw-space-12);
+  padding: var(--gw-space-12) 0; border-top: 1px solid var(--gd-border);
+  font: var(--gw-text-body-14-med); color: var(--gd-text);
+}
+.gd .gd-summary__point svg { width: 16px; height: 16px; margin-top: 2px; display: block; color: var(--gd-text-muted); }
+.gd .gd-summary__point[data-tone="good"] svg { color: var(--gd-tone-good-fg); }
+.gd .gd-summary__point[data-tone="warn"] svg { color: var(--gd-tone-warn-fg); }
+.gd .gd-summary__point[data-tone="bad"] svg  { color: var(--gd-tone-bad-fg); }
+
+/* ---- generate-report-dialog: the few layout rules its form needs; the rest is the modal, form field, select and checkbox ---- */
+.gd .gd-gr__fields:not([hidden]) { display: flex; flex-direction: column; gap: var(--gd-gap); }
+.gd .gd-gr__set { border: 0; margin: 0; padding: 0; min-width: 0; }
+.gd .gd-gr__set > legend { padding: 0; margin-bottom: var(--gw-space-8); }   /* a legend is not a flex child of the field, so it takes the label's gap itself */
+.gd .gd-gr__list { display: flex; flex-direction: column; gap: var(--gw-space-12); }
+.gd .gd-gr__msg { margin: 0; }
+
 /* ---- definition-tile ----------------------------------------------------- */
 .gd .gd-def { display: flex; flex-direction: column; gap: var(--gd-gap); }
 .gd .gd-def__head { display: flex; align-items: flex-start; gap: var(--gd-gap); }
@@ -87,5 +115,5 @@
   .gd .gd-report .gd-tabs__panel[data-gd-title]::before {
     content: attr(data-gd-title); grid-column: 1 / -1; font: var(--gw-text-h6-bold); color: var(--gd-text);
   }
-  .gd .gd-report :is(.gd-card, .gd-chart, .gd-stat-card, .gd-banner) { break-inside: avoid; }
+  .gd .gd-report :is(.gd-card, .gd-chart, .gd-stat-card, .gd-banner, .gd-summary) { break-inside: avoid; }
 }

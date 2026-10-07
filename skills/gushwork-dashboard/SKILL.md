@@ -122,6 +122,7 @@ postmortem came back as a nine-page app).
 | Status feedback, empty and unavailable states | `toast`, `banner`, `empty-state`, `skeleton`, `unavailable-state` | `feedback.md` |
 | Dialogs, drawers, side panels | `modal`, `confirm-dialog`, `drawer`, `docked-panel`, `popover`, `tooltip`, `command-palette` | `overlays.md` |
 | One record in full | `detail-view` | `detail.md` |
+| A shareable report of this dashboard, **only if the dashboard has one to make** | header `action-button` + `generate-report-dialog`; the report itself is `gushwork-reports` | `reports.md` |
 | Behind a login | `login-screen`, `google-button`, `access-denied-screen` | `auth.md` |
 
 **Charts are drawn by `GD.charts` from arrays.** Never hand-compute a path and never reach for a charting

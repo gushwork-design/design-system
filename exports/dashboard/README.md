@@ -54,7 +54,7 @@ Fonts (Vert Grotesk Display, Inter) and icons come from the plugin, not from thi
 | [`auth.md`](auth.md) | login-screen, google-button, sign-in-modal, access-denied-screen, session-expired |
 | [`base.md`](base.md) | theme-and-density: the colour aliases, `light-dark()` theming, the density switch, focus and motion |
 | [`templates.md`](templates.md) | analytics-overview-template: a whole verified page to copy |
-| [`reports.md`](reports.md) | report-frame, report-source-line, definition-tile, growth-report-template: a report is one scrolling page with no rail |
+| [`reports.md`](reports.md) | report-frame, report-source-line, summary-block, definition-tile, generate-report-dialog, growth-report-template: a report is one scrolling page with no rail |
 | [`notice.md`](notice.md) | build-notice, and the build stamp every dashboard carries |
 | [`patterns.md`](patterns.md) | How the screens are put together: analytics overview, list with filters, explorer, log, monitoring, settings, detail, customisable home, and what each does while loading, empty, partly failed, stale or off limits |
 

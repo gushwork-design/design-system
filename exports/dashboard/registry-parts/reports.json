@@ -22,5 +22,17 @@
     "changed": "2026-10-07",
     "breaking": false,
     "doc": "reports.md"
+  },
+  "summary-block": {
+    "version": "2.0.3",
+    "changed": "2026-10-07",
+    "breaking": false,
+    "doc": "reports.md"
+  },
+  "generate-report-dialog": {
+    "version": "2.0.3",
+    "changed": "2026-10-07",
+    "breaking": false,
+    "doc": "reports.md"
   }
 }

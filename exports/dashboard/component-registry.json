@@ -266,6 +266,12 @@
       "breaking": false,
       "doc": "charts.md"
     },
+    "generate-report-dialog": {
+      "version": "2.0.3",
+      "changed": "2026-10-07",
+      "breaking": false,
+      "doc": "reports.md"
+    },
     "google-button": {
       "version": "2.0.0",
       "changed": "2026-10-03",
@@ -583,6 +589,12 @@
       "changed": "2026-10-03",
       "breaking": false,
       "doc": "navigation.md"
+    },
+    "summary-block": {
+      "version": "2.0.3",
+      "changed": "2026-10-07",
+      "breaking": false,
+      "doc": "reports.md"
     },
     "support-ops-app-template": {
       "version": "2.0.1",
