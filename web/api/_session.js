@@ -15,7 +15,17 @@
    ========================================================================= */
 
 export const COOKIE = 'gw_session';
-export const MAX_AGE = 60 * 60 * 12; // 12 hours, then sign in again
+export const MAX_AGE = 60 * 60 * 24 * 30; // 30 days, then sign in again
+
+/* One cookie, Path=/, on the design site's host: the hub, /internal/staging/* and every /internal
+   tool are the same host, so a single sign-in already covers all of them. Set SESSION_COOKIE_DOMAIN
+   (for example `gushwork.ai`) to ALSO share the sign-in with other subdomains. Unset keeps the
+   cookie host-only, which is the safe default. It is a signed, HttpOnly cookie, so a sibling
+   subdomain can only use it if it holds the same SESSION_SECRET. */
+export function cookieDomain() {
+  const d = (process.env.SESSION_COOKIE_DOMAIN || '').trim().replace(/^\./, '').toLowerCase();
+  return /^[a-z0-9.-]+\.[a-z]{2,}$/.test(d) ? d : '';
+}
 
 const enc = new TextEncoder();
 const dec = new TextDecoder();
@@ -90,6 +100,7 @@ export function readCookie(header, name) {
 export function serializeCookie(name, value, opts = {}) {
   const bits = [`${name}=${encodeURIComponent(value)}`];
   bits.push(`Path=${opts.path || '/'}`);
+  if (opts.domain) bits.push(`Domain=${opts.domain}`);
   if (opts.maxAge != null) bits.push(`Max-Age=${opts.maxAge}`);
   bits.push(`SameSite=${opts.sameSite || 'Lax'}`);
   if (opts.httpOnly !== false) bits.push('HttpOnly');

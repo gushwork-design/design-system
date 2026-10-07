@@ -11,7 +11,7 @@
    is the only way in. */
 
 import {
-  COOKIE, MAX_AGE, sign, serializeCookie, safeNext,
+  COOKIE, MAX_AGE, sign, serializeCookie, cookieDomain, safeNext,
   sitePassword, sessionSecret, constantTimeEqual
 } from '../_session.js';
 import { recordVisit } from '../_log-visit.js';
@@ -83,7 +83,7 @@ export default async function handler(req, res) {
 
   await recordVisit({ email: null, path: '/', kind: 'signin', via: 'password' });
   res.setHeader('Set-Cookie',
-    serializeCookie(COOKIE, await sign(payload, sessionSecret()), { maxAge: MAX_AGE }));
+    serializeCookie(COOKIE, await sign(payload, sessionSecret()), { maxAge: MAX_AGE, domain: cookieDomain() }));
   res.status(200).setHeader('Content-Type', 'application/json');
   res.end(JSON.stringify({ ok: true, next: safeNext(body.next) }));
 }

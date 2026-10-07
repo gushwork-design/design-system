@@ -32,6 +32,22 @@ password, so changing the password signs everyone out. That is intended.
 
 ---
 
+## How long you stay signed in
+
+**30 days**, from the moment you sign in (`MAX_AGE` in `api/_session.js`; it was 12 hours until 7 Oct 2026).
+One `gw_session` cookie, `Path=/`, covers the hub, every `/internal/staging/*` page and every
+`/internal` tool, because they are all the same host.
+
+To share the sign-in with other subdomains too, set **`SESSION_COOKIE_DOMAIN`** (for example `gushwork.ai`)
+on the Vercel project. Unset, the cookie stays host-only. The other apps must hold the same
+`SESSION_SECRET` to accept it. Logout clears both versions.
+
+Worth knowing: the cookie is signed, not looked up, so nothing can cancel one early. Someone who leaves
+keeps access until their cookie expires, up to 30 days, unless `SESSION_SECRET` is rotated, which
+signs everyone out. Admin rights are the exception: they are checked against the live rules on every request.
+
+---
+
 ## Turning on Google sign-in
 
 Creating the OAuth client and entering the secret are yours to do; neither
