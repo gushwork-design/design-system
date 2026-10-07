@@ -188,6 +188,12 @@
       "breaking": false,
       "doc": "inputs.md"
     },
+    "definition-tile": {
+      "version": "2.0.3",
+      "changed": "2026-10-07",
+      "breaking": false,
+      "doc": "reports.md"
+    },
     "delta-pill": {
       "version": "2.0.0",
       "changed": "2026-10-03",
@@ -265,6 +271,12 @@
       "changed": "2026-10-03",
       "breaking": false,
       "doc": "auth.md"
+    },
+    "growth-report-template": {
+      "version": "2.0.3",
+      "changed": "2026-10-07",
+      "breaking": false,
+      "doc": "reports.md"
     },
     "heatmap": {
       "version": "2.0.0",
@@ -427,6 +439,18 @@
       "changed": "2026-10-03",
       "breaking": false,
       "doc": "inputs.md"
+    },
+    "report-frame": {
+      "version": "2.0.3",
+      "changed": "2026-10-07",
+      "breaking": false,
+      "doc": "reports.md"
+    },
+    "report-source-line": {
+      "version": "2.0.3",
+      "changed": "2026-10-07",
+      "breaking": false,
+      "doc": "reports.md"
     },
     "ring": {
       "version": "2.0.0",

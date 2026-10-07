@@ -7,6 +7,8 @@
 #   skills/gushwork-dashboard/templates/analytics-overview/ -> web/previews/dashboard/pages/ (the review drawer's copy)
 #                                                          -> templates/analytics-overview/ (the templates folder's copy)
 #   skills/gushwork-dashboard/templates/support-ops-app/    -> web/previews/dashboard/pages/support-ops-app/ (the review drawer's copy of the five pages)
+#   skills/gushwork-reports/templates/growth-report/        -> web/previews/dashboard/pages/growth-report.html (the review drawer's copy)
+#                                                          -> templates/growth-report/ (the templates folder's copy)
 #
 # Edit the PARTIALS, never the built files: the next run overwrites them. Partials are joined in
 # filename order, so the number prefix is the cascade order (00 base, 10 shell, 20 actions, ...).
@@ -46,6 +48,18 @@ app_preview() {  # $1 = output dir
 templates_copy() {  # $1 = output file
   mkdir -p "$(dirname "$1")"
   perl -pe 's#\.\./\.\./\.\./\.\./foundation/#../../foundation/#g; s#\.\./\.\./\.\./\.\./exports/#../../exports/#g' "$TPL" > "$1"
+}
+# The reports skill's template: the same two treatments as the overview. Its source is in the skill; the hub's review copy
+# gets absolute links and a blanked stamp registry; the templates/ copy gets links re-based two levels deep. render.sh and
+# the README are not copied (render.sh needs the skill's folder depth; the README beside the copy is hand-written).
+RPT=skills/gushwork-reports/templates/growth-report/growth-report.html
+report_page_preview() {  # $1 = output file
+  mkdir -p "$(dirname "$1")"
+  perl -pe 's#\.\./\.\./\.\./\.\./foundation/#/foundation/#g; s#\.\./\.\./\.\./\.\./exports/#/exports/#g; s#"registry":"https://[^"]*"#"registry":""#' "$RPT" > "$1"
+}
+report_templates_copy() {  # $1 = output file
+  mkdir -p "$(dirname "$1")"
+  perl -pe 's#\.\./\.\./\.\./\.\./foundation/#../../foundation/#g; s#\.\./\.\./\.\./\.\./exports/#../../exports/#g' "$RPT" > "$1"
 }
 build() {  # $1 = output dir to write into
   local out="$1"; mkdir -p "$out"
@@ -98,10 +112,18 @@ case "${1:-}" in
     templates_copy "$tmp/tpl.html"
     cmp -s "$tmp/tpl.html" templates/analytics-overview/analytics-overview.html \
       || { echo "templates/analytics-overview/analytics-overview.html is out of date — run: bash scripts/build-dashboard-css.sh" >&2; exit 1; }
+    report_page_preview "$tmp/report.html"
+    cmp -s "$tmp/report.html" web/previews/dashboard/pages/growth-report.html \
+      || { echo "web/previews/dashboard/pages/growth-report.html is out of date — run: bash scripts/build-dashboard-css.sh" >&2; exit 1; }
+    report_templates_copy "$tmp/report-tpl.html"
+    cmp -s "$tmp/report-tpl.html" templates/growth-report/growth-report.html \
+      || { echo "templates/growth-report/growth-report.html is out of date — run: bash scripts/build-dashboard-css.sh" >&2; exit 1; }
     echo "$D built files are current." ;;
   "") build "$D"; page_preview web/previews/dashboard/pages/analytics-overview.html
       app_preview web/previews/dashboard/pages/support-ops-app
       templates_copy templates/analytics-overview/analytics-overview.html
+      report_page_preview web/previews/dashboard/pages/growth-report.html
+      report_templates_copy templates/growth-report/growth-report.html
       echo "built $D/dashboard.css, dashboard.js, component-registry.json, and the template preview" ;;
   *) echo "usage: $0 [--check]" >&2; exit 2 ;;
 esac

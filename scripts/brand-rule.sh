@@ -28,7 +28,7 @@ rule = (
     "or playful — must use the plugin's own tokens (foundation/tokens.css), its two typefaces (Vert "
     "Grotesk Display for headings, Inter for the rest) and the real logo files (assets/logo/), never "
     "an approximation, a redrawn logo, a near-match blue or a third typeface. Use the matching surface "
-    "skill when there is one (gushwork-web, gushwork-dashboard, gushwork-tools, gushwork-slides, gushwork-lead-magnet). "
+    "skill when there is one (gushwork-web, gushwork-dashboard, gushwork-reports, gushwork-tools, gushwork-slides, gushwork-lead-magnet). "
     "For everything else that carries the brand, invoke the gushwork-brand skill BEFORE writing any "
     "code or markup. If the user explicitly asks for an off-brand look, do it and say in one line that "
     "it is off-system. Anything you create that the library does not already have must also be registered "
