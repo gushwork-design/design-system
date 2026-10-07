@@ -732,6 +732,9 @@ main{padding-top:0}
  .sheet{width:100%}
  .toast{max-width:calc(100vw - 32px)}
 }
+/* the picture frames get a hairline (the art is cream on a lighter ground, so the edge needs one) */
+.adlg .himg{border:1px solid var(--gw-color-neutral-100)}
+.sum .it .f,.sum .pkr .f,.sheet .pkr .f,.sheet .th{border:.5px solid var(--gw-color-neutral-100)}
 /* ---------- motion: small and quick ---------- */
 .card{transition:border-color .15s,box-shadow .2s,transform .2s cubic-bezier(.22,1,.36,1),opacity .45s ease}
 .card:hover{transform:translateY(-2px)}
@@ -857,7 +860,7 @@ const esc = s => String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&
 const ic = (n,w='regular') => `<i class="i" style="--m:url(assets/icons/${n}-${w}.svg)"></i>`;
 // Every agent has fur-mascot art now (Utsav's 33-image drop, 7 Oct): one square-ish picture per agent, filling its tile.
 const IMG = {}; D.agents.forEach(a=>{IMG[a.id]=1;});
-const thumb = a => IMG[a.id] ? `<img class="pic" src="assets/agents/${a.id}.jpg" alt="" loading="lazy">` : '';
+const thumb = a => IMG[a.id] ? `<img class="pic" src="assets/agents/${a.id}.jpg" alt="" decoding="async">` : '';
 const bundleOf = a => D.bundles.find(b=>b.name===a.bundle);
 const fitsInd = a => /Both/i.test(a.fits||'') || (a.fits||'').includes(S.ind);
 const perItem = a => a.free ? 'Free, fair use up to 3,000 emails' : a.luxury ? '$1,000 / mo' : `${a.credits} credit${a.credits>1?'s':''} per ${a.item}`;
