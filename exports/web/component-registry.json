@@ -543,6 +543,14 @@
       "fingerprint": "c4007984432572eb",
       "previewFingerprint": "f081f6b5de5738de",
       "note": "i've updated this, check and fix"
+    },
+    "agent-card": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-07",
+      "fingerprint": "c8f94f433978ae07",
+      "previewFingerprint": "aa933f609435460a",
+      "note": "i've updated this, check and fix"
     }
   }
 }
