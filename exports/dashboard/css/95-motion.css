@@ -1,0 +1,51 @@
+/* ============================================================================
+   Gushwork dashboard — 95 micro motion (R65, 8 Oct 2026; supersedes R61's "nothing else moves")
+
+   WHAT IT ADDS to what was already here (selected fills that slide, 20-actions; menus, dialogs,
+   drawers and toasts that transition over --gw-motion-fast): a page arriving, a button pressing in,
+   a menu opening. The counting KPI numbers are js/90-motion.js. The rules are foundation/motion.md:
+   only opacity and transform move, 8px or less of travel, 320ms or less, nothing leaves, nothing
+   loops, nothing is left on the element afterwards (`backwards` fill: a lingering transform would
+   break the sticky page header).
+
+   Reduced motion is already handled once, in 00-base: every transition and animation under .gd is
+   switched off. The @media below is the second lock, so none of this is even declared for someone
+   who asked for less.
+   ============================================================================ */
+.gd { --gd-ease: cubic-bezier(.2, .7, .2, 1); --gd-dur: 200ms; --gd-dur-enter: 320ms; }
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes gd-rise { from { opacity: 0; transform: translateY(8px); } }
+  @keyframes gd-pop  { from { opacity: 0; transform: translateY(-4px) scale(.98); } }
+
+  /* A page arrives: the page header, filters, cards and tables rise and fade in, the first few 40ms apart.
+     .gd-page is replaced on a page swap, so this runs once per page, not on every redraw inside it. */
+  .gd .gd-page > * { animation: gd-rise var(--gd-dur-enter) var(--gd-ease) backwards; }
+  .gd .gd-page > :nth-child(2) { animation-delay: 40ms; }
+  .gd .gd-page > :nth-child(3) { animation-delay: 80ms; }
+  .gd .gd-page > :nth-child(4) { animation-delay: 120ms; }
+  .gd .gd-page > :nth-child(n+5) { animation-delay: 160ms; }
+  /* A tab that shows a panel brings it in the same way (the panel is un-hidden, which restarts this). It has no
+     stagger delay on purpose: a panel that waits 80ms after a click reads as lag, and this rule restating the
+     animation is what resets the delay for a panel that is also a direct child of .gd-page. */
+  .gd .gd-tabs__panel:not([hidden]) { animation: gd-rise var(--gd-dur-enter) var(--gd-ease) backwards; }
+
+  /* Press. A named list, never global: a control that positions itself with transform would jump. The
+     transition is restated with transform added, because each of these set their own. */
+  .gd .gd-btn, .gd .gd-iconbtn, .gd .gd-topbar__btn, .gd .gd-chip__x {
+    transition: background var(--gw-motion-fast), border-color var(--gw-motion-fast), color var(--gw-motion-fast),
+                box-shadow var(--gw-motion-fast), transform var(--gd-dur) var(--gd-ease);
+  }
+  .gd .gd-btn:active:not([aria-disabled="true"]):not([aria-busy="true"]) { transform: scale(.97); }
+  .gd :is(.gd-iconbtn, .gd-topbar__btn, .gd-chip__x):active:not([aria-disabled="true"]):not(:disabled) { transform: scale(.92); }
+  .gd .gd-tabs__tab, .gd .gd-seg__item, .gd .gd-views__tab {
+    transition: background var(--gw-motion-fast), color var(--gw-motion-fast), transform var(--gd-dur) var(--gd-ease);
+  }
+  .gd :is(.gd-tabs__tab, .gd-seg__item, .gd-views__tab):active:not([aria-selected="true"]):not([aria-checked="true"]):not([aria-disabled="true"]) { transform: scale(.96); }
+
+  /* A menu opens from the corner it hangs from. */
+  .gd .gd-menu:not([hidden]) { transform-origin: top left; animation: gd-pop 160ms var(--gd-ease); }
+  .gd .gd-menu--end:not([hidden]) { transform-origin: top right; }
+  .gd .gd-pop.is-up > .gd-menu:not([hidden]), .gd .gd-menu.is-up:not([hidden]) { transform-origin: bottom left; animation-name: gd-pop-up; }
+  @keyframes gd-pop-up { from { opacity: 0; transform: translateY(4px) scale(.98); } }
+}
