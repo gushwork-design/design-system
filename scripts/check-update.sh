@@ -289,6 +289,32 @@ print("yes")
 PY
 )"
 
+# ── pull it now, once a day ────────────────────────────────────────────────────────────────
+# Auto-update only fetches at startup and takes effect at the start AFTER, so a release lands one
+# chat late, and a quiet release says nothing in that chat (7 Oct 2026: a new chat opened on the
+# old copy hours after the release). Utsav's ruling (R63): when this machine is behind, the first
+# chat of the day runs the update itself, so the next chat starts on the new copy.
+#
+# It is a pull, not a schedule: nothing is installed on anyone's Mac, and nothing runs at 5 am.
+# · BEHIND ONLY. This point is reached only when the version check above found a newer release.
+# · ONCE A DAY. A stamp file, 20h, so a machine that is stuck behind is not hammered every chat.
+# · DETACHED AND SILENT. nohup + &, output discarded, never waited on, so the session cannot stall.
+# · OPT-OUT. GW_NO_AUTO_PULL=1 turns it off. GW_CLAUDE_BIN names the binary (the tests use a stub).
+if [ -z "${GW_NO_AUTO_PULL:-}" ]; then
+  PULL_STAMP="${GW_PULL_STAMP:-$CACHE_DIR/last-pull}"
+  PULL_BIN="${GW_CLAUDE_BIN:-}"
+  [ -n "$PULL_BIN" ] || PULL_BIN="$(command -v claude 2>/dev/null || true)"
+  [ -n "$PULL_BIN" ] || PULL_BIN="${CLAUDE_CODE_EXECPATH:-}"
+  [ -n "$PULL_BIN" ] || for c in "$HOME/.claude/local/claude" "$HOME/.local/bin/claude" /opt/homebrew/bin/claude /usr/local/bin/claude; do
+    [ -x "$c" ] && { PULL_BIN="$c"; break; }
+  done
+  if [ -n "$PULL_BIN" ] && [ -x "$PULL_BIN" ] \
+     && ! find "$PULL_STAMP" -mmin -1200 2>/dev/null | grep -q .; then
+    : > "$PULL_STAMP" 2>/dev/null
+    ( nohup "$PULL_BIN" plugin update gushwork-design@gushwork >/dev/null 2>&1 & ) >/dev/null 2>&1
+  fi
+fi
+
 # ── quiet path: behind, but not flagged — the flip above was the whole job ─────────────────
 VERDICT="$VERDICT" python3 -c 'import json,os,sys; sys.exit(0 if json.loads(os.environ["VERDICT"]).get("flagged") else 1)' \
   2>/dev/null || exit 0

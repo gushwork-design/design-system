@@ -29,8 +29,14 @@ fake() {                      # fake <version> -> prints a plugin root running t
   printf '%s' "$d"
 }
 
+# The hook may pull an update in the background (R63). Every run here gets a stub in place of
+# the real claude and its own stamp file, so no test ever updates the machine it runs on.
+STUB="$TMP/claude-stub"; CALLS="$TMP/pull-calls"
+printf '#!/bin/sh\necho "$@" >> "%s"\n' "$CALLS" > "$STUB"; chmod +x "$STUB"
+
 run() {                       # run <plugin-root> <payload-url>
-  GW_FORCE_CHECK=1 GW_VERSION_URL="$2" CLAUDE_PLUGIN_ROOT="$1" bash "$HOOK" 2>"$TMP/err"
+  GW_CLAUDE_BIN="$STUB" GW_PULL_STAMP="${GW_PULL_STAMP:-$TMP/stamp-default}" \
+    GW_FORCE_CHECK=1 GW_VERSION_URL="$2" CLAUDE_PLUGIN_ROOT="$1" bash "$HOOK" 2>"$TMP/err"
 }
 
 bash scripts/version-json.sh > "$TMP/v.json"
@@ -174,6 +180,24 @@ before="$(cat "$TMP/km-bad.json")"
 python3 "$FLIP" "$TMP/km-bad.json" >/dev/null 2>&1
 [ "$(cat "$TMP/km-bad.json")" = "$before" ] && ck ok "flip: leaves malformed config alone" \
                                             || ck no "flip: touched a malformed config"
+
+# 7 · the daily pull (R63): behind → the first run starts `claude plugin update` in the
+#     background, a second run the same day does not, and current or opted-out never does.
+pulls() { sleep 1; [ -f "$CALLS" ] && wc -l < "$CALLS" | tr -d ' ' || echo 0; }
+rm -f "$CALLS" "$TMP/stamp-pull"
+GW_PULL_STAMP="$TMP/stamp-pull" run "$(fake "$OLD")" "file://$TMP/unflagged.json" >/dev/null
+[ "$(pulls)" = 1 ] && grep -q "plugin update gushwork-design@gushwork" "$CALLS" \
+  && ck ok "pull: behind runs the update once, in the background, even when unflagged" \
+  || ck no "pull: behind did not run the update ($(cat "$CALLS" 2>/dev/null))"
+GW_PULL_STAMP="$TMP/stamp-pull" run "$(fake "$OLD")" "file://$TMP/unflagged.json" >/dev/null
+[ "$(pulls)" = 1 ] && ck ok "pull: a second chat the same day does not run it again" \
+                   || ck no "pull: ran twice in one day"
+rm -f "$CALLS" "$TMP/stamp-cur"
+GW_PULL_STAMP="$TMP/stamp-cur" run "$(fake "$CUR")" "file://$TMP/v.json" >/dev/null
+[ "$(pulls)" = 0 ] && ck ok "pull: current never runs it" || ck no "pull: ran while current"
+rm -f "$CALLS" "$TMP/stamp-off"
+GW_NO_AUTO_PULL=1 GW_PULL_STAMP="$TMP/stamp-off" run "$(fake "$OLD")" "file://$TMP/v.json" >/dev/null
+[ "$(pulls)" = 0 ] && ck ok "pull: GW_NO_AUTO_PULL turns it off" || ck no "pull: ignored the opt-out"
 
 echo
 if [ "$fail" = 0 ]; then echo "✔ $pass passed"; else echo "✘ $fail failed, $pass passed"; exit 1; fi
