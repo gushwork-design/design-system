@@ -1975,3 +1975,86 @@
 
    <script>try{var c=localStorage.getItem('gw-theme-choice'),t=c==='dark'||c==='light'?c:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
 */
+
+/* Micro motion (8 Oct 2026), the script half of the block at the end of shell.css. Two things CSS cannot do:
+   slide the underline between tabs, and count a KPI number up. Both stand down for anyone whose system asks
+   for reduced motion, and both leave the page exactly as it was if anything here throws. */
+(function () {
+  'use strict';
+  try {
+    if (!window.matchMedia || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    /* One indicator per underlined tab row (.an-bar .an-tabs). It is placed with transform only, and a row
+       it has not yet placed itself in gets no transition, so the first paint never slides in from the left. */
+    function place(row) {
+      var ind = row.querySelector(':scope > .gw-tab-ind');
+      var tab = row.querySelector('.ul-tab[aria-selected="true"]');
+      if (!ind || !tab || !tab.offsetWidth) return;                     /* hidden panel: try again when it is shown */
+      ind.style.transform = 'translateX(' + tab.offsetLeft + 'px) scaleX(' + tab.offsetWidth + ')';
+      if (row.getAttribute('data-gw-ind') !== 'on') requestAnimationFrame(function () { row.setAttribute('data-gw-ind', 'on'); });
+    }
+    function attach(row) {
+      if (!row.querySelector(':scope > .gw-tab-ind')) {
+        var ind = document.createElement('span'); ind.className = 'gw-tab-ind'; ind.setAttribute('aria-hidden', 'true');
+        row.appendChild(ind);
+      }
+      if (!row.hasAttribute('data-gw-ind')) row.setAttribute('data-gw-ind', 'off');
+      if (!row.__gwInd) {
+        row.__gwInd = true;
+        new MutationObserver(function (list) {
+          var own = list.every(function (m) { return m.type === 'childList' && [].every.call(m.addedNodes, function (n) { return n.className === 'gw-tab-ind'; }) && !m.removedNodes.length; });
+          if (own) return;
+          if (!row.querySelector(':scope > .gw-tab-ind')) attach(row);   /* the page re-rendered the tabs and wiped it */
+          place(row);
+        }).observe(row, { subtree: true, childList: true, attributes: true, attributeFilter: ['aria-selected'] });
+        if (window.ResizeObserver) new ResizeObserver(function () { place(row); }).observe(row);
+      }
+      place(row);
+    }
+    var scanQueued = false;
+    function scan() {
+      scanQueued = false;
+      [].forEach.call(document.querySelectorAll('.an-bar .an-tabs'), attach);
+    }
+    function queueScan() { if (!scanQueued) { scanQueued = true; requestAnimationFrame(scan); } }
+
+    /* KPI numbers (.ul-num) count up once. The page redraws them on every refresh and search keystroke, so the
+       last value each one showed is remembered by where it sits and its label: unchanged means still, changed
+       means it counts from the old figure. Only plain whole numbers (1,234) move; "3 min ago" or "$50" stay put. */
+    var seen = {};
+    function keyOf(el) {
+      var box = el.closest('.ul-metric, .ul-stat, [id]');
+      var lab = box && box.querySelector('.ul-lab, .ul-ttl');
+      var host = el.closest('[id]');
+      return (host ? host.id : '') + '|' + (lab ? lab.textContent : '') ;
+    }
+    function count(el) {
+      if (el.__gwCounted) return; el.__gwCounted = true;
+      var txt = el.textContent.trim();
+      if (!/^\d{1,3}(,\d{3})*$|^\d+$/.test(txt)) return;
+      var to = +txt.replace(/,/g, ''), k = keyOf(el), from = seen.hasOwnProperty(k) ? seen[k] : 0;
+      seen[k] = to;
+      if (from === to || to > 1e7) return;
+      var start = null, dur = 600;
+      el.style.fontVariantNumeric = 'tabular-nums';
+      (function frame(t) {
+        if (start === null) start = t;
+        var p = Math.min(1, (t - start) / dur), e = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.round(from + (to - from) * e).toLocaleString('en-US');
+        if (p < 1) requestAnimationFrame(frame); else el.textContent = txt;
+      })(performance.now());
+    }
+    function scanNums(root) {
+      if (!root.querySelectorAll) return;
+      if (root.classList && root.classList.contains('ul-num')) count(root);
+      [].forEach.call(root.querySelectorAll('.ul-num'), count);
+    }
+
+    new MutationObserver(function (list) {
+      queueScan();
+      list.forEach(function (m) { [].forEach.call(m.addedNodes, function (n) { if (n.nodeType === 1) scanNums(n); }); });
+    }).observe(document.documentElement, { childList: true, subtree: true });
+    document.addEventListener('DOMContentLoaded', function () { queueScan(); scanNums(document); });
+    window.addEventListener('load', queueScan);
+  } catch (e) { /* motion is a nicety; never the reason a page breaks */ }
+})();
