@@ -27,7 +27,7 @@ import { COOKIE, verify, readCookie, sessionSecret, authModes, GATE_ENABLED }
 import { loadRules, decide } from './api/_access.js';
 
 export const config = {
-  matcher: ['/internal/:path*', '/admin/:path*', '/library', '/library/:path*']
+  matcher: ['/internal/:path*', '/admin/:path*', '/library', '/library/:path*', '/agents', '/agents/:path*']
 };
 
 /* ── THE GATE IS ON, 15 Sep 2026 ─────────────────────────────────────────────
