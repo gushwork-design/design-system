@@ -2120,7 +2120,7 @@ window.__anRefilter = {};
     slot.querySelector('[data-pg="next"]').addEventListener('click', function () { PG[key]++; renderAll(); });
   }
   function cell(t, cls, title) { return '<div class="ul-c ' + (cls || '') + '" role="cell" title="' + esc(title || t) + '">' + esc(t) + '</div>'; }
-  function who(e) { return e === '(shared password)' ? 'Shared password' : e; }
+  function who(e) { return e === '(shared password)' ? 'Shared password' : e === '(public visitor)' ? 'Public visitors' : e; }
   /* The person cell, with a New tag for anyone first seen in the last day. */
   function whoCell(e, isNew) {
     return '<div class="ul-c ul-c--whotag" role="cell" title="' + esc(e) + '"><span>' + esc(who(e)) + '</span>' + (isNew ? '<span class="ul-badge ul-badge--new">New</span>' : '') + '</div>';
