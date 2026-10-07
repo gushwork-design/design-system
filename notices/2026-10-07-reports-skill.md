@@ -16,7 +16,8 @@ restates none of them.
 
 **Three new elements, each marked NEW in its CSS and in `reports.md`, each registered pending review, each drawn.**
 - `report-frame`: the grey ground, the one-pager's top bar lifted above the white sheet (logo left, `Created` date
-  right), and the sheet. Takes the shell's container name so the dashboard's phone reflow applies.
+  and the existing `theme-menu` right, so a report switches between System, Light and Dark), and the sheet. Takes the
+  shell's container name so the dashboard's phone reflow applies.
 - `report-source-line`: sources and as-of date under the title (Mobbin Gumloop, Fresha).
 - `definition-tile`: an icon badge, a definition, a formula chip and a Badge on a card (Mobbin Sprig).
 

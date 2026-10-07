@@ -2180,6 +2180,7 @@ a.gd-hbar__row:hover, a.gd-hbar__row.is-hover { background: var(--gd-hover-bg); 
   -webkit-mask: url("../../assets/logo/gushwork-logo-dark.svg") left center / contain no-repeat;
           mask: url("../../assets/logo/gushwork-logo-dark.svg") left center / contain no-repeat;   /* the real logo file, so it takes the grey; 421:80 is its aspect */
 }
+.gd .gd-report__end { display: flex; align-items: center; gap: var(--gw-space-12); }   /* the date, then the theme menu */
 .gd .gd-report__date { font: var(--gw-text-body-12-med); color: var(--gw-color-neutral-500); white-space: nowrap; }
 .gd .gd-report__sheet {
   max-width: 1120px; margin: 0 auto; background: var(--gd-panel-bg);
@@ -2191,14 +2192,17 @@ a.gd-hbar__row:hover, a.gd-hbar__row.is-hover { background: var(--gd-hover-bg); 
 
 @container gd-app (max-width: 767px) {
   .gd .gd-report__bar { --gd-page-px: var(--gw-space-20); }
-  .gd .gd-report__source { flex-direction: column; align-items: flex-start; }                /* two lines, no separator left dangling */
-  .gd .gd-report__source > [aria-hidden="true"] { display: none; }
 }
 
 /* ---- report-source-line -------------------------------------------------- */
 .gd .gd-report__source {
   display: flex; flex-wrap: wrap; align-items: center; gap: var(--gw-space-4) var(--gw-space-8);
   margin: var(--gw-space-8) 0 0; font: var(--gw-text-body-12-med); color: var(--gd-text-muted);
+}
+
+@container gd-app (max-width: 767px) {      /* after the base rule above, or the base wins on source order */
+  .gd .gd-report__source { flex-direction: column; align-items: flex-start; }                /* two lines, no separator left dangling */
+  .gd .gd-report__source > [aria-hidden="true"] { display: none; }
 }
 
 /* A short list inside a card: limits, notes. The system has no list component, so this is the one rule for it. */

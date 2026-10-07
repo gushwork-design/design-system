@@ -15,7 +15,10 @@ A report is not an app. It has no sidebar, no top bar and no account row, so the
 <div class="gd-report">                                  <!-- the grey ground; also the size container the phone reflow reads -->
   <div class="gd-report__bar">                            <!-- on the ground, above the sheet, like the one-pager -->
     <span class="gd-report__logo" role="img" aria-label="Gushwork"></span>
-    <span class="gd-report__date">Created 7 Oct 2026</span>
+    <div class="gd-report__end">
+      <span class="gd-report__date">Created 7 Oct 2026</span>
+      <div class="gd-theme" data-gd-pop data-gd-print="hide">…</div>   <!-- theme-menu, see navigation.md -->
+    </div>
   </div>
   <div class="gd-report__sheet">                          <!-- the white sheet -->
     <div class="gd-page"> page-header, tabs, content, footnote </div>
@@ -31,7 +34,9 @@ The logo is the real `assets/logo/gushwork-logo-dark.svg`, used as a mask on `--
 
 **Phone.** The frame takes the shell's container name (`gd-app`), so the dashboard's phone reflow applies: `gd-span-3` tiles pair up two to a row, charts and tables take the full width, the title drops to 32, actions go full width.
 
-**Date.** `Created` is the date the report was made. When the report is regenerated, add `Updated` beside it only when it differs. Never put a time of day here; the as-of time belongs in the source line.
+**Light and dark.** The frame carries the dashboard's `theme-menu` (System, Light, Dark) at the right end of the top bar, after the date. It is the existing component, unchanged, and `dashboard.js` already drives it: with no choice made the report follows the machine, live; picking Light or Dark sticks, in the same `gw-theme-choice` key every dashboard uses, until System is picked again. Keep the `<script>` at the top of `<head>` that reads that key, or the page flashes the wrong theme on load. It is hidden when the report prints (`data-gd-print="hide"`), and a PDF is made in light.
+
+**Date.** `Created` is the date the report was made. When the report is regenerated, add `Updated` beside it only when it differs. Never put a time of day here.
 
 **Print.** See *Printing and PDF* below.
 
@@ -41,9 +46,9 @@ The logo is the real `assets/logo/gushwork-logo-dark.svg`, used as a mask on `--
 
 **Purpose.** Says where the numbers came from and how fresh they are, directly under the title. A report is a snapshot, so a reader has to be able to see which data it was made from. Use it on every report.
 
-**Anatomy.** `p.gd-report__source` inside `gd-page-header__titles`, after the description: `Sources: Meta Ads, Google Ads, product database · Data as of 5 Oct 2026, 23:59`. Each part is its own `span`; the separator is a `·` with `aria-hidden`.
+**Anatomy.** `p.gd-report__source` inside `gd-page-header__titles`, after the description: `Sources: Meta Ads, Google Ads, product database · Data as of 5 Oct 2026`. Each part is its own `span`; the separator is a `·` with `aria-hidden`.
 
-**Rules.** Name the real sources, not "internal data". The as-of date is the end of the data, not the day the report was made (that is the top bar's date). With sample data it says so, and the `Sample data` Badge stays in the title row.
+**Rules.** Name the real sources, not "internal data". The as-of date is the end of the data, not the day the report was made (that is the top bar's date). A time of day only when the data is intraday or was pulled live; a daily or weekly report ends at a date, and a time such as 23:59 there is noise. On a phone the two parts stack, left aligned, with no separator. With sample data it says so, and the `Sample data` Badge stays in the title row.
 
 **Tokens.** `--gw-text-body-12-med`, `--gd-text-muted`, `--gw-space-4`, `--gw-space-8`. **Provenance.** NEW, pending library review: Mobbin Gumloop ("Snapshot from ... Loaded ..."), Fresha ("Last updated").
 

@@ -441,7 +441,10 @@ a.cat-name{color:var(--gw-color-primary-600);text-decoration:none}
 &lt;div class=&quot;gd-report&quot;&gt;                                  &lt;!-- the grey ground; also the size container the phone reflow reads --&gt;
   &lt;div class=&quot;gd-report__bar&quot;&gt;                            &lt;!-- on the ground, above the sheet, like the one-pager --&gt;
     &lt;span class=&quot;gd-report__logo&quot; role=&quot;img&quot; aria-label=&quot;Gushwork&quot;&gt;&lt;/span&gt;
-    &lt;span class=&quot;gd-report__date&quot;&gt;Created 7 Oct 2026&lt;/span&gt;
+    &lt;div class=&quot;gd-report__end&quot;&gt;
+      &lt;span class=&quot;gd-report__date&quot;&gt;Created 7 Oct 2026&lt;/span&gt;
+      &lt;div class=&quot;gd-theme&quot; data-gd-pop data-gd-print=&quot;hide&quot;&gt;…&lt;/div&gt;   &lt;!-- theme-menu, see navigation.md --&gt;
+    &lt;/div&gt;
   &lt;/div&gt;
   &lt;div class=&quot;gd-report__sheet&quot;&gt;                          &lt;!-- the white sheet --&gt;
     &lt;div class=&quot;gd-page&quot;&gt; page-header, tabs, content, footnote &lt;/div&gt;
@@ -451,13 +454,14 @@ a.cat-name{color:var(--gw-color-primary-600);text-decoration:none}
 <p><b>Spacing.</b> The bar and the sheet share one inset: the page gutter (<code>--gd-gap</code> x 2.5, 40 comfortable) plus the sheet's 1px edge, so the logo lines up with the title and the date with the right edge of the content. The bar sits 20 above the logo and 20 below to the sheet. The title's inset from the sheet's top equals the side gutter, at every width. On a phone the gutter is 20, as everywhere else.</p>
 <p><b>Measure.</b> The sheet is 1120 wide at most. That figure is not in any other doc; it was chosen for this component.</p>
 <p><b>Phone.</b> The frame takes the shell's container name (<code>gd-app</code>), so the dashboard's phone reflow applies: <code>gd-span-3</code> tiles pair up two to a row, charts and tables take the full width, the title drops to 32, actions go full width.</p>
-<p><b>Date.</b> <code>Created</code> is the date the report was made. When the report is regenerated, add <code>Updated</code> beside it only when it differs. Never put a time of day here; the as-of time belongs in the source line.</p>
+<p><b>Light and dark.</b> The frame carries the dashboard's <code>theme-menu</code> (System, Light, Dark) at the right end of the top bar, after the date. It is the existing component, unchanged, and <code>dashboard.js</code> already drives it: with no choice made the report follows the machine, live; picking Light or Dark sticks, in the same <code>gw-theme-choice</code> key every dashboard uses, until System is picked again. Keep the <code>&lt;script&gt;</code> at the top of <code>&lt;head&gt;</code> that reads that key, or the page flashes the wrong theme on load. It is hidden when the report prints (<code>data-gd-print=&quot;hide&quot;</code>), and a PDF is made in light.</p>
+<p><b>Date.</b> <code>Created</code> is the date the report was made. When the report is regenerated, add <code>Updated</code> beside it only when it differs. Never put a time of day here.</p>
 <p><b>Print.</b> See <i>Printing and PDF</i> below.</p>
 <p><b>Tokens.</b> <code>--gd-page-bg</code>, <code>--gd-panel-bg</code>, <code>--gd-border</code>, <code>--gw-radius-16</code>, <code>--gw-color-neutral-500</code>, <code>--gw-text-body-12-med</code>, <code>--gw-space-*</code>, <code>--gd-gap</code>. <b>Accessibility.</b> The logo is <code>role=&quot;img&quot;</code> with a label, the date is plain text. <b>Provenance.</b> NEW, pending library review: the one-pager's top bar (<code>templates/one-pager</code>) and Swapnil Sinha's report, 7 Oct 2026.</p>
 <h3 id="definition-tile">Report source line</h3>
 <p><b>Purpose.</b> Says where the numbers came from and how fresh they are, directly under the title. A report is a snapshot, so a reader has to be able to see which data it was made from. Use it on every report.</p>
-<p><b>Anatomy.</b> <code>p.gd-report__source</code> inside <code>gd-page-header__titles</code>, after the description: <code>Sources: Meta Ads, Google Ads, product database · Data as of 5 Oct 2026, 23:59</code>. Each part is its own <code>span</code>; the separator is a <code>·</code> with <code>aria-hidden</code>.</p>
-<p><b>Rules.</b> Name the real sources, not &quot;internal data&quot;. The as-of date is the end of the data, not the day the report was made (that is the top bar's date). With sample data it says so, and the <code>Sample data</code> Badge stays in the title row.</p>
+<p><b>Anatomy.</b> <code>p.gd-report__source</code> inside <code>gd-page-header__titles</code>, after the description: <code>Sources: Meta Ads, Google Ads, product database · Data as of 5 Oct 2026</code>. Each part is its own <code>span</code>; the separator is a <code>·</code> with <code>aria-hidden</code>.</p>
+<p><b>Rules.</b> Name the real sources, not &quot;internal data&quot;. The as-of date is the end of the data, not the day the report was made (that is the top bar's date). A time of day only when the data is intraday or was pulled live; a daily or weekly report ends at a date, and a time such as 23:59 there is noise. On a phone the two parts stack, left aligned, with no separator. With sample data it says so, and the <code>Sample data</code> Badge stays in the title row.</p>
 <p><b>Tokens.</b> <code>--gw-text-body-12-med</code>, <code>--gd-text-muted</code>, <code>--gw-space-4</code>, <code>--gw-space-8</code>. <b>Provenance.</b> NEW, pending library review: Mobbin Gumloop (&quot;Snapshot from ... Loaded ...&quot;), Fresha (&quot;Last updated&quot;).</p>
 <h3 id="a-short-list-in-a-card">Definition tile</h3>
 <p><b>Purpose.</b> Defines one term the report uses: a metric, a period, a rule. Use it on the report's last tab or in a footer section so a reader can check what a number means. Not for a feature list, and not for anything with its own number (that is a stat card).</p>

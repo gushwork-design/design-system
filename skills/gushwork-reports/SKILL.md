@@ -83,9 +83,9 @@ already answers, and drop the interview for a small change.
 
 ## What a report contains, in this order
 
-1. **The top bar**: logo left, `Created <date>` right. Part of `report-frame`; do not rebuild it.
+1. **The top bar**: logo left; `Created <date>` and the light and dark menu right. Part of `report-frame`; do not rebuild it.
 2. **The title**, a `Sample data` Badge when the numbers are invented, a one-sentence description with the period,
-   then the **source line**: what the numbers came from and the date the data runs to. **Required, every report.**
+   then the **source line**: what the numbers came from and the date the data runs to (a time of day only for intraday data). **Required, every report.**
 3. **The verdict**, first, in plain words. The template uses a `banner`; see *Gaps*.
 4. **Three or four headline numbers** as `stat-card`s, each with its change against a stated comparison. A fifth
    number means the report is doing two jobs.
@@ -153,7 +153,7 @@ is. Register what is new for review on the hub (the registry entry and a drawing
 
 A report is shared, so check what a stranger will see, in the browser:
 
-- **Both themes** and **comfortable density** (compact only when the user asks for it, R57).
+- **Both themes**, switched with the report's own menu (System, Light, Dark; the choice survives a reload), and **comfortable density** (compact only when the user asks for it, R57).
 - **Widths with `getBoundingClientRect()`** at 1440, 1280 and 390. At 390 the stat tiles pair up two to a row and
   nothing overflows sideways; the logo and the date line up with the content edges at every width.
 - **The sums**: every total, share and change recomputed from the rows.
