@@ -2475,12 +2475,10 @@ html:has(script[src*="shell.js"]):not(.gw-shell-ready) body::before { background
 
   /* Underlined tabs: shell.js adds one indicator per tab row and slides it, so the line glides
      to the new tab instead of jumping. Without the script the tab's own ::after still draws it. */
-  .an-tabs[data-gw-ind] { position: relative; }
-  .sg__main .an-bar .an-tabs[data-gw-ind] .ul-tab[aria-selected="true"]::after,
-  .tl-tabs[data-gw-ind] .tl-tab[aria-selected="true"]::after { display: none; }
+    .sg__main .an-bar .an-tabs[data-gw-ind] .ul-tab[aria-selected="true"]::after,
+  [role="tablist"][data-gw-ind] > [role="tab"][aria-selected="true"]::after { opacity: 0; }   /* hidden, not removed: shell.js reads its colour */
   .gw-tab-ind { position: absolute; left: 0; bottom: 0; height: 2px; width: 1px; border-radius: 2px 2px 0 0; background: var(--ul-value, currentColor);
     transform-origin: 0 0; pointer-events: none; }
-  .tl-tabs > .gw-tab-ind { background: var(--s-heading); }
   [data-gw-ind="on"] > .gw-tab-ind { transition: transform var(--hub-dur-enter) var(--hub-ease); }
 
   /* Coverage (8 Oct 2026, after an audit of every hub page). Overview and Login have their own wrappers, so they
