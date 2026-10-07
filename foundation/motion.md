@@ -84,7 +84,8 @@ button that should press in joins the named list in `shell.css` (both the `trans
 
 | Surface | Motion |
 |---|---|
-| **Hub pages and any page in the hub shell** (dashboards, Library, Analytics, Access Control, Templates, Tools, Downloads, Overview, Login) | All of it, already. Build with the shell's classes and add nothing. |
+| **Hub pages and any page in the hub shell** (Library, Analytics, Access Control, Templates, Tools, Downloads, Overview, Login) | All of it, already, from `web/shell.css` and `web/shell.js`. Build with the shell's classes and add nothing. |
+| **Dashboards built from `dashboard.css` and `dashboard.js`** (the analytics-overview and support-ops-app templates, and anything made from them) | The same values, already, under the `.gd` classes: `css/95-motion.css` (the children of `.gd-page` rise in, `.gd-btn`, icon buttons and tabs press, `.gd-menu` opens from its corner) and `js/90-motion.js` (stat-card and metric-strip figures count up; prefixes, suffixes and decimals are kept). The sliding selected fill (R61) and the arriving dialogs and drawers were already there. Add nothing. |
 | **Ad landers and web pages (`gushwork-web`)** | Entrance, hover and press on buttons and cards, and menu/modal arrival. No count-up unless a stats block asks for it. Copy the tokens and the rules you use; keep rule 3. |
 | **Hub tools (`gushwork-tools`)** | The tool's own page uses `tool-shell.css`, which does not load `shell.css`: add the press and entrance rules you need from this file. A tool that already slides its panels (the editor tools do) keeps that. |
 | **Slides, lead-magnet PDFs, reports** | None. They are static output. |

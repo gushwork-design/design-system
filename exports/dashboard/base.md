@@ -51,6 +51,10 @@ set it on a region (`<section data-density="compact">`) to densify only that reg
 shows a 1px edge (`--gd-border-focus`) instead, because a browser counts a click into a text field as keyboard
 focus (R41, `foundation/states.md`). `--gw-motion-fast` is declared once in `tokens.css` and is never
 re-declared here; `prefers-reduced-motion` switches transitions and animations off for the whole `.gd` tree.
+The small movements on top of that (a page arriving, a button pressing in, a menu opening, KPI numbers
+counting up; R65, `foundation/motion.md`) are `css/95-motion.css` and `js/90-motion.js`, with their own
+`--gd-ease`, `--gd-dur` and `--gd-dur-enter` on `.gd`; they sit inside `prefers-reduced-motion: no-preference`
+as a second lock.
 `.gd-num` turns on tabular numerals for any figure that can change.
 
 **States.** Not applicable; this is a layer. A component's own states are in its doc.
