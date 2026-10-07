@@ -2432,3 +2432,61 @@ html:has(script[src*="shell.js"]):not(.gw-shell-ready) body::before { background
 
 /* Caveat, for the slide margin annotation preview only (foundation/tokens.css does not declare it) */
 @font-face{font-family:'Caveat';src:url('/fonts/Caveat-VariableFont_wght.ttf') format('truetype-variations');font-weight:400 700;font-style:normal;font-display:swap}
+
+/* =========================================================================
+   MICRO MOTION (Utsav, 8 Oct 2026: "subtle micro animations to elevate the experience")
+
+   The system has one motion token, --gw-motion-fast (120ms), for colour changes. These are the
+   hub's own, for movement, and live here because nothing outside the hub shell uses them. Three
+   rules keep it subtle: only opacity and transform move (nothing that reflows), 8px or less of
+   travel, and 320ms at the longest. All of it sits inside no-preference, so a person who asks
+   their system for less motion gets none of it.
+   Leaving is not animated: closing an overlay hides it at once.
+   ========================================================================= */
+:root { --hub-ease: cubic-bezier(.2, .7, .2, 1); --hub-dur: 200ms; --hub-dur-enter: 320ms; }
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes hub-rise  { from { opacity: 0; transform: translateY(8px); } }
+  @keyframes hub-fade  { from { opacity: 0; } }
+  @keyframes hub-pop   { from { opacity: 0; transform: translateY(-4px) scale(.98); } }
+  @keyframes hub-modal { from { opacity: 0; transform: translateY(8px) scale(.97); } }
+
+  /* Page and panel entrance. `backwards` fill, so nothing is left on the element afterwards:
+     a lingering transform would turn it into a containing block and break sticky bars. It starts
+     when the shell reveals the page (gw-shell-ready), not behind the hidden body. */
+  html.gw-shell-ready :is(.sg__main, .dl__main, .st__main, .cl__main) > * { animation: hub-rise var(--hub-dur-enter) var(--hub-ease) backwards; }
+  html.gw-shell-ready :is(.sg__main, .dl__main, .st__main, .cl__main) > :nth-child(2) { animation-delay: 40ms; }
+  html.gw-shell-ready :is(.sg__main, .dl__main, .st__main, .cl__main) > :nth-child(3) { animation-delay: 80ms; }
+  html.gw-shell-ready :is(.sg__main, .dl__main, .st__main, .cl__main) > :nth-child(4) { animation-delay: 120ms; }
+  html.gw-shell-ready :is(.sg__main, .dl__main, .st__main, .cl__main) > :nth-child(n+5) { animation-delay: 160ms; }
+  /* Switching a tab un-hides its panel, which restarts this. */
+  .an-panel:not([hidden]), .ds-panel:not([hidden]) { animation: hub-rise var(--hub-dur-enter) var(--hub-ease) backwards; }
+
+  /* Press and hover. Buttons go in 4-8% on press; the rail label leans in 2px on hover. */
+  .gw-iconbtn, button.ul-ib { transition: background var(--gw-motion-fast), color var(--gw-motion-fast), transform var(--hub-dur) var(--hub-ease); }
+  .gw-iconbtn:active:not(:disabled), button.ul-ib:active:not(:disabled) { transform: scale(.92); }
+  button.ul-tab { transition: background var(--gw-motion-fast), color var(--gw-motion-fast), transform var(--hub-dur) var(--hub-ease); }
+  button.ul-tab:active:not([aria-selected="true"]) { transform: scale(.96); }
+  .gw-navitem { transition: background var(--gw-motion-fast), transform var(--hub-dur) var(--hub-ease); }
+  .gw-navitem__text { transition: transform var(--hub-dur) var(--hub-ease); }
+  .gw-navitem:hover .gw-navitem__text { transform: translateX(2px); }
+  .gw-navitem:active { transform: scale(.985); }
+  .ul-tbl > .ul-row--d { transition: background var(--gw-motion-fast); }
+
+  /* Underlined tabs: shell.js adds one indicator per tab row and slides it, so the line glides
+     to the new tab instead of jumping. Without the script the tab's own ::after still draws it. */
+  .an-tabs[data-gw-ind] { position: relative; }
+  .sg__main .an-bar .an-tabs[data-gw-ind] .ul-tab[aria-selected="true"]::after { display: none; }
+  .gw-tab-ind { position: absolute; left: 0; bottom: 0; height: 2px; width: 1px; border-radius: 2px 2px 0 0; background: var(--ul-value, currentColor);
+    transform-origin: 0 0; pointer-events: none; }
+  .an-tabs[data-gw-ind="on"] .gw-tab-ind { transition: transform var(--hub-dur-enter) var(--hub-ease); }
+
+  /* Overlays arrive; they do not leave (the page hides them at once). */
+  .gw-pop__menu:not([hidden]) { transform-origin: top right; animation: hub-pop 160ms var(--hub-ease); }
+  .gw-modal:not([hidden]) { animation: hub-fade var(--hub-dur) ease-out; }
+  .gw-modal:not([hidden]) .gw-modal__box { animation: hub-modal var(--hub-dur-enter) var(--hub-ease); }
+  .gw-pal[data-open="true"] .gw-pal__scrim { animation: hub-fade var(--hub-dur) ease-out; }
+  .gw-pal[data-open="true"] .gw-pal__box { animation: hub-modal var(--hub-dur-enter) var(--hub-ease); }
+  .ul-dlg[open] { animation: hub-modal var(--hub-dur-enter) var(--hub-ease); }
+  .ul-dlg[open]::backdrop { animation: hub-fade var(--hub-dur) ease-out; }
+}

@@ -1399,3 +1399,14 @@ Ruled by Utsav, 7 Oct 2026, after asking for a daily 5 am auto-update on every m
 - **Quiet or flagged, it pulls.** The pull runs for every release, not just `--notify` ones. What stays R51's call is who is told; the update itself no longer waits for the next start.
 - **Safe by construction.** Detached, output discarded, never waited on; it skips silently if `claude` cannot be found. `GW_NO_AUTO_PULL=1` turns it off, and `GW_CLAUDE_BIN` and `GW_PULL_STAMP` let the tests use a stub, so no test updates the machine it runs on.
 - **Who gets it.** Only copies that contain this hook. A machine on an older release still relies on auto-update for the first hop.
+
+## R64 — the hub moves a little, and only where it helps
+Asked by Utsav, 8 Oct 2026: "subtle micro animations in the design hub to elevate the user experience". Scope chosen: the hub shell and shared components, all four moments (press and hover, tab underline, entrance, overlays and numbers).
+
+- **Rules.** Only opacity and transform move, 8px or less of travel, 320ms at the longest, one easing (`--hub-ease`). All of it is inside `prefers-reduced-motion: no-preference`; the script half stands down for anyone who asks for less motion. The hub's own tokens (`--hub-ease`, `--hub-dur`, `--hub-dur-enter`) live in `shell.css`; the design system still has only `--gw-motion-fast`.
+- **Entrance.** Page content and a newly shown tab panel rise 8px and fade in over 320ms, the first few blocks 40ms apart. The animation leaves nothing on the element afterwards, so sticky bars keep working.
+- **Press and hover.** Icon buttons and small buttons go in to 92% on press, pill tabs to 96%, the rail row to 98.5%; the rail label leans 2px on hover. Tool and template cards already lifted and pressed (`cards.css`) and are untouched.
+- **Tab underline.** One indicator per underlined tab row slides to the selected tab (`shell.js`). Without the script the tab's own underline still shows.
+- **Overlays.** The profile menu, sign-in modal, search palette and the Design System dialog fade and rise in. They do not animate out: closing hides them at once.
+- **Numbers.** Whole-number KPIs (`.ul-num`) count up once over 600ms. A redraw with the same figure, such as a search keystroke, shows at once; a changed figure counts from the old one.
+- **Left out on purpose.** Table rows do not stagger in: the tables redraw on every sort, page and search keystroke, and rows re-animating while someone types would read as flicker.
