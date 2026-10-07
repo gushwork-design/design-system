@@ -835,12 +835,12 @@
 /* The hand-placed cells are redundant once the asset carries them. */
 .gw-modal--solo .gw-login__cell { display: none; }
 .gw-modal__box {
-  width: 100%; max-width: 420px;
-  padding: 48px 32px;
-  border-radius: var(--gw-radius-12);
+  width: 100%; max-width: 496px;
+  padding: var(--gw-space-60) var(--gw-space-40);
+  border-radius: var(--gw-radius-24);
   background: var(--s-card-bg);
   border: 1px solid var(--s-card-border);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--gw-shadow-s4);
   text-align: center;
   position: relative;
 }
@@ -854,16 +854,19 @@
 .gw-modal__x svg { width: 14px; height: 14px; display: block; }
 .gw-modal__x:hover { background: var(--s-nav-hover); }
 .gw-modal__chip {
-  width: 56px; height: 56px; margin: 0 auto var(--gw-space-20);
+  width: 60px; height: 60px; margin: 0 auto var(--gw-space-20);
   display: grid; place-items: center;
-  border-radius: var(--gw-radius-12);
-  background: var(--gw-color-primary-50);
-  color: var(--gw-color-primary-500);
+  border-radius: 15px;
+  /* Black, per 763:2599 — this supersedes the 15 Sep Primary/500 + Primary/600
+     chip, which was chosen before any drawing existed for this modal. */
+  background: var(--gw-color-black);
+  /* The outline the owner pages' logo chip has (Neutral/800), so a black chip on the dark modal still has an edge. */
+  box-shadow: inset 0 0 0 1px var(--gw-color-neutral-800);
 }
-.gw-modal__chip svg { width: 32px; height: 32px; display: block; }
+.gw-modal__chip svg { width: 30px; height: 30px; display: block; }
 .gw-modal__title {
   margin: 0 0 8px;
-  font: var(--gw-text-h3);
+  font: var(--gw-text-h5);
   letter-spacing: 0;
   color: var(--s-heading);
 }
@@ -885,22 +888,22 @@
 }
 .gw-modal__sub[hidden] { display: none; }
 .gw-modal__btn {
-  width: 100%; height: 44px;
+  width: 100%; height: 48px;
   display: flex; align-items: center; justify-content: center;
-  gap: var(--gw-space-12);
-  padding: 0 20px;
-  border-radius: 8px;
-  border: 1px solid var(--gw-color-neutral-200);
+  gap: var(--gw-space-8);
+  padding: 0 var(--gw-space-16) 0 var(--gw-space-20);
+  border-radius: var(--gw-radius-12);
+  border: 0.81px solid var(--gw-color-neutral-200);
   background: var(--gw-color-white);
-  color: var(--gw-color-black);
-  font: var(--gw-text-button-16);
-  box-shadow: none;
+  color: var(--gw-color-neutral-900);
+  font: var(--gw-text-button-14);
+  box-shadow: var(--gw-shadow-s3);
   cursor: pointer;
   text-decoration: none;
-  transition: background-color 0.2s, border-color 0.2s;
+  transition: box-shadow var(--gw-motion-fast);
 }
 .gw-modal__btn > svg { width: 18px; height: 18px; flex: none; display: block; }
-.gw-modal__btn:hover { background: var(--gw-color-neutral-50); border-color: var(--gw-color-neutral-300); }
+.gw-modal__btn:hover { box-shadow: var(--gw-shadow-s4); }
 /* Trailing arrow on the Google button — 683:4571 sets it right after the
    label, so it rides with the centred group rather than pinning to the edge.
    The G mark is already sized by the rule below; this keeps the arrow to the
@@ -945,7 +948,7 @@
 .gw-modal__input::placeholder { color: var(--s-placeholder); }
 /* A text field shows its edge, not the ring: a click into one counts as keyboard focus, so a ring would show on a click (R41). */
 .gw-modal__input:focus-visible {
-  outline: none; border-color: var(--gw-color-primary-500); box-shadow: 0 0 0 3px var(--gw-color-primary-50);
+  outline: none; border-color: var(--gw-color-neutral-400);
 }
 .gw-modal__err {
   margin: 0;
