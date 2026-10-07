@@ -125,7 +125,7 @@ h1{font:var(--gw-text-h3);letter-spacing:var(--gw-text-h3-tracking);margin:var(-
 .card .meta{padding:0 var(--gw-space-8) var(--gw-space-8);display:flex;flex-direction:column;gap:2px;min-width:0}
 .card .row{display:flex;align-items:center;justify-content:space-between;gap:var(--gw-space-8)}
 .card h2{font:var(--gw-text-body-16-sem);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card .sub{font:var(--gw-text-body-12-reg);color:var(--s-body)}
+.card .sub{font:var(--gw-text-body-12-reg);color:var(--s-body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hov{position:absolute;right:var(--gw-space-8);top:var(--gw-space-8);display:flex;gap:6px;opacity:0;transform:translateY(-2px);transition:opacity .12s,transform .12s}
 .card:hover .hov,.card:focus-within .hov{opacity:1;transform:none}
 .hov button{position:relative;width:32px;height:32px;border-radius:var(--gw-radius-8);background:var(--s-card);border:1px solid var(--s-line-2);display:grid;place-items:center;box-shadow:var(--gw-shadow-s2);color:var(--s-text)}
@@ -294,7 +294,7 @@ dialog::backdrop{background:var(--s-scrim)}
     return '<article class="card" data-id="'+a.id+'">'+
       '<button type="button" class="pic" data-open="'+a.id+'" aria-label="Open '+esc(a.name)+'"><img src="img/'+a.id+'.jpg" alt="" loading="lazy" decoding="async"></button>'+
       '<div class="hov"><button type="button" data-copy="'+a.id+'" data-tip="Copy link" aria-label="Copy link to '+esc(a.name)+'">'+ic('link')+'</button><button type="button" data-dl="'+a.id+'" data-tip="Download picture" aria-label="Download '+esc(a.name)+' picture">'+ic('dl')+'</button></div>'+
-      '<div class="meta"><div class="row"><h2>'+esc(a.name)+'</h2>'+chip+'</div><div class="sub">'+esc(a.bundle)+'</div></div></article>';
+      '<div class="meta"><div class="row"><h2>'+esc(a.name)+'</h2>'+chip+'</div><div class="sub">'+esc(a.line)+'</div></div></article>';
   }
   function render(){
     var t=tabsHTML();
@@ -319,12 +319,25 @@ dialog::backdrop{background:var(--s-scrim)}
   });
 
   /* toast */
-  var tt; function toast(msg){$('toast-t').textContent=msg; $('toast').classList.add('on'); clearTimeout(tt); tt=setTimeout(function(){$('toast').classList.remove('on')},2200)}
+  var tt; function toast(msg){var host=$('qv').open?$('qv'):document.body; if($('toast').parentNode!==host) host.appendChild($('toast')); $('toast-t').textContent=msg; $('toast').classList.add('on'); clearTimeout(tt); tt=setTimeout(function(){$('toast').classList.remove('on')},2200)}
 
   /* link + download */
   function linkFor(id){return location.origin+location.pathname+'?agent='+encodeURIComponent(id)}
-  function copy(id){
-    var url=linkFor(id), done=function(){toast('Link copied')};
+  function flash(btn){
+    if(!btn) return;
+    clearTimeout(btn._t);
+    if(btn.id==='qcopy'){
+      if(!btn._html) btn._html=btn.innerHTML;
+      btn.innerHTML=ic('check')+'Link copied';
+      btn._t=setTimeout(function(){btn.innerHTML=btn._html;btn._html=null},2000);
+    }else{
+      if(!btn._html){btn._html=btn.innerHTML;btn._tip=btn.getAttribute('data-tip')}
+      btn.innerHTML=ic('check'); btn.setAttribute('data-tip','Link copied');
+      btn._t=setTimeout(function(){btn.innerHTML=btn._html;btn.setAttribute('data-tip',btn._tip);btn._html=null},2000);
+    }
+  }
+  function copy(id,btn){
+    var url=linkFor(id), done=function(){flash(btn)};
     if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(done,function(){fallback(url,done)})}else fallback(url,done);
   }
   function fallback(text,done){var t=document.createElement('textarea'); t.value=text; t.style.position='fixed'; t.style.opacity='0'; document.body.appendChild(t); t.select(); try{document.execCommand('copy'); done()}catch(e){toast('Copy failed. Select the address bar instead.')} t.remove()}
@@ -352,13 +365,13 @@ dialog::backdrop{background:var(--s-scrim)}
   $('qwrap').addEventListener('click',function(e){if(e.target===this) close()});
   dlg.addEventListener('keydown',function(e){if(e.key==='ArrowLeft') step(-1); else if(e.key==='ArrowRight') step(1)});
   $('qdl').addEventListener('click',function(){if(cur) download(cur)});
-  $('qcopy').addEventListener('click',function(){if(cur) copy(cur)});
+  $('qcopy').addEventListener('click',function(){if(cur) copy(cur,this)});
   $('qreq').addEventListener('click',function(){toast('Requesting a new picture arrives in the next phase')});
   $('create').addEventListener('click',function(){toast('Creating agents arrives in the next phase')});
 
   /* grid actions */
   $('grid').addEventListener('click',function(e){
-    var c=e.target.closest('[data-copy]'); if(c){e.stopPropagation(); copy(c.getAttribute('data-copy')); return}
+    var c=e.target.closest('[data-copy]'); if(c){e.stopPropagation(); copy(c.getAttribute('data-copy'),c); return}
     var d=e.target.closest('[data-dl]'); if(d){e.stopPropagation(); download(d.getAttribute('data-dl')); return}
     if(e.target.id==='clear'){state={q:'',bundle:ALL,status:'all'}; $('q').value=''; render(); return}
     var card=e.target.closest('.card'); if(card) open(card.getAttribute('data-id'));

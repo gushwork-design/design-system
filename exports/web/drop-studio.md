@@ -12,7 +12,8 @@ The page has no template. It is owner-only while it is staged.
 A picture-first card for a character gallery. Width follows the grid column. White, 1px `--gw-color-neutral-100`,
 `--gw-radius-16`, padding `--gw-space-8`, gap `--gw-space-12`. The picture is a square, `--gw-radius-8`, `object-fit:
 cover`, so outer 16 = inner 8 + padding 8. Below it: the name (`--gw-text-body-16-sem`, one line, ellipsis) with an
-optional status chip on the right, then the bundle in `--gw-text-body-12-reg`.
+optional status chip on the right, then a one-line description of what the agent does in `--gw-text-body-12-reg`
+(sentence case, no full stop, one line with an ellipsis; the bundle lives in the rail and the quick view).
 
 States: rest; hover or keyboard focus-within (two 32px actions appear at the picture's top right, **Copy link** and
 **Download picture**, each `--gw-radius-8`, a 1px `--gw-color-neutral-200` edge and `--gw-shadow-s2`, with a short
