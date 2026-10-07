@@ -76,8 +76,8 @@ a{color:inherit;text-decoration:none}
 /* ---------- hero (Figma 136:11175) ---------- */
 .hero{position:relative;height:500px;border-radius:0 0 var(--gw-radius-20) var(--gw-radius-20);overflow:hidden;background:var(--gw-color-primary-500)}
 /* Figma 215:15824 (image 52, 7 Oct): 1594x597 centred in the 1500x460 frame, top -45; scales with the width */
-/* Figma 215:15824 (image 52, 7 Oct, second pass): 1594x597 at x -34, y -53 in the frame (moved down 24px in Figma); it then drifts down as the page scrolls (parallax). The gap that opens at the top is always scrolled out of view because the drift is slower than the scroll. */
-.hero .bg{position:absolute;left:-2.27%;top:-53px;width:106.27%;height:auto;min-height:calc(100% + 53px);max-width:none;object-fit:cover;object-position:50% 0;will-change:transform}
+/* Figma 215:15824 (image 57, fur mascot, 7 Oct): 1548x581 at x -28, y -32 in the frame; it then drifts down as the page scrolls (parallax). The gap that opens at the top is always scrolled out of view because the drift is slower than the scroll. */
+.hero .bg{position:absolute;left:-1.87%;top:-32px;width:103.2%;height:auto;min-height:calc(100% + 32px);max-width:none;object-fit:cover;object-position:50% 0;will-change:transform}
 .hero .shade{position:absolute;left:0;top:0;bottom:0;width:85.13%}
 /* Figma 136:13549: PROGRESSIVE background blur, radius 8 (about 4px in CSS) at the left edge easing to 0 by 82% of the 863px shade.
    Built as four masked copies of the photo, lightest underneath, so the blur grows toward the left without compounding. */
@@ -782,7 +782,7 @@ main{padding-top:0}
 </header>
 
 <section class="hero" aria-label="Gushwork Agents">
- <img class="bg" src="assets/figma/hero-cafe-v2.jpg" alt="">
+ <img class="bg" src="assets/figma/hero-fur.jpg" alt="">
   <div class="shade" aria-hidden="true"></div>
  <div class="tx"><h1>Gushwork Agents</h1><p>Only pay for agents that work for you.</p></div>
 </section>
