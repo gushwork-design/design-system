@@ -9,54 +9,161 @@
 <link rel="stylesheet" href="/foundation/tokens.css">
 <link rel="stylesheet" href="/shell.css?v=ghost3">
 <script src="/shell.js?v=ghost1" defer></script>
+<style>
+body[data-gw-page="login"] {
+  background: var(--gw-color-neutral-25);
+}
+.gw-login { display: grid; place-items: center; min-height: 100vh; padding: 32px 16px; }
+.gw-login__card {
+  max-width: 420px;
+  background: var(--gw-color-white);
+  border: 1px solid var(--gw-color-neutral-100);
+  border-radius: 12px;
+  padding: 48px 32px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+.gw-login__head { text-align: center; margin-bottom: 32px; }
+.gw-login__chip {
+  display: flex;
+  width: 56px;
+  height: 56px;
+  align-items: center;
+  justify-content: center;
+  background: var(--gw-color-primary-50);
+  border-radius: 12px;
+  color: var(--gw-color-primary-500);
+  margin: 0 auto 16px;
+}
+.gw-login__chip svg { width: 32px; height: 32px; }
+.gw-login__copy h1 {
+  font: var(--gw-text-h3);
+  margin: 0 0 8px;
+  color: var(--gw-color-black);
+}
+.gw-login__copy p {
+  font: var(--gw-text-body-16-reg);
+  margin: 0;
+  color: var(--gw-color-neutral-600);
+}
+.gw-login__google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  height: 44px;
+  background: var(--gw-color-white);
+  border: 1px solid var(--gw-color-neutral-200);
+  border-radius: 8px;
+  color: var(--gw-color-black);
+  text-decoration: none;
+  font: var(--gw-text-button-16);
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+  margin-bottom: 16px;
+}
+.gw-login__google:hover {
+  background: var(--gw-color-neutral-50);
+  border-color: var(--gw-color-neutral-300);
+}
+.gw-login__g { width: 18px; height: 18px; flex-shrink: 0; }
+.gw-login__arrow { width: 20px; height: 20px; flex-shrink: 0; }
+.gw-login__or {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 24px 0;
+  color: var(--gw-color-neutral-400);
+  font: var(--gw-text-body-14-reg);
+}
+.gw-login__or::before,
+.gw-login__or::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--gw-color-neutral-200);
+}
+.gw-login__pw { display: flex; flex-direction: column; gap: 16px; }
+.gw-login__label {
+  font: var(--gw-text-body-14-bold);
+  color: var(--gw-color-black);
+}
+.gw-login__field {
+  position: relative;
+}
+.gw-login__input {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--gw-color-neutral-200);
+  border-radius: 8px;
+  font: var(--gw-text-body-16-reg);
+  background: var(--gw-color-white);
+  color: var(--gw-color-black);
+}
+.gw-login__input::placeholder {
+  color: var(--gw-color-neutral-500);
+}
+.gw-login__input:focus {
+  outline: none;
+  border-color: var(--gw-color-primary-500);
+  box-shadow: 0 0 0 3px var(--gw-color-primary-50);
+}
+.gw-login__err {
+  font: var(--gw-text-body-14-reg);
+  color: #d32f2f;
+  margin: 0;
+}
+.gw-login__submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  background: var(--gw-color-primary-500);
+  border: none;
+  border-radius: 8px;
+  color: var(--gw-color-white);
+  font: var(--gw-text-button-16);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.gw-login__submit:hover:not(:disabled) {
+  background: var(--gw-color-primary-600);
+}
+.gw-login__submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.gw-login__note {
+  font: var(--gw-text-body-14-reg);
+  color: var(--gw-color-neutral-600);
+  text-align: center;
+  margin: 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--gw-color-neutral-100);
+}
+.gw-login__grid { display: none; }
+</style>
 </head>
 <body data-gw-page="login">
 
-<!-- login (488:21730). The shell draws the topbar and sidebar; this page is only
-     the centred card and the grid behind it. -->
 <div class="gw-login">
-
-  <!-- The brand grid, as the same two-gradient recipe .gw-hero uses — one source
-       for the pattern, not two. This is the neutral colourway: the lines take the
-       chrome's own border tone and the filled cells its surface tone, so both
-       follow the theme with no second block to keep in step. -->
-  <div class="gw-login__grid" aria-hidden="true">
-    <span class="gw-login__cell" style="left:400px;top:80px"></span>
-    <span class="gw-login__cell" style="left:440px;top:120px"></span>
-    <span class="gw-login__cell" style="left:800px;top:240px"></span>
-    <span class="gw-login__cell" style="right:120px;bottom:200px"></span>
-    <span class="gw-login__cell" style="right:280px;bottom:80px"></span>
-  </div>
-
   <div class="gw-login__card">
-
     <div class="gw-login__head">
       <span class="gw-login__chip">
-        <!-- The mark, from assets/logo/gushwork-symbol-white.svg — the same paths
-             shell.js draws in the topbar chip, filled with currentColor. -->
         <svg viewBox="0 0 80 80" fill="none" aria-hidden="true">
           <path d="M76.6088 4.56344C77.5025 2.36058 75.8495 0 73.4723 0H9.14286C4.0934 0 0 4.0934 0 9.14286V66.7778C0 72.018 5.17081 75.6829 9.9603 73.5568C40.8494 59.8449 64.3785 34.7075 76.6088 4.56344Z" fill="currentColor"/>
           <path d="M32.5161 80C31.4022 80 30.9357 78.5531 31.8259 77.8835C54.9007 60.5265 71.4338 35.8047 78.7658 8.0522C78.9403 7.39154 80 7.51618 80 8.19951V70.8571C80 75.9066 75.9066 80 70.8571 80H32.5161Z" fill="currentColor"/>
         </svg>
       </span>
       <div class="gw-login__copy">
-        <h1>You&rsquo;ll need to log in</h1>
-        <p>Log in using your Gushwork email id to get access.</p>
+        <h1>You'll need to log in</h1>
+        <p>Log in using your Gushwork email to get access.</p>
       </div>
     </div>
 
-    <!-- BOTH doors ship, and the server says which are open — the same thing
-         modalHTML() does in shell.js, so the two entrances can never disagree
-         about what is available. Both start hidden: /api/auth/me reveals the
-         ones authModes() reports, so a door is never drawn onto a page that
-         cannot honour it.
-
-         628:5272. A link, not a button: it starts an OAuth redirect, which is a
-         navigation. `next` is appended below. -->
     <a class="gw-login__google" href="/api/auth/login" data-google-href hidden>
-      <!-- Google's mark, from assets/brand/google-g.svg — the same four paths
-           shell.js draws in the modal. Brand artwork: it keeps its own colours
-           in both themes and is never recoloured. -->
       <svg class="gw-login__g" viewBox="0 0 17.64 18" fill="none" aria-hidden="true">
         <path d="M8.99986 7.36361V10.8491H13.8435C13.6308 11.97 12.9925 12.9191 12.0353 13.5573L14.9562 15.8237C16.658 14.2528 17.6398 11.9455 17.6398 9.20461C17.6398 8.56644 17.5826 7.95274 17.4762 7.36371L8.99986 7.36361Z" fill="#4285F4"/>
         <path d="M3.95601 10.713L3.29723 11.2173L0.965378 13.0336C2.44628 15.9709 5.48151 18 8.99967 18C11.4296 18 13.4669 17.1982 14.956 15.8237L12.0351 13.5573C11.2333 14.0973 10.2105 14.4246 8.99967 14.4246C6.65968 14.4246 4.67156 12.8455 3.95969 10.7182L3.95601 10.713Z" fill="#34A853"/>
@@ -67,13 +174,8 @@
       <svg class="gw-login__arrow" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M224.49,136.49l-72,72a12,12,0,0,1-17-17L187,140H40a12,12,0,0,1,0-24H187L135.51,64.49a12,12,0,0,1,17-17l72,72A12,12,0,0,1,224.49,136.49Z"/></svg>
     </a>
 
-    <!-- Only drawn when BOTH doors are open, which is the state README-auth.md
-         calls out as temporary: close the password once Google works. -->
     <div class="gw-login__or" data-or hidden><span>or</span></div>
 
-    <!-- The password stopgap. Not in 488:21730 — that frame draws the finished
-         Google-only state — so this borrows the field and blue button from the
-         same node's previous revision rather than inventing a second idiom. -->
     <form class="gw-login__pw" data-pw-form hidden>
       <label class="gw-login__label" for="gw-login-pw">Team password</label>
       <div class="gw-login__field">

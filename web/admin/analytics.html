@@ -786,7 +786,12 @@ window.anMe = { on: false, email: '' };
 window.anMe.ready = fetch('/api/auth/me', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : {}; })
   .then(function (j) { window.anMe.email = String((j && j.email) || '').trim().toLowerCase(); }).catch(function () {});
 window.anHide = function (rows) {
-  return window.anMe.on && window.anMe.email ? rows.filter(function (r) { return String(r.email || '').toLowerCase() !== window.anMe.email; }) : rows;
+  if (!window.anMe.on || !window.anMe.email) return rows;
+  return rows.filter(function (r) {
+    var email = String(r.email || '').toLowerCase();
+    var host = String(r.host || '').toLowerCase();
+    return email !== window.anMe.email && host !== 'design.gushwork.ai';
+  });
 };
 window.__anRefilter = {};
 </script>
@@ -2332,7 +2337,10 @@ window.__anRefilter = {};
     });
     return out;
   }
-  function hideMe(rows) { return window.anMe.on && S.owner ? rows.filter(function (r) { return r.user !== S.owner; }) : rows; }
+  function hideMe(rows) {
+    if (!window.anMe.on || !S.owner) return rows;
+    return rows.filter(function (r) { return r.user !== S.owner && r.host !== 'design.gushwork.ai'; });
+  }
   function scoped() {
     var cut = S.period === 'all' ? 0 : Date.now() - (+S.period) * DAY;
     return S.rows.filter(function (r) { return r.at.getTime() >= cut; });
@@ -2456,7 +2464,7 @@ window.__anRefilter = {};
   var box = document.getElementById('an-me-box'), KEY = 'gw-analytics-hide-me';
   try { window.anMe.on = localStorage.getItem(KEY) === '1'; } catch (e) {}
   box.checked = window.anMe.on;
-  window.anMe.ready.then(function () { if (window.anMe.email) document.getElementById('an-me').title = 'Leaves out rows from ' + window.anMe.email; });
+  window.anMe.ready.then(function () { if (window.anMe.email) document.getElementById('an-me').title = 'Leaves out rows from ' + window.anMe.email + ' and design.gushwork.ai'; });
   box.addEventListener('change', function () {
     window.anMe.on = box.checked;
     try { localStorage.setItem(KEY, box.checked ? '1' : '0'); } catch (e) {}
