@@ -26,9 +26,9 @@ A report is not an app. It has no sidebar, no top bar and no account row, so the
 </div>
 ```
 
-The logo is the real `assets/logo/gushwork-logo-dark.svg`, used as a mask on `--gw-color-neutral-500`, so it renders grey, the same grey as the date and the one-pager's footer mark. Recolouring a logo file is off-system (`shared-components.md`); this was asked for by the owner on 7 Oct 2026 and is a single CSS rule to undo. The logo is 24 px high, one of the logo's own size steps, and 126 wide, its 421:80 aspect.
+The logo is the real `assets/logo/gushwork-logo-dark.svg`, used as a mask on `--gw-color-neutral-500`, so it renders grey, the same grey as the date and the one-pager's footer mark. Recolouring a logo file is off-system (`shared-components.md`); this was asked for by the owner on 7 Oct 2026 and is a single CSS rule to undo. The logo is 20 px high, one of the logo's own size steps, and 105 wide, its 421:80 aspect.
 
-**Spacing.** The bar and the sheet share one inset: the page gutter (`--gd-gap` x 2.5, 40 comfortable) plus the sheet's 1px edge, so the logo lines up with the title and the date with the right edge of the content. The bar sits 20 above the logo and 20 below to the sheet. The title's inset from the sheet's top equals the side gutter, at every width. On a phone the gutter is 20, as everywhere else.
+**Spacing.** The bar and the sheet share one inset: the page gutter (`--gd-gap` x 2.5, 40 comfortable) plus the sheet's 1px edge, so the logo lines up with the title and the date with the right edge of the content. The bar sits 22 above the logo and 22 below to the sheet (the 24 px theme menu sets the bar's height, the logo is centred in it). The title's inset from the sheet's top equals the side gutter, at every width. On a phone the gutter is 20, as everywhere else.
 
 **Measure.** The sheet is 1120 wide at most. That figure is not in any other doc; it was chosen for this component.
 

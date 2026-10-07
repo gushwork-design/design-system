@@ -2159,7 +2159,7 @@ a.gd-hbar__row:hover, a.gd-hbar__row.is-hover { background: var(--gd-hover-bg); 
    (gd-app) so the dashboard's phone reflow (span-3 tiles pair up, gutter 20, full-width actions) works inside it without a
    second set of rules. Everything else is existing components.
 
-   Tokens only; no value here is new. Sizes that have no token are the logo's own size step (24) and the measure (1120), both
+   Tokens only; no value here is new. Sizes that have no token are the logo's own size step (20) and the measure (1120), both
    said so in reports.md.
    ============================================================================ */
 
@@ -2176,7 +2176,7 @@ a.gd-hbar__row:hover, a.gd-hbar__row.is-hover { background: var(--gd-hover-bg); 
   padding: var(--gw-space-12) calc(var(--gd-page-px) + 1px);       /* the sheet's 1px edge: logo and date line up with the content */
 }
 .gd .gd-report__logo {
-  display: block; flex: none; width: 126px; height: 24px; background: var(--gw-color-neutral-500);
+  display: block; flex: none; width: 105px; height: 20px; background: var(--gw-color-neutral-500);
   -webkit-mask: url("../../assets/logo/gushwork-logo-dark.svg") left center / contain no-repeat;
           mask: url("../../assets/logo/gushwork-logo-dark.svg") left center / contain no-repeat;   /* the real logo file, so it takes the grey; 421:80 is its aspect */
 }

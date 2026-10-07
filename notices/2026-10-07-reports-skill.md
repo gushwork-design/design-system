@@ -49,5 +49,5 @@ a bar chart, tables, three tabs, a definitions tab. Invented sample data, marked
 6. **A short list inside a card** has no component, so `gd-report__list` is one rule inside `report-frame`. If you
    want a real list component, it should be its own entry.
 
-Token safety: no value was added to the palette, type ramp or radii. The two sizes with no token (the logo's 24 px
+Token safety: no value was added to the palette, type ramp or radii. The two sizes with no token (the logo's 20 px
 step and the 1120 px measure) are said so in `reports.md`.
