@@ -10,7 +10,7 @@ Dense, calm, grey ground with a white working panel, black-and-outline actions, 
 and status. It is the same look as the Gushwork design hub, because the components were extracted from it.
 This is not the marketing site.
 
-Announce at the start: **"Using the Gushwork dashboard skill — v2.0.2, updated 7 Oct 2026."**
+Announce at the start: **"Using the Gushwork dashboard skill — v2.0.3, updated 7 Oct 2026."**
 
 That version and date are stamped into this file, so **a stale copy reports its own stale date** rather
 than claiming to be current. If the user asks whether they are up to date, check for real:
