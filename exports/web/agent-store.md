@@ -129,7 +129,7 @@ The store as a **marketplace page**, built from Utsav's Figma (`1m3ozYgQqR6KFYGb
 
 ### `agent-store-hero`
 
-500px banner, `--gw-radius-20` bottom corners, primary-500 behind. The picture (Figma `image 52`, 1594 x 597 at x -34, y -53) **drifts down at 0.24x the scroll** (parallax, `translate3d`, off under reduced motion). A 40% black gradient runs left to right over 85% of the width. Title 80px Vert Grotesk Display bold (off-token: the ramp stops at 60px), subtitle `--gw-text-body-22-med` at 90% white. 100px of page ground below it.
+500px banner, `--gw-radius-20` bottom corners, primary-500 behind. The picture (Figma `image 57`, the fur mascot, 1548 x 581 at x -28, y -32) **drifts down at 0.24x the scroll** (parallax, `translate3d`, off under reduced motion). A 40% black gradient runs left to right over 85% of the width. Title 80px Vert Grotesk Display bold (off-token: the ramp stops at 60px), subtitle `--gw-text-body-22-med` at 90% white. 100px of page ground below it.
 
 ### `agent-checkout-panel`
 
@@ -168,4 +168,4 @@ The dashboard's R53 pattern on the web surface: the key sits **inside its contro
   sentence case per `foundation/voice.md`.
 - The page `<title>` and description are proposals awaiting sign-off.
 - No favicon set or social card yet: layout pass only, and `/internal/*` cannot be scraped anyway.
-- AI Marketplace: Paid Ad Agent's modal description and the wording of `agent-saving-line` are my drafts; the Distributor popular picks are my pick; only SEO, Paid Ad and Email Marketing have Figma art, every other tile is gray.
+- AI Marketplace: Paid Ad Agent's modal description and the wording of `agent-saving-line` are my drafts; the Distributor popular picks are my pick; all 33 agents now have fur-mascot art (Utsav's drop of 7 Oct), one picture each, filling the tile.
