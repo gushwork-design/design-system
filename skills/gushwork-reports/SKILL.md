@@ -86,7 +86,7 @@ already answers, and drop the interview for a small change.
 1. **The top bar**: logo left; `Created <date>` and the light and dark menu right. Part of `report-frame`; do not rebuild it.
 2. **The title**, a `Sample data` Badge when the numbers are invented, a one-sentence description with the period,
    then the **source line**: what the numbers came from and the date the data runs to (a time of day only for intraday data). **Required, every report.**
-3. **The verdict**, first, in plain words. The template uses a `banner`; see *Gaps*.
+3. **The verdict**, first, as a `summary-block`: a status Badge, the finding as the headline with its number, one paragraph, and two or three key points. Not a banner; a banner is for a condition that persists.
 4. **Three or four headline numbers** as `stat-card`s, each with its change against a stated comparison. A fifth
    number means the report is doing two jobs.
 5. **The charts that prove the verdict**, each with a **title that states the finding it proves**, not its subject:
@@ -131,12 +131,10 @@ tokens only, mark it in the code as new and pending library review, and declare 
 
 **Gaps in this skill today.** Say so rather than hiding them:
 
-- **A summary block.** The verdict is a `banner`, which is meant for a condition that persists, not a finding. A
-  headline plus a paragraph, optionally key points, is the missing element. Flag it in the notice.
-- **Generate a report from a dashboard.** Dashboards will offer a `Generate report` action, but it is not built or
-  designed yet (where the action lives, which sections go in, who can see the result). If asked, say it is planned and
-  raise it with Utsav; do not draw a button for it.
 - **A report with a rail, or a live range.** That is a dashboard.
+- **Making the report from a dashboard.** The dashboard side is built (`Generate report`, below); the part that renders and stores the report is the product's, and `reports.md` says what to wire.
+
+**Generate report from a dashboard.** Dashboards can offer it, but only when there is a report to make. When asked, build the header action and its dialog from `reports.md` (*Generate report*) and wire the `gd:generate-report` event; never draw the button without a handler, and say what the handler does. This skill builds the report the link opens, from the template.
 
 **Archived components and templates are not part of the system.** A registry entry whose `review` record says
 `"reviewed": "rejected"` was rejected and archived. Never use one: do not compose from it, start from it, copy its
