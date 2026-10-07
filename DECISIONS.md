@@ -1382,3 +1382,10 @@ Asked by Utsav, 6 Oct 2026: "add micro animations in all the components but make
 - **Not added.** Press effects, entrance animations, hover movement, anything that runs without an action. That is the limit of "not too much".
 - **Two fixes found on the way.** The period select is a radiogroup (`aria-checked`) but the pill only styled `aria-selected`, so no period ever showed as selected, in the shipped CSS and in its own drawing; the pill now styles both. And a chart's hidden data table (for screen readers) kept its full height because a `<table>` ignores a 1px size, which stretched the scroll area of whatever held the chart: the Explorer's chart pane scrolled by 700px. The table now sits in a clipped wrapper.
 - **Where it is written.** The CSS and JS above. No spec text or version moved, so the passes stand; the period select's drawing now shows its selected period, which the approved drawing did not.
+
+## R62 — the plugin says nothing at the start of a chat unless an update is waiting
+Ruled by Utsav, 7 Oct 2026: "lets remove this from every chat, lets greet and send message only when they need to update the plugin".
+
+- **What goes.** The new-chat greeting from R48 ("Hey Utsav, fresh chat — you're on Gushwork design system v2.0.1"). `scripts/greet.sh` is deleted and its `SessionStart` entry is out of `hooks/hooks.json`.
+- **What stays.** `check-update.sh` is now the only thing that speaks at the start of a chat. It still fires only when a flagged release (`.claude-plugin/notify.json`, R51) is ahead of the running copy, and it now opens the first reply itself, with the Run block and `/reload-plugins`, instead of following a greeting line.
+- **What this costs.** A teammate on a current version gets no sign that the plugin is loaded until a skill fires. That was R48's reason for the greeting; Utsav ruled it out of every chat anyway.

@@ -36,12 +36,9 @@
     "every other row), and a closed laptop or a crash simply means the last skill, file or artifact row",
     "carries the most recent figures instead.",
     "",
-    "greet.sh opens every NEW chat with one line by name \u2014 \"Hey Utsav, fresh chat \u2014 you're on Gushwork",
-    "design system v1.59.0. What are we making today?\" \u2014 so a teammate knows the plugin is loaded, and",
-    "skill has had a reason to fire (R48, 5 Oct 2026). startup|clear only: those begin a conversation;",
-    "resume and compact continue one, and \"new chat\" would be a lie there. It is additionalContext,",
-    "not systemMessage, because a hook cannot make Claude speak before the person types \u2014 the line",
-    "rides on the first reply. Its own script for the same reason as the others: one hook, one envelope."
+    "There is no greeting hook. greet.sh opened every new chat with \"Hey Utsav, fresh chat \u2014 you're on",
+    "Gushwork design system v2.0.1\" (R48, 5 Oct 2026) and was removed on 7 Oct 2026 (R62): the plugin now",
+    "speaks only through check-update.sh, and only when a flagged release is ahead of this copy."
   ],
   "hooks": {
     "SessionStart": [
@@ -57,16 +54,6 @@
             "type": "command",
             "command": "\"${CLAUDE_PLUGIN_ROOT}\"/scripts/check-approvals.sh",
             "timeout": 10
-          }
-        ]
-      },
-      {
-        "matcher": "startup|clear",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/scripts/greet.sh",
-            "timeout": 5
           }
         ]
       },

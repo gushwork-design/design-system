@@ -356,7 +356,7 @@ print(json.dumps({"systemMessage": head + " " + tail, "hookSpecificOutput": {
         + "If the user asks whether they are current, they are not. "
         # The user may not see systemMessage in every client (the desktop app, a stripped terminal),
         # so Claude says it once as well, in the first reply, in one sentence.
-        + "In your first reply, right after the greeting line (or as your opener if there is none), "
+        + "Open your first reply with it, before anything else, "
           f"tell them in one or two warm sentences that they're on v{local} and v{remote} is out"
         + (f", and what v{nv} brings" if v.get("summary") else "")
         + ". Write it the way a colleague would — for example: \"You're on v1.58.0, and v1.61.0 "
