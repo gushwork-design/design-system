@@ -33,5 +33,5 @@ Colour, type, radius, shadow and spacing are `--gw-*` tokens (every token the pa
 240px rail, the 820px quick view and the 560px search column.
 
 ## Known gaps
-No Help control. The quick view's `close` event did not fire in the preview browser, so cleanup also runs from the close
+The quick view's `close` event did not fire in the preview browser, so cleanup also runs from the close
 button and from `cancel`; Escape was not exercised in a real browser.
