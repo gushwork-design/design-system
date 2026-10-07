@@ -735,6 +735,7 @@ main{padding-top:0}
 /* the picture frames get a hairline (the art is cream on a lighter ground, so the edge needs one) */
 .adlg .himg{border:1px solid var(--gw-color-neutral-100)}
 .sum .it .f,.sum .pkr .f,.sheet .pkr .f,.sheet .th{border:.5px solid var(--gw-color-neutral-100)}
+.add.live .i{font-size:14px}
 /* ---------- motion: small and quick ---------- */
 .card{transition:border-color .15s,box-shadow .2s,transform .2s cubic-bezier(.22,1,.36,1),opacity .45s ease}
 .card:hover{transform:translateY(-2px)}
@@ -909,7 +910,7 @@ function card(a){
   return `<article class="card ${a.luxury?'prem':''} ${on?'sel':''} ${S.reveal?'rv':''}" data-open="${a.id}" tabindex="0" role="button" aria-label="Open ${esc(a.name)}">
     <div class="top"><div class="tile">${thumb(a)}</div><div class="tx"><h3>${esc(a.name)}</h3>${a.luxury?`<span class="one price">${esc(perItem(a))}</span>`:`<span class="one">${esc(ONE[a.id]||'')}</span>`}</div></div>
     <p class="desc">${esc(CARD[a.id]||a.blurb)}</p>
-    <button class="add ${on?'live':''} ${on&&S.fresh===a.id?'pop':''}" data-add="${a.id}" aria-label="${on?'Remove':'Add'} ${esc(a.name)} ${on?'from':'to'} package" aria-pressed="${on}">${ic(on?'check':'plus','bold')}</button></article>`;
+    <button class="add ${on?'live':''} ${on&&S.fresh===a.id?'pop':''}" data-add="${a.id}" aria-label="${on?'Remove':'Add'} ${esc(a.name)} ${on?'from':'to'} package" aria-pressed="${on}">${on?ic('check-heavy','bold'):ic('plus','bold')}</button></article>`;
 }
 function renderResults(){
   $('#qclear').hidden = !S.q; $('#kbd').style.display = S.q?'none':'';
