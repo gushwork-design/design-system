@@ -1,0 +1,119 @@
+# Publish the site when main moves.
+#
+# WHY. The nightly routine opens rework PRs; until now someone still had to run
+# `bash scripts/publish-sheets.sh` by hand after merging them, so a merged rework
+# could sit unpublished for days. This runs the same script, from main, on every
+# merge — so what is on main is what is live, and nothing else is.
+#
+# WHAT IT RUNS, in order:
+#   1. bash scripts/release-log.sh     regenerate CHANGELOG.md + the changelog sheet
+#                                      from git history (publish-sheets.sh refuses to
+#                                      ship a stale one). release-log.sh is changelog.sh
+#                                      plus the sheet and the site stamp — the same
+#                                      derivation, so the three cannot disagree.
+#   2. bash scripts/publish-sheets.sh  every gate in that script, then deploy + alias.
+#
+# WHAT IT NEEDS, as repository secrets (Settings → Secrets and variables → Actions):
+#   VERCEL_TOKEN       a Vercel personal token with access to the gushwork-design team.
+#                      The CLI reads it from the environment; it is never on a command
+#                      line and never in a log.
+#   VERCEL_ORG_ID      team_… — the `orgId` in a linked checkout's .vercel/project.json
+#   VERCEL_PROJECT_ID  prj_…  — the `projectId` from the same file
+#                      Both are needed because .vercel/ is gitignored, so the runner has
+#                      no link file; the CLI reads these instead of prompting.
+#
+# WHAT IT DOES NOT DO. It never commits. Main needs a reviewed PR, so a regenerated
+# changelog that differs from the committed one is reported in the job summary, not
+# pushed. Fix that by running `bash scripts/release-log.sh` locally and opening a PR.
+#
+# THE ONE THING TO KNOW BEFORE TRUSTING IT. publish-sheets.sh ships the working tree.
+# Locally that tree may hold files main does not (uncommitted staging pages, the
+# gitignored ai-crm-flow.mp4). A publish from here ships ONLY what is on main, and
+# Vercel replaces the deployment wholesale — so anything live that is not committed
+# disappears on the first run. Commit it first.
+name: Publish site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# One publish at a time, in order. A second merge waits for the first to finish rather
+# than racing it to `vercel alias set`; cancelling would leave an unaliased deploy.
+concurrency:
+  group: publish-site
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: Regenerate the changelog and publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - name: Check the secrets exist
+        run: |
+          missing=0
+          for v in VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID; do
+            if [ -z "${!v:-}" ]; then
+              echo "::error::$v is not set — add it under Settings → Secrets and variables → Actions"
+              missing=1
+            fi
+          done
+          [ "$missing" = 0 ]
+
+      - uses: actions/checkout@v4
+        with:
+          # The changelog is DERIVED from git history: a release is a commit that moved
+          # plugin.json's version field. A shallow clone would see no releases at all.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install the Vercel CLI
+        # Pinned to the major that reads VERCEL_TOKEN from the environment. The publish
+        # script only needs `vercel`; nothing in the repo has a package.json to install.
+        run: npm install -g vercel@50
+
+      - name: Regenerate the changelog from git history
+        run: bash scripts/release-log.sh
+
+      - name: Report if the committed changelog was stale
+        # Not a failure — the deploy below ships the regenerated copy either way. It is a
+        # note that main is behind its own generator, so someone opens the PR that fixes it.
+        run: |
+          if ! git diff --quiet -- CHANGELOG.md preview/changelog-sheet.html; then
+            {
+              echo "### Committed changelog was out of date"
+              echo
+              echo "The deploy shipped the regenerated copy. To bring main in line, run"
+              echo '`bash scripts/release-log.sh` locally and open a PR with the result.'
+              echo
+              echo '```diff'
+              git diff --stat -- CHANGELOG.md preview/changelog-sheet.html
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "::warning::CHANGELOG.md / changelog-sheet.html on main are stale; see the job summary"
+          fi
+
+      - name: Publish to production
+        run: bash scripts/publish-sheets.sh
+
+      - name: Record what went live
+        if: success()
+        run: |
+          {
+            echo "### Published"
+            echo
+            echo "- commit: \`${GITHUB_SHA::7}\` — $(git log -1 --format=%s)"
+            echo "- site: https://gushwork-design.vercel.app"
+            echo "- version: $(python3 -c 'import json;print(json.load(open(".claude-plugin/plugin.json"))["version"])')"
+          } >> "$GITHUB_STEP_SUMMARY"

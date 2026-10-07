@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Gushwork For You — one-pager</title>
+<meta name="author" content="Gushwork">
+<meta name="subject" content="A one-page company overview: why customers trust Gushwork, what it believes, the numbers">
+<!-- gushwork-build:{"pluginVersion":"1.57.0","surface":"lead-magnet","createdBy":"utsav.singh@gushwork.ai","createdAt":"2026-10-01","registry":"https://gushwork-design.vercel.app/exports/lead-magnet/component-registry.json","changelog":"https://gushwork-design.vercel.app/preview/changelog-sheet.html","components":["document"]} -->
+<link rel="stylesheet" href="../../foundation/tokens.css">
+<style>
+/* ─────────────────────────────────────────────────────────────────────────
+   Gushwork · one-pager template  —  640 x 1036 px, one page
+   Source: Figma GW-Document, node 319:337 (gushwork-one-pager).
+   Frame size is the Figma size on purpose (screen-first, not a print size).
+   Colour, radius, shadow come from foundation/tokens.css. Type sizes are
+   explicit px, matched to the frame: 8/10/12/14/18/22/32.
+   ───────────────────────────────────────────────────────────────────────── */
+@font-face{font-family:"Vert Grotesk Display";src:url("../../fonts/Vert_Grotesk_Display_VF.ttf")format("truetype-variations");font-weight:100 900;font-style:normal;font-display:block}
+@font-face{font-family:"Inter";src:url("../../fonts/Inter-VariableFont_opsz_wght.ttf")format("truetype-variations");font-weight:100 900;font-style:normal;font-display:block}
+
+@page{size:640px 1036px;margin:0}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{font-family:var(--gw-font-body);background:var(--gw-color-neutral-100);-webkit-font-smoothing:antialiased;text-rendering:geometricPrecision}
+
+.sheet{
+  width:640px;height:1036px;padding:12px;overflow:hidden;
+  display:flex;flex-direction:column;gap:4px;
+  background:var(--gw-color-neutral-100);
+}
+.bar{display:flex;align-items:center;padding:12px 24px;flex:none}
+.bar--top{justify-content:space-between}
+.bar--foot{gap:6px}
+.bar-logo{display:block;width:95px;height:18px;background:var(--gw-color-neutral-500); /* the logo file as a mask, so it takes the grey; 421:80 is its own aspect */
+  -webkit-mask:url("../../assets/logo/gushwork-logo-dark.svg") left center/contain no-repeat;
+          mask:url("../../assets/logo/gushwork-logo-dark.svg") left center/contain no-repeat}
+.bar-tab,.bar-line{font:500 10px/1 var(--gw-font-body);color:var(--gw-color-neutral-500);white-space:nowrap}
+.bar-mark{width:12px;height:12px;background:var(--gw-color-neutral-500);
+  -webkit-mask:url("../../assets/logo/gushwork-symbol-original.svg") center/contain no-repeat;
+          mask:url("../../assets/logo/gushwork-symbol-original.svg") center/contain no-repeat}
+
+/* the white card */
+.card-page{
+  position:relative;flex:none;overflow:hidden;
+  display:flex;flex-direction:column;gap:40px;
+  padding:24px 24px 40px;
+  background:#fff;border:2px solid var(--gw-color-neutral-100);border-radius:16px;
+  box-shadow:var(--gw-shadow-s3);
+}
+.grid-bg{position:absolute;right:-3px;top:-261px;width:773px;height:537px;pointer-events:none}
+.card-page > *:not(.grid-bg){position:relative}
+
+/* hero */
+.hero{width:460px;display:flex;flex-direction:column;gap:16px}
+.h1{font:700 32px/1.2 var(--gw-font-display);color:var(--gw-color-black);display:flex;flex-direction:column;gap:2px}
+.h1 .l1{display:flex;gap:12px;white-space:nowrap}
+.gword{display:flex;align-items:flex-start}
+.gword svg{display:block;flex:none}
+.lede{font:500 12px/1.6 var(--gw-font-body);color:var(--gw-color-neutral-600)}
+
+.stack-20{display:flex;flex-direction:column;gap:20px}
+.sec{display:flex;flex-direction:column;gap:12px}
+.h2{font:700 18px/1.2 var(--gw-font-display);color:var(--gw-color-black)}
+.h3{font:600 14px/20px var(--gw-font-display);letter-spacing:-.028px;color:var(--gw-color-black)}
+
+/* cards + chips */
+.row{display:flex;gap:8px;align-items:stretch}
+.stat-row{align-items:flex-start}
+.fcard{
+  flex:1 0 0;min-width:0;display:flex;flex-direction:column;gap:8px;padding:12px;
+  background:#fff;border:1px solid #e1e3e8;border-radius:12px;box-shadow:var(--gw-shadow-s2);
+}
+.fcard--stat{gap:12px}
+.chip{display:flex;align-items:center;gap:3px;height:16px;
+  font:600 8px/8px var(--gw-font-body);letter-spacing:-.036px;text-transform:uppercase;color:var(--gw-color-neutral-600);white-space:nowrap}
+.chip img{width:10px;height:10px;display:block}
+.chip--blue{color:var(--gw-color-primary-500)}
+.t{display:flex;flex-direction:column;gap:4px}
+.t b{font:600 12px/1.6 var(--gw-font-body);color:var(--gw-color-black)}
+.t p{font:500 10px/15px var(--gw-font-body);color:var(--gw-color-neutral-600)}
+
+/* backers strip */
+.strip{display:flex;align-items:center;gap:32px;padding:12px;
+  background:var(--gw-color-neutral-25);border:1px solid var(--gw-color-neutral-50);border-radius:8px;box-shadow:var(--gw-shadow-s2)}
+.strip .chip{color:var(--gw-color-neutral-600)}
+.logos{display:flex;align-items:center;gap:32px;margin:0 auto}
+.logos img{display:block}
+
+/* belief tiles */
+.tiles{display:flex;gap:6px;align-items:stretch}
+.tile{flex:1 0 0;min-width:0;display:flex;flex-direction:column;gap:6px;padding:12px;
+  background:var(--gw-color-neutral-25);border:1px solid var(--gw-color-neutral-50);border-radius:6px}
+.tile-ic{align-self:flex-start;display:flex;padding:4px;background:var(--gw-color-black);border-radius:4px}
+.tile-ic img{width:12px;height:12px;display:block}
+.tile b{font:600 10px/15px var(--gw-font-body);color:var(--gw-color-black)}
+.tile p{font:500 10px/15px var(--gw-font-body);color:var(--gw-color-neutral-600)}
+
+/* numbers */
+.num{font:600 22px/1.4 var(--gw-font-display);color:var(--gw-color-primary-500)}
+.cap{font:500 10px/15px var(--gw-font-body);color:var(--gw-color-neutral-900)}
+
+/* industry pills */
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{display:flex;align-items:center;gap:4px;padding:8px;
+  background:var(--gw-color-neutral-25);border:1px solid var(--gw-color-neutral-50);border-radius:8px;
+  font:500 10px/1 var(--gw-font-body);color:var(--gw-color-neutral-900);white-space:nowrap}
+.pill img{width:10px;height:10px;display:block}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="bar bar--top">
+    <span class="bar-logo" role="img" aria-label="Gushwork"></span>
+    <span class="bar-tab">Gushwork For You</span>
+  </div>
+
+  <div class="card-page">
+    <img class="grid-bg" src="assets/grid.png" alt="">
+
+    <div class="hero">
+      <h1 class="h1">
+        <span class="l1"><span>A growth</span><span class="gword"><svg width="239" height="38" viewBox="0 0 239 38" role="img" aria-label="business partner"><defs><linearGradient id="gw-grad" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="190" y2="60"><stop offset="0.114" stop-color="#0070ff"/><stop offset="1.399" stop-color="#94c3ff"/></linearGradient></defs><text x="0" y="29" font-family="Vert Grotesk Display" font-weight="700" font-size="32" fill="url(#gw-grad)">business partner</text></svg>,</span></span>
+        <span>not just another vendor.</span>
+      </h1>
+      <p class="lede">Gushwork runs your AI-driven marketing and revenue stack as one accountable system, so you get outcomes without stitching together five vendors.</p>
+    </div>
+
+    <div class="stack-20">
+      <div class="sec">
+        <h2 class="h2">Why customers trust us</h2>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="row">
+            <div class="fcard">
+              <div class="chip chip--blue"><img src="assets/sparkle.svg" alt="">Since 2023</div>
+              <div class="t"><b>Built for the AI era</b><p>Founded in the months right after ChatGPT changed how buyers search. Gushwork was built AI-native from day one, not retrofitted onto a legacy agency.</p></div>
+            </div>
+            <div class="fcard">
+              <div class="chip chip--blue"><img src="assets/map-pin.svg" alt="">U.S.-incorporated</div>
+              <div class="t"><b>Regents Inc.</b><p>Registered in Lewes, Delaware, United States, with a growing customer base spanning industrial, B2B services, and software companies.</p></div>
+            </div>
+          </div>
+          <div class="strip">
+            <span class="chip">Backed by top investors</span>
+            <div class="logos">
+              <img src="assets/susquehanna.svg" alt="Susquehanna" style="height:9.33px">
+              <img src="assets/lightspeed.svg" alt="Lightspeed" style="height:14px;opacity:.9">
+              <img src="assets/b-capital.png" alt="B Capital" style="height:10.5px;opacity:.5">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <h3 class="h3">What we believe...</h3>
+        <div class="tiles">
+          <div class="tile"><span class="tile-ic"><img src="assets/seal-check.svg" alt=""></span><b>No bad customers,<br>only bad products.</b><p>If the results aren't there, that's ours to fix in the product, not yours to work around.</p></div>
+          <div class="tile"><span class="tile-ic"><img src="assets/heart.svg" alt=""></span><b>Customers over everything.</b><p>Every roadmap call and trade-off gets settled the same way, whatever moves your numbers wins.</p></div>
+          <div class="tile"><span class="tile-ic"><img src="assets/trend-up-white.svg" alt=""></span><b>We keep getting better.</b><p>What we learn on one account rolls into all of them, so the system you run keeps compounding.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stack-20">
+      <div class="sec">
+        <h2 class="h2">Gushwork by the numbers</h2>
+        <div class="row stat-row">
+          <div class="fcard fcard--stat"><div class="chip"><img src="assets/buildings.svg" alt="">Customers</div><div class="t"><div class="num">1000+</div><div class="cap">Businesses running<br>on Gushwork</div></div></div>
+          <div class="fcard fcard--stat"><div class="chip"><img src="assets/currency-dollar.svg" alt="">Revenue influenced</div><div class="t"><div class="num">$10M+</div><div class="cap">Customer revenue<br>influenced globally</div></div></div>
+          <div class="fcard fcard--stat"><div class="chip"><img src="assets/trend-up.svg" alt="">Monthly leads</div><div class="t"><div class="num">8,000+</div><div class="cap">Qualified leads<br>generated every month</div></div></div>
+        </div>
+      </div>
+      <div class="sec">
+        <h3 class="h3">Where our customers come from...</h3>
+        <div class="pills">
+          <span class="pill"><img src="assets/factory.svg" alt="">Industrial &amp; equipment manufacturing</span>
+          <span class="pill"><img src="assets/git-fork.svg" alt="">Contract manufacturing &amp; distribution</span>
+          <span class="pill"><img src="assets/cards.svg" alt="">Waterproofing &amp; environmental services</span>
+          <span class="pill"><img src="assets/desktop.svg" alt="">B2B software</span>
+          <span class="pill"><img src="assets/warehouse.svg" alt="">Field &amp; home services</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bar bar--foot">
+    <span class="bar-mark"></span>
+    <span class="bar-line">Regents Inc. · 16192 Coastal Hwy, Lewes, DE 19958, United States</span>
+  </div>
+
+</div>
+</body>
+</html>

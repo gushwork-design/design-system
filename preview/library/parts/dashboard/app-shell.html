@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>app-shell — Gushwork</title>
+<meta name="description" content="Dashboard · shell.md">
+<meta name="robots" content="noindex">
+<script>try{var c=localStorage.getItem('gw-theme-choice'),t=c==='dark'||c==='light'?c:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20x%3D%221%22%20y%3D%221%22%20width%3D%2278%22%20height%3D%2278%22%20rx%3D%2219%22%20fill%3D%22%230070ff%22%20stroke%3D%22%230061e0%22%20stroke-width%3D%222%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="../../../foundation/tokens.css">
+<link rel="stylesheet" href="../../../shell.css">
+<style>
+.cl{--cl-gap:var(--gw-space-40)}
+.cl h2{font:var(--gw-text-h5);color:var(--s-heading);margin:0}
+.cl h3{font:var(--gw-text-h7);color:var(--s-heading);margin:0}
+.cl h4{font:var(--gw-text-body-16-sem);color:var(--s-heading);margin:0}
+.cl p{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+      color:var(--s-body);margin:0;max-width:78ch}
+.cl code,.cl .mono{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px}
+
+/* --- page head ------------------------------------------------------------ */
+.cl-head{display:flex;flex-direction:column;gap:var(--gw-space-16)}
+.cl-head h1{font:var(--gw-text-h4);color:var(--s-heading);margin:0}
+.cl-lede{font:var(--gw-text-body-18-reg);letter-spacing:var(--gw-text-body-18-reg-tracking);
+         color:var(--s-body);margin:0;max-width:72ch}
+
+/* --- the tally ------------------------------------------------------------ */
+.cl-tally{display:flex;flex-wrap:wrap;gap:var(--gw-space-12)}
+.cl-stat{flex:1 1 150px;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-16) var(--gw-space-20);
+         display:flex;flex-direction:column;gap:var(--gw-space-4)}
+.cl-stat b{font:var(--gw-text-h6);color:var(--s-heading);font-feature-settings:"tnum" 1}
+.cl-stat span{font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-400);
+              text-transform:uppercase;letter-spacing:.06em}
+
+/* --- review queue --------------------------------------------------------- */
+.cl-queue{background:var(--s-card-bg);border:1px solid var(--gw-color-yellow-300);
+          border-left:3px solid var(--gw-color-yellow-400);border-radius:var(--gw-radius-12);
+          padding:var(--gw-space-20) var(--gw-space-24);display:flex;flex-direction:column;
+          gap:var(--gw-space-12)}
+.cl-queue h2{font:var(--gw-text-h7)}
+.cl-queue ul{margin:0;padding-left:var(--gw-space-20);display:flex;flex-direction:column;
+             gap:var(--gw-space-4)}
+.cl-queue li{font:var(--gw-text-body-14-reg);color:var(--s-body)}
+.cl-queue a{color:var(--gw-color-primary-600);text-decoration:none}
+.cl-queue a:hover{text-decoration:underline}
+.cl-pass{background:var(--s-card-bg);border:1px solid var(--gw-color-green-300);
+         border-left:3px solid var(--gw-color-green-400)}
+
+/* --- controls ------------------------------------------------------------- */
+.cl-bar{position:sticky;top:0;z-index:5;background:var(--s-page-bg);
+        padding:var(--gw-space-12) 0;display:flex;flex-wrap:wrap;gap:var(--gw-space-8);
+        align-items:center;border-bottom:1px solid var(--s-chrome-border)}
+.cl-find{flex:1 1 220px;min-width:180px;background:var(--s-field-bg);
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         padding:var(--gw-space-8) var(--gw-space-12);font:var(--gw-text-body-14-reg);
+         color:var(--s-heading)}
+.cl-find::placeholder{color:var(--s-placeholder)}
+.cl-find:focus{outline:none;border-color:var(--gw-color-neutral-400)}
+.cl-filter{display:flex;gap:var(--gw-space-4);flex-wrap:wrap}
+.cl-f{font:var(--gw-text-body-12-med);color:var(--s-body);background:transparent;
+      border:1px solid var(--s-field-border);border-radius:var(--gw-radius-full);
+      padding:6px var(--gw-space-12);cursor:pointer}
+.cl-f:hover{border-color:var(--gw-color-primary-500)}
+.cl-f[aria-pressed="true"]{background:var(--gw-color-black);color:var(--gw-color-white);
+                           border-color:var(--gw-color-black)}
+.cl-f:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.cl-count{font:var(--gw-text-body-12-reg);color:var(--gw-color-neutral-400);margin-left:auto}
+
+/* --- sections ------------------------------------------------------------- */
+.cl-sec{display:flex;flex-direction:column;gap:var(--gw-space-20);
+        scroll-margin-top:var(--gw-space-80)}
+.cl-sec[hidden]{display:none}
+.cl-sechead{display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--gw-space-12)}
+.cl-note{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+         color:var(--s-body);background:var(--gw-color-neutral-25);
+         border:1px solid var(--s-card-border);border-left:3px solid var(--gw-color-neutral-300);
+         border-radius:var(--gw-radius-8);padding:var(--gw-space-12) var(--gw-space-16);
+         white-space:pre-wrap;max-width:88ch}
+:root[data-theme="dark"] .cl-note{background:var(--gw-color-neutral-900)}
+.cl-sub{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.cl-sub[hidden]{display:none}
+
+/* --- chips ---------------------------------------------------------------- */
+.cl-chip{display:inline-flex;align-items:center;gap:6px;font:var(--gw-text-body-12-med);
+         border-radius:var(--gw-radius-full);padding:3px var(--gw-space-8);white-space:nowrap}
+.cl-chip--measured{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.cl-chip--transcribed{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.cl-chip--ruled{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+.cl-chip--passed{background:var(--gw-color-green-500);color:var(--gw-color-white)}
+.cl-chip--pending{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+.cl-chip--rejected{background:var(--gw-color-red-500);color:var(--gw-color-white)}
+.cl-chip--gap{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+:root[data-theme="dark"] .cl-chip--measured{background:var(--gw-color-green-900);
+                                            color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .cl-chip--transcribed{background:var(--gw-color-yellow-900);
+                                               color:var(--gw-color-yellow-100)}
+:root[data-theme="dark"] .cl-chip--ruled{background:var(--gw-color-primary-900);
+                                         color:var(--gw-color-primary-200)}
+:root[data-theme="dark"] .cl-chip--pending{background:var(--gw-color-neutral-800);
+                                           color:var(--gw-color-neutral-300)}
+:root[data-theme="dark"] .cl-chip--gap{background:var(--gw-color-red-900);
+                                       color:var(--gw-color-red-200)}
+
+/* --- colour --------------------------------------------------------------- */
+.cl-ramp{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));
+         gap:var(--gw-space-8)}
+.cl-sw{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+       border-radius:var(--gw-radius-10);overflow:hidden;display:flex;flex-direction:column}
+.cl-sw[hidden]{display:none}
+.cl-sw__chip{height:64px;border-bottom:1px solid var(--s-card-border);
+             background-image:linear-gradient(45deg,var(--gw-color-neutral-100) 25%,transparent 25%),
+                              linear-gradient(-45deg,var(--gw-color-neutral-100) 25%,transparent 25%),
+                              linear-gradient(45deg,transparent 75%,var(--gw-color-neutral-100) 75%),
+                              linear-gradient(-45deg,transparent 75%,var(--gw-color-neutral-100) 75%);
+             background-size:12px 12px;
+             background-position:0 0,0 6px,6px -6px,-6px 0}
+.cl-sw__fill{width:100%;height:100%}
+.cl-sw__body{padding:var(--gw-space-8) var(--gw-space-12);display:flex;
+             flex-direction:column;gap:3px}
+.cl-sw__name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;
+             color:var(--s-heading);word-break:break-all;line-height:1.35}
+.cl-sw__hex{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;
+            color:var(--gw-color-neutral-400);text-transform:uppercase}
+.cl-sw__ac{display:flex;gap:4px;margin-top:2px}
+.cl-ac{font-size:9.5px;font-weight:600;letter-spacing:.04em;border-radius:var(--gw-radius-4);
+       padding:1px 4px;line-height:1.5}
+.cl-ac--ok{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.cl-ac--no{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+:root[data-theme="dark"] .cl-ac--ok{background:var(--gw-color-green-900);color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .cl-ac--no{background:var(--gw-color-red-900);color:var(--gw-color-red-200)}
+
+/* --- type ----------------------------------------------------------------- */
+.cl-types{display:flex;flex-direction:column;gap:2px}
+.cl-t{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:var(--gw-space-20);
+      align-items:start;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+      border-radius:var(--gw-radius-10);padding:var(--gw-space-16) var(--gw-space-20)}
+.cl-t[hidden]{display:none}
+.cl-t__spec{color:var(--s-heading);min-width:0;overflow-wrap:anywhere}
+.cl-t__meta{display:flex;flex-direction:column;gap:2px;text-align:right}
+.cl-t__name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+            color:var(--gw-color-primary-600)}
+.cl-t__val{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10.5px;
+           color:var(--gw-color-neutral-400);line-height:1.5}
+@media (max-width:860px){.cl-t{grid-template-columns:1fr}.cl-t__meta{text-align:left}}
+
+/* --- faces ---------------------------------------------------------------- */
+.cl-faces{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+          gap:var(--gw-space-16)}
+.cl-face{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-24);
+         display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.cl-face__aa{font-size:52px;line-height:1.05;color:var(--s-heading)}
+.cl-face__wt{display:flex;flex-direction:column;gap:2px}
+.cl-face__wt span{color:var(--s-heading);font-size:19px;line-height:1.45}
+
+/* --- space / radius / shadow ---------------------------------------------- */
+.cl-rows{display:flex;flex-direction:column;gap:6px}
+.cl-row{display:grid;grid-template-columns:132px minmax(0,1fr) 60px;gap:var(--gw-space-16);
+        align-items:center;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-radius:var(--gw-radius-8);padding:var(--gw-space-8) var(--gw-space-16)}
+.cl-row[hidden]{display:none}
+.cl-row__n{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+           color:var(--gw-color-primary-600);word-break:break-all}
+.cl-row__v{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+           color:var(--gw-color-neutral-400);text-align:right}
+.cl-bararea{min-height:18px;display:flex;align-items:center}
+.cl-barfill{height:16px;background:var(--gw-color-primary-500);border-radius:var(--gw-radius-2);
+            max-width:100%}
+.cl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));
+         gap:var(--gw-space-12)}
+.cl-tile{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-10);padding:var(--gw-space-16);display:flex;
+         flex-direction:column;align-items:center;gap:var(--gw-space-8)}
+.cl-tile[hidden]{display:none}
+.cl-tile__demo{width:72px;height:72px;background:var(--gw-color-primary-100);
+               border:1.5px solid var(--gw-color-primary-500)}
+.cl-tile__sh{width:100%;height:64px;background:var(--gw-color-white);
+             border-radius:var(--gw-radius-8)}
+:root[data-theme="dark"] .cl-tile__sh{background:var(--gw-color-neutral-800)}
+/* The alpha checker is drawn in neutral-100, which is near-white and shouts on a
+   black ground. Same job, quieter, in dark. */
+:root[data-theme="dark"] .cl-sw__chip{
+  background-image:linear-gradient(45deg,var(--gw-color-neutral-800) 25%,transparent 25%),
+                   linear-gradient(-45deg,var(--gw-color-neutral-800) 25%,transparent 25%),
+                   linear-gradient(45deg,transparent 75%,var(--gw-color-neutral-800) 75%),
+                   linear-gradient(-45deg,transparent 75%,var(--gw-color-neutral-800) 75%)}
+
+/* --- tables --------------------------------------------------------------- */
+.cl-tbl{width:100%;border-collapse:collapse;background:var(--s-card-bg);
+        border:1px solid var(--s-card-border);border-radius:var(--gw-radius-10);
+        overflow:hidden;font:var(--gw-text-body-14-reg)}
+.cl-tblwrap{overflow-x:auto}
+.cl-tbl th{text-align:left;font:var(--gw-text-body-12-med);text-transform:uppercase;
+           letter-spacing:.06em;color:var(--gw-color-neutral-400);
+           padding:var(--gw-space-8) var(--gw-space-16);
+           border-bottom:1px solid var(--s-card-border);white-space:nowrap}
+.cl-tbl td{padding:var(--gw-space-8) var(--gw-space-16);color:var(--s-body);
+           border-bottom:1px solid var(--s-card-border);vertical-align:top}
+.cl-tbl tr:last-child td{border-bottom:none}
+.cl-tbl tr[hidden]{display:none}
+.cl-tbl .mono{color:var(--gw-color-primary-600)}
+.cl-tbl .num{font-feature-settings:"tnum" 1;white-space:nowrap}
+
+/* --- gaps ----------------------------------------------------------------- */
+.cl-gaps{display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.cl-gap{display:grid;grid-template-columns:28px minmax(0,1fr);gap:var(--gw-space-12);
+        background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-left:3px solid var(--gw-color-red-400);border-radius:var(--gw-radius-8);
+        padding:var(--gw-space-12) var(--gw-space-16)}
+.cl-gap__n{font:var(--gw-text-body-14-sem);color:var(--gw-color-red-500);
+           font-feature-settings:"tnum" 1}
+.cl-gap__t{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+           color:var(--s-body);white-space:pre-wrap;margin:0}
+
+/* --- use-case cards ------------------------------------------------------- */
+.cl-cases{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+          gap:var(--gw-space-12)}
+.cl-case{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-20);
+         display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.cl-case__n{display:flex;align-items:baseline;justify-content:space-between;gap:var(--gw-space-8)}
+.cl-case__list{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:4px}
+.cl-case__list li{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10.5px;
+                  color:var(--gw-color-neutral-600);background:var(--gw-color-neutral-25);
+                  border:1px solid var(--s-card-border);border-radius:var(--gw-radius-4);
+                  padding:1px 5px}
+:root[data-theme="dark"] .cl-case__list li{background:var(--gw-color-neutral-900)}
+
+/* --- misc ----------------------------------------------------------------- */
+.cl-src{display:flex;flex-wrap:wrap;gap:var(--gw-space-8)}
+.cl-src code{background:var(--s-code-bg);border:1px solid var(--s-code-border);
+             color:var(--s-code-fg);border-radius:var(--gw-radius-4);padding:2px 7px}
+.cl-empty{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-400);
+          border:1px dashed var(--s-field-border);border-radius:var(--gw-radius-10);
+          padding:var(--gw-space-24);text-align:center}
+.cl-jump{display:flex;flex-wrap:wrap;gap:6px}
+.cl-jump a{font:var(--gw-text-body-12-med);color:var(--s-body);text-decoration:none;
+           border:1px solid var(--s-field-border);border-radius:var(--gw-radius-full);
+           padding:5px var(--gw-space-12)}
+.cl-jump a:hover{border-color:var(--gw-color-primary-500);color:var(--gw-color-primary-600)}
+@media print{.cl-bar,.cl-jump{display:none}}
+
+*{box-sizing:border-box}
+/* Body/body-16-reg, the site-wide page default ruled 29 Sep 2026 (796:12917).
+   This sheet named the family but no size, so it fell to the browser's 16px at
+   `normal` leading — the right size by accident, the wrong line-height. */
+body{margin:0;background:var(--s-page-bg);
+     font:var(--gw-text-body-16-reg);
+     letter-spacing:var(--gw-text-body-16-reg-tracking);
+     color:var(--s-body);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
+
+/* ---- topbar ------------------------------------------------------------- */
+.lb-top{position:sticky;top:0;z-index:20;height:60px;display:flex;align-items:center;
+        gap:var(--gw-space-16);padding:0 var(--gw-space-24);
+        background:var(--s-chrome-bg);border-bottom:1px solid var(--s-chrome-border)}
+.lb-brand{display:flex;align-items:center;gap:var(--gw-space-12);text-decoration:none;
+          flex:none}
+.lb-brand__chip{width:32px;height:32px;border-radius:var(--gw-radius-8);
+                background:var(--gw-color-primary-500);color:var(--gw-color-white);
+                box-shadow:inset 0 0 0 1px var(--gw-color-primary-600);
+                display:grid;place-items:center;flex:none}
+.lb-brand__chip svg{width:16px;height:16px;display:block}
+.lb-brand__n{font:var(--gw-text-h7);color:var(--s-heading)}
+.lb-crumb{font:var(--gw-text-body-14-reg);color:var(--s-group-label);
+          white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-crumb a{color:var(--gw-color-primary-600);text-decoration:none}
+.lb-top__r{display:flex;align-items:center;gap:var(--gw-space-12);margin-left:auto}
+.lb-find{width:300px;height:36px;background:var(--s-field-bg);
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         padding:0 var(--gw-space-12);font:var(--gw-text-body-14-reg);color:var(--s-heading)}
+.lb-find::placeholder{color:var(--s-placeholder)}
+.lb-find:focus{outline:none;border-color:var(--gw-color-neutral-400)}
+.lb-tbtn{width:36px;height:36px;display:grid;place-items:center;background:transparent;
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         color:var(--s-body);cursor:pointer;flex:none}
+.lb-tbtn svg{width:18px;height:18px;display:block}
+.lb-tbtn:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+@media (max-width:820px){.lb-find{display:none}}
+
+/* ---- three columns ------------------------------------------------------- */
+.lb-3{display:grid;grid-template-columns:240px minmax(0,1fr) 212px;align-items:start;
+      max-width:1600px;margin:0 auto}
+.lb-rail{position:sticky;top:60px;max-height:calc(100vh - 60px);overflow-y:auto;
+         border-right:1px solid var(--s-chrome-border);padding:var(--gw-space-24) 0}
+.lb-rail__t{font:var(--gw-text-body-12-med);text-transform:uppercase;letter-spacing:.06em;
+            color:var(--s-group-label);padding:0 var(--gw-space-20) var(--gw-space-8)}
+.lb-rail a{display:flex;justify-content:space-between;gap:var(--gw-space-8);
+           font:var(--gw-text-body-14-reg);color:var(--s-body);text-decoration:none;
+           padding:6px var(--gw-space-20)}
+.lb-rail a:hover{background:var(--s-nav-hover);color:var(--s-heading)}
+.lb-rail a.on{background:var(--s-nav-sel);color:var(--s-heading);
+              font:var(--gw-text-body-14-sem)}
+.lb-rail a span{color:var(--gw-color-neutral-400);font:var(--gw-text-body-12-reg);flex:none}
+.lb-rail a.on span{color:var(--s-heading)}
+.lb-rail__sep{margin:var(--gw-space-12) var(--gw-space-20) var(--gw-space-8);
+              border-top:1px solid var(--s-chrome-border)}
+
+.lb-mid{grid-column:2;padding:var(--gw-space-32) var(--gw-space-40) var(--gw-space-80);
+        min-width:0;display:flex;flex-direction:column;gap:var(--gw-space-24)}
+.lb-toc{grid-column:3;position:sticky;top:60px;max-height:calc(100vh - 60px);overflow-y:auto;
+        padding:var(--gw-space-32) var(--gw-space-20);display:flex;flex-direction:column;
+        gap:5px}
+.lb-toc b{font:var(--gw-text-body-12-med);text-transform:uppercase;letter-spacing:.06em;
+          color:var(--gw-color-neutral-400);margin-bottom:3px}
+.lb-toc a{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-600);
+          text-decoration:none;line-height:1.35}
+.lb-toc a:hover{color:var(--gw-color-primary-600)}
+.lb-toc a.l3{padding-left:var(--gw-space-12)}
+@media (max-width:1180px){.lb-3{grid-template-columns:220px minmax(0,1fr)}
+                          .lb-toc{display:none}}
+@media (max-width:820px){.lb-3{grid-template-columns:minmax(0,1fr)}
+                         /* `.lb-mid{grid-column:2}` above made the grid two columns even here, so the rail
+                            was squeezed to 0 wide and there was no way to move between sections. Both
+                            go back to column 1, and the rail becomes one scrolling row of chips instead
+                            of a 400px list in front of the content. */
+                         .lb-mid,.lb-rail{grid-column:1}
+                         .lb-rail{position:static;max-height:none;border-right:0;
+                                  border-bottom:1px solid var(--s-chrome-border);
+                                  display:flex;flex-direction:row;align-items:center;gap:var(--gw-space-8);
+                                  overflow-x:auto;padding:var(--gw-space-12) var(--gw-space-20);
+                                  scrollbar-width:none}
+                         .lb-rail::-webkit-scrollbar{display:none}
+                         .lb-rail__t,.lb-rail__sep{display:none}
+                         .lb-rail a{flex:none;white-space:nowrap;gap:var(--gw-space-4);
+                                    padding:6px var(--gw-space-12);border-radius:var(--gw-radius-full);
+                                    border:1px solid var(--s-chrome-border)}
+                         .lb-mid{padding:var(--gw-space-24) var(--gw-space-20)}}
+@media (max-width:640px){.lb-crumb{display:none}}
+
+/* ---- page head ----------------------------------------------------------- */
+.lb-h{display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.lb-h h1{font:var(--gw-text-h4);margin:0}
+.lb-h .lede{font:var(--gw-text-body-16-reg);color:var(--s-body);margin:0;max-width:74ch}
+.lb-row{display:flex;flex-wrap:wrap;gap:var(--gw-space-8);align-items:center}
+.lb-rowfind{width:100%;max-width:360px;height:36px;padding:0 12px;margin:0 0 20px;border:0;border-radius:12px;background:var(--s-field-bg);
+  box-shadow:inset 0 0 0 1px var(--s-field-border);color:var(--s-heading);font:var(--gw-text-body-14-reg)}
+.lb-rowfind::placeholder{color:var(--s-placeholder)}
+.cat-name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px;color:var(--s-heading);font-weight:600}
+a.cat-name{color:var(--gw-color-primary-600);text-decoration:none}
+:root[data-theme="dark"] a.cat-name{color:var(--gw-color-primary-400)}
+.cat-note{display:block;margin-top:2px;font:var(--gw-text-body-12-reg);color:var(--s-body)}
+@media (max-width:760px){.lb-mid td a,.lb-mid th a{display:inline-flex;align-items:center;min-height:24px}}
+.cat-link{font:var(--gw-text-body-14-med);color:var(--gw-color-primary-600);text-decoration:none}
+:root[data-theme="dark"] .cat-link{color:var(--gw-color-primary-400)}
+.cat-link:hover{text-decoration:underline}
+.sec>.lb-meta{margin:4px 0 14px}
+.cat-dim{color:var(--s-body)}
+.chip--annotated{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+:root[data-theme="dark"] .chip--annotated{background:var(--gw-color-neutral-800);color:var(--gw-color-neutral-300)}
+.lb-meta{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+         color:var(--gw-color-neutral-400)}
+
+.chip{display:inline-flex;align-items:center;gap:5px;font:var(--gw-text-body-12-med);
+      border-radius:var(--gw-radius-full);padding:3px var(--gw-space-8);white-space:nowrap}
+.chip--measured{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.chip--transcribed{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.chip--ruled,.chip--extracted{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+.chip--structure{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.chip--built-here{background:var(--gw-color-orange-50);color:var(--gw-color-orange-700)}
+.chip--passed{background:var(--gw-color-green-500);color:var(--gw-color-white)}
+.chip--pending{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+.chip--rejected{background:var(--gw-color-red-500);color:var(--gw-color-white)}
+.chip--gap{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+.chip--web{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+:root[data-theme="dark"] .chip--measured{background:var(--gw-color-green-900);color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .chip--transcribed,
+:root[data-theme="dark"] .chip--structure{background:var(--gw-color-yellow-900);color:var(--gw-color-yellow-100)}
+:root[data-theme="dark"] .chip--ruled,
+:root[data-theme="dark"] .chip--extracted,
+:root[data-theme="dark"] .chip--web{background:var(--gw-color-primary-900);color:var(--gw-color-primary-200)}
+:root[data-theme="dark"] .chip--pending{background:var(--gw-color-neutral-800);color:var(--gw-color-neutral-300)}
+:root[data-theme="dark"] .chip--built-here{background:var(--gw-color-orange-900);color:var(--gw-color-orange-100)}
+:root[data-theme="dark"] .chip--gap{background:var(--gw-color-red-900);color:var(--gw-color-red-200)}
+
+/* ---- markdown ------------------------------------------------------------ */
+.md{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.md h2{font:var(--gw-text-h6);margin:var(--gw-space-20) 0 0;scroll-margin-top:80px}
+.md h3{font:var(--gw-text-h7);margin:var(--gw-space-16) 0 0;scroll-margin-top:80px}
+.md h4,.md h5,.md h6{font:var(--gw-text-body-16-sem);margin:var(--gw-space-12) 0 0}
+.md p{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+      color:var(--s-body);margin:0;max-width:80ch}
+.md ul,.md ol{margin:0;padding-left:var(--gw-space-20);display:flex;
+              flex-direction:column;gap:5px}
+.md li{font:var(--gw-text-body-14-reg);color:var(--s-body);max-width:78ch}
+.md code{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px;
+         background:var(--s-code-bg);border:1px solid var(--s-code-border);
+         color:var(--s-code-fg);border-radius:var(--gw-radius-4);padding:1px 5px}
+.md a{color:var(--gw-color-primary-600)}
+.md-pre{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-radius:var(--gw-radius-8);padding:var(--gw-space-16);overflow-x:auto;margin:0}
+.md-pre code{background:none;border:0;padding:0;color:var(--s-body);font-size:12px}
+.md-q{margin:0;border-left:3px solid var(--gw-color-neutral-300);
+      padding:var(--gw-space-8) var(--gw-space-16);font:var(--gw-text-body-14-reg);
+      color:var(--s-body)}
+.md-hr{border:0;border-top:1px solid var(--s-card-border);margin:var(--gw-space-12) 0}
+.md-tblwrap{overflow-x:auto}
+.md-tbl{width:100%;border-collapse:collapse;background:var(--s-card-bg);
+        border:1px solid var(--s-card-border);border-radius:var(--gw-radius-8);
+        overflow:hidden;font:var(--gw-text-body-14-reg)}
+.md-tbl th{text-align:left;font:var(--gw-text-body-12-med);text-transform:uppercase;
+           letter-spacing:.06em;color:var(--gw-color-neutral-400);
+           padding:var(--gw-space-8) var(--gw-space-12);
+           border-bottom:1px solid var(--s-card-border);white-space:nowrap}
+.md-tbl td{padding:var(--gw-space-8) var(--gw-space-12);color:var(--s-body);
+           border-bottom:1px solid var(--s-card-border);vertical-align:top}
+.md-tbl tr:last-child td{border-bottom:none}
+.md-tbl code{white-space:nowrap}
+
+.note{font:var(--gw-text-body-14-reg);color:var(--s-body);
+      background:var(--gw-color-neutral-25);border:1px solid var(--s-card-border);
+      border-left:3px solid var(--gw-color-neutral-300);border-radius:var(--gw-radius-8);
+      padding:var(--gw-space-12) var(--gw-space-16);white-space:pre-wrap;max-width:88ch}
+:root[data-theme="dark"] .note{background:var(--gw-color-neutral-900)}
+.note--find{border-left-color:var(--gw-color-yellow-400);white-space:normal}
+.empty{border:1px dashed var(--s-field-border);border-radius:var(--gw-radius-10);
+       padding:var(--gw-space-24);text-align:center;font:var(--gw-text-body-14-reg);
+       color:var(--gw-color-neutral-400)}
+.sec{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.sec h2{font:var(--gw-text-h6);margin:0;scroll-margin-top:80px}
+</style>
+</head>
+<body>
+<header class="lb-top">
+  <a class="lb-brand" href="/internal/design-system#library">
+    <span class="lb-brand__chip"><svg viewBox="0 0 80 80" fill="none" aria-hidden="true"><path d="M76.6088 4.56344C77.5025 2.36058 75.8495 0 73.4723 0H9.14286C4.0934 0 0 4.0934 0 9.14286V66.7778C0 72.018 5.17081 75.6829 9.9603 73.5568C40.8494 59.8449 64.3785 34.7075 76.6088 4.56344Z" fill="currentColor"/><path d="M32.5161 80C31.4022 80 30.9357 78.5531 31.8259 77.8835C54.9007 60.5265 71.4338 35.8047 78.7658 8.0522C78.9403 7.39154 80 7.51618 80 8.19951V70.8571C80 75.9066 75.9066 80 70.8571 80H32.5161Z" fill="currentColor"/></svg></span>
+    <span class="lb-brand__n">Component Library</span></a>
+  <span class="lb-crumb"><a href="../../index.html">Library</a> / <a href="index.html">Dashboard</a></span>
+  <div class="lb-top__r"><input class="lb-find" id="lb-find" type="search" placeholder="Filter this library" aria-label="Filter this library">
+    <button class="lb-tbtn" id="lb-theme" type="button" aria-label="Switch theme">
+      <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z"/></svg></button></div>
+</header>
+<div class="lb-3"><nav class="lb-rail"><div class="lb-rail__t">Dashboard · 118</div><a href="index.html" data-q="overview 117">Overview<span>117</span></a><div class="lb-rail__sep"></div><a href="access-denied-screen.html" data-q="access-denied-screen ">access-denied-screen</a><a href="account-row.html" data-q="account-row ">account-row</a><a href="action-button.html" data-q="action-button ">action-button</a><a href="activity-timeline.html" data-q="activity-timeline ">activity-timeline</a><a href="app-shell.html" data-q="app-shell " class="on">app-shell</a><a href="area-chart.html" data-q="area-chart ">area-chart</a><a href="avatar.html" data-q="avatar ">avatar</a><a href="avatar-group.html" data-q="avatar-group ">avatar-group</a><a href="banner.html" data-q="banner ">banner</a><a href="bar-chart.html" data-q="bar-chart ">bar-chart</a><a href="board.html" data-q="board ">board</a><a href="breadcrumbs.html" data-q="breadcrumbs ">breadcrumbs</a><a href="breakdown-bar.html" data-q="breakdown-bar ">breakdown-bar</a><a href="build-notice.html" data-q="build-notice ">build-notice</a><a href="bulk-action-bar.html" data-q="bulk-action-bar ">bulk-action-bar</a><a href="card.html" data-q="card ">card</a><a href="chart-frame.html" data-q="chart-frame ">chart-frame</a><a href="chart-tooltip.html" data-q="chart-tooltip ">chart-tooltip</a><a href="checkbox.html" data-q="checkbox ">checkbox</a><a href="checklist.html" data-q="checklist ">checklist</a><a href="coachmark.html" data-q="coachmark ">coachmark</a><a href="column-menu.html" data-q="column-menu ">column-menu</a><a href="combobox.html" data-q="combobox ">combobox</a><a href="command-palette.html" data-q="command-palette ">command-palette</a><a href="confirm-dialog.html" data-q="confirm-dialog ">confirm-dialog</a><a href="content-panel.html" data-q="content-panel ">content-panel</a><a href="data-table.html" data-q="data-table ">data-table</a><a href="date-range-picker.html" data-q="date-range-picker ">date-range-picker</a><a href="datetime-field.html" data-q="datetime-field ">datetime-field</a><a href="definition-tile.html" data-q="definition-tile ">definition-tile</a><a href="delta-pill.html" data-q="delta-pill ">delta-pill</a><a href="detail-view.html" data-q="detail-view ">detail-view</a><a href="docked-panel.html" data-q="docked-panel ">docked-panel</a><a href="donut-chart.html" data-q="donut-chart ">donut-chart</a><a href="drawer.html" data-q="drawer ">drawer</a><a href="empty-state.html" data-q="empty-state ">empty-state</a><a href="explorer-layout.html" data-q="explorer-layout ">explorer-layout</a><a href="filter-builder.html" data-q="filter-builder ">filter-builder</a><a href="filter-chip.html" data-q="filter-chip ">filter-chip</a><a href="form-field.html" data-q="form-field ">form-field</a><a href="form-section.html" data-q="form-section ">form-section</a><a href="funnel.html" data-q="funnel ">funnel</a><a href="google-button.html" data-q="google-button ">google-button</a><a href="growth-report-template.html" data-q="growth-report-template ">growth-report-template</a><a href="heatmap.html" data-q="heatmap ">heatmap</a><a href="histogram.html" data-q="histogram ">histogram</a><a href="horizontal-bar-chart.html" data-q="horizontal-bar-chart ">horizontal-bar-chart</a><a href="icon-button.html" data-q="icon-button ">icon-button</a><a href="incident-row.html" data-q="incident-row ">incident-row</a><a href="info-hint.html" data-q="info-hint ">info-hint</a><a href="issue-summary.html" data-q="issue-summary ">issue-summary</a><a href="key-value-list.html" data-q="key-value-list ">key-value-list</a><a href="legend.html" data-q="legend ">legend</a><a href="legend-table.html" data-q="legend-table ">legend-table</a><a href="line-chart.html" data-q="line-chart ">line-chart</a><a href="log-viewer.html" data-q="log-viewer ">log-viewer</a><a href="login-screen.html" data-q="login-screen ">login-screen</a><a href="menu.html" data-q="menu ">menu</a><a href="metric-strip.html" data-q="metric-strip ">metric-strip</a><a href="modal.html" data-q="modal ">modal</a><a href="multi-select.html" data-q="multi-select ">multi-select</a><a href="nav-group.html" data-q="nav-group ">nav-group</a><a href="nav-item.html" data-q="nav-item ">nav-item</a><a href="page-header.html" data-q="page-header ">page-header</a><a href="page-layout.html" data-q="page-layout ">page-layout</a><a href="pagination.html" data-q="pagination ">pagination</a><a href="period-select.html" data-q="period-select ">period-select</a><a href="popover.html" data-q="popover ">popover</a><a href="progress-bar.html" data-q="progress-bar ">progress-bar</a><a href="query-builder.html" data-q="query-builder ">query-builder</a><a href="radio.html" data-q="radio ">radio</a><a href="report-frame.html" data-q="report-frame ">report-frame</a><a href="report-source-line.html" data-q="report-source-line ">report-source-line</a><a href="ring.html" data-q="ring ">ring</a><a href="row-actions-menu.html" data-q="row-actions-menu ">row-actions-menu</a><a href="row-selection.html" data-q="row-selection ">row-selection</a><a href="saved-views.html" data-q="saved-views ">saved-views</a><a href="search-field.html" data-q="search-field ">search-field</a><a href="search-trigger.html" data-q="search-trigger ">search-trigger</a><a href="segmented-control.html" data-q="segmented-control ">segmented-control</a><a href="select.html" data-q="select ">select</a><a href="session-expired.html" data-q="session-expired ">session-expired</a><a href="setting-row.html" data-q="setting-row ">setting-row</a><a href="shortcut-key.html" data-q="shortcut-key ">shortcut-key</a><a href="sidebar.html" data-q="sidebar ">sidebar</a><a href="sidebar-collapsed.html" data-q="sidebar-collapsed ">sidebar-collapsed</a><a href="sign-in-modal.html" data-q="sign-in-modal ">sign-in-modal</a><a href="skeleton.html" data-q="skeleton ">skeleton</a><a href="sparkline.html" data-q="sparkline ">sparkline</a><a href="split-button.html" data-q="split-button ">split-button</a><a href="stat-card.html" data-q="stat-card ">stat-card</a><a href="status-banner.html" data-q="status-banner ">status-banner</a><a href="status-dot.html" data-q="status-dot ">status-dot</a><a href="status-list.html" data-q="status-list ">status-list</a><a href="sub-nav.html" data-q="sub-nav ">sub-nav</a><a href="support-ops-app-template.html" data-q="support-ops-app-template ">support-ops-app-template</a><a href="table-cell-types.html" data-q="table-cell-types ">table-cell-types</a><a href="table-states.html" data-q="table-states ">table-states</a><a href="table-toolbar.html" data-q="table-toolbar ">table-toolbar</a><a href="tabs-pill.html" data-q="tabs-pill ">tabs-pill</a><a href="tabs-underline.html" data-q="tabs-underline ">tabs-underline</a><a href="tag.html" data-q="tag ">tag</a><a href="text-input.html" data-q="text-input ">text-input</a><a href="textarea.html" data-q="textarea ">textarea</a><a href="theme-and-density.html" data-q="theme-and-density ">theme-and-density</a><a href="theme-menu.html" data-q="theme-menu ">theme-menu</a><a href="time-range-bar.html" data-q="time-range-bar ">time-range-bar</a><a href="timezone-select.html" data-q="timezone-select ">timezone-select</a><a href="toast.html" data-q="toast ">toast</a><a href="toggle.html" data-q="toggle ">toggle</a><a href="tooltip.html" data-q="tooltip ">tooltip</a><a href="topbar.html" data-q="topbar ">topbar</a><a href="unavailable-state.html" data-q="unavailable-state ">unavailable-state</a><a href="unsaved-changes-bar.html" data-q="unsaved-changes-bar ">unsaved-changes-bar</a><a href="uptime-bar.html" data-q="uptime-bar ">uptime-bar</a><a href="widget-grid.html" data-q="widget-grid ">widget-grid</a><a href="workspace-switcher.html" data-q="workspace-switcher ">workspace-switcher</a></nav><main class="lb-mid"><div class="lb-h"><h1>app-shell</h1><p class="lede">Dashboard · shell.md</p><div class="lb-row"><span class="chip chip--extracted" title="Extracted from the design hub's shipped code and generalised, not measured off Figma. The hub is its source of truth. Elements marked NEW in the doc are not in the hub at all.">extracted</span><span class="chip chip--passed" title="2026-10-05 utsav.singh@gushwork.ai">passed</span><span class="pill">v2.0.0</span></div><div class="lb-meta">review: bash scripts/review-pass.sh dashboard app-shell</div></div><div class="md"><h2 id="app-shell">Dashboard shell and page layout</h2>
+<p>The frame every dashboard screen sits in, and the way a page lays itself out inside it: the app shell (rail, optional phone topbar, floating content panel), the sidebar in its two widths, the page header, the page layout grid, and two layouts for heavy tools, the widget grid and the explorer layout. Page chrome is built from these components only; a screen never hand-builds its own rail, header or sticky strip. Source is the design hub (<code>web/shell.css</code>, <code>web/shell.js</code>, <code>web/admin/analytics.html</code>, <code>web/admin/access-control.html</code>); where a component is not in the hub it is marked NEW and is pending library review. CSS is <code>css/10-shell.css</code>, behaviour is <code>js/10-shell.js</code>. The navigation parts that live inside the rail are in <code>navigation.md</code>.</p>
+<p>Everything is scoped by <code>class=&quot;gd&quot;</code> on <code>&lt;html&gt;</code> or <code>&lt;body&gt;</code> and themed by <code>color-scheme</code> (no <code>data-theme</code> follows the OS; <code>light</code> and <code>dark</code> force it). Density is set once with <code>data-density=&quot;compact&quot;</code> and every height here follows <code>--gd-control-h</code>, <code>--gd-row-h</code>, <code>--gd-head-h</code>, <code>--gd-cell-px</code>, <code>--gd-gap</code> and <code>--gd-card-pad</code>.</p>
+<h3 id="sidebar">App shell</h3>
+<p><b>Purpose.</b> The outer frame: the rail on the page ground at the left, and the content panel floating on that ground at the right (12px clear on the top, right and bottom). It owns the viewport, the scale rule, the phone reflow and the single scroll region. Use it once per app. Do not use it for a login screen, an empty marketing page or a full-screen tool with no navigation.</p>
+<p><b>Anatomy.</b></p>
+<pre class="md-pre"><code>&lt;div class=&quot;gd-app&quot;&gt;                                  &lt;!-- the size container, named gd-app --&gt;
+  &lt;aside class=&quot;gd-sidebar&quot; id=&quot;gd-rail&quot;&gt;…&lt;/aside&gt;     &lt;!-- sidebar --&gt;
+  &lt;div class=&quot;gd-app__main&quot;&gt;
+    &lt;header class=&quot;gd-topbar&quot;&gt;…&lt;/header&gt;               &lt;!-- phone only --&gt;
+    &lt;section class=&quot;gd-panel&quot;&gt;…&lt;/section&gt;              &lt;!-- content panel --&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+<p><code>gd-app--embed</code> makes the shell fill a bounded frame (no viewport height, no zoom); it is for docs, previews and tests. Below 768 wide an embed renders the phone layout, so a desktop embed needs 768 or more.</p>
+<p><b>Responsive (R17 as the hub ships it).</b> The shell is a container query on its own width, so the rules follow the box and not only the window.</p>
+<ul><li><b>1440 and wider:</b> the measured layout, scale 1. It never scales up.</li><li><b>768 to 1439:</b> the whole shell is scaled with <code>zoom</code>, factor <code>width / 1440</code>, and nothing reflows. <code>js/10-shell.js</code> writes <code>--gd-fit</code> on <code>&lt;html&gt;</code>; the shell's height is <code>100dvh / --gd-fit</code> because viewport units are not divided back by zoom. Type paints smaller than the ramp; that is the accepted price.</li><li><b>767 and narrower:</b> scale is 1 and the layout reflows. The topbar appears, the panel bar is dropped, the panel loses its radius and shadow, the page gutter becomes 20, spans collapse (see Page layout), and the rail becomes a drawer that slides in from the left, full width, under the topbar.</li></ul>
+<p><code>DECISIONS.md</code> R17 still describes a reflow below 1280; the shipped code scales to 768. This document follows the code.</p>
+<p><b>One scroll region.</b> <code>.gd-panel__body</code> is the only element that scrolls. The rail never moves; its nav list scrolls internally while the account row stays pinned. The hub scrolled the document on phone; here the panel body scrolls at every width, so sticky offsets are the same everywhere.</p>
+<p><b>States.</b> <code>data-nav-open=&quot;true&quot;</code> on <code>.gd-app</code> is the phone drawer open. There is no loading state of its own; the account row and page content carry theirs.</p>
+<p><b>Accessibility.</b> The rail is <code>&lt;aside aria-label=&quot;Primary&quot;&gt;</code>, the panel is a <code>&lt;section&gt;</code>. The drawer is not in the tab order while closed (<code>visibility: hidden</code>). Esc closes it and returns focus to the burger.</p>
+<p><b>Behaviour.</b> <code>data-gd-nav-toggle</code> opens and closes the drawer, Esc closes it, following a rail link closes it, widening past 767 closes it. Scale is automatic.</p>
+<p><b>Tokens.</b> <code>--gd-page-bg</code>, <code>--gd-panel-bg</code>, <code>--gd-panel-edge</code> (NEW alias: a hairline on the dark panel, which is the same black as the ground), <code>--gw-radius-16</code>, <code>--gw-shadow-s3</code>, <code>--gw-motion-fast</code>. <b>Provenance.</b> extracted: <code>web/shell.css:262-286, 1566-1593, 1658-1733</code>.</p>
+<h3 id="sidebar-collapsed">Sidebar</h3>
+<p><b>Purpose.</b> The primary navigation rail, 260 wide. Use it for the app's top-level destinations, grouped. Do not put page actions, filters or a second level of in-page tabs in it; those belong to the page header and sub-nav.</p>
+<p><b>Anatomy.</b></p>
+<pre class="md-pre"><code>&lt;aside class=&quot;gd-sidebar&quot; id=&quot;gd-rail&quot; data-collapsed=&quot;false&quot; aria-label=&quot;Primary&quot;&gt;
+  &lt;div class=&quot;gd-sidebar__top&quot;&gt;
+    &lt;a class=&quot;gd-sidebar__brand&quot; href=&quot;/&quot;&gt;&lt;span class=&quot;gd-sidebar__chip&quot;&gt;…&lt;/span&gt;&lt;span class=&quot;gd-sidebar__name&quot;&gt;Gushwork&lt;/span&gt;&lt;/a&gt;
+    &lt;button class=&quot;gd-sidebar__toggle&quot; data-gd-rail-toggle aria-expanded=&quot;true&quot; aria-controls=&quot;gd-rail&quot; aria-label=&quot;Collapse sidebar&quot;&gt;…&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;nav class=&quot;gd-sidebar__nav&quot; aria-label=&quot;Main&quot;&gt; …nav-groups… &lt;/nav&gt;
+  &lt;div class=&quot;gd-sidebar__foot&quot;&gt; …account-row… &lt;/div&gt;
+&lt;/aside&gt;</code></pre>
+<p>The top block holds the brand, or a workspace switcher when the person belongs to more than one workspace. The nav list holds every group and scrolls on its own. The foot is pinned.</p>
+<p><b>Variants.</b> Brand or switcher on top. The collapse toggle is optional; omit it for a fixed rail.</p>
+<p><b>States.</b> Expanded, collapsed (own entry below), and as a phone drawer. The collapse button is a real control: it flips <code>data-collapsed</code>, <code>aria-expanded</code> and its label. Persist with <code>data-gd-persist</code> (stored in <code>localStorage</code> as <code>gd-rail</code>).</p>
+<p><b>Tokens.</b> <code>--gd-gap</code>, <code>--gd-control-h</code>, <code>--gd-text-muted</code>, <code>--gd-border-strong</code>, <code>--gd-icon</code> (NEW alias), <code>--gw-motion-fast</code>. Rail padding is 32 / 16 / 16; the top block is <code>--gd-control-h</code> tall, which centres the brand on the panel bar.</p>
+<p><b>Accessibility.</b> One landmark per nav list; groups carry their own label. Arrow keys, Home and End move between rows. <b>Provenance.</b> extracted: <code>web/shell.css:522-562, 1798-1804</code>.</p>
+<h3 id="topbar">Sidebar collapsed</h3>
+<p><b>Purpose.</b> The same sidebar at 64 wide, icons only, for people who want the room. Use it when the content is wide (tables, the explorer layout); keep expanded as the default because labels are how people find things.</p>
+<p><b>What changes.</b> Labels, counts, carets, the switcher text and the account text are removed visually but stay in the accessibility tree; each row gets a Tooltip (<code>data-gd-tooltip</code>, placement right, set by JS) so the name shows on hover and keyboard focus. Group labels become a hairline. Expandable groups hide their children: clicking a group head in the collapsed rail expands the rail first, then opens the group. The account row shows the avatar only and the sign-out action is dropped. The toggle's glyph flips.</p>
+<p><b>Behaviour.</b> <code>data-gd-rail-toggle</code>. The collapsed rules apply only at 768 wide and above; the phone drawer is always expanded.</p>
+<p><b>Accessibility.</b> <code>aria-expanded</code> on the toggle, <code>aria-label</code> flips to &quot;Expand sidebar&quot;. Focus is never lost on toggle. <b>Provenance.</b> NEW: not in the hub, reference Mobbin Linear, Vercel, Clerk. Pending library review.</p>
+<h3 id="content-panel">Topbar</h3>
+<p><b>Purpose.</b> The phone bar: brand on the left, then the two actions that have no other home on a phone (search icon, theme menu), then the menu button at the right end. It exists only because on a phone the rail is the thing the burger opens. At 768 and wider it is not drawn; the content panel bar carries search and theme instead. Use <code>gd-topbar--always</code> only for a phone-only app or to show it in docs.</p>
+<p><b>Anatomy.</b> <code>.gd-topbar &gt; .gd-topbar__start (burger + brand) + .gd-topbar__acts (search-trigger icon, theme-menu)</code>. The bar draws the burger last, at the right end (CSS <code>order</code>, the markup keeps it first). The burger is <code>.gd-topbar__btn</code> with <code>data-gd-nav-toggle</code>, <code>aria-expanded</code> and <code>aria-controls</code> pointing at the rail; its glyph swaps list and close from the state.</p>
+<p><b>Tokens.</b> Height is <code>--gd-control-h + 24</code> (60 comfortable, 52 compact). <b>Provenance.</b> extracted: <code>web/shell.css:355-405, 1624-1704, 1828-1835</code>.</p>
+<h3 id="page-layout">Content panel</h3>
+<p><b>Purpose.</b> The white panel floating on the grey ground. It holds an optional bar (search trigger left, utility actions right) fixed above the one scroll region. Use it as the body of the app shell. Do not nest panels.</p>
+<p><b>Anatomy.</b></p>
+<pre class="md-pre"><code>&lt;section class=&quot;gd-panel&quot; aria-label=&quot;Content&quot;&gt;
+  &lt;div class=&quot;gd-panel__bar&quot;&gt; &lt;button class=&quot;gd-search&quot;&gt;…&lt;/button&gt; &lt;div class=&quot;gd-panel__acts&quot;&gt;theme-menu, …&lt;/div&gt; &lt;/div&gt;
+  &lt;div class=&quot;gd-panel__body&quot;&gt; &lt;div class=&quot;gd-page&quot;&gt;…&lt;/div&gt; &lt;/div&gt;
+&lt;/section&gt;</code></pre>
+<p><code>&lt;div class=&quot;gd-panel__body&quot; data-fill&gt;</code> stops the body scrolling and lets a fill layout (the explorer) scroll its own panes; that is the one deliberate exception to a single scroller.</p>
+<p><b>Tokens.</b> <code>--gd-panel-bg</code>, <code>--gd-panel-edge</code>, <code>--gw-radius-16</code>, <code>--gw-shadow-s3</code>. The bar is <code>--gd-control-h + 40</code> tall (76 comfortable, 68 compact) with the page gutter on each side. The scrollbar is hidden, as in the hub. <b>Provenance.</b> extracted: <code>web/shell.css:262-295, 1843-1858</code>.</p>
+<h3 id="page-header">Page layout</h3>
+<p><b>Purpose.</b> The grid and rhythm of a page inside the panel: gutter, section gap, the 12-column grid, the sticky strips, and the settings split. Use <code>.gd-page</code> as the single child of the panel body. Do not scroll anything else.</p>
+<p><b>Anatomy and parts.</b></p>
+<ul><li><code>.gd-page</code> is a flex column, gutter <code>--gd-gap * 2.5</code> (40 / 30), section gap <code>--gd-gap * 1.5</code>. <code>--measure</code> caps it at 800 for forms and settings; <code>--fill</code> removes gutters and gap for the explorer.</li><li><code>.gd-grid</code> is 12 columns with <code>--gd-gap</code>. Children span 12 by default; <code>gd-span-1</code> to <code>gd-span-12</code> set the span. KPI rows are <code>gd-span-3</code>, a chart beside a list is <code>gd-span-8</code> and <code>gd-span-4</code>.</li><li>Sticky strips, in order: the optional sticky page header (<code>gd-page-header--sticky</code>), the tab strip (<code>gd-page-header__tabs</code>, <code>--gd-control-h + 4</code> tall) and the filter bar slot <code>.gd-page__filters</code>. Each sticks under the one above. CSS knows the tab height; only a sticky header's height is measured, by JS, into <code>--gd-s-head</code>. Every sticky strip has a hairline under it (<code>--gd-border</code>): the tab strip's own rule, the page header's rule when it has no tabs, and, since 6 Oct 2026, an inset shadow under the filter bar slot, so content scrolling beneath a strip reads as separate from it. The shadow adds no height. On a phone the filter bar is static and scrolls away, so it has no line there.</li><li><code>.gd-page__split</code> is a 220 column plus content for settings: put a sub-nav in the first cell, it sticks under the strips.</li></ul>
+<p><b>Responsive.</b> At 767 and narrower the gutter is 20, spans of 6 or fewer become 6 (two across, so KPI cards keep two columns), larger spans become 12, and the split stacks with the sub-nav as a horizontal strip.</p>
+<p><b>Accessibility.</b> The filter bar slot needs a name from its contents; do not make the sticky strips cover focused content: scroll-padding is the consumer's to set if rows are tall. <b>Provenance.</b> extracted: <code>web/shell.css:2005-2008, 2124-2220</code> and the sticky strips from <code>analytics.html:499</code> and <code>access-control.html:24</code>; the 12-column grid is NEW (the hub has fixed 800 + 220 and 1120 columns).</p>
+<p><b>Phone.</b> In a 12 column grid a span of 1 to 3 pairs up two to a row (stat tiles); anything spanning 4 or more takes the full width. Until 6 Oct 2026 spans 4 to 6 also went half width, which squeezed charts and cards into a column of 150. The sticky filter bar scrolls away with the page.</p>
+<h3 id="widget-grid">Page header</h3>
+<p><b>Purpose.</b> The title block of a page: title, description, actions and, optionally, breadcrumbs above and a tab strip below. Use one per page. Do not use it for a section inside a page; that is a section header (cards).</p>
+<p><b>Anatomy.</b></p>
+<pre class="md-pre"><code>&lt;header class=&quot;gd-page-header&quot;&gt;
+  &lt;div class=&quot;gd-page-header__main&quot;&gt;
+    &lt;div class=&quot;gd-page-header__titles&quot;&gt;
+      &lt;div class=&quot;gd-page-header__crumbs&quot;&gt; breadcrumbs &lt;/div&gt;   &lt;!-- optional --&gt;
+      &lt;h1 class=&quot;gd-page-header__title&quot;&gt;Lead analytics&lt;/h1&gt;
+      &lt;p class=&quot;gd-page-header__desc&quot;&gt;Where leads come from and how fast agents reply&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;gd-page-header__actions&quot;&gt; buttons &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;gd-tabs gd-tabs--underline gd-page-header__tabs&quot; role=&quot;tablist&quot;&gt; … &lt;/div&gt;   &lt;!-- optional --&gt;
+&lt;/header&gt;</code></pre>
+<p>The header is <code>display: contents</code> so the tab strip is a child of <code>.gd-page</code> and can stay stuck for the whole page.</p>
+<p><b>Variants.</b> Default (44px display title; 26 in compact density); <code>--sm</code> for detail pages; <code>--sticky</code> keeps the title block stuck; with tabs the header's own rule gives way to the strip's hairline (one line, not two); <b>editable</b> (NEW): the title and description are inputs.</p>
+<p><b>Editable title.</b> <code>&lt;input class=&quot;gd-page-header__title-input&quot; data-gd-edit=&quot;title&quot; data-initial=&quot;…&quot;&gt;</code> and <code>&lt;textarea class=&quot;gd-page-header__desc-input&quot; data-gd-edit=&quot;description&quot; placeholder=&quot;Add description…&quot;&gt;</code>. The fields are invisible until hovered (a hover fill); focus shows the 1px <code>--gd-border-focus</code> edge, not a ring (R41). Enter commits a title, Esc reverts both, the description grows with its text, change fires <code>gd:title-change</code>. A status badge goes in <code>.gd-page-header__status</code> inside the title (a <code>gd-badge gd-badge--neutral</code> &quot;Draft&quot;), and share and save are normal actions; the primary action is Save.</p>
+<p><b>Tokens.</b> <code>--gd-text</code>, <code>--gd-text-muted</code>, <code>--gd-border</code>, <code>--gd-hover-bg</code>, <code>--gd-border-focus</code>, <code>--gd-placeholder</code>, <code>--gd-gap</code>. 44px has no type token: a token gap.</p>
+<p><b>Accessibility.</b> The title is the page's one <code>&lt;h1&gt;</code>; editable inputs carry an <code>aria-label</code>. <b>Provenance.</b> extracted: <code>web/shell.css:2174-2203</code>, <code>analytics.html:499-520</code>. Editable variant NEW: reference Mobbin Amplitude, Mixpanel.</p>
+<h3 id="explorer-layout">Widget grid</h3>
+<p><b>Purpose.</b> A dashboard canvas the person can arrange: widgets of four sizes on the 12-column grid, an Edit layout mode, and an add-widget panel. Use it for home and overview dashboards where different roles want different things. Do not use it for a fixed report; use <code>gd-grid</code> with cards.</p>
+<p><b>Anatomy.</b></p>
+<pre class="md-pre"><code>&lt;section class=&quot;gd-widget-grid&quot; data-gd-widgets data-editing=&quot;false&quot;&gt;
+  &lt;div class=&quot;gd-widget-grid__bar&quot;&gt; title + [Add widget] [Edit layout]  (data-gd-widgets-edit=&quot;start&quot;) &lt;/div&gt;
+  &lt;div class=&quot;gd-widget-grid__banner&quot; hidden&gt; Customize your layout … [Cancel] [Done] &lt;/div&gt;
+  &lt;div class=&quot;gd-widget-grid__stage&quot;&gt;
+    &lt;div class=&quot;gd-widget-grid__canvas&quot;&gt;
+      &lt;article class=&quot;gd-widget-grid__item&quot; data-gd-widget-id=&quot;src&quot; data-size=&quot;m&quot;&gt;
+        &lt;button class=&quot;gd-widget-grid__remove&quot; data-gd-widget-remove aria-label=&quot;Remove Leads by source&quot;&gt;…&lt;/button&gt;
+        &lt;div class=&quot;gd-widget-grid__head&quot;&gt; handle, title, size group &lt;/div&gt;
+        &lt;div class=&quot;gd-widget-grid__body&quot;&gt; … &lt;/div&gt;
+      &lt;/article&gt;
+      &lt;div class=&quot;gd-widget-grid__slot&quot; hidden&gt;Drop a widget here&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;aside class=&quot;gd-widget-grid__palette&quot; hidden&gt; options with data-gd-widget-add=&quot;id&quot; &lt;/aside&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;gd-sr gd-widget-grid__live&quot; aria-live=&quot;polite&quot;&gt;&lt;/div&gt;
+&lt;/section&gt;</code></pre>
+<p><b>Spacing.</b> A widget's padding is <code>--gd-card-pad</code> on the top and both sides and under the body; the heading sits that far from the top and 12px above its chart.</p>
+<p><b>Sizes.</b> <code>data-size</code> <code>s</code> (4 columns), <code>m</code> (6), <code>l</code> (8), <code>full</code> (12). On a phone every widget is full width except <code>s</code>, which is half.</p>
+<p><b>Edit mode.</b> Entering shows the banner, a drag handle, the size group (S, M, L, XL) and a remove badge on each widget, the drop slot, and the add panel. The remove badge is a rounded square in the ink fill, never a circle, never red. Cancel restores the exact order, sizes and removed widgets from when editing began; Done keeps them. Esc cancels. A removed widget reappears in the add panel.</p>
+<p><b>Pointer and keyboard (R19).</b> Drag the handle to reorder. Keyboard path: focus the handle, Arrow keys move the widget earlier or later, plus and minus change its size, and the size buttons do the same by click. Every change is announced in the live region.</p>
+<p><b>Persistence.</b> The component stores nothing. Each change fires <code>gd:layout</code> with <code>{reason, widgets: [{id, size}]}</code> in order; the app saves it. Adding fires a cancelable <code>gd:widget-add</code>; if the app does not handle it, a <code>&lt;template data-gd-widget-template=&quot;id&quot;&gt;</code> in the grid is cloned.</p>
+<p><b>Tokens.</b> <code>--gd-card-bg</code>, <code>--gd-border</code>, <code>--gd-border-strong</code>, <code>--gd-border-focus</code>, <code>--gd-sunken-bg</code>, <code>--gd-ink</code>, <code>--gd-ink-fg</code>, <code>--gd-card-pad</code>, <code>--gd-gap</code>. <b>Provenance.</b> NEW: not in the hub, reference Mobbin Xero, Aboard, Evernote, Zoho CRM, Salesforce. Pending library review.</p>
+<p><b>Phone.</b> Every widget is full width except size S, which pairs up.</p>
+<h3>Explorer layout</h3>
+<p><b>Purpose.</b> The analytics tool layout: a collapsible query panel on the left, a chart above a results table in the centre with a horizontal splitter between them, and an optional docked details panel on the right. Use it for open-ended exploration (funnels, event queries, logs). Do not use it for a read-only report.</p>
+<p><b>Anatomy.</b></p>
+<pre class="md-pre"><code>&lt;div class=&quot;gd-page gd-page--fill&quot;&gt; page header
+  &lt;div class=&quot;gd-explorer&quot; data-gd-explorer&gt;
+    &lt;section class=&quot;gd-explorer__pane gd-explorer__query&quot; id=&quot;ex-q&quot; data-gd-pane=&quot;query&quot;&gt;
+      &lt;div class=&quot;gd-explorer__head&quot;&gt; title &lt;button class=&quot;gd-explorer__collapse&quot; data-gd-explorer-collapse=&quot;query&quot; aria-expanded=&quot;true&quot;&gt;…&lt;/button&gt;&lt;/div&gt;
+      &lt;div class=&quot;gd-explorer__body&quot;&gt; query controls &lt;/div&gt;&lt;/section&gt;
+    &lt;div class=&quot;gd-resizer&quot; role=&quot;separator&quot; aria-orientation=&quot;vertical&quot; tabindex=&quot;0&quot; data-gd-resizer=&quot;query&quot; aria-valuemin=&quot;200&quot; aria-valuemax=&quot;560&quot; aria-valuenow=&quot;280&quot; aria-controls=&quot;ex-q&quot; aria-label=&quot;Resize query panel&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;gd-explorer__main&quot;&gt; chart pane, horizontal separator (data-gd-resizer=&quot;chart&quot;), results pane &lt;/div&gt;
+    &lt;!-- optional: separator data-gd-resizer=&quot;dock&quot; + .gd-explorer__dock --&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+<p>Put it in a panel body with <code>data-fill</code>. The explorer fills the panel; each pane scrolls on its own.</p>
+<p><b>Resizing.</b> Separators are <code>role=&quot;separator&quot;</code> with <code>aria-valuenow</code>, <code>aria-valuemin</code>, <code>aria-valuemax</code> in pixels. Pointer: drag (the delta is divided by the scale factor), double-click resets. Keyboard: Arrow keys move 16px, Shift and Arrow 64, Home and End go to the limits, Enter on the chart separator resets it and on a side separator collapses that panel. Limits: query 200 to 560, dock 240 to 640, chart 120 up to the space left. The sizes live in <code>--gd-ex-left</code>, <code>--gd-ex-right</code>, <code>--gd-ex-chart</code> on the explorer; <code>gd:split</code> reports the change.</p>
+<p><b>Collapse.</b> The query and dock headers carry a collapse button (a real control): the pane shrinks to a rail (<code>--gd-control-h + 16</code>) showing only the button, and its separator is hidden. At 767 and narrower the panes stack, separators are hidden and the chart is 240 tall.</p>
+<p><b>Tokens.</b> <code>--gd-border</code>, <code>--gd-border-focus</code> (separator hover and drag), <code>--gd-head-h</code>, <code>--gd-card-pad</code>, <code>--gd-cell-px</code>. The separator keeps the keyboard focus ring; the hit area is 9px around a 1px line. <b>Provenance.</b> NEW: not in the hub, reference Mobbin Sentry, Mixpanel, Amplitude, Google Analytics. Pending library review.</p></div></main><div class="lb-toc"><b>On this page</b><a href="#app-shell" class="l3">App shell</a><a href="#sidebar" class="l3">Sidebar</a><a href="#sidebar-collapsed" class="l3">Sidebar collapsed</a><a href="#topbar" class="l3">Topbar</a><a href="#content-panel" class="l3">Content panel</a><a href="#page-layout" class="l3">Page layout</a><a href="#page-header" class="l3">Page header</a><a href="#widget-grid" class="l3">Widget grid</a><a href="#explorer-layout" class="l3">Explorer layout</a></div></div>
+<script>
+(function(){
+  /* Theme: the same keys as the main site. `gw-theme-choice` is what the person picked (light, dark or system) and is
+     written only when they pick; no choice means System, which follows the machine. `gw-theme` is the resolved
+     light or dark. This button toggles light and dark, so using it is a choice. */
+  var CH='gw-theme-choice', RES='gw-theme';
+  function pref(){try{var v=localStorage.getItem(CH);return (v==='light'||v==='dark'||v==='system')?v:'system'}catch(e){return 'system'}}
+  function res(p){return p==='dark'?'dark':p==='light'?'light':(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}
+  function apply(p,remember){var r=res(p);
+    document.documentElement.setAttribute('data-theme',r);
+    try{localStorage.setItem(RES,r);if(remember)localStorage.setItem(CH,p)}catch(e){}
+    var b=document.getElementById('lb-theme');
+    if(b)b.setAttribute('aria-label',r==='dark'?'Switch to light':'Switch to dark');}
+  var btn=document.getElementById('lb-theme');
+  if(btn)btn.addEventListener('click',function(){
+    apply(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark',true)});
+  apply(pref(),false);
+  try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){if(pref()==='system')apply('system',false)})}catch(e){}
+
+  /* Rail filter. Narrows the inventory in place — it does not navigate, because the
+     rail is a list of siblings and losing your place to search them is worse than
+     scrolling. */
+  var f=document.getElementById('lb-find');
+  if(f){
+    var rows=[].slice.call(document.querySelectorAll('.lb-rail a'));
+    f.addEventListener('input',function(){
+      var t=f.value.trim().toLowerCase();
+      rows.forEach(function(a){
+        a.hidden=!!t&&a.getAttribute('data-q').indexOf(t)===-1});
+    });
+  }
+
+  /* Component list filter: hides rows that do not match, and a surface whose rows all went. */
+  var rf=document.getElementById('lb-rows');
+  if(rf){
+    var trs=[].slice.call(document.querySelectorAll('tr[data-q]')), secs=[].slice.call(document.querySelectorAll('section[data-cat]'));
+    rf.addEventListener('input',function(){
+      var t=rf.value.trim().toLowerCase();
+      trs.forEach(function(r){r.hidden=!!t&&r.getAttribute('data-q').indexOf(t)===-1});
+      secs.forEach(function(sc){sc.hidden=!sc.querySelector('tr[data-q]:not([hidden])')});
+    });
+  }
+
+  /* Mark the on-this-page entry for whatever heading is currently at the top. */
+  var toc=[].slice.call(document.querySelectorAll('.lb-toc a'));
+  if(toc.length){
+    var heads=toc.map(function(a){return document.getElementById(a.hash.slice(1))})
+                 .filter(Boolean);
+    var tick=function(){
+      var best=0;
+      heads.forEach(function(h,i){if(h.getBoundingClientRect().top<=90)best=i});
+      toc.forEach(function(a,i){a.style.color=i===best?'var(--gw-color-primary-600)':''});
+    };
+    document.addEventListener('scroll',tick,{passive:true});tick();
+  }
+})();
+</script>
+</body></html>

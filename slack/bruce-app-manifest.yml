@@ -1,0 +1,73 @@
+# The Slack app "Bruce" (one app, two jobs). Paste into api.slack.com/apps -> Bruce -> App Manifest -> YAML -> Save.
+#
+#   1. The ✅ review loop: reaction_added on a notice records an approval (web/api/_slack-events.js).
+#   2. The concierge: @Bruce in a channel, or a DM, hands over brand assets and points at templates and tools
+#      (web/api/_concierge.js). No model is called.
+#
+# Both arrive at the same Request URL, so Socket Mode must stay OFF: turning it on stops Slack sending events to the URL
+# and silently breaks the review loop.
+#
+# What the concierge added to the review loop's original manifest:
+#   scopes  im:history (read DMs), im:write (open the DM), reactions:write (tick a reply)
+#   event   message.im
+#   home    the Messages tab, writable, so people can DM him
+display_information:
+  name: Bruce
+  description: Design Assistant
+  long_description: "Bruce is Gushwork's design agent. He works from the Gushwork design system, so everything he makes is on brand.\r\n\r\n*Ask him for*\r\n• Brand files: the logo in any colour and format, the colours, the fonts, the tokens\r\n• Something built: a landing page, one-pager, deck or banner. You get a link and a screenshot, not a file to fix\r\n• Which template to use, and the prompt to use it with Claude\r\n\r\n*Good to know*\r\n• Keep requests simple: say who it's for, the offer and the call to action\r\n• Designs are made for screens. Ask for a PDF if you need one\r\n• Three builds a day each. Files and quick answers don't count\r\n• He can't delete or change templates. He'll pass that on to Utsav\r\n• Say thanks, or react 👍 to his last message, to wrap up"
+  background_color: "#0d0d0d"
+features:
+  # Agent mode (R55 addendum, 6 Oct 2026): Bruce in Slack's agent pane. Turn on "Agents" in the app settings as well.
+  agent_view:
+    agent_description: "Gushwork's design agent. Brand files in any format, a landing page, one-pager, deck or banner on the design system, and a line to Utsav for anything else."
+    suggested_prompts:
+      - title: Send me the logo
+        message: Send me the Gushwork logo, svg and png
+      - title: Brand colours and fonts
+        message: Send me the brand colours and fonts
+      - title: Build a one-pager
+        message: "Build a one-pager. Audience: ... Offer: ... Call to action: ..."
+      - title: Which template do I use?
+        message: Which template should I use for a ...
+  app_home:
+    home_tab_enabled: false
+    messages_tab_enabled: true
+    messages_tab_read_only_enabled: false
+  bot_user:
+    display_name: Bruce Wayne
+    always_online: true
+oauth_config:
+  scopes:
+    bot:
+      - reactions:read
+      - reactions:write
+      - app_mentions:read
+      - channels:history
+      - chat:write
+      - files:write
+      - groups:history
+      - im:history
+      - im:write
+      - incoming-webhook
+      - users:read
+      - assistant:write
+  pkce_enabled: false
+settings:
+  interactivity:
+    is_enabled: true
+    request_url: https://design.gushwork.ai/api/slack-events
+  event_subscriptions:
+    request_url: https://design.gushwork.ai/api/slack-events
+    bot_events:
+      - app_mention
+      - message.im
+      - reaction_added
+      - app_home_opened
+      - app_context_changed
+      - agent_session_stopped
+      - agent_session_title_changed
+  org_deploy_enabled: false
+  socket_mode_enabled: false
+  token_rotation_enabled: false
+  app_level_token_rotation_enabled: false
+  is_mcp_enabled: false

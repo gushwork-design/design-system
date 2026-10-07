@@ -29,12 +29,30 @@ fake() {                      # fake <version> -> prints a plugin root running t
   printf '%s' "$d"
 }
 
+# The hook may pull an update in the background (R63). Every run here gets a stub in place of
+# the real claude and its own stamp file, so no test ever updates the machine it runs on.
+STUB="$TMP/claude-stub"; CALLS="$TMP/pull-calls"
+printf '#!/bin/sh\necho "$@" >> "%s"\n' "$CALLS" > "$STUB"; chmod +x "$STUB"
+
 run() {                       # run <plugin-root> <payload-url>
-  GW_FORCE_CHECK=1 GW_VERSION_URL="$2" CLAUDE_PLUGIN_ROOT="$1" bash "$HOOK" 2>"$TMP/err"
+  GW_CLAUDE_BIN="$STUB" GW_PULL_STAMP="${GW_PULL_STAMP:-$TMP/stamp-default}" \
+    GW_FORCE_CHECK=1 GW_VERSION_URL="$2" CLAUDE_PLUGIN_ROOT="$1" bash "$HOOK" 2>"$TMP/err"
 }
 
 bash scripts/version-json.sh > "$TMP/v.json"
 CUR="$(python3 -c "import json;print(json.load(open('$TMP/v.json'))['version'])")"
+# Every speaking case below is FLAGGED at the current version (R51): the live notify.json may
+# well point at an older release, and then "behind" is silent by design, not by accident.
+# unflagged.json is the same payload with the flag removed — the night-release case.
+python3 - "$TMP/v.json" "$CUR" "$TMP/unflagged.json" <<'PY'
+import json, sys
+p, cur, unflagged = sys.argv[1:4]
+d = json.load(open(p))
+json.dump({**d, "notify": None}, open(unflagged, "w"))
+d["notify"] = {"version": cur, "summary": "a new template",
+               "links": ["https://example.test/ad-page"]}
+json.dump(d, open(p, "w"))
+PY
 OLD="$(python3 -c "
 v=[int(x) for x in '$CUR'.split('.')]; v[1]-=1; print('.'.join(map(str,v)))")"
 
@@ -70,12 +88,32 @@ out="$(run "$(fake "$OLD")" "file://$TMP/v.json")"; rc=$?
 [ "$rc" = 0 ] && ck ok "behind: exit 0" || ck no "behind: exit 0 (got $rc)"
 printf '%s' "$out" | python3 -c "
 import json,sys
-d=json.load(sys.stdin)['hookSpecificOutput']
+o=json.load(sys.stdin); d=o['hookSpecificOutput']
 assert d['hookEventName']=='SessionStart'
-assert '$CUR' in d['systemMessage'] and '$OLD' in d['systemMessage']
-assert d['additionalContext']
+assert 'systemMessage' not in d, 'systemMessage inside hookSpecificOutput is ignored by Claude Code'
+assert '$CUR' in o['systemMessage'] and '$OLD' in o['systemMessage']
+assert d['additionalContext'] and 'first reply' in d['additionalContext']
+assert 'reload-plugins' in d['additionalContext'] and 'reload-plugins' in o['systemMessage']
+assert 'then restart' not in o['systemMessage'], 'the restart claim is stale since /reload-plugins'
 " 2>/dev/null && ck ok "behind: names both versions in a valid envelope" \
                 || ck no "behind: envelope malformed"
+
+# 1b · behind, but the newest FLAGGED release is one this copy already has → silent. This is the
+#      R51 case: a bump that changes nothing a teammate builds with must not wake anyone.
+out="$(run "$(fake "$OLD")" "file://$TMP/unflagged.json")"; rc=$?
+[ "$rc" = 0 ] && [ -z "$out" ] && ck ok "behind, not flagged: silent, exit 0" \
+                              || ck no "behind, not flagged: spoke (rc=$rc) $out"
+printf '%s' "$(run "$(fake "$OLD")" "file://$TMP/v.json")" | grep -q 'a new template' \
+  && ck ok "flagged: the summary is in the notice" || ck no "flagged: summary missing"
+run "$(fake "$OLD")" "file://$TMP/v.json" | python3 -c "
+import json,sys
+o=json.load(sys.stdin); m=o['systemMessage']; c=o['hookSpecificOutput']['additionalContext']
+assert 'on Gushwork design system v$OLD' in m and 'a new template' in m, m
+assert 'https://example.test/ad-page' in m and 'https://example.test/ad-page' in c, 'links missing'
+assert 'changelog-sheet' in m, 'the changelog sheet must always be linked'
+assert 'do not list earlier releases' in c and 'colleague' in c, c
+" 2>/dev/null && ck ok "flagged: names the flagged version, its links and the changelog" \
+              || ck no "flagged: version/links/changelog wrong"
 
 # 2 · the plugin moved but no component did → must not point at a list that is not
 #     there. Its own payload: the live registry normally DOES have components above OLD.
@@ -87,7 +125,7 @@ printf '%s' "$out" | grep -q "components named above" \
 # 3 · breaking components are named, and counted separately from the rest
 run "$(fake "$OLD")" "file://$TMP/breaking.json" | python3 -c "
 import json,sys
-m=json.load(sys.stdin)['hookSpecificOutput']['systemMessage']
+m=json.load(sys.stdin)['systemMessage']
 assert '2 breaking' in m and 'badge' in m and 'data-table' in m, m
 assert '1 changed' in m, m
 " 2>/dev/null && ck ok "breaking: counted and named" || ck no "breaking: not reported"
@@ -142,6 +180,24 @@ before="$(cat "$TMP/km-bad.json")"
 python3 "$FLIP" "$TMP/km-bad.json" >/dev/null 2>&1
 [ "$(cat "$TMP/km-bad.json")" = "$before" ] && ck ok "flip: leaves malformed config alone" \
                                             || ck no "flip: touched a malformed config"
+
+# 7 · the daily pull (R63): behind → the first run starts `claude plugin update` in the
+#     background, a second run the same day does not, and current or opted-out never does.
+pulls() { sleep 1; [ -f "$CALLS" ] && wc -l < "$CALLS" | tr -d ' ' || echo 0; }
+rm -f "$CALLS" "$TMP/stamp-pull"
+GW_PULL_STAMP="$TMP/stamp-pull" run "$(fake "$OLD")" "file://$TMP/unflagged.json" >/dev/null
+[ "$(pulls)" = 1 ] && grep -q "plugin update gushwork-design@gushwork" "$CALLS" \
+  && ck ok "pull: behind runs the update once, in the background, even when unflagged" \
+  || ck no "pull: behind did not run the update ($(cat "$CALLS" 2>/dev/null))"
+GW_PULL_STAMP="$TMP/stamp-pull" run "$(fake "$OLD")" "file://$TMP/unflagged.json" >/dev/null
+[ "$(pulls)" = 1 ] && ck ok "pull: a second chat the same day does not run it again" \
+                   || ck no "pull: ran twice in one day"
+rm -f "$CALLS" "$TMP/stamp-cur"
+GW_PULL_STAMP="$TMP/stamp-cur" run "$(fake "$CUR")" "file://$TMP/v.json" >/dev/null
+[ "$(pulls)" = 0 ] && ck ok "pull: current never runs it" || ck no "pull: ran while current"
+rm -f "$CALLS" "$TMP/stamp-off"
+GW_NO_AUTO_PULL=1 GW_PULL_STAMP="$TMP/stamp-off" run "$(fake "$OLD")" "file://$TMP/v.json" >/dev/null
+[ "$(pulls)" = 0 ] && ck ok "pull: GW_NO_AUTO_PULL turns it off" || ck no "pull: ignored the opt-out"
 
 echo
 if [ "$fail" = 0 ]; then echo "✔ $pass passed"; else echo "✘ $fail failed, $pass passed"; exit 1; fi

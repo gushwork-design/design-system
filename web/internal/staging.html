@@ -4,42 +4,35 @@
 <title>Staging — Gushwork Design</title>
 <meta name="robots" content="noindex">
 <meta name="description" content="Live previews of design-staging work — pages and tools that exist and are worth showing, but aren't the official surface yet.">
-<script>try{var t=localStorage.getItem('gw-theme');if(t!=='dark')t='light';document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20width%3D%2280%22%20height%3D%2280%22%20rx%3D%2220%22%20fill%3D%22%230d0d0d%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<script>try{var c=localStorage.getItem('gw-theme-choice'),t=c==='dark'||c==='light'?c:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20x%3D%221%22%20y%3D%221%22%20width%3D%2278%22%20height%3D%2278%22%20rx%3D%2219%22%20fill%3D%22%230070ff%22%20stroke%3D%22%230061e0%22%20stroke-width%3D%222%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
 <link rel="stylesheet" href="/foundation/tokens.css">
-<link rel="stylesheet" href="/shell.css">
-<script src="/shell.js" defer></script>
+<link rel="stylesheet" href="/shell.css?v=ghost3">
+<script src="/shell.js?v=ghost1" defer></script>
 <style>
   /* ===========================================================================
      PAGE SHELL — the same one web/style-guide.html, web/downloads.html and
      web/internal/tools.html use. Only the Overview gets its own treatment (the
      blue gw-hero). Values mirrored from .sg / .dl rather than re-derived.
      =========================================================================== */
-  .st{max-width:1200px;margin:0 auto;
-      padding:var(--gw-space-60) var(--gw-space-40) var(--gw-space-120);
-      display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--gw-space-60)}
-  .st__main{min-width:0;display:flex;flex-direction:column;gap:var(--gw-space-32)}
-  /* The rule is DOTTED: 2px, round cap, [0.1,4] dash — a dot, not a dash. */
-  .st__hd{padding:0 var(--gw-space-40) var(--gw-space-32);
-          background-image:radial-gradient(circle closest-side,
-                           var(--s-rule) 100%, transparent 100%);
-          background-size:4.1px 2px;background-position:left bottom;
-          background-repeat:repeat-x;
-          display:flex;flex-direction:column;gap:var(--gw-space-20)}
+  /* Layout (grid, header rule, section gaps) is shared — see "THE SHARED PAGE
+     LAYOUT" in shell.css. This page only styles its own content. */
   .st__title{margin:0;font:600 44px/1.2 var(--gw-font-display);color:var(--s-heading)}
   .st__meta{margin:0;font:var(--gw-text-body-14-med);
             letter-spacing:var(--gw-text-body-14-med-tracking);
             color:var(--gw-color-neutral-400)}
   .st__body{display:flex;flex-direction:column;gap:var(--gw-space-60)}
-  .st-sec{padding-left:var(--gw-space-40);display:flex;flex-direction:column;
+  /* No left inset. The old layout put sections 40 inside a wider column; under the
+     shared grid `__main` already carries the 20 that aligns the content with the
+     header (796:11946 — the 800 column's sections are 780, flush). A second 40 here
+     pushed every section right of its own page title. */
+  .st-sec{display:flex;flex-direction:column;
           gap:var(--gw-space-20);scroll-margin-top:var(--gw-space-24)}
   .st-sec :where(h2){margin:0;font:600 28px/1.2 var(--gw-font-display);color:var(--s-heading)}
-  .st-sec :where(p){margin:0;font:var(--gw-text-body-18-med);
-            letter-spacing:var(--gw-text-body-18-med-tracking);color:var(--s-body)}
-  .st-sec :where(p) a{color:inherit;font-weight:600;text-decoration:underline;
-            text-underline-offset:3px;text-decoration-thickness:1px;
-            text-decoration-color:var(--gw-color-neutral-300)}
-  .st-sec :where(p) a:hover{color:var(--s-heading);text-decoration-color:currentColor}
+  .st-sec :where(p){margin:0;font:var(--gw-text-body-16-reg);
+            letter-spacing:var(--gw-text-body-16-reg-tracking);color:var(--s-body)}
+  /* Inline links are shell.css's — inherit the sentence's colour, semibold,
+     underlined one step back. This page had its own copy. */
   .st-note{font:var(--gw-text-body-14-reg)!important;color:var(--gw-color-neutral-600)!important}
   /* Both page-local in web/downloads.html rather than in shell.css, so they are
      redefined here rather than inherited. */
@@ -48,7 +41,7 @@
   .st-sec code{font:500 15px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;
                background:var(--gw-color-neutral-100);color:var(--s-heading);
                padding:1px 6px;border-radius:var(--gw-radius-4)}
-  :root[data-theme="dark"] .st-sec code{background:var(--gw-color-neutral-800)}
+  :root[data-theme="dark"] .st-sec code{background:var(--gw-color-neutral-900)}
 
   /* ===========================================================================
      TABLES — the same .dl-table the Downloads page uses, with one change: the
@@ -63,11 +56,11 @@
     --d-muted:var(--gw-color-neutral-600);
   }
   :root[data-theme="dark"]{
-    --d-card:var(--gw-color-neutral-900);
-    --d-card-border:var(--gw-color-neutral-800);
-    --d-row-border:var(--gw-color-neutral-800);
-    --d-head-bg:var(--gw-color-neutral-800);
-    --d-muted:var(--gw-color-neutral-300);
+    --d-card:var(--gw-color-black);
+    --d-card-border:var(--gw-color-neutral-900);
+    --d-row-border:var(--gw-color-neutral-900);
+    --d-head-bg:var(--gw-color-black);
+    --d-muted:var(--gw-color-neutral-400);
   }
   .st-table{width:100%;border-collapse:separate;border-spacing:0;
             background:var(--d-card);border:1px solid var(--d-card-border);
@@ -92,11 +85,12 @@
   .st-pv{display:block;width:164px;height:auto;aspect-ratio:16/10;object-fit:cover;
          object-position:top center;border-radius:var(--gw-radius-10);
          border:1px solid var(--gw-color-neutral-100);background:var(--gw-color-neutral-25)}
-  :root[data-theme="dark"] .st-pv{border-color:var(--gw-color-neutral-800)}
+  :root[data-theme="dark"] .st-pv{border-color:var(--gw-color-neutral-850)}
 
   .st-open{display:inline-flex;align-items:center;gap:var(--gw-space-8);
            text-decoration:none;font:var(--gw-text-button-14);
            color:var(--gw-color-primary-600)}
+  :root[data-theme="dark"] .st-open{color:var(--gw-color-primary-400)}
   .st-open svg{width:14px;height:14px;fill:currentColor;transition:transform 140ms ease}
   .st-open:hover svg{transform:translateX(3px)}
   .st-open:focus-visible{outline:2px solid var(--gw-color-primary-500);outline-offset:2px;
@@ -122,21 +116,24 @@
 <body data-gw-page="staging">
 
 <div class="st">
-  <div class="st__main">
 
-    <header class="st__hd">
+  <!-- The header is its own full-width grid row — 796:10015 spans both columns.
+       Lifted out of __main so `grid-column:1/-1` in shell.css can reach it. -->
+  <header class="st__hd">
       <h1 class="st__title">Staging</h1>
-      <p class="st__meta">Last updated 29th Sep, 2026</p>
+      <p class="st__meta">Last updated 30th Sep, 2026</p>
     </header>
 
+  <div class="st__main">
+
+    
     <div class="st__body">
 
       <section class="st-sec">
-        <p>Live previews of work in progress, kept off the official surface until it is ready.
-        Not indexed, and not linked from anywhere public. The default is committed straight into
-        this repo under this domain — no separate project, unless one genuinely needs its own
-        backend. Every link below stays on this domain either way, so bookmark or share the
-        design.gushwork.ai address rather than a project&rsquo;s own <code>.vercel.app</code> one.</p>
+        <p>Work in progress, previewed here before it goes anywhere public. Nothing on this
+        page is indexed or linked from the outside. Every link stays on this domain, so share
+        the design.gushwork.ai address rather than a project&rsquo;s own <code>.vercel.app</code>
+        one.</p>
       </section>
 
       <section class="st-sec" id="landing-pages">
@@ -175,6 +172,12 @@
               <td class="u">One AI system across CRM, invoicing, support and lead follow-up, with agents running the daily work.</td>
               <td class="c-act"><a class="st-open" href="/internal/staging/ai-services-lander">Open <svg viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a></td>
             </tr>
+            <tr>
+              <td class="c-prev"><img class="st-pv" src="/assets/staging/followups-lander.png" alt="The follow-ups lander, showing its hero and the picture card beneath it" loading="lazy"></td>
+              <td class="c-name">Follow-ups lander</td>
+              <td class="u">Never let a lead go cold: automatic follow-ups drafted in your tone, with a one-click Google sign-up.</td>
+              <td class="c-act"><a class="st-open" href="/internal/staging/followups-lander">Open <svg viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a></td>
+            </tr>
             </tbody>
           </table>
       </section>
@@ -192,10 +195,40 @@
             </thead>
             <tbody>
             <tr>
+              <td class="c-prev"><img class="st-pv" src="/assets/staging/agent-store.png" alt="The Agent Store, showing the filter rail, search and featured agents" loading="lazy"></td>
+              <td class="c-name">Agent Store</td>
+              <td class="u">A marketplace of 33 agents for manufacturers and distributors, with a package builder that recommends the tier.</td>
+              <td class="c-act"><a class="st-open" href="/internal/staging/agent-store">Open <svg viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a></td>
+            </tr>
+            <tr>
+              <td class="c-prev"><img class="st-pv" src="/assets/staging/agent-store-v2.png" alt="The Agent Store version 2, with category tabs in a sticky bar and a package panel on the right" loading="lazy"></td>
+              <td class="c-name">Agent Store v2</td>
+              <td class="u">The same store with every category as an underlined tab in one sticky bar, and the package builder sticky on the right.</td>
+              <td class="c-act"><a class="st-open" href="/internal/staging/agent-store-v2">Open <svg viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a></td>
+            </tr>
+            <tr>
+              <td class="c-prev"><img class="st-pv" src="/assets/staging/agent-store-v3.png" alt="The Agent Store version 3, with a pill toggle for categories and a package panel on the right" loading="lazy"></td>
+              <td class="c-name">Agent Store v3</td>
+              <td class="u">Version 2 with the category tabs as a pill toggle: a white capsule with the active category in black.</td>
+              <td class="c-act"><a class="st-open" href="/internal/staging/agent-store-v3">Open <svg viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a></td>
+            </tr>
+            <tr>
+              <td class="c-prev"><img class="st-pv" src="/assets/staging/ai-marketplace.png" alt="The AI Marketplace, with a parallax banner, a segmented category toggle and a checkout-style package panel" loading="lazy"></td>
+              <td class="c-name">AI Marketplace</td>
+              <td class="u">The agents sold as a marketplace: pre-filled package per industry, a checkout panel with a saving line, a quick view with folded details, and a two-column builder.</td>
+              <td class="c-act"><a class="st-open" href="/internal/staging/ai-marketplace">Open <svg viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a></td>
+            </tr>
+            <tr>
               <td class="c-prev"><img class="st-pv" src="/assets/staging/homepage-neo.png" alt="The Homepage Neo redesign, showing its hero and product screenshot" loading="lazy"></td>
               <td class="c-name">Homepage Neo</td>
               <td class="u">The marketing homepage redesign, ahead of replacing the live site.</td>
               <td class="c-act"><a class="st-open" href="/internal/staging/homepage-neo">Open <svg viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a></td>
+            </tr>
+            <tr>
+              <td class="c-prev"><img class="st-pv" src="/assets/staging/nugget.png" alt="Nugget, a cream felted character in a denim bucket hat holding a coffee cup" loading="lazy"></td>
+              <td class="c-name">Nugget</td>
+              <td class="u">The intro page for Nugget, the one face for every Gushwork agent.</td>
+              <td class="c-act"><a class="st-open" href="/internal/staging/nugget">Open <svg viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a></td>
             </tr>
             </tbody>
           </table>
@@ -225,8 +258,9 @@
 
       <section class="st-sec" id="apps">
         <h2>Apps</h2>
-        <p class="st-note">One project here runs its own backend, so it lives in its own Vercel
-        project and is framed into this domain rather than committed into this repo.</p>
+        <p class="st-note">Tools rather than pages. Most are committed into this repo; the exception is
+        Case Study Gen Studio, which runs its own backend, so it lives in its own Vercel project
+        and is framed into this domain.</p>
           <table class="st-table">
             <thead>
               <tr>
@@ -237,6 +271,12 @@
               </tr>
             </thead>
             <tbody>
+              <tr>
+                <td class="c-prev"><img class="st-pv" src="/assets/staging/social-creative.png" alt="The social creative builder, with a form on the left and a live preview of the post on the right" loading="lazy"></td>
+                <td class="c-name">Social creative</td>
+                <td class="u">Builds a social image with the real Gushwork logo and fonts, drawn by code rather than generated, and exports it as a PNG. Portrait, square and link-card sizes.</td>
+                <td class="c-act"><a class="st-open" href="/internal/staging/social-creative/">Open <svg viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a></td>
+              </tr>
               <tr>
                 <td class="c-prev"><span class="st-pv" style="display:grid;place-items:center">
                   <svg viewBox="0 0 256 256" fill="var(--gw-color-neutral-400)" aria-hidden="true" style="width:24px;height:24px"><path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,16V88H40V56ZM40,200V104H216v96Z"/></svg>

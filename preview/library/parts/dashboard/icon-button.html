@@ -2,11 +2,10 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>icon-button — Gushwork</title>
+<meta name="description" content="Dashboard · actions.md">
 <meta name="robots" content="noindex">
-<script>try{var t=localStorage.getItem('gw-theme');if(t!=='dark')t='light';
-document.documentElement.setAttribute('data-theme',t)}catch(e){
-document.documentElement.setAttribute('data-theme','light')}</script>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20width%3D%2280%22%20height%3D%2280%22%20rx%3D%2220%22%20fill%3D%22%230d0d0d%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<script>try{var c=localStorage.getItem('gw-theme-choice'),t=c==='dark'||c==='light'?c:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20x%3D%221%22%20y%3D%221%22%20width%3D%2278%22%20height%3D%2278%22%20rx%3D%2219%22%20fill%3D%22%230070ff%22%20stroke%3D%22%230061e0%22%20stroke-width%3D%222%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
 <link rel="stylesheet" href="../../../foundation/tokens.css">
 <link rel="stylesheet" href="../../../shell.css">
 <style>
@@ -56,7 +55,7 @@ document.documentElement.setAttribute('data-theme','light')}</script>
          padding:var(--gw-space-8) var(--gw-space-12);font:var(--gw-text-body-14-reg);
          color:var(--s-heading)}
 .cl-find::placeholder{color:var(--s-placeholder)}
-.cl-find:focus{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.cl-find:focus{outline:none;border-color:var(--gw-color-neutral-400)}
 .cl-filter{display:flex;gap:var(--gw-space-4);flex-wrap:wrap}
 .cl-f{font:var(--gw-text-body-12-med);color:var(--s-body);background:transparent;
       border:1px solid var(--s-field-border);border-radius:var(--gw-radius-full);
@@ -242,7 +241,12 @@ document.documentElement.setAttribute('data-theme','light')}</script>
 @media print{.cl-bar,.cl-jump{display:none}}
 
 *{box-sizing:border-box}
-body{margin:0;background:var(--s-page-bg);font-family:var(--gw-font-body);
+/* Body/body-16-reg, the site-wide page default ruled 29 Sep 2026 (796:12917).
+   This sheet named the family but no size, so it fell to the browser's 16px at
+   `normal` leading — the right size by accident, the wrong line-height. */
+body{margin:0;background:var(--s-page-bg);
+     font:var(--gw-text-body-16-reg);
+     letter-spacing:var(--gw-text-body-16-reg-tracking);
      color:var(--s-body);-webkit-font-smoothing:antialiased}
 a{color:inherit}
 h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
@@ -254,11 +258,12 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
 .lb-brand{display:flex;align-items:center;gap:var(--gw-space-12);text-decoration:none;
           flex:none}
 .lb-brand__chip{width:32px;height:32px;border-radius:var(--gw-radius-8);
-                background:var(--gw-color-black);color:var(--gw-color-white);
+                background:var(--gw-color-primary-500);color:var(--gw-color-white);
+                box-shadow:inset 0 0 0 1px var(--gw-color-primary-600);
                 display:grid;place-items:center;flex:none}
 .lb-brand__chip svg{width:16px;height:16px;display:block}
 .lb-brand__n{font:var(--gw-text-h7);color:var(--s-heading)}
-.lb-crumb{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-400);
+.lb-crumb{font:var(--gw-text-body-14-reg);color:var(--s-group-label);
           white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lb-crumb a{color:var(--gw-color-primary-600);text-decoration:none}
 .lb-top__r{display:flex;align-items:center;gap:var(--gw-space-12);margin-left:auto}
@@ -266,7 +271,7 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
          border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
          padding:0 var(--gw-space-12);font:var(--gw-text-body-14-reg);color:var(--s-heading)}
 .lb-find::placeholder{color:var(--s-placeholder)}
-.lb-find:focus{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.lb-find:focus{outline:none;border-color:var(--gw-color-neutral-400)}
 .lb-tbtn{width:36px;height:36px;display:grid;place-items:center;background:transparent;
          border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
          color:var(--s-body);cursor:pointer;flex:none}
@@ -280,7 +285,7 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
 .lb-rail{position:sticky;top:60px;max-height:calc(100vh - 60px);overflow-y:auto;
          border-right:1px solid var(--s-chrome-border);padding:var(--gw-space-24) 0}
 .lb-rail__t{font:var(--gw-text-body-12-med);text-transform:uppercase;letter-spacing:.06em;
-            color:var(--gw-color-neutral-400);padding:0 var(--gw-space-20) var(--gw-space-8)}
+            color:var(--s-group-label);padding:0 var(--gw-space-20) var(--gw-space-8)}
 .lb-rail a{display:flex;justify-content:space-between;gap:var(--gw-space-8);
            font:var(--gw-text-body-14-reg);color:var(--s-body);text-decoration:none;
            padding:6px var(--gw-space-20)}
@@ -305,16 +310,45 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
 .lb-toc a.l3{padding-left:var(--gw-space-12)}
 @media (max-width:1180px){.lb-3{grid-template-columns:220px minmax(0,1fr)}
                           .lb-toc{display:none}}
-@media (max-width:820px){.lb-3{grid-template-columns:1fr}
+@media (max-width:820px){.lb-3{grid-template-columns:minmax(0,1fr)}
+                         /* `.lb-mid{grid-column:2}` above made the grid two columns even here, so the rail
+                            was squeezed to 0 wide and there was no way to move between sections. Both
+                            go back to column 1, and the rail becomes one scrolling row of chips instead
+                            of a 400px list in front of the content. */
+                         .lb-mid,.lb-rail{grid-column:1}
                          .lb-rail{position:static;max-height:none;border-right:0;
-                                  border-bottom:1px solid var(--s-chrome-border)}
+                                  border-bottom:1px solid var(--s-chrome-border);
+                                  display:flex;flex-direction:row;align-items:center;gap:var(--gw-space-8);
+                                  overflow-x:auto;padding:var(--gw-space-12) var(--gw-space-20);
+                                  scrollbar-width:none}
+                         .lb-rail::-webkit-scrollbar{display:none}
+                         .lb-rail__t,.lb-rail__sep{display:none}
+                         .lb-rail a{flex:none;white-space:nowrap;gap:var(--gw-space-4);
+                                    padding:6px var(--gw-space-12);border-radius:var(--gw-radius-full);
+                                    border:1px solid var(--s-chrome-border)}
                          .lb-mid{padding:var(--gw-space-24) var(--gw-space-20)}}
+@media (max-width:640px){.lb-crumb{display:none}}
 
 /* ---- page head ----------------------------------------------------------- */
 .lb-h{display:flex;flex-direction:column;gap:var(--gw-space-8)}
 .lb-h h1{font:var(--gw-text-h4);margin:0}
 .lb-h .lede{font:var(--gw-text-body-16-reg);color:var(--s-body);margin:0;max-width:74ch}
 .lb-row{display:flex;flex-wrap:wrap;gap:var(--gw-space-8);align-items:center}
+.lb-rowfind{width:100%;max-width:360px;height:36px;padding:0 12px;margin:0 0 20px;border:0;border-radius:12px;background:var(--s-field-bg);
+  box-shadow:inset 0 0 0 1px var(--s-field-border);color:var(--s-heading);font:var(--gw-text-body-14-reg)}
+.lb-rowfind::placeholder{color:var(--s-placeholder)}
+.cat-name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px;color:var(--s-heading);font-weight:600}
+a.cat-name{color:var(--gw-color-primary-600);text-decoration:none}
+:root[data-theme="dark"] a.cat-name{color:var(--gw-color-primary-400)}
+.cat-note{display:block;margin-top:2px;font:var(--gw-text-body-12-reg);color:var(--s-body)}
+@media (max-width:760px){.lb-mid td a,.lb-mid th a{display:inline-flex;align-items:center;min-height:24px}}
+.cat-link{font:var(--gw-text-body-14-med);color:var(--gw-color-primary-600);text-decoration:none}
+:root[data-theme="dark"] .cat-link{color:var(--gw-color-primary-400)}
+.cat-link:hover{text-decoration:underline}
+.sec>.lb-meta{margin:4px 0 14px}
+.cat-dim{color:var(--s-body)}
+.chip--annotated{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+:root[data-theme="dark"] .chip--annotated{background:var(--gw-color-neutral-800);color:var(--gw-color-neutral-300)}
 .lb-meta{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
          color:var(--gw-color-neutral-400)}
 
@@ -322,7 +356,7 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
       border-radius:var(--gw-radius-full);padding:3px var(--gw-space-8);white-space:nowrap}
 .chip--measured{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
 .chip--transcribed{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
-.chip--ruled{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+.chip--ruled,.chip--extracted{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
 .chip--structure{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
 .chip--built-here{background:var(--gw-color-orange-50);color:var(--gw-color-orange-700)}
 .chip--passed{background:var(--gw-color-green-500);color:var(--gw-color-white)}
@@ -334,6 +368,7 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
 :root[data-theme="dark"] .chip--transcribed,
 :root[data-theme="dark"] .chip--structure{background:var(--gw-color-yellow-900);color:var(--gw-color-yellow-100)}
 :root[data-theme="dark"] .chip--ruled,
+:root[data-theme="dark"] .chip--extracted,
 :root[data-theme="dark"] .chip--web{background:var(--gw-color-primary-900);color:var(--gw-color-primary-200)}
 :root[data-theme="dark"] .chip--pending{background:var(--gw-color-neutral-800);color:var(--gw-color-neutral-300)}
 :root[data-theme="dark"] .chip--built-here{background:var(--gw-color-orange-900);color:var(--gw-color-orange-100)}
@@ -388,111 +423,95 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
 </head>
 <body>
 <header class="lb-top">
-  <a class="lb-brand" href="../../../library/index.html">
+  <a class="lb-brand" href="/internal/design-system#library">
     <span class="lb-brand__chip"><svg viewBox="0 0 80 80" fill="none" aria-hidden="true"><path d="M76.6088 4.56344C77.5025 2.36058 75.8495 0 73.4723 0H9.14286C4.0934 0 0 4.0934 0 9.14286V66.7778C0 72.018 5.17081 75.6829 9.9603 73.5568C40.8494 59.8449 64.3785 34.7075 76.6088 4.56344Z" fill="currentColor"/><path d="M32.5161 80C31.4022 80 30.9357 78.5531 31.8259 77.8835C54.9007 60.5265 71.4338 35.8047 78.7658 8.0522C78.9403 7.39154 80 7.51618 80 8.19951V70.8571C80 75.9066 75.9066 80 70.8571 80H32.5161Z" fill="currentColor"/></svg></span>
     <span class="lb-brand__n">Component Library</span></a>
   <span class="lb-crumb"><a href="../../index.html">Library</a> / <a href="index.html">Dashboard</a></span>
-  <div class="lb-top__r"><input class="lb-find" id="lb-find" type="search" placeholder="Filter this library">
+  <div class="lb-top__r"><input class="lb-find" id="lb-find" type="search" placeholder="Filter this library" aria-label="Filter this library">
     <button class="lb-tbtn" id="lb-theme" type="button" aria-label="Switch theme">
-      <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M116,36V32a12,12,0,0,1,24,0v4a12,12,0,0,1-24,0Zm80,92a68,68,0,1,1-68-68A68.07,68.07,0,0,1,196,128Zm-24,0a44,44,0,1,0-44,44A44.05,44.05,0,0,0,172,128ZM51.51,68.49a12,12,0,1,0,17-17l-4-4a12,12,0,0,0-17,17Zm0,119-4,4a12,12,0,0,0,17,17l4-4a12,12,0,1,0-17-17ZM196,72a12,12,0,0,0,8.49-3.51l4-4a12,12,0,0,0-17-17l-4,4A12,12,0,0,0,196,72Zm8.49,115.51a12,12,0,0,0-17,17l4,4a12,12,0,0,0,17-17ZM48,128a12,12,0,0,0-12-12H32a12,12,0,0,0,0,24h4A12,12,0,0,0,48,128Zm80,80a12,12,0,0,0-12,12v4a12,12,0,0,0,24,0v-4A12,12,0,0,0,128,208Zm96-92h-4a12,12,0,0,0,0,24h4a12,12,0,0,0,0-24Z"/></svg></button></div>
+      <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z"/></svg></button></div>
 </header>
-<div class="lb-3"><nav class="lb-rail"><div class="lb-rail__t">Dashboard · 29</div><a href="index.html" data-q="overview 29">Overview<span>29</span></a><div class="lb-rail__sep"></div><a href="card-shell.html" data-q="card-shell ">card-shell</a><a href="checkbox.html" data-q="checkbox ">checkbox</a><a href="control.html" data-q="control ">control</a><a href="dashboard-switcher.html" data-q="dashboard-switcher ">dashboard-switcher</a><a href="date-range-picker.html" data-q="date-range-picker ">date-range-picker</a><a href="divider.html" data-q="divider ">divider</a><a href="empty-state.html" data-q="empty-state ">empty-state</a><a href="icon-button.html" data-q="icon-button " class="on">icon-button</a><a href="icon-toggle-group.html" data-q="icon-toggle-group ">icon-toggle-group</a><a href="input.html" data-q="input ">input</a><a href="legend.html" data-q="legend ">legend</a><a href="metric-card.html" data-q="metric-card ">metric-card</a><a href="modal.html" data-q="modal ">modal</a><a href="page-header.html" data-q="page-header ">page-header</a><a href="pagination.html" data-q="pagination ">pagination</a><a href="progress-bar.html" data-q="progress-bar ">progress-bar</a><a href="ring.html" data-q="ring ">ring</a><a href="section-header.html" data-q="section-header ">section-header</a><a href="sidebar.html" data-q="sidebar ">sidebar</a><a href="skeleton.html" data-q="skeleton ">skeleton</a><a href="stat-card.html" data-q="stat-card ">stat-card</a><a href="status-dot.html" data-q="status-dot ">status-dot</a><a href="tab-group.html" data-q="tab-group ">tab-group</a><a href="tab-item.html" data-q="tab-item ">tab-item</a><a href="table-cell.html" data-q="table-cell ">table-cell</a><a href="table-row.html" data-q="table-row ">table-row</a><a href="toast.html" data-q="toast ">toast</a><a href="tooltip.html" data-q="tooltip ">tooltip</a><a href="topbar.html" data-q="topbar ">topbar</a></nav><main class="lb-mid"><div class="lb-h"><h1>icon-button</h1><p class="lede">Dashboard · v2/controls.md</p><div class="lb-row"><span class="chip chip--measured" title="Read off the bound Figma variables. Safe to build from.">measured</span><span class="chip chip--pending" title="Has not been through a review pass">not reviewed</span><span class="pill">v1.38.0</span></div><div class="lb-meta">review: bash scripts/review-pass.sh dashboard icon-button</div></div><div class="md"><h2 id="control-one-component-four-jobs">Controls — control, icon-button, tabs, input</h2>
-<p>Page <code>Dashboard Components</code> (<code>257:371</code>) in <b><code>Q9L6q38dEj3Qu1JkjiT13y</code></b> — the product file, not the library. See <code>README.md</code> in this folder.</p>
-<p><b>Scope: dashboard / product.</b></p>
-<hr class="md-hr">
-<h3 id="geometry-shared-by-button-and-select"><code>control</code> — one component, four jobs</h3>
-<p>Set <code>267:1810</code> · <b>32 variants</b>.</p>
-<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Property</th><th>Values</th></tr></thead><tbody><tr><td><code>Kind</code></td><td><code>button</code> · <code>select</code> · <code>nav</code> · <code>user</code></td></tr><tr><td><code>Style</code></td><td><code>outlined</code> · <code>primary</code> · <code>plain</code> · <code>filled</code> · <code>selected</code></td></tr><tr><td><code>Size</code></td><td><code>28</code> · <code>32</code> · <code>36</code></td></tr><tr><td><code>Theme</code></td><td><code>light</code> · <code>dark</code></td></tr></tbody></table></div>
-<p><b>The matrix is deliberately incomplete</b> — <code>Style</code> and <code>Size</code> values are per <code>Kind</code>. Valid combinations only:</p>
-<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Kind</th><th>Styles</th><th>Sizes</th><th>Variants</th></tr></thead><tbody><tr><td><code>button</code></td><td><code>outlined</code> · <code>primary</code> · <code>plain</code></td><td>28 · 32 · 36</td><td>18</td></tr><tr><td><code>select</code></td><td><code>outlined</code> · <code>filled</code></td><td>28 · 32</td><td>8</td></tr><tr><td><code>nav</code></td><td><code>plain</code> · <code>selected</code></td><td>32</td><td>4</td></tr><tr><td><code>user</code></td><td><code>plain</code></td><td>32</td><td>2</td></tr></tbody></table></div>
-<p>Why one component: the library <code>list-item</code> had been <b>detached 34 times</b> across nine sizes to do all four of these jobs. Utsav ruled one flexible control rather than five named components, 13 Aug 2026.</p>
-<p>Stable layer names for overrides: <b><code>icon-leading</code></b> · <b><code>icon-trailing</code></b> (hidden by default) · <b><code>identity</code></b> · <b><code>meta</code></b> · <b><code>action</code></b>.</p>
-<p><b>Component properties:</b> <code>Label</code> (TEXT) · <code>Leading icon</code> and <code>Trailing icon</code> (BOOLEAN). Layer names remain stable for anything the properties do not cover.</p>
-<h4>Geometry — shared by button and select</h4>
-<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Size</th><th>Radius</th><th>Padding</th><th>Gap</th><th>Label</th><th>Icon</th></tr></thead><tbody><tr><td><code>28</code></td><td><code>radius/8</code></td><td><code>py-8 px-12</code></td><td><code>spacing/4</code></td><td><code>button-12-med</code></td><td>12</td></tr><tr><td><code>32</code></td><td><code>radius/8</code></td><td><code>py-8 px-12</code></td><td><code>spacing/4</code></td><td><code>button-14-med</code></td><td>16</td></tr><tr><td><code>36</code></td><td><b><code>radius/12</code></b></td><td><code>py-8 px-12</code></td><td><code>spacing/4</code></td><td><code>button-14-med</code></td><td>16</td></tr></tbody></table></div>
-<p>Height is <b>fixed</b>, not hugged — 28/32/36 exactly. Width hugs.</p>
-<h4><code>Kind=button</code></h4>
-<p><b>36h at <code>radius/12</code> is the dashboard button.</b> That is what the screens render — the topbar <code>Sync Now</code> (112 × 36) and <code>Compare</code> (97 × 36). 28 and 32 are provided for dense rows.</p>
-<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Style</th><th>Theme</th><th>Fill</th><th>Border</th><th>Label</th><th>Icon</th></tr></thead><tbody><tr><td><code>outlined</code></td><td>light</td><td>none</td><td>1px <code>neutral/200</code></td><td><code>neutral/900</code></td><td><code>neutral/600</code></td></tr><tr><td><code>outlined</code></td><td>dark</td><td>none</td><td>1px <b><code>neutral/700</code></b></td><td><b><code>neutral/50</code></b></td><td><code>neutral/300</code></td></tr><tr><td><code>primary</code></td><td>light</td><td><code>neutral/black</code></td><td>none</td><td><code>neutral/white</code></td><td><code>neutral/white</code></td></tr><tr><td><code>primary</code></td><td>dark</td><td><b><code>neutral/white</code></b></td><td>none</td><td><b><code>neutral/900</code></b></td><td><code>neutral/900</code></td></tr><tr><td><code>plain</code></td><td>light</td><td>none</td><td>none</td><td><code>neutral/900</code></td><td><code>neutral/600</code></td></tr><tr><td><code>plain</code></td><td>dark</td><td>none</td><td>none</td><td><code>neutral/50</code></td><td><code>neutral/300</code></td></tr></tbody></table></div>
-<p><b>Dark primary is a full inversion</b> — white fill, dark label. Measured, and consistent with the dark active tab and the dark checked checkbox. Do not carry <code>neutral/black</code> into dark.</p>
-<p><code>primary</code> exists because <b>the screens contain no filled button at all</b> — only outlined. Utsav ruled a black primary in, 13 Aug 2026, matching the active tab and checked checkbox rather than introducing a new colour. <b>Still never a blue fill</b> — the standing surface default holds.</p>
-<p>⚠ <b>One unresolved disagreement in the source.</b> In dark, the two buttons that are identical in light diverge: <code>Sync Now</code> renders no fill + <code>neutral/700</code> border + <code>neutral/50</code> label, while <code>Compare</code> renders <b><code>neutral/800</code> fill + <code>neutral/600</code> border + white label</b>. <code>Style=outlined, Theme=dark</code> encodes the <code>Sync Now</code> treatment. <b>The filled dark treatment is not represented</b> — if you need it, that is a finding.</p>
-<h4><code>Kind=select</code></h4>
-<p><code>SPACE_BETWEEN</code>, trailing <code>CaretDown</code> <b>12px Weight=Bold</b>.</p>
-<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Style</th><th>Theme</th><th>Fill</th><th>Border</th><th>Label</th></tr></thead><tbody><tr><td><code>outlined</code></td><td>light</td><td><code>neutral/white</code></td><td>1px <b><code>neutral/400</code></b></td><td><code>neutral/900</code></td></tr><tr><td><code>outlined</code></td><td>dark</td><td><b><code>neutral/800</code></b></td><td>1px <code>neutral/600</code></td><td><code>neutral/white</code></td></tr><tr><td><code>filled</code></td><td>light</td><td><code>neutral/25</code></td><td>1px <code>neutral/200</code></td><td><code>neutral/900</code></td></tr><tr><td><code>filled</code></td><td>dark</td><td><code>neutral/900</code></td><td>1px <code>neutral/800</code></td><td><code>neutral/white</code></td></tr></tbody></table></div>
-<p><code>neutral/400</code> is the <b>only</b> place in the system a border uses that step — it is measured, and it is what makes a select read as an input rather than a button. Both <code>outlined</code> and <code>filled</code> were ruled in as legitimate, 13 Aug 2026: outlined for inline selects, filled for filter selects.</p>
-<p>⚠ <b>There is no open-menu state.</b> The screens never drew one. For the menu, <code>controls.md</code> (v1) <code>controls/dropdown</code> <code>State=Open</code> is still the reference — 160 wide vs a 144 trigger, right-aligned, <code>neutral/50</code> border, no selected checkmark.</p>
-<h4><code>Kind=nav</code></h4>
-<p><b>200 × 32</b>, <code>radius/8</code>, padding <code>spacing/8</code>, gap <code>spacing/8</code>. Leading icon 16, label <code>button-14-med</code>, <b>label grows</b> so the row fills the rail.</p>
-<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Style</th><th>Theme</th><th>Fill</th><th>Label</th><th>Icon</th></tr></thead><tbody><tr><td><code>plain</code></td><td>light</td><td>none</td><td><code>neutral/900</code></td><td><code>neutral/600</code></td></tr><tr><td><code>selected</code></td><td>light</td><td><code>neutral/100</code></td><td><code>neutral/900</code></td><td><code>neutral/600</code></td></tr><tr><td><code>plain</code></td><td>dark</td><td>none</td><td><code>neutral/white</code></td><td><code>neutral/300</code></td></tr><tr><td><code>selected</code></td><td>dark</td><td><b><code>neutral/800</code></b></td><td><code>neutral/white</code></td><td><code>neutral/300</code></td></tr></tbody></table></div>
-<p>Group labels are <b>not</b> part of this component — see <code>cards-and-chrome.md</code> → <code>sidebar</code>.</p>
-<h4><code>Kind=user</code></h4>
-<p><b>200 × 32</b>, <code>SPACE_BETWEEN</code>, gap <code>spacing/8</code>, <code>radius/8</code>, <b>no fill in any state</b> (the v1 <code>user-card</code> ruling still holds).</p>
-<ul><li><code>identity</code> → <code>Avatar</code> <b>32 × 32</b> + <code>meta</code></li><li><code>meta</code> → name <code>button-12-med</code> <code>neutral/black</code> (dark: <code>neutral/white</code>) over role</li></ul>
-<p><code>button-10-med</code> <code>neutral/400</code> (dark: unchanged), gap <code>spacing/4</code></p>
-<ul><li><code>action</code> → 24 × 24, <code>radius/4</code>, padding <code>spacing/4</code>, <code>SignOut</code> 16 Weight=Bold <code>neutral/600</code></li></ul>
-<p>(dark: <code>neutral/300</code>)</p>
-<p>⚠ The library's <code>user-card</code> renders its Avatar at <b>42.7 × 32 — squashed</b>. This one is a correct square 32 × 32. Fixing the library instance is a filed finding.</p>
-<hr class="md-hr">
-<h3 id="kind-button"><code>icon-button</code></h3>
-<p>Set <code>268:403</code> · <b>6 variants</b> (3 × 2).</p>
-<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Property</th><th>Values</th></tr></thead><tbody><tr><td><code>Size</code></td><td><code>20</code> · <code>24</code> · <code>28</code></td></tr><tr><td><code>Theme</code></td><td><code>light</code> · <code>dark</code></td></tr></tbody></table></div>
-<p><b>Size-driven styling</b> — this is intentional, ruled 13 Aug 2026:</p>
-<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Size</th><th>Radius</th><th>Padding</th><th>Icon</th><th>Fill</th><th>Border</th></tr></thead><tbody><tr><td><code>20</code></td><td><code>radius/4</code></td><td><code>spacing/4</code></td><td>12</td><td>none</td><td>none</td></tr><tr><td><code>24</code></td><td><code>radius/4</code></td><td><code>spacing/4</code></td><td>16</td><td>none</td><td>none</td></tr><tr><td><code>28</code></td><td><b><code>radius/8</code></b></td><td><code>spacing/8</code></td><td>12</td><td>none</td><td><b>1px <code>neutral/200</code></b></td></tr></tbody></table></div>
-<p>20 and 24 are ghost affordances (24 uses in the screens); <b>28 is the outlined standalone control</b> used by the pagination arrows. Swap the layer named <b><code>icon</code></b>.</p>
-<p><b>Dark:</b> icon <code>neutral/300</code>; <code>Size=28</code>'s border becomes <code>neutral/700</code> — the chrome border step measured on the dark topbar, not the <code>neutral/800</code> card border.</p>
-<hr class="md-hr">
-<h3 id="kind-select"><code>tab-item</code></h3>
-<p>Set <code>268:408</code> · <b>4 variants</b> (2 × 2), complete.</p>
-<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Property</th><th>Values</th></tr></thead><tbody><tr><td><code>State</code></td><td><code>default</code> · <code>active</code></td></tr><tr><td><code>Theme</code></td><td><code>light</code> · <code>dark</code></td></tr></tbody></table></div>
-<p><b>28h</b>, <code>radius/8</code>, <code>py-8 px-12</code>, gap <code>spacing/4</code>, <code>button-12-med</code>.</p>
-<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>State</th><th>Theme</th><th>Fill</th><th>Label</th></tr></thead><tbody><tr><td><code>default</code></td><td>light</td><td>none</td><td><code>neutral/900</code></td></tr><tr><td><code>active</code></td><td>light</td><td><code>neutral/black</code></td><td><code>neutral/white</code></td></tr><tr><td><code>default</code></td><td>dark</td><td>none</td><td><code>neutral/white</code></td></tr><tr><td><code>active</code></td><td>dark</td><td><b><code>neutral/white</code></b></td><td><b><code>neutral/black</code></b></td></tr></tbody></table></div>
-<p><b>Inactive labels are not greyed</b> — the v1 observation still holds, both themes.</p>
-<hr class="md-hr">
-<h3 id="kind-nav"><code>tab-group</code></h3>
-<p>Set <code>356:913</code> · <b>2 variants</b> (<code>Theme</code> = <code>light</code> · <code>dark</code>).</p>
-<p><b>36h</b>, <code>radius/12</code>, padding <code>spacing/4</code>, gap <b><code>spacing/4</code></b>, fill <code>neutral/50</code>, 1px <code>neutral/100</code>. Holds <code>tab-item</code> instances; set exactly one to <code>State=active</code>.</p>
-<p>Renders 340 wide with four tabs. The screens' date-range row is 413 with five.</p>
-<p>⚠ <b>Gap <code>spacing/4</code>, not 8.</b> The v1 <code>controls/tab</code> used <code>gap-8</code>; the screens use 4. Screens won.</p>
-<p><b>Dark (measured):</b> container <code>neutral/900</code> + 1px <code>neutral/800</code>; the active item inverts to a white fill with a <code>neutral/black</code> label. Now a variant set, so the dark topbar and page-header point at the dark variant instead of carrying hand-applied overrides.</p>
-<hr class="md-hr">
-<h3 id="kind-user"><code>icon-toggle-group</code></h3>
-<p>Set <code>356:921</code> · <b>2 variants</b> (<code>Theme</code>). <b>66 × 36</b> — exactly the topbar theme switcher.</p>
-<p><code>radius/12</code>, padding <code>spacing/4</code>, gap <b><code>spacing/2</code></b>, <b>no fill</b>, 1px <b><code>neutral/200</code></b>. Two 28 × 28 cells at <code>radius/8</code>:</p>
-<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Cell</th><th>Fill</th><th>Icon</th></tr></thead><tbody><tr><td><code>toggle-on</code></td><td><code>neutral/black</code></td><td>12px <code>neutral/white</code></td></tr><tr><td><code>toggle-off</code></td><td>none</td><td>12px <code>neutral/600</code></td></tr></tbody></table></div>
-<p><b>This is deliberately not <code>tab-group</code>.</b> Same 36h and <code>radius/12</code>, but no fill and a <code>neutral/200</code> border instead of <code>neutral/50</code> + <code>neutral/100</code>, and gap 2 not 4. Both specs are measured; Utsav ruled them two components, 13 Aug 2026.</p>
-<p>Dark (applied as an override in <code>topbar Theme=dark</code>): container border → <code>neutral/700</code>, <code>toggle-on</code> → <code>neutral/white</code> fill with a <code>neutral/900</code> icon, <code>toggle-off</code> icon → <code>neutral/white</code>.</p>
-<hr class="md-hr">
-<h3 id="icon-button"><code>input</code></h3>
-<p>Set <code>269:528</code> · <b>12 variants</b> (2 × 3 × 2).</p>
-<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Property</th><th>Values</th></tr></thead><tbody><tr><td><code>Type</code></td><td><code>text</code> · <code>search</code></td></tr><tr><td><code>State</code></td><td><code>placeholder</code> · <code>filled</code> · <code>focus</code></td></tr><tr><td><code>Theme</code></td><td><code>light</code> · <code>dark</code></td></tr></tbody></table></div>
-<p><b>NEW — the dashboard screens contain no text input of any kind.</b> Built from the <code>select</code> <code>outlined</code> spec so it sits in the same family. Declared 13 Aug 2026.</p>
-<p><b>240 × 36</b>, <code>radius/8</code>, <code>py-8 px-12</code>, gap <code>spacing/8</code>, fill <code>neutral/white</code>, 1px <code>neutral/400</code>. Label <code>button-14-med</code>, and it grows.</p>
-<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>State</th><th>Border</th><th>Text</th><th>Extra</th></tr></thead><tbody><tr><td><code>placeholder</code></td><td>1px <code>neutral/400</code></td><td><code>neutral/400</code></td><td>—</td></tr><tr><td><code>filled</code></td><td>1px <code>neutral/400</code></td><td><code>neutral/900</code></td><td>—</td></tr><tr><td><code>focus</code></td><td>1px <b><code>neutral/black</code></b></td><td><code>neutral/900</code></td><td>1 × 16 caret, <code>neutral/black</code></td></tr></tbody></table></div>
-<p><code>Type=search</code> prepends <code>MagnifyingGlass</code> 16 Weight=Regular, <code>neutral/400</code>.</p>
-<p>⚠ The <code>focus</code> border here is a <b>fill treatment, not the focus ring.</b> <code>--gw-focus-ring</code> on <code>:focus-visible</code> is still mandatory and additive — see <code>states.md</code>, ruling <b>R1/R2</b>.</p>
-<p>⚠ <b><code>foundation/text-field.md</code> is the shared 14-variant text field used by both surfaces, and it remains authoritative for forms.</b> This component is the dashboard's dense inline field — a table toolbar search, a filter box. If you are building a form, use the shared atom.</p>
-<p><b>Dark is DERIVED, not measured</b> — the dark screen contains no input. Taken from the measured dark select: <code>neutral/800</code> fill + 1px <code>neutral/600</code>, white value, <code>neutral/400</code> placeholder, focus border <code>neutral/white</code>.</p></div></main><div class="lb-toc"><b>On this page</b><a href="#control-one-component-four-jobs" class="l3">control — one component, four jobs</a><a href="#geometry-shared-by-button-and-select" class="l3">Geometry — shared by button and select</a><a href="#kind-button" class="l3">Kind=button</a><a href="#kind-select" class="l3">Kind=select</a><a href="#kind-nav" class="l3">Kind=nav</a><a href="#kind-user" class="l3">Kind=user</a><a href="#icon-button" class="l3">icon-button</a><a href="#tab-item" class="l3">tab-item</a><a href="#tab-group" class="l3">tab-group</a><a href="#icon-toggle-group" class="l3">icon-toggle-group</a><a href="#input" class="l3">input</a></div></div>
+<div class="lb-3"><nav class="lb-rail"><div class="lb-rail__t">Dashboard · 118</div><a href="index.html" data-q="overview 117">Overview<span>117</span></a><div class="lb-rail__sep"></div><a href="access-denied-screen.html" data-q="access-denied-screen ">access-denied-screen</a><a href="account-row.html" data-q="account-row ">account-row</a><a href="action-button.html" data-q="action-button ">action-button</a><a href="activity-timeline.html" data-q="activity-timeline ">activity-timeline</a><a href="app-shell.html" data-q="app-shell ">app-shell</a><a href="area-chart.html" data-q="area-chart ">area-chart</a><a href="avatar.html" data-q="avatar ">avatar</a><a href="avatar-group.html" data-q="avatar-group ">avatar-group</a><a href="banner.html" data-q="banner ">banner</a><a href="bar-chart.html" data-q="bar-chart ">bar-chart</a><a href="board.html" data-q="board ">board</a><a href="breadcrumbs.html" data-q="breadcrumbs ">breadcrumbs</a><a href="breakdown-bar.html" data-q="breakdown-bar ">breakdown-bar</a><a href="build-notice.html" data-q="build-notice ">build-notice</a><a href="bulk-action-bar.html" data-q="bulk-action-bar ">bulk-action-bar</a><a href="card.html" data-q="card ">card</a><a href="chart-frame.html" data-q="chart-frame ">chart-frame</a><a href="chart-tooltip.html" data-q="chart-tooltip ">chart-tooltip</a><a href="checkbox.html" data-q="checkbox ">checkbox</a><a href="checklist.html" data-q="checklist ">checklist</a><a href="coachmark.html" data-q="coachmark ">coachmark</a><a href="column-menu.html" data-q="column-menu ">column-menu</a><a href="combobox.html" data-q="combobox ">combobox</a><a href="command-palette.html" data-q="command-palette ">command-palette</a><a href="confirm-dialog.html" data-q="confirm-dialog ">confirm-dialog</a><a href="content-panel.html" data-q="content-panel ">content-panel</a><a href="data-table.html" data-q="data-table ">data-table</a><a href="date-range-picker.html" data-q="date-range-picker ">date-range-picker</a><a href="datetime-field.html" data-q="datetime-field ">datetime-field</a><a href="definition-tile.html" data-q="definition-tile ">definition-tile</a><a href="delta-pill.html" data-q="delta-pill ">delta-pill</a><a href="detail-view.html" data-q="detail-view ">detail-view</a><a href="docked-panel.html" data-q="docked-panel ">docked-panel</a><a href="donut-chart.html" data-q="donut-chart ">donut-chart</a><a href="drawer.html" data-q="drawer ">drawer</a><a href="empty-state.html" data-q="empty-state ">empty-state</a><a href="explorer-layout.html" data-q="explorer-layout ">explorer-layout</a><a href="filter-builder.html" data-q="filter-builder ">filter-builder</a><a href="filter-chip.html" data-q="filter-chip ">filter-chip</a><a href="form-field.html" data-q="form-field ">form-field</a><a href="form-section.html" data-q="form-section ">form-section</a><a href="funnel.html" data-q="funnel ">funnel</a><a href="google-button.html" data-q="google-button ">google-button</a><a href="growth-report-template.html" data-q="growth-report-template ">growth-report-template</a><a href="heatmap.html" data-q="heatmap ">heatmap</a><a href="histogram.html" data-q="histogram ">histogram</a><a href="horizontal-bar-chart.html" data-q="horizontal-bar-chart ">horizontal-bar-chart</a><a href="icon-button.html" data-q="icon-button " class="on">icon-button</a><a href="incident-row.html" data-q="incident-row ">incident-row</a><a href="info-hint.html" data-q="info-hint ">info-hint</a><a href="issue-summary.html" data-q="issue-summary ">issue-summary</a><a href="key-value-list.html" data-q="key-value-list ">key-value-list</a><a href="legend.html" data-q="legend ">legend</a><a href="legend-table.html" data-q="legend-table ">legend-table</a><a href="line-chart.html" data-q="line-chart ">line-chart</a><a href="log-viewer.html" data-q="log-viewer ">log-viewer</a><a href="login-screen.html" data-q="login-screen ">login-screen</a><a href="menu.html" data-q="menu ">menu</a><a href="metric-strip.html" data-q="metric-strip ">metric-strip</a><a href="modal.html" data-q="modal ">modal</a><a href="multi-select.html" data-q="multi-select ">multi-select</a><a href="nav-group.html" data-q="nav-group ">nav-group</a><a href="nav-item.html" data-q="nav-item ">nav-item</a><a href="page-header.html" data-q="page-header ">page-header</a><a href="page-layout.html" data-q="page-layout ">page-layout</a><a href="pagination.html" data-q="pagination ">pagination</a><a href="period-select.html" data-q="period-select ">period-select</a><a href="popover.html" data-q="popover ">popover</a><a href="progress-bar.html" data-q="progress-bar ">progress-bar</a><a href="query-builder.html" data-q="query-builder ">query-builder</a><a href="radio.html" data-q="radio ">radio</a><a href="report-frame.html" data-q="report-frame ">report-frame</a><a href="report-source-line.html" data-q="report-source-line ">report-source-line</a><a href="ring.html" data-q="ring ">ring</a><a href="row-actions-menu.html" data-q="row-actions-menu ">row-actions-menu</a><a href="row-selection.html" data-q="row-selection ">row-selection</a><a href="saved-views.html" data-q="saved-views ">saved-views</a><a href="search-field.html" data-q="search-field ">search-field</a><a href="search-trigger.html" data-q="search-trigger ">search-trigger</a><a href="segmented-control.html" data-q="segmented-control ">segmented-control</a><a href="select.html" data-q="select ">select</a><a href="session-expired.html" data-q="session-expired ">session-expired</a><a href="setting-row.html" data-q="setting-row ">setting-row</a><a href="shortcut-key.html" data-q="shortcut-key ">shortcut-key</a><a href="sidebar.html" data-q="sidebar ">sidebar</a><a href="sidebar-collapsed.html" data-q="sidebar-collapsed ">sidebar-collapsed</a><a href="sign-in-modal.html" data-q="sign-in-modal ">sign-in-modal</a><a href="skeleton.html" data-q="skeleton ">skeleton</a><a href="sparkline.html" data-q="sparkline ">sparkline</a><a href="split-button.html" data-q="split-button ">split-button</a><a href="stat-card.html" data-q="stat-card ">stat-card</a><a href="status-banner.html" data-q="status-banner ">status-banner</a><a href="status-dot.html" data-q="status-dot ">status-dot</a><a href="status-list.html" data-q="status-list ">status-list</a><a href="sub-nav.html" data-q="sub-nav ">sub-nav</a><a href="support-ops-app-template.html" data-q="support-ops-app-template ">support-ops-app-template</a><a href="table-cell-types.html" data-q="table-cell-types ">table-cell-types</a><a href="table-states.html" data-q="table-states ">table-states</a><a href="table-toolbar.html" data-q="table-toolbar ">table-toolbar</a><a href="tabs-pill.html" data-q="tabs-pill ">tabs-pill</a><a href="tabs-underline.html" data-q="tabs-underline ">tabs-underline</a><a href="tag.html" data-q="tag ">tag</a><a href="text-input.html" data-q="text-input ">text-input</a><a href="textarea.html" data-q="textarea ">textarea</a><a href="theme-and-density.html" data-q="theme-and-density ">theme-and-density</a><a href="theme-menu.html" data-q="theme-menu ">theme-menu</a><a href="time-range-bar.html" data-q="time-range-bar ">time-range-bar</a><a href="timezone-select.html" data-q="timezone-select ">timezone-select</a><a href="toast.html" data-q="toast ">toast</a><a href="toggle.html" data-q="toggle ">toggle</a><a href="tooltip.html" data-q="tooltip ">tooltip</a><a href="topbar.html" data-q="topbar ">topbar</a><a href="unavailable-state.html" data-q="unavailable-state ">unavailable-state</a><a href="unsaved-changes-bar.html" data-q="unsaved-changes-bar ">unsaved-changes-bar</a><a href="uptime-bar.html" data-q="uptime-bar ">uptime-bar</a><a href="widget-grid.html" data-q="widget-grid ">widget-grid</a><a href="workspace-switcher.html" data-q="workspace-switcher ">workspace-switcher</a></nav><main class="lb-mid"><div class="lb-h"><h1>icon-button</h1><p class="lede">Dashboard · actions.md</p><div class="lb-row"><span class="chip chip--extracted" title="Extracted from the design hub's shipped code and generalised, not measured off Figma. The hub is its source of truth. Elements marked NEW in the doc are not in the hub at all.">extracted</span><span class="chip chip--passed" title="2026-10-05 utsav.singh@gushwork.ai">passed</span><span class="pill">v2.0.0</span></div><div class="lb-meta">review: bash scripts/review-pass.sh dashboard icon-button</div></div><div class="md"><h2 id="action-button">Actions — buttons, menus, switchers</h2>
+<p>Scope: the controls that make something happen or switch what is shown, for dense analytics dashboards and web apps. Source of truth is the design hub (<code>web/shell.css</code>, <code>web/admin/analytics.html</code>, <code>web/admin/access-control.html</code>, <code>web/internal/design-system.html</code>), consolidated from its duplicated <code>ul-*</code>/<code>ac-*</code>/<code>rv-*</code> blocks into one set. CSS is <code>css/20-actions.css</code>, behaviour is <code>js/20-actions.js</code> (<code>GD.actions</code>). Everything is scoped under the <code>gd</code> root class and takes its colours from <code>--gd-*</code> aliases, so light and dark come from <code>color-scheme</code> alone. Every height flows from <code>--gd-control-h</code> (36px comfortable, 28px under <code>data-density=&quot;compact&quot;</code>). Blue is data and status; black (<code>--gd-ink</code>) is interaction state, so no button, selected tab or toggle is ever blue. Destructive is a red label and red edge on the neutral shape, never a red fill; a confirm dialog carries the weight.</p>
+<h3 id="icon-button">Action button</h3>
+<p><b>Use</b> for any action a person triggers: save, export, add, apply. <b>Not</b> for navigation between pages (a link or tab) or for a single glyph with no label (icon button).</p>
+<p>Anatomy: <code>.gd-btn</code> with an optional leading or trailing 16px glyph and a label.</p>
+<pre class="md-pre"><code>&lt;button type=&quot;button&quot; class=&quot;gd-btn gd-btn--primary&quot;&gt;&lt;svg …/&gt;Add campaign&lt;/button&gt;</code></pre>
+<p>Variants: <code>--primary</code> (ink fill, one per view), default outline (1px edge), <code>--ghost</code> (no edge), <code>--danger</code> (red label + red edge), <code>--link</code> (inline, underlined on hover). Sizes: default <code>--gd-control-h</code>, <code>--sm</code> 28px (toolbars, table footers). Radius 12 (8 at 28px and in compact). The 1px edge is an inset <code>box-shadow</code>, so a button hugs its content and is never 2px wider than it.</p>
+<p>States: rest, hover (primary <code>--gd-ink-hover</code>; others <code>--gd-ctl-hover</code>), <code>:focus-visible</code> ring (keyboard only, R41), <code>aria-disabled=&quot;true&quot;</code> or <code>:disabled</code> (primary: <code>--gd-ink-disabled-bg/fg</code>; others: <code>--gd-disabled-ink</code> label), <code>aria-busy=&quot;true&quot;</code> (spinner replaces the glyph, pointer events off, label stays). Force hover in previews with <code>.is-hover</code>.</p>
+<p>Tokens: <code>--gd-control-h</code>, <code>--gd-ink</code>, <code>--gd-ink-fg</code>, <code>--gd-ink-hover</code>, <code>--gd-ctl-hover</code>, <code>--gd-border-strong</code>, <code>--gd-danger</code>, <code>--gd-link</code>, <code>--gd-disabled-ink</code>, <code>--gw-text-button-14/12</code>, <code>--gw-motion-fast</code>.</p>
+<p>Accessibility: use a real <code>&lt;button&gt;</code> (or <code>&lt;a class=&quot;gd-btn&quot;&gt;</code> for a link); disabled buttons keep <code>aria-disabled</code> so they stay discoverable; set <code>aria-busy</code> while loading and keep the accessible name. Behaviour: none in JS; the consumer owns click handling. Provenance: extracted <code>web/admin/analytics.html:357-359</code> (<code>.ul-btn</code>), <code>design-system.html:754-764</code> (<code>.rv-b</code>); hover from old button.md (neutral-850) where the hub agrees; <code>.rv-b--bad</code> red fill replaced by the ruled danger outline.</p>
+<h3 id="split-button">Icon button</h3>
+<p><b>Use</b> for a compact action whose meaning a glyph carries: more actions, copy, close, refresh, pager arrows. <b>Not</b> when the action is the primary one on screen (use a labelled button).</p>
+<p>Anatomy: <code>.gd-iconbtn</code> holding one 16px SVG, always with <code>aria-label</code>. Optional <code>data-tip=&quot;Copy link&quot;</code> draws a tooltip from the attribute on hover and keyboard focus; <code>data-tip-end</code> right-aligns it near a viewport edge. The bubble is clipped by an <code>overflow:hidden</code> ancestor; in tables use the Feedback tooltip instead.</p>
+<pre class="md-pre"><code>&lt;button type=&quot;button&quot; class=&quot;gd-iconbtn&quot; aria-label=&quot;Copy link&quot; data-tip=&quot;Copy link&quot;&gt;&lt;svg …/&gt;&lt;/button&gt;</code></pre>
+<p>Variants: default (no edge), <code>--outline</code> (1px edge, the hub's <code>.ul-ib</code>), <code>--sm</code> (28px, 14px glyph). States: hover/open (<code>aria-expanded=&quot;true&quot;</code> keeps the hover look while its menu is down), disabled, <code>aria-busy</code> (glyph spins). Tokens: <code>--gd-control-h</code>, <code>--gd-ctl-hover</code>, <code>--gd-text-muted</code>, <code>--gd-text</code>, <code>--gd-raised-bg</code> (bubble). Accessibility: Esc hides the tooltip (WCAG 1.4.13), <code>aria-label</code> is mandatory. Behaviour: Esc handler in <code>20-actions.js</code>. Provenance: extracted <code>web/shell.css:1861-1899</code> (<code>.gw-iconbtn</code> + <code>data-tip</code>), <code>analytics.html:187-193</code> (<code>.ul-ib</code>). The hub's 24px and 44px sizes are replaced by the density-driven square.</p>
+<h3 id="menu">Split button</h3>
+<p><b>Use</b> when one action is the default and a few related ones sit behind it (Copy page / Open in…). <b>Not</b> for unrelated actions; use a menu button.</p>
+<p>Anatomy: <code>.gd-split</code> &gt; <code>.gd-split__main</code> (a <code>.gd-btn</code>) + <code>.gd-split__tog</code> (a <code>.gd-btn</code> with caret, <code>data-gd-menu</code>) + a <code>.gd-menu</code>.</p>
+<pre class="md-pre"><code>&lt;div class=&quot;gd-split&quot;&gt;&lt;button class=&quot;gd-btn gd-split__main&quot;&gt;Copy page&lt;/button&gt;
+&lt;button class=&quot;gd-btn gd-split__tog&quot; data-gd-menu aria-label=&quot;More page options&quot;&gt;&lt;svg …/&gt;&lt;/button&gt;&lt;div class=&quot;gd-menu&quot; hidden&gt;…&lt;/div&gt;&lt;/div&gt;</code></pre>
+<p>Variants: default, <code>--primary</code> (ink fill, hairline divider). States as button; the toggle shows hover while open and the caret flips. Menu right-aligns under the toggle and flips up when there is no room. Accessibility: toggle has an accessible name, <code>aria-haspopup=&quot;menu&quot;</code>, <code>aria-expanded</code>. Behaviour: the menu engine (see Menu). Provenance: extracted <code>web/shell.css:2229-2260</code> (<code>.pa__split</code>, <code>.pa__main</code>, <code>.pa__tog</code>).</p>
+<h3 id="segmented-control">Menu</h3>
+<p><b>Use</b> for a list of actions or checkable options anchored to a trigger. <b>Not</b> for choosing a form value (select) or for navigation (nav). Shared primitive: Tables, Data and Feedback reference these class names.</p>
+<p>Anatomy: <code>.gd-menu</code> (role <code>menu</code>) &gt; <code>.gd-menu__item</code> (role <code>menuitem</code>, <code>menuitemcheckbox</code> or <code>menuitemradio</code>), <code>.gd-menu__sep</code>, <code>.gd-menu__label</code>, <code>.gd-menu__check</code>, <code>.gd-menu__text</code>, <code>.gd-menu__desc</code>.</p>
+<pre class="md-pre"><code>&lt;div class=&quot;gd-pop&quot;&gt;&lt;button class=&quot;gd-btn&quot; data-gd-menu aria-haspopup=&quot;menu&quot; aria-expanded=&quot;false&quot;&gt;Actions&lt;/button&gt;
+&lt;div class=&quot;gd-menu&quot; hidden&gt;&lt;button class=&quot;gd-menu__item&quot; role=&quot;menuitem&quot;&gt;&lt;svg …/&gt;&lt;span&gt;Edit&lt;/span&gt;&lt;/button&gt;
+&lt;div class=&quot;gd-menu__sep&quot;&gt;&lt;/div&gt;&lt;button class=&quot;gd-menu__item gd-menu__item--danger&quot; role=&quot;menuitem&quot;&gt;Delete&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;</code></pre>
+<p>Variants: <code>--danger</code> (red label), <code>aria-checked=&quot;true&quot;</code> (check mark and weight, in ink not blue), <code>aria-disabled=&quot;true&quot;</code>, <code>--end</code> (right-aligned), description line, compact density (12px type). Hover and keyboard highlight use <code>--gd-menu-hover</code>.</p>
+<p>Behaviour (JS): <code>data-gd-menu</code> on the trigger opens the menu with that id or the next sibling; the menu is placed <code>position:fixed</code> under the trigger, clamped to the viewport, and flips up when below-space is short. Esc closes and refocuses, ArrowUp/Down/Home/End move focus, type-ahead jumps, Tab closes, outside press, scroll and resize close. Checkable items flip <code>aria-checked</code>; every activation emits <code>gd:menu {item,value,checked}</code>; <code>data-gd-keep</code> keeps it open. Layering: z-index 60 (popover). Provenance: extracted <code>shell.css:1910-1937</code> (<code>.gw-pop</code>), <code>analytics.html:344-352</code> (<code>.ul-menu</code>), <code>access-control.html:283-308</code> (<code>.ac-dd</code>). The hub's blue check is dropped: selection is ink.</p>
+<p><b>Phone.</b> Rows are 44 tall and the menu is never wider than the screen minus 32.</p>
+<h3 id="tabs-pill">Segmented control</h3>
+<p><b>Use</b> to set a value of the same data, usually a view: table / board / list, line / bar / table. <b>Not</b> to switch page sections (tabs) or for more than about seven options (select).</p>
+<p>Anatomy: <code>.gd-seg[role=radiogroup]</code> &gt; <code>.gd-seg__item[role=radio][aria-checked][data-value]</code>; <code>--icon</code> items carry only a glyph and need <code>aria-label</code>. Roving tabindex: the checked item is <code>tabindex=&quot;0&quot;</code>.</p>
+<pre class="md-pre"><code>&lt;div class=&quot;gd-seg&quot; role=&quot;radiogroup&quot; aria-label=&quot;View&quot;&gt;&lt;button class=&quot;gd-seg__item gd-seg__item--icon&quot; role=&quot;radio&quot; aria-checked=&quot;true&quot; tabindex=&quot;0&quot; data-value=&quot;table&quot; aria-label=&quot;Table&quot;&gt;&lt;svg …/&gt;&lt;/button&gt;…&lt;/div&gt;</code></pre>
+<p>Selected is a soft fill (<code>--gd-selected-bg</code>) inside an edged track, which is what tells it from the black tabs-pill. States: hover, checked, disabled. Behaviour: arrows, Home/End move and select; emits <code>gd:change {item,value}</code>.</p>
+<p><b>Chart type switcher</b> is this component with icons and labels (Line, Bar, Table); there is no separate component. Provenance: NEW, not in the hub; reference Mobbin Linear and Mixpanel view switchers; pending library review.</p>
+<p><b>Phone.</b> The control spans its row and every option shares the width; if there are too many to fit it scrolls inside itself. Inside the page header's action row it keeps its own size.</p>
+<h3 id="tabs-underline">Tabs pill</h3>
+<p><b>Use</b> for in-page view switching (Insights / Usage / Visits, or a period). <b>Not</b> for page-level sections (tabs underline) or for setting a value (segmented control).</p>
+<p>Anatomy: <code>.gd-tabs.gd-tabs--pill[role=tablist]</code> &gt; <code>.gd-tabs__tab[role=tab][aria-selected][aria-controls]</code>, optional <code>.gd-tabs__count</code>; panels are <code>.gd-tabs__panel</code>.</p>
+<pre class="md-pre"><code>&lt;div class=&quot;gd-tabs gd-tabs--pill&quot; role=&quot;tablist&quot; aria-label=&quot;Analytics&quot;&gt;&lt;button class=&quot;gd-tabs__tab&quot; role=&quot;tab&quot; aria-selected=&quot;true&quot; tabindex=&quot;0&quot;&gt;Insights&lt;/button&gt;…&lt;/div&gt;</code></pre>
+<p>Track <code>--gd-track-bg</code> with a 1px inset edge so 28px tabs still fit; selected is ink fill (white text, inverts in dark); hover <code>--gd-track-hover</code>; disabled <code>aria-disabled</code>. Compact density tightens padding so the track is 28px. Behaviour: click and arrows activate (automatic activation), toggles <code>hidden</code> on <code>aria-controls</code> panels, emits <code>gd:tab {tab,value}</code>; tablists inside <code>[data-gd-metric-strip]</code> are skipped. Provenance: extracted <code>analytics.html:177-181</code> (<code>.ul-tabs</code>, <code>.ul-tab</code>).</p>
+<p><b>Phone.</b> The pill row scrolls inside itself rather than overflowing the page.</p>
+<h3 id="period-select">Tabs underline</h3>
+<p><b>Use</b> for page-level sections (Overview / Members / Billing), sticky under the page header. <b>Not</b> for in-page view switches.</p>
+<p><b>One row per page (R59).</b> Never stack two underlined rows. If a page's sections each have sections of their own, the upper level is a rail submenu (<code>nav-group</code>, see <code>navigation.md</code>) and only the lower level is <code>tabs-underline</code>. The hub's Design System page does this: Library, Review and Workflow are the submenu, Foundations, Web pages, Slides and the rest are the one underlined row.</p>
+<p>Anatomy: same roles as tabs pill with <code>.gd-tabs--underline</code>; a hairline runs full width and a 2px ink bar sits under the selected tab. Overflow scrolls horizontally with the scrollbar hidden. States: rest <code>--gd-text-muted</code>, hover and selected <code>--gd-text</code>, focus ring inside the tab, disabled. Same JS and events as tabs pill. Provenance: extracted <code>web/admin/access-control.html:24-32</code> (<code>.ac-tabbar</code>, <code>.ac-tab</code>).</p>
+<h3 id="shortcut-key">Period select</h3>
+<p><b>Use</b> for the common &quot;how far back&quot; control on a chart or table: 7 days / 30 days / All time. For a full range with custom dates and compare, use time range bar.</p>
+<p>Anatomy: a tabs-pill track used as a radiogroup inside <code>.gd-period</code>, optional <code>.gd-period__t</code> caption.</p>
+<pre class="md-pre"><code>&lt;div class=&quot;gd-period&quot;&gt;&lt;div class=&quot;gd-tabs gd-tabs--pill&quot; role=&quot;radiogroup&quot; aria-label=&quot;Period&quot;&gt;&lt;button class=&quot;gd-tabs__tab&quot; role=&quot;radio&quot; aria-checked=&quot;true&quot; tabindex=&quot;0&quot; data-value=&quot;30&quot;&gt;30 days&lt;/button&gt;…&lt;/div&gt;&lt;/div&gt;</code></pre>
+<p>States and tokens as tabs pill. Behaviour: emits <code>gd:change {item,value}</code>. Provenance: extracted <code>analytics.html:555-559</code> (the Period <code>.ul-tabs</code>); it is a composition, kept as its own key because it is the pattern teams reach for first.</p>
+<h3 id="info-hint">Shortcut key</h3>
+<p><b>Use</b> whenever a control has a keyboard shortcut: the shortcut is shown inside that control, after its label, as a quiet key cap. <b>Not</b> as a separate hint line under or beside a group of buttons (R53), and not for a shortcut with no control to carry it: that goes in the control's tooltip (<code>title</code>), as in &quot;Save (⌘S)&quot;.</p>
+<p>Anatomy: <code>.gd-btn__key</code> as the last child of a <code>.gd-btn</code>, <code>aria-hidden=&quot;true&quot;</code>, with <code>aria-keyshortcuts</code> on the button so assistive tech still gets the key.</p>
+<pre class="md-pre"><code>&lt;button type=&quot;button&quot; class=&quot;gd-btn gd-btn--primary&quot; aria-keyshortcuts=&quot;A&quot;&gt;Approve&lt;kbd class=&quot;gd-btn__key&quot; aria-hidden=&quot;true&quot;&gt;A&lt;/kbd&gt;&lt;/button&gt;</code></pre>
+<p>The cap is the label's own colour at 55% on a 14% tint of it, 18px tall with a 4px radius, 8px after the label. It is a filled shape, so the button's right padding is inset to <code>(control height - 18) / 2</code>, which makes the cap's gap to the right edge equal its gap above and below. Keys read as they appear on the keyboard: <code>A</code>, <code>Esc</code>, <code>⌘↵</code>. Not drawn at <code>--sm</code> (28px buttons are too tight), on touch (<code>hover: none</code>) or under 768px: there is no keyboard to press, and the shortcut still works.</p>
+<p>States: it follows its button (hover, focus, disabled, busy); the cap has none of its own. Tokens: <code>--gd-control-h</code>, <code>--gw-space-4</code>, <code>--gw-space-8</code>, <code>--gw-radius-4</code>, <code>--gw-text-body-12-med</code>. Provenance: NEW (R53, from Utsav's review of the Review drawer footer, 5 Oct 2026); the drawer's own <code>.rv-b kbd</code> is the hub's copy of the same pattern. Pending library review. Not <code>.gd-kbd</code>: that class is the Feedback key hint (tooltips, the command palette) and has its own colours.</p>
+<h3>Info hint</h3>
+<p><b>Use</b> beside a metric or column name to define it (bounce rate, cost per lead). <b>Not</b> for errors, or for text people must read to proceed.</p>
+<p>Anatomy: <code>.gd-hint</code> &gt; <code>.gd-hint__label</code> (plain text, no underline: the glyph is the cue) + <code>.gd-hint__btn</code> (info glyph, <code>data-tip</code> carries the definition, <code>aria-label</code> names it). The bubble opens centred under the label and glyph together, not under the glyph alone.</p>
+<pre class="md-pre"><code>&lt;span class=&quot;gd-hint&quot;&gt;&lt;span class=&quot;gd-hint__label&quot;&gt;Bounce rate&lt;/span&gt;&lt;button class=&quot;gd-hint__btn&quot; aria-label=&quot;About bounce rate&quot; data-tip=&quot;Share of sessions that ended on the first page.&quot;&gt;&lt;svg …/&gt;&lt;/button&gt;&lt;/span&gt;</code></pre>
+<p>States: rest muted, hover/focus darker and the bubble opens (max 240px, wraps), Esc dismisses. The bubble here is CSS from <code>data-tip</code>; Feedback owns the real tooltip, so inside scrollers and sticky table headers where <code>overflow</code> would clip it, point <code>aria-describedby</code> at the Feedback tooltip instead. Provenance: NEW, not in the hub; reference Mobbin Square, Google Analytics and Fresha; pending library review.</p></div></main><div class="lb-toc"><b>On this page</b><a href="#action-button" class="l3">Action button</a><a href="#icon-button" class="l3">Icon button</a><a href="#split-button" class="l3">Split button</a><a href="#menu" class="l3">Menu</a><a href="#segmented-control" class="l3">Segmented control</a><a href="#tabs-pill" class="l3">Tabs pill</a><a href="#tabs-underline" class="l3">Tabs underline</a><a href="#period-select" class="l3">Period select</a><a href="#shortcut-key" class="l3">Shortcut key</a><a href="#info-hint" class="l3">Info hint</a></div></div>
 <script>
 (function(){
-  /* Theme: the same two localStorage keys the main site uses, so a choice made there
-     carries here and back. 'system' can still arrive from an older stored value and
-     resolves to light, matching shell.js. */
-  var PREF='gw-theme-pref', RES='gw-theme';
-  function pref(){try{var v=localStorage.getItem(PREF);
-    if(v==='light'||v==='dark')return v;
-    if(v==='system')return 'light';
-    var o=localStorage.getItem(RES);
-    return (o==='dark'||o==='light')?o:'light';}catch(e){return 'light'}}
-  function apply(p){var r=p==='dark'?'dark':'light';
+  /* Theme: the same keys as the main site. `gw-theme-choice` is what the person picked (light, dark or system) and is
+     written only when they pick; no choice means System, which follows the machine. `gw-theme` is the resolved
+     light or dark. This button toggles light and dark, so using it is a choice. */
+  var CH='gw-theme-choice', RES='gw-theme';
+  function pref(){try{var v=localStorage.getItem(CH);return (v==='light'||v==='dark'||v==='system')?v:'system'}catch(e){return 'system'}}
+  function res(p){return p==='dark'?'dark':p==='light'?'light':(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}
+  function apply(p,remember){var r=res(p);
     document.documentElement.setAttribute('data-theme',r);
-    try{localStorage.setItem(PREF,p);localStorage.setItem(RES,r)}catch(e){}
+    try{localStorage.setItem(RES,r);if(remember)localStorage.setItem(CH,p)}catch(e){}
     var b=document.getElementById('lb-theme');
     if(b)b.setAttribute('aria-label',r==='dark'?'Switch to light':'Switch to dark');}
   var btn=document.getElementById('lb-theme');
   if(btn)btn.addEventListener('click',function(){
-    apply(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
-  apply(pref());
+    apply(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark',true)});
+  apply(pref(),false);
+  try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){if(pref()==='system')apply('system',false)})}catch(e){}
 
   /* Rail filter. Narrows the inventory in place — it does not navigate, because the
      rail is a list of siblings and losing your place to search them is worse than
@@ -504,6 +523,17 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
       var t=f.value.trim().toLowerCase();
       rows.forEach(function(a){
         a.hidden=!!t&&a.getAttribute('data-q').indexOf(t)===-1});
+    });
+  }
+
+  /* Component list filter: hides rows that do not match, and a surface whose rows all went. */
+  var rf=document.getElementById('lb-rows');
+  if(rf){
+    var trs=[].slice.call(document.querySelectorAll('tr[data-q]')), secs=[].slice.call(document.querySelectorAll('section[data-cat]'));
+    rf.addEventListener('input',function(){
+      var t=rf.value.trim().toLowerCase();
+      trs.forEach(function(r){r.hidden=!!t&&r.getAttribute('data-q').indexOf(t)===-1});
+      secs.forEach(function(sc){sc.hidden=!sc.querySelector('tr[data-q]:not([hidden])')});
     });
   }
 

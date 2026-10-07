@@ -1,0 +1,37 @@
+/* ============================================================================
+   80 — build notice (drift notice)
+   NEW, pending library review. Replaces the DRIFT_JS/.drift block that every old dashboard
+   copied out of preview/_build_gtm_command_center.py. Same behaviour and the same stamp format
+   (scripts/check-drift.sh still reads the gushwork-build:{...} comment), now a component so a
+   builder includes dashboard.js instead of pasting 150 lines.
+   ============================================================================ */
+.gd .gd-drift {
+  position: fixed; right: var(--gw-space-16); bottom: var(--gw-space-16); z-index: 70;   /* under modal/drawer (90) and toast (100) */
+  width: 380px; max-width: calc(100vw - var(--gw-space-32));
+  display: none; flex-direction: column; gap: var(--gw-space-8);
+  padding: var(--gw-space-12) var(--gw-space-16);
+  background: var(--gd-raised-bg); color: var(--gd-text-body);
+  border: 1px solid var(--gd-border-strong); border-radius: var(--gw-radius-12);
+  box-shadow: var(--gw-shadow-s3);
+}
+.gd .gd-drift.is-on { display: flex; }
+/* Badge and dismiss share the first row; the headline sits below, full width, so a long headline
+   never competes with the badge for the line. */
+.gd .gd-drift__head { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: var(--gw-space-8); }
+.gd .gd-drift__head > .gd-badge { grid-column: 1; grid-row: 1; justify-self: start; }
+.gd .gd-drift__head > .gd-iconbtn { grid-column: 2; grid-row: 1; }
+.gd .gd-drift__title { grid-column: 1 / -1; grid-row: 2; margin: 0; font: var(--gw-text-body-14-sem); color: var(--gd-text); }
+.gd .gd-drift__list { display: flex; flex-direction: column; gap: var(--gw-space-4); font: var(--gw-text-body-12-reg); }
+.gd .gd-drift__item b { font-weight: 600; color: var(--gd-text); }
+.gd .gd-drift__foot { font: var(--gw-text-body-12-reg); color: var(--gd-text-muted); }
+.gd .gd-drift__foot a { color: var(--gd-link); }
+.gd .gd-drift__acts { display: flex; gap: var(--gw-space-8); align-items: center; }
+.gd .gd-drift__fallback { display: none; width: 100%; min-height: 96px; font: var(--gw-text-body-12-reg); font-family: var(--gd-font-mono, ui-monospace, Menlo, monospace);
+  color: var(--gd-text); background: var(--gd-sunken-bg); border: 1px solid var(--gd-border-strong); border-radius: var(--gw-radius-8); padding: var(--gw-space-8); }
+.gd .gd-drift__fallback:focus { outline: none; border-color: var(--gd-border-focus); }   /* R41: a text field shows its edge */
+/* Update now / Remind later: one row, primary first. Focus rings come from the base :focus-visible rule (R41), so both are keyboard-visible. */
+.gd .gd-drift__acts .gd-btn { flex: 0 0 auto; }
+.gd .gd-drift__steps { display: none; flex-direction: column; gap: var(--gw-space-4); font: var(--gw-text-body-12-reg); }
+.gd .gd-drift__steps.is-on { display: flex; }
+.gd .gd-drift__steps p { margin: 0; }
+.gd .gd-drift__cmd { display: none; min-height: 0; resize: none; }

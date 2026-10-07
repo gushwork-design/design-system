@@ -67,7 +67,30 @@ t('an empty ruleset is rejected so the caller falls back', normalise({ routes: [
 t('a route with no leading slash is dropped', normalise({ routes: [{ path: 'x' }, { path: '/ok' }] }).routes.length, 1);
 t('an unknown access level is not a wildcard', normalise({ routes: [{ path: '/x', access: 'wide-open' }] }).routes[0].access, 'internal');
 t('non-addresses are filtered out of the admin list', normalise({ routes: [{ path: '/x' }], admins: ['nope', 'a@b.co'] }).admins, ['a@b.co']);
-t('the compiled fallback is the old two tiers', defaultRules().routes.map(r => r.access), ['admin', 'internal']);
+/* The compiled routes, in order: /admin, /internal, /library, /library/review, /previews, the owner-only
+   usage log, analytics and system health, and the one public ad lander. This used to assert just the first two and went stale
+   as routes were added; it now names them all so adding one is a deliberate edit here. */
+t('the compiled fallback routes and their tiers', defaultRules().routes.map(r => r.access),
+  ['admin', 'internal', 'internal', 'internal', 'admin', 'owner', 'owner', 'owner', 'public']);   // /library and /previews became internal on 3 Oct 2026; /admin/system-health is the third owner page
+t('previews: an ordinary teammate is let in (internal tier since 3 Oct 2026)', decide('/previews/web/button.html', S('sam@gushwork.ai'), normalise(defaultRules())), 'allow');
+
+/* The usage log lists who ran a session. It is the owner tier, so an admin who is not an
+   owner is kept out, while the owner is let in. Uses the COMPILED rules, which is what a
+   deploy with no Edge Config store serves. */
+const compiled = normalise(defaultRules());
+t('analytics: an admin who is not an owner is forbidden',
+  decide('/admin/analytics', S('priya@gushwork.ai'), { ...compiled, admins: ['priya@gushwork.ai'] }), 'forbid');
+t('review sheet: an admin who is not an owner is forbidden',
+  decide('/admin/review-sheet', S('priya@gushwork.ai'), { ...compiled, admins: ['priya@gushwork.ai'] }), 'forbid');
+t('review sheet: an owner is let in', decide('/admin/review-sheet', S('utsav.singh@gushwork.ai'), compiled), 'allow');
+t('library: an ordinary teammate is let in (internal tier since 3 Oct 2026)', decide('/library', S('sam@gushwork.ai'), compiled), 'allow');
+t('library: an admin is let in', decide('/library', S('priya@gushwork.ai'), { ...compiled, admins: ['priya@gushwork.ai'] }), 'allow');
+t('library review queue: an ordinary teammate is kept out', decide('/library/review', S('sam@gushwork.ai'), compiled), 'forbid');
+t('library review queue: an admin is let in', decide('/library/review', S('priya@gushwork.ai'), { ...compiled, admins: ['priya@gushwork.ai'] }), 'allow');
+t('system health: an admin who is not an owner is forbidden',
+  decide('/admin/system-health', S('priya@gushwork.ai'), { ...compiled, admins: ['priya@gushwork.ai'] }), 'forbid');
+t('system health: an owner is let in', decide('/admin/system-health', S('utsav.singh@gushwork.ai'), compiled), 'allow');
+t('analytics: an owner is let in', decide('/admin/analytics', S('utsav.singh@gushwork.ai'), compiled), 'allow');
 
 /* The unconfigured path — no Edge Config store — is what every deployment
    serves until a store is attached, and it is the one the page crashed on:
@@ -80,6 +103,12 @@ for (const r of defaultRules().routes) {
 }
 t('defaults survive a round-trip through normalise',
   normalise(defaultRules()).routes, defaultRules().routes);
+
+/* The edge gate only runs for paths in middleware.js's matcher, so a rule in _access.js for a path the matcher leaves
+   out does nothing. /previews has a rule; this keeps it in the matcher. */
+import fs from 'node:fs';
+const mw = fs.readFileSync(new URL('../web/middleware.js', import.meta.url), 'utf8');
+t('the middleware matcher covers /previews', /matcher:[^\]]*'\/previews\/:path\*'/.test(mw), true);
 
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

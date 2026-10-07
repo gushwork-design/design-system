@@ -45,7 +45,7 @@ const C = {
   neutral400: '959BA4',
   neutral600: '6A7077',
   neutral700: '535A61',
-  neutral850: '333333',
+  neutral850: '2e3338',
   // 60% white over primary-500 resolves EXACTLY to primary-200 (#99c6ff):
   //   r .6*255+.4*0x00 = 153  g .6*255+.4*112 = 198  b .6*255+.4*255 = 255
   // pptx has no per-run opacity, so the cover's dimmed title uses the flat

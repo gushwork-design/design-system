@@ -1,0 +1,116 @@
+/* ============================================================================
+   Gushwork dashboard — 00 base layer
+   Source: extracted from the design hub (web/shell.css, web/admin/analytics.html),
+   16 Oct 2026 rebuild. Every value is a token from foundation/tokens.css or an
+   alias of one. Components live in 10-…, 20-… and are concatenated by
+   scripts/build-dashboard-css.sh into exports/dashboard/dashboard.css — edit the
+   partials, never the built file.
+
+   Usage: put class="gd" on <html> or <body>. Everything is scoped under .gd and
+   prefixed gd-, so it cannot collide with the hub's gw-* shell.
+
+   THEME. One declaration per alias, using light-dark(), driven by color-scheme.
+   The hub declares every alias in three blocks (bare :root, a prefers-color-scheme
+   media block, [data-theme=dark]); an alias missed in one of them silently keeps
+   the other theme's value. light-dark() makes that impossible. Behaviour:
+     no data-theme          follows the OS, live            (R37, System)
+     data-theme="light"     forced light
+     data-theme="dark"      forced dark
+   Needs a browser from 2024 or later; the hub already requires one.
+   ============================================================================ */
+
+:root { color-scheme: light dark; }
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"]  { color-scheme: dark; }
+
+.gd, .gd *, .gd *::before, .gd *::after { box-sizing: border-box; }
+/* Text smoothing, as the hub (web/shell.css) and the review drawings (web/previews/_sheet.css) both render it. Without it a dashboard
+   built outside the hub draws every glyph heavier on macOS than the Library shows (found 6 Oct 2026, R60). */
+.gd { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+.gd {
+  /* --- surfaces ----------------------------------------------------------- */
+  --gd-page-bg:      light-dark(var(--gw-color-neutral-50),  var(--gw-color-black));
+  --gd-panel-bg:     light-dark(var(--gw-color-white),       var(--gw-color-black));
+  --gd-card-bg:      light-dark(var(--gw-color-white),       var(--gw-color-black));
+  --gd-raised-bg:    light-dark(var(--gw-color-white),       var(--gw-color-neutral-900));  /* popover, drawer, dialog */
+  --gd-sunken-bg:    light-dark(var(--gw-color-neutral-25),  var(--gw-color-neutral-900));  /* well, table header, code */
+
+  /* --- lines -------------------------------------------------------------- */
+  --gd-border:       light-dark(var(--gw-color-neutral-100), var(--gw-color-neutral-900));  /* hairline */
+  --gd-border-strong:light-dark(var(--gw-color-neutral-200), var(--gw-color-neutral-850));  /* a control's edge */
+  --gd-border-focus: light-dark(var(--gw-color-neutral-400), var(--gw-color-neutral-400));  /* R41: a text field shows its edge, not a ring */
+
+  /* --- text --------------------------------------------------------------- */
+  --gd-text:         light-dark(var(--gw-color-black),       var(--gw-color-neutral-100));  /* headings, values */
+  --gd-text-body:    light-dark(var(--gw-color-neutral-600), var(--gw-color-neutral-400));  /* running text */
+  --gd-text-muted:   light-dark(var(--gw-color-neutral-600), var(--gw-color-neutral-400));  /* captions; 600 clears 4.5:1 on the grey ground, 400 does not */
+  --gd-placeholder:  var(--gw-color-neutral-400);
+  --gd-link:         light-dark(var(--gw-color-primary-600), var(--gw-color-primary-300));
+
+  /* --- interaction -------------------------------------------------------- */
+  --gd-hover-bg:     light-dark(var(--gw-color-neutral-50),  color-mix(in srgb, var(--gw-color-neutral-900) 55%, transparent));
+  --gd-selected-bg:  light-dark(var(--gw-color-neutral-100), var(--gw-color-neutral-900));
+  --gd-nav-label:    light-dark(var(--gw-color-neutral-900), var(--gw-color-neutral-300));
+  --gd-ink:          light-dark(var(--gw-color-black),       var(--gw-color-neutral-100));  /* primary action fill; inverts in dark */
+  --gd-ink-fg:       light-dark(var(--gw-color-white),       var(--gw-color-neutral-900));
+  --gd-ink-hover:    light-dark(var(--gw-color-neutral-850), var(--gw-color-white));
+  --gd-disabled-fg:  var(--gw-color-neutral-250);
+  --gd-scrim:        color-mix(in srgb, var(--gw-color-black) 44%, transparent);
+
+  /* --- signal. Blue and green/amber/red carry data and status; black carries
+         interaction state. Never a blue button. ----------------------------- */
+  --gd-accent:       var(--gw-color-primary-500);
+  --gd-danger:       light-dark(var(--gw-color-red-400),     var(--gw-color-red-300));
+  --gd-good:         light-dark(var(--gw-color-green-400),   var(--gw-color-green-300));
+  --gd-warn:         light-dark(var(--gw-color-yellow-400),  var(--gw-color-yellow-300));
+
+  /* --- density. The single switch for heavy dashboards. Comfortable is the
+         default; set data-density="compact" on .gd (or any ancestor of a
+         region) for dense analytics screens. ------------------------------- */
+  --gd-control-h:    36px;
+  --gd-row-h:        56px;
+  --gd-head-h:       44px;
+  --gd-cell-px:      var(--gw-space-16);
+  --gd-gap:          var(--gw-space-16);
+  --gd-card-pad:     var(--gw-space-20);
+
+  font: var(--gw-text-body-14-reg);
+  letter-spacing: var(--gw-text-body-14-reg-tracking);
+  color: var(--gd-text-body);
+  background: var(--gd-page-bg);
+}
+.gd [data-density="compact"], .gd[data-density="compact"] {
+  --gd-control-h:    28px;
+  --gd-row-h:        40px;
+  --gd-head-h:       36px;
+  --gd-cell-px:      var(--gw-space-12);
+  --gd-gap:          var(--gw-space-12);
+  --gd-card-pad:     var(--gw-space-16);
+}
+
+/* --- shared atoms ----------------------------------------------------------- */
+/* :where() keeps this at zero specificity, so a component's own colour (.gd-btn--primary) wins.
+   Written as `.gd button` it outranked them and primary labels rendered grey. */
+.gd :where(button) { font: inherit; color: inherit; }
+.gd .gd-num { font-feature-settings: "tnum" 1; }           /* every figure that can change aligns */
+.gd .gd-sr  { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* R41: the ring is keyboard-only. Text fields draw their edge instead (see
+   30-inputs). Native <button>, <a> and [tabindex] get the ring. */
+.gd :where(button, a, [tabindex], summary, [role="tab"], [role="menuitem"], [role="option"]):focus-visible {
+  outline: var(--gw-focus-ring);
+  outline-offset: var(--gw-focus-offset);
+}
+.gd :where(button, a, [tabindex], summary):focus:not(:focus-visible) { outline: none; }
+
+/* Motion. --gw-motion-fast is declared ONCE in tokens.css; do not re-declare it
+   here (the hub did, in shell.css, and tokens.css warns about that trap). Reduced
+   motion is handled by switching the transitions off instead. */
+.gd .gd-t { transition: background var(--gw-motion-fast), border-color var(--gw-motion-fast), color var(--gw-motion-fast), box-shadow var(--gw-motion-fast); }
+@media (prefers-reduced-motion: reduce) {
+  .gd *, .gd *::before, .gd *::after { transition: none !important; animation: none !important; }
+}
+
+/* Loading pulse, shared by .gd-ghost (feedback) and chart skeletons. */
+@keyframes gd-pulse { 0%, 100% { opacity: 1 } 50% { opacity: .55 } }

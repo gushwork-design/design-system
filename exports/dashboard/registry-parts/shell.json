@@ -1,0 +1,104 @@
+{
+  "app-shell": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "shell.md"
+  },
+  "sidebar": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "shell.md"
+  },
+  "sidebar-collapsed": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "shell.md"
+  },
+  "topbar": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "shell.md"
+  },
+  "content-panel": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "shell.md"
+  },
+  "page-layout": {
+    "version": "2.0.1",
+    "changed": "2026-10-05",
+    "breaking": false,
+    "doc": "shell.md"
+  },
+  "page-header": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "shell.md"
+  },
+  "widget-grid": {
+    "version": "2.0.1",
+    "changed": "2026-10-05",
+    "breaking": false,
+    "doc": "shell.md"
+  },
+  "explorer-layout": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "shell.md"
+  },
+  "nav-item": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "navigation.md"
+  },
+  "nav-group": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "navigation.md"
+  },
+  "account-row": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "navigation.md"
+  },
+  "workspace-switcher": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "navigation.md"
+  },
+  "breadcrumbs": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "navigation.md"
+  },
+  "sub-nav": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "navigation.md"
+  },
+  "theme-menu": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "navigation.md"
+  },
+  "search-trigger": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "navigation.md"
+  }
+}

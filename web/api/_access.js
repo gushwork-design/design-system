@@ -54,19 +54,33 @@ export function defaultRules() {
       { path: '/admin',    access: 'admin',    groups: [], people: [] },
       { path: '/internal', access: 'internal', groups: [], people: [] },
       /* The component library. Its own surface rather than a page under
-         /internal, because it renders its own chrome instead of the site shell
-         — but the same tier: any verified @gushwork.ai. The review sheet under
-         it is admin, and wins here by being the longer prefix. */
+         /internal, because it renders its own chrome instead of the site shell.
+         Internal tier again since 3 Oct 2026: the Design System page moved into
+         the internal section so that everyone internal can use the Library tab.
+         The review queue under it stays admin, and wins here by being the longer prefix. */
       { path: '/library',  access: 'internal', groups: [], people: [] },
+      /* The drawn previews the Library's drawer shows, one HTML file per component. Same tier as the library. */
+      { path: '/previews', access: 'internal', groups: [], people: [] },
       { path: '/library/review', access: 'admin', groups: [], people: [] },
       /* Agent Store: internal only. Made private 7 Oct 2026: "make it internal for now". */
       { path: '/agents',  access: 'internal', groups: [], people: [] },
-      /* The usage log lists who ran a session, which admins have no need to see.
+      /* The review sheet is where a component is passed into skills/, so it is the owner's, and the
+         Review tab of /internal/design-system shows admins what is waiting; only the owner can act on it. */
+      { path: '/admin/review-sheet', access: 'owner', groups: [], people: [] },
+      /* Analytics (usage log, visits and insights on one page) lists who ran a session and who opened
+         which page, which admins have no need to see. The old /admin/usage-log, /visits and /insights
+         paths redirect here before middleware runs (web/vercel.json).
+         The original note on the usage log, still true of the page as a whole:
          NOTE: like any compiled route, this only fills a hole — once a store holds an
          /admin rule it covers this path and this line is never added, so the page
          is admin-tier at the edge and the OWNER check that really holds is the one in
          api/_usage-log.js, which the data cannot be read without. */
+<<<<<<< HEAD
       { path: '/admin/usage-log', access: 'owner', groups: [], people: [] },
+=======
+      { path: '/admin/analytics', access: 'owner', groups: [], people: [] },
+      { path: '/admin/system-health', access: 'owner', groups: [], people: [] },
+>>>>>>> origin/main
       /* Ad landers are public on purpose. An ad page's whole job is to be
          pasted into Slack, sent to a client and run as paid media, and a
          social card cannot render from behind the gate: the scraper fetching

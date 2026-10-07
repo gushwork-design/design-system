@@ -3,17 +3,17 @@
     "Per-component versions for the marketing web surface. The plugin version tells someone the PLUGIN is",
     "stale; this tells them which of the components THEY used actually changed, which is the only",
     "thing that makes them act. Bump a component's version in the same commit that changes its spec",
-    "\u2014 scripts/check-drift.sh reads this file and a build's stamp, and reports the intersection.",
+    "— scripts/check-drift.sh reads this file and a build's stamp, and reports the intersection.",
     "",
     "version = the plugin version in which that component's spec last changed.",
     "breaking = true when a build using it will render WRONG until updated, as opposed to merely",
     "missing an improvement. It is the difference between a red notice and an amber one.",
     "",
-    "Seeded by deriving, for each spec doc, the first release that shipped its last change \u2014 not",
+    "Seeded by deriving, for each spec doc, the first release that shipped its last change — not",
     "by stamping everything at the current version, which would have told every existing build that",
     "all of its components moved at once.",
     "",
-    "Names come from the decision table in skills/gushwork-web/SKILL.md \u2014 the list a build actually",
+    "Names come from the decision table in skills/gushwork-web/SKILL.md — the list a build actually",
     "chooses from. Several share a doc, because the doc is the spec; a fold-level change therefore",
     "moves every fold. That is coarser than the dashboard's per-component granularity and is the",
     "honest starting point. Bump individually from here."
@@ -187,6 +187,265 @@
       "changed": "2026-08-08",
       "breaking": false,
       "doc": "images.md"
+    },
+    "agent-card": {
+      "version": "2.0.1",
+      "changed": "2026-10-06",
+      "breaking": false,
+      "doc": "agent-store.md"
+    },
+    "agent-filter-rail": {
+      "version": "2.0.1",
+      "changed": "2026-10-06",
+      "breaking": false,
+      "doc": "agent-store.md"
+    },
+    "agent-package-bar": {
+      "version": "2.0.1",
+      "changed": "2026-10-06",
+      "breaking": false,
+      "doc": "agent-store.md"
+    },
+    "agent-listing-panel": {
+      "version": "2.0.1",
+      "changed": "2026-10-07",
+      "breaking": false,
+      "doc": "agent-store.md"
+    },
+    "agent-package-builder": {
+      "version": "2.0.1",
+      "changed": "2026-10-07",
+      "breaking": false,
+      "doc": "agent-store.md"
+    },
+    "agent-section-header": {
+      "version": "2.0.1",
+      "changed": "2026-10-06",
+      "breaking": false,
+      "doc": "agent-store.md"
+    },
+    "agent-category-tabs": {
+      "version": "2.0.1",
+      "changed": "2026-10-06",
+      "breaking": false,
+      "doc": "agent-store.md"
+    },
+    "agent-package-panel": {
+      "version": "2.0.1",
+      "changed": "2026-10-07",
+      "breaking": false,
+      "doc": "agent-store.md"
+    },
+    "agent-category-toggle": {
+      "version": "2.0.1",
+      "changed": "2026-10-07",
+      "breaking": false,
+      "doc": "agent-store.md"
+    },
+    "agent-checkout-panel": {
+      "version": "2.0.1",
+      "changed": "2026-10-07",
+      "breaking": false,
+      "doc": "agent-store.md"
+    },
+    "agent-picker": {
+      "version": "2.0.1",
+      "changed": "2026-10-07",
+      "breaking": false,
+      "doc": "agent-store.md"
+    },
+    "agent-saving-line": {
+      "version": "2.0.1",
+      "changed": "2026-10-07",
+      "breaking": false,
+      "doc": "agent-store.md"
+    },
+    "agent-step-timeline": {
+      "version": "2.0.1",
+      "changed": "2026-10-07",
+      "breaking": false,
+      "doc": "agent-store.md"
+    },
+    "agent-store-hero": {
+      "version": "2.0.1",
+      "changed": "2026-10-07",
+      "breaking": false,
+      "doc": "agent-store.md"
+    },
+    "shortcut-key-cap": {
+      "version": "2.0.1",
+      "changed": "2026-10-07",
+      "breaking": false,
+      "doc": "agent-store.md"
+    }
+  },
+  "review": {
+    "button": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-10-02",
+      "fingerprint": "c579bba41b60f7c2"
+    },
+    "card-case-study": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-10-02",
+      "fingerprint": "b079e9e4b1f933f3"
+    },
+    "card-information": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-10-02",
+      "fingerprint": "167ff79e4a942f32"
+    },
+    "card-testimonial": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-02",
+      "fingerprint": "0fd6f219750af8d0",
+      "note": "visual is not added for the review"
+    },
+    "navbar": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-04",
+      "fingerprint": "cb392797cf0b2749"
+    },
+    "client-avatar": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-04",
+      "fingerprint": "fc6eefa39a5a7158"
+    },
+    "form": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "be439785c55823cc",
+      "note": "country flag and avatars are missing, you can take the avatar from here https://www.figma.com/design/VKcb4fgVyOHKfQonMgN772/Gush-Design-System-v2.0?node-id=1948-8226&t=2sN2OJ41r7XNQyh2-11\n\nand country flags should show all country flags, take deign reference from figma",
+      "previewFingerprint": "09c2b44d99753c96"
+    },
+    "card-review": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "926bb623fd1baa05",
+      "previewFingerprint": "07ca611eb462c0df"
+    },
+    "cards-grid": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "365920b33d971853",
+      "previewFingerprint": "d1f098724778dda7"
+    },
+    "cards-grid-small": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "08ab2271717bae2a",
+      "previewFingerprint": "1ad1ac72b1bb8f56"
+    },
+    "case-study-page": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "d758df8540c334b3",
+      "previewFingerprint": "94c63f9616155202"
+    },
+    "fold-other": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "df0aacba0b029908",
+      "previewFingerprint": "668202067994ec2b"
+    },
+    "hero": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "f2c4006add28e3b9",
+      "previewFingerprint": "4570415d8697da77"
+    },
+    "client-logos": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "5d23d18c3d59fdf9",
+      "previewFingerprint": "4e14b3c705353d69"
+    },
+    "eyebrow": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "c95561be01ce7d09",
+      "previewFingerprint": "084bc81f00a03af9"
+    },
+    "inline-input": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "eb030b38fb1c4395",
+      "previewFingerprint": "6866305f326ac1f4"
+    },
+    "input-fields": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "5c49058af9c32c23",
+      "previewFingerprint": "6866305f326ac1f4"
+    },
+    "page-build": {
+      "reviewed": "rejected",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "b76f6a3847613853",
+      "previewFingerprint": "40fae7f4376402ca",
+      "note": "new footer design being used"
+    },
+    "testimonial": {
+      "reviewed": "rejected",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "7f7e932161b58e16",
+      "previewFingerprint": "7fd9ae925f62afe4",
+      "note": "new design in the templates"
+    },
+    "timeline": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "b011f54c631f2238",
+      "previewFingerprint": "d64f8671cba95deb"
+    },
+    "video": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "62c9d56b5e6fd51b",
+      "previewFingerprint": "6b48ce82b47895a5"
+    },
+    "with-image": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "9a1a325ce008f724",
+      "previewFingerprint": "c67baf26ce5ecb69"
+    },
+    "footer": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "4f3074b5c817a033",
+      "previewFingerprint": "3121dbde5129459f",
+      "note": "wrong design"
+    },
+    "cta": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "3f7ffb91cad57972",
+      "previewFingerprint": "4c29b6ab6a337561"
     }
   }
 }

@@ -130,8 +130,8 @@ To take an update the moment you hear about one:
 claude plugin update gushwork-design@gushwork
 ```
 
-Restart after. Either way a new version takes effect on the **next** start, not the current one —
-which is exactly why the check speaks at the *start* of a session rather than the end.
+Then type `/reload-plugins` in the chat — the new version is live in that chat at once, no restart.
+In the desktop app the command arrives with a Run button when a chat tells you that you are behind.
 
 ## If something isn't working
 

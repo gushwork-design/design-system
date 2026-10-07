@@ -1,5 +1,5 @@
 /* ============================================================================
-   gw.js — one function, five jobs.
+   gw.js — one function, many jobs.
 
    WHY THIS EXISTS AND IS NOT FOUR FILES. Vercel's Hobby plan allows 12 serverless
    functions per deployment. This project already spends 8 on the auth gate and the
@@ -24,14 +24,28 @@ import logUsage from './_log-usage.js';
 import postNotice from './_post-notice.js';
 import slackEvents from './_slack-events.js';
 import approvals from './_approvals.js';
+import tools from './_tools.js';
 import usageLog from './_usage-log.js';
+import logOutput from './_log-output.js';
+import visits from './_visits.js';
+import review from './_review.js';
+import health from './_health.js';
+import certificates from './_certificates.js';
+import bruceMemory from './_bruce-memory.js';
 
 const ROUTES = {
   'log-usage': logUsage,
   'post-notice': postNotice,
   'slack-events': slackEvents,
   'approvals': approvals,
+  'tools': tools,
   'usage-log': usageLog,
+  'log-output': logOutput,
+  'visits': visits,
+  'review': review,
+  'health': health,
+  'certificates': certificates,
+  'bruce-memory': bruceMemory,
 };
 
 export default async function handler(req, res) {

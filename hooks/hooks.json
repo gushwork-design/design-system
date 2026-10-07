@@ -1,14 +1,14 @@
 {
   "$comment": [
     "Claude Code hooks for the Gushwork design system. NOT the same thing as scripts/hooks/,",
-    "which holds this repo's git hooks — those guard pushing, these run on a teammate's machine.",
+    "which holds this repo's git hooks \u2014 those guard pushing, these run on a teammate's machine.",
     "",
     "check-update.sh exists because two documented gaps had no code behind them: autoUpdate is",
     "per-machine and unsettable from repo settings, so it got skipped; and auto-update takes",
     "effect only on the NEXT start, so the session that could warn you is the one that does not",
     "know yet. See the header of scripts/check-update.sh.",
     "",
-    "check-approvals.sh is the last leg of REVIEW-LOOP.md — a ✅ reaction in Slack queues an",
+    "check-approvals.sh is the last leg of REVIEW-LOOP.md \u2014 a \u2705 reaction in Slack queues an",
     "approval, and this is where it re-enters a session so the pass can be recorded. It is a",
     "SEPARATE hook on purpose: one hook emits one JSON envelope, so two notices need two",
     "scripts, and a broken approvals endpoint must not be able to silence the stale-version",
@@ -20,7 +20,25 @@
     "for 6h and stays silent when there is nothing to say, so a repeated start is cheap.",
     "",
     "timeout 10: the default is 600s. This runs before anyone can type, on every session, on",
-    "someone else's machine. It must never be the reason a session feels slow."
+    "someone else's machine. It must never be the reason a session feels slow.",
+    "",
+    "brand-rule.sh is the floor under the skills. A skill loads only when the request matches its",
+    "description, and the five surface skills each name a specific deliverable, so a game, a poster",
+    "or a one-off that merely carries the Gushwork name loaded nothing and came back with the wrong",
+    "logo, font and blue (30 Sep 2026). This hands Claude the standing rule at the start of every",
+    "session, independent of the request, and points at the gushwork-brand skill for the detail. Its",
+    "matcher is wider than the other two on purpose: clear and compact DROP the session's context, so",
+    "a rule injected only at startup would be gone after the first compaction. The update notices stay",
+    "startup|resume because repeating them reads as a bug; repeating a rule does not.",
+    "",
+    "SessionEnd runs log-activity.sh once more when a session closes, so a session that ends records its",
+    "final token totals. It does nothing unless a Gushwork skill ran in that session (the same gate as",
+    "every other row), and a closed laptop or a crash simply means the last skill, file or artifact row",
+    "carries the most recent figures instead.",
+    "",
+    "There is no greeting hook. greet.sh opened every new chat with \"Hey Utsav, fresh chat \u2014 you're on",
+    "Gushwork design system v2.0.1\" (R48, 5 Oct 2026) and was removed on 7 Oct 2026 (R62): the plugin now",
+    "speaks only through check-update.sh, and only when a flagged release is ahead of this copy."
   ],
   "hooks": {
     "SessionStart": [
@@ -35,6 +53,39 @@
           {
             "type": "command",
             "command": "\"${CLAUDE_PLUGIN_ROOT}\"/scripts/check-approvals.sh",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/scripts/brand-rule.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Skill|Write|Artifact|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/scripts/log-activity.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/scripts/log-activity.sh",
             "timeout": 10
           }
         ]

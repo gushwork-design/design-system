@@ -1,0 +1,2468 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Analytics — Gushwork Design</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="Insights, plugin usage and hub visits, for the owner.">
+<script>try{var c=localStorage.getItem('gw-theme-choice'),t=c==='dark'||c==='light'?c:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20width%3D%2280%22%20height%3D%2280%22%20rx%3D%2220%22%20fill%3D%22%230d0d0d%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="/foundation/tokens.css">
+<link rel="stylesheet" href="/shell.css?v=ghost3">
+<script src="/shell.js?v=ghost1" defer></script>
+<style>
+/* /admin/usage-log — the session log, read back for the owner.
+
+   SHELL. This is an admin page inside the design-system site, so it takes the site's own
+   chrome (shell.css / shell.js, the same as /admin/access-control) rather than a
+   `dashboard-build` rail: a rail whose only row is this page would be chrome with nothing to
+   navigate. The CONTENT is dashboard: v2 stat-card, metric-card, card-shell, section-header,
+   table-row, pagination, tab-group, input and empty-state, from exports/dashboard/v2.
+
+   Width. 1120 is the measured v2 page-header / section-header width, not a value chosen here.
+   Everything not measured is marked NOT MEASURED below. */
+body[data-gw-page="analytics"] .sg__main { grid-column: 1 / -1; max-width: 1120px; gap: var(--gw-space-24); }
+body[data-gw-page="analytics"] .sg__main > * { min-width: 0; }
+
+/* ── theme aliases ─────────────────────────────────────────────────────────────────────
+   Declared in BOTH themes on purpose: an alias set in one block silently keeps the other
+   theme's value. Light is measured; dark is the measured light→dark map in v2/README.md,
+   and where the dark screen draws nothing (tab hover, tooltip, filled-button hover) the
+   value is DERIVED one step toward the element's own selected state and marked so. */
+:root {
+  --ul-label:      var(--gw-color-neutral-700);
+  --ul-value:      var(--gw-color-black);
+  --ul-sub:        var(--gw-color-neutral-500);
+  --ul-cell:       var(--gw-color-neutral-600);
+  --ul-icon:       var(--gw-color-neutral-600);
+  --ul-track:      var(--gw-color-neutral-200);
+  --ul-good:       var(--gw-color-green-400);
+  --ul-grid:       var(--gw-color-neutral-100);
+  --ul-hdr-bg:     var(--gw-color-neutral-25);
+  --ul-hdr-line:   var(--gw-color-neutral-100);
+  --ul-hdr-fg:     var(--gw-color-neutral-700);
+  --ul-row-line:   var(--gw-color-neutral-25);
+  --ul-row-bg:     transparent;
+  --ul-row-hover:  var(--gw-color-neutral-25);
+  --ul-ctl-line:   var(--gw-color-neutral-200);
+  --ul-ctl-fg:     var(--gw-color-neutral-900);
+  --ul-ctl-hover:  var(--gw-color-neutral-35);
+  --ul-field-bg:   var(--gw-color-white);
+  --ul-field-line: var(--gw-color-neutral-200);       /* was neutral-400: a quiet outline, the field's fill does the work */
+  --ul-field-fg:   var(--gw-color-neutral-900);
+  --ul-field-ph:   var(--gw-color-neutral-400);
+  --ul-tabs-bg:    var(--gw-color-neutral-50);
+  --ul-tabs-line:  var(--gw-color-neutral-100);
+  --ul-tab-fg:     var(--gw-color-neutral-900);
+  --ul-tab-hover:  var(--gw-color-neutral-100);
+  --ul-tab-on-bg:  var(--gw-color-black);
+  --ul-tab-on-fg:  var(--gw-color-white);
+  --ul-prim-bg:    var(--gw-color-black);
+  --ul-prim-fg:    var(--gw-color-white);
+  --ul-prim-hover: var(--gw-color-neutral-850);
+  --ul-tip-bg:     var(--gw-color-neutral-25);
+  --ul-tip-line:   var(--gw-color-neutral-100);
+  --ul-tip-head:   var(--gw-color-neutral-500);
+  --ul-tip-main:   var(--gw-color-neutral-900);
+  --ul-skel:       var(--gw-color-neutral-100);
+  --ul-circle:     var(--gw-color-neutral-50);
+  --ul-circle-fg:  var(--gw-color-neutral-400);
+  --ul-b-ok-bg:    var(--gw-color-green-25);
+  --ul-b-ok-fg:    var(--gw-color-green-500);
+  --ul-b-no-bg:    var(--gw-color-neutral-50);
+  --ul-b-no-fg:    var(--gw-color-neutral-700);
+  --ul-disabled:   var(--gw-color-neutral-250);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ul-label:      var(--gw-color-neutral-400);
+    --ul-value:      var(--gw-color-white);
+    --ul-sub:        var(--gw-color-neutral-500);       /* unchanged in dark, measured */
+    --ul-cell:       var(--gw-color-neutral-400);
+    --ul-icon:       var(--gw-color-neutral-400);
+    --ul-track:      var(--gw-color-neutral-600);
+    --ul-good:       var(--gw-color-green-300);
+    --ul-grid:       var(--gw-color-neutral-900);
+    --ul-hdr-bg:     var(--gw-color-black);
+    --ul-hdr-line:   var(--gw-color-neutral-900);
+    --ul-hdr-fg:     var(--gw-color-neutral-100);
+    --ul-row-line:   var(--gw-color-neutral-900);
+    --ul-row-bg:     var(--gw-color-black);
+    --ul-row-hover:  var(--gw-color-neutral-900);       /* RULED in v2/data-table.md, not drawn */
+    --ul-ctl-line:   var(--gw-color-neutral-850);
+    --ul-ctl-fg:     var(--gw-color-neutral-50);
+    --ul-ctl-hover:  var(--gw-color-neutral-850);       /* DERIVED: one step toward the border */
+    --ul-field-bg:   var(--gw-color-neutral-900);       /* DERIVED from the measured dark select */
+    --ul-field-line: var(--gw-color-neutral-850);
+    --ul-field-fg:   var(--gw-color-white);
+    --ul-field-ph:   var(--gw-color-neutral-400);
+    --ul-tabs-bg:    var(--gw-color-neutral-900);
+    --ul-tabs-line:  var(--gw-color-neutral-900);
+    --ul-tab-fg:     var(--gw-color-white);
+    --ul-tab-hover:  var(--gw-color-neutral-800);       /* one step LIGHTER than the neutral-900 track, as light mode is one step darker than its track; the library draws no dark tab hover, so this is derived, not read */
+    --ul-tab-on-bg:  var(--gw-color-white);             /* the active tab inverts */
+    --ul-tab-on-fg:  var(--gw-color-black);
+    --ul-prim-bg:    var(--gw-color-white);             /* dark primary is a full inversion */
+    --ul-prim-fg:    var(--gw-color-neutral-900);
+    --ul-prim-hover: var(--gw-color-neutral-100);       /* DERIVED */
+    --ul-tip-bg:     var(--gw-color-neutral-900);       /* DERIVED: the dark screen draws no tooltip */
+    --ul-tip-line:   var(--gw-color-neutral-850);
+    --ul-tip-head:   var(--gw-color-neutral-400);
+    --ul-tip-main:   var(--gw-color-white);
+    --ul-skel:       var(--gw-color-neutral-900);
+    --ul-circle:     var(--gw-color-neutral-900);
+    --ul-circle-fg:  var(--gw-color-neutral-400);
+    --ul-b-ok-bg:    var(--gw-color-green-alpha-10);    /* dark tint: Alpha/10 fill + /300 label */
+    --ul-b-ok-fg:    var(--gw-color-green-300);
+    --ul-b-no-bg:    var(--gw-color-neutral-900);
+    --ul-b-no-fg:    var(--gw-color-neutral-400);
+    --ul-disabled:   var(--gw-color-neutral-600);
+  }
+}
+:root[data-theme="dark"] {
+    --ul-label:      var(--gw-color-neutral-400);
+    --ul-value:      var(--gw-color-white);
+    --ul-sub:        var(--gw-color-neutral-500);       /* unchanged in dark, measured */
+    --ul-cell:       var(--gw-color-neutral-400);
+    --ul-icon:       var(--gw-color-neutral-400);
+    --ul-track:      var(--gw-color-neutral-600);
+    --ul-good:       var(--gw-color-green-300);
+    --ul-grid:       var(--gw-color-neutral-900);
+    --ul-hdr-bg:     var(--gw-color-black);
+    --ul-hdr-line:   var(--gw-color-neutral-900);
+    --ul-hdr-fg:     var(--gw-color-neutral-100);
+    --ul-row-line:   var(--gw-color-neutral-900);
+    --ul-row-bg:     var(--gw-color-black);
+    --ul-row-hover:  var(--gw-color-neutral-900);       /* RULED in v2/data-table.md, not drawn */
+    --ul-ctl-line:   var(--gw-color-neutral-850);
+    --ul-ctl-fg:     var(--gw-color-neutral-50);
+    --ul-ctl-hover:  var(--gw-color-neutral-850);       /* DERIVED: one step toward the border */
+    --ul-field-bg:   var(--gw-color-neutral-900);       /* DERIVED from the measured dark select */
+    --ul-field-line: var(--gw-color-neutral-850);
+    --ul-field-fg:   var(--gw-color-white);
+    --ul-field-ph:   var(--gw-color-neutral-400);
+    --ul-tabs-bg:    var(--gw-color-neutral-900);
+    --ul-tabs-line:  var(--gw-color-neutral-900);
+    --ul-tab-fg:     var(--gw-color-white);
+    --ul-tab-hover:  var(--gw-color-neutral-800);       /* one step LIGHTER than the neutral-900 track, as light mode is one step darker than its track; the library draws no dark tab hover, so this is derived, not read */
+    --ul-tab-on-bg:  var(--gw-color-white);             /* the active tab inverts */
+    --ul-tab-on-fg:  var(--gw-color-black);
+    --ul-prim-bg:    var(--gw-color-white);             /* dark primary is a full inversion */
+    --ul-prim-fg:    var(--gw-color-neutral-900);
+    --ul-prim-hover: var(--gw-color-neutral-100);       /* DERIVED */
+    --ul-tip-bg:     var(--gw-color-neutral-900);       /* DERIVED: the dark screen draws no tooltip */
+    --ul-tip-line:   var(--gw-color-neutral-850);
+    --ul-tip-head:   var(--gw-color-neutral-400);
+    --ul-tip-main:   var(--gw-color-white);
+    --ul-skel:       var(--gw-color-neutral-900);
+    --ul-circle:     var(--gw-color-neutral-900);
+    --ul-circle-fg:  var(--gw-color-neutral-400);
+    --ul-b-ok-bg:    var(--gw-color-green-alpha-10);    /* dark tint: Alpha/10 fill + /300 label */
+    --ul-b-ok-fg:    var(--gw-color-green-300);
+    --ul-b-no-bg:    var(--gw-color-neutral-900);
+    --ul-b-no-fg:    var(--gw-color-neutral-400);
+    --ul-disabled:   var(--gw-color-neutral-600);
+}
+
+/* Focus. No v2 component defines one. The ring is keyboard-only, on :focus-visible (R41, states.md). Text fields are
+   not in this list: a browser counts a click into one as keyboard focus, so they show their own edge instead. */
+.ul-scope :is(button, a, select, [tabindex]):focus-visible {
+  outline: var(--gw-focus-ring);
+  outline-offset: var(--gw-focus-offset);
+}
+
+/* ── controls row (page-header controls-row) ─────────────────────────────────────────── */
+.ul-bar { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-16); flex-wrap: wrap; }
+/* tab-group: 36h, radius/12, pad 4, gap 4. The 1px border is an inset shadow, not a CSS
+   border, so the 28h tab-items still fit — a border under border-box would eat 2px of them. */
+.ul-tabs { display: inline-flex; height: 36px; padding: var(--gw-space-4); gap: var(--gw-space-4);
+  border-radius: var(--gw-radius-12); background: var(--ul-tabs-bg); box-shadow: inset 0 0 0 1px var(--ul-tabs-line); }
+.ul-tab { height: 28px; padding: 0 var(--gw-space-12); border: 0; border-radius: var(--gw-radius-8);
+  background: none; font: var(--gw-text-button-12); color: var(--ul-tab-fg); cursor: pointer;
+  transition: background var(--gw-motion-fast); }
+.ul-tab:hover { background: var(--ul-tab-hover); }
+.ul-tab[aria-selected="true"] { background: var(--ul-tab-on-bg); color: var(--ul-tab-on-fg); }
+.ul-refresh { display: flex; align-items: center; gap: var(--gw-space-8); }
+.ul-refresh__t { font: var(--gw-text-button-10); color: var(--ul-label); }
+/* icon-button Size=28: radius/8, 12px glyph, 1px neutral/200 (inset, same reason as above) */
+.ul-ib { width: 28px; height: 28px; padding: 0; display: inline-grid; place-items: center; border: 0;
+  border-radius: var(--gw-radius-8); background: none; color: var(--ul-icon); cursor: pointer;
+  box-shadow: inset 0 0 0 1px var(--ul-ctl-line); transition: background var(--gw-motion-fast); }
+.ul-ib:hover:not(:disabled) { background: var(--ul-ctl-hover); }
+.ul-ib:disabled { color: var(--ul-disabled); cursor: default; }
+.ul-ib svg { width: 12px; height: 12px; display: block; }
+.ul-ib[aria-busy="true"] svg { animation: ul-spin 1s linear infinite; }
+@keyframes ul-spin { to { transform: rotate(360deg); } }
+
+/* ── stat-card / metric-card ─────────────────────────────────────────────────────────── */
+.ul-kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gw-space-8); }
+.ul-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gw-space-8); }
+/* stat-card 218 x 132 is the intrinsic size; these fill their column (a floor, not a width). */
+.ul-stat, .ul-metric { background: var(--s-card-bg); box-shadow: inset 0 0 0 1px var(--s-card-border);
+  border-radius: var(--gw-radius-12); display: flex; flex-direction: column; gap: var(--gw-space-16); min-width: 0; }
+.ul-stat { padding: var(--gw-space-12); min-height: 132px; }
+.ul-metric { padding: var(--gw-space-16); min-height: 124px; }   /* metric-card pad 16, not 12: measured */
+.ul-stat__lab { display: flex; align-items: center; gap: var(--gw-space-8); padding: 0 var(--gw-space-4); }
+.ul-lab { flex: 1; font: var(--gw-text-body-12-med); color: var(--ul-label); }
+.ul-dot { width: 8px; height: 8px; border-radius: var(--gw-radius-20); background: var(--gw-color-neutral-400); flex: none; }
+.ul-stat__body { display: flex; flex-direction: column; gap: var(--gw-space-8); padding: 0 var(--gw-space-4); margin-top: auto; }
+.ul-stat__row { display: flex; justify-content: space-between; align-items: flex-end; gap: var(--gw-space-8); }
+.ul-val { display: flex; flex-direction: column; gap: var(--gw-space-4); min-width: 0; }
+/* Dashboard/display-28-med — HAS NO TOKEN (v2/README.md, R15). Literal spec: Vert Grotesk
+   Display Medium 500, 28 / 120%. Deliberately not --gw-text-h6 (600 / 26). */
+.ul-num { font: 500 28px/1.2 var(--gw-font-display); color: var(--ul-value); }
+.ul-note { font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.ul-pct { font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.ul-metric__body { display: flex; flex-direction: column; gap: var(--gw-space-4); margin-top: auto; }
+/* progress-bar Size=md: 4px, radius/40, track neutral/200, fill green/400 (dark: 600 / green/300) */
+.ul-pb { height: 4px; border-radius: var(--gw-radius-40); background: var(--ul-track); overflow: hidden; }
+.ul-pb > i { display: block; height: 100%; border-radius: var(--gw-radius-40); background: var(--ul-good); }
+/* skeleton: one block per real element, never a 0 while data is in flight (states.md) */
+.sk { display: block; background: var(--ul-skel); border-radius: var(--gw-radius-4);
+  animation: ul-pulse 960ms ease-in-out infinite alternate; }   /* --gw-motion-fast x 8 */
+@keyframes ul-pulse { from { opacity: 1; } to { opacity: .45; } }
+@media (prefers-reduced-motion: reduce) { .sk { animation: none; } .ul-ib[aria-busy="true"] svg { animation: none; } }
+
+/* ── card-shell lg + section-header ──────────────────────────────────────────────────── */
+.ul-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gw-space-24); margin-top: var(--gw-space-24); }
+@media (max-width: 960px) { .ul-pair { grid-template-columns: minmax(0, 1fr); } }
+.ul-sec { background: var(--s-card-bg); box-shadow: inset 0 0 0 1px var(--s-card-border);
+  border-radius: var(--gw-radius-16); padding: var(--gw-space-12); display: flex; flex-direction: column; gap: var(--gw-space-16); }
+.ul-sh { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-8);
+  padding: 0 var(--gw-space-8); min-height: 24px; flex-wrap: wrap; }
+.ul-sh__t { display: flex; align-items: baseline; gap: var(--gw-space-8); min-width: 0; }
+.ul-sh h2 { margin: 0; font: var(--gw-text-body-16-sem); color: var(--ul-value); }
+.ul-sh__q { font: var(--gw-text-body-16-reg); color: var(--ul-sub); }
+.ul-inner { border-radius: var(--gw-radius-8); padding: 0 var(--gw-space-8) var(--gw-space-8); }
+
+/* ── Graph / Line: single series + gradient fill ────────────────────────────────────── */
+/* Plot height 240 is NOT MEASURED. The measured Line is 400 tall in a 1028-wide chart; this
+   sits inside a card beside two other sections, so it is shorter. Chosen, and said so. */
+.ul-line { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: var(--gw-space-12);
+  /* room above the top label, below the dates, and right of the last date (centred on the plot edge) */
+  padding: var(--gw-space-16) var(--gw-space-32) var(--gw-space-16) var(--gw-space-8); }
+.ul-line__y { position: relative; height: 240px; width: 32px; }
+.ul-line__y span, .ul-line__x span { font: 500 12px/1 var(--gw-font-body); letter-spacing: -.2px; color: var(--ul-cell); }
+.ul-line__y span { position: absolute; right: 0; transform: translateY(-50%); }
+.ul-plot { position: relative; height: 240px; cursor: crosshair; }
+.ul-plot__g { position: absolute; left: 0; right: 0; height: 1px; background: var(--ul-grid); }
+.ul-plot svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.ul-line__x { grid-column: 2; position: relative; height: 12px; margin-top: var(--gw-space-16); }
+.ul-line__x span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+.ul-cross { position: absolute; top: 0; bottom: 0; width: 1px; pointer-events: none; display: none;
+  /* crosshair is dashed 2 2 in the measured Line */
+  background: repeating-linear-gradient(to bottom, var(--gw-color-primary-500) 0 2px, transparent 2px 4px); }
+.ul-dotp { position: absolute; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: var(--gw-radius-full);
+  background: var(--gw-color-primary-500); box-shadow: 0 0 0 2px var(--s-card-bg); pointer-events: none; display: none; }
+/* Line tooltip: neutral/25, 1px neutral/100 (measured 0.5, rounded per R5), radius/4, p-8, gap-8, shadow S2 */
+.ul-tip { position: absolute; z-index: 2; min-width: 148px; padding: var(--gw-space-8); display: none; pointer-events: none;
+  flex-direction: column; gap: var(--gw-space-8); background: var(--ul-tip-bg); box-shadow: inset 0 0 0 1px var(--ul-tip-line), var(--gw-shadow-s2);
+  border-radius: var(--gw-radius-4); }
+.ul-tip__h { display: flex; align-items: center; gap: 2px; font: var(--gw-text-body-10-med); color: var(--ul-tip-head); }
+/* .ul-plot svg (the chart) would otherwise pin this icon to the tooltip's corner */
+.ul-tip__h svg { position: static; inset: auto; flex: none; width: 12px; height: 12px; }
+.ul-tip__m { font: var(--gw-text-body-10-med); color: var(--ul-tip-main); }
+.ul-tip__b { border-left: 1px dashed var(--gw-color-neutral-500); padding: var(--gw-space-4) 0 var(--gw-space-4) var(--gw-space-8);
+  display: flex; flex-direction: column; gap: var(--gw-space-4); }
+/* The measured breakdown rows are 8px, which is below legibility. Built at 10 and reported. */
+.ul-tip__r { display: flex; justify-content: space-between; gap: var(--gw-space-12); font: var(--gw-text-body-10-med); }
+.ul-tip__r span:first-child { color: var(--ul-cell); max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ul-tip__r span:last-child { color: var(--ul-label); }
+
+/* ── Graph / Bar: bars are primary/500, 10 tall, radius 2 on the trailing corners only ─── */
+.ul-bars { display: flex; flex-direction: column; gap: var(--gw-space-20); padding: var(--gw-space-8) 0; }
+.ul-bars__r { display: grid; grid-template-columns: var(--ul-lw, 96px) minmax(0, 1fr); align-items: center; gap: var(--gw-space-12); }
+.ul-bars__l { font: 500 12px/1.2 var(--gw-font-body); letter-spacing: -.2px; color: var(--ul-cell); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ul-bars__t { padding-right: 52px; min-width: 0; }
+.ul-bar-b { position: relative; height: 10px; min-width: 2px; background: var(--gw-color-primary-500); border-radius: 0 2px 2px 0; }
+.ul-bar-b span { position: absolute; left: calc(100% + 4px); top: -2px; white-space: nowrap;
+  font: 500 10px/1 var(--gw-font-body); letter-spacing: -.2px; color: var(--ul-tip-main); }
+
+/* ── input Type=search, select, buttons ───────────────────────────────────────────────── */
+.ul-tools { display: flex; align-items: center; gap: var(--gw-space-8); flex-wrap: wrap; }
+.ul-input { position: relative; display: block; }
+.ul-input svg { position: absolute; left: var(--gw-space-12); top: 10px; width: 16px; height: 16px; color: var(--ul-field-ph); pointer-events: none; }
+.ul-input input { width: 240px; max-width: 100%; height: 36px; padding: 0 var(--gw-space-12) 0 calc(var(--gw-space-12) + 24px);
+  border: 0; border-radius: var(--gw-radius-8); background: var(--ul-field-bg); color: var(--ul-field-fg);
+  box-shadow: inset 0 0 0 1px var(--ul-field-line); font: var(--gw-text-button-14); }
+.ul-input input::placeholder { color: var(--ul-field-ph); }
+.ul-input input:focus { outline: none; box-shadow: inset 0 0 0 1px var(--gw-color-black); }
+:root[data-theme="dark"] .ul-input input:focus { box-shadow: inset 0 0 0 1px var(--gw-color-white); }
+.ul-select { position: relative; display: inline-block; }
+.ul-select select { appearance: none; -webkit-appearance: none; height: 36px; padding: 0 calc(var(--gw-space-12) + 16px) 0 var(--gw-space-12);
+  border: 0; border-radius: var(--gw-radius-8); background: var(--ul-field-bg); color: var(--ul-field-fg);
+  box-shadow: inset 0 0 0 1px var(--ul-field-line); font: var(--gw-text-button-14); cursor: pointer; }
+.ul-pair .ul-sec { display: flex; flex-direction: column; }
+.ul-pair .ul-inner { flex: 1; display: flex; flex-direction: column; }
+.ul-foot { margin: auto 0 0; padding-top: var(--gw-space-12); font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+/* out-of-date people */
+.ul-sh--nw { flex-wrap: nowrap; }
+.ul-sh--nw .ul-sh__t { flex: 1 1 auto; }
+.ul-sh--nw .ul-sh__q { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.ul-split { display: flex; height: 12px; gap: 2px; border-radius: var(--gw-radius-full); overflow: hidden; }
+.ul-split i { display: block; height: 100%; min-width: 2px; background: var(--gw-color-neutral-400); }
+.ul-split i:first-child { background: var(--gw-color-primary-500); }
+.ul-split__k { display: flex; justify-content: space-between; gap: var(--gw-space-16); margin: var(--gw-space-8) 0 0; font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.ul-split__k b { font-weight: 600; color: var(--ul-value); }
+.ul-link { flex: none; white-space: nowrap; border: 0; background: none; padding: 0; cursor: pointer; font: var(--gw-text-body-14-med); color: var(--ul-sub); transition: color var(--gw-motion-fast); }
+.ul-link:hover { color: var(--ul-value); }
+.ul-link[hidden] { display: none; }
+.ul-big { margin: 0; font: var(--gw-text-body-24-sem, 600 24px/1.2 var(--gw-font-body)); color: var(--ul-value); }
+.ul-vmid { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: var(--gw-space-16) 0; }
+.ul-dlg { width: min(640px, calc(100vw - 32px)); max-height: min(560px, calc(100vh - 64px)); padding: 0; border: 0; border-radius: var(--gw-radius-16);
+  background: var(--ul-field-bg); color: var(--ul-value); box-shadow: inset 0 0 0 1px var(--ul-hdr-line), var(--gw-shadow-s3); }
+.ul-dlg[open] { display: flex; flex-direction: column; }
+.ul-dlg::backdrop { background: rgba(0, 0, 0, 0.4); }
+.ul-dlg__h { display: flex; align-items: baseline; gap: var(--gw-space-8); padding: var(--gw-space-16) var(--gw-space-16) var(--gw-space-8) var(--gw-space-24); }
+.ul-dlg__h h2 { margin: 0; font: var(--gw-text-body-16-sem); }
+.ul-dlg__x { margin-left: auto; align-self: center; width: 28px; height: 28px; border: 0; border-radius: var(--gw-radius-8); background: none; cursor: pointer;
+  font-size: 20px; line-height: 1; color: var(--ul-sub); }
+.ul-dlg__x:hover { color: var(--ul-value); background: var(--ul-hdr-line); }
+.ul-dlg__b { padding: 0 var(--gw-space-24) var(--gw-space-24); overflow-y: auto; }
+.ul-old { display: flex; flex-direction: column; }
+.ul-old__r { display: grid; grid-template-columns: minmax(0, 1fr) 112px 148px; align-items: center; column-gap: var(--gw-space-16); padding: var(--gw-space-12) 0; }
+.ul-old__r + .ul-old__r { border-top: 1px solid var(--ul-hdr-line); }
+.ul-old__who { min-width: 0; }
+.ul-old__who b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--gw-text-body-12-med); font-weight: 600; color: var(--ul-value); }
+.ul-old__who span { font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.ul-old__v { font: var(--gw-text-body-12-med); color: var(--ul-cell); }
+.ul-old__s { display: flex; justify-content: flex-end; }
+.ul-old__v { text-align: left; }
+/* skills donut */
+.ul-donut { flex: 1; display: flex; align-items: center; justify-content: center; gap: var(--gw-space-40); flex-wrap: wrap; padding: var(--gw-space-8) 0; }
+.ul-donut__c { position: relative; width: 160px; height: 160px; flex: none; }
+.ul-donut__c svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ul-donut__c circle { fill: none; stroke-width: 26; }
+.ul-donut__n { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.ul-donut__n b { font: var(--gw-text-body-24-sem, 600 24px/1.2 var(--gw-font-body)); color: var(--ul-value); }
+.ul-donut__n span { font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.ul-leg { flex: 0 1 240px; min-width: 180px; margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--gw-space-12); }
+.ul-leg li { display: grid; grid-template-columns: 12px minmax(0, 1fr) auto auto; align-items: center; column-gap: var(--gw-space-8); font: var(--gw-text-body-12-med); color: var(--ul-cell); }
+.ul-leg i { width: 12px; height: 12px; border-radius: var(--gw-radius-4); }
+.ul-leg li span:nth-child(2) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ul-value); }
+.ul-leg li span:last-child { min-width: 36px; text-align: right; color: var(--ul-sub); }
+/* ── dropdown menu: replaces the browser's own list, which is drawn by the OS and cannot be styled ── */
+.ul-menu { position: fixed; z-index: 50; min-width: 120px; max-height: 280px; overflow-y: auto; padding: var(--gw-space-4);
+  display: flex; flex-direction: column; gap: 2px; background: var(--ul-field-bg); border-radius: var(--gw-radius-12);
+  box-shadow: inset 0 0 0 1px var(--ul-hdr-line), var(--gw-shadow-s3); }
+.ul-menu__i { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-16); height: 32px; padding: 0 var(--gw-space-8) 0 var(--gw-space-12);
+  border: 0; border-radius: var(--gw-radius-8); background: none; text-align: left; white-space: nowrap; cursor: pointer;
+  font: var(--gw-text-body-12-med); color: var(--ul-cell); }
+.ul-menu__i:hover, .ul-menu__i.is-focus { background: var(--ul-row-hover); color: var(--ul-value); }
+.ul-menu__i[aria-selected="true"] { color: var(--ul-value); font-weight: 600; }
+.ul-menu__i svg { width: 12px; height: 12px; flex: none; color: var(--gw-color-primary-500); }
+/* No focus ring or darker border on the dropdown buttons: the open menu is the state (owner's call, overrides the page-wide ring above). */
+.ul-scope .ul-select select:focus-visible { outline: none; }
+.ul-select--sm select { height: 28px; font: var(--gw-text-button-12); }
+.ul-select svg { position: absolute; right: var(--gw-space-12); top: 50%; width: 12px; height: 12px; margin-top: -6px; color: var(--ul-icon); pointer-events: none; }
+.ul-btn { height: 36px; padding: 0 var(--gw-space-12); border: 0; border-radius: var(--gw-radius-12); cursor: pointer;
+  font: var(--gw-text-button-14); background: var(--ul-prim-bg); color: var(--ul-prim-fg); transition: background var(--gw-motion-fast); }
+.ul-btn:hover { background: var(--ul-prim-hover); }
+
+/* ── data table: table-row 56h data / 44h header, px-24, gap 32; first column fixed ─── */
+.ul-tbl { border-radius: var(--gw-radius-8); overflow: hidden; background: var(--ul-row-bg); }
+:root[data-theme="dark"] .ul-tbl { background: var(--gw-color-black); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ul-tbl { background: var(--gw-color-black); } }
+/* Every row is its own grid, so a content-sized track would resolve per row. The first track
+   is fixed and the rest are minmax(floor, 1fr): floors resolve identically for every row. */
+.ul-row { display: grid; grid-template-columns: 200px minmax(160px, 1.6fr) minmax(96px, 1fr) minmax(130px, 1fr) minmax(130px, 1.1fr);
+  column-gap: var(--gw-space-32); align-items: center; padding: 0 var(--gw-space-24); min-width: 820px; }
+.ul-row--h { height: 44px; background: var(--ul-hdr-bg); box-shadow: inset 0 -1px 0 var(--ul-hdr-line); }
+.ul-row--d { height: 56px; box-shadow: inset 0 -1px 0 var(--ul-row-line); transition: background var(--gw-motion-fast); }
+.ul-row--d:hover { background: var(--ul-row-hover); }
+.ul-th { display: inline-flex; align-items: center; gap: var(--gw-space-4); justify-self: start; padding: 0; border: 0; background: none;
+  font: var(--gw-text-body-12-med); color: var(--ul-hdr-fg); text-transform: uppercase; cursor: pointer; }
+.ul-th svg { width: 12px; height: 12px; color: var(--ul-icon); }
+.ul-th:hover svg { color: var(--ul-hdr-fg); }
+.ul-th[data-on] svg { color: var(--gw-color-primary-500); }   /* the sorted column: the library's active sort glyph */
+.ul-th span.ul-th--plain { cursor: default; }
+.ul-c { font: var(--gw-text-body-12-med); color: var(--ul-cell); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ul-c--who { color: var(--ul-value); }
+.ul-c--none { color: var(--ul-sub); }
+.ul-c--ver { display: flex; align-items: center; gap: var(--gw-space-8); overflow: visible; }
+/* badge Size=sm: radius/4, py-4 px-8, 20h, /25 tint. NOTE exports/dashboard/data-display.md reports the light
+   tints at 3.07 to 3.15:1, under AA at 12px; built as measured, finding stands. */
+.ul-badge { display: inline-flex; align-items: center; height: 20px; padding: 0 var(--gw-space-8); border-radius: var(--gw-radius-4);
+  font: var(--gw-text-button-12); background: var(--ul-b-no-bg); color: var(--ul-b-no-fg); }
+.ul-badge--ok { background: var(--ul-b-ok-bg); color: var(--ul-b-ok-fg); }
+.ul-badge--bad { background: var(--gw-color-red-alpha-10); color: var(--gw-color-red-600); }
+.ul-badge--warn { background: var(--gw-color-yellow-alpha-10); color: var(--gw-color-yellow-600); }
+:root[data-theme="dark"] .ul-badge--warn { color: var(--gw-color-yellow-300); }
+/* New visitor: first seen in the last day. Primary tint, like the other badges' Alpha/10 fill with a /600 label (/400 in dark). */
+.ul-badge--new { background: var(--gw-color-primary-alpha-10); color: var(--gw-color-primary-600); height: 20px; flex: none; }
+:root[data-theme="dark"] .ul-badge--new { color: var(--gw-color-primary-400); }
+.ul-c--whotag { display: flex; align-items: center; gap: var(--gw-space-8); color: var(--ul-value); min-width: 0; }
+.ul-c--whotag > span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vs-note { margin: var(--gw-space-12) 0 0; font: var(--gw-text-body-12-reg); color: var(--ul-sub); max-width: 70ch; }
+:root[data-theme="dark"] .ul-badge--bad { color: var(--gw-color-red-300); }
+.ul-c--chk { display: flex; align-items: center; gap: var(--gw-space-8); overflow: visible; }
+.ul-c--out a { color: var(--ul-value); text-decoration: underline; text-underline-offset: 2px; }
+.ul-row--chat { cursor: pointer; }
+/* Each chat is a group: the row and its tray share one rounded container, so the open state reads as one object. */
+.ul-grp { position: relative; margin: 0 var(--gw-space-8); border-radius: var(--gw-radius-12); transition: background var(--gw-motion-fast); }
+.ul-grp:not(.is-open):hover { background: var(--ul-row-hover); }
+.ul-grp.is-open { background: var(--ul-hdr-bg); }
+.ul-grp.is-open .ul-row--chat .ul-when b, .ul-grp.is-open .ul-row--chat .ul-chat__t svg { color: var(--gw-color-primary-500); }
+:root[data-theme="dark"] .ul-grp.is-open .ul-row--chat .ul-when b, :root[data-theme="dark"] .ul-grp.is-open .ul-row--chat .ul-chat__t svg { color: var(--gw-color-primary-400); }
+.ul-grp.is-open .ul-row--chat .ul-c--who { font-weight: 600; }
+/* While one chat is open, the closed ones step back so the open one is unmistakable. */
+.ul-tbl:has(.ul-grp.is-open) .ul-grp:not(.is-open) .ul-row--d { opacity: .55; transition: opacity var(--gw-motion-fast); }
+.ul-tbl:has(.ul-grp.is-open) .ul-grp:not(.is-open):hover .ul-row--d { opacity: 1; }
+.ul-grp + .ul-grp::before { content: ""; position: absolute; top: 0; left: var(--gw-space-16); right: var(--gw-space-16); height: 1px; background: var(--ul-hdr-line); }
+.ul-grp:hover::before, .ul-grp:hover + .ul-grp::before, .ul-grp.is-open::before, .ul-grp.is-open + .ul-grp::before { display: none; }
+.ul-grp .ul-row--d { height: 64px; box-shadow: none; background: none; padding: 0 var(--gw-space-16); min-width: 0; }
+.ul-grp .ul-row--d:hover { background: none; }
+/* Plain table rows follow the chat groups above: inset 8, a 12 radius on hover, and the hairline between
+   rows drawn as a pseudo-element that steps out of the way of the row being hovered. */
+.ul-tbl > .ul-row--d { position: relative; margin: 0 var(--gw-space-8); padding: 0 var(--gw-space-16); border-radius: var(--gw-radius-12); box-shadow: none; }
+.ul-tbl > .ul-row--d + .ul-row--d::before { content: ""; position: absolute; top: 0; left: var(--gw-space-16); right: var(--gw-space-16); height: 1px; background: var(--ul-hdr-line); }
+.ul-tbl > .ul-row--d:hover::before, .ul-tbl > .ul-row--d:hover + .ul-row--d::before { display: none; }
+/* The header row is a plain row with a firmer rule under it: no fill, no corners (a rounded header curls the
+   rule up at both ends), the line one step stronger than the hairlines between rows. */
+.ul-tbl .ul-row--h { position: relative; margin: 0 var(--gw-space-8); padding: 0 var(--gw-space-16); border-radius: 0; background: none; box-shadow: none; }
+.ul-tbl .ul-row--h::after { content: ""; position: absolute; left: var(--gw-space-16); right: var(--gw-space-16); bottom: 0; height: 1px; background: var(--gw-color-neutral-200); }
+:root[data-theme="dark"] .ul-tbl .ul-row--h::after { background: var(--gw-color-neutral-800); }
+.ul-when { display: flex; flex-direction: column; gap: 1px; line-height: 1.3; }
+.ul-when b { font: var(--gw-text-body-12-med); color: var(--ul-value); }
+.ul-when span { font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.ul-chat__t { gap: var(--gw-space-12); }
+.ul-skill { display: inline-flex; align-items: center; height: 24px; padding: 0 var(--gw-space-8); border-radius: var(--gw-radius-full);
+  border: 1px solid var(--ul-hdr-line); background: var(--ul-field-bg); font: var(--gw-text-body-12-med); color: var(--ul-cell); }
+.ul-grp--quiet .ul-row--d .ul-c { opacity: .7; }
+.ul-detail { display: flex; flex-direction: column; gap: var(--gw-space-16); min-width: 0;
+  padding: var(--gw-space-4) var(--gw-space-16) var(--gw-space-16); }
+.ul-detail__top { display: flex; align-items: baseline; justify-content: space-between; gap: var(--gw-space-16); }
+.ul-detail__h { margin: 0; font: var(--gw-text-body-14-sem, 600 14px/1.4 var(--gw-font-body)); color: var(--ul-value); }
+.ul-detail__h span { margin-left: var(--gw-space-8); font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.ul-detail__sum { font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.ul-outs { display: flex; flex-direction: column; background: var(--ul-field-bg); border: 1px solid var(--ul-hdr-line);
+  border-radius: var(--gw-radius-12); overflow: hidden; }
+.ul-o { display: grid; grid-template-columns: 44px minmax(0, 1fr) 112px 160px; column-gap: var(--gw-space-16); align-items: center;
+  padding: var(--gw-space-12) var(--gw-space-16); }
+.ul-o + .ul-o { border-top: 1px solid var(--ul-hdr-line); }
+.ul-o__t { justify-self: start; height: 20px; padding: 0 var(--gw-space-8); display: inline-flex; align-items: center; border-radius: var(--gw-radius-4);
+  background: var(--ul-tab-hover); color: var(--ul-cell); font: var(--gw-text-body-10-sem, 600 10px/1 var(--gw-font-body)); letter-spacing: .02em; }
+.ul-o__n { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--gw-text-body-12-med); color: var(--ul-value); }
+.ul-o__n a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.ul-o__n small { display: block; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; font: var(--gw-text-body-12-med); color: var(--ul-sub); text-decoration: none; }
+.ul-o__b { display: flex; }
+.ul-act { display: flex; align-items: center; gap: var(--gw-space-16); flex-wrap: wrap; font: var(--gw-text-body-12-med); color: var(--ul-cell); }
+.ul-act__h { color: var(--ul-sub); }
+.ul-act ol { display: contents; margin: 0; padding: 0; list-style: none; }
+.ul-act li { display: inline-flex; align-items: baseline; gap: var(--gw-space-8); }
+.ul-act li + li::before { content: ""; align-self: center; width: 16px; height: 1px; background: var(--ul-track); margin-right: var(--gw-space-8); }
+.ul-act time { color: var(--ul-sub); }
+.ul-chips { display: flex; flex-wrap: wrap; gap: var(--gw-space-4); align-items: center; }
+.ul-chat__t { display: inline-flex; align-items: center; gap: var(--gw-space-8); background: none; border: 0; padding: 0; color: inherit; font: inherit; cursor: pointer; }
+.ul-chat__t svg { width: 12px; height: 12px; color: var(--ul-icon); transition: transform var(--gw-motion-fast); }
+.ul-row--chat[aria-expanded="true"] .ul-chat__t svg { transform: rotate(180deg); }
+.ul-scroll { overflow-x: auto; }
+.ul-tbl:has(.ul-grp) .ul-row--h { margin: 0 var(--gw-space-8); padding: 0 var(--gw-space-16); min-width: 0; border-radius: 0; }
+/* pagination: 52h, pad 12, space-between; arrows are icon-button 28 */
+.ul-pg { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-8); padding: var(--gw-space-12); flex-wrap: wrap; }
+.ul-pg__l, .ul-pg__r { display: flex; align-items: center; gap: var(--gw-space-8); }
+.ul-pg__t { font: var(--gw-text-button-14); color: var(--ul-cell); }
+
+/* ── empty-state: 480 wide, pad 40, gap 16, 40px circle ─────────────────────────────────── */
+.ul-empty { width: 100%; max-width: 480px; margin: 0 auto; padding: var(--gw-space-40); display: flex; flex-direction: column;
+  align-items: center; gap: var(--gw-space-16); text-align: center; }
+.ul-empty__c { width: 40px; height: 40px; border-radius: var(--gw-radius-full); background: var(--ul-circle); color: var(--ul-circle-fg); display: grid; place-items: center; }
+.ul-empty__c svg { width: 16px; height: 16px; }
+.ul-empty__copy { display: flex; flex-direction: column; gap: var(--gw-space-8); }
+.ul-empty h2 { margin: 0; font: var(--gw-text-body-16-sem); color: var(--ul-value); }
+.ul-empty p { margin: 0; font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.ul-note-line { margin: 0; font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+[hidden] { display: none !important; }
+
+/* Below the measured 1120 the content reflows. NOT MEASURED — R17 covers 1280 and 600 for a
+   dashboard-build shell; this page has no rail, so it reflows earlier and the card floors hold
+   by dropping columns rather than shrinking. */
+@media (max-width: 900px) { .ul-kpis, .ul-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .ul-kpis, .ul-metrics { grid-template-columns: minmax(0, 1fr); } .ul-input input { width: 100%; } }
+.vs-t .ul-row { grid-template-columns: var(--vs-cols); min-width: 640px; }
+.vs-more { display: flex; justify-content: center; padding: var(--gw-space-12); }
+.vs-sub { margin: 0; padding: var(--gw-space-4) var(--gw-space-8) 0; font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.vs-areas { display: flex; flex-wrap: wrap; gap: var(--gw-space-12); align-items: center; }
+.in-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.in-list li { display: grid; grid-template-columns: 8px 1fr auto; gap: var(--gw-space-12); align-items: baseline; padding: var(--gw-space-12) var(--gw-space-8); box-shadow: inset 0 -1px 0 var(--ul-hdr-line); font: var(--gw-text-body-14-reg); color: var(--ul-cell); }
+.in-list li:last-child { box-shadow: none; }
+.in-list b { color: var(--ul-value); font-weight: 600; }
+.in-list i { width: 8px; height: 8px; border-radius: 50%; background: var(--gw-color-primary-500); align-self: center; }
+.in-list .in-tag { font: var(--gw-text-body-12-med); color: var(--ul-sub); white-space: nowrap; }
+.in-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gw-space-24); margin-top: var(--gw-space-24); }
+@media (max-width: 960px) { .in-pair { grid-template-columns: minmax(0, 1fr); } }
+.vs-t .ul-th { white-space: nowrap; }
+#in-skill .ul-row { column-gap: var(--gw-space-16); padding: 0 var(--gw-space-16); }
+.in-pair .vs-t .ul-row { min-width: 0; padding: 0 var(--gw-space-16); column-gap: var(--gw-space-16); }
+.in-h { margin: var(--gw-space-24) 0 var(--gw-space-8); font: var(--gw-text-body-12-med); letter-spacing: .06em; text-transform: uppercase; color: var(--ul-sub); }
+
+/* Page-level tabs: flat text with an underline for the open one, on a full-width hairline (Exa Usage,
+   Xero, Laravel Cloud). The period control inside each tab stays the filled segmented pill, aligned to
+   the right, so the two controls read as different things. */
+.an-bar { position: sticky; top: 0; z-index: 6; background: var(--s-panel-bg); margin-top: calc(var(--gw-space-8) * -1); padding-top: var(--gw-space-8); align-self: stretch; display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-16); box-shadow: inset 0 -1px 0 var(--ul-hdr-line); }
+@media (max-width: 767px) { .an-bar { top: 76px; } }
+.sg__main .an-bar > .an-tabs { display: flex; gap: var(--gw-space-24); height: auto; padding: 0; border-radius: 0; background: none; box-shadow: none; }
+/* "Hide my activity": a small switch in the topbar-icon family (no stroke on the label, a filled track when on). */
+.an-me { display: inline-flex; align-items: center; gap: var(--gw-space-8); cursor: pointer; user-select: none; font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.an-me:hover { color: var(--ul-value); }
+.an-me input { position: absolute; opacity: 0; width: 0; height: 0; }
+.an-me__sw { position: relative; width: 28px; height: 16px; border-radius: 999px; background: var(--ul-hdr-line); transition: background var(--gw-motion-fast); }
+.an-me__sw::after { content: ''; position: absolute; left: 2px; top: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--gw-color-white); box-shadow: 0 1px 2px rgba(0, 0, 0, .25); transition: transform var(--gw-motion-fast); }
+.an-me input:checked + .an-me__sw { background: var(--ul-tab-on-bg); }
+.an-me input:checked + .an-me__sw::after { background: var(--ul-tab-on-fg); box-shadow: none; }
+.an-me input:checked + .an-me__sw::after { transform: translateX(12px); }
+.an-me input:checked ~ .an-me__t { color: var(--ul-value); }
+.an-me input:focus-visible + .an-me__sw { outline: var(--gw-focus-ring); outline-offset: 2px; }
+.sg__main .an-bar .an-tabs .ul-tab { position: relative; height: 40px; padding: 0 2px; border-radius: 0; background: none; color: var(--ul-sub); font: var(--gw-text-body-14-med); }
+.sg__main .an-bar .an-tabs .ul-tab:hover { background: none; color: var(--ul-value); }
+.sg__main .an-bar .an-tabs .ul-tab[aria-selected="true"] { background: none; color: var(--ul-value); }
+.sg__main .an-bar .an-tabs .ul-tab[aria-selected="true"]::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; border-radius: 2px 2px 0 0; background: var(--ul-value); }
+/* The period pills (7 days, 30 days, All time) sit on the left of each tab's controls, with Visits' area filter beside them; the refresh icon stays on the right. */
+
+/* One divider, not two: the tab row's hairline is the page header's rule. */
+body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw-space-8); }
+.an-panel { display: flex; flex-direction: column; gap: var(--gw-space-24); }
+.an-panel > * { min-width: 0; }
+.an-panel[hidden] { display: none; }
+.an-panel .ul-refresh__t { display: none; }
+.gw-iconbtn[aria-busy="true"] svg { animation: ul-spin 1s linear infinite; }
+</style>
+</head>
+<body data-gw-page="analytics">
+
+<div class="sg ul-scope">
+
+  <header class="sg__hd">
+    <h1>Analytics</h1>
+    <p>How the plugin and the design hub are used, and where they can be faster and easier to use</p>
+  </header>
+
+  <main class="sg__main">
+
+    <div class="an-bar">
+      <div class="ul-tabs an-tabs" id="an-tabs" role="tablist" aria-label="Analytics">
+        <button class="ul-tab" role="tab" data-tab="insights" aria-selected="true">Insights</button>
+        <button class="ul-tab" role="tab" data-tab="usage" aria-selected="false">Usage</button>
+        <button class="ul-tab" role="tab" data-tab="visits" aria-selected="false">Visits</button>
+        <button class="ul-tab" role="tab" data-tab="bruce" aria-selected="false">Bruce</button>
+      </div>
+      <label class="an-me" id="an-me" title="Leaves your own rows out of every tab">
+        <input type="checkbox" id="an-me-box">
+        <span class="an-me__sw" aria-hidden="true"></span>
+        <span class="an-me__t">Hide my activity</span>
+      </label>
+    </div>
+
+    <section class="an-panel" id="an-insights" role="tabpanel">
+
+    <div class="ul-bar" id="in-bar">
+      <div class="ul-tabs" role="tablist" aria-label="Period">
+        <button class="ul-tab" role="tab" data-period="7"  aria-selected="false">7 days</button>
+        <button class="ul-tab" role="tab" data-period="30" aria-selected="true">30 days</button>
+        <button class="ul-tab" role="tab" data-period="all" aria-selected="false">All time</button>
+      </div>
+      <div class="ul-refresh">
+        <span class="ul-refresh__t" id="in-updated" aria-live="polite"></span>
+        <button class="gw-iconbtn" id="in-refresh" type="button" aria-label="Refresh" data-tip="Refresh" data-tip-end></button>
+      </div>
+    </div>
+
+    <div id="in-blocked" hidden></div>
+
+    <div id="in-app">
+
+      <section class="ul-sec" aria-labelledby="in-h-act">
+        <div class="ul-sh"><div class="ul-sh__t"><h2 id="in-h-act">Worth acting on</h2><span class="ul-sh__q" id="in-q-act"></span></div></div>
+        <div class="ul-inner"><ul class="in-list" id="in-act"></ul></div>
+      </section>
+
+      <p class="in-h">Plugin speed</p>
+      <div class="ul-metrics" id="in-speed"></div>
+
+      <p class="in-h">Tokens</p>
+      <div class="ul-metrics" id="in-tokens"></div>
+
+      <p class="in-h">Review cycles</p>
+      <div class="ul-metrics" id="in-review"></div>
+
+      <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="in-h-skill">
+        <div class="ul-sh"><div class="ul-sh__t"><h2 id="in-h-skill">By skill</h2><span class="ul-sh__q" id="in-q-skill"></span></div></div>
+        <div class="ul-scroll vs-t" id="in-skill"></div>
+      </section>
+
+      <div class="in-pair">
+        <section class="ul-sec" aria-labelledby="in-h-fail">
+          <div class="ul-sh"><div class="ul-sh__t"><h2 id="in-h-fail">Why outputs miss the brand check</h2></div></div>
+          <div class="ul-scroll vs-t" id="in-fail"></div>
+        </section>
+        <section class="ul-sec" aria-labelledby="in-h-ver">
+          <div class="ul-sh"><div class="ul-sh__t"><h2 id="in-h-ver">Who is behind</h2><span class="ul-sh__q" id="in-q-ver"></span></div></div>
+          <div class="ul-scroll vs-t" id="in-ver"></div>
+        </section>
+      </div>
+
+      <p class="in-h">The hub</p>
+      <div class="ul-metrics" id="in-hub"></div>
+      <div class="in-pair">
+        <section class="ul-sec" aria-labelledby="in-h-top">
+          <div class="ul-sh"><div class="ul-sh__t"><h2 id="in-h-top">Most opened</h2></div></div>
+          <div class="ul-scroll vs-t" id="in-top"></div>
+        </section>
+        <section class="ul-sec" aria-labelledby="in-h-never">
+          <div class="ul-sh"><div class="ul-sh__t"><h2 id="in-h-never">Never opened</h2><span class="ul-sh__q" id="in-q-never"></span></div></div>
+          <div class="ul-scroll vs-t" id="in-never"></div>
+        </section>
+      </div>
+    </div>
+
+  </section>
+    <section class="an-panel" id="an-usage" role="tabpanel" hidden>
+
+    <div class="ul-bar" id="ul-bar">
+      <div class="ul-tabs" role="tablist" aria-label="Period">
+        <button class="ul-tab" role="tab" data-period="7"  aria-selected="false">7 days</button>
+        <button class="ul-tab" role="tab" data-period="30" aria-selected="true">30 days</button>
+        <button class="ul-tab" role="tab" data-period="all" aria-selected="false">All time</button>
+      </div>
+      <div class="ul-refresh">
+        <span class="ul-refresh__t" id="ul-updated" aria-live="polite"></span>
+        <button class="gw-iconbtn" id="ul-refresh" type="button" aria-label="Refresh" data-tip="Refresh" data-tip-end></button>
+      </div>
+    </div>
+
+    <div id="ul-blocked" hidden></div>
+
+    <div id="ul-app">
+      <div class="ul-kpis" id="ul-kpis"></div>
+      <div class="ul-metrics" id="ul-metrics" style="margin-top: var(--gw-space-8)"></div>
+
+      <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="ul-h-chart">
+        <div class="ul-sh"><div class="ul-sh__t"><h2 id="ul-h-chart">Sessions</h2><span class="ul-sh__q" id="ul-q-chart"></span></div></div>
+        <div class="ul-inner" id="ul-chart"></div>
+      </section>
+
+      <div class="ul-pair">
+      <section class="ul-sec" aria-labelledby="ul-h-ver">
+        <div class="ul-sh ul-sh--nw"><div class="ul-sh__t"><h2 id="ul-h-ver">Out of date</h2><span class="ul-sh__q" id="ul-q-ver"></span></div>
+          <button type="button" class="ul-link" id="ul-ver-open" hidden>View details</button></div>
+        <div class="ul-inner" id="ul-versions"></div>
+      </section>
+      <dialog class="ul-dlg" id="ul-ver-dlg" aria-labelledby="ul-ver-dlg-t">
+        <div class="ul-dlg__h"><h2 id="ul-ver-dlg-t">Out of date</h2><span class="ul-sh__q" id="ul-ver-dlg-q"></span>
+          <button type="button" class="ul-dlg__x" id="ul-ver-close" aria-label="Close">&times;</button></div>
+        <div class="ul-dlg__b" id="ul-ver-dlg-b"></div>
+      </dialog>
+
+      <section class="ul-sec" aria-labelledby="ul-h-skills">
+        <div class="ul-sh"><div class="ul-sh__t"><h2 id="ul-h-skills">Skills</h2><span class="ul-sh__q" id="ul-q-skills"></span></div></div>
+        <div class="ul-inner" id="ul-skills"></div>
+      </section>
+      </div>
+
+      <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="ul-h-new">
+        <div class="ul-sh"><div class="ul-sh__t"><h2 id="ul-h-new">New users</h2><span class="ul-sh__q" id="ul-q-new"></span></div></div>
+        <div class="ul-scroll vs-t" id="ul-new"></div>
+        <div class="ul-pg" id="ul-new-pg" hidden></div>
+        <p class="vs-note" id="ul-new-note" hidden></p>
+      </section>
+
+      <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="ul-h-out">
+        <div class="ul-sh"><div class="ul-sh__t"><h2 id="ul-h-out">Outputs</h2><span class="ul-sh__q" id="ul-q-out"></span></div></div>
+        <div class="ul-inner"><div class="ul-metrics" id="ul-out-metrics" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr))"></div></div>
+      </section>
+
+      <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="ul-h-log">
+        <div class="ul-sh">
+          <div class="ul-sh__t"><h2 id="ul-h-log">Log</h2><span class="ul-sh__q" id="ul-q-log"></span></div>
+          <div class="ul-tools">
+            <label class="ul-input"><span class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Search the log</span>
+              <span id="ul-i-search"></span>
+              <input id="ul-search" type="search" placeholder="Search person or version" autocomplete="off"></label>
+            <label class="ul-select"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Filter by version</span>
+              <select id="ul-ver"></select><span class="ul-i-caret"></span></label>
+            <label class="ul-select"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">View</span>
+              <select id="ul-view"><option value="chat">By chat</option><option value="flat">All events</option></select><span class="ul-i-caret"></span></label>
+            <label class="ul-select"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Filter by event</span>
+              <select id="ul-evt"><option value="">All events</option><option value="session">Sessions</option><option value="skill">Skills</option><option value="file">Files</option><option value="artifact">Artifacts</option></select><span class="ul-i-caret"></span></label>
+          </div>
+        </div>
+        <div class="ul-scroll"><div class="ul-tbl" id="ul-table" role="table" aria-label="Activity log"></div></div>
+        <div class="ul-pg" id="ul-pg"></div>
+      </section>
+    </div>
+
+  </section>
+    <section class="an-panel" id="an-visits" role="tabpanel" hidden>
+
+    <div class="ul-bar" id="vs-bar">
+      <div class="vs-areas">
+        <div class="ul-tabs" role="tablist" aria-label="Period">
+          <button class="ul-tab" role="tab" data-period="7"  aria-selected="false">7 days</button>
+          <button class="ul-tab" role="tab" data-period="30" aria-selected="true">30 days</button>
+          <button class="ul-tab" role="tab" data-period="all" aria-selected="false">All time</button>
+        </div>
+        <div class="ul-tabs" role="tablist" aria-label="Area" id="vs-area-tabs"></div>
+      </div>
+      <div class="ul-refresh">
+        <span class="ul-refresh__t" id="vs-updated" aria-live="polite"></span>
+        <button class="gw-iconbtn" id="vs-refresh" type="button" aria-label="Refresh" data-tip="Refresh" data-tip-end></button>
+      </div>
+    </div>
+
+    <div id="vs-blocked" hidden></div>
+
+    <div id="vs-app">
+      <div class="ul-metrics" id="vs-metrics"></div>
+
+      <!-- Recent first (Utsav, 7 Oct 2026: it is the part he opens this tab for), then People and Pages. -->
+      <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="vs-h-recent">
+        <div class="ul-sh">
+          <div class="ul-sh__t"><h2 id="vs-h-recent">Recent</h2><span class="ul-sh__q" id="vs-q-recent"></span></div>
+          <div class="ul-tools">
+            <label class="ul-input"><span class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Search recent visits</span>
+              <span id="vs-i-search"></span>
+              <input id="vs-search" type="search" placeholder="Search person or page" autocomplete="off"></label>
+          </div>
+        </div>
+        <div class="ul-scroll vs-t" id="vs-recent"></div>
+        <div class="vs-more" id="vs-more"></div>
+      </section>
+
+      <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="vs-h-people">
+        <div class="ul-sh"><div class="ul-sh__t"><h2 id="vs-h-people">People</h2><span class="ul-sh__q" id="vs-q-people"></span></div></div>
+        <div class="ul-scroll vs-t" id="vs-people"></div>
+      </section>
+
+      <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="vs-h-pages">
+        <div class="ul-sh"><div class="ul-sh__t"><h2 id="vs-h-pages">Pages</h2><span class="ul-sh__q" id="vs-q-pages"></span></div></div>
+        <div class="ul-scroll vs-t" id="vs-pages"></div>
+      </section>
+
+    </div>
+
+  </section>
+
+    <!-- Bruce (R55 addendum, 5 Oct 2026): every turn Bruce was asked for in Slack, who asked, and what it cost in runs. -->
+    <section class="an-panel" id="an-bruce" role="tabpanel" hidden>
+
+    <div class="ul-bar" id="br-bar">
+      <div class="vs-areas">
+        <div class="ul-tabs" role="tablist" aria-label="Period">
+          <button class="ul-tab" role="tab" data-period="7"  aria-selected="false">7 days</button>
+          <button class="ul-tab" role="tab" data-period="30" aria-selected="true">30 days</button>
+          <button class="ul-tab" role="tab" data-period="all" aria-selected="false">All time</button>
+        </div>
+      </div>
+      <div class="ul-refresh">
+        <span class="ul-refresh__t" id="br-updated" aria-live="polite"></span>
+        <button class="gw-iconbtn" id="br-refresh" type="button" aria-label="Refresh" data-tip="Refresh" data-tip-end></button>
+      </div>
+    </div>
+
+    <div id="br-blocked" hidden></div>
+
+    <div id="br-app">
+      <div class="ul-metrics" id="br-metrics"></div>
+
+      <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="br-h-people">
+        <div class="ul-sh"><div class="ul-sh__t"><h2 id="br-h-people">People</h2><span class="ul-sh__q" id="br-q-people"></span></div></div>
+        <div class="ul-scroll vs-t" id="br-people"></div>
+      </section>
+
+      <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="br-h-recent">
+        <div class="ul-sh"><div class="ul-sh__t"><h2 id="br-h-recent">Recent</h2><span class="ul-sh__q" id="br-q-recent"></span></div></div>
+        <div class="ul-scroll vs-t" id="br-recent"></div>
+        <div class="vs-more" id="br-more"></div>
+      </section>
+    </div>
+
+  </section>
+
+  </main>
+</div>
+
+<script>
+/* Shared by the three tabs: the signed-in owner's own address, and the switch that leaves it out. */
+window.anMe = { on: false, email: '' };
+window.anMe.ready = fetch('/api/auth/me', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : {}; })
+  .then(function (j) { window.anMe.email = String((j && j.email) || '').trim().toLowerCase(); }).catch(function () {});
+window.anHide = function (rows) {
+  return window.anMe.on && window.anMe.email ? rows.filter(function (r) { return String(r.email || '').toLowerCase() !== window.anMe.email; }) : rows;
+};
+window.__anRefilter = {};
+</script>
+<script>
+(function () {
+  'use strict';
+  var ROOT = document.getElementById('an-insights');
+  var ICON = {"arrows-down-up":"<path d=\"M117.66,170.34a8,8,0,0,1,0,11.32l-32,32a8,8,0,0,1-11.32,0l-32-32a8,8,0,0,1,11.32-11.32L72,188.69V48a8,8,0,0,1,16,0V188.69l18.34-18.35A8,8,0,0,1,117.66,170.34Zm96-96-32-32a8,8,0,0,0-11.32,0l-32,32a8,8,0,0,0,11.32,11.32L168,67.31V208a8,8,0,0,0,16,0V67.31l18.34,18.35a8,8,0,0,0,11.32-11.32Z\"/>","arrow-up":"<path d=\"M205.66,117.66a8,8,0,0,1-11.32,0L136,59.31V216a8,8,0,0,1-16,0V59.31L61.66,117.66a8,8,0,0,1-11.32-11.32l72-72a8,8,0,0,1,11.32,0l72,72A8,8,0,0,1,205.66,117.66Z\"/>","arrow-down":"<path d=\"M205.66,149.66l-72,72a8,8,0,0,1-11.32,0l-72-72a8,8,0,0,1,11.32-11.32L120,196.69V40a8,8,0,0,1,16,0V196.69l58.34-58.35a8,8,0,0,1,11.32,11.32Z\"/>","arrow-left":"<path d=\"M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z\"/>","arrow-right":"<path d=\"M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z\"/>","arrow-clockwise":"<path d=\"M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z\"/>","lock":"<path d=\"M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Zm-68-56a12,12,0,1,1-12-12A12,12,0,0,1,140,152Z\"/>","warning-circle":"<path d=\"M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z\"/>","magnifying-glass":"<path d=\"M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z\"/>"};
+  function icon(n) { return '<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">' + (ICON[n] || '') + '</svg>'; }
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+  function $(id) { return document.getElementById(id); }
+  function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
+  var DAY = 86400000;
+  function ago(ms) {
+    var s = Math.max(0, Math.round(ms / 1000));
+    if (s < 60) return s + 's ago';
+    var m = Math.round(s / 60); if (m < 60) return m + ' min ago';
+    var h = Math.round(m / 60); if (h < 48) return h + ' h ago';
+    return Math.round(h / 24) + ' days ago';
+  }
+  function dur(ms) {
+    var s = Math.round(ms / 1000);
+    if (s < 90) return s + ' s';
+    var m = Math.round(s / 60); if (m < 90) return m + ' min';
+    return (Math.round(m / 6) / 10) + ' h';
+  }
+  function pct(a, b) { return b ? Math.round(a / b * 100) : null; }
+  function pctS(a, b) { var p = pct(a, b); return p == null ? '—' : p + '%'; }
+  function median(a) { if (!a.length) return null; var s = a.slice().sort(function (x, y) { return x - y; }), h = s.length >> 1; return s.length % 2 ? s[h] : (s[h - 1] + s[h]) / 2; }
+  function vparts(v) { var m = /^(\d+)\.(\d+)\.(\d+)/.exec(v); return m ? [+m[1], +m[2], +m[3]] : null; }
+  function vcmp(a, b) { var x = vparts(a), y = vparts(b); if (!x && !y) return 0; if (!x) return -1; if (!y) return 1; for (var i = 0; i < 3; i++) if (x[i] !== y[i]) return x[i] - y[i]; return 0; }
+  function skillName(s) { return String(s || '').replace(/^.*:/, ''); }
+
+  var TOOLS = ['/internal/tools', '/internal/employee-id-card', '/internal/email-signature'];
+  function areaOf(p) {
+    if (TOOLS.indexOf(p) !== -1) return 'Tools';
+    if (p.indexOf('/internal/staging') === 0) return 'Staging';
+    if (p.indexOf('/internal/templates') === 0) return 'Templates';
+    if (p.indexOf('/library') === 0) return 'Library';
+    if (p.indexOf('/admin') === 0) return 'Admin';
+    return 'Hub';
+  }
+  var TITLES = {};
+  function pageName(p) { return TITLES[p] || (p.split('/').filter(Boolean).pop() || 'Overview').replace(/[-_]+/g, ' ').replace(/^./, function (c) { return c.toUpperCase(); }); }
+  function cleanPath(p) { var s = String(p || '/').split('#')[0].split('?')[0].replace(/\/index\.html$/, '').replace(/\.html$/, ''); return (s.length > 1 ? s.replace(/\/+$/, '') : s) || '/'; }
+
+  var S = { status: 'loading', usage: [], outcomes: {}, visits: [], haveVisits: false, index: [], period: '30', busy: false, fetchedAt: 0 };
+
+  function parseUsage(raw) {
+    var out = [];
+    raw.forEach(function (r) {
+      var d = new Date(r.at); if (isNaN(d.getTime())) return;
+      out.push({ at: d, key: String(r.at), email: String(r.email || '').trim().toLowerCase(), version: String(r.version || '').trim(), event: String(r.event || ''),
+                 skill: String(r.skill || ''), file: String(r.file || ''), sess: String(r.sess || ''), flags: r.flags && typeof r.flags === 'object' ? r.flags : null,
+                 tok: r.tok && typeof r.tok === 'object' ? { i: +r.tok.i || 0, o: +r.tok.o || 0, c: +r.tok.c || 0 } : null });
+    });
+    return out;
+  }
+  function inPeriod(d) { return S.period === 'all' || d.getTime() >= Date.now() - (+S.period) * DAY; }
+  function inPrev(d) { return S.period !== 'all' && d.getTime() >= Date.now() - 2 * (+S.period) * DAY && d.getTime() < Date.now() - (+S.period) * DAY; }
+  function fmtTok(n) { n = Math.round(n || 0); return n >= 1e9 ? (n / 1e9).toFixed(1) + 'B' : n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1e3 ? Math.round(n / 1e3) + 'k' : String(n); }
+  /* Token figures for any slice of rows. A skill, file or artifact row carries the session's running
+     totals, so a session's use is the largest it reached, and tokens to a first output is the figure at
+     the first output minus the figure when the first skill started. Input + output only; cache re-reads
+     are counted apart. */
+  function tokenStats(rows) {
+    var by = {};
+    rows.forEach(function (r) { if (r.sess) (by[r.sess] = by[r.sess] || []).push(r); });
+    var perSession = [], toOutput = [], toBySkill = {}, used = 0, cache = 0;
+    Object.keys(by).forEach(function (k) {
+      var evs = by[k].slice().sort(function (a, b) { return a.at - b.at; }), top = null;
+      evs.forEach(function (r) { if (r.tok && (!top || r.tok.i + r.tok.o > top.i + top.o)) top = r.tok; });
+      if (!top) return;
+      perSession.push(top.i + top.o); used += top.i + top.o; cache += top.c;
+      var sk = evs.filter(function (r) { return r.event === 'skill' && r.tok; })[0];
+      var out = evs.filter(function (r) { return (r.event === 'file' || r.event === 'artifact') && r.tok; })[0];
+      if (sk && out && out.at >= sk.at) {
+        var dlt = (out.tok.i + out.tok.o) - (sk.tok.i + sk.tok.o);
+        if (dlt >= 0) { toOutput.push(dlt); var n = skillName(sk.skill); (toBySkill[n] = toBySkill[n] || []).push(dlt); }
+      }
+    });
+    return { perSession: perSession, toOutput: toOutput, toBySkill: toBySkill, used: used, cache: cache };
+  }
+  function trend(cur, prev, what) {
+    if (S.period === 'all' || cur == null || prev == null || !prev) return 'no earlier period to compare';
+    var d = Math.round((cur - prev) / prev * 100);
+    return (d === 0 ? 'level with' : Math.abs(d) + '% ' + (d < 0 ? 'lower than' : 'higher than')) + ' the previous ' + S.period + ' days';
+  }
+  function isSess(r) { return !r.event || r.event === 'session-start'; }
+  function onBrand(f) { return !!f && f.tokens === true && f.fonts !== 'foreign'; }
+
+  function compute() {
+    var rows = S.usage.filter(function (r) { return inPeriod(r.at); });
+    var sessions = rows.filter(isSess);
+    /* Group by session tag. Rows without one cannot be tied to a skill exactly, so they are left out of
+       every ratio here rather than guessed. */
+    var bySess = {};
+    rows.forEach(function (r) { if (r.sess) (bySess[r.sess] = bySess[r.sess] || []).push(r); });
+    Object.keys(bySess).forEach(function (k) { bySess[k].sort(function (a, b) { return a.at - b.at; }); });
+
+    var skillRuns = {}, outputs = {}, times = [], timesBySkill = {};
+    var reran = 0, withSkill = 0, withOutput = 0;
+    Object.keys(bySess).forEach(function (k) {
+      var evs = bySess[k], sk = evs.filter(function (r) { return r.event === 'skill'; });
+      if (!sk.length) return;
+      withSkill++;
+      var names = {}; sk.forEach(function (r) { names[r.skill] = (names[r.skill] || 0) + 1; });
+      if (Object.keys(names).some(function (n) { return names[n] > 1; })) reran++;
+      sk.forEach(function (r) { var n = skillName(r.skill); skillRuns[n] = (skillRuns[n] || 0) + 1; });
+      var outs = evs.filter(function (r) { return r.event === 'file' || r.event === 'artifact'; });
+      if (outs.length) {
+        withOutput++;
+        var dt = outs[0].at - sk[0].at;
+        if (dt >= 0) { times.push(dt); var n0 = skillName(sk[0].skill); (timesBySkill[n0] = timesBySkill[n0] || []).push(dt); }
+      }
+      /* One output = one file name in one session. Its first write is the first pass; more writes are rework. */
+      var groups = {};
+      outs.forEach(function (r) {
+        var g = r.event === 'artifact' ? 'a|' + r.key : 'f|' + r.file;
+        (groups[g] = groups[g] || []).push(r);
+      });
+      Object.keys(groups).forEach(function (g) {
+        var ws = groups[g], first = ws[0], skRow = null;
+        sk.forEach(function (s) { if (s.at <= first.at) skRow = s; });
+        if (!skRow) skRow = sk[0];
+        var verdict = ws.map(function (w) { return S.outcomes[w.key]; }).filter(Boolean).pop() || '';
+        outputs[k + '|' + g] = { skill: skillName(skRow.skill), writes: ws.length, flags: first.flags, verdict: verdict, person: first.email, version: first.version };
+      });
+    });
+
+    var outList = Object.keys(outputs).map(function (k) { return outputs[k]; });
+    var measured = outList.filter(function (o) { return o.flags; });
+    var onB = measured.filter(function (o) { return onBrand(o.flags); }).length;
+    var reworked = outList.filter(function (o) { return o.writes > 1; }).length;
+    var appr = outList.filter(function (o) { return o.verdict === 'approved'; }).length;
+    var chg = outList.filter(function (o) { return o.verdict === 'changes'; }).length;
+
+    var fail = { 'No Gushwork tokens': 0, 'Another typeface': 0, 'No logo': 0, 'No build stamp': 0 };
+    measured.forEach(function (o) {
+      if (o.flags.tokens !== true) fail['No Gushwork tokens']++;
+      if (o.flags.fonts === 'foreign') fail['Another typeface']++;
+      if (o.flags.logo !== true) fail['No logo']++;
+      if (o.flags.stamp !== true) fail['No build stamp']++;
+    });
+
+    var perSkill = Object.keys(skillRuns).map(function (n) {
+      var os = outList.filter(function (o) { return o.skill === n; }), ms = os.filter(function (o) { return o.flags; });
+      return { name: n, runs: skillRuns[n], outs: os.length, measured: ms.length, on: ms.filter(function (o) { return onBrand(o.flags); }).length,
+               rework: os.filter(function (o) { return o.writes > 1; }).length, chg: os.filter(function (o) { return o.verdict === 'changes'; }).length,
+               med: median(timesBySkill[n] || []) };
+    }).sort(function (a, b) { return b.runs - a.runs; });
+
+    /* Versions: who is behind the newest seen. */
+    var newest = ''; S.usage.filter(isSess).forEach(function (r) { if (r.version && vparts(r.version) && (!newest || vcmp(r.version, newest) > 0)) newest = r.version; });
+    var last = {};
+    sessions.forEach(function (r) { if (r.email && (!last[r.email] || r.at > last[r.email].at)) last[r.email] = r; });
+    var behind = Object.keys(last).filter(function (e) { return newest && vcmp(newest, last[e].version) > 0; }).map(function (e) { return { email: e, version: last[e].version }; });
+
+    /* The hub. */
+    var vrows = S.visits.filter(function (r) { return r.kind === 'view' && inPeriod(r.at); });
+    var opened = {}; vrows.forEach(function (r) { var p = cleanPath(r.path); var g = opened[p] || (opened[p] = { path: p, views: 0, who: {} }); g.views++; g.who[r.email] = 1; });
+    var seenPages = {}; var allPages = [];
+    S.index.forEach(function (e) {
+      var u = cleanPath(e.u || ''); if (!u || seenPages[u]) return; seenPages[u] = 1;
+      if (u === '/') return;
+      if (!TITLES[u] && e.t) TITLES[u] = e.t;
+      allPages.push(u);
+    });
+    var never = allPages.filter(function (u) { return !opened[u] && u.indexOf('/admin') !== 0; });
+    var top = Object.keys(opened).map(function (k) { return opened[k]; }).sort(function (a, b) { return b.views - a.views; });
+    var firstVisit = S.visits.length ? S.visits.reduce(function (m, r) { return r.at < m ? r.at : m; }, S.visits[0].at) : null;
+
+    var tkNow = tokenStats(rows), tkPrev = tokenStats(S.usage.filter(function (r) { return inPrev(r.at); }));
+    return { tk: tkNow, tkPrev: tkPrev, rows: rows, sessions: sessions, withSkill: withSkill, withOutput: withOutput, reran: reran, times: times, outList: outList, measured: measured, onB: onB,
+             reworked: reworked, appr: appr, chg: chg, fail: fail, perSkill: perSkill, newest: newest, behind: behind, vrows: vrows, top: top, never: never, allPages: allPages, firstVisit: firstVisit };
+  }
+
+  function metric(label, value, note) {
+    return '<div class="ul-metric"><span class="ul-lab">' + esc(label) + '</span><div class="ul-metric__body"><span class="ul-num">' + esc(value) + '</span><span class="ul-note">' + esc(note) + '</span></div></div>';
+  }
+  function th(t) { return t && typeof t === 'object' ? t.html : '<div role="columnheader"><span class="ul-th"><span class="ul-th--plain">' + esc(t) + '</span></span></div>'; }
+  function cell(t, cls, title) { return '<div class="ul-c ' + (cls || '') + '" role="cell" title="' + esc(title || t) + '">' + esc(t) + '</div>'; }
+  function table(cols, heads, rows, empty) {
+    return '<div class="ul-tbl" role="table" style="--vs-cols:' + cols + '"><div class="ul-row ul-row--h" role="row">' + heads.map(th).join('') + '</div>' +
+      (rows.length ? rows.join('') : '<div class="ul-empty"><div class="ul-empty__copy"><h2>' + esc(empty) + '</h2></div></div>') + '</div>';
+  }
+  function row(cells) { return '<div class="ul-row ul-row--d" role="row">' + cells.join('') + '</div>'; }
+
+  /* Ten rows to a page. The pager shows only when there is more than a page, and uses the same markup as the
+     Usage tab's "New people" table (.ul-pg). It sits OUTSIDE the table's scroller so it does not scroll sideways
+     with a wide table. */
+
+  /* Sorting. A column header is a button; the first click leads with the useful end of the column (biggest, newest or A to Z,
+     lowest where lower is better), the second reverses it. Empty values stay last either way, and ties keep the order they were in. */
+  var SORT = {};
+  function sortItems(items, defs, st) {
+    if (!st || !defs[st.i]) return items;
+    var get = defs[st.i].get;
+    return items.map(function (x, n) { return { x: x, n: n, v: get(x) }; }).sort(function (a, b) {
+      var an = a.v == null || a.v === '', bn = b.v == null || b.v === '';
+      if (an || bn) return an && bn ? a.n - b.n : an ? 1 : -1;
+      var c = typeof a.v === 'string' ? a.v.localeCompare(b.v, undefined, { sensitivity: 'base', numeric: true }) : a.v - b.v;
+      return c * st.dir || a.n - b.n;
+    }).map(function (o) { return o.x; });
+  }
+  function sortTh(key, i, label) {
+    var st = SORT[key], on = st && st.i === i;
+    return '<div role="columnheader" aria-sort="' + (on ? (st.dir < 0 ? 'descending' : 'ascending') : 'none') + '">' +
+      '<button class="ul-th" type="button" data-sort-i="' + i + '"' + (on ? ' data-on' : '') + '>' + esc(label) + icon(on ? (st.dir < 0 ? 'arrow-down' : 'arrow-up') : 'arrows-down-up') + '</button></div>';
+  }
+  function sortNote(key, heads, dflt) {
+    var st = SORT[key];
+    return st ? 'by ' + String(heads[st.i]).toLowerCase() + ', ' + (st.dir < 0 ? 'descending' : 'ascending') : dflt;
+  }
+  var PER = 10, PG = {};
+  function paged(hostId, key, cols, heads, items, rowFn, empty, sorts) {
+    sorts = sorts || [];
+    if (SORT[key] && !sorts[SORT[key].i]) SORT[key] = null;
+    var list = sortItems(items, sorts, SORT[key]);
+    var hd = sorts.some(Boolean) ? heads.map(function (h, i) { return sorts[i] ? { html: sortTh(key, i, h) } : h; }) : heads;
+    var host = $(hostId), pages = Math.max(1, Math.ceil(items.length / PER));
+    PG[key] = Math.min(Math.max(1, PG[key] || 1), pages);
+    var from = (PG[key] - 1) * PER;
+    host.innerHTML = table(cols, hd, list.slice(from, from + PER).map(rowFn), empty);
+    [].forEach.call(host.querySelectorAll('[data-sort-i]'), function (b) {
+      b.addEventListener('click', function () {
+        var i = +b.getAttribute('data-sort-i'), cur = SORT[key];
+        SORT[key] = cur && cur.i === i ? { i: i, dir: -cur.dir } : { i: i, dir: sorts[i].dir };
+        PG[key] = 1; renderAll();
+      });
+    });
+    var slot = $(hostId + '-pg');
+    if (!slot) { slot = document.createElement('div'); slot.id = hostId + '-pg'; slot.className = 'ul-pg'; host.insertAdjacentElement('afterend', slot); }
+    slot.hidden = items.length <= PER;
+    if (slot.hidden) return;
+    slot.innerHTML = '<div class="ul-pg__l"><span class="ul-pg__t">' + (from + 1) + '–' + Math.min(from + PER, items.length) + ' of ' + items.length + '</span></div>' +
+      '<div class="ul-pg__r"><span class="ul-pg__t">Page ' + PG[key] + ' of ' + pages + '</span>' +
+      '<button class="ul-ib" data-pg="prev" type="button" aria-label="Previous page"' + (PG[key] <= 1 ? ' disabled' : '') + '>' + icon('arrow-left') + '</button>' +
+      '<button class="ul-ib" data-pg="next" type="button" aria-label="Next page"' + (PG[key] >= pages ? ' disabled' : '') + '>' + icon('arrow-right') + '</button></div>';
+    slot.querySelector('[data-pg="prev"]').addEventListener('click', function () { PG[key]--; renderAll(); });
+    slot.querySelector('[data-pg="next"]').addEventListener('click', function () { PG[key]++; renderAll(); });
+  }
+
+  function actions(m) {
+    var a = [];
+    var sk = m.perSkill.filter(function (s) { return s.measured >= 3; });
+    if (sk.length) {
+      var w = sk.slice().sort(function (x, y) { return x.on / x.measured - y.on / y.measured; })[0];
+      if (w.on < w.measured) a.push(['<b>' + esc(w.name) + '</b> misses the brand check most: ' + (w.measured - w.on) + ' of ' + w.measured + ' outputs missed it on the first pass.', 'review cycles']);
+    }
+    var fk = Object.keys(m.fail).sort(function (x, y) { return m.fail[y] - m.fail[x]; })[0];
+    if (m.measured.length >= 3 && m.fail[fk] > 0) a.push(['Most common miss: <b>' + esc(fk.toLowerCase()) + '</b>, in ' + m.fail[fk] + ' of ' + m.measured.length + ' measured outputs.', 'review cycles']);
+    var rw = m.perSkill.filter(function (s) { return s.outs >= 3 && s.rework > 0; }).sort(function (x, y) { return y.rework / y.outs - x.rework / x.outs; })[0];
+    if (rw) a.push(['<b>' + esc(rw.name) + '</b> gets rewritten most: ' + rw.rework + ' of ' + rw.outs + ' outputs were written more than once in a session.', 'review cycles']);
+    var tsk = Object.keys(m.tk.toBySkill).filter(function (n) { return m.tk.toBySkill[n].length >= 3; }).sort(function (x, y) { return median(m.tk.toBySkill[y]) - median(m.tk.toBySkill[x]); })[0];
+    if (tsk) a.push(['<b>' + esc(tsk) + '</b> costs the most to reach a first output: about ' + fmtTok(median(m.tk.toBySkill[tsk])) + ' tokens.', 'plugin speed']);
+    var tm = median(m.tk.perSession), tp = median(m.tkPrev.perSession);
+    if (tm != null && tp && m.tk.perSession.length >= 3 && m.tkPrev.perSession.length >= 3) {
+      var td = Math.round((tm - tp) / tp * 100);
+      if (Math.abs(td) >= 10) a.push(['Tokens per session are <b>' + (td < 0 ? 'down ' : 'up ') + Math.abs(td) + '%</b> on the previous ' + S.period + ' days.', 'plugin speed']);
+    } else if (!m.tk.perSession.length) {
+      a.push(['No token figures yet. They arrive as people update the plugin, and this page then shows how usage is trending.', 'plugin speed']);
+    }
+    var sl = m.perSkill.filter(function (s) { return s.med != null; }).sort(function (x, y) { return y.med - x.med; })[0];
+    if (sl && m.times.length >= 3) a.push(['<b>' + esc(sl.name) + '</b> is the slowest to a first output: about ' + dur(sl.med) + ' from the skill starting.', 'plugin speed']);
+    if (m.behind.length) a.push([(m.behind.length === 1 ? '1 person is' : m.behind.length + ' people are') + ' still on a plugin older than ' + esc(m.newest) + ', so ' + (m.behind.length === 1 ? 'they miss' : 'they miss') + ' recent fixes.', 'plugin speed']);
+    if (m.firstVisit && m.allPages.length) {
+      var days = (Date.now() - m.firstVisit.getTime()) / DAY;
+      if (days >= 7 && m.never.length) a.push([plural(m.never.length, 'hub page') + ' not opened by anyone in this period. Worth merging or removing.', 'hub']);
+      else if (days < 7) a.push(['Hub visits have been recorded for ' + Math.max(1, Math.round(days)) + (Math.round(days) <= 1 ? ' day' : ' days') + '. Pages "never opened" is a guess until a week has passed.', 'hub']);
+    }
+    return a;
+  }
+
+  function renderAll() {
+    var m = compute();
+    var acts = actions(m);
+    $('in-q-act').textContent = acts.length ? plural(acts.length, 'finding') : 'nothing stands out yet';
+    $('in-act').innerHTML = acts.length ? acts.map(function (x) { return '<li><i></i><span>' + x[0] + '</span><span class="in-tag">' + esc(x[1]) + '</span></li>'; }).join('')
+      : '<li><i></i><span>Not enough data in this period to point at anything. Skill runs with outputs, and verdicts, are what feed this.</span><span class="in-tag"></span></li>';
+
+    var med = median(m.times);
+    $('in-speed').innerHTML =
+      metric('Skill to first output', med == null ? 'None' : dur(med), med == null ? 'no session has both yet' : 'median of ' + plural(m.times.length, 'session')) +
+      metric('Skill runs that made something', pctS(m.withOutput, m.withSkill), m.withOutput + ' of ' + plural(m.withSkill, 'session') + ' with a skill') +
+      metric('Sessions that re-ran a skill', pctS(m.reran, m.withSkill), m.reran + ' of ' + m.withSkill + ', a sign the first run missed');
+    var tmed = median(m.tk.perSession), pmed = median(m.tkPrev.perSession), omed = median(m.tk.toOutput), opmed = median(m.tkPrev.toOutput);
+    $('in-tokens').innerHTML =
+      metric('Tokens per session', tmed == null ? 'None' : fmtTok(tmed), tmed == null ? 'arrives as people update the plugin' : trend(tmed, pmed) + ', ' + plural(m.tk.perSession.length, 'session')) +
+      metric('Tokens to first output', omed == null ? 'None' : fmtTok(omed), omed == null ? 'no session has both yet' : trend(omed, opmed)) +
+      metric('Tokens used', m.tk.perSession.length ? fmtTok(m.tk.used) : 'None', m.tk.perSession.length ? 'plus ' + fmtTok(m.tk.cache) + ' re-read from cache' : 'input + output, Gushwork skill sessions');
+    $('in-review').innerHTML =
+      metric('On-brand on the first pass', pctS(m.onB, m.measured.length), m.onB + ' of ' + m.measured.length + ' measured outputs') +
+      metric('Outputs written more than once', pctS(m.reworked, m.outList.length), m.reworked + ' of ' + plural(m.outList.length, 'output')) +
+      metric('Approved / needs changes', m.appr + ' / ' + m.chg, 'marked by an owner');
+
+    $('in-q-skill').textContent = plural(m.perSkill.length, 'skill') + ' run, ' + (S.period === 'all' ? 'all time' : 'last ' + S.period + ' days');
+    if (PG._p !== S.period) PG = { _p: S.period };   /* a new period starts every table on page 1 */
+    paged('in-skill', 'skill', 'minmax(170px,1.6fr) 64px 84px 88px 92px 120px 112px 130px', ['Skill', 'Runs', 'Outputs', 'On-brand', 'Rewritten', 'Needs changes', 'Time to output', 'Tokens to output'],
+      m.perSkill, function (s) {
+        return row([cell(s.name, 'ul-c--who'), cell(String(s.runs)), cell(String(s.outs)), cell(pctS(s.on, s.measured)), cell(pctS(s.rework, s.outs)), cell(String(s.chg)), cell(s.med == null ? '—' : dur(s.med)), cell(m.tk.toBySkill[s.name] && m.tk.toBySkill[s.name].length ? fmtTok(median(m.tk.toBySkill[s.name])) : '—')]);
+      }, 'No skill runs in this period', [
+        { get: function (x) { return x.name; }, dir: 1 }, { get: function (x) { return x.runs; }, dir: -1 }, { get: function (x) { return x.outs; }, dir: -1 },
+        { get: function (x) { return x.measured ? x.on / x.measured : null; }, dir: -1 }, { get: function (x) { return x.outs ? x.rework / x.outs : null; }, dir: -1 },
+        { get: function (x) { return x.chg; }, dir: -1 }, { get: function (x) { return x.med; }, dir: 1 },
+        { get: function (x) { var t = m.tk.toBySkill[x.name]; return t && t.length ? median(t) : null; }, dir: 1 }]);
+
+    paged('in-fail', 'fail', 'minmax(160px,1.4fr) 80px 90px', ['Check', 'Missed', 'Share'],
+      Object.keys(m.fail), function (k) { return row([cell(k, 'ul-c--who'), cell(String(m.fail[k])), cell(pctS(m.fail[k], m.measured.length))]); }, 'Nothing measured yet', [
+        { get: function (k) { return k; }, dir: 1 }, { get: function (k) { return m.fail[k]; }, dir: -1 }, { get: function (k) { return m.fail[k]; }, dir: -1 }]);
+
+    $('in-q-ver').textContent = m.newest ? 'on a plugin older than ' + m.newest : '';
+    paged('in-ver', 'ver', 'minmax(200px,1.6fr) 100px', ['Person', 'On'], m.behind, function (b) { return row([cell(b.email, 'ul-c--who'), cell(b.version || 'Unknown')]); }, 'Everyone is on the newest plugin', [
+      { get: function (b) { return b.email; }, dir: 1 },
+      { get: function (b) { return b.version ? String(b.version).split('.').map(function (n) { return ('00000' + n).slice(-5); }).join('.') : null; }, dir: 1 }]);
+
+    var hubDays = m.firstVisit ? Math.max(1, Math.round((Date.now() - m.firstVisit.getTime()) / DAY)) : 0;
+    $('in-hub').innerHTML =
+      metric('Page views', String(m.vrows.length), S.haveVisits ? (m.firstVisit ? 'recorded since ' + m.firstVisit.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) : 'none recorded yet') : 'visit log unavailable') +
+      metric('Pages opened', String(m.top.length), 'of ' + m.allPages.length + ' in the hub') +
+      metric('Never opened', String(m.never.length), hubDays && hubDays < 7 ? 'too early to trust, ' + hubDays + (hubDays === 1 ? ' day' : ' days') + ' of data' : 'in this period');
+    paged('in-top', 'top', 'minmax(180px,2fr) 90px 80px 80px', ['Page', 'Area', 'Views', 'People'],
+      m.top, function (g) { return row([cell(pageName(g.path), 'ul-c--who', g.path), cell(areaOf(g.path)), cell(String(g.views)), cell(String(Object.keys(g.who).length))]); }, 'No page views recorded', [
+        { get: function (g) { return pageName(g.path); }, dir: 1 }, { get: function (g) { return areaOf(g.path); }, dir: 1 },
+        { get: function (g) { return g.views; }, dir: -1 }, { get: function (g) { return Object.keys(g.who).length; }, dir: -1 }]);
+    $('in-q-never').textContent = m.never.length ? plural(m.never.length, 'page') : '';
+    paged('in-never', 'never', 'minmax(180px,2fr) 90px', ['Page', 'Area'],
+      m.never, function (u) { return row([cell(pageName(u), 'ul-c--who', u), cell(areaOf(u))]); }, m.allPages.length ? 'Every page was opened' : 'No page list available', [
+        { get: function (u) { return pageName(u); }, dir: 1 }, { get: function (u) { return areaOf(u); }, dir: 1 }]);
+  }
+
+  var BLOCK = {
+    forbidden:    { icon: 'lock', title: 'Owners only', body: 'Insights are visible to the site owner and nobody else.' },
+    signin:       { icon: 'lock', title: 'Sign in to see insights', body: 'Use your @gushwork.ai account. You will come back to this page afterwards.', action: 'Sign in' },
+    unconfigured: { icon: 'warning-circle', title: 'The log store is not connected', body: 'Add the Upstash variables to the project and redeploy, then reload this page.' },
+    empty:        { icon: 'magnifying-glass', title: 'Nothing logged yet', body: 'Insights appear once there are plugin sessions to read.' },
+    error:        { icon: 'warning-circle', title: 'Could not read the logs', body: 'The log store did not answer. Try again in a moment.', action: 'Try again' }
+  };
+  function renderBlocked(kind) {
+    var b = BLOCK[kind];
+    $('in-blocked').innerHTML = '<div class="ul-sec"><div class="ul-empty"><div class="ul-empty__c">' + icon(b.icon) + '</div>' +
+      '<div class="ul-empty__copy"><h2>' + esc(b.title) + '</h2><p>' + esc(b.body) + '</p></div>' +
+      (b.action ? '<button class="ul-btn" id="in-act" type="button">' + esc(b.action) + '</button>' : '') + '</div></div>';
+    var act = $('in-act');
+    if (act) act.addEventListener('click', function () { if (kind === 'signin') location.href = '/?signin=required&next=' + encodeURIComponent(location.pathname); else load(); });
+  }
+
+  /* Loading state: a block per real element, never an empty card (states.md). The Usage tab already
+     did this; Insights and Visits rendered nothing until the answer arrived. */
+  function sk(w, h) { return '<span class="sk" style="width:' + w + ';height:' + h + 'px"></span>'; }
+  function skMetric(label) {
+    return '<div class="ul-metric"><span class="ul-lab">' + esc(label) + '</span><div class="ul-metric__body">' + sk('88px', 34) + sk('110px', 12) + '</div></div>';
+  }
+  function skRows(n) {
+    var w = [92, 78, 86, 70, 82, 64], out = '';
+    for (var i = 0; i < n; i++) out += sk(w[i % w.length] + '%', 14);
+    return '<div style="display:flex;flex-direction:column;gap:14px;padding:16px 20px">' + out + '</div>';
+  }
+  function renderLoading() {
+    ['in-q-act', 'in-q-skill', 'in-q-ver', 'in-q-never'].forEach(function (id) { $(id).textContent = ''; });
+    $('in-act').innerHTML = [90, 76, 64].map(function (w) { return '<li style="display:block">' + sk(w + '%', 14) + '</li>'; }).join('');
+    $('in-speed').innerHTML = ['Skill to first output', 'Skill runs that made something', 'Sessions that re-ran a skill'].map(skMetric).join('');
+    $('in-tokens').innerHTML = ['Tokens per session', 'Tokens to first output', 'Tokens used'].map(skMetric).join('');
+    $('in-review').innerHTML = ['On-brand on the first pass', 'Outputs written more than once', 'Approved / needs changes'].map(skMetric).join('');
+    $('in-hub').innerHTML = ['Page views', 'Pages opened', 'Never opened'].map(skMetric).join('');
+    $('in-skill').innerHTML = skRows(5);
+    ['in-fail', 'in-ver', 'in-top', 'in-never'].forEach(function (id) { $(id).innerHTML = skRows(3); });
+  }
+  function render() {
+    var blocked = ['forbidden', 'signin', 'unconfigured', 'empty', 'error'].indexOf(S.status) !== -1;
+    $('in-blocked').hidden = !blocked; $('in-app').hidden = blocked; $('in-bar').hidden = blocked;
+    if (blocked) { renderBlocked(S.status); return; }
+    if (S.status === 'loading') { renderLoading(); return; }
+    renderAll();
+    ROOT.querySelectorAll('.ul-tab').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-period') === S.period)); });
+    updated();
+  }
+  function updated() { $('in-updated').textContent = S.fetchedAt ? 'Updated ' + ago(Date.now() - S.fetchedAt) : ''; }
+
+  function load() {
+    if (S.busy) return; S.busy = true; $('in-refresh').setAttribute('aria-busy', 'true');
+    var visits = fetch('/api/visits', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
+    var idx = fetch('/search-index.json', { cache: 'force-cache' }).then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; });
+    fetch('/api/usage-log', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) {
+      if (r.status === 401) { S.status = 'signin'; return null; }
+      if (r.status === 403) { S.status = 'forbidden'; return null; }
+      if (!r.ok) throw new Error('http ' + r.status);
+      return r.json();
+    }).then(function (j) {
+      if (!j) return;
+      if (!j.configured) { S.status = 'unconfigured'; return; }
+      S.usageAll = parseUsage(j.rows || []); S.usage = window.anHide(S.usageAll); S.outcomes = j.outcomes || {}; S.fetchedAt = Date.now();
+      S.status = S.usageAll.length ? 'ready' : 'empty';
+      return Promise.all([visits, idx]).then(function (v) {
+        var vj = v[0]; S.haveVisits = !!(vj && vj.configured);
+        S.visits = ((vj && vj.rows) || []).map(function (r) { var d = new Date(r.at); return isNaN(d.getTime()) ? null : { at: d, email: String(r.email || ''), path: String(r.path || '/'), kind: r.kind === 'signin' ? 'signin' : 'view' }; }).filter(Boolean);
+        S.visitsAll = S.visits; S.visits = window.anHide(S.visitsAll);
+        S.index = v[1] || [];
+      });
+    }).catch(function () { S.status = 'error'; }).then(function () { S.busy = false; $('in-refresh').removeAttribute('aria-busy'); render(); });
+  }
+
+  $('in-refresh').innerHTML = icon('arrow-clockwise');
+  ROOT.querySelectorAll('.ul-tab').forEach(function (b) { b.addEventListener('click', function () { S.period = b.getAttribute('data-period'); render(); }); });
+  $('in-refresh').addEventListener('click', load);
+  setInterval(updated, 10000);
+  window.__an = window.__an || {};
+  window.__an.insights = function () { render(); load(); };
+  window.__anRefilter.insights = function () { S.usage = window.anHide(S.usageAll || []); S.visits = window.anHide(S.visitsAll || []); render(); };
+})();
+</script>
+<script>
+(function () {
+  'use strict';
+  var ROOT = document.getElementById('an-usage');
+
+  var API = '/api/usage-log';
+  var ICON = {"arrow-up":"<path d=\"M205.66,117.66a8,8,0,0,1-11.32,0L136,59.31V216a8,8,0,0,1-16,0V59.31L61.66,117.66a8,8,0,0,1-11.32-11.32l72-72a8,8,0,0,1,11.32,0l72,72A8,8,0,0,1,205.66,117.66Z\"/>","arrow-down":"<path d=\"M205.66,149.66l-72,72a8,8,0,0,1-11.32,0l-72-72a8,8,0,0,1,11.32-11.32L120,196.69V40a8,8,0,0,1,16,0V196.69l58.34-58.35a8,8,0,0,1,11.32,11.32Z\"/>","arrows-down-up":"<path d=\"M117.66,170.34a8,8,0,0,1,0,11.32l-32,32a8,8,0,0,1-11.32,0l-32-32a8,8,0,0,1,11.32-11.32L72,188.69V48a8,8,0,0,1,16,0V188.69l18.34-18.35A8,8,0,0,1,117.66,170.34Zm96-96-32-32a8,8,0,0,0-11.32,0l-32,32a8,8,0,0,0,11.32,11.32L168,67.31V208a8,8,0,0,0,16,0V67.31l18.34,18.35a8,8,0,0,0,11.32-11.32Z\"/>","arrow-clockwise":"<path d=\"M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z\"/>","caret-down":"<path d=\"M216.49,104.49l-80,80a12,12,0,0,1-17,0l-80-80a12,12,0,0,1,17-17L128,159l71.51-71.52a12,12,0,0,1,17,17Z\"/>","magnifying-glass":"<path d=\"M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z\"/>","arrow-left":"<path d=\"M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z\"/>","arrow-right":"<path d=\"M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z\"/>","clock":"<path d=\"M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z\"/>","lock":"<path d=\"M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Zm-68-56a12,12,0,1,1-12-12A12,12,0,0,1,140,152Z\"/>","warning-circle":"<path d=\"M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z\"/>"};
+  function icon(n, cls) {
+    return '<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"' + (cls ? ' class="' + cls + '"' : '') + '>' + (ICON[n] || '') + '</svg>';
+  }
+  /* Rows were written by a PUBLIC endpoint, so every value is untrusted. Nothing goes into
+     markup unescaped. */
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function $(id) { return document.getElementById(id); }
+  function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
+
+  var S = { status: 'loading', rows: [], period: '30', q: '', ver: '', sortKey: 'at', sortDir: -1,
+            evt: '', view: 'chat', open: {}, outcomes: {}, files: {}, page: 1, per: 10, fetchedAt: 0, busy: false, skipped: 0, capped: false };
+  var DAY = 86400000;
+
+  /* ── data ───────────────────────────────────────────────────────────────────────── */
+  function parse(raw) {
+    var out = [];
+    for (var i = 0; i < raw.length; i++) {
+      var r = raw[i], d = new Date(r.at);
+      if (isNaN(d.getTime())) continue;
+      out.push({ at: d, email: String(r.email || '').trim().toLowerCase(), version: String(r.version || '').trim(),
+                 event: String(r.event || ''), skill: String(r.skill || ''), file: String(r.file || ''),
+                 key: String(r.at), sess: String(r.sess || ''), url: String(r.url || ''),
+                 flags: r.flags && typeof r.flags === 'object' ? r.flags : null,
+                 tok: r.tok && typeof r.tok === 'object' ? { i: +r.tok.i || 0, o: +r.tok.o || 0, c: +r.tok.c || 0 } : null });
+    }
+    return out;
+  }
+  function isSess(r) { return !r.event || r.event === 'session-start'; }
+  function vparts(v) { var m = /^(\d+)\.(\d+)\.(\d+)/.exec(v); return m ? [+m[1], +m[2], +m[3]] : null; }
+  function vcmp(a, b) {
+    var x = vparts(a), y = vparts(b);
+    if (!x && !y) return 0; if (!x) return -1; if (!y) return 1;
+    for (var i = 0; i < 3; i++) if (x[i] !== y[i]) return x[i] - y[i];
+    return 0;
+  }
+  function dayKey(d) { return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+  function startOfDay(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+  function fmtDay(d) { return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }); }
+  function fmtWhen(d) { return d.toLocaleString(undefined, { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }); }
+  function ago(ms) {
+    var s = Math.max(0, Math.round(ms / 1000));
+    if (s < 60) return s + 's ago';
+    var m = Math.round(s / 60); if (m < 60) return m + ' min ago';
+    var h = Math.round(m / 60); if (h < 48) return h + ' h ago';
+    return Math.round(h / 24) + ' days ago';
+  }
+  function inPeriod(rows) {
+    if (S.period === 'all') return rows;
+    var cut = Date.now() - (+S.period) * DAY;
+    return rows.filter(function (r) { return r.at.getTime() >= cut; });
+  }
+  function compute() {
+    /* A row is a SESSION only if it is a session-start (or predates the event field). Skill and
+       file rows are activity: counting them as sessions would inflate every number here. */
+    var all = S.rows, sessAll = all.filter(isSess), curAll = inPeriod(all), cur = curAll.filter(isSess), now = new Date(), today = dayKey(now), yest = dayKey(new Date(now.getTime() - DAY));
+    var newest = '';
+    sessAll.forEach(function (r) { if (r.version && vparts(r.version) && (!newest || vcmp(r.version, newest) > 0)) newest = r.version; });
+    var bySkill = {}; curAll.forEach(function (r) { if (r.event === 'skill' && r.skill) bySkill[r.skill] = (bySkill[r.skill] || 0) + 1; });
+    var skills = Object.keys(bySkill).sort(function (a, b) { return bySkill[b] - bySkill[a]; });
+    var nFiles = curAll.filter(function (r) { return r.event === 'file'; }).length;
+    function people(rows) { var s = {}; rows.forEach(function (r) { if (r.email) s[r.email] = 1; }); return Object.keys(s).length; }
+    var perDay = {}; cur.forEach(function (r) { var k = dayKey(r.at); perDay[k] = (perDay[k] || 0) + 1; });
+    var busy = null; Object.keys(perDay).forEach(function (k) { if (!busy || perDay[k] > busy.n) busy = { k: k, n: perDay[k] }; });
+    var busyDate = null; if (busy) cur.some(function (r) { if (dayKey(r.at) === busy.k) { busyDate = r.at; return true; } });
+    var byVer = {}; cur.forEach(function (r) { var v = r.version || 'Unknown'; byVer[v] = (byVer[v] || 0) + 1; });
+    var vers = Object.keys(byVer).sort(function (a, b) {
+      if (a === 'Unknown') return 1; if (b === 'Unknown') return -1; return vcmp(b, a);
+    });
+    var onNewest = newest ? (byVer[newest] || 0) : 0;
+    var oldest = ''; vers.forEach(function (v) { if (v !== 'Unknown' && vparts(v)) oldest = v; });
+    var last = sessAll.length ? sessAll.reduce(function (m, r) { return r.at > m ? r.at : m; }, sessAll[0].at) : null;
+    return {
+      cur: cur, curAll: curAll, all: all, sessTotal: sessAll.length, bySkill: bySkill, skills: skills, nFiles: nFiles, newest: newest, perDay: perDay, byVer: byVer, vers: vers, oldest: oldest,
+      sessions: cur.length, people: people(curAll), peopleAll: people(all),
+      today: sessAll.filter(function (r) { return dayKey(r.at) === today; }).length,
+      yest: sessAll.filter(function (r) { return dayKey(r.at) === yest; }).length,
+      unknown: cur.filter(function (r) { return !r.email; }).length,
+      onNewest: onNewest, busy: busy, busyDate: busyDate, last: last
+    };
+  }
+
+  /* ── pieces ─────────────────────────────────────────────────────────────────────── */
+  function statCard(label, value, note, pct) {
+    return '<div class="ul-stat"><div class="ul-stat__lab"><span class="ul-lab">' + esc(label) + '</span><span class="ul-dot"></span></div>' +
+      '<div class="ul-stat__body"><div class="ul-stat__row"><div class="ul-val"><span class="ul-num">' + esc(value) + '</span>' +
+      '<span class="ul-note">' + esc(note) + '</span></div><span class="ul-pct">' + esc(pct) + '%</span></div>' +
+      '<div class="ul-pb" role="img" aria-label="' + esc(pct) + ' percent"><i style="width:' + esc(pct) + '%"></i></div></div></div>';
+  }
+  function metricCard(label, value, note) {
+    return '<div class="ul-metric"><span class="ul-lab">' + esc(label) + '</span><div class="ul-metric__body">' +
+      '<span class="ul-num">' + esc(value) + '</span><span class="ul-note">' + esc(note) + '</span></div></div>';
+  }
+  function skelStat(label) {
+    return '<div class="ul-stat"><div class="ul-stat__lab"><span class="ul-lab">' + esc(label) + '</span><span class="ul-dot"></span></div>' +
+      '<div class="ul-stat__body"><span class="sk" style="width:96px;height:34px"></span><span class="sk" style="width:120px;height:12px"></span>' +
+      '<span class="sk" style="width:100%;height:4px"></span></div></div>';
+  }
+  function skelMetric(label) {
+    return '<div class="ul-metric"><span class="ul-lab">' + esc(label) + '</span><div class="ul-metric__body">' +
+      '<span class="sk" style="width:88px;height:34px"></span><span class="sk" style="width:110px;height:12px"></span></div></div>';
+  }
+  var PERIOD_NAME = { '7': 'last 7 days', '30': 'last 30 days', 'all': 'all time' };
+
+  function renderCards(m) {
+    var loading = S.status === 'loading';
+    if (loading) {
+      $('ul-kpis').innerHTML = skelStat('Sessions') + skelStat('Active people');
+      $('ul-metrics').innerHTML = ['Tokens used', 'Per session', 'On the newest version'].map(skelMetric).join('');
+      return;
+    }
+    var pctS = m.sessTotal ? Math.round(m.sessions / m.sessTotal * 100) : 0;
+    var pctP = m.peopleAll ? Math.round(m.people / m.peopleAll * 100) : 0;
+    $('ul-kpis').innerHTML =
+      statCard('Sessions', String(m.sessions), 'of ' + m.sessTotal + ' logged' + (m.unknown ? ', ' + m.unknown + ' without an email' : ''), pctS) +
+      statCard('Active people', String(m.people), 'of ' + m.peopleAll + ' ever identified', pctP);
+    var newestPct = m.sessions ? Math.round(m.onNewest / m.sessions * 100) + '%' : 'None';
+    var st = sessTokens(m.curAll), ks = Object.keys(st), used = 0, cache = 0, per = [];
+    ks.forEach(function (k) { var t = st[k]; used += t.i + t.o; cache += t.c; per.push(t.i + t.o); });
+    per.sort(function (a, b) { return a - b; });
+    var med = per.length ? (per.length % 2 ? per[per.length >> 1] : (per[(per.length >> 1) - 1] + per[per.length >> 1]) / 2) : 0;
+    var none = 'Arrives as people update the plugin';
+    /* Three numbers, chosen for what the owner acts on: what the skills cost in total, what a session
+       costs (the figure to push down), and whether people are on the build with the latest fixes.
+       Today, busiest day, last session, versions in use and not-identified are in the chart, the log and
+       the Out of date card below; cache re-reads sit in the note on tokens used. */
+    $('ul-metrics').innerHTML =
+      metricCard('Tokens used', ks.length ? fmtTok(used) : 'None', ks.length ? 'input + output, ' + plural(ks.length, 'session') + ' measured, plus ' + fmtTok(cache) + ' re-read from cache' : none) +
+      metricCard('Per session', ks.length ? fmtTok(med) : 'None', ks.length ? 'median, in Gushwork skill sessions' : 'No token figures yet') +
+      metricCard('On the newest version', newestPct, m.newest ? m.newest + ' is the newest seen' : 'No version recorded');
+  }
+
+  /* Line chart. One series, primary/500, 2px, with a 30% to 0% gradient beneath. */
+  function niceStep(x) { var p = Math.pow(10, Math.floor(Math.log(x) / Math.LN10)), f = x / p; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * p; }
+  var chartPts = [];
+  function renderChart(m) {
+    var host = $('ul-chart');
+    if (S.status === 'loading') { host.innerHTML = '<span class="sk" style="width:100%;height:264px;display:block"></span>'; $('ul-q-chart').textContent = ''; return; }
+    var end = startOfDay(new Date()), start;
+    if (S.period === 'all') {
+      start = m.all.length ? startOfDay(m.all.reduce(function (a, r) { return r.at < a ? r.at : a; }, m.all[0].at)) : end;
+    } else start = new Date(end.getTime() - (+S.period - 1) * DAY);
+    var days = [];
+    for (var t = start.getTime(); t <= end.getTime(); t += DAY) {
+      /* DST-safe: rebuild the date from the calendar day rather than trusting +24h */
+      var d = new Date(t); d = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      days.push({ date: d, n: m.perDay[dayKey(d)] || 0 });
+    }
+    days = days.filter(function (d, i, a) { return !i || dayKey(d.date) !== dayKey(a[i - 1].date); });
+    var max = days.reduce(function (a, d) { return Math.max(a, d.n); }, 0);
+    var step = niceStep(Math.max(5, max) / 5), top = step * 5;
+    $('ul-q-chart').textContent = 'per day, ' + PERIOD_NAME[S.period];
+    var n = days.length, W = 1000, H = 1000;
+    function px(i) { return n === 1 ? W / 2 : i / (n - 1) * W; }
+    function py(v) { return H - v / top * H; }
+    var line = '', area = '';
+    days.forEach(function (d, i) { line += (i ? ' L' : 'M') + px(i).toFixed(1) + ' ' + py(d.n).toFixed(1); });
+    area = line + ' L' + px(n - 1).toFixed(1) + ' ' + H + ' L' + px(0).toFixed(1) + ' ' + H + ' Z';
+    var yl = '', gl = '';
+    for (var i = 0; i <= 5; i++) {
+      var pct = i / 5 * 100;
+      gl += '<div class="ul-plot__g" style="top:' + pct + '%"></div>';
+      yl += '<span style="top:' + pct + '%">' + Math.round(top - i * step) + '</span>';
+    }
+    var every = Math.ceil(n / 8), xl = '';
+    days.forEach(function (d, i) { if (i % every === 0) xl += '<span style="left:' + (n === 1 ? 50 : i / (n - 1) * 100) + '%">' + esc(fmtDay(d.date)) + '</span>'; });
+    var peak = max ? 'peak ' + max + ' on ' + fmtDay(days.filter(function (d) { return d.n === max; })[0].date) : 'no sessions';
+    host.innerHTML =
+      '<div class="ul-line" role="img" aria-label="Sessions per day, ' + esc(plural(n, 'day')) + ', ' + esc(peak) + '">' +
+      '<div class="ul-line__y">' + yl + '</div>' +
+      '<div class="ul-plot" id="ul-plot">' + gl +
+      '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" aria-hidden="true"><defs>' +
+      '<linearGradient id="ul-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--gw-color-primary-500);stop-opacity:.3"/>' +
+      '<stop offset="1" style="stop-color:var(--gw-color-primary-500);stop-opacity:0"/></linearGradient></defs>' +
+      '<path d="' + area + '" fill="url(#ul-grad)"/>' +
+      /* non-scaling-stroke: a stretched viewBox otherwise scales the 2px line under 1px */
+      '<path d="' + line + '" fill="none" stroke="var(--gw-color-primary-500)" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/></svg>' +
+      '<div class="ul-cross" id="ul-cross"></div><div class="ul-dotp" id="ul-dotp"></div><div class="ul-tip" id="ul-tip"></div></div>' +
+      '<div class="ul-line__x">' + xl + '</div></div>';
+    chartPts = days.map(function (d, i) { return { x: n === 1 ? 0.5 : i / (n - 1), y: d.n / top, d: d }; });
+    bindPlot(m);
+  }
+  function bindPlot(m) {
+    var plot = $('ul-plot'); if (!plot) return;
+    function show(i) {
+      var p = chartPts[i], cross = $('ul-cross'), dot = $('ul-dotp'), tip = $('ul-tip'), w = plot.clientWidth, h = plot.clientHeight;
+      var x = p.x * w, y = h - p.y * h;
+      cross.style.display = dot.style.display = 'block'; cross.style.left = x + 'px'; dot.style.left = x + 'px'; dot.style.top = y + 'px';
+      var who = {}; m.cur.forEach(function (r) { if (dayKey(r.at) === dayKey(p.d.date)) { var k = r.email || 'Not identified'; who[k] = (who[k] || 0) + 1; } });
+      var rows = Object.keys(who).sort(function (a, b) { return who[b] - who[a]; }).slice(0, 3);
+      tip.innerHTML = '<div class="ul-tip__h">' + icon('clock') + esc(fmtDay(p.d.date)) + '</div>' +
+        '<div class="ul-tip__m">' + esc(plural(p.d.n, 'session')) + '</div>' +
+        (rows.length ? '<div class="ul-tip__b">' + rows.map(function (k) { return '<div class="ul-tip__r"><span>' + esc(k) + '</span><span>' + who[k] + '</span></div>'; }).join('') + '</div>' : '');
+      tip.style.display = 'flex';
+      var tw = tip.offsetWidth, th = tip.offsetHeight;
+      tip.style.left = (x + 12 + tw > w ? Math.max(0, x - 12 - tw) : x + 12) + 'px';
+      tip.style.top = Math.max(0, Math.min(h - th, y - th / 2)) + 'px';
+    }
+    function hide() { ['ul-cross', 'ul-dotp', 'ul-tip'].forEach(function (id) { $(id).style.display = 'none'; }); }
+    plot.addEventListener('mousemove', function (e) {
+      var r = plot.getBoundingClientRect(), f = (e.clientX - r.left) / r.width;
+      show(chartPts.length === 1 ? 0 : Math.max(0, Math.min(chartPts.length - 1, Math.round(f * (chartPts.length - 1)))));
+    });
+    plot.addEventListener('mouseleave', hide);
+  }
+
+  function renderVersions(m) {
+    var host = $('ul-versions'); $('ul-ver-open').hidden = true;
+    if (S.status === 'loading') { host.innerHTML = '<span class="sk" style="width:100%;height:120px;display:block"></span>'; $('ul-q-ver').textContent = ''; return; }
+    $('ul-q-ver').textContent = m.newest ? 'older than ' + m.newest + ', ' + PERIOD_NAME[S.period] : PERIOD_NAME[S.period];
+    if (!m.newest) { host.innerHTML = '<p class="ul-note-line">No versioned sessions yet.</p>'; return; }
+    var who = {}, anon = 0;
+    m.cur.forEach(function (r) {
+      var old = !r.version || !vparts(r.version) || vcmp(m.newest, r.version) > 0;
+      if (!r.email) { if (old) anon++; return; }
+      var w = who[r.email] || (who[r.email] = { email: r.email, last: r, old: 0 });
+      if (r.at > w.last.at) w.last = r;
+      if (old) w.old++;
+    });
+    var list = Object.keys(who).map(function (k) { return who[k]; }).filter(function (w) { return w.old > 0; });
+    list.forEach(function (w) {
+      var v = w.last.version, known = v && vparts(v), behind = !known || vcmp(m.newest, v) > 0;
+      w.behind = behind;
+      var pn = vparts(m.newest), pv = known ? vparts(v) : null;
+      w.gap = behind && pv ? (pn[0] === pv[0] ? pn[1] - pv[1] : 99) : 0;
+    });
+    list.sort(function (a, b) { return (b.behind - a.behind) || (b.gap - a.gap) || (b.last.at - a.last.at); });
+    var stale = list.filter(function (w) { return w.behind; }).length;
+    if (!list.length && !anon) { host.innerHTML = '<p class="ul-note-line">Everyone who started a session is on ' + esc(m.newest) + '.</p>'; return; }
+    var rows = list.map(function (w) {
+      var v = w.last.version || 'Unknown';
+      var status = w.behind
+        ? '<span class="ul-badge ul-badge--bad">' + (w.gap > 0 && w.gap < 99 ? plural(w.gap, 'release') + ' behind' : 'Behind') + '</span>'
+        : '<span class="ul-badge ul-badge--ok">Updated</span>';
+      return '<div class="ul-old__r"><div class="ul-old__who"><b title="' + esc(w.email) + '">' + esc(w.email) + '</b><span>' + (w.behind ? 'Still on ' : 'Now on ') + esc(v) + ' · last seen ' + esc(ago(Date.now() - w.last.at.getTime())) + '</span></div>' +
+        '<span class="ul-old__v">' + esc(plural(w.old, 'older session')) + '</span><div class="ul-old__s">' + status + '</div></div>';
+    }).join('');
+    var head = stale ? stale + (stale === 1 ? ' person' : ' people') + ' still behind' : 'No one is behind now';
+    var sub = anon ? plural(anon, 'session') + ' with no email on an older version' : '';
+    var vt = m.vers.reduce(function (a, v) { return a + m.byVer[v]; }, 0), vn = m.byVer[m.newest] || 0, vo = vt - vn;
+    var chart = vt ? '<div class="ul-split" role="img" aria-label="' + vn + ' sessions on ' + esc(m.newest) + ', ' + vo + ' on older versions">' +
+      (vn ? '<i style="flex:' + vn + '"></i>' : '') + (vo ? '<i style="flex:' + vo + '"></i>' : '') + '</div>' +
+      '<p class="ul-split__k"><span><b>' + Math.round(vn / vt * 100) + '%</b> on ' + esc(m.newest) + '</span><span><b>' + Math.round(vo / vt * 100) + '%</b> older</span></p>' : '';
+    host.innerHTML = (chart ? '<div class="ul-vmid">' + chart + '</div>' : '') + '<div class="ul-vtxt"><p class="ul-big">' + head + '</p>' + (sub ? '<p class="ul-foot" style="margin:0;padding-top:var(--gw-space-4)">' + esc(sub) + '</p>' : '') + '</div>';
+    $('ul-ver-dlg-q').textContent = 'on a version older than ' + m.newest + ', ' + PERIOD_NAME[S.period];
+    $('ul-ver-dlg-b').innerHTML = (rows ? '<div class="ul-old">' + rows + '</div>' : '') +
+      '<p class="ul-foot">' + esc(head) + (sub ? ' · ' + esc(sub) : '') + '.</p>';
+    $('ul-ver-open').hidden = !list.length;
+  }
+  /* New users: people whose first logged event of any kind falls in the chosen period (everyone, for All time). The first
+     time we ever saw someone is read from every row, so a regular who was quiet last month is not listed. */
+  var NEW_PER = 10;
+  function renderNew(m) {
+    var host = $('ul-new'), note = $('ul-new-note'), pg = $('ul-new-pg');
+    if (S.status === 'loading') { host.innerHTML = '<span class="sk" style="width:100%;height:120px;display:block"></span>'; $('ul-q-new').textContent = ''; note.hidden = true; pg.hidden = true; return; }
+    var cut = S.period === 'all' ? 0 : Date.now() - (+S.period) * DAY, by = {};
+    m.all.slice().sort(function (a, b) { return a.at - b.at; }).forEach(function (r) {
+      if (!r.email) return;
+      var u = by[r.email] || (by[r.email] = { email: r.email, first: r.at, version: '', skill: '', sess: 0 });
+      if (isSess(r)) { u.sess++; if (!u.version && r.version) u.version = r.version; }
+      if (r.event === 'skill' && r.skill && !u.skill) u.skill = r.skill.replace(/^.*:/, '');
+    });
+    var list = Object.keys(by).map(function (k) { return by[k]; }).filter(function (u) { return u.first.getTime() >= cut; }).sort(function (a, b) { return b.first - a.first; });
+    $('ul-q-new').textContent = S.period === 'all' ? 'everyone, by first session' : 'first seen in the ' + PERIOD_NAME[S.period] + ', ' + list.length + (list.length === 1 ? ' person' : ' people');
+    /* Ten to a page; the pager shows only when there is more than a page. */
+    var pages = Math.max(1, Math.ceil(list.length / NEW_PER));
+    if (S.newKey !== S.period) { S.newKey = S.period; S.newPage = 1; }
+    S.newPage = Math.min(Math.max(1, S.newPage || 1), pages);
+    var th = function (t) { return '<div role="columnheader"><span class="ul-th"><span class="ul-th--plain">' + esc(t) + '</span></span></div>'; };
+    var c = function (t, cls, title) { return '<div class="ul-c ' + (cls || '') + '" role="cell" title="' + esc(title || t) + '">' + esc(t) + '</div>'; };
+    host.innerHTML = '<div class="ul-tbl" role="table" style="--vs-cols:minmax(200px,1.6fr) minmax(120px,1fr) 110px 100px minmax(140px,1fr)"><div class="ul-row ul-row--h" role="row">' +
+      ['Person', 'First seen', 'Started on', 'Sessions', 'First skill'].map(th).join('') + '</div>' +
+      (list.length ? list.slice((S.newPage - 1) * NEW_PER, S.newPage * NEW_PER).map(function (u) {
+        return '<div class="ul-row ul-row--d" role="row">' + c(u.email, 'ul-c--who') + c(ago(Date.now() - u.first.getTime()), '', u.first.toISOString()) + c(u.version || '—') + c(String(u.sess)) + c(u.skill || '—') + '</div>';
+      }).join('') : '<div class="ul-empty"><div class="ul-empty__copy"><h2>Nobody new in this period</h2></div></div>') + '</div>';
+    pg.hidden = list.length <= NEW_PER;
+    if (!pg.hidden) {
+      pg.innerHTML = '<div class="ul-pg__l"><span class="ul-pg__t">' + ((S.newPage - 1) * NEW_PER + 1) + '–' + Math.min(S.newPage * NEW_PER, list.length) + ' of ' + list.length + '</span></div>' +
+        '<div class="ul-pg__r"><span class="ul-pg__t">Page ' + S.newPage + ' of ' + pages + '</span>' +
+        '<button class="ul-ib" id="ul-new-prev" type="button" aria-label="Previous page"' + (S.newPage <= 1 ? ' disabled' : '') + '>' + icon('arrow-left') + '</button>' +
+        '<button class="ul-ib" id="ul-new-next" type="button" aria-label="Next page"' + (S.newPage >= pages ? ' disabled' : '') + '>' + icon('arrow-right') + '</button></div>';
+      $('ul-new-prev').addEventListener('click', function () { S.newPage--; renderNew(m); });
+      $('ul-new-next').addEventListener('click', function () { S.newPage++; renderNew(m); });
+    }
+    if (S.capped) { note.textContent = 'The log keeps only the newest events, so someone who has not used the plugin lately may show here as new.'; note.hidden = false; }
+    else note.hidden = true;
+  }
+  function renderSkills(m) {
+    var host = $('ul-skills');
+    if (S.status === 'loading') { host.innerHTML = '<span class="sk" style="width:100%;height:96px;display:block"></span>'; $('ul-q-skills').textContent = ''; return; }
+    $('ul-q-skills').textContent = 'runs by skill, ' + PERIOD_NAME[S.period];
+    if (!m.skills.length) {
+      host.innerHTML = '<p class="ul-note-line">Nothing recorded yet. Skill and file events start arriving once people are on plugin 1.51.0.</p>';
+      return;
+    }
+    var COL = ['var(--gw-color-primary-500)', 'var(--gw-color-primary-300)', 'var(--gw-color-neutral-850)', 'var(--gw-color-primary-200)', 'var(--gw-color-neutral-400)', 'var(--gw-color-neutral-200)'];
+    var items = m.skills.slice(0, 5).map(function (k) { return { n: k.replace(/^.*:/, ''), full: k, v: m.bySkill[k] }; });
+    var rest = m.skills.slice(5).reduce(function (a, k) { return a + m.bySkill[k]; }, 0);
+    if (rest) items.push({ n: 'Other', full: 'Other skills', v: rest });
+    var total = items.reduce(function (a, x) { return a + x.v; }, 0), R = 70, C = 2 * Math.PI * R, off = 0;
+    var arcs = items.map(function (x, i) {
+      var len = x.v / total * C, gap = items.length > 1 ? 2 : 0;
+      var el = '<circle cx="84" cy="84" r="' + R + '" stroke="' + COL[i] + '" stroke-dasharray="' + Math.max(0, len - gap).toFixed(2) + ' ' + (C - Math.max(0, len - gap)).toFixed(2) + '" stroke-dashoffset="' + (-off).toFixed(2) + '"><title>' + esc(x.full + ': ' + x.v) + '</title></circle>';
+      off += len; return el;
+    }).join('');
+    var legend = items.map(function (x, i) {
+      return '<li title="' + esc(x.full) + '"><i style="background:' + COL[i] + '"></i><span>' + esc(x.n) + '</span><span>' + x.v + '</span><span>' + Math.round(x.v / total * 100) + '%</span></li>';
+    }).join('');
+    host.innerHTML = '<div class="ul-donut"><div class="ul-donut__c"><svg viewBox="0 0 168 168" role="img" aria-label="Skill runs">' + arcs + '</svg>' +
+      '<div class="ul-donut__n"><b>' + total + '</b><span>' + (total === 1 ? 'run' : 'runs') + '</span></div></div><ul class="ul-leg">' + legend + '</ul></div>' +
+      '<p class="ul-foot">' + esc(plural(m.nFiles, 'output file')) + ' named in this period. Names only, never the contents.</p>';
+  }
+
+  /* ── log table ──────────────────────────────────────────────────────────────────── */
+  function rowPasses(r) {
+    var q = S.q.trim().toLowerCase();
+    {
+      if (S.ver && (r.version || 'Unknown') !== S.ver) return false;
+      if (S.evt === 'session' && !isSess(r)) return false;
+      if (S.evt === 'skill' && r.event !== 'skill') return false;
+      if (S.evt === 'file' && r.event !== 'file') return false;
+      if (S.evt === 'artifact' && r.event !== 'artifact') return false;
+      if (!q) return true;
+      return r.email.indexOf(q) !== -1 || r.version.toLowerCase().indexOf(q) !== -1 ||
+             r.skill.toLowerCase().indexOf(q) !== -1 || r.file.toLowerCase().indexOf(q) !== -1;
+    }
+  }
+  function filtered(m) {
+    var rows = m.curAll.filter(rowPasses);
+    var k = S.sortKey, dir = S.sortDir;
+    rows = rows.slice().sort(function (a, b) {
+      var c;
+      if (k === 'at') c = a.at - b.at;
+      else if (k === 'email') { var x = a.email || '￿', y = b.email || '￿'; c = x < y ? -1 : x > y ? 1 : 0; }
+      else c = vcmp(a.version, b.version);
+      return c * dir || (b.at - a.at);
+    });
+    return rows;
+  }
+  /* ── chats ───────────────────────────────────────────────────────────────
+     A chat is one Claude session: its start, the skills it ran and what it made. Rows written by
+     plugin 1.56.0 onward all carry `sess`, so they group exactly. Older rows do not, so they are
+     grouped by inference: a session start opens a chat for that person, and their skill and file
+     rows attach to it until their next session start. A row with nothing to attach to stands alone. */
+  function buildChats(rows) {
+    var asc = rows.slice().sort(function (a, b) { return a.at - b.at; });
+    var byKey = {}, openFor = {}, list = [];
+    asc.forEach(function (r) {
+      var key;
+      if (r.sess) key = 'x|' + (r.email || '') + '|' + r.sess;
+      else if (isSess(r) || !openFor[r.email]) { key = 'i|' + (r.email || '') + '|' + r.key; openFor[r.email] = key; }
+      else key = openFor[r.email];
+      var c = byKey[key];
+      if (!c) { c = byKey[key] = { key: key, email: r.email, version: r.version, at: r.at, rows: [] }; list.push(c); }
+      c.rows.push(r);
+      if (!c.version && r.version) c.version = r.version;
+    });
+    return list;
+  }
+  function chatsFiltered(m) {
+    var chats = buildChats(m.curAll).filter(function (c) { return c.rows.some(rowPasses); });
+    var k = S.sortKey, dir = S.sortDir;
+    return chats.sort(function (a, b) {
+      var c;
+      if (k === 'at') c = a.at - b.at;
+      else if (k === 'email') { var x = a.email || '\uffff', y = b.email || '\uffff'; c = x < y ? -1 : x > y ? 1 : 0; }
+      else c = vcmp(a.version, b.version);
+      return c * dir || (b.at - a.at);
+    });
+  }
+  /* The collapsed row says what is inside without opening it: how many outputs, and whether any is
+     off-brand or approved. The outputs themselves stay hidden until the chat is opened. */
+  /* Label column sized to the longest label, so a long skill name is never clipped under its bar. */
+  function lblW(list) { var n = list.reduce(function (a, x) { return Math.max(a, String(x).length); }, 0); return Math.max(96, Math.round(n * 7.4) + 8) + 'px'; }
+  function chatChips(c) {
+    var outs = c.rows.filter(isOut), sk = c.rows.filter(function (r) { return r.event === 'skill'; }).length;
+    if (!outs.length && !sk) return '<span class="ul-c--none">Started only</span>';
+    var bad = outs.filter(function (r) { return r.flags && !onBrand(r.flags); }).length;
+    var appr = outs.filter(function (r) { return S.outcomes[r.key] === 'approved'; }).length;
+    var chg = outs.filter(function (r) { return S.outcomes[r.key] === 'changes'; }).length;
+    var h = '<div class="ul-chips">';
+    var tk = chatTok(c);
+    if (tk) h += '<span class="ul-badge" title="' + esc(fmtTok(tk.i) + ' in, ' + fmtTok(tk.o) + ' out, ' + fmtTok(tk.c) + ' re-read from cache') + '">' + esc(fmtTok(tk.i + tk.o)) + ' tokens</span>';
+    if (outs.length) h += '<span class="ul-badge">' + esc(plural(outs.length, 'output')) + '</span>';
+    else h += '<span class="ul-badge">' + esc(plural(sk, 'skill run')) + '</span>';
+    if (bad) h += '<span class="ul-badge ul-badge--bad">' + bad + ' off-brand</span>';
+    if (appr) h += '<span class="ul-badge ul-badge--ok">' + appr + ' approved</span>';
+    if (chg) h += '<span class="ul-badge ul-badge--bad">' + chg + ' needs changes</span>';
+    return h + '</div>';
+  }
+  function chatSummary(c) {
+    var sk = c.rows.filter(function (r) { return r.event === 'skill'; }).length;
+    var outs = c.rows.filter(isOut).length;
+    var bits = [];
+    if (sk) bits.push(plural(sk, 'skill run'));
+    if (outs) bits.push(plural(outs, 'output'));
+    return 'Chat' + (bits.length ? ' · ' + bits.join(' · ') : ' · started only');
+  }
+  /* Tokens. Each skill, file and artifact row carries the session's running totals, so a session's total
+     is the largest it reached. "Used" is input + output (including context written to the cache);
+     tokens re-read from the cache are shown apart, because they are cheap and would swamp the sum. */
+  function fmtTok(n) { n = Math.round(n || 0); return n >= 1e9 ? (n / 1e9).toFixed(1) + 'B' : n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1e3 ? Math.round(n / 1e3) + 'k' : String(n); }
+  function sessTokens(rows) {
+    var by = {};
+    rows.forEach(function (r) { if (r.sess && r.tok && (!by[r.sess] || r.tok.i + r.tok.o > by[r.sess].i + by[r.sess].o)) by[r.sess] = r.tok; });
+    return by;
+  }
+  function chatTok(c) { var t = null; c.rows.forEach(function (r) { if (r.tok && (!t || r.tok.i + r.tok.o > t.i + t.o)) t = r.tok; }); return t; }
+  function evtText(r) {
+    if (r.event === 'session-end') return 'Session ended' + (r.tok ? ' · ' + fmtTok(r.tok.i + r.tok.o) + ' tokens' : '');
+    if (r.event === 'skill') return 'Skill: ' + (r.skill || 'unknown').replace(/^.*:/, '');
+    if (r.event === 'file') return 'File: ' + (r.file || 'unknown');
+    if (r.event === 'artifact') return 'Artifact: ' + (r.url ? r.url.replace(/^https:\/\/claude\.ai\//, '') : 'unknown');
+    return 'Session start';
+  }
+  function th(key, label) {
+    var on = S.sortKey === key;
+    return '<div role="columnheader" aria-sort="' + (on ? (S.sortDir < 0 ? 'descending' : 'ascending') : 'none') + '">' +
+      '<button class="ul-th" type="button" data-sort="' + key + '"' + (on ? ' data-on' : '') + '>' + esc(label) + icon(on ? (S.sortDir < 0 ? 'arrow-down' : 'arrow-up') : 'arrows-down-up') + '</button></div>';
+  }
+  function renderLog(m) {
+    var tbl = $('ul-table'), pg = $('ul-pg');
+    if (S.status === 'loading') {
+      var sk = ''; for (var i = 0; i < 5; i++) sk += '<div class="ul-row ul-row--d"><span class="sk" style="width:120px;height:12px"></span><span class="sk" style="width:180px;height:12px"></span><span class="sk" style="width:60px;height:12px"></span><span class="sk" style="width:80px;height:12px"></span><span class="sk" style="width:90px;height:12px"></span></div>';
+      tbl.innerHTML = '<div class="ul-row ul-row--h"><span class="ul-th"><span class="ul-th--plain">WHEN</span></span><span class="ul-th"><span class="ul-th--plain">PERSON</span></span><span class="ul-th"><span class="ul-th--plain">VERSION</span></span><span class="ul-th"><span class="ul-th--plain">SKILL</span></span><span class="ul-th"><span class="ul-th--plain">EVENT</span></span></div>' + sk;
+      pg.innerHTML = ''; $('ul-q-log').textContent = ''; return;
+    }
+    if (S.view === 'chat') { renderChats(m); return; }
+    var rows = filtered(m), pages = Math.max(1, Math.ceil(rows.length / S.per));
+    S.page = Math.min(S.page, pages);
+    var slice = rows.slice((S.page - 1) * S.per, S.page * S.per);
+    var order = S.sortKey === 'at' ? (S.sortDir < 0 ? 'newest first' : 'oldest first')
+      : 'by ' + (S.sortKey === 'email' ? 'person' : 'version') + (S.sortDir < 0 ? ', descending' : ', ascending');
+    $('ul-q-log').textContent = order + ', ' + plural(rows.length, 'row');
+    var head = '<div class="ul-row ul-row--h" role="row">' + th('at', 'When') + th('email', 'Person') + th('version', 'Version') +
+      '<div role="columnheader"><span class="ul-th"><span class="ul-th--plain">Skill</span></span></div>' +
+      '<div role="columnheader"><span class="ul-th"><span class="ul-th--plain">Event</span></span></div></div>';
+    var body = slice.map(function (r) {
+      var who = r.email ? '<div class="ul-c ul-c--who" role="cell" title="' + esc(r.email) + '">' + esc(r.email) + '</div>'
+                        : '<div class="ul-c ul-c--none" role="cell">Not identified</div>';
+      var badge = (m.newest && r.version === m.newest) ? '<span class="ul-badge ul-badge--ok">Newest</span>' : '';
+      var sk = skillInfo(r, m);
+      var skCell = sk.n
+        ? '<div class="ul-c" role="cell" title="' + esc(sk.n + (sk.inferred ? ' (inferred: this row has no session tag, so it is the same person\'s latest skill run)' : '')) + '">' + esc(sk.n) + (sk.inferred ? ' <span class="ul-c--none">~</span>' : '') + '</div>'
+        : '<div class="ul-c ul-c--none" role="cell">' + (isSess(r) ? '' : 'Unknown') + '</div>';
+      return '<div class="ul-row ul-row--d" role="row"><div class="ul-c" role="cell" title="' + esc(r.at.toISOString()) + '">' + esc(fmtWhen(r.at)) + '</div>' + who +
+        '<div class="ul-c ul-c--ver" role="cell">' + esc(r.version || 'Unknown') + badge + '</div>' + skCell + '<div class="ul-c" role="cell" title="' + esc(evtText(r)) + '">' + esc(evtText(r)) + '</div></div>';
+    }).join('');
+    tbl.innerHTML = head + (slice.length ? body :
+      '<div class="ul-empty"><div class="ul-empty__copy"><h2>No rows match</h2><p>Clear the search or pick another version to see the log again.</p></div></div>');
+    pg.innerHTML =
+      '<div class="ul-pg__l"><span class="ul-pg__t">Items per page</span><label class="ul-select ul-select--sm"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Items per page</span>' +
+      '<select id="ul-per">' + [10, 25, 50].map(function (n) { return '<option' + (n === S.per ? ' selected' : '') + '>' + n + '</option>'; }).join('') + '</select>' + icon('caret-down') + '</label></div>' +
+      '<div class="ul-pg__r"><span class="ul-pg__t">Page ' + S.page + ' of ' + pages + '</span>' +
+      '<button class="ul-ib" id="ul-prev" type="button" aria-label="Previous page"' + (S.page <= 1 ? ' disabled' : '') + '>' + icon('arrow-left') + '</button>' +
+      '<button class="ul-ib" id="ul-next" type="button" aria-label="Next page"' + (S.page >= pages ? ' disabled' : '') + '>' + icon('arrow-right') + '</button></div>';
+    $('ul-per').addEventListener('change', function (e) { S.per = +e.target.value; S.page = 1; render(); });
+    $('ul-prev').addEventListener('click', function () { S.page--; render(); });
+    $('ul-next').addEventListener('click', function () { S.page++; render(); });
+  }
+  function renderChats(m) {
+    var tbl = $('ul-table'), pg = $('ul-pg');
+    var chats = chatsFiltered(m), pages = Math.max(1, Math.ceil(chats.length / S.per));
+    S.page = Math.min(S.page, pages);
+    var slice = chats.slice((S.page - 1) * S.per, S.page * S.per);
+    var order = S.sortKey === 'at' ? (S.sortDir < 0 ? 'newest first' : 'oldest first')
+      : 'by ' + (S.sortKey === 'email' ? 'person' : 'version') + (S.sortDir < 0 ? ', descending' : ', ascending');
+    $('ul-q-log').textContent = order + ', ' + plural(chats.length, 'chat');
+    var head = '<div class="ul-row ul-row--h" role="row">' + th('at', 'When') + th('email', 'Person') + th('version', 'Version') +
+      '<div role="columnheader"><span class="ul-th"><span class="ul-th--plain">Skill</span></span></div>' +
+      '<div role="columnheader"><span class="ul-th"><span class="ul-th--plain">Events</span></span></div></div>';
+    var body = slice.map(function (c) {
+      var open = !!S.open[c.key];
+      var skills = []; c.rows.forEach(function (r) { var n = skillInfo(r, m).n; if (r.event === 'skill' && n && skills.indexOf(n) === -1) skills.push(n); });
+      c.rows.forEach(function (r) { if (r.event !== 'skill') { var i = skillInfo(r, m); if (i.n && skills.indexOf(i.n) === -1) skills.push(i.n); } });
+      var badge = (m.newest && c.version === m.newest) ? '<span class="ul-badge ul-badge--ok">Newest</span>' : '';
+      var who = c.email ? '<div class="ul-c ul-c--who" role="cell" title="' + esc(c.email) + '">' + esc(c.email) + '</div>' : '<div class="ul-c ul-c--none" role="cell">Not identified</div>';
+      var dayS = c.at.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+      var timeS = c.at.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+      var quiet = !c.rows.some(function (r) { return r.event === 'skill' || isOut(r); });
+      var parent = '<div class="ul-row ul-row--d ul-row--chat" role="row" data-chat="' + esc(c.key) + '" aria-expanded="' + open + '" tabindex="0">' +
+        '<div class="ul-c" role="cell" title="' + esc(c.at.toISOString()) + '"><span class="ul-chat__t">' + icon('caret-down') + '<span class="ul-when"><b>' + esc(dayS) + '</b><span>' + esc(timeS) + '</span></span></span></div>' + who +
+        '<div class="ul-c ul-c--ver" role="cell">' + esc(c.version || 'Unknown') + badge + '</div>' +
+        '<div class="ul-c" role="cell" title="' + esc(skills.join(', ')) + '" style="overflow:visible">' + skills.map(function (n) { return '<span class="ul-skill">' + esc(n) + '</span>'; }).join(' ') + '</div>' +
+        '<div class="ul-c" role="cell" title="' + esc(chatSummary(c)) + '" style="overflow:visible">' + chatChips(c) + '</div></div>';
+      var grp = function (inner) { return '<div class="ul-grp' + (open ? ' is-open' : '') + (quiet ? ' ul-grp--quiet' : '') + '">' + inner + '</div>'; };
+      if (!open) return grp(parent);
+      var time = function (r) { return r.at.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }); };
+      var acts = c.rows.filter(function (r) { return !isOut(r); }).map(function (r) {
+        var txt = r.event === 'skill' ? 'Ran ' + (r.skill || 'a skill').replace(/^.*:/, '') : 'Session started';
+        return '<li><time datetime="' + esc(r.at.toISOString()) + '">' + esc(time(r)) + '</time><span>' + esc(txt) + '</span></li>';
+      }).join('');
+      var outRows = c.rows.filter(isOut);
+      var outs = outRows.map(function (r) {
+        var isArt = r.event === 'artifact';
+        var ext = isArt ? 'LINK' : (r.file.split('.').pop() || '').toUpperCase().slice(0, 4);
+        var name = isArt
+          ? '<a href="' + esc(r.url) + '" target="_blank" rel="noopener">Artifact ' + esc(r.url.replace(/^.*\//, '').slice(0, 8)) + '…</a>'
+          : fileLink(r, r.file);
+        var notes = [];
+        if (!isArt && !fileHref(r)) notes.push('Name only, no copy kept');
+        if (r.flags && !onBrand(r.flags)) notes.push(whyOff(r.flags));
+        else if (r.flags) notes.push(r.flags.stamp ? 'Built by a skill' : 'Tokens and fonts ok');
+        return '<div class="ul-o"><span class="ul-o__t">' + esc(ext) + '</span>' +
+          '<div class="ul-o__n" title="' + esc(isArt ? r.url : r.file) + '">' + name + (notes.length ? '<small>' + esc(notes.join(' · ')) + '</small>' : '') + '</div>' +
+          '<div class="ul-o__b">' + checkBadge(r) + '</div><div>' + outcomeHTML(r) + '</div></div>';
+      }).join('');
+      var off = outRows.filter(function (r) { return r.flags && !onBrand(r.flags); }).length;
+      var done = outRows.filter(function (r) { return S.outcomes[r.key]; }).length;
+      var sum = outRows.length ? [off ? off + ' off-brand' : '', done + ' of ' + outRows.length + ' reviewed'].filter(Boolean).join(' · ') : '';
+      return grp(parent + '<div class="ul-detail" role="row">' +
+        '<div class="ul-detail__top"><h3 class="ul-detail__h">Outputs<span>' + outRows.length + '</span></h3><span class="ul-detail__sum">' + esc(sum) + '</span></div>' +
+        (outs ? '<div class="ul-outs">' + outs + '</div>' : '<p class="ul-note-line">No outputs from this chat.</p>') +
+        '<div class="ul-act"><span class="ul-act__h">Activity</span><ol>' + (acts || '<li><span>Nothing else recorded</span></li>') + '</ol></div></div>');
+    }).join('');
+    tbl.innerHTML = head + (slice.length ? body :
+      '<div class="ul-empty"><div class="ul-empty__copy"><h2>No chats match</h2><p>Clear the search or pick another version to see the log again.</p></div></div>');
+    pg.innerHTML =
+      '<div class="ul-pg__l"><span class="ul-pg__t">Items per page</span><label class="ul-select ul-select--sm"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Items per page</span>' +
+      '<select id="ul-per">' + [10, 25, 50].map(function (n) { return '<option' + (n === S.per ? ' selected' : '') + '>' + n + '</option>'; }).join('') + '</select>' + icon('caret-down') + '</label></div>' +
+      '<div class="ul-pg__r"><span class="ul-pg__t">Page ' + S.page + ' of ' + pages + '</span>' +
+      '<button class="ul-ib" id="ul-prev" type="button" aria-label="Previous page"' + (S.page <= 1 ? ' disabled' : '') + '>' + icon('arrow-left') + '</button>' +
+      '<button class="ul-ib" id="ul-next" type="button" aria-label="Next page"' + (S.page >= pages ? ' disabled' : '') + '>' + icon('arrow-right') + '</button></div>';
+    $('ul-per').addEventListener('change', function (e) { S.per = +e.target.value; S.page = 1; render(); });
+    $('ul-prev').addEventListener('click', function () { S.page--; render(); });
+    $('ul-next').addEventListener('click', function () { S.page++; render(); });
+  }
+  function renderVerFilter(m) {
+    var sel = $('ul-ver'), keep = S.ver;
+    var opts = '<option value="">All versions</option>' + m.vers.map(function (v) { return '<option value="' + esc(v) + '"' + (v === keep ? ' selected' : '') + '>' + esc(v) + '</option>'; }).join('');
+    sel.innerHTML = opts;
+    if (keep && m.vers.indexOf(keep) === -1) S.ver = '';
+  }
+
+  /* ── outputs ─────────────────────────────────────────────────────────────
+     What the skills MADE: a file written or a page published in a session where a Gushwork skill
+     had run. The plugin measured each one locally and sent four flags (stamp, tokens, fonts, logo)
+     instead of the text, so "on-brand" here is a measurement, not a review. On-brand means it uses
+     the tokens and names no typeface outside the system. Whether it was GOOD is the verdict, which
+     is the owner's and is kept apart from the log so a usage row is never rewritten. */
+  /* A kept copy exists for a file row when the plugin sent one (plugin 1.57.0 on, a private store
+     connected, the file small enough). Its address is owner-only: the link goes through the same
+     gate as the log, so opening it signed out or as a non-owner gets a refusal, not a file. */
+  function fileHref(r) {
+    return r.event === 'file' && r.sess && S.files[r.sess + '|' + r.file]
+      ? '/api/usage-log?file=' + encodeURIComponent(r.sess + '|' + r.file) : '';
+  }
+  function fileLink(r, label) {
+    var h = fileHref(r);
+    return h ? '<a href="' + esc(h) + '" target="_blank" rel="noopener">' + esc(label) + '</a>' : esc(label);
+  }
+  function isOut(r) { return r.event === 'file' || r.event === 'artifact'; }
+  function onBrand(f) { return !!f && f.tokens === true && f.fonts !== 'foreign'; }
+  function whyOff(f) {
+    var w = [];
+    if (!f.tokens) w.push('no tokens');
+    if (f.fonts === 'foreign') w.push('other typeface');
+    return w.join(', ');
+  }
+  /* Which skill a row belongs to. A skill row is its own answer. Newer rows carry `sess`, a hash of
+     the session, so an output joins to the skill that ran in the same session exactly. Older rows do
+     not, so they are INFERRED: the same person's latest skill run, stopping at their next session
+     start, since a new session is a new conversation. That can be wrong when someone runs two
+     sessions at once, so an inferred answer is marked. A session start has no skill. */
+  function skillInfo(r, m) {
+    if (r.event === 'skill') return { n: (r.skill || '').replace(/^.*:/, ''), inferred: false };
+    if (isSess(r)) return { n: '', inferred: false };
+    if (r.sess) {
+      var best = null;
+      m.all.forEach(function (x) {
+        if (x.event === 'skill' && x.sess === r.sess && x.at <= r.at && (!best || x.at > best.at)) best = x;
+      });
+      if (best) return { n: best.skill.replace(/^.*:/, ''), inferred: false };
+    }
+    if (!r.email) return { n: '', inferred: false };
+    var mine = m.all.filter(function (x) { return x.email === r.email && x.at <= r.at && x !== r; })
+      .sort(function (a, b) { return b.at - a.at; });
+    for (var i = 0; i < mine.length; i++) {
+      if (mine[i].event === 'skill') return { n: mine[i].skill.replace(/^.*:/, ''), inferred: true };
+      if (isSess(mine[i])) break;
+    }
+    return { n: '', inferred: false };
+  }
+  function skillFor(r, m) {
+    var s = skillInfo(r, m);
+    return s.n;
+  }
+  /* The summary cards. The outputs themselves live inside their chat (the By chat view), where
+     each one shows its link, its on-brand checks and the owner's verdict next to the skill that
+     made it, so there is one table to read and not two that repeat each other. */
+  function renderOutputs(m) {
+    var mt = $('ul-out-metrics'), q = $('ul-q-out');
+    if (S.status === 'loading') { mt.innerHTML = ['Outputs', 'On-brand', 'Approved', 'Needs changes'].map(skelMetric).join(''); q.textContent = ''; return; }
+    var outs = m.curAll.filter(isOut);
+    var measured = outs.filter(function (r) { return r.flags; });
+    var on = measured.filter(function (r) { return onBrand(r.flags); }).length;
+    var appr = outs.filter(function (r) { return S.outcomes[r.key] === 'approved'; }).length;
+    var chg = outs.filter(function (r) { return S.outcomes[r.key] === 'changes'; }).length;
+    q.textContent = plural(outs.length, 'output') + ', ' + PERIOD_NAME[S.period] + (outs.length ? '. Open a chat below to see them' : '');
+    mt.innerHTML =
+      metricCard('Outputs', String(outs.length), plural(outs.filter(function (r) { return r.event === 'artifact'; }).length, 'artifact') + ' published') +
+      metricCard('On-brand', measured.length ? Math.round(on / measured.length * 100) + '%' : 'None', measured.length ? on + ' of ' + measured.length + ' measured' : 'Nothing measured yet') +
+      metricCard('Approved', String(appr), 'marked by an owner') +
+      metricCard('Needs changes', String(chg), 'marked by an owner');
+  }
+  /* The checks and the verdict control for one output, shared by the chat rows. */
+  function checkBadge(r) {
+    var f = r.flags;
+    if (!f) return '<span class="ul-badge">Not measured</span>';
+    var ok = onBrand(f);
+    return '<span class="ul-badge ' + (ok ? 'ul-badge--ok' : 'ul-badge--bad') + '" title="tokens ' + (f.tokens ? 'yes' : 'no') + ', fonts ' + esc(f.fonts) + ', logo ' + (f.logo ? 'yes' : 'no') + ', stamp ' + (f.stamp ? 'yes' : 'no') + '">' + (ok ? 'On-brand' : 'Off-brand') + '</span>';
+  }
+  function checksHTML(r) {
+    var f = r.flags;
+    if (!f) return '<span class="ul-c--none">Not measured</span>';
+    var ok = onBrand(f);
+    return '<span class="ul-badge ' + (ok ? 'ul-badge--ok' : 'ul-badge--bad') + '">' + (ok ? 'On-brand' : 'Off-brand') + '</span>' +
+      '<span class="ul-c--none" title="tokens ' + (f.tokens ? 'yes' : 'no') + ', fonts ' + esc(f.fonts) + ', logo ' + (f.logo ? 'yes' : 'no') + ', stamp ' + (f.stamp ? 'yes' : 'no') + '">' +
+      esc(ok ? (f.stamp ? 'built by a skill' : 'tokens and fonts ok') : whyOff(f)) + '</span>';
+  }
+  function outcomeHTML(r) {
+    var v = S.outcomes[r.key] || '';
+    return '<label class="ul-select ul-select--sm"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Outcome</span>' +
+      '<select data-outcome="' + esc(r.key) + '"><option value=""' + (v === '' ? ' selected' : '') + '>Not reviewed</option><option value="approved"' + (v === 'approved' ? ' selected' : '') +
+      '>Approved</option><option value="changes"' + (v === 'changes' ? ' selected' : '') + '>Needs changes</option></select>' + icon('caret-down') + '</label>';
+  }
+  $('ul-table').addEventListener('change', function (e) {
+    var sel = e.target.closest('select[data-outcome]'); if (!sel) return;
+    var key = sel.getAttribute('data-outcome'), want = sel.value, before = S.outcomes[key] || '';
+    if (want) S.outcomes[key] = want; else delete S.outcomes[key];
+    render();
+    fetch(API, { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ at: key, status: want }) })
+      .then(function (r) { if (!r.ok) throw new Error('http ' + r.status); })
+      .catch(function () {
+        /* The verdict did not save, so put the control back rather than show one that is not true. */
+        if (before) S.outcomes[key] = before; else delete S.outcomes[key];
+        render();
+      });
+  });
+
+  /* ── page-level states. The whole page reads one source, so when it cannot be read there
+        is nothing to keep the shape of: one empty-state, not five zeroed cards. ───────── */
+  var BLOCK = {
+    forbidden:    { icon: 'lock', title: 'Only owners can open the usage log', body: 'This list shows who starts a session, so it is limited to owners. Ask an owner if you need to see it.' },
+    signin:       { icon: 'lock', title: 'Sign in to see the usage log', body: 'Use your @gushwork.ai account. You will come back to this page afterwards.', action: 'Sign in' },
+    unconfigured: { icon: 'warning-circle', title: 'The log store is not connected', body: 'Add the Upstash variables to the project and redeploy, then reload this page.' },
+    empty:        { icon: 'magnifying-glass', title: 'No sessions logged yet', body: 'Rows appear here when someone starts a Claude session with the plugin.' },
+    error:        { icon: 'warning-circle', title: 'Could not read the usage log', body: 'The log store did not answer. Try again in a moment.', action: 'Try again' }
+  };
+  function renderBlocked(kind) {
+    var b = BLOCK[kind];
+    $('ul-blocked').innerHTML = '<div class="ul-sec"><div class="ul-empty"><div class="ul-empty__c">' + icon(b.icon) + '</div>' +
+      '<div class="ul-empty__copy"><h2>' + esc(b.title) + '</h2><p>' + esc(b.body) + '</p></div>' +
+      (b.action ? '<button class="ul-btn" id="ul-act" type="button">' + esc(b.action) + '</button>' : '') + '</div></div>';
+    var act = $('ul-act');
+    if (act) act.addEventListener('click', function () {
+      if (kind === 'signin') location.href = '/?signin=required&next=' + encodeURIComponent(location.pathname);
+      else load();
+    });
+  }
+
+  function render() {
+    var blocked = ['forbidden', 'signin', 'unconfigured', 'empty', 'error'].indexOf(S.status) !== -1;
+    $('ul-blocked').hidden = !blocked; $('ul-app').hidden = blocked;
+    /* A period and a refresh have nothing to act on when the log cannot be read, and the
+       last "Updated Ns ago" would be a stale claim. The state's own action is the retry. */
+    $('ul-bar').hidden = blocked;
+    if (blocked) { renderBlocked(S.status); updated(); return; }
+    var m = compute();
+    renderCards(m); renderChart(m); renderVersions(m); renderSkills(m); renderNew(m); renderOutputs(m);
+    if (S.status === 'ready') renderVerFilter(m);
+    renderLog(m); updated();
+    ROOT.querySelectorAll('.ul-tab').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-period') === S.period)); });
+  }
+  function updated() {
+    $('ul-updated').textContent = S.fetchedAt ? 'Updated ' + ago(Date.now() - S.fetchedAt) : '';
+  }
+
+  function load() {
+    if (S.busy) return;
+    S.busy = true; $('ul-refresh').setAttribute('aria-busy', 'true');
+    var first = S.status === 'loading' || !S.rows.length;
+    if (first) { S.status = 'loading'; render(); }
+    fetch(API, { credentials: 'same-origin', cache: 'no-store' }).then(function (r) {
+      if (r.status === 401) { S.status = 'signin'; return null; }
+      if (r.status === 403) { S.status = 'forbidden'; return null; }
+      if (!r.ok) throw new Error('http ' + r.status);
+      return r.json();
+    }).then(function (j) {
+      if (!j) return;
+      if (!j.configured) { S.status = 'unconfigured'; return; }
+      S.outcomes = j.outcomes || {}; S.files = {}; (j.files || []).forEach(function (k) { S.files[k] = 1; }); S.rowsAll = parse(j.rows || []); S.rows = window.anHide(S.rowsAll); S.skipped = j.skipped || 0; S.capped = !!j.capped; S.fetchedAt = Date.now();
+      S.status = S.rowsAll.length ? 'ready' : 'empty';
+    }).catch(function () { S.status = 'error'; }).then(function () {
+      S.busy = false; $('ul-refresh').removeAttribute('aria-busy'); render();
+    });
+  }
+
+  /* ── wiring: bound once. Everything that is re-rendered is delegated from a stable parent,
+        so no handler is attached to an element that a render later replaces. ─────────── */
+  $('ul-refresh').innerHTML = icon('arrow-clockwise');
+  $('ul-i-search').innerHTML = icon('magnifying-glass');
+  ROOT.querySelectorAll('.ul-i-caret').forEach(function (c) { c.outerHTML = icon('caret-down'); });
+  ROOT.querySelectorAll('.ul-tab').forEach(function (b) {
+    b.addEventListener('click', function () { S.period = b.getAttribute('data-period'); S.page = 1; render(); });
+  });
+  $('ul-refresh').addEventListener('click', load);
+  $('ul-search').addEventListener('input', function (e) { S.q = e.target.value; S.page = 1; render(); $('ul-search').focus(); });
+  $('ul-view').addEventListener('change', function (e) { S.view = e.target.value; S.page = 1; render(); });
+  function toggleChat(row) { var k = row.getAttribute('data-chat'); S.open[k] = !S.open[k]; render(); }
+  $('ul-table').addEventListener('click', function (e) { var row = e.target.closest('[data-chat]'); if (row) toggleChat(row); });
+  $('ul-table').addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    var row = e.target.closest('[data-chat]'); if (row) { e.preventDefault(); toggleChat(row); }
+  });
+  $('ul-evt').addEventListener('change', function (e) { S.evt = e.target.value; S.page = 1; render(); });
+  $('ul-ver').addEventListener('change', function (e) { S.ver = e.target.value; S.page = 1; render(); });
+  $('ul-table').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-sort]'); if (!b) return;
+    var k = b.getAttribute('data-sort');
+    if (S.sortKey === k) S.sortDir = -S.sortDir; else { S.sortKey = k; S.sortDir = k === 'at' ? -1 : 1; }
+    S.page = 1; render();
+  });
+  /* Custom dropdown. The native <select> stays in the DOM as the source of truth (value, change event);
+     only its popup is replaced, so every existing change handler keeps working. */
+  (function () {
+    var menu = null, owner = null, idx = -1;
+    var CHECK = '<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg>';
+    function close(refocus) {
+      if (!menu) return;
+      menu.remove(); menu = null;
+      if (owner) { var l = owner.closest('.ul-select'); if (l) l.classList.remove('is-open'); if (refocus && document.contains(owner)) owner.focus(); }
+      owner = null; idx = -1;
+      document.removeEventListener('mousedown', outside, true); window.removeEventListener('scroll', onScroll, true); window.removeEventListener('resize', close);
+    }
+    function outside(e) { if (menu && !menu.contains(e.target) && e.target !== owner) close(false); }
+    function onScroll(e) { if (menu && !menu.contains(e.target)) close(false); }
+    function focusAt(i) {
+      var items = menu.children; if (!items.length) return;
+      idx = (i + items.length) % items.length;
+      for (var k = 0; k < items.length; k++) items[k].classList.toggle('is-focus', k === idx);
+      items[idx].scrollIntoView({ block: 'nearest' });
+    }
+    function pick(i) {
+      var sel = owner, o = sel.options[i]; close(true);
+      if (o && sel.value !== o.value) { sel.value = o.value; sel.dispatchEvent(new Event('change', { bubbles: true })); }
+    }
+    function open(sel) {
+      close(false); owner = sel;
+      menu = document.createElement('div'); menu.className = 'ul-menu'; menu.setAttribute('role', 'listbox');
+      Array.prototype.forEach.call(sel.options, function (o, i) {
+        var b = document.createElement('button'); b.type = 'button'; b.className = 'ul-menu__i'; b.setAttribute('role', 'option');
+        b.setAttribute('aria-selected', o.selected ? 'true' : 'false');
+        b.innerHTML = '<span></span>' + (o.selected ? CHECK : ''); b.firstChild.textContent = o.text;
+        b.addEventListener('mousedown', function (e) { e.preventDefault(); });
+        b.addEventListener('click', function () { pick(i); });
+        menu.appendChild(b);
+      });
+      document.body.appendChild(menu);
+      var r = sel.getBoundingClientRect(), mh = menu.offsetHeight, below = window.innerHeight - r.bottom, up = below < mh + 12 && r.top > below;
+      menu.style.minWidth = r.width + 'px';
+      menu.style.left = Math.max(8, Math.min(r.left, window.innerWidth - menu.offsetWidth - 8)) + 'px';
+      menu.style.top = (up ? Math.max(8, r.top - mh - 4) : r.bottom + 4) + 'px';
+      sel.closest('.ul-select').classList.add('is-open');
+      focusAt(sel.selectedIndex);
+      document.addEventListener('mousedown', outside, true); window.addEventListener('resize', close);
+      setTimeout(function () { if (menu) window.addEventListener('scroll', onScroll, true); }, 150);
+    }
+    document.addEventListener('mousedown', function (e) {
+      var sel = e.target.closest && e.target.closest('.ul-select select'); if (!sel) return;
+      e.preventDefault(); sel.focus({ preventScroll: true });
+      if (menu && owner === sel) close(false); else open(sel);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (menu) {
+        if (e.key === 'Escape') { e.preventDefault(); close(true); }
+        else if (e.key === 'ArrowDown') { e.preventDefault(); focusAt(idx + 1); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); focusAt(idx - 1); }
+        else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(idx); }
+        else if (e.key === 'Tab') close(false);
+        return;
+      }
+      var sel = e.target.closest && e.target.closest('.ul-select select');
+      if (sel && (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown' || e.key === 'ArrowUp')) { e.preventDefault(); open(sel); }
+    });
+  })();
+  (function () {
+    var dlg = $('ul-ver-dlg');
+    $('ul-ver-open').addEventListener('click', function () { dlg.showModal(); if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); });
+    $('ul-ver-close').addEventListener('click', function () { dlg.close(); });
+    dlg.addEventListener('mousedown', function (e) { if (e.target === dlg) dlg.close(); });
+  })();
+  setInterval(updated, 10000);
+  window.__an = window.__an || {};
+  window.__an.usage = function () { render(); load(); };
+  window.__anRefilter.usage = function () { S.rows = window.anHide(S.rowsAll || []); S.page = 1; render(); };
+})();
+</script>
+<script>
+(function () {
+  'use strict';
+  var ROOT = document.getElementById('an-visits');
+  var API = '/api/visits';
+  var ICON = {"arrows-down-up":"<path d=\"M117.66,170.34a8,8,0,0,1,0,11.32l-32,32a8,8,0,0,1-11.32,0l-32-32a8,8,0,0,1,11.32-11.32L72,188.69V48a8,8,0,0,1,16,0V188.69l18.34-18.35A8,8,0,0,1,117.66,170.34Zm96-96-32-32a8,8,0,0,0-11.32,0l-32,32a8,8,0,0,0,11.32,11.32L168,67.31V208a8,8,0,0,0,16,0V67.31l18.34,18.35a8,8,0,0,0,11.32-11.32Z\"/>","arrow-up":"<path d=\"M205.66,117.66a8,8,0,0,1-11.32,0L136,59.31V216a8,8,0,0,1-16,0V59.31L61.66,117.66a8,8,0,0,1-11.32-11.32l72-72a8,8,0,0,1,11.32,0l72,72A8,8,0,0,1,205.66,117.66Z\"/>","arrow-down":"<path d=\"M205.66,149.66l-72,72a8,8,0,0,1-11.32,0l-72-72a8,8,0,0,1,11.32-11.32L120,196.69V40a8,8,0,0,1,16,0V196.69l58.34-58.35a8,8,0,0,1,11.32,11.32Z\"/>","arrow-left":"<path d=\"M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z\"/>","arrow-right":"<path d=\"M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z\"/>","arrow-clockwise":"<path d=\"M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z\"/>","lock":"<path d=\"M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Zm-68-56a12,12,0,1,1-12-12A12,12,0,0,1,140,152Z\"/>","warning-circle":"<path d=\"M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z\"/>","magnifying-glass":"<path d=\"M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z\"/>"};
+  function icon(n) { return '<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">' + (ICON[n] || '') + '</svg>'; }
+  /* Rows come from our own endpoint but the path is a request path, so nothing goes into markup unescaped. */
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+  function $(id) { return document.getElementById(id); }
+  function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
+  var DAY = 86400000;
+  function ago(ms) {
+    var s = Math.max(0, Math.round(ms / 1000));
+    if (s < 60) return s + 's ago';
+    var m = Math.round(s / 60); if (m < 60) return m + ' min ago';
+    var h = Math.round(m / 60); if (h < 48) return h + ' h ago';
+    return Math.round(h / 24) + ' days ago';
+  }
+  function fmtWhen(d) { return d.toLocaleString(undefined, { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }); }
+
+  /* Which part of the site a path belongs to. */
+  var TOOLS = ['/internal/tools', '/internal/employee-id-card', '/internal/email-signature'];
+  var AREAS = ['All', 'Tools', 'Staging', 'Templates', 'Library', 'Admin', 'Hub'];
+  function areaOf(p) {
+    if (TOOLS.indexOf(p) !== -1) return 'Tools';
+    if (p.indexOf('/internal/staging') === 0) return 'Staging';
+    if (p.indexOf('/internal/templates') === 0) return 'Templates';
+    if (p.indexOf('/library') === 0) return 'Library';
+    if (p.indexOf('/admin') === 0) return 'Admin';
+    return 'Hub';
+  }
+  var TITLES = {};
+  function pageName(p) {
+    if (TITLES[p]) return TITLES[p];
+    var last = p.split('/').filter(Boolean).pop() || 'Overview';
+    return last.replace(/[-_]+/g, ' ').replace(/^./, function (c) { return c.toUpperCase(); });
+  }
+
+  var S = { status: 'loading', rows: [], period: '30', area: 'All', q: '', shown: 25, busy: false, fetchedAt: 0 };
+
+  function parse(raw) {
+    var out = [];
+    raw.forEach(function (r) {
+      var d = new Date(r.at); if (isNaN(d.getTime())) return;
+      out.push({ at: d, email: String(r.email || ''), path: String(r.path || '/'), kind: r.kind === 'signin' ? 'signin' : 'view', via: String(r.via || '') });
+    });
+    return out;
+  }
+  function scoped() {
+    var cut = S.period === 'all' ? 0 : Date.now() - (+S.period) * DAY;
+    return S.rows.filter(function (r) {
+      if (r.at.getTime() < cut) return false;
+      if (S.area !== 'All') return r.kind === 'view' && areaOf(r.path) === S.area;
+      return true;
+    });
+  }
+
+  function metric(label, value, note) {
+    return '<div class="ul-metric"><span class="ul-lab">' + esc(label) + '</span><div class="ul-metric__body"><span class="ul-num">' + esc(value) +
+      '</span><span class="ul-note">' + esc(note) + '</span></div></div>';
+  }
+  function th(t) { return t && typeof t === 'object' ? t.html : '<div role="columnheader"><span class="ul-th"><span class="ul-th--plain">' + esc(t) + '</span></span></div>'; }
+  function table(cols, heads, rows, empty) {
+    var h = '<div class="ul-row ul-row--h" role="row">' + heads.map(th).join('') + '</div>';
+    return '<div class="ul-tbl" role="table" style="--vs-cols:' + cols + '">' + h +
+      (rows.length ? rows.join('') : '<div class="ul-empty"><div class="ul-empty__copy"><h2>' + esc(empty) + '</h2></div></div>') + '</div>';
+  }
+
+  /* Ten rows to a page. The pager shows only when there is more than a page, and uses the same markup as the
+     Usage tab's "New people" table (.ul-pg). It sits OUTSIDE the table's scroller so it does not scroll sideways
+     with a wide table. */
+
+  /* Sorting. A column header is a button; the first click leads with the useful end of the column (biggest, newest or A to Z,
+     lowest where lower is better), the second reverses it. Empty values stay last either way, and ties keep the order they were in. */
+  var SORT = {};
+  function sortItems(items, defs, st) {
+    if (!st || !defs[st.i]) return items;
+    var get = defs[st.i].get;
+    return items.map(function (x, n) { return { x: x, n: n, v: get(x) }; }).sort(function (a, b) {
+      var an = a.v == null || a.v === '', bn = b.v == null || b.v === '';
+      if (an || bn) return an && bn ? a.n - b.n : an ? 1 : -1;
+      var c = typeof a.v === 'string' ? a.v.localeCompare(b.v, undefined, { sensitivity: 'base', numeric: true }) : a.v - b.v;
+      return c * st.dir || a.n - b.n;
+    }).map(function (o) { return o.x; });
+  }
+  function sortTh(key, i, label) {
+    var st = SORT[key], on = st && st.i === i;
+    return '<div role="columnheader" aria-sort="' + (on ? (st.dir < 0 ? 'descending' : 'ascending') : 'none') + '">' +
+      '<button class="ul-th" type="button" data-sort-i="' + i + '"' + (on ? ' data-on' : '') + '>' + esc(label) + icon(on ? (st.dir < 0 ? 'arrow-down' : 'arrow-up') : 'arrows-down-up') + '</button></div>';
+  }
+  function sortNote(key, heads, dflt) {
+    var st = SORT[key];
+    return st ? 'by ' + String(heads[st.i]).toLowerCase() + ', ' + (st.dir < 0 ? 'descending' : 'ascending') : dflt;
+  }
+  var PER = 10, PG = {};
+  function paged(hostId, key, cols, heads, items, rowFn, empty, sorts) {
+    sorts = sorts || [];
+    if (SORT[key] && !sorts[SORT[key].i]) SORT[key] = null;
+    var list = sortItems(items, sorts, SORT[key]);
+    var hd = sorts.some(Boolean) ? heads.map(function (h, i) { return sorts[i] ? { html: sortTh(key, i, h) } : h; }) : heads;
+    var host = $(hostId), pages = Math.max(1, Math.ceil(items.length / PER));
+    PG[key] = Math.min(Math.max(1, PG[key] || 1), pages);
+    var from = (PG[key] - 1) * PER;
+    host.innerHTML = table(cols, hd, list.slice(from, from + PER).map(rowFn), empty);
+    [].forEach.call(host.querySelectorAll('[data-sort-i]'), function (b) {
+      b.addEventListener('click', function () {
+        var i = +b.getAttribute('data-sort-i'), cur = SORT[key];
+        SORT[key] = cur && cur.i === i ? { i: i, dir: -cur.dir } : { i: i, dir: sorts[i].dir };
+        PG[key] = 1; renderAll();
+      });
+    });
+    var slot = $(hostId + '-pg');
+    if (!slot) { slot = document.createElement('div'); slot.id = hostId + '-pg'; slot.className = 'ul-pg'; host.insertAdjacentElement('afterend', slot); }
+    slot.hidden = items.length <= PER;
+    if (slot.hidden) return;
+    slot.innerHTML = '<div class="ul-pg__l"><span class="ul-pg__t">' + (from + 1) + '–' + Math.min(from + PER, items.length) + ' of ' + items.length + '</span></div>' +
+      '<div class="ul-pg__r"><span class="ul-pg__t">Page ' + PG[key] + ' of ' + pages + '</span>' +
+      '<button class="ul-ib" data-pg="prev" type="button" aria-label="Previous page"' + (PG[key] <= 1 ? ' disabled' : '') + '>' + icon('arrow-left') + '</button>' +
+      '<button class="ul-ib" data-pg="next" type="button" aria-label="Next page"' + (PG[key] >= pages ? ' disabled' : '') + '>' + icon('arrow-right') + '</button></div>';
+    slot.querySelector('[data-pg="prev"]').addEventListener('click', function () { PG[key]--; renderAll(); });
+    slot.querySelector('[data-pg="next"]').addEventListener('click', function () { PG[key]++; renderAll(); });
+  }
+  function cell(t, cls, title) { return '<div class="ul-c ' + (cls || '') + '" role="cell" title="' + esc(title || t) + '">' + esc(t) + '</div>'; }
+  function who(e) { return e === '(shared password)' ? 'Shared password' : e === '(public visitor)' ? 'Public visitors' : e; }
+  /* The person cell, with a New tag for anyone first seen in the last day. */
+  function whoCell(e, isNew) {
+    return '<div class="ul-c ul-c--whotag" role="cell" title="' + esc(e) + '"><span>' + esc(who(e)) + '</span>' + (isNew ? '<span class="ul-badge ul-badge--new">New</span>' : '') + '</div>';
+  }
+  /* A person is New for a day after the first time we ever logged them. It reads every row, not just this period, so a
+     regular is not called new because they were quiet last month. */
+  var NEW_DAYS = 1;
+  function firstSeen() {
+    var first = {};
+    S.rows.forEach(function (r) { if (r.email && (!first[r.email] || r.at < first[r.email])) first[r.email] = r.at; });
+    return first;
+  }
+
+  function renderAll() {
+    var rows = scoped();
+    var first = firstSeen(), tagCut = Date.now() - NEW_DAYS * DAY;
+    var isNew = function (e) { return !!first[e] && first[e].getTime() >= tagCut; };
+    var signins = rows.filter(function (r) { return r.kind === 'signin'; });
+    var views = rows.filter(function (r) { return r.kind === 'view'; });
+    var people = {}, pages = {};
+    rows.forEach(function (r) {
+      var p = people[r.email] || (people[r.email] = { email: r.email, views: 0, signins: 0, last: r.at, pages: {} });
+      if (r.at > p.last) p.last = r.at;
+      if (r.kind === 'signin') p.signins++; else { p.views++; p.pages[r.path] = (p.pages[r.path] || 0) + 1; }
+    });
+    views.forEach(function (r) {
+      var g = pages[r.path] || (pages[r.path] = { path: r.path, views: 0, who: {}, last: r.at });
+      g.views++; g.who[r.email] = 1; if (r.at > g.last) g.last = r.at;
+    });
+    var plist = Object.keys(people).map(function (k) { return people[k]; }).sort(function (a, b) { return b.last - a.last; });
+    var glist = Object.keys(pages).map(function (k) { return pages[k]; }).sort(function (a, b) { return b.views - a.views || b.last - a.last; });
+
+    var lastAt = rows.length ? rows.reduce(function (m, r) { return r.at > m ? r.at : m; }, rows[0].at) : null;
+    $('vs-metrics').innerHTML =
+      metric('Sign-ins', String(signins.length), (function (n) { return n + (n === 1 ? ' person' : ' people'); })(Object.keys(signins.reduce(function (o, r) { o[r.email] = 1; return o; }, {})).length) + ' signed in') +
+      metric('Page views', String(views.length), plural(glist.length, 'page') + ' opened') +
+      metric('Active people', String(plist.length), lastAt ? 'last visit ' + ago(Date.now() - lastAt.getTime()) : 'nothing logged yet');
+
+    $('vs-q-people').textContent = (plist.length + (plist.length === 1 ? ' person' : ' people'));
+    if (PG._p !== S.period + '|' + S.area) PG = { _p: S.period + '|' + S.area };   /* a new period or area starts every table on page 1 */
+    /* The page itself, not its area: "Staging" or "Hub" says where, the name says what. */
+    var topPath = function (p) { return Object.keys(p.pages).sort(function (a, b) { return p.pages[b] - p.pages[a]; })[0] || ''; };
+    var topName = function (p) { var t = topPath(p); return t ? pageName(t) : ''; };
+    paged('vs-people', 'people', 'minmax(200px,1.6fr) 100px 100px minmax(120px,1fr) minmax(120px,1fr)', ['Person', 'Sign-ins', 'Page views', 'Last seen', 'Opens most'],
+      plist, function (p) {
+        var top = topPath(p);
+        return '<div class="ul-row ul-row--d" role="row">' + whoCell(p.email, isNew(p.email)) + cell(String(p.signins)) + cell(String(p.views)) + cell(ago(Date.now() - p.last.getTime()), '', p.last.toISOString()) + cell(top ? pageName(top) : '', '', top) + '</div>';
+      }, 'No visits in this view', [
+        { get: function (p) { return p.email; }, dir: 1 }, { get: function (p) { return p.signins; }, dir: -1 }, { get: function (p) { return p.views; }, dir: -1 },
+        { get: function (p) { return p.last.getTime(); }, dir: -1 }, { get: topName, dir: 1 }]);
+
+    $('vs-q-pages').textContent = sortNote('pages', ['Page', 'Area', 'Views', 'People', 'Last opened'], 'most opened') + ', ' + plural(glist.length, 'page');
+    paged('vs-pages', 'pages', 'minmax(220px,2fr) 110px 90px 90px minmax(120px,1fr)', ['Page', 'Area', 'Views', 'People', 'Last opened'],
+      glist, function (g) {
+        return '<div class="ul-row ul-row--d" role="row">' + cell(pageName(g.path), 'ul-c--who', g.path) + cell(areaOf(g.path)) + cell(String(g.views)) + cell(String(Object.keys(g.who).length)) + cell(ago(Date.now() - g.last.getTime()), '', g.last.toISOString()) + '</div>';
+      }, 'No pages opened in this view', [
+        { get: function (g) { return pageName(g.path); }, dir: 1 }, { get: function (g) { return areaOf(g.path); }, dir: 1 },
+        { get: function (g) { return g.views; }, dir: -1 }, { get: function (g) { return Object.keys(g.who).length; }, dir: -1 }, { get: function (g) { return g.last.getTime(); }, dir: -1 }]);
+
+    /* The search box filters this table only: person, page name or path, and the event ("Opened" or "Signed in"). */
+    var q = S.q.trim().toLowerCase();
+    var recent = rows.slice().sort(function (a, b) { return b.at - a.at; }).filter(function (r) {
+      if (!q) return true;
+      var evt = r.kind === 'signin' ? 'signed in' : 'opened';
+      return (r.email + ' ' + (r.kind === 'signin' ? '' : pageName(r.path) + ' ' + r.path) + ' ' + evt).toLowerCase().indexOf(q) !== -1;
+    });
+    $('vs-q-recent').textContent = sortNote('recent', ['When', 'Person', 'Page', 'Event'], 'newest first') + ', ' + plural(recent.length, 'event');
+    paged('vs-recent', 'recent', '160px minmax(180px,1.4fr) minmax(200px,2fr) 110px', ['When', 'Person', 'Page', 'Event'],
+      recent, function (r) {
+        var evt = r.kind === 'signin' ? 'Signed in' + (r.via === 'password' ? ' (password)' : '') : 'Opened';
+        return '<div class="ul-row ul-row--d" role="row">' + cell(fmtWhen(r.at), '', r.at.toISOString()) + whoCell(r.email, isNew(r.email)) +
+          cell(r.kind === 'signin' ? '—' : pageName(r.path), '', r.path) + cell(evt) + '</div>';
+      }, q ? 'No recent visits match that search' : 'No visits in this view', [
+        { get: function (r) { return r.at.getTime(); }, dir: -1 }, { get: function (r) { return r.email; }, dir: 1 },
+        { get: function (r) { return r.kind === 'signin' ? null : pageName(r.path); }, dir: 1 },
+        { get: function (r) { return r.kind === 'signin' ? 'Signed in' : 'Opened'; }, dir: 1 }]);
+    $('vs-more').innerHTML = '';   /* "Show 25 more" is replaced by the pager under the table */
+  }
+
+  var BLOCK = {
+    forbidden:    { icon: 'lock', title: 'Owners only', body: 'The visit log is visible to the site owner and nobody else.' },
+    signin:       { icon: 'lock', title: 'Sign in to see visits', body: 'Use your @gushwork.ai account. You will come back to this page afterwards.', action: 'Sign in' },
+    unconfigured: { icon: 'warning-circle', title: 'The log store is not connected', body: 'Add the Upstash variables to the project and redeploy, then reload this page.' },
+    empty:        { icon: 'magnifying-glass', title: 'No visits logged yet', body: 'Rows appear here when someone signs in or opens a page behind the sign-in.' },
+    error:        { icon: 'warning-circle', title: 'Could not read the visit log', body: 'The log store did not answer. Try again in a moment.', action: 'Try again' }
+  };
+  function renderBlocked(kind) {
+    var b = BLOCK[kind];
+    $('vs-blocked').innerHTML = '<div class="ul-sec"><div class="ul-empty"><div class="ul-empty__c">' + icon(b.icon) + '</div>' +
+      '<div class="ul-empty__copy"><h2>' + esc(b.title) + '</h2><p>' + esc(b.body) + '</p></div>' +
+      (b.action ? '<button class="ul-btn" id="vs-act" type="button">' + esc(b.action) + '</button>' : '') + '</div></div>';
+    var act = $('vs-act');
+    if (act) act.addEventListener('click', function () {
+      if (kind === 'signin') location.href = '/?signin=required&next=' + encodeURIComponent(location.pathname); else load();
+    });
+  }
+
+  /* Loading state: a block per real element, never an empty card (states.md). The Usage tab already
+     did this; Visits rendered nothing until the answer arrived. */
+  function sk(w, h) { return '<span class="sk" style="width:' + w + ';height:' + h + 'px"></span>'; }
+  function skMetric(label) {
+    return '<div class="ul-metric"><span class="ul-lab">' + esc(label) + '</span><div class="ul-metric__body">' + sk('88px', 34) + sk('110px', 12) + '</div></div>';
+  }
+  function skRows(n) {
+    var w = [92, 78, 86, 70, 82, 64], out = '';
+    for (var i = 0; i < n; i++) out += sk(w[i % w.length] + '%', 14);
+    return '<div style="display:flex;flex-direction:column;gap:14px;padding:16px 20px">' + out + '</div>';
+  }
+  function renderLoading() {
+    ['vs-q-people', 'vs-q-pages', 'vs-q-recent'].forEach(function (id) { var e = $(id); if (e) e.textContent = ''; });
+    $('vs-metrics').innerHTML = ['Sign-ins', 'Page views', 'Active people'].map(skMetric).join('');
+    ['vs-people', 'vs-pages', 'vs-recent'].forEach(function (id) { $(id).innerHTML = skRows(5); });
+    var more = $('vs-more'); if (more) more.innerHTML = '';
+  }
+  function render() {
+    var blocked = ['forbidden', 'signin', 'unconfigured', 'empty', 'error'].indexOf(S.status) !== -1;
+    $('vs-blocked').hidden = !blocked; $('vs-app').hidden = blocked; $('vs-bar').hidden = blocked;
+    if (blocked) { renderBlocked(S.status); return; }
+    if (S.status === 'loading') { renderLoading(); return; }
+    renderAll();
+    ROOT.querySelectorAll('.ul-tab[data-period]').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-period') === S.period)); });
+    ROOT.querySelectorAll('.ul-tab[data-area]').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-area') === S.area)); });
+    updated();
+  }
+  function updated() { $('vs-updated').textContent = S.fetchedAt ? 'Updated ' + ago(Date.now() - S.fetchedAt) : ''; }
+
+  function load() {
+    if (S.busy) return; S.busy = true; $('vs-refresh').setAttribute('aria-busy', 'true');
+    if (!S.rows.length) { S.status = 'loading'; render(); }
+    var idx = fetch('/search-index.json', { cache: 'force-cache' }).then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; });
+    fetch(API, { credentials: 'same-origin', cache: 'no-store' }).then(function (r) {
+      if (r.status === 401) { S.status = 'signin'; return null; }
+      if (r.status === 403) { S.status = 'forbidden'; return null; }
+      if (!r.ok) throw new Error('http ' + r.status);
+      return r.json();
+    }).then(function (j) {
+      if (!j) return;
+      if (!j.configured) { S.status = 'unconfigured'; return; }
+      S.rowsAll = parse(j.rows || []); S.rows = window.anHide(S.rowsAll); S.fetchedAt = Date.now();
+      S.status = S.rowsAll.length ? 'ready' : 'empty';
+      return idx.then(function (list) { list.forEach(function (e) { var u = (e.u || '').replace(/\/+$/, '') || '/'; if (!TITLES[u] && e.t) TITLES[u] = e.t; }); });
+    }).catch(function () { S.status = 'error'; }).then(function () {
+      S.busy = false; $('vs-refresh').removeAttribute('aria-busy'); render();
+    });
+  }
+
+  $('vs-refresh').innerHTML = icon('arrow-clockwise');
+  $('vs-i-search').innerHTML = icon('magnifying-glass');
+  $('vs-search').addEventListener('input', function (e) { S.q = e.target.value; PG.recent = 1; renderAll(); });
+  $('vs-area-tabs').innerHTML = AREAS.map(function (a) { return '<button class="ul-tab" role="tab" data-area="' + a + '" aria-selected="' + (a === 'All') + '">' + a + '</button>'; }).join('');
+  ROOT.querySelectorAll('.ul-tab').forEach(function (b) {
+    b.addEventListener('click', function () {
+      if (b.hasAttribute('data-period')) S.period = b.getAttribute('data-period'); else S.area = b.getAttribute('data-area');
+      S.shown = 25; render();
+    });
+  });
+  $('vs-refresh').addEventListener('click', load);
+  setInterval(updated, 10000);
+  window.__an = window.__an || {};
+  window.__an.visits = function () { render(); load(); };
+  window.__anRefilter.visits = function () { S.rows = window.anHide(S.rowsAll || []); S.shown = 25; render(); };
+})();
+</script>
+
+<script>
+/* Bruce. Reads /api/bruce-memory?log=1 (owner only): one row per turn Bruce was asked for in Slack. A "run" spent one
+   cloud session on Utsav's account; "capped" is an ask refused at the daily cap; "to Alfred" is a reply passed to an
+   item's thread; "failed" is a run that did not start. People are Slack display names, not emails, so the Hide-my-
+   activity switch hides the owner's Slack id instead. */
+(function () {
+  'use strict';
+  var ROOT = document.getElementById('an-bruce');
+  var API = '/api/bruce-memory?log=1';
+  var ICON = { 'arrow-clockwise': '<path d="M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z"/>' };
+  function icon(n) { return '<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">' + (ICON[n] || '') + '</svg>'; }
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+  function $(id) { return document.getElementById(id); }
+  function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
+  var DAY = 86400000;
+  function ago(ms) {
+    var s = Math.max(0, Math.round(ms / 1000));
+    if (s < 60) return s + 's ago';
+    var m = Math.round(s / 60); if (m < 60) return m + ' min ago';
+    var h = Math.round(m / 60); if (h < 48) return h + ' h ago';
+    return Math.round(h / 24) + ' days ago';
+  }
+  function fmtWhen(d) { return d.toLocaleString(undefined, { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }); }
+  var KIND = { run: 'Run', capped: 'Capped', 'to-alfred': 'To Alfred', failed: 'Failed' };
+  var S = { status: 'loading', rows: [], rowsAll: [], period: '30', page: 1, per: 25, busy: false, fetchedAt: 0, owner: '', cap: 3 };
+  var ICON_NAV = { 'arrow-left': '<path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"/>',
+    'arrow-right': '<path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/>' };
+  function navIcon(n) { return '<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">' + ICON_NAV[n] + '</svg>'; }
+
+  function parse(raw) {
+    var out = [];
+    raw.forEach(function (r) {
+      var d = new Date(r.at); if (isNaN(d.getTime())) return;
+      out.push({ at: d, user: String(r.user || ''), name: String(r.name || r.user || ''), role: r.role === 'owner' ? 'owner' : 'teammate',
+        kind: KIND[r.kind] ? r.kind : 'run', thread: !!r.thread, text: String(r.text || '') });
+    });
+    return out;
+  }
+  function hideMe(rows) { return window.anMe.on && S.owner ? rows.filter(function (r) { return r.user !== S.owner; }) : rows; }
+  function scoped() {
+    var cut = S.period === 'all' ? 0 : Date.now() - (+S.period) * DAY;
+    return S.rows.filter(function (r) { return r.at.getTime() >= cut; });
+  }
+  function metric(label, value, note) {
+    return '<div class="ul-metric"><span class="ul-lab">' + esc(label) + '</span><div class="ul-metric__body"><span class="ul-num">' + esc(value) +
+      '</span><span class="ul-note">' + esc(note) + '</span></div></div>';
+  }
+  function th(t) { return '<div role="columnheader"><span class="ul-th"><span class="ul-th--plain">' + esc(t) + '</span></span></div>'; }
+  function cell(t, cls, title) { return '<div class="ul-c ' + (cls || '') + '" role="cell" title="' + esc(title || t) + '">' + esc(t) + '</div>'; }
+  function who(r) { return '<div class="ul-c ul-c--whotag" role="cell" title="' + esc(r.user) + '"><span>' + esc(r.name) + '</span>' + (r.role === 'owner' ? '<span class="ul-badge">Owner</span>' : '') + '</div>'; }
+  function kindCell(k) { var cls = k === 'capped' ? ' ul-badge--warn' : k === 'failed' ? ' ul-badge--bad' : k === 'run' ? ' ul-badge--ok' : ''; return '<div class="ul-c" role="cell"><span class="ul-badge' + cls + '">' + esc(KIND[k]) + '</span></div>'; }
+  function table(cols, heads, rows, empty) {
+    return '<div class="ul-tbl" role="table" style="--vs-cols:' + cols + '"><div class="ul-row ul-row--h" role="row">' + heads.map(th).join('') + '</div>' +
+      (rows.length ? rows.join('') : '<div class="ul-empty"><div class="ul-empty__copy"><h2>' + esc(empty) + '</h2></div></div>') + '</div>';
+  }
+
+  function renderAll() {
+    var rows = scoped();
+    var runs = rows.filter(function (r) { return r.kind === 'run'; });
+    var capped = rows.filter(function (r) { return r.kind === 'capped'; });
+    var people = {};
+    rows.forEach(function (r) {
+      var p = people[r.user] || (people[r.user] = { user: r.user, name: r.name, role: r.role, runs: 0, capped: 0, last: r.at });
+      if (r.kind === 'run') p.runs++; if (r.kind === 'capped') p.capped++; if (r.at > p.last) p.last = r.at;
+    });
+    var plist = Object.keys(people).map(function (k) { return people[k]; }).sort(function (a, b) { return b.runs - a.runs || b.last - a.last; });
+    var today = new Date().toISOString().slice(0, 10);
+    var todayRuns = S.rows.filter(function (r) { return r.kind === 'run' && r.at.toISOString().slice(0, 10) === today; }).length;
+    var lastAt = rows.length ? rows.reduce(function (m, r) { return r.at > m ? r.at : m; }, rows[0].at) : null;
+    $('br-metrics').innerHTML =
+      metric('Runs', String(runs.length), 'each one a cloud session on your account, ' + todayRuns + ' today') +
+      metric('People', String(plist.length), lastAt ? 'last ask ' + ago(Date.now() - lastAt.getTime()) : 'nobody has asked yet') +
+      metric('Hit the cap', String(capped.length), capped.length ? (function (n) { return n + (n === 1 ? ' person' : ' people'); })(Object.keys(capped.reduce(function (o, r) { o[r.user] = 1; return o; }, {})).length) + ' asked past ' + S.cap + ' a day' : 'the cap is ' + S.cap + ' a day each');
+
+    $('br-q-people').textContent = plist.length + (plist.length === 1 ? ' person' : ' people') + ', most runs first';
+    $('br-people').innerHTML = table('minmax(200px,1.6fr) 90px 110px minmax(120px,1fr)', ['Person', 'Runs', 'Hit the cap', 'Last ask'],
+      plist.map(function (p) { return '<div class="ul-row ul-row--d" role="row">' + who(p) + cell(String(p.runs)) + cell(p.capped ? String(p.capped) : '—') + cell(ago(Date.now() - p.last.getTime()), '', p.last.toISOString()) + '</div>'; }),
+      'Nobody has asked Bruce in this period');
+
+    var recent = rows.slice().sort(function (a, b) { return b.at - a.at; });
+    var pages = Math.max(1, Math.ceil(recent.length / S.per)); S.page = Math.min(S.page, pages);
+    $('br-q-recent').textContent = 'newest first, ' + plural(recent.length, 'turn');
+    $('br-recent').innerHTML = table('150px minmax(160px,1.2fr) 100px minmax(260px,3fr)', ['When', 'Person', 'Kind', 'What they asked'],
+      recent.slice((S.page - 1) * S.per, S.page * S.per).map(function (r) {
+        return '<div class="ul-row ul-row--d" role="row">' + cell(fmtWhen(r.at), '', r.at.toISOString()) + who(r) + kindCell(r.kind) +
+          cell((r.thread ? '\u21b3 ' : '') + (r.text || '\u2014'), '', r.text) + '</div>';
+      }), 'Nothing in this period');
+    /* The same pager as the Usage log: page count and two arrow buttons, outside the table's scroller. */
+    $('br-more').innerHTML = pages > 1 ? '<div class="ul-pg" style="width:100%"><div class="ul-pg__l"><span class="ul-pg__t">' + S.per + ' per page</span></div>' +
+      '<div class="ul-pg__r"><span class="ul-pg__t">Page ' + S.page + ' of ' + pages + '</span>' +
+      '<button class="ul-ib" id="br-prev" type="button" aria-label="Previous page"' + (S.page <= 1 ? ' disabled' : '') + '>' + navIcon('arrow-left') + '</button>' +
+      '<button class="ul-ib" id="br-next" type="button" aria-label="Next page"' + (S.page >= pages ? ' disabled' : '') + '>' + navIcon('arrow-right') + '</button></div></div>' : '';
+    var pv = $('br-prev'), nx = $('br-next');
+    if (pv) pv.addEventListener('click', function () { S.page--; renderAll(); });
+    if (nx) nx.addEventListener('click', function () { S.page++; renderAll(); });
+  }
+  function renderBlocked(kind) {
+    var copy = { signin: ['Sign in to see this', 'Bruce\u2019s log is for the owner.'], forbidden: ['Owners only', 'Bruce\u2019s log shows who asked him what. Only an owner can see it.'],
+      unconfigured: ['No store connected', 'The site has no KV store, so nothing is logged yet.'], error: ['Could not load the log', 'Try again in a moment.'] }[kind];
+    $('br-blocked').innerHTML = '<div class="ul-empty"><div class="ul-empty__copy"><h2>' + esc(copy[0]) + '</h2><p>' + esc(copy[1]) + '</p></div></div>';
+    $('br-blocked').hidden = false; $('br-app').hidden = true;
+  }
+  function render() {
+    if (S.status === 'ready' || S.status === 'empty' || S.status === 'loading') { $('br-blocked').hidden = true; $('br-app').hidden = false; renderAll(); }
+    else renderBlocked(S.status);
+    ROOT.querySelectorAll('.ul-tab[data-period]').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-period') === S.period)); });
+    updated();
+  }
+  function updated() { $('br-updated').textContent = S.fetchedAt ? 'Updated ' + ago(Date.now() - S.fetchedAt) : ''; }
+  function load() {
+    if (S.busy) return; S.busy = true; $('br-refresh').setAttribute('aria-busy', 'true');
+    fetch(API, { credentials: 'same-origin', cache: 'no-store' }).then(function (r) {
+      if (r.status === 401) { S.status = 'signin'; return null; }
+      if (r.status === 403) { S.status = 'forbidden'; return null; }
+      if (!r.ok) throw new Error('http ' + r.status);
+      return r.json();
+    }).then(function (j) {
+      if (!j) return;
+      if (!j.configured) { S.status = 'unconfigured'; return; }
+      S.owner = String(j.owner || ''); S.cap = Number(j.cap) || 3;
+      S.rowsAll = parse(j.rows || []); S.rows = hideMe(S.rowsAll); S.fetchedAt = Date.now();
+      S.status = S.rowsAll.length ? 'ready' : 'empty';
+    }).catch(function () { S.status = 'error'; }).then(function () { S.busy = false; $('br-refresh').removeAttribute('aria-busy'); render(); });
+  }
+  $('br-refresh').innerHTML = icon('arrow-clockwise');
+  ROOT.querySelectorAll('.ul-tab[data-period]').forEach(function (b) { b.addEventListener('click', function () { S.period = b.getAttribute('data-period'); S.page = 1; render(); }); });
+  $('br-refresh').addEventListener('click', load);
+  setInterval(updated, 10000);
+  window.__an = window.__an || {};
+  window.__an.bruce = function () { render(); load(); };
+  window.__anRefilter.bruce = function () { S.rows = hideMe(S.rowsAll || []); S.page = 1; render(); };
+})();
+</script>
+
+<script>
+(function () {
+  'use strict';
+  var TABS = ['insights', 'usage', 'visits', 'bruce'], started = {};
+  function show(name, push) {
+    if (TABS.indexOf(name) === -1) name = 'insights';
+    TABS.forEach(function (t) { document.getElementById('an-' + t).hidden = t !== name; });
+    document.querySelectorAll('#an-tabs .ul-tab').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-tab') === name)); });
+    if (push) { try { history.replaceState(null, '', '#' + name); } catch (e) { location.hash = name; } }
+    /* Each tab loads its data the first time it is opened, not all three on arrival. */
+    /* A tab starts once the owner's address is known, so the first load already honours the switch. */
+    if (!started[name] && window.__an && window.__an[name]) { started[name] = 1; window.anMe.ready.then(function () { window.__an[name](); }); }
+  }
+  document.querySelectorAll('#an-tabs .ul-tab').forEach(function (b) { b.addEventListener('click', function () { show(b.getAttribute('data-tab'), true); }); });
+  window.addEventListener('hashchange', function () { show(location.hash.slice(1), false); });
+  /* The panels write "Updated 5 min ago" into a hidden span; the refresh button shows it as its tooltip. */
+  [['ul', 'Refresh the log'], ['vs', 'Refresh'], ['in', 'Refresh'], ['br', 'Refresh']].forEach(function (p) {
+    var span = document.getElementById(p[0] + '-updated'), btn = document.getElementById(p[0] + '-refresh');
+    if (!span || !btn) return;
+    function sync() { var t = span.textContent.trim(); btn.setAttribute('data-tip', t ? t + ' · click to refresh' : p[1]); }
+    new MutationObserver(sync).observe(span, { childList: true, characterData: true, subtree: true });
+    sync();
+  });
+  /* Hide my activity. Remembered per browser; off until you turn it on. Switching it re-filters the
+     tabs that have already loaded, with no new request. */
+  var box = document.getElementById('an-me-box'), KEY = 'gw-analytics-hide-me';
+  try { window.anMe.on = localStorage.getItem(KEY) === '1'; } catch (e) {}
+  box.checked = window.anMe.on;
+  window.anMe.ready.then(function () { if (window.anMe.email) document.getElementById('an-me').title = 'Leaves out rows from ' + window.anMe.email; });
+  box.addEventListener('change', function () {
+    window.anMe.on = box.checked;
+    try { localStorage.setItem(KEY, box.checked ? '1' : '0'); } catch (e) {}
+    Object.keys(started).forEach(function (t) { if (window.__anRefilter[t]) window.__anRefilter[t](); });
+  });
+  show(location.hash.slice(1), false);
+})();
+</script>
+</body></html>

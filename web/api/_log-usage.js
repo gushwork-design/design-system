@@ -7,9 +7,23 @@
    hook that already runs every session (scripts/check-update.sh) fires one fire-and-forget
    ping here, and this appends a row.
 
-   WHAT IT DELIBERATELY DOES NOT COLLECT. Identity, plugin version, timestamp. Not the
-   prompt, not the output, not the repo, not file paths. Anything richer than "somebody used
-   version X on day Y" is a different product with a different consent conversation.
+   WHAT IT COLLECTS. Identity, plugin version, timestamp, and — since 30 Sep 2026, ruled by
+   Utsav after the consent conversation this header used to defer — which Gushwork SKILL ran
+   and the BASENAME of the output files it wrote (scripts/log-activity.sh).
+
+   Since 30 Sep 2026, three more fields on those activity rows, each a measurement or a link and
+   never the thing itself: `sess`, a short one-way hash of the session id that lets an output be
+   tied to the skill that ran in the same session; `url`, the claude.ai link of an artifact the
+   person published; and `flags`, four values the plugin measured locally on an HTML or SVG output
+   (stamp, tokens, fonts, logo — see scripts/log-activity.sh) and sent INSTEAD of the text.
+
+   Since 1 Oct 2026, a fourth field on the same rows: `tok`, the session's token totals so far, three whole
+   numbers read from Claude Code's own transcript by scripts/log-activity.sh (never any text from it).
+
+   WHAT IT DELIBERATELY STILL DOES NOT COLLECT. The prompt, the contents of any file, the
+   repo, or any file path — only a file's own name. Uploading the generated files is a
+   separate step that has NOT been taken: it needs its own store and its own decision, because
+   file contents can carry client copy and pricing.
 
    WHY KV AND NOT A GOOGLE SHEET. The Sheet route needs a service-account JSON key, and
    Google now blocks key creation by default on newer Workspace orgs
@@ -52,7 +66,7 @@ function store() {
    throttles a casual loop rather than a determined one — which is the honest claim. */
 const HITS = new Map();
 const WINDOW_MS = 5 * 60 * 1000;
-const PER_WINDOW = 12;
+const PER_WINDOW = 120;   // was 12. One office shares one IP, so 12 per 5 minutes across everyone silently dropped real rows
 
 function rateLimited(ip) {
   const now = Date.now();
@@ -62,6 +76,30 @@ function rateLimited(ip) {
   if (HITS.size > 500) for (const [k, v] of HITS) if (!v.some((t) => now - t < WINDOW_MS)) HITS.delete(k);
   return fresh.length > PER_WINDOW;
 }
+
+/* `flags` is a fixed shape, rebuilt field by field rather than stored as sent: this endpoint is
+   public, so whatever arrives in it is untrusted and only these four values may be kept. */
+function cleanFlags(f) {
+  if (!f || typeof f !== 'object') return null;
+  return {
+    stamp: f.stamp === true,
+    tokens: f.tokens === true,
+    fonts: ['ok', 'foreign', 'none'].includes(f.fonts) ? f.fonts : 'none',
+    logo: f.logo === true,
+  };
+}
+
+/* `tok` is three whole numbers, rebuilt and capped like `flags`: input + cache-written tokens (i), output
+   tokens (o) and tokens re-read from the cache (c), for the session so far. Counts, nothing else. */
+function cleanTok(t) {
+  if (!t || typeof t !== 'object') return null;
+  const n = (v) => (Number.isFinite(+v) && +v >= 0 ? Math.min(Math.floor(+v), 1e11) : 0);
+  const out = { i: n(t.i), o: n(t.o), c: n(t.c) };
+  return out.i || out.o ? out : null;
+}
+
+/* Only a claude.ai artifact link is kept, and only in that exact shape. */
+const ARTIFACT_URL = /^https:\/\/claude\.ai\/(?:code\/)?artifact\/[A-Za-z0-9-]{8,80}$/;
 
 function clean(value, max = 120) {
   return String(value ?? '').replace(/[\r\n\t]/g, ' ').trim().slice(0, max);
@@ -102,6 +140,14 @@ export default async function handler(req, res) {
     version: clean(body.version, 32),
     event: clean(body.event || 'session-start', 40),
     surface: clean(body.surface, 40),
+    /* Only present on the two activity events sent by scripts/log-activity.sh: the NAME of a
+       Gushwork skill, and the BASENAME of an output file. Never a path, never contents. */
+    ...(body.skill ? { skill: clean(body.skill, 80) } : {}),
+    ...(body.file ? { file: clean(body.file, 120) } : {}),
+    ...(/^[a-f0-9]{8,16}$/.test(String(body.sess || '')) ? { sess: String(body.sess) } : {}),
+    ...(ARTIFACT_URL.test(String(body.url || '')) ? { url: String(body.url) } : {}),
+    ...(cleanFlags(body.flags) ? { flags: cleanFlags(body.flags) } : {}),
+    ...(cleanTok(body.tok) ? { tok: cleanTok(body.tok) } : {}),
   });
 
   try {

@@ -31,7 +31,7 @@
       "version": "1.40.0",
       "changed": "2026-08-26",
       "breaking": false,
-      "doc": "v2/primitives.md",
+      "doc": "shared-components.md",
       "note": "FINDING: light tints fail 4.5:1 at their own 12px label — success 3.15, warning 3.07, danger 4.28 composited. Dark passes. Reported, not changed."
     },
     "gushwork-logo": {
@@ -45,6 +45,98 @@
       "changed": "2026-08-27",
       "breaking": false,
       "doc": "shared-components.md"
+    }
+  },
+  "foundations": {
+    "spacing": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-10-02",
+      "fingerprint": "bdf4a3823c2385a3"
+    },
+    "radius": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-10-02",
+      "fingerprint": "3177eaa4adab8f1b"
+    },
+    "elevation": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-10-02",
+      "fingerprint": "7a2720d55cc96752"
+    },
+    "type": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-10-02",
+      "fingerprint": "2c183bce48a6a9c5"
+    },
+    "color": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-02",
+      "fingerprint": "3bd6ace21879382b"
+    },
+    "breakpoint": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-10-02",
+      "fingerprint": "2d4f716c7bdf5a5b"
+    },
+    "typefaces": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-10-02",
+      "fingerprint": "3b716dac88816c6f"
+    },
+    "content-width": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-10-02",
+      "fingerprint": "328bc00afa631ca5"
+    },
+    "type-links": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav-gushwork",
+      "reviewedOn": "2026-10-02",
+      "fingerprint": "9c1e6facfe4c7417"
+    },
+    "ruled": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-03",
+      "fingerprint": "b9312e9fe1a9ed34"
+    },
+    "slides": {
+      "reviewed": "rejected",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-04",
+      "fingerprint": "8f66ae1cf12b554c",
+      "note": "not designed properly"
+    }
+  },
+  "review": {
+    "badge": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "6a0473470b7a326f",
+      "previewFingerprint": "eff36df49b327be3"
+    },
+    "gushwork-logo": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "af4e27662128fa16",
+      "previewFingerprint": "6a39042b464a8c22"
+    },
+    "icons": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "b050b5e7146419dc",
+      "previewFingerprint": "66f825ae74d41323"
     }
   }
 }

@@ -185,21 +185,24 @@ function PropSegmented({ value, onChange, options }) {
   );
 }
 
+/* A yes/no value is a switch, not a two-tab control (library: controls/toggle, Size=Small 44x24).
+   Tabs stay for choosing between named views; a boolean is a toggle. */
 function PropYesNo({ value, onChange }) {
   return (
-    <PropSegmented
-      value={value ? 'yes' : 'no'}
-      onChange={(v) => onChange(v === 'yes')}
-      options={[
-        { value: 'yes', label: 'Yes' },
-        { value: 'no', label: 'No' },
-      ]}
-    />
+    <button
+      type="button"
+      role="switch"
+      aria-checked={!!value}
+      className={`gw-switch${value ? ' on' : ''}`}
+      onClick={() => onChange(!value)}
+    >
+      <span className="gw-switch__knob" />
+    </button>
   );
 }
 
 /* ── PropDropdown ─────────────────────────────────────────────────
-   Hover-to-open dropdown that matches the Gushwork picker design.
+   Click-to-open dropdown, as on the hub (admin/access-control .ac-dd).
    Closed: pill-shaped chip with the active label + soft chevron.
    Open: a panel below with each option as a row; active row has a
    subtle gray background + a small circle-check icon at the right.
@@ -244,8 +247,6 @@ function PropDropdown({ value, onChange, options }) {
     <div
       ref={rootRef}
       className={`prop-dropdown${open ? ' open' : ''}`}
-      onMouseEnter={() => { cancelClose(); setOpen(true); }}
-      onMouseLeave={scheduleClose}
     >
       <button
         type="button"
@@ -280,8 +281,7 @@ function PropDropdown({ value, onChange, options }) {
                 </span>
                 {isActive && (
                   <svg className="prop-dropdown-item-check" width="16" height="16" viewBox="0 0 16 16" aria-hidden>
-                    <circle cx="8" cy="8" r="7" fill="currentColor" />
-                    <path d="M5 8.2L7 10.2L11 6.2" stroke="#fff" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 )}
               </button>
@@ -688,22 +688,34 @@ function MobileIcon({ size = 14 }) {
   );
 }
 
+/* New icon, pending library review: a Phosphor-style sidebar glyph for the panel collapse / reopen. */
+function SidebarIcon() {
+  return (
+    <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
+      <path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM40,56H80V200H40ZM216,200H96V56H216V200Z" />
+    </svg>
+  );
+}
+
 /* ── Main App ──────────────────────────────────────────────── */
 function App() {
   const [data, setData] = useState(DEFAULTS);
   const [photoUrl, setPhotoUrl] = useState(() => window.GW_ASSETS?.defaultPhoto || null);
   const [photoName, setPhotoName] = useState(() => (window.GW_ASSETS?.defaultPhoto ? 'Default photo' : ''));
   const [photoXform, setPhotoXform] = useState({ x: 50, y: 40, zoom: 100, grayscale: false });
-  const [theme, setTheme] = useState('light'); // preview background
+  // One theme for the whole tool: the hub's Appearance setting (tool-chrome.js). It writes data-theme on <html>;
+  // the observer below keeps the preview in step with it.
+  const [theme, setThemeState] = useState(() => (document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light'));
+  useEffect(() => {
+    const obs = new MutationObserver(() => setThemeState(document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light'));
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => obs.disconnect();
+  }, []);
   const [viewport, setViewport] = useState('desktop'); // desktop | mobile
+  const [panelOpen, setPanelOpen] = useState(true); // floating editor panel
   const [copyState, setCopyState] = useState('idle'); // 'idle' | 'ok' | 'err'
   const [downloadState, setDownloadState] = useState('idle'); // 'idle' | 'err'
 
-  // Sync the page background with the preview theme so dark mode fills the canvas, not just the email card.
-  useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-    return () => { delete document.documentElement.dataset.theme; };
-  }, [theme]);
   const sigWrapRef = useRef(null);
 
   // Expose a global helper so the custom-banner Render can hoist a
@@ -846,16 +858,35 @@ function App() {
   const photoControlsDisabled = data.layout !== 'photo';
 
   return (
-    <div className="app">
-      {/* ── LEFT: brand card + form card ── */}
-      <div className="left-col">
-        <header className="brand-card">
+    <div className="app" data-panel={panelOpen ? 'open' : 'closed'}>
+      {/* collapsed: the panel folds to its own header (tool-panel, 5 Oct 2026) */}
+      <div className="panel-mini" aria-hidden={panelOpen}>
+        <a className="brand-link" href="/internal/tools" title="Back to Tools" aria-label="Back to Tools" tabIndex={panelOpen ? -1 : 0}>
           <svg className="brand-icon" width="32" height="32" viewBox="0 0 160 160" fill="none" aria-hidden>
-            <rect width="160" height="160" rx="20" fill="#0D0D0D" />
+            <rect className="brand-icon__bg" width="160" height="160" rx="20" fill="#0070FF" />
             <path d="M116.609 44.5634C117.503 42.3606 115.85 40 113.472 40H49.1429C44.0934 40 40 44.0934 40 49.1429V106.778C40 112.018 45.1708 115.683 49.9603 113.557C80.8494 99.8449 104.378 74.7075 116.609 44.5634Z" fill="white" />
             <path d="M72.5161 120C71.4022 120 70.9357 118.553 71.8259 117.884C94.9007 100.527 111.434 75.8047 118.766 48.0522C118.94 47.3915 120 47.5162 120 48.1995V110.857C120 115.907 115.907 120 110.857 120H72.5161Z" fill="white" />
           </svg>
+        </a>
+        <span className="panel-mini__name">Email Signature Creator</span>
+        <button type="button" className="panel-reopen" onClick={() => setPanelOpen(true)} aria-label="Open editor panel" title="Open editor panel" tabIndex={panelOpen ? -1 : 0}>
+          <SidebarIcon />
+        </button>
+      </div>
+      {/* ── LEFT: floating editor panel ── */}
+      <div className="left-col" aria-hidden={!panelOpen}>
+        <header className="brand-card">
+          <a className="brand-link" href="/internal/tools" title="Back to Tools" aria-label="Back to Tools">
+          <svg className="brand-icon" width="32" height="32" viewBox="0 0 160 160" fill="none" aria-hidden>
+            <rect className="brand-icon__bg" width="160" height="160" rx="20" fill="#0070FF" />
+            <path d="M116.609 44.5634C117.503 42.3606 115.85 40 113.472 40H49.1429C44.0934 40 40 44.0934 40 49.1429V106.778C40 112.018 45.1708 115.683 49.9603 113.557C80.8494 99.8449 104.378 74.7075 116.609 44.5634Z" fill="white" />
+            <path d="M72.5161 120C71.4022 120 70.9357 118.553 71.8259 117.884C94.9007 100.527 111.434 75.8047 118.766 48.0522C118.94 47.3915 120 47.5162 120 48.1995V110.857C120 115.907 115.907 120 110.857 120H72.5161Z" fill="white" />
+          </svg>
+          </a>
           <h1>Email Signature Creator</h1>
+          <button type="button" className="panel-collapse" onClick={() => setPanelOpen(false)} aria-label="Collapse editor panel" title="Collapse editor panel">
+            <SidebarIcon />
+          </button>
         </header>
 
         <aside className="form-card">
@@ -918,13 +949,15 @@ function App() {
               <PropSection title="Photo">
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <PropRow label="Image" align="start">
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%', minWidth: 0 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%', minWidth: 0 }}>
                     <PhotoDropzone
                       photoUrl={photoUrl}
                       photoName={photoName}
                       onPhoto={(url, name) => {
                         setPhotoUrl(url);
                         setPhotoName(name);
+                        // a new photo starts framed to fill the window; grayscale is kept
+                        setPhotoXform((p) => ({ ...p, x: 50, y: 40, zoom: 100 }));
                       }}
                       onClear={() => {
                         setPhotoUrl(null);
@@ -1031,8 +1064,8 @@ function App() {
 
             <PropSection
               title={
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" style={{ color: '#9ca3af', flex: '0 0 auto' }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" style={{ color: 'var(--gw-color-neutral-400)', flex: '0 0 auto' }}>
                     <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.4" />
                     <path d="M8 7.25v3.75M8 5.25v.01" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
                   </svg>
@@ -1125,6 +1158,7 @@ function App() {
                     processPhotoFile(f, (url, name) => {
                       setPhotoUrl(url);
                       setPhotoName(name);
+                      setPhotoXform((p) => ({ ...p, x: 50, y: 40, zoom: 100 }));
                     });
                     e.target.value = '';
                   }}
@@ -1142,31 +1176,6 @@ function App() {
 
       {/* ── floating bottom toolbar ── */}
       <div className="floating-toolbar">
-        <div className="tb-pill" role="tablist" aria-label="Preview background">
-          <button
-            className={`icon-only ${theme === 'light' ? 'active' : ''}`}
-            onClick={() => setTheme('light')}
-            type="button"
-            title="Light background"
-            aria-label="Light"
-          >
-            <SunIcon />
-          </button>
-          <span className="moon-tooltip">
-            <button
-              className={`icon-only ${theme === 'dark' ? 'active' : ''}`}
-              onClick={() => setTheme('dark')}
-              type="button"
-              aria-label="Dark"
-            >
-              <MoonIcon />
-            </button>
-            <span className="moon-tooltip-tip" role="tooltip">
-              In dark mode — signature may render differently on some devices.
-            </span>
-          </span>
-        </div>
-
         <div className="tb-pill" role="tablist" aria-label="Viewport">
           <button
             className={viewport === 'desktop' ? 'active' : ''}

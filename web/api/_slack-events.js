@@ -30,6 +30,8 @@
    ========================================================================= */
 
 import crypto from 'node:crypto';
+import { handleMessage } from './_concierge.js';
+import { handleAction } from './_slack-actions.js';
 
 const APPROVE_EMOJI = new Set(['white_check_mark', 'heavy_check_mark', 'ballot_box_with_check']);
 const QUEUE_KEY = 'gw:approvals';
@@ -88,6 +90,25 @@ export default async function handler(req, res) {
 
   const raw = await rawBody(req);
 
+  /* BUTTONS AND FORMS (R55 addendum). Slack posts interactive payloads form-encoded, as payload=<json>, to this same URL
+     (the app's Interactivity Request URL). Signed like events, so the signature is checked first. */
+  if (raw.startsWith('payload=')) {
+    if (!signatureValid(req, raw)) return res.status(401).json({ error: 'bad signature' });
+    let ip;
+    try { ip = JSON.parse(new URLSearchParams(raw).get('payload') || ''); } catch { return res.status(400).json({ error: 'bad payload' }); }
+    const allowed = new Set(String(process.env.BRUCE_USER_IDS || process.env.OWNER_SLACK_ID || '').split(',').map((x) => x.trim()).filter(Boolean));
+    const { ownerEmails } = await import('./_access.js');
+    const { recordDecision } = await import('./_review.js');
+    const cfg = store();
+    const email = String(process.env.OWNER_EMAIL || ownerEmails()[0] || '');
+    let out;
+    try {
+      out = await handleAction(ip, { token: process.env.SLACK_BOT_TOKEN, allowed, email, root: process.cwd(),
+        record: (body, who) => (cfg ? recordDecision(cfg, body, who) : [503, { error: 'the store is not connected' }]) });
+    } catch (e) { console.warn('[slack-actions]', String(e.message || e).slice(0, 200)); }
+    return out ? res.status(200).json(out) : res.status(200).end();
+  }
+
   let payload;
   try { payload = JSON.parse(raw); } catch { return res.status(400).json({ error: 'bad json' }); }
 
@@ -101,6 +122,59 @@ export default async function handler(req, res) {
   if (!signatureValid(req, raw)) return res.status(401).json({ error: 'bad signature' });
 
   const event = payload.event || {};
+
+  /* AGENT MODE (R55 addendum, 6 Oct 2026). With Slack's Agents feature on, Bruce also lives in the agent pane. Each
+     conversation there is a thread in his DM, so the message.im path below already carries it; these are the extra events.
+     Opening the pane (app_home_opened, tab messages) gets the suggested prompts. The rest are acknowledged and dropped:
+     a stop button press cannot stop a cloud run that has already started, and a renamed session needs nothing from us. */
+  if (event.type === 'app_home_opened') {
+    if (req.headers['x-slack-retry-num']) return res.status(200).json({ ok: true, ignored: 'retry' });
+    const token = process.env.SLACK_BOT_TOKEN;
+    if (!token || event.tab !== 'messages' || !event.channel) return res.status(200).json({ ok: true, ignored: 'not the agent pane' });
+    const { suggestPrompts } = await import('./_concierge.js');
+    const did = await suggestPrompts(token, event.channel);
+    return res.status(200).json({ ok: true, prompts: did });
+  }
+  if (event.type === 'app_context_changed' || event.type === 'agent_session_stopped' || event.type === 'agent_session_title_changed') {
+    return res.status(200).json({ ok: true, ignored: event.type });
+  }
+
+  /* BRUCE THE CONCIERGE (see _concierge.js). The same Slack app answers people who @Bruce in a channel or DM him: it hands
+     over brand assets and points at templates and tools. No model is called. Slack redelivers an event it thinks was not
+     acknowledged in 3 seconds, so retries are acknowledged and dropped, and the event id is remembered for an hour. */
+  if (event.type === 'app_mention' || (event.type === 'message' && event.channel_type === 'im')) {
+    if (req.headers['x-slack-retry-num']) return res.status(200).json({ ok: true, ignored: 'retry' });
+    const token = process.env.SLACK_BOT_TOKEN;
+    if (!token) return res.status(200).json({ ok: true, ignored: 'no bot token' });
+    const cfg = store();
+    if (cfg && payload.event_id) {
+      try {
+        const [{ result }] = await redis(cfg, [['SET', `gw:slack:ev:${payload.event_id}`, '1', 'NX', 'EX', '3600']]);
+        if (result !== 'OK') return res.status(200).json({ ok: true, ignored: 'duplicate' });
+      } catch { /* no dedupe is better than no answer */ }
+    }
+    const owners = new Set((process.env.SLACK_REVIEWER_IDS || '').split(',').map((x) => x.trim()).filter(Boolean));
+    // Who gets Bruce proper in a DM. Utsav only for now; BRUCE_USER_IDS opens it to more people later without a code change.
+    // Empty = everyone may DM Bruce (5 Oct 2026). A list narrows it.
+    const bruceUsers = new Set(String(process.env.BRUCE_USER_IDS || '').split(',').map((x) => x.trim()).filter(Boolean));
+    const memory = await import('./_bruce-memory.js');
+    const out = await handleMessage(event, { token, root: process.cwd(), owners, bruceUsers, ownerId: String(process.env.OWNER_SLACK_ID || '').trim(), memory, agent: true });
+    if (out.did === 'error') console.warn('[concierge]', out.error);
+    return res.status(200).json({ ok: true, concierge: out.did });
+  }
+
+  // A thumbs-up (or ✅, 🙏) on one of Bruce's messages in a DM ends that conversation (6 Oct 2026). Review notices live in
+  // channels, so a DM reaction never collides with the ✅ loop below.
+  if (event.type === 'reaction_added' && event.item && /^D/.test(event.item.channel || '')) {
+    const token = process.env.SLACK_BOT_TOKEN;
+    if (!token || req.headers['x-slack-retry-num']) return res.status(200).json({ ok: true, ignored: 'dm reaction' });
+    const { closeOnReaction } = await import('./_concierge.js');
+    const memory = await import('./_bruce-memory.js');
+    let closed = false;
+    try { closed = await closeOnReaction(token, event, memory); } catch { /* a missed close is harmless */ }
+    return res.status(200).json({ ok: true, concierge: closed ? 'closed' : 'ignored' });
+  }
+
   // Anything that is not an approval reaction is ignored — quietly, and with a 200 so Slack
   // does not retry it. reaction_removed is deliberately not handled: the reverse of a pass
   // is an explicit --reject with a note, not a silently removed emoji.

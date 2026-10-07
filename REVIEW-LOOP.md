@@ -197,3 +197,71 @@ posting a message and receiving a reaction involve no inference at all.
 **The discipline that keeps it that way: this loop is outbound plus a reaction, and nothing
 else.** The moment it grows a conversational surface it stops being free, and that is a
 decision to make deliberately with the cost in view — not somewhere to drift.
+
+---
+
+## Review on the site (1 Oct 2026)
+
+The Design System page's **Review** tab is the inbox, and every item opens in a **drawer**: what it looks like, its
+details, and three buttons. There is no separate sheet to open.
+
+```
+Review tab (owner)  ->  Waiting / In rework / Passed / Rejected, with a filter
+        |  click a row, or a component or foundation in the Library
+        v
+drawer: the visual · version, doc, fingerprint · who decided and when
+        |
+   [ Pass ]   [ Rework + note ]   [ Reject + note ]       Pass advances to the next thing waiting
+        |
+        v  POST /api/review  (owner session; web/api/_review.js)
+queue: gw:review-decisions (list) + gw:review-state (latest per item, so Undo works)
+        |
+        v  next Claude session: scripts/check-approvals.sh reads ?kind=decisions
+scripts/review-pass.sh <scope> <key> [--reject | --rework --note "..."] --expect <fingerprint>
+        |  refuses if the source moved since the owner looked
+        v
+registry records it -> library-site.sh -> PR (main needs a review) -> publish
+```
+
+- **States.** Not reviewed, in rework (sent back with a note), passed, rejected, and expired (passed, then the source
+  moved). The buttons queue a decision; they never edit the repo. The row reads "being recorded" until a session does.
+- **Rework** is a brief: the note goes to the next session as the thing to fix, after which the owner looks again.
+  Reject and Rework refuse an empty note.
+- **Why a queue.** A serverless function cannot run `review-pass.sh` against a repo whose main needs a reviewed PR, and
+  cannot re-check a fingerprint against source it does not have. The session applies; the site only records the decision.
+- **The visual.** A foundation is drawn from `tokens.json` (the same views as the Foundations library). A component shows,
+  in order: its own `web/previews/<surface>/<key>.frag` (a piece of HTML drawn from its measured values, shown in the drawer itself, not in a
+  frame), or its Figma render (`assets/<surface>/<key>-desktop.png`). If it has none the drawer says
+  "No visual yet", and `bash scripts/check-previews.sh` lists them (a pre-push WARN, never a block).
+- **The old sheets** (`/admin/review-sheet`, `/library`, `/library/review`, `/library/components`) redirect to the Design
+  System page. The generated library pages stay on disk because `data.json` is built from them, but nothing links to them.
+
+### Pass, Rework and Reject write to GitHub themselves (1 Oct 2026)
+
+With `GW_GITHUB_TOKEN` set on the site, a button no longer waits for a Claude session. `web/api/_review-github.js` commits the
+decision to ONE branch, `review/decisions`, behind ONE open pull request titled "Review decisions". Each commit is one
+decision, written exactly the way `scripts/review-pass.sh` writes it. The row shows "in PR #N". Nothing reaches `main` until a
+person approves and merges that pull request, the same rule as every other change.
+
+```
+[ Pass ] -> POST /api/review -> commit on review/decisions (registry JSON) -> PR "Review decisions" (opened once, then added to)
+                                      |                                              |
+                          gw:review-state (for the badge)               approve + merge -> publish -> plain "passed"
+```
+
+- **Preview fingerprint.** Sent alongside, since 5 Oct 2026: the fingerprint of the drawing (`web/previews/<scope>/<key>.frag`), stored as `previewFingerprint`. A reworked drawing reads "redone", a passed one "expired" (R45 addendum).
+- **Fingerprint.** The one the page was showing, sent with the decision. If the source moved since, the stored fingerprint no
+  longer matches and the pass reads "expired" straight away.
+- **Undo** takes the decision back out of the pull request (the item is put back as `main` has it), then clears the badge.
+- **A merged batch starts fresh.** When the pull request is merged or closed, the next decision resets the branch to `main`
+  and opens a new one.
+- **Rework** is also queued for a session, because its note is the brief for the fix. The session does not record it again.
+- **Fallbacks.** No token, no fingerprint, or GitHub failing: the decision is queued for a session exactly as before, and the
+  toast says why. A decision is never dropped.
+- **Publishing.** A merged decision changes a registry and nothing else, which makes the committed `preview/library` stale.
+  `publish-sheets.sh` therefore regenerates it for the deploy instead of refusing.
+
+**Setting it up (one time).** Create a *fine-grained* personal access token at github.com/settings/personal-access-tokens, with
+Repository access = Only select repositories, `gushwork-design/design-system`, and Repository permissions Contents = Read and
+write, Pull requests = Read and write, nothing else. Add it to the Vercel project (gushwork-design) as `GW_GITHUB_TOKEN` for
+Production, then redeploy. Rotate it when the person it belongs to leaves.

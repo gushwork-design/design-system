@@ -11,9 +11,10 @@
    is the only way in. */
 
 import {
-  COOKIE, MAX_AGE, sign, serializeCookie, safeNext,
+  COOKIE, MAX_AGE, sign, serializeCookie, cookieDomain, safeNext,
   sitePassword, sessionSecret, constantTimeEqual
 } from '../_session.js';
+import { recordVisit } from '../_log-visit.js';
 
 /* A crude per-instance throttle. Serverless instances come and go, so this is
    a speed bump against a casual script, not a real rate limiter. */
@@ -80,8 +81,9 @@ export default async function handler(req, res) {
     exp: Math.floor(Date.now() / 1000) + MAX_AGE
   };
 
+  await recordVisit({ email: null, path: '/', kind: 'signin', via: 'password' });
   res.setHeader('Set-Cookie',
-    serializeCookie(COOKIE, await sign(payload, sessionSecret()), { maxAge: MAX_AGE }));
+    serializeCookie(COOKIE, await sign(payload, sessionSecret()), { maxAge: MAX_AGE, domain: cookieDomain() }));
   res.status(200).setHeader('Content-Type', 'application/json');
   res.end(JSON.stringify({ ok: true, next: safeNext(body.next) }));
 }

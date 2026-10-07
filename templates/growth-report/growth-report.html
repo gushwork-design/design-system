@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Growth report - Gushwork</title>
+<script>try{var c=localStorage.getItem('gw-theme-choice');if(c==='light'||c==='dark')document.documentElement.setAttribute('data-theme',c)}catch(e){}</script>
+<link rel="stylesheet" href="../../foundation/tokens.css">
+<link rel="stylesheet" href="../../exports/dashboard/dashboard.css">
+<style>
+html, body { margin: 0; }   /* the browser's own 8 px body margin would otherwise sit above the top bar */
+/* Template-only: four week labels always fit, but the chart re-thins its ticks at the print width and drops two. */
+@media print { #ch-cpt .gd-xl.is-off { visibility: visible; } }
+</style>
+<!-- gushwork-build:{"pluginVersion":"2.0.3","createdBy":"Claude Code (reports skill template)","createdAt":"7 Oct 2026","surface":"dashboard",
+  "registry":"https://gushwork-design.vercel.app/exports/dashboard/component-registry.json",
+  "changelog":"https://gushwork-design.vercel.app/changelog-sheet","components":["report-frame","report-source-line","definition-tile","theme-menu","page-header","page-layout","tabs-underline","banner","stat-card","delta-pill","card","chart-frame","line-chart","bar-chart","horizontal-bar-chart","breakdown-bar","funnel","data-table","table-cell-types","theme-and-density"]} -->
+</head>
+<body class="gd" data-density="comfortable">
+<div class="gd-report">
+ <div class="gd-report__bar"><span class="gd-report__logo" role="img" aria-label="Gushwork"></span><div class="gd-report__end"><span class="gd-report__date">Created 7 Oct 2026</span><div class="gd-theme" data-gd-pop data-gd-print="hide"><button class="gd-theme__trigger" type="button" data-gd-pop-trigger data-pref="system" aria-haspopup="menu" aria-expanded="false" aria-label="Colour theme: System"><span data-gd-ico="system"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M208,40H48A24,24,0,0,0,24,64V176a24,24,0,0,0,24,24H208a24,24,0,0,0,24-24V64A24,24,0,0,0,208,40Zm8,136a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V64a8,8,0,0,1,8-8H208a8,8,0,0,1,8,8Zm-48,48a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,224Z"/></svg></span><span data-gd-ico="light"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z"/></svg></span><span data-gd-ico="dark"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M233.54,142.23a8,8,0,0,0-8-2,88.08,88.08,0,0,1-109.8-109.8,8,8,0,0,0-10-10,104.84,104.84,0,0,0-52.91,37A104,104,0,0,0,136,224a103.09,103.09,0,0,0,62.52-20.88,104.84,104.84,0,0,0,37-52.91A8,8,0,0,0,233.54,142.23ZM188.9,190.34A88,88,0,0,1,65.66,67.11a89,89,0,0,1,31.4-26A106,106,0,0,0,96,56,104.11,104.11,0,0,0,200,160a106,106,0,0,0,14.92-1.06A89,89,0,0,1,188.9,190.34Z"/></svg></span></button><div class="gd-menu gd-menu--end gd-theme__menu" role="menu" aria-label="Colour theme" data-gd-pop-menu hidden><button class="gd-menu__item" type="button" role="menuitemradio" aria-checked="true" data-gd-theme="system"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M208,40H48A24,24,0,0,0,24,64V176a24,24,0,0,0,24,24H208a24,24,0,0,0,24-24V64A24,24,0,0,0,208,40Zm8,136a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V64a8,8,0,0,1,8-8H208a8,8,0,0,1,8,8Zm-48,48a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,224Z"/></svg><span>System</span><span class="gd-menu__check" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></span></button><button class="gd-menu__item" type="button" role="menuitemradio" aria-checked="false" data-gd-theme="light"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z"/></svg><span>Light</span><span class="gd-menu__check" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></span></button><button class="gd-menu__item" type="button" role="menuitemradio" aria-checked="false" data-gd-theme="dark"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M233.54,142.23a8,8,0,0,0-8-2,88.08,88.08,0,0,1-109.8-109.8,8,8,0,0,0-10-10,104.84,104.84,0,0,0-52.91,37A104,104,0,0,0,136,224a103.09,103.09,0,0,0,62.52-20.88,104.84,104.84,0,0,0,37-52.91A8,8,0,0,0,233.54,142.23ZM188.9,190.34A88,88,0,0,1,65.66,67.11a89,89,0,0,1,31.4-26A106,106,0,0,0,96,56,104.11,104.11,0,0,0,200,160a106,106,0,0,0,14.92-1.06A89,89,0,0,1,188.9,190.34Z"/></svg><span>Dark</span><span class="gd-menu__check" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></span></button></div></div></div></div>
+ <div class="gd-report__sheet">
+  <div class="gd-page">
+
+
+    <header class="gd-page-header">
+      <div class="gd-page-header__main">
+        <div class="gd-page-header__titles">
+          <h1 class="gd-page-header__title">Growth report <span class="gd-page-header__status"><span class="gd-badge gd-badge--md gd-badge--warn">Sample data</span></span></h1>
+          <p class="gd-page-header__desc">How traffic turned into trials and demos, 8 Sep to 5 Oct 2026, against the 28 days before. Every figure on this page is invented sample data.</p>
+          <p class="gd-report__source"><span>Sources: Meta Ads, Google Ads, product database, calendar bookings</span><span aria-hidden="true">·</span><span>Data as of 5 Oct 2026</span></p>
+        </div>
+      </div>
+      <div class="gd-tabs gd-tabs--underline gd-page-header__tabs" role="tablist" aria-label="Sections">
+        <button type="button" class="gd-tabs__tab" role="tab" id="t-summary" aria-selected="true" aria-controls="p-summary" tabindex="0">Summary</button>
+        <button type="button" class="gd-tabs__tab" role="tab" id="t-creatives" aria-selected="false" aria-controls="p-creatives" tabindex="-1">Creatives</button>
+        <button type="button" class="gd-tabs__tab" role="tab" id="t-about" aria-selected="false" aria-controls="p-about" tabindex="-1">About this report</button>
+      </div>
+    </header>
+
+    <!-- SUMMARY -->
+    <div class="gd-grid gd-tabs__panel" role="tabpanel" id="p-summary" aria-labelledby="t-summary">
+      <div class="gd-span-12">
+        <div class="gd-banner gd-banner--success" role="note">
+          <span class="gd-banner__icon"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm45.66-109.66a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,156.69l50.34-50.35A8,8,0,0,1,173.66,106.34Z"/></svg></span>
+          <div class="gd-banner__body"><span class="gd-banner__title">Cost per trial fell 14% while trials grew 24%</span><span>Meta ads carried the gain. The Missed leads counter creative now takes 33% of Meta spend and costs 24% less per trial than the channel average.</span></div>
+        </div>
+      </div>
+
+      <div class="gd-stat-card gd-span-3"><div class="gd-stat-card__label"><span class="gd-status-dot gd-status-dot--info" aria-hidden="true"></span><span class="gd-stat-card__name">Spend</span></div><div class="gd-stat-card__body"><div class="gd-stat-card__row"><div class="gd-stat-card__value gd-num">$41,820</div></div><div class="gd-stat-card__meta"><span class="gd-delta gd-delta--neutral"><span class="gd-delta__arrow" data-dir="up"></span><span class="gd-delta__value">6.1%</span><span class="gd-sr">Up 6.1 percent on the previous 28 days</span></span><span class="gd-stat-card__compare">vs previous 28 days</span></div></div></div>
+      <div class="gd-stat-card gd-span-3"><div class="gd-stat-card__label"><span class="gd-status-dot gd-status-dot--info" aria-hidden="true"></span><span class="gd-stat-card__name">Trials started</span></div><div class="gd-stat-card__body"><div class="gd-stat-card__row"><div class="gd-stat-card__value gd-num">612</div></div><div class="gd-stat-card__meta"><span class="gd-delta gd-delta--good"><span class="gd-delta__arrow" data-dir="up"></span><span class="gd-delta__value">23.9%</span><span class="gd-sr">Up 23.9 percent, better than the previous 28 days</span></span><span class="gd-stat-card__compare">vs previous 28 days</span></div></div></div>
+      <div class="gd-stat-card gd-span-3"><div class="gd-stat-card__label"><span class="gd-status-dot gd-status-dot--info" aria-hidden="true"></span><span class="gd-stat-card__name">Cost per trial</span></div><div class="gd-stat-card__body"><div class="gd-stat-card__row"><div class="gd-stat-card__value gd-num">$68.33</div></div><div class="gd-stat-card__meta"><span class="gd-delta gd-delta--good"><span class="gd-delta__arrow" data-dir="down"></span><span class="gd-delta__value">14.4%</span><span class="gd-sr">Down 14.4 percent, better than the previous 28 days</span></span><span class="gd-stat-card__compare">vs previous 28 days</span></div></div></div>
+      <div class="gd-stat-card gd-span-3"><div class="gd-stat-card__label"><span class="gd-status-dot gd-status-dot--info" aria-hidden="true"></span><span class="gd-stat-card__name">Demo show rate</span></div><div class="gd-stat-card__body"><div class="gd-stat-card__row"><div class="gd-stat-card__value gd-num">71.0%</div></div><div class="gd-stat-card__meta"><span class="gd-delta gd-delta--good"><span class="gd-delta__arrow" data-dir="up"></span><span class="gd-delta__value">3.0 pts</span><span class="gd-sr">Up 3.0 points, better than the previous 28 days</span></span><span class="gd-stat-card__compare">vs previous 28 days</span></div></div></div>
+
+      <div class="gd-span-12" id="ch-trials"></div>
+      <div class="gd-span-12" id="ch-source"></div>
+      <div class="gd-span-6" id="ch-funnel"></div>
+      <div class="gd-span-6" id="ch-cpt"></div>
+
+      <section class="gd-card gd-span-12" aria-labelledby="chan-title">
+        <div class="gd-card__head"><div class="gd-card__titles"><h2 class="gd-card__title" id="chan-title">By channel</h2><p class="gd-card__desc">Spend, trials and show rate for 8 Sep to 5 Oct. Organic and AEO has no media spend.</p></div></div>
+        <div class="gd-card__body"><div class="gd-tview gd-tview--flush"><div class="gd-table-wrap"><div class="gd-table" id="tbl-channel" role="table" aria-label="Results by channel"></div></div></div></div>
+      </section>
+    </div>
+
+    <!-- CREATIVES -->
+    <div class="gd-grid gd-tabs__panel" role="tabpanel" id="p-creatives" aria-labelledby="t-creatives" data-gd-title="Creatives" hidden>
+      <div class="gd-span-12">
+        <div class="gd-banner gd-banner--info" role="note">
+          <span class="gd-banner__icon"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm16-40a8,8,0,0,1-8,8,16,16,0,0,1-16-16V128a8,8,0,0,1,0-16,16,16,0,0,1,16,16v40A8,8,0,0,1,144,176ZM112,84a12,12,0,1,1,12,12A12,12,0,0,1,112,84Z"/></svg></span>
+          <div class="gd-banner__body"><span class="gd-banner__title">Static offer was paused on 29 Sep</span><span>It cost $140 per trial, 81% above the Meta average, and brought 20 trials in the period.</span></div>
+        </div>
+      </div>
+      <div class="gd-span-12" id="ch-creative"></div>
+      <section class="gd-card gd-span-12" aria-labelledby="cr-title">
+        <div class="gd-card__head"><div class="gd-card__titles"><h2 class="gd-card__title" id="cr-title">Meta ads creatives</h2><p class="gd-card__desc">All five creatives that ran in the period.</p></div></div>
+        <div class="gd-card__body"><div class="gd-tview gd-tview--flush"><div class="gd-table-wrap"><div class="gd-table" id="tbl-creative" role="table" aria-label="Meta ads creatives"></div></div></div></div>
+      </section>
+    </div>
+
+    <!-- ABOUT -->
+    <div class="gd-grid gd-tabs__panel" role="tabpanel" id="p-about" aria-labelledby="t-about" data-gd-title="About this report" hidden>
+      <section class="gd-card gd-span-6 gd-def">
+        <div class="gd-def__head">
+          <span class="gd-def__badge" aria-hidden="true"><svg viewBox="0 0 256 256" fill="currentColor" focusable="false"><path d="M256,136a8,8,0,0,1-8,8H232v16a8,8,0,0,1-16,0V144H200a8,8,0,0,1,0-16h16V112a8,8,0,0,1,16,0v16h16A8,8,0,0,1,256,136Zm-57.87,58.85a8,8,0,0,1-12.26,10.3C165.75,181.19,138.09,168,108,168s-57.75,13.19-77.87,37.15a8,8,0,0,1-12.25-10.3c14.94-17.78,33.52-30.41,54.17-37.17a68,68,0,1,1,71.9,0C164.6,164.44,183.18,177.07,198.13,194.85ZM108,152a52,52,0,1,0-52-52A52.06,52.06,0,0,0,108,152Z"/></svg></span>
+          <div class="gd-card__titles"><h2 class="gd-card__title">Trial started</h2><p class="gd-card__desc">A new account that signs up and opens the product for the first time.</p></div>
+        </div>
+        <div class="gd-def__formula"><span class="gd-def__label">Counts as</span><span class="gd-num">sign-up + first product open</span></div>
+        <div><span class="gd-badge gd-badge--info">Every channel</span></div>
+      </section>
+      <section class="gd-card gd-span-6 gd-def">
+        <div class="gd-def__head">
+          <span class="gd-def__badge" aria-hidden="true"><svg viewBox="0 0 256 256" fill="currentColor" focusable="false"><path d="M152,120H136V56h8a32,32,0,0,1,32,32,8,8,0,0,0,16,0,48.05,48.05,0,0,0-48-48h-8V24a8,8,0,0,0-16,0V40h-8a48,48,0,0,0,0,96h8v64H104a32,32,0,0,1-32-32,8,8,0,0,0-16,0,48.05,48.05,0,0,0,48,48h16v16a8,8,0,0,0,16,0V216h16a48,48,0,0,0,0-96Zm-40,0a32,32,0,0,1,0-64h8v64Zm40,80H136V136h16a32,32,0,0,1,0,64Z"/></svg></span>
+          <div class="gd-card__titles"><h2 class="gd-card__title">Cost per trial</h2><p class="gd-card__desc">Media spend divided by all trials, including organic. This is the blended figure.</p></div>
+        </div>
+        <div class="gd-def__formula"><span class="gd-def__label">Formula</span><span class="gd-num">spend ÷ trials started</span></div>
+        <div><span class="gd-badge gd-badge--info">Blended</span></div>
+      </section>
+      <section class="gd-card gd-span-6 gd-def">
+        <div class="gd-def__head">
+          <span class="gd-def__badge" aria-hidden="true"><svg viewBox="0 0 256 256" fill="currentColor" focusable="false"><path d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Zm-38.34-85.66a8,8,0,0,1,0,11.32l-48,48a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L116,164.69l42.34-42.35A8,8,0,0,1,169.66,122.34Z"/></svg></span>
+          <div class="gd-card__titles"><h2 class="gd-card__title">Demo show rate</h2><p class="gd-card__desc">Share of booked demos where the person joined the call.</p></div>
+        </div>
+        <div class="gd-def__formula"><span class="gd-def__label">Formula</span><span class="gd-num">demos attended ÷ demos booked</span></div>
+        <div><span class="gd-badge gd-badge--info">Booked in the period</span></div>
+      </section>
+      <section class="gd-card gd-span-6 gd-def">
+        <div class="gd-def__head">
+          <span class="gd-def__badge" aria-hidden="true"><svg viewBox="0 0 256 256" fill="currentColor" focusable="false"><path d="M136,80v43.47l36.12,21.67a8,8,0,0,1-8.24,13.72l-40-24A8,8,0,0,1,120,128V80a8,8,0,0,1,16,0Zm-8-48A95.44,95.44,0,0,0,60.08,60.15C52.81,67.51,46.35,74.59,40,82V64a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H72a8,8,0,0,0,0-16H49c7.15-8.42,14.27-16.35,22.39-24.57a80,80,0,1,1,1.66,114.75,8,8,0,1,0-11,11.64A96,96,0,1,0,128,32Z"/></svg></span>
+          <div class="gd-card__titles"><h2 class="gd-card__title">Comparison period</h2><p class="gd-card__desc">The 28 days before the report range, used for every change figure.</p></div>
+        </div>
+        <div class="gd-def__formula"><span class="gd-def__label">Range</span><span class="gd-num">11 Aug to 7 Sep 2026</span></div>
+        <div><span class="gd-badge gd-badge--info">28 days</span></div>
+      </section>
+
+      <section class="gd-card gd-span-12" aria-labelledby="src-title">
+        <div class="gd-card__head"><div class="gd-card__titles"><h2 class="gd-card__title" id="src-title">Where the data comes from</h2></div></div>
+        <div class="gd-card__body"><div class="gd-tview gd-tview--flush"><div class="gd-table-wrap"><div class="gd-table" id="tbl-sources" role="table" aria-label="Data sources"></div></div></div></div>
+      </section>
+
+      <section class="gd-card gd-span-12" aria-labelledby="lm-title">
+        <div class="gd-card__head"><div class="gd-card__titles"><h2 class="gd-card__title" id="lm-title">Limits of this report</h2></div></div>
+        <div class="gd-card__body"><ul class="gd-report__list">
+          <li>Every figure is invented sample data. Connect the sources above before sharing it.</li>
+          <li>Organic and AEO trials are credited to the last source before sign-up, so they can be undercounted.</li>
+          <li>Demo show rate counts demos booked in the period, so late bookings are not yet in the figure.</li>
+        </ul></div>
+      </section>
+    </div>
+
+    <p class="gd-chart__foot">Sample data. Replace it with connected data and remove the badge before this leaves the team.</p>
+  </div>
+ </div>
+</div>
+
+<script src="../../exports/dashboard/dashboard.js"></script>
+<script>
+(function () {
+  'use strict';
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  var DAY = 864e5, TO = Date.UTC(2026, 9, 5);
+  var short = function (t) { var d = new Date(t); return MON[d.getUTCMonth()] + ' ' + d.getUTCDate(); };
+  var usd = function (n) { return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }); };
+  var usd2 = function (n) { return '$' + n.toFixed(2); };
+
+  /* Invented daily trials: a seeded wobble on a weekday shape, scaled so the 28 days sum to exactly 612 (this period) and 494 (previous). */
+  function hash(n) { n = Math.imul(n ^ (n >>> 15), 2246822507); n = Math.imul(n ^ (n >>> 13), 3266489909); return ((n ^ (n >>> 16)) >>> 0) / 4294967296; }
+  function series(seed, total, lift) {
+    var w = [0.55, 1.1, 1.15, 1.1, 1.05, 0.95, 0.6], raw = [], sum = 0, i;
+    for (i = 0; i < 28; i++) { var dow = (i + (seed % 7)) % 7, v = w[dow] * (1 + lift * i / 27) * (1 + (hash(seed * 100 + i) - 0.5) * 0.35); raw.push(v); sum += v; }
+    var out = raw.map(function (v) { return Math.round(v / sum * total); }), diff = total - out.reduce(function (a, b) { return a + b; }, 0);
+    out[13] += diff; return out;
+  }
+  var cur = series(3, 612, 0.35), prev = series(5, 494, 0.12);
+  var curT = [], prevT = [], i;
+  for (i = 0; i < 28; i++) { curT.push(TO - (27 - i) * DAY); prevT.push(TO - (55 - i) * DAY); }
+
+  function mount(id, kind, spec) { GD.charts.mount($('#' + id), kind, spec); }
+  mount('ch-trials', 'line', { title: 'Trials started per day', description: '8 Sep to 5 Oct 2026, against the previous 28 days.', size: 'sm', card: true, legend: true,
+    labels: curT.map(short), titles: curT.map(function (t) { return short(t); }),
+    series: [{ name: 'This period', data: cur }, { name: 'Previous 28 days', data: prev, comparison: true }] });
+  mount('ch-source', 'breakdown', { title: 'Where trials came from', description: '612 trials in the period.', size: 'sm', card: true,
+    segments: [{ label: 'Meta ads', value: 318 }, { label: 'Google Ads', value: 129 }, { label: 'Organic and AEO', value: 104 }, { label: 'Referrals', value: 61, tone: 'neutral' }] });
+  mount('ch-funnel', 'funnel', { title: 'From trial to paying account', description: 'Accounts that reach each step in the period.', size: 'sm', card: true,
+    steps: [{ label: 'Trial started', value: 612 }, { label: 'Connected inbox', value: 391 }, { label: 'Booked a demo', value: 214 }, { label: 'Showed up', value: 152 }, { label: 'Paid', value: 38 }] });
+  mount('ch-cpt', 'bar', { title: 'Cost per trial by week', description: 'Blended, in dollars. Falls every week of the period.', size: 'sm', card: true, prefix: '$',
+    labels: ['8 Sep', '15 Sep', '22 Sep', '29 Sep'], titles: ['Week of 8 Sep', 'Week of 15 Sep', 'Week of 22 Sep', 'Week of 29 Sep'],
+    series: [{ name: 'Cost per trial', data: [74.6, 70.9, 66.2, 62.0] }] });
+  mount('ch-creative', 'hbar', { title: 'Cost per trial by creative', description: 'Meta ads, in dollars, lowest first. The channel average is $77.36.', size: 'sm', card: true, sort: false, share: false, prefix: '$',
+    items: [{ label: 'Missed leads counter', value: 58.57 }, { label: 'Founder demo clip', value: 78.87 }, { label: 'Customer quote card', value: 82.69 }, { label: 'Feature carousel', value: 105.71 }, { label: 'Static offer', value: 140 }] });
+
+  /* ---- tables, same cell markup as the app templates ---- */
+  var cell = function (html, num) { return '<div class="gd-table__cell' + (num ? ' gd-table__cell--num' : '') + '" role="cell">' + html + '</div>'; };
+  var th = function (label, num) { return '<div class="gd-table__th' + (num ? ' gd-table__th--num' : '') + '" role="columnheader">' + label + '</div>'; };
+  var badge = function (t, tone) { return '<span class="gd-badge gd-badge--' + tone + '">' + t + '</span>'; };
+  function table(id, cols, head, rows, min) {
+    var t = $('#' + id); t.style.cssText = '--gd-cols:' + cols + '; --gd-table-min:' + (min == null ? 560 : min) + 'px';
+    t.innerHTML = '<div class="gd-table__row gd-table__row--head" role="row">' + head.map(function (h) { return h.charAt(0) === '>' ? th(h.slice(1), 1) : th(h); }).join('') + '</div><div class="gd-table__body" role="rowgroup">' +
+      rows.map(function (r) { return '<div class="gd-table__row" role="row">' + r + '</div>'; }).join('') + '</div>';
+  }
+  var who = function (t, d) { return '<span class="gd-table__who"><b>' + t + '</b><small>' + d + '</small></span>'; };
+  table('tbl-channel', 'minmax(160px,1.4fr) repeat(4,minmax(90px,1fr))', ['Channel', '>Spend', '>Trials', '>Cost per trial', '>Demo show rate'], [
+    cell('Meta ads') + cell(usd(24600), 1) + cell('318', 1) + cell(usd2(77.36), 1) + cell('69%', 1),
+    cell('Google Ads') + cell(usd(14300), 1) + cell('129', 1) + cell(usd2(110.85), 1) + cell('72%', 1),
+    cell('Organic and AEO') + cell('—', 1) + cell('104', 1) + cell('—', 1) + cell('74%', 1),
+    cell('Referrals') + cell(usd(2920), 1) + cell('61', 1) + cell(usd2(47.87), 1) + cell('76%', 1),
+    cell('<b>All channels</b>') + cell('<b>' + usd(41820) + '</b>', 1) + cell('<b>612</b>', 1) + cell('<b>' + usd2(68.33) + '</b>', 1) + cell('<b>71%</b>', 1)]);
+  table('tbl-creative', 'minmax(200px,1.6fr) repeat(4,minmax(90px,1fr)) minmax(100px,.8fr)', ['Creative', '>Spend', '>Trials', '>Cost per trial', '>Share of Meta spend', 'Status'], [
+    cell('Missed leads counter') + cell(usd(8200), 1) + cell('140', 1) + cell(usd2(58.57), 1) + cell('33%', 1) + cell(badge('Active', 'good')),
+    cell('Founder demo clip') + cell(usd(5600), 1) + cell('71', 1) + cell(usd2(78.87), 1) + cell('23%', 1) + cell(badge('Active', 'good')),
+    cell('Customer quote card') + cell(usd(4300), 1) + cell('52', 1) + cell(usd2(82.69), 1) + cell('17%', 1) + cell(badge('Active', 'good')),
+    cell('Feature carousel') + cell(usd(3700), 1) + cell('35', 1) + cell(usd2(105.71), 1) + cell('15%', 1) + cell(badge('Active', 'good')),
+    cell('Static offer') + cell(usd(2800), 1) + cell('20', 1) + cell(usd2(140), 1) + cell('11%', 1) + cell(badge('Paused', 'warn'))]);
+  table('tbl-sources', 'minmax(320px,3fr) minmax(160px,1fr)', ['Source', 'Status'], [
+    cell(who('Meta Ads', 'Spend, creatives and attributed trials')) + cell(badge('Sample', 'warn')),
+    cell(who('Google Ads', 'Spend and attributed trials')) + cell(badge('Sample', 'warn')),
+    cell(who('Product database', 'Trials, inbox connections and paid accounts')) + cell(badge('Sample', 'warn')),
+    cell(who('Calendar bookings', 'Demos booked and attended')) + cell(badge('Sample', 'warn'))]);
+
+  var h = location.hash.slice(1), tab = h && $('#t-' + h); if (tab) tab.click();   // #creatives and #about open that tab
+})();
+</script>
+</body>
+</html>

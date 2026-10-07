@@ -19,9 +19,36 @@ and skipping it meant running last month's design system indefinitely, with no w
 plugin now ships a session-start hook that turns it on itself, and tells you which components
 moved when you are behind.
 
+**Every new chat opens with a line that names you** — "Hey <you>, new chat. Gushwork design system
+v<version> is on." — so you know the plugin is loaded before you ask for anything. If you are behind,
+the update command follows it with a Run button: click it, type `/reload-plugins`, done.
+
 *Reading this yourself instead of pasting it in? Run steps 1 and 2 in a terminal, then restart
 Claude Code. Nothing to do at all if your repo has a `.claude/settings.json` mentioning
 `gushwork` — it installs itself.*
+
+**What the plugin logs.** When a Claude session starts with the plugin installed, it records who you
+are (your Claude account email, or your git email if that is missing), which plugin version you are
+on, and when. When you run a Gushwork skill it also records the skill's name, and the file names
+(the name, not the folder) of any page or document it writes in that session, the link
+of any Claude artifact you publish in it, and the file names of any PDF, PowerPoint, PNG or HTML file that
+appears in your working folder after a command runs (a deck or lead magnet is made by a script, not
+written directly). Only the name is sent, never the folder. New designs you create with a skill (a PDF, image, PowerPoint or page, up to 4 MB) are
+kept for review, visible only to the owners, and deleted after a few weeks. Set `GW_NO_OUTPUT_COPIES=1` to
+keep everything else but skip this. For an HTML or SVG output or a published artifact it
+checks, on your machine, whether the page uses the Gushwork tokens, only the brand typefaces, the
+real logo and the build stamp, and sends those four yes/no answers instead of the text. A session
+is tied to its outputs by a short one-way hash that cannot be turned back into your session id. For
+a session in which a Gushwork skill ran, it also records how many tokens that session has used so far
+(three numbers read from the usage figures Claude Code keeps, never any text from them), so we can see
+what the skills cost and whether they are getting cheaper. It
+never records your prompts. It exists so we can see whether the design system
+is being used, what for, and who is running an old version. To turn it off, set
+`GW_NO_USAGE_PING=1` in your shell.
+
+Separately from the plugin, the design hub website notes which work email signs in and which of its pages that
+email opens (the page and the time, no IP address or browser details), visible only to the owner. The
+`GW_NO_USAGE_PING` switch does not affect it; it is part of using the site.
 
 ## Then just ask for what you want
 
@@ -42,7 +69,7 @@ and guessing produces a screen that looks right and answers nothing.
 
 | Look for | Why |
 |---|---|
-| **A blue filled button on a dashboard** | means the wrong component got picked — web and dashboard have separate button sets, both named `Button`. The most common way output goes off-system. |
+| **A blue filled button on a dashboard** | means the wrong component got picked — web and dashboard have separate button sets (web `Button`, dashboard `action-button`). The most common way output goes off-system. |
 | **A raw hex code** | every value comes from `foundation/tokens.css`. A hardcoded colour is a bug. |
 | **A `Sample data` badge** | the numbers are illustrative. Don't put it in a deck until it's real. |
 | **A four-line Slack block** | Claude had to build something the library lacks. **Paste it to Utsav** — see below. |
@@ -74,7 +101,7 @@ the setup block prevents that. If you skipped it, update by hand:
 claude plugin marketplace update gushwork && claude plugin update gushwork-design@gushwork
 ```
 
-Restart after. Either way a new version takes effect on the **next** start, not the current one.
+Then type `/reload-plugins` in the chat. No restart: the new version is live in that chat at once.
 
 ## Where to look things up
 
@@ -82,15 +109,16 @@ Restart after. Either way a new version takes effect on the **next** start, not 
 |---|---|
 | What's the hex / size / type style? | `foundation/tokens.css` |
 | Which component do I use here? | `skills/gushwork-dashboard/SKILL.md`, `skills/gushwork-web/SKILL.md` |
-| What exactly does it measure? | `exports/dashboard/`, `exports/web/` |
-| Why does the shell scroll like that? | `exports/dashboard/build-rules.md` |
+| What exactly does it specify? | `exports/dashboard/`, `exports/web/` |
+| Why does the shell scroll like that? | `exports/dashboard/shell.md` |
 | Voice, casing, CTA copy | `foundation/voice.md` |
 | React or static HTML? | `foundation/output-targets.md` |
 
 ## Two things about the current state
 
-**The dashboard surface is solid** — measured off Figma and driven through a real nine-page
-build, so the defects are already found.
+**The dashboard surface was rebuilt on 4 Oct 2026** from the design hub's own code: 100+ components for
+heavy analytics dashboards and web apps. Every one is pending its review pass, so treat output as a
+strong draft and check the Design System page for which components are passed.
 
 **The web surface is thinner** — Button, eyebrow, navbar, footer and `client/avatar` are
 measured; roughly 22 components are still transcribed from annotations rather than verified

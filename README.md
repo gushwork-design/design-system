@@ -61,10 +61,10 @@ The chain, end to end:
 |---|---|---|
 | 1 | maintainer | change it in Figma |
 | 2 | maintainer | measure it into `exports/` or re-pull `tokens.css` — see [`CONTRIBUTING.md`](CONTRIBUTING.md) |
-| 3 | maintainer | `bash scripts/release.sh 1.2.0 "<summary>" --session "<uuid> <title>"` — stamps version + date into both manifests and every skill's announce line, makes the release commit, rebuilds [`CHANGELOG.md`](CHANGELOG.md) **and** `preview/changelog-sheet.html` as a second commit, then verifies the three agree. Add `--publish` to deploy too |
+| 3 | maintainer | `bash scripts/release.sh 1.2.0 "<summary>" --quiet` or `--notify "<one line>"`, plus `--session "<uuid> <title>"` — stamps version + date into both manifests and every skill's announce line, makes the release commit, rebuilds [`CHANGELOG.md`](CHANGELOG.md) **and** `preview/changelog-sheet.html` as a second commit, then verifies the three agree. Add `--publish` to deploy too |
 | 4 | maintainer | `GW_PUSH=1 git push origin main` — `release.sh` deliberately does not push |
 | 5 | maintainer | `bash scripts/release-notes.sh`, then post it in Slack — there is no push notification |
-| 6 | everyone | nothing, if `autoUpdate` is on — the session-start hook takes it at the next start and names what changed. Otherwise `claude plugin marketplace update gushwork && claude plugin update gushwork-design@gushwork`, then **restart** |
+| 6 | everyone | nothing, if `autoUpdate` is on — it lands at the next start. A chat opens with a notice **only for a `--notify` release**; a `--quiet` one arrives in silence. Otherwise `claude plugin marketplace update gushwork && claude plugin update gushwork-design@gushwork`, then `/reload-plugins` in the chat — no restart |
 
 Three things worth knowing:
 
@@ -79,8 +79,8 @@ Three things worth knowing:
   "Plugin not found".
 - **Auto-update is off by default for third-party marketplaces.** Set `autoUpdate: true` and
   step 6 happens on startup; leave it and a teammate runs whatever they installed, indefinitely,
-  with no warning. Either way **a restart is required** — updating without one leaves the old
-  skills loaded. See [`ROLLOUT.md`](ROLLOUT.md).
+  with no warning. Either way the running chat takes it only after **`/reload-plugins`** — updating
+  without that leaves the old skills loaded until the next start. See [`ROLLOUT.md`](ROLLOUT.md).
 
 Steps 5 and 6 disappear entirely if you deploy via committed `.claude/settings.json` or managed
 settings, which is what [`ROLLOUT.md`](ROLLOUT.md) recommends.
@@ -88,17 +88,27 @@ settings, which is what [`ROLLOUT.md`](ROLLOUT.md) recommends.
 Verdicts from a [`notices/`](notices/) review are exactly what feeds step 1. That is the loop
 closing: a deviation someone hit in a real build becomes a measured value everyone gets.
 
-## Four surfaces, four skills
+## Six surfaces, six skills
 
-The system covers four surfaces that look and behave differently, so they are four skills with
+The system covers six surfaces that look and behave differently, so they are six skills with
 disjoint trigger vocabularies. They are deliberately **not** merged.
+
+A seventh skill, `gushwork-brand`, is the catch-all for everything else that carries the Gushwork
+name, logo or blue — a game, a poster, a one-off tool. It exists because a skill only loads when the
+request matches its description, and a request that matches none of the six loaded nothing. It
+holds the floor (tokens, two typefaces, the real logo, voice) and hands off to a surface skill when
+one fits. `hooks/hooks.json` also injects that floor at every session start, so the rule does not
+depend on any description matching.
 
 | Skill | Surface | Fires on |
 |---|---|---|
 | [`gushwork-web`](skills/gushwork-web/SKILL.md) | Public marketing site | landing page, ad lander, hero, fold, CTA section, pricing, comparison table, testimonial, case study, FAQ, navbar, footer |
-| [`gushwork-dashboard`](skills/gushwork-dashboard/SKILL.md) | Logged-in product | dashboard, app screen, KPI card, analytics panel, data table, side nav, filters, tabs, toasts |
+| [`gushwork-dashboard`](skills/gushwork-dashboard/SKILL.md) | Logged-in analytics dashboards and web apps | dashboard, analytics screen, data table, chart, filters, settings page, side nav, sign-in |
+| [`gushwork-reports`](skills/gushwork-reports/SKILL.md) | Report: one scrolling page, no rail, shared as a link or PDF | report, weekly readout, one-page analytics summary, performance report, backtest, audit |
+| [`gushwork-tools`](skills/gushwork-tools/SKILL.md) | Hub tools (`/internal`) | new hub tool, change to the email signature or ID card tool, tool panel, tool card, a generator for the team |
 | [`gushwork-lead-magnet`](skills/gushwork-lead-magnet/SKILL.md) | Downloadable PDF | lead magnet, gated asset, PDF checklist, prompt pack, audit worksheet, playbook, buyer guide |
 | [`gushwork-slides`](skills/gushwork-slides/SKILL.md) | Presented deck | sales deck, pitch deck, QBR, investor update, slide, `.pptx`, Google Slides |
+| [`gushwork-brand`](skills/gushwork-brand/SKILL.md) | Anything else with the brand | game, poster, banner, social post, email header, animation, internal tool, one-off page — when none of the six above fits |
 
 Spacious white-and-blue marketing surfaces; dense gray-canvas product surfaces with
 black-and-outline actions; print-bound documents that invert the convention so the page is the
@@ -113,7 +123,7 @@ Jakarta Sans by design. That is R21, not a bug.
 
 ## Foundation — referenced, never duplicated
 
-All four skills point at these. None restates them, and none should.
+All six skills point at these. None restates them, and none should.
 
 | File | Holds |
 |---|---|
@@ -141,22 +151,27 @@ gushwork-design/
 ├── skills/
 │   ├── gushwork-web/SKILL.md
 │   ├── gushwork-dashboard/SKILL.md
+│   ├── gushwork-reports/SKILL.md
+│   ├── gushwork-tools/SKILL.md
 │   ├── gushwork-lead-magnet/SKILL.md
-│   └── gushwork-slides/SKILL.md
+│   ├── gushwork-slides/SKILL.md
+│   └── gushwork-brand/SKILL.md
 ├── notices/          declared elements and deviations, one file per piece of work
 └── exports/
     ├── web/          page-shell · folds · fold-elements · atoms · cards · button · avatar · images
-    └── dashboard/    dashboard-build · sections · section-elements · button · avatar · controls · toast · build-rules
+    └── dashboard/    dashboard.css · dashboard.js · component-registry.json · README · shell · navigation · actions ·
+                      inputs · tables · filtering · data-display · charts · feedback · overlays · auth · patterns
 ```
 
 ## The composition ladder
 
-Both surfaces mirror each other. Compose downward; never place a lower tier directly into a
-page shell's slot.
+The web surface composes downward; never place a lower tier directly into a page shell's slot. The
+dashboard is different: it is one stylesheet of components, and `exports/dashboard/patterns.md` says how
+they are put together into screens.
 
 ```
 web         atoms  →  fold-elements  →  Folds     →  Page Build
-dashboard          section-elements  →  Sections  →  Dashboard Build
+dashboard          components  →  page recipes (patterns.md)  →  app-shell
 ```
 
 ## Three components exist separately per surface
@@ -166,16 +181,16 @@ goes off-system. Both skills carry a "which one?" pointer.
 
 | | Web | Dashboard |
 |---|---|---|
-| **Button** | `Button` `1457:668` — `Blue` / `Black` / `Outlined/ black` / … | `Button` `2203:931` — `Primary` / `Outline` / `Ghost` |
-| **Avatar** | `client/avatar` — grayscale squircle, real client photos | `Avatar` `1658:24023` — generated character, app users |
+| **Button** | `Button` `1457:668` — `Blue` / `Black` / `Outlined/ black` / … | `action-button` — black fill / outline / ghost / red label, never a blue fill |
+| **Avatar** | `client/avatar` — grayscale squircle, real client photos | `avatar` — the hub's generated dot-pattern mark, app users |
 | **Logo** | `gushwork-logo` — full marketing wordmark | `gushwork-logo-(internal-use)` — 32×32 symbol tile |
 
-The two button sets are **both literally named `Button`** and expose a `Style` property whose
-values are completely disjoint. This is intentional and permanent — never merge or alias
+The two button sets are named differently on purpose (web `Button`, dashboard `action-button`) and
+their styles are completely disjoint. This is intentional and permanent — never merge or alias
 them.
 
 **Badge is genuinely shared**, same component on both surfaces — web cards and tables,
-dashboard KPI cards.
+dashboard stat cards.
 
 ## When the library is missing something
 
@@ -265,7 +280,9 @@ in building this. The list above is the fix queue, not a changelog.
 
 Figma — **Gush Design System v2.0**, file key `VKcb4fgVyOHKfQonMgN772`. Marketing components
 on `↳ web/ pattern-library` with worked pages on `↳ web/ template-library`; product components
-on `↳ dashboard/ component+pattern-library` (`1658:24112`).
+on `↳ dashboard/ component+pattern-library` (`1658:24112`). **The dashboard is no longer sourced from
+Figma:** since 4 Oct 2026 its components are extracted from the design hub (`web/`) and documented in
+`exports/dashboard/`.
 
 When the Figma file changes, update the affected `exports/` file and re-check the rule in the
 matching `SKILL.md`. Tokens come from the variables — re-pull them, don't hand-edit.

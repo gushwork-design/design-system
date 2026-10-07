@@ -91,14 +91,11 @@
   --gw-color-primary-alpha-10: #0070ff1a;
   --gw-color-primary-alpha-40: #0070ff66;
 
-  /* --- Secondary -----------------------------------------------------------
-     Figma path Colors/Secondary/500-main. A single step, no ramp. Used as the
-     dark surface on page-build, navbar, footer and the comparison table. */
-  --gw-color-secondary-500: #111827;
-
   /* --- Neutral -------------------------------------------------------------
      Figma path Colors/Neutral/*. Cool-tinted, not pure gray. The 35/250/850
-     steps are real variables but have no swatch on the canvas. */
+     steps are real variables but have no swatch on the canvas.
+     850 was a pure #333333, the one step outside the family; retinted to #2e3338 on 2 Oct 2026
+     (same lightness, the hue and saturation of 800 and 900). DECISIONS.md R39. */
   --gw-color-neutral-25:  #f7f8f9;
   --gw-color-neutral-35:  #f5f5f5;
   --gw-color-neutral-50:  #f1f2f3;
@@ -111,7 +108,7 @@
   --gw-color-neutral-600: #6a7077;
   --gw-color-neutral-700: #535a61;
   --gw-color-neutral-800: #4d545c;
-  --gw-color-neutral-850: #333333;
+  --gw-color-neutral-850: #2e3338;
   --gw-color-neutral-900: #262a2e;
   --gw-color-white: #ffffff;
   --gw-color-black: #0d0d0d;
@@ -664,7 +661,12 @@
      keyboard user got whatever the browser did.
 
      Composed from existing tokens; introduces no new colour. Applies to every
-     focusable element on both surfaces. */
+     focusable element on both surfaces.
+
+     Keyboard only (R41, 3 Oct 2026): use it on :focus-visible, never on :focus,
+     so a click leaves nothing behind. Text fields do not take it: a browser
+     counts a click into one as keyboard focus, so a field shows its own edge
+     (a 1px Neutral/400, or black in the dashboard) instead. */
   --gw-focus-ring: 2px solid var(--gw-color-primary-alpha-40);
   --gw-focus-offset: 2px;
 

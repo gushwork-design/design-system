@@ -8,7 +8,7 @@ description: Builds Gushwork marketing and public-website pages on-brand — lan
 You are building a **public-facing marketing surface** for Gushwork. Spacious,
 white-on-black with a blue accent, numbers leading every claim. This is not the product UI.
 
-Announce at the start: **"Using the Gushwork web skill — v1.49.0, updated 24 Sep 2026."**
+Announce at the start: **"Using the Gushwork web skill — v2.0.3, updated 7 Oct 2026."**
 
 That version and date are stamped into this file, so **a stale copy reports its own stale date**
 rather than claiming to be current. If the user asks whether they are up to date, or the output
@@ -19,7 +19,8 @@ cd ~/.claude/plugins/marketplaces/gushwork && git fetch -q && git log --oneline 
 ```
 
 Any commits listed means they are behind: tell them to run
-`claude plugin marketplace update gushwork` and restart Claude Code.
+`claude plugin marketplace update gushwork && claude plugin update gushwork-design@gushwork`,
+then `/reload-plugins` in the chat.
 
 ## Read these first
 
@@ -124,11 +125,28 @@ What changes is **which folds you reach for**. There is a measured ad-page set h
 the landers built over the last four to five months, and it beats composing the same shapes
 out of the general folds.
 
-**Before you reach for the fold set at all, check `templates/ad-page/`.** It is the whole
-page already assembled from these folds and measured against
-`O6g05YAT980r85VaDQha4h` — copy it and fill the tokens rather than rebuilding the
-composition. The fold set below is what you reach for when a lander genuinely needs a
-shape the template does not carry.
+**Before you reach for the fold set at all, check the two ad-page templates.** Each is a
+whole page already assembled from measured folds — copy one and fill its tokens rather than
+rebuilding the composition. The fold set below is what you reach for when a lander genuinely
+needs a shape neither template carries.
+
+| Template | Its hero | Reach for it when |
+|---|---|---|
+| `templates/ad-page/` | Form-first: headline, proof ticks, demo form | The conversion is a form on the page |
+| `templates/ad-page-signup/` | Illustrated: headline, one-click Google sign-up, a picture card | The conversion is a sign-up, and there is a picture of the product to show |
+
+**The rule for every ad page, now and for any template added later (DECISIONS.md R27):**
+
+1. **Ask the user what kind of hero they want**, and start from the template whose hero matches.
+   That is the one question to ask up front.
+2. **Fill the other folds by what the content needs, from either template.** The templates share
+   the navbar, the white frame around the folds, the logo ticker, the FAQs and the closing call
+   to action, so a fold taken from the other one drops in. Do not stay inside the chosen
+   template's fold list, and do not rewrite a fold another template already has.
+3. **Say which template each fold came from** when you state the layout, and keep the build
+   stamp's `components` list true for the mixed page.
+4. **A fold is built the same way wherever it appears.** Only its text and destination change
+   per page; its design does not.
 
 **`Type=Ads` still governs everything above.** Navbar drops to logo + blue CTA, footer to a
 copyright line, primary button goes Blue. Set it once at the page level. Nothing below changes
@@ -197,7 +215,7 @@ values elsewhere — `700 18px` display and `700 16px` Inter are still not in th
 | Any marketing page | `page-build` | `page-shell.md` |
 | An empty page to compose freely | `page-build` with `Blank=yes` | `page-shell.md` |
 | A customer case study | **`templates/case-study/`** — a measured page, not a fold | `templates/case-study/README.md` |
-| A paid-ad landing page | **`templates/ad-page/`** — a measured page, not a stack of folds | `templates/ad-page/README.md` |
+| A paid-ad landing page | **Ask for the hero first**, then **`templates/ad-page/`** (form-first hero) or **`templates/ad-page-signup/`** (illustrated hero, one-click sign-up) — a measured page, not a stack of folds; take folds from either | `templates/ad-page/README.md`, `templates/ad-page-signup/README.md` |
 | Top nav | `navbar/navbar` — `Type` inherits from the page | `page-shell.md` |
 | Bottom of page | `footer/footer` — `Type` inherits | `page-shell.md` |
 | The opening fold | `fold/ Hero` — `Layout` = `Home` / `Centered` / `Split` / `Form` | `folds.md` |
@@ -245,10 +263,12 @@ is how a page ends up plausible but wrong.
 |---|---|---|
 | `templates/case-study/` | One customer story as a page — hero with outcome numbers, prose column with a sticky rail CTA, closing CTA | Figma `case-study-with-image`, `2PbNu2kGHalHhMUfFyFoeG` / `495:3382`, with the navbar, rail card and footer from the live site |
 | `templates/ad-page/` | A paid-ad landing page — form-first hero, proof ticks, logo ticker, media fold, feature rows, agent marquee, timeline, comparison table, FAQs with an ask-anything row, closing CTA | Figma **GW Meta/Google Ads** `O6g05YAT980r85VaDQha4h` — desktop `1890:42045`, phone `1890:43786` |
+| `templates/ad-page-signup/` | A paid-ad landing page with an illustrated hero and a one-click Google sign-up — problem cards, three feature rows with picture slots, a black call to action with a phone, reassurance cards, a comparison table, FAQs, closing CTA. **Every string is a token**, so it carries no product's claims | Figma **GW Ads Library** `t9rRxJODIVZ4N6CnrGdMhC` — section `95:20276`, desktop `87:9662`; navbar, frame, ticker, FAQs and footer CTA from `templates/ad-page/` |
 
 ```bash
 cp -r skills/gushwork-web/templates/case-study skills/gushwork-web/examples/<client-slug>
 cp -r skills/gushwork-web/templates/ad-page    skills/gushwork-web/examples/<campaign-slug>
+cp -r skills/gushwork-web/templates/ad-page-signup skills/gushwork-web/examples/<campaign-slug>
 ```
 
 Each template's README records what it was measured from, **where the live site disagrees with
@@ -458,7 +478,7 @@ thing before anyone reviews any of them:
 
 1. **Check for a matching proposal before inventing one.** Read the relevant surface's
    `exports/<surface>/component-registry.json` `components` block — **regardless of its
-   `review` status** — for an entry that already covers this gap. If one exists, reuse its
+   `review` status, except `rejected`, which is archived and never reused** — for an entry that already covers this gap. If one exists, reuse its
    exact spec; do not build a second, slightly different version. Say so in your notice:
    *"reusing the pending proposal from `notices/<date>-<slug>.md`, not a new one."* This is
    the one case where reading an unreviewed entry is required, not just permitted — see the
@@ -483,6 +503,8 @@ it passes — same obligation `ai-agents` and `comparison-table` already carry i
 `exports/ad-page/built-here.json` ("report the value rather than reproducing it silently"),
 just stated once here instead of per-fold. Promotion to citable-without-disclosure is
 **`bash scripts/review-pass.sh <surface> <key>`** — already built, nothing to invent.
+
+**Archived components and templates are not part of the system.** A registry entry whose `review` record says `"reviewed": "rejected"` was rejected and archived (R54 addendum); a template is a registry entry too, so an archived template is out as well. Never use one: do not compose from it, start from it, copy its markup, cite it, or reuse its spec as a proposal, and do not "take inspiration" from it either. Build from the approved library as if it did not exist, and if the screen needs that thing, treat it as a missing element and say so. Before starting from any template or component, check its `review` record in the registry; if it reads `rejected`, it is archived.
 
 ### Then notify — every time
 

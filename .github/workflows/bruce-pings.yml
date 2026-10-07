@@ -1,0 +1,79 @@
+# Bruce tells Utsav in Slack when Alfred has something for him (R55 addendum).
+#
+# WHEN. Every comment Alfred leaves on a rework thread (an issue "Rework thread: <scope>/<key>"). A burst, such as a
+# sweep or twenty send-backs at once, becomes ONE message: the `wait` job is cancelled and restarted by every new
+# comment, so `send` runs only after 90 quiet seconds and then sends everything not yet sent. Every 30 minutes a
+# scheduled run catches anything an event missed. scripts/bruce-pings.mjs marks each comment it sent with a 🚀, so
+# nothing is sent twice.
+#
+# NEEDS two repository secrets (Settings → Secrets and variables → Actions):
+#   SLACK_BOT_TOKEN   the Bruce app's Bot User OAuth Token (xoxb-…)
+#   OWNER_SLACK_ID    Utsav's Slack member ID
+name: Bruce pings
+
+on:
+  issue_comment:
+    types: [created]
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+    inputs:
+      test_item:
+        description: 'Send a test ping for this item (e.g. web/faqs) instead of reading Alfred''s comments'
+        required: false
+        default: ''
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  wait:
+    if: github.event_name != 'issue_comment' || startsWith(github.event.comment.body, '<!-- gw-hub:alfred')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    concurrency:
+      group: bruce-pings-wait
+      cancel-in-progress: true
+    steps:
+      - name: Let a burst finish
+        if: github.event_name == 'issue_comment'
+        run: sleep 90
+
+  send:
+    needs: wait
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    concurrency:
+      group: bruce-pings-send
+      cancel-in-progress: false
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      OWNER_SLACK_ID: ${{ secrets.OWNER_SLACK_ID }}
+    steps:
+      - name: Check the secrets exist
+        run: |
+          if [ -z "$SLACK_BOT_TOKEN" ] || [ -z "$OWNER_SLACK_ID" ]; then
+            echo "::warning::SLACK_BOT_TOKEN or OWNER_SLACK_ID is not set — add them under Settings → Secrets and variables → Actions"
+            exit 0
+          fi
+          echo "ready=1" >> "$GITHUB_ENV"
+      - uses: actions/checkout@v4
+        if: env.ready == '1'
+        with:
+          fetch-depth: 0          # the before/after images render the drawing at the fix and at the commit before it
+      - uses: actions/setup-node@v4
+        if: env.ready == '1'
+        with:
+          node-version: 20
+      - name: Tools for the before/after images
+        if: env.ready == '1'
+        run: command -v convert >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq imagemagick >/dev/null) || true
+      - name: Send what Alfred said
+        if: env.ready == '1'
+        env:
+          SHOTS: '1'
+          TEST_ITEM: ${{ github.event.inputs.test_item }}
+        run: |
+          if [ -n "$TEST_ITEM" ]; then node scripts/bruce-pings.mjs --test "$TEST_ITEM"; else node scripts/bruce-pings.mjs; fi

@@ -2,11 +2,10 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>status-dot — Gushwork</title>
+<meta name="description" content="Dashboard · data-display.md">
 <meta name="robots" content="noindex">
-<script>try{var t=localStorage.getItem('gw-theme');if(t!=='dark')t='light';
-document.documentElement.setAttribute('data-theme',t)}catch(e){
-document.documentElement.setAttribute('data-theme','light')}</script>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20width%3D%2280%22%20height%3D%2280%22%20rx%3D%2220%22%20fill%3D%22%230d0d0d%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<script>try{var c=localStorage.getItem('gw-theme-choice'),t=c==='dark'||c==='light'?c:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20x%3D%221%22%20y%3D%221%22%20width%3D%2278%22%20height%3D%2278%22%20rx%3D%2219%22%20fill%3D%22%230070ff%22%20stroke%3D%22%230061e0%22%20stroke-width%3D%222%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
 <link rel="stylesheet" href="../../../foundation/tokens.css">
 <link rel="stylesheet" href="../../../shell.css">
 <style>
@@ -56,7 +55,7 @@ document.documentElement.setAttribute('data-theme','light')}</script>
          padding:var(--gw-space-8) var(--gw-space-12);font:var(--gw-text-body-14-reg);
          color:var(--s-heading)}
 .cl-find::placeholder{color:var(--s-placeholder)}
-.cl-find:focus{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.cl-find:focus{outline:none;border-color:var(--gw-color-neutral-400)}
 .cl-filter{display:flex;gap:var(--gw-space-4);flex-wrap:wrap}
 .cl-f{font:var(--gw-text-body-12-med);color:var(--s-body);background:transparent;
       border:1px solid var(--s-field-border);border-radius:var(--gw-radius-full);
@@ -242,7 +241,12 @@ document.documentElement.setAttribute('data-theme','light')}</script>
 @media print{.cl-bar,.cl-jump{display:none}}
 
 *{box-sizing:border-box}
-body{margin:0;background:var(--s-page-bg);font-family:var(--gw-font-body);
+/* Body/body-16-reg, the site-wide page default ruled 29 Sep 2026 (796:12917).
+   This sheet named the family but no size, so it fell to the browser's 16px at
+   `normal` leading — the right size by accident, the wrong line-height. */
+body{margin:0;background:var(--s-page-bg);
+     font:var(--gw-text-body-16-reg);
+     letter-spacing:var(--gw-text-body-16-reg-tracking);
      color:var(--s-body);-webkit-font-smoothing:antialiased}
 a{color:inherit}
 h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
@@ -254,11 +258,12 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
 .lb-brand{display:flex;align-items:center;gap:var(--gw-space-12);text-decoration:none;
           flex:none}
 .lb-brand__chip{width:32px;height:32px;border-radius:var(--gw-radius-8);
-                background:var(--gw-color-black);color:var(--gw-color-white);
+                background:var(--gw-color-primary-500);color:var(--gw-color-white);
+                box-shadow:inset 0 0 0 1px var(--gw-color-primary-600);
                 display:grid;place-items:center;flex:none}
 .lb-brand__chip svg{width:16px;height:16px;display:block}
 .lb-brand__n{font:var(--gw-text-h7);color:var(--s-heading)}
-.lb-crumb{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-400);
+.lb-crumb{font:var(--gw-text-body-14-reg);color:var(--s-group-label);
           white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lb-crumb a{color:var(--gw-color-primary-600);text-decoration:none}
 .lb-top__r{display:flex;align-items:center;gap:var(--gw-space-12);margin-left:auto}
@@ -266,7 +271,7 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
          border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
          padding:0 var(--gw-space-12);font:var(--gw-text-body-14-reg);color:var(--s-heading)}
 .lb-find::placeholder{color:var(--s-placeholder)}
-.lb-find:focus{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.lb-find:focus{outline:none;border-color:var(--gw-color-neutral-400)}
 .lb-tbtn{width:36px;height:36px;display:grid;place-items:center;background:transparent;
          border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
          color:var(--s-body);cursor:pointer;flex:none}
@@ -280,7 +285,7 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
 .lb-rail{position:sticky;top:60px;max-height:calc(100vh - 60px);overflow-y:auto;
          border-right:1px solid var(--s-chrome-border);padding:var(--gw-space-24) 0}
 .lb-rail__t{font:var(--gw-text-body-12-med);text-transform:uppercase;letter-spacing:.06em;
-            color:var(--gw-color-neutral-400);padding:0 var(--gw-space-20) var(--gw-space-8)}
+            color:var(--s-group-label);padding:0 var(--gw-space-20) var(--gw-space-8)}
 .lb-rail a{display:flex;justify-content:space-between;gap:var(--gw-space-8);
            font:var(--gw-text-body-14-reg);color:var(--s-body);text-decoration:none;
            padding:6px var(--gw-space-20)}
@@ -305,16 +310,45 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
 .lb-toc a.l3{padding-left:var(--gw-space-12)}
 @media (max-width:1180px){.lb-3{grid-template-columns:220px minmax(0,1fr)}
                           .lb-toc{display:none}}
-@media (max-width:820px){.lb-3{grid-template-columns:1fr}
+@media (max-width:820px){.lb-3{grid-template-columns:minmax(0,1fr)}
+                         /* `.lb-mid{grid-column:2}` above made the grid two columns even here, so the rail
+                            was squeezed to 0 wide and there was no way to move between sections. Both
+                            go back to column 1, and the rail becomes one scrolling row of chips instead
+                            of a 400px list in front of the content. */
+                         .lb-mid,.lb-rail{grid-column:1}
                          .lb-rail{position:static;max-height:none;border-right:0;
-                                  border-bottom:1px solid var(--s-chrome-border)}
+                                  border-bottom:1px solid var(--s-chrome-border);
+                                  display:flex;flex-direction:row;align-items:center;gap:var(--gw-space-8);
+                                  overflow-x:auto;padding:var(--gw-space-12) var(--gw-space-20);
+                                  scrollbar-width:none}
+                         .lb-rail::-webkit-scrollbar{display:none}
+                         .lb-rail__t,.lb-rail__sep{display:none}
+                         .lb-rail a{flex:none;white-space:nowrap;gap:var(--gw-space-4);
+                                    padding:6px var(--gw-space-12);border-radius:var(--gw-radius-full);
+                                    border:1px solid var(--s-chrome-border)}
                          .lb-mid{padding:var(--gw-space-24) var(--gw-space-20)}}
+@media (max-width:640px){.lb-crumb{display:none}}
 
 /* ---- page head ----------------------------------------------------------- */
 .lb-h{display:flex;flex-direction:column;gap:var(--gw-space-8)}
 .lb-h h1{font:var(--gw-text-h4);margin:0}
 .lb-h .lede{font:var(--gw-text-body-16-reg);color:var(--s-body);margin:0;max-width:74ch}
 .lb-row{display:flex;flex-wrap:wrap;gap:var(--gw-space-8);align-items:center}
+.lb-rowfind{width:100%;max-width:360px;height:36px;padding:0 12px;margin:0 0 20px;border:0;border-radius:12px;background:var(--s-field-bg);
+  box-shadow:inset 0 0 0 1px var(--s-field-border);color:var(--s-heading);font:var(--gw-text-body-14-reg)}
+.lb-rowfind::placeholder{color:var(--s-placeholder)}
+.cat-name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px;color:var(--s-heading);font-weight:600}
+a.cat-name{color:var(--gw-color-primary-600);text-decoration:none}
+:root[data-theme="dark"] a.cat-name{color:var(--gw-color-primary-400)}
+.cat-note{display:block;margin-top:2px;font:var(--gw-text-body-12-reg);color:var(--s-body)}
+@media (max-width:760px){.lb-mid td a,.lb-mid th a{display:inline-flex;align-items:center;min-height:24px}}
+.cat-link{font:var(--gw-text-body-14-med);color:var(--gw-color-primary-600);text-decoration:none}
+:root[data-theme="dark"] .cat-link{color:var(--gw-color-primary-400)}
+.cat-link:hover{text-decoration:underline}
+.sec>.lb-meta{margin:4px 0 14px}
+.cat-dim{color:var(--s-body)}
+.chip--annotated{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+:root[data-theme="dark"] .chip--annotated{background:var(--gw-color-neutral-800);color:var(--gw-color-neutral-300)}
 .lb-meta{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
          color:var(--gw-color-neutral-400)}
 
@@ -322,7 +356,7 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
       border-radius:var(--gw-radius-full);padding:3px var(--gw-space-8);white-space:nowrap}
 .chip--measured{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
 .chip--transcribed{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
-.chip--ruled{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+.chip--ruled,.chip--extracted{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
 .chip--structure{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
 .chip--built-here{background:var(--gw-color-orange-50);color:var(--gw-color-orange-700)}
 .chip--passed{background:var(--gw-color-green-500);color:var(--gw-color-white)}
@@ -334,6 +368,7 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
 :root[data-theme="dark"] .chip--transcribed,
 :root[data-theme="dark"] .chip--structure{background:var(--gw-color-yellow-900);color:var(--gw-color-yellow-100)}
 :root[data-theme="dark"] .chip--ruled,
+:root[data-theme="dark"] .chip--extracted,
 :root[data-theme="dark"] .chip--web{background:var(--gw-color-primary-900);color:var(--gw-color-primary-200)}
 :root[data-theme="dark"] .chip--pending{background:var(--gw-color-neutral-800);color:var(--gw-color-neutral-300)}
 :root[data-theme="dark"] .chip--built-here{background:var(--gw-color-orange-900);color:var(--gw-color-orange-100)}
@@ -388,86 +423,99 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
 </head>
 <body>
 <header class="lb-top">
-  <a class="lb-brand" href="../../../library/index.html">
+  <a class="lb-brand" href="/internal/design-system#library">
     <span class="lb-brand__chip"><svg viewBox="0 0 80 80" fill="none" aria-hidden="true"><path d="M76.6088 4.56344C77.5025 2.36058 75.8495 0 73.4723 0H9.14286C4.0934 0 0 4.0934 0 9.14286V66.7778C0 72.018 5.17081 75.6829 9.9603 73.5568C40.8494 59.8449 64.3785 34.7075 76.6088 4.56344Z" fill="currentColor"/><path d="M32.5161 80C31.4022 80 30.9357 78.5531 31.8259 77.8835C54.9007 60.5265 71.4338 35.8047 78.7658 8.0522C78.9403 7.39154 80 7.51618 80 8.19951V70.8571C80 75.9066 75.9066 80 70.8571 80H32.5161Z" fill="currentColor"/></svg></span>
     <span class="lb-brand__n">Component Library</span></a>
   <span class="lb-crumb"><a href="../../index.html">Library</a> / <a href="index.html">Dashboard</a></span>
-  <div class="lb-top__r"><input class="lb-find" id="lb-find" type="search" placeholder="Filter this library">
+  <div class="lb-top__r"><input class="lb-find" id="lb-find" type="search" placeholder="Filter this library" aria-label="Filter this library">
     <button class="lb-tbtn" id="lb-theme" type="button" aria-label="Switch theme">
-      <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M116,36V32a12,12,0,0,1,24,0v4a12,12,0,0,1-24,0Zm80,92a68,68,0,1,1-68-68A68.07,68.07,0,0,1,196,128Zm-24,0a44,44,0,1,0-44,44A44.05,44.05,0,0,0,172,128ZM51.51,68.49a12,12,0,1,0,17-17l-4-4a12,12,0,0,0-17,17Zm0,119-4,4a12,12,0,0,0,17,17l4-4a12,12,0,1,0-17-17ZM196,72a12,12,0,0,0,8.49-3.51l4-4a12,12,0,0,0-17-17l-4,4A12,12,0,0,0,196,72Zm8.49,115.51a12,12,0,0,0-17,17l4,4a12,12,0,0,0,17-17ZM48,128a12,12,0,0,0-12-12H32a12,12,0,0,0,0,24h4A12,12,0,0,0,48,128Zm80,80a12,12,0,0,0-12,12v4a12,12,0,0,0,24,0v-4A12,12,0,0,0,128,208Zm96-92h-4a12,12,0,0,0,0,24h4a12,12,0,0,0,0-24Z"/></svg></button></div>
+      <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z"/></svg></button></div>
 </header>
-<div class="lb-3"><nav class="lb-rail"><div class="lb-rail__t">Dashboard · 29</div><a href="index.html" data-q="overview 29">Overview<span>29</span></a><div class="lb-rail__sep"></div><a href="card-shell.html" data-q="card-shell ">card-shell</a><a href="checkbox.html" data-q="checkbox ">checkbox</a><a href="control.html" data-q="control ">control</a><a href="dashboard-switcher.html" data-q="dashboard-switcher ">dashboard-switcher</a><a href="date-range-picker.html" data-q="date-range-picker ">date-range-picker</a><a href="divider.html" data-q="divider ">divider</a><a href="empty-state.html" data-q="empty-state ">empty-state</a><a href="icon-button.html" data-q="icon-button ">icon-button</a><a href="icon-toggle-group.html" data-q="icon-toggle-group ">icon-toggle-group</a><a href="input.html" data-q="input ">input</a><a href="legend.html" data-q="legend ">legend</a><a href="metric-card.html" data-q="metric-card ">metric-card</a><a href="modal.html" data-q="modal ">modal</a><a href="page-header.html" data-q="page-header ">page-header</a><a href="pagination.html" data-q="pagination ">pagination</a><a href="progress-bar.html" data-q="progress-bar ">progress-bar</a><a href="ring.html" data-q="ring ">ring</a><a href="section-header.html" data-q="section-header ">section-header</a><a href="sidebar.html" data-q="sidebar ">sidebar</a><a href="skeleton.html" data-q="skeleton ">skeleton</a><a href="stat-card.html" data-q="stat-card ">stat-card</a><a href="status-dot.html" data-q="status-dot " class="on">status-dot</a><a href="tab-group.html" data-q="tab-group ">tab-group</a><a href="tab-item.html" data-q="tab-item ">tab-item</a><a href="table-cell.html" data-q="table-cell ">table-cell</a><a href="table-row.html" data-q="table-row ">table-row</a><a href="toast.html" data-q="toast ">toast</a><a href="tooltip.html" data-q="tooltip ">tooltip</a><a href="topbar.html" data-q="topbar ">topbar</a></nav><main class="lb-mid"><div class="lb-h"><h1>status-dot</h1><p class="lede">Dashboard · v2/primitives.md</p><div class="lb-row"><span class="chip chip--measured" title="Read off the bound Figma variables. Safe to build from.">measured</span><span class="chip chip--pending" title="Has not been through a review pass">not reviewed</span><span class="pill">v1.38.0</span></div><div class="lb-meta">review: bash scripts/review-pass.sh dashboard status-dot</div></div><div class="md"><h2 id="status-dot">Primitives — dot, progress, badge, checkbox, divider</h2>
-<p>Page <code>Dashboard Components</code> (<code>257:371</code>) in <b><code>Q9L6q38dEj3Qu1JkjiT13y</code></b> — the product file, not the library. See <code>README.md</code> in this folder for why.</p>
-<p><b>Scope: dashboard / product.</b> None of these carries a <code>Theme</code> variant — they are fills and text only, so dark is an override. Each section lists it.</p>
-<hr class="md-hr">
-<h3 id="progress-bar"><code>status-dot</code></h3>
-<p>Set <code>261:375</code> · <b>4 variants</b>, complete.</p>
-<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Property</th><th>Values</th></tr></thead><tbody><tr><td><code>Status</code></td><td><code>on-track</code> · <code>pending</code> · <code>behind</code> · <code>neutral</code></td></tr></tbody></table></div>
-<p><b>8 × 8, <code>radius/20</code>.</b> No stroke, no padding.</p>
-<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Status</th><th>Fill</th></tr></thead><tbody><tr><td><code>on-track</code></td><td><code>green/400</code></td></tr><tr><td><code>pending</code></td><td><code>yellow/400</code></td></tr><tr><td><code>behind</code></td><td><code>red/400</code></td></tr><tr><td><code>neutral</code></td><td><code>neutral/400</code></td></tr></tbody></table></div>
-<p><b>8px is the only correct size.</b> The screens contain eight dots — six at 8px and two at 12px, and <b>both 12px instances are hidden</b>. Every visible dot is 8px. Ruled 13 Aug 2026.</p>
-<p><b>Dark:</b> unchanged. The dark screen renders <code>green/400</code> at full strength — the dot is one of the few things that does <i>not</i> step down to <code>/300</code>.</p>
-<p>⚠ Note the standing surface default: <i>&quot;No bare coloured status dots — use a Badge.&quot;</i> This component exists because the section-header legend and the stat-card label genuinely use a bare dot. It is for <b>those two places</b>, not a general status affordance. For status on a row or a card, still use Badge.</p>
-<hr class="md-hr">
-<h3 id="badge"><code>progress-bar</code></h3>
-<p>Set <code>261:392</code> · <b>8 variants</b> (2 × 4), complete.</p>
-<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Property</th><th>Values</th></tr></thead><tbody><tr><td><code>Size</code></td><td><code>sm</code> · <code>md</code></td></tr><tr><td><code>Status</code></td><td><code>on-track</code> · <code>pending</code> · <code>behind</code> · <code>neutral</code></td></tr></tbody></table></div>
-<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Size</th><th>Height</th><th>Where</th></tr></thead><tbody><tr><td><code>sm</code></td><td><b>2</b></td><td>inside a table cell, under the metric value</td></tr><tr><td><code>md</code></td><td><b>4</b></td><td>hero card, stat-card</td></tr></tbody></table></div>
-<p>Track <code>neutral/200</code>, <code>radius/40</code>, default width 160, <code>clipsContent</code>. Fill child is named <b><code>fill</code></b> — <code>radius/40</code>, height fills the track. <b>Resize <code>fill</code> to set the percentage</b>; there is no numeric property.</p>
-<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Status</th><th>Fill</th></tr></thead><tbody><tr><td><code>on-track</code></td><td><code>green/400</code></td></tr><tr><td><code>pending</code></td><td><code>yellow/400</code></td></tr><tr><td><code>behind</code></td><td><code>red/400</code></td></tr><tr><td><code>neutral</code></td><td><code>neutral/200</code></td></tr></tbody></table></div>
-<p><b>Dark override:</b> track → <b><code>neutral/600</code></b>, fill → the <b><code>/300</code></b> step (<code>green/300</code>, <code>red/300</code>). Measured off the dark stat-card, not inferred.</p>
-<p>⚠ This is a hairline data bar. It is <b>not</b> the library's <code>section/progress-bar</code>, which is a whole 1084 × 116 card with a 32px blue labelled bar. Both are real and they do different jobs — see <code>sections.md</code> for that one.</p>
-<hr class="md-hr">
-<h3 id="finding-the-light-tints-fail-contrast-at-their-own-label-siz"><code>badge</code></h3>
-<p>Set <code>270:424</code> · <b>8 variants</b> (2 × 4), complete.</p>
-<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Property</th><th>Values</th></tr></thead><tbody><tr><td><code>Size</code></td><td><code>sm</code> · <code>md</code></td></tr><tr><td><code>Tone</code></td><td><code>success</code> · <code>warning</code> · <code>danger</code> · <code>neutral</code></td></tr></tbody></table></div>
-<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Size</th><th>Radius</th><th>Padding</th><th>Height</th><th>Label</th></tr></thead><tbody><tr><td><code>sm</code></td><td><code>radius/4</code></td><td><code>py-4 px-8</code></td><td><b>20</b></td><td><code>button-12-med</code></td></tr><tr><td><code>md</code></td><td><code>radius/8</code></td><td><code>py-4 px-12</code></td><td><b>24</b></td><td><code>body-12-sem</code></td></tr></tbody></table></div>
-<p>Gap <code>spacing/4</code>. Both sizes hug.</p>
-<p><b>The tint step differs by size</b> — <code>sm</code> uses the <code>/25</code> step, <code>md</code> uses <code>/50</code>:</p>
-<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Tone</th><th><code>sm</code> fill</th><th><code>md</code> fill</th><th>Text</th></tr></thead><tbody><tr><td><code>success</code></td><td><code>green/25</code></td><td><code>green/50</code></td><td><code>green/500</code></td></tr><tr><td><code>warning</code></td><td><code>yellow/25</code></td><td><code>yellow/50</code></td><td><code>yellow/500</code></td></tr><tr><td><code>danger</code></td><td><code>red/25</code></td><td><code>red/50</code></td><td><code>red/500</code></td></tr><tr><td><code>neutral</code></td><td><code>neutral/50</code></td><td><code>neutral/100</code></td><td><code>neutral/700</code></td></tr></tbody></table></div>
-<p>Why: 28 of the 29 badges in the screens are the <code>sm</code> shape on a <code>/25</code> tint; the single <code>md</code> badge (&quot;Behind&quot;, 64 × 24) is on <code>red/50</code>. The size-keyed tint reproduces both exactly rather than averaging them. Ruled 13 Aug 2026.</p>
-<p><b>This is the dashboard's own pill and it is not the shared <code>Badge</code>.</b> <code>foundation/shared-components.md</code> Badge remains the cross-surface component. Use this one for in-table deltas and row status where the 20h shape matters; use shared Badge for <code>Sample data</code> and anything a web surface also shows.</p>
-<p><b>Dark:</b> inherits. Override the tint if the surface demands it.</p>
-<h4>⚠ FINDING — the light tints fail contrast at their own label size</h4>
-<p>Measured 26 Aug 2026, each foreground composited over the real card fill it sits on, against the 12px medium label the component specifies:</p>
-<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Tone</th><th>Light</th><th>Dark</th></tr></thead><tbody><tr><td><code>success</code></td><td><b>3.15</b></td><td>6.99</td></tr><tr><td><code>warning</code></td><td><b>3.07</b></td><td>7.24</td></tr><tr><td><code>danger</code></td><td><b>4.28</b></td><td>4.90</td></tr></tbody></table></div>
-<p>All three light tones are under 4.5:1. Dark passes comfortably, because the <code>&lt;Tone&gt;/Alpha/10</code> + <code>/300</code> pattern separates better than the light <code>/25</code> + <code>/500</code> one.</p>
-<p><b>Reported, not fixed</b> — silently changing a measured tint is exactly what this system forbids. If the <code>sm</code> badge should take the <code>/50</code> tint in light, or the label should drop to <code>/600</code>, that is a one-line change here and a registry bump. Until then, badges are the one place the system ships a known contrast failure.</p>
-<hr class="md-hr">
-<h3 id="checkbox"><code>checkbox</code></h3>
-<p>Set <code>263:383</code> · <b>4 variants</b> (2 × 2), complete.</p>
-<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Property</th><th>Values</th></tr></thead><tbody><tr><td><code>Theme</code></td><td><code>light</code> · <code>dark</code></td></tr><tr><td><code>State</code></td><td><code>unchecked</code> · <code>checked</code></td></tr></tbody></table></div>
-<p><b>24 × 24, <code>radius/8</code>, padding <code>spacing/4</code>.</b> Tick is <code>Check</code> at <b>16px, Weight=Bold</b>, hidden on <code>unchecked</code>.</p>
-<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Theme</th><th>State</th><th>Fill</th><th>Border</th><th>Tick</th></tr></thead><tbody><tr><td><code>light</code></td><td><code>unchecked</code></td><td>none</td><td>1px <code>neutral/200</code></td><td>—</td></tr><tr><td><code>light</code></td><td><code>checked</code></td><td><code>neutral/black</code></td><td>1px <code>neutral/200</code></td><td><code>neutral/white</code></td></tr><tr><td><code>dark</code></td><td><code>unchecked</code></td><td>none</td><td>1px <b><code>neutral/600</code></b></td><td>—</td></tr><tr><td><code>dark</code></td><td><code>checked</code></td><td><b><code>neutral/white</code></b></td><td>1px <code>neutral/600</code></td><td><b><code>neutral/black</code></b></td></tr></tbody></table></div>
-<p>All four measured from the screens — the dark pair included. The dark checked state is a <b>full inversion</b>, matching the dark active tab and the dark primary button.</p>
-<p>⚠ <code>radius/8</code> on a 24px box is deliberate and measured. It is not a scaled instance.</p>
-<hr class="md-hr">
-<h3 id="divider"><code>divider</code></h3>
-<p>Set <code>263:390</code> · <b>6 variants</b> (3 × 2), complete.</p>
-<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Property</th><th>Values</th></tr></thead><tbody><tr><td><code>Tone</code></td><td><code>default</code> · <code>subtle</code> · <code>strong</code></td></tr><tr><td><code>Orientation</code></td><td><code>horizontal</code> · <code>vertical</code></td></tr></tbody></table></div>
-<p><b>Uses a fill, not a stroke</b> — a 1px stroke on a zero-height node collapses in auto-layout and Figma centre-aligns strokes while CSS puts borders inside the box. A filled 1px frame survives both.</p>
-<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Tone</th><th>Fill</th><th>Where</th></tr></thead><tbody><tr><td><code>default</code></td><td><code>neutral/100</code></td><td>card edges, table header underline</td></tr><tr><td><code>subtle</code></td><td><code>neutral/25</code></td><td>between table body rows</td></tr><tr><td><code>strong</code></td><td><code>neutral/800</code></td><td>dark theme, either position</td></tr></tbody></table></div>
-<p><code>horizontal</code> is 160 × 1, <code>vertical</code> is 1 × 160 — both meant to be stretched. In a table row the vertical divider is set to fill the row height.</p></div></main><div class="lb-toc"><b>On this page</b><a href="#status-dot" class="l3">status-dot</a><a href="#progress-bar" class="l3">progress-bar</a><a href="#badge" class="l3">badge</a><a href="#finding-the-light-tints-fail-contrast-at-their-own-label-siz" class="l3">⚠ FINDING — the light tints fail contrast at their own label size</a><a href="#checkbox" class="l3">checkbox</a><a href="#divider" class="l3">divider</a></div></div>
+<div class="lb-3"><nav class="lb-rail"><div class="lb-rail__t">Dashboard · 118</div><a href="index.html" data-q="overview 117">Overview<span>117</span></a><div class="lb-rail__sep"></div><a href="access-denied-screen.html" data-q="access-denied-screen ">access-denied-screen</a><a href="account-row.html" data-q="account-row ">account-row</a><a href="action-button.html" data-q="action-button ">action-button</a><a href="activity-timeline.html" data-q="activity-timeline ">activity-timeline</a><a href="app-shell.html" data-q="app-shell ">app-shell</a><a href="area-chart.html" data-q="area-chart ">area-chart</a><a href="avatar.html" data-q="avatar ">avatar</a><a href="avatar-group.html" data-q="avatar-group ">avatar-group</a><a href="banner.html" data-q="banner ">banner</a><a href="bar-chart.html" data-q="bar-chart ">bar-chart</a><a href="board.html" data-q="board ">board</a><a href="breadcrumbs.html" data-q="breadcrumbs ">breadcrumbs</a><a href="breakdown-bar.html" data-q="breakdown-bar ">breakdown-bar</a><a href="build-notice.html" data-q="build-notice ">build-notice</a><a href="bulk-action-bar.html" data-q="bulk-action-bar ">bulk-action-bar</a><a href="card.html" data-q="card ">card</a><a href="chart-frame.html" data-q="chart-frame ">chart-frame</a><a href="chart-tooltip.html" data-q="chart-tooltip ">chart-tooltip</a><a href="checkbox.html" data-q="checkbox ">checkbox</a><a href="checklist.html" data-q="checklist ">checklist</a><a href="coachmark.html" data-q="coachmark ">coachmark</a><a href="column-menu.html" data-q="column-menu ">column-menu</a><a href="combobox.html" data-q="combobox ">combobox</a><a href="command-palette.html" data-q="command-palette ">command-palette</a><a href="confirm-dialog.html" data-q="confirm-dialog ">confirm-dialog</a><a href="content-panel.html" data-q="content-panel ">content-panel</a><a href="data-table.html" data-q="data-table ">data-table</a><a href="date-range-picker.html" data-q="date-range-picker ">date-range-picker</a><a href="datetime-field.html" data-q="datetime-field ">datetime-field</a><a href="definition-tile.html" data-q="definition-tile ">definition-tile</a><a href="delta-pill.html" data-q="delta-pill ">delta-pill</a><a href="detail-view.html" data-q="detail-view ">detail-view</a><a href="docked-panel.html" data-q="docked-panel ">docked-panel</a><a href="donut-chart.html" data-q="donut-chart ">donut-chart</a><a href="drawer.html" data-q="drawer ">drawer</a><a href="empty-state.html" data-q="empty-state ">empty-state</a><a href="explorer-layout.html" data-q="explorer-layout ">explorer-layout</a><a href="filter-builder.html" data-q="filter-builder ">filter-builder</a><a href="filter-chip.html" data-q="filter-chip ">filter-chip</a><a href="form-field.html" data-q="form-field ">form-field</a><a href="form-section.html" data-q="form-section ">form-section</a><a href="funnel.html" data-q="funnel ">funnel</a><a href="google-button.html" data-q="google-button ">google-button</a><a href="growth-report-template.html" data-q="growth-report-template ">growth-report-template</a><a href="heatmap.html" data-q="heatmap ">heatmap</a><a href="histogram.html" data-q="histogram ">histogram</a><a href="horizontal-bar-chart.html" data-q="horizontal-bar-chart ">horizontal-bar-chart</a><a href="icon-button.html" data-q="icon-button ">icon-button</a><a href="incident-row.html" data-q="incident-row ">incident-row</a><a href="info-hint.html" data-q="info-hint ">info-hint</a><a href="issue-summary.html" data-q="issue-summary ">issue-summary</a><a href="key-value-list.html" data-q="key-value-list ">key-value-list</a><a href="legend.html" data-q="legend ">legend</a><a href="legend-table.html" data-q="legend-table ">legend-table</a><a href="line-chart.html" data-q="line-chart ">line-chart</a><a href="log-viewer.html" data-q="log-viewer ">log-viewer</a><a href="login-screen.html" data-q="login-screen ">login-screen</a><a href="menu.html" data-q="menu ">menu</a><a href="metric-strip.html" data-q="metric-strip ">metric-strip</a><a href="modal.html" data-q="modal ">modal</a><a href="multi-select.html" data-q="multi-select ">multi-select</a><a href="nav-group.html" data-q="nav-group ">nav-group</a><a href="nav-item.html" data-q="nav-item ">nav-item</a><a href="page-header.html" data-q="page-header ">page-header</a><a href="page-layout.html" data-q="page-layout ">page-layout</a><a href="pagination.html" data-q="pagination ">pagination</a><a href="period-select.html" data-q="period-select ">period-select</a><a href="popover.html" data-q="popover ">popover</a><a href="progress-bar.html" data-q="progress-bar ">progress-bar</a><a href="query-builder.html" data-q="query-builder ">query-builder</a><a href="radio.html" data-q="radio ">radio</a><a href="report-frame.html" data-q="report-frame ">report-frame</a><a href="report-source-line.html" data-q="report-source-line ">report-source-line</a><a href="ring.html" data-q="ring ">ring</a><a href="row-actions-menu.html" data-q="row-actions-menu ">row-actions-menu</a><a href="row-selection.html" data-q="row-selection ">row-selection</a><a href="saved-views.html" data-q="saved-views ">saved-views</a><a href="search-field.html" data-q="search-field ">search-field</a><a href="search-trigger.html" data-q="search-trigger ">search-trigger</a><a href="segmented-control.html" data-q="segmented-control ">segmented-control</a><a href="select.html" data-q="select ">select</a><a href="session-expired.html" data-q="session-expired ">session-expired</a><a href="setting-row.html" data-q="setting-row ">setting-row</a><a href="shortcut-key.html" data-q="shortcut-key ">shortcut-key</a><a href="sidebar.html" data-q="sidebar ">sidebar</a><a href="sidebar-collapsed.html" data-q="sidebar-collapsed ">sidebar-collapsed</a><a href="sign-in-modal.html" data-q="sign-in-modal ">sign-in-modal</a><a href="skeleton.html" data-q="skeleton ">skeleton</a><a href="sparkline.html" data-q="sparkline ">sparkline</a><a href="split-button.html" data-q="split-button ">split-button</a><a href="stat-card.html" data-q="stat-card ">stat-card</a><a href="status-banner.html" data-q="status-banner ">status-banner</a><a href="status-dot.html" data-q="status-dot " class="on">status-dot</a><a href="status-list.html" data-q="status-list ">status-list</a><a href="sub-nav.html" data-q="sub-nav ">sub-nav</a><a href="support-ops-app-template.html" data-q="support-ops-app-template ">support-ops-app-template</a><a href="table-cell-types.html" data-q="table-cell-types ">table-cell-types</a><a href="table-states.html" data-q="table-states ">table-states</a><a href="table-toolbar.html" data-q="table-toolbar ">table-toolbar</a><a href="tabs-pill.html" data-q="tabs-pill ">tabs-pill</a><a href="tabs-underline.html" data-q="tabs-underline ">tabs-underline</a><a href="tag.html" data-q="tag ">tag</a><a href="text-input.html" data-q="text-input ">text-input</a><a href="textarea.html" data-q="textarea ">textarea</a><a href="theme-and-density.html" data-q="theme-and-density ">theme-and-density</a><a href="theme-menu.html" data-q="theme-menu ">theme-menu</a><a href="time-range-bar.html" data-q="time-range-bar ">time-range-bar</a><a href="timezone-select.html" data-q="timezone-select ">timezone-select</a><a href="toast.html" data-q="toast ">toast</a><a href="toggle.html" data-q="toggle ">toggle</a><a href="tooltip.html" data-q="tooltip ">tooltip</a><a href="topbar.html" data-q="topbar ">topbar</a><a href="unavailable-state.html" data-q="unavailable-state ">unavailable-state</a><a href="unsaved-changes-bar.html" data-q="unsaved-changes-bar ">unsaved-changes-bar</a><a href="uptime-bar.html" data-q="uptime-bar ">uptime-bar</a><a href="widget-grid.html" data-q="widget-grid ">widget-grid</a><a href="workspace-switcher.html" data-q="workspace-switcher ">workspace-switcher</a></nav><main class="lb-mid"><div class="lb-h"><h1>status-dot</h1><p class="lede">Dashboard · data-display.md</p><div class="lb-row"><span class="chip chip--extracted" title="Extracted from the design hub's shipped code and generalised, not measured off Figma. The hub is its source of truth. Elements marked NEW in the doc are not in the hub at all.">extracted</span><span class="chip chip--passed" title="2026-10-05 utsav.singh@gushwork.ai">passed</span><span class="pill">v2.0.0</span></div><div class="lb-meta">review: bash scripts/review-pass.sh dashboard status-dot</div></div><div class="md"><h2 id="card">Cards and data display</h2>
+<p>Everything that holds or labels a figure, a status or a person on a dashboard: cards, KPI cards, badges, deltas, progress, legends, property lists, activity feeds, checklists, avatars, tags and the status-page set. CSS is <code>css/50-data.css</code>; behaviour is <code>js/50-data.js</code> (<code>data-gd-*</code> hooks, delegated on <code>document</code>, safe inside shadow roots). Every colour comes from an alias in <code>00-base.css</code> or the <code>--gd-tone-*</code> pairs declared at the top of <code>50-data.css</code>; no component hard-codes a theme. Heights and padding flow from <code>--gd-control-h</code>, <code>--gd-row-h</code>, <code>--gd-cell-px</code>, <code>--gd-gap</code>, <code>--gd-card-pad</code>. Light badge labels follow R18 (<code>/600</code> step on a <code>/25</code> fill); dark pairs <code>{Colour}/Alpha/10</code> with a <code>/300</code> label.</p>
+<p>Rules that apply to the whole set: a figure that can change carries <code>gd-num</code> (tabular). A value that cannot be read shows a dash, never a zero (R20). Colour carries meaning; a green badge on a falling metric is a bug. Direction and meaning are independent (a falling cost is down and good).</p>
+<h3 id="stat-card">Card</h3>
+<p><b>Purpose.</b> The container for a section of a screen: a chart, a table, a form group. Use it to group related content under one title. Do not nest a card inside a card; use a bordered well or the key value list inside.</p>
+<p><b>Anatomy.</b> <code>.gd-card</code> &gt; <code>.gd-card__head</code> (<code>__titles</code> &gt; <code>__title</code>, <code>__desc</code>; <code>__actions</code>), <code>.gd-card__body</code>, optional <code>.gd-card__foot</code>. <code>__actions</code> sit at the top right of the head (inside the card padding, in compact too); they drop under the title only when the card is too narrow for both.</p>
+<pre class="md-pre"><code>&lt;section class=&quot;gd-card&quot;&gt;&lt;div class=&quot;gd-card__head&quot;&gt;&lt;div class=&quot;gd-card__titles&quot;&gt;&lt;h3 class=&quot;gd-card__title&quot;&gt;Lead sources&lt;/h3&gt;&lt;p class=&quot;gd-card__desc&quot;&gt;Last 30 days&lt;/p&gt;&lt;/div&gt;&lt;div class=&quot;gd-card__actions&quot;&gt;…&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;gd-card__body&quot;&gt;…&lt;/div&gt;&lt;/section&gt;</code></pre>
+<p><b>Variants.</b> <code>--flush</code> (head and body padded individually, so <code>__body--bleed</code> lets a table touch the edges); <code>--interactive</code> (the whole card is a link or a focusable region); collapsible: the title becomes <code>&lt;button class=&quot;gd-card__toggle&quot; data-gd-toggle aria-expanded aria-controls&gt;</code> with a chevron, and the body carries the id and <code>hidden</code> when closed.</p>
+<p><b>States.</b> Rest. Hover and active only on <code>--interactive</code> (edge darkens to <code>--gd-border-strong</code> plus <code>--gw-shadow-s3</code>; the edge carries the separation in dark where the shadow is invisible). Selected (<code>aria-selected</code> or <code>aria-current</code>): 1px <code>--gd-ink</code> edge. Disabled (<code>aria-disabled</code>): 50%. Loading (<code>aria-busy</code>): body at 55%; put the Feedback ghost blocks in the body.</p>
+<p><b>Tokens.</b> <code>--gd-card-bg</code>, <code>--gd-border</code>, <code>--gd-border-strong</code>, <code>--gd-text</code>, <code>--gd-text-muted</code>, <code>--gd-card-pad</code>, <code>--gd-gap</code>, radius 16.</p>
+<p><b>Accessibility.</b> Heading level is the consumer's. An interactive card needs <code>tabindex=&quot;0&quot;</code> (or be an <code>&lt;a&gt;</code>) and shows the keyboard-only ring. The toggle is a real button; Enter and Space work.</p>
+<p><b>Behaviour.</b> <code>data-gd-toggle</code> flips <code>aria-expanded</code> and the target's <code>hidden</code>. <b>Provenance.</b> extracted: <code>web/admin/analytics.html:228-236</code>, <code>web/cards.css:99-113</code>; collapsible is NEW (Mobbin Squarespace), pending library review.</p>
+<h3 id="metric-strip">Stat card</h3>
+<p><b>Purpose.</b> One KPI: label, big number, change, optional sparkline or progress. Use for 3 to 6 headline figures at the top of a screen. Use a metric strip when the figures also switch a chart.</p>
+<p><b>Anatomy.</b> <code>.gd-stat-card</code> &gt; <code>__label</code> (status dot, <code>__name</code>, optional <code>__hint</code>) and <code>__body</code> (<code>__row</code> &gt; <code>__value</code>, <code>__spark</code>; <code>__meta</code> &gt; delta pill, <code>__compare</code>; optional progress bar). <code>__hint</code> is a slot for <code>.gd-hint</code> (owned by Inputs): the definition of the metric. <code>__compare</code> is the comparison line (&quot;vs previous period&quot;). The label dot is a series key, the one place besides a badge or legend a dot appears.</p>
+<p><b>Variants.</b> Plain, with sparkline, with progress, unavailable (<code>data-state=&quot;unavailable&quot;</code>: value is a dash and the compare line says why). As <code>&lt;button&gt;</code> or <code>&lt;a&gt;</code> it is interactive (hover, <code>aria-pressed</code> selected).</p>
+<p><b>Tokens.</b> Padding is <code>--gd-card-pad</code> minus 4 (16 comfortable, the hub metric card; 12 compact, the hub stat card); min height <code>--gd-row-h</code> x 2 + 12; value is 500 28px display, no token (R15), kept at 28 in compact. <b>Accessibility.</b> Give the delta pill its screen-reader text (see Delta pill); put the spark's meaning in <code>aria-label</code> or hide it with <code>aria-hidden</code>. <b>Provenance.</b> extracted: <code>analytics.html:198-216</code>; comparison and hint slots NEW.</p>
+<p><b>Phone.</b> Tiles pair up two to a row. The sparkline drops under the figure, and a long name wraps to two lines instead of truncating.</p>
+<h3 id="delta-pill">Metric strip</h3>
+<p><b>Purpose.</b> A row of KPIs that are also tabs: selecting one changes the chart below. Use when 3 to 6 metrics share one chart area. Do not use for unrelated KPIs (use stat cards).</p>
+<p><b>Anatomy.</b> <code>.gd-metric-strip[role=tablist][data-gd-metric-strip]</code> &gt; <code>button.gd-metric-strip__item[role=tab]</code> (<code>__label</code>, <code>__value</code>, <code>__meta</code> with a small delta). The chart is a <code>role=tabpanel</code>; items point at it with <code>aria-controls</code>.</p>
+<p><b>States.</b> Rest, hover, selected (<code>aria-selected</code>: sunken fill plus 2px <code>--gd-ink</code> underline), disabled (<code>aria-disabled</code>). Overflows horizontally below 144px per item.</p>
+<p><b>Behaviour.</b> Click, Left/Right (wrapping), Home, End select and move focus; roving <code>tabindex</code>; fires <code>gd:metric-select {id}</code>; shows and hides panels named by <code>aria-controls</code>. <b>Accessibility.</b> Standard tabs pattern. <b>Provenance.</b> NEW: reference Mobbin Squarespace, Fresha; pending library review.</p>
+<p><b>Phone.</b> The strip scrolls sideways and snaps; each metric is about 44% wide so the next one peeks in.</p>
+<h3 id="badge">Delta pill</h3>
+<p><b>Purpose.</b> The change in a figure against a comparison, as arrow and value. Use on KPI cards and in table cells. Class is <code>.gd-delta</code>.</p>
+<p><b>Anatomy.</b> <code>.gd-delta.gd-delta--good|--bad|--neutral</code> &gt; <code>__arrow[data-dir=up|down|flat]</code> + <code>__value</code>; optional <code>.gd-delta__vs</code> (&quot;vs last 30 days&quot;) placed after it, 4px (<code>--gw-space-4</code>) from the pill. <b>Direction and tone are independent:</b> <code>data-dir</code> is what happened, the modifier is whether that is good. Cost per lead down 3.2% is <code>data-dir=&quot;down&quot;</code> with <code>--good</code>.</p>
+<p><b>Variants.</b> Default 20h (KPI card); <code>--sm</code> 16h at 12px (table cell, fits compact rows); <code>--arrow</code> arrow only, with the figure beside it or in <code>gd-sr</code> text; <code>--ghost</code> no tint, coloured text only for dense tables.</p>
+<p><b>Accessibility.</b> Colour and arrow are not the only carrier: add <code>&lt;span class=&quot;gd-sr&quot;&gt;Up 12.4 percent, better than last period&lt;/span&gt;</code>. Tokens: <code>--gd-tone-good|bad|neutral-bg/-fg</code>. <b>Provenance.</b> NEW: the hub prints the change as plain text; reference Mobbin Fresha, Mixpanel; pending library review.</p>
+<h3 id="status-dot">Badge</h3>
+<p><b>Purpose.</b> A status or label pill. The spec of record is the shared Badge doc (<code>foundation/shared-components.md</code>); this entry is the dashboard CSS and a pointer. When the hub and the doc disagree, R18 decides.</p>
+<p><b>Anatomy.</b> <code>.gd-badge</code> + one tone: <code>--neutral</code> (default), <code>--good</code>, <code>--warn</code>, <code>--bad</code>, <code>--info</code>, <code>--solid</code> (Black, high emphasis), <code>--orange</code>, <code>--violet</code> (categorical only, see Tag). Optional leading <code>.gd-status-dot</code> or 12px icon, trailing arrow. <code>--md</code> is 24h, radius 8, 12px semibold; default is 20h, radius 4, 12px medium. Badges do not follow density.</p>
+<p><b>Tokens.</b> <code>--gd-tone-&lt;tone&gt;-bg/-fg</code>: light <code>/25</code> fill and <code>/600</code> label, dark <code>Alpha/10</code> fill and <code>/300</code> label. <b>Findings.</b> The hub's <code>.ul-badge--ok</code> uses a <code>green-500</code> label and <code>.ul-badge--bad</code> an alpha-10 fill, both against R18; <code>.bdg--on</code> in <code>cards.css</code> uses <code>green-500</code>. This set follows R18. The dark pairs are not yet contrast-measured (open in R18). <b>Provenance.</b> extracted: <code>analytics.html:384-394</code>, <code>cards.css:42-53</code>.</p>
+<h3 id="progress-bar">Status dot</h3>
+<p><b>Purpose.</b> An 8px key that says which series or state a label belongs to. Only inside a badge or a legend (and the stat card label, which is a series key). Never bare on a row; use a badge. <b>Anatomy.</b> <code>.gd-status-dot</code> + <code>--good|--warn|--bad|--info|--neutral</code>; <code>--live</code> pulses (off under reduced motion). A legend key sets <code>style=&quot;--gd-dot:…&quot;</code>. Decorative: <code>aria-hidden</code>; the adjacent text carries the meaning. <b>Provenance.</b> extracted: <code>analytics.html:204-205</code>.</p>
+<h3 id="ring">Progress bar</h3>
+<p><b>Purpose.</b> How far a value is toward a target. Use for budgets, quotas, completion. <b>Anatomy.</b> <code>.gd-progress-bar[role=progressbar][aria-valuenow]</code> with <code>style=&quot;--gd-pct:62&quot;</code> and one <code>&lt;i&gt;</code> fill. <code>--sm</code> is 2px (in a cell), default 4px (the hub). Tones <code>--warn</code>, <code>--bad</code>, <code>--info</code>, <code>--neutral</code>; default green. <b>Over target:</b> <code>data-state=&quot;over&quot;</code> makes the fill full and red; add <code>.gd-progress-bar__target</code> with <code>--gd-target:85</code> for a tick. The optional <code>.gd-progress-bar-wrap</code> adds a label and value row. Track is <code>--gd-track</code>. <b>Behaviour.</b> The consumer updates <code>--gd-pct</code> and <code>aria-valuenow</code>. <b>Provenance.</b> extracted: <code>analytics.html:217-218</code>; over-target and tick NEW.</p>
+<h3 id="legend">Ring</h3>
+<p><b>Purpose.</b> One value as a circle, for completion or a score. Use when a bar is too wide; not for part-of-whole (that is a chart). <b>Anatomy.</b> <code>.gd-ring</code> (<code>--sm</code> 32, default 48, <code>--lg</code> 96) &gt; svg with <code>__track</code> and <code>__fill</code> circles (<code>pathLength=&quot;100&quot;</code>, <code>r=15.9155</code>) + <code>__label</code>; set <code>style=&quot;--gd-pct:72&quot;</code>. Tones as progress bar. Same ARIA as progress bar. <b>Provenance.</b> extracted geometry from <code>analytics.html:331-337</code>.</p>
+<h3 id="key-value-list">Legend</h3>
+<p><b>Purpose.</b> Names the series in a chart: swatch, label, value. Clickable, it hides and shows a series. <b>Anatomy.</b> <code>.gd-legend[data-gd-legend]</code> &gt; <code>button.gd-legend__item[aria-pressed][data-key]</code> (<code>__swatch</code>, <code>__label</code>, <code>__value</code>); a static legend uses <code>div</code> items. <code>--inline</code> lays out in a row. Swatch colour: <code>--gd-swatch</code>, or <code>__swatch--1|2|3</code> for the chart palette (R11 ceiling is three series; a fourth is a finding, not a colour).</p>
+<p><b>States.</b> On, hover, off (hollow swatch, struck label), disabled. <b>Behaviour.</b> Click toggles <code>aria-pressed</code> and fires <code>gd:legend-toggle {key, on}</code> on the list; the chart listens. The last visible series cannot be hidden. <b>Accessibility.</b> Buttons with <code>aria-pressed</code>; group labelled. <b>Provenance.</b> extracted: <code>analytics.html:338-342</code>; toggle NEW.</p>
+<h3 id="activity-timeline">Key value list</h3>
+<p><b>Purpose.</b> A read-only properties panel: label on the left, value on the right. Use on detail pages and drawers. For editing use form fields; for many records use a table. <b>Anatomy.</b> <code>&lt;dl class=&quot;gd-key-value-list&quot;&gt;</code> &gt; <code>__row</code> &gt; <code>dt.__key</code>, <code>dd.__value</code> (text, badge, avatar and name, link, tags). Missing value: <code>&lt;span class=&quot;gd-key-value-list__empty&quot;&gt;—&lt;/span&gt;</code>. Variants <code>--ruled</code> (hairlines) and <code>--stacked</code> (label above value, for narrow panels). Row height is <code>--gd-control-h</code>. <b>Provenance.</b> NEW: reference Mobbin Twenty, Rox; pending library review.</p>
+<h3 id="checklist">Activity timeline</h3>
+<p><b>Purpose.</b> A chronological feed of events on a record, grouped by date. <b>Anatomy.</b> <code>ol.gd-timeline</code> &gt; <code>li.gd-timeline__group</code> (<code>__date</code>, inner list) &gt; <code>li.gd-timeline__item[--good|--warn|--bad|--info]</code> &gt; <code>__node</code> (24px rounded square with icon or avatar), <code>__body</code> (actor in bold; optional <code>__comment</code>), <code>&lt;time class=&quot;gd-timeline__time&quot;&gt;</code> right-aligned relative time with the absolute time in <code>datetime</code> and <code>title</code>.</p>
+<p><b>Incident variant</b> (<code>.gd-timeline--incident</code>): the node is the actor's small avatar, or a status icon for system events; each event may carry an expandable comment: <code>button.gd-timeline__more[data-gd-toggle]</code> + <code>p.gd-timeline__comment[hidden]</code>. <b>Behaviour.</b> The comment toggle is the shared disclosure. <b>Provenance.</b> NEW: reference Mobbin Twenty, Zoho; incident variant Better Stack; pending library review.</p>
+<h3 id="avatar">Checklist</h3>
+<p><b>Purpose.</b> Getting-started steps with a progress count. Use for onboarding and setup; not for task management. <b>Anatomy.</b> <code>.gd-checklist</code> &gt; <code>__head</code> (<code>__title</code>, <code>__count[data-gd-checklist-count]</code>, a progress bar) and <code>ul.__steps</code> &gt; <code>li.__step[data-state=done|current|todo]</code> &gt; <code>button.__toggle[data-gd-toggle data-gd-accordion]</code> (<code>__mark</code>, title, chevron) and <code>__detail[hidden]</code> (copy plus an action; a <code>data-gd-step-done</code> button completes the step).</p>
+<p><b>States.</b> Todo (empty ring), current (ink ring), done (filled mark, muted title), hover on the toggle. <b>Behaviour.</b> One step open at a time; completing a step opens the next and updates &quot;2 of 5 complete&quot; and the bar. <b>Accessibility.</b> Toggle is a button with <code>aria-expanded</code>; the mark is decorative, state is in the title's text or <code>gd-sr</code>. <b>Provenance.</b> NEW: reference Mobbin Squarespace, HoneyBook, Vanta; pending library review.</p>
+<h3 id="avatar-group">Avatar</h3>
+<p><b>Purpose.</b> A person or account mark. The hub's generated mark: a rounded square with a 3x3 dot profile chosen by hashing a seed (email), the same on every device. <b>Anatomy.</b> <code>.gd-avatar</code> (24 <code>--sm</code>, 32 default, 40 <code>--lg</code>) containing the svg, or <code>data-gd-avatar=&quot;seed&quot;</code> and JS renders it. Level: <code>--team</code> (primary-300), <code>--admin</code> and <code>--owner</code> (black in light; neutral-800 in dark, an added alias <code>--gd-avatar-admin</code>, because black vanishes on the dark ground). Team avatars take one of five tones, all at the <code>-300</code> step: blue (default), red, yellow, orange, green. <code>data-tone=&quot;red|yellow|orange|green&quot;</code> sets it; with <code>data-gd-avatar</code> outside a group JS picks a stable tone from the seed. Admin and owner stay black. <code>--initials</code> is the fallback when no seed exists. Radius is 20% of the size. <b>Accessibility.</b> <code>role=img</code> with the person's name. <b>Provenance.</b> extracted: <code>web/shell.js:407-455</code>; initials NEW.</p>
+<h3 id="tag">Avatar group</h3>
+<p><b>Purpose.</b> Several people at once, stacked with an overflow count. <b>Anatomy.</b> <code>.gd-avatar-group</code> (<code>--sm</code>, <code>--lg</code>) &gt; avatars + <code>.gd-avatar-group__more</code> (&quot;+3&quot;). Overlap is 25%, with a 2px ring in the card colour. Show at most 4 and count the rest. Neighbours take the next tone in turn (blue, red, yellow, orange, green) so they read as different people; a <code>data-tone</code> on one avatar overrides. <b>Accessibility.</b> <code>role=group</code> with a label giving the total. <b>Provenance.</b> NEW; pending library review.</p>
+<h3 id="status-banner">Tag</h3>
+<p><b>Purpose.</b> A user-facing category or filter chip, optionally removable. Not status (that is a badge). <b>Anatomy.</b> <code>.gd-tag</code> (<code>__label</code>, optional <code>button.__remove[data-gd-tag-remove][aria-label=&quot;Remove X&quot;]</code>). Height is <code>--gd-control-h</code> minus 8 (28 comfortable, 20 compact). Outlined by default; add a tone for a tinted category chip. As <code>&lt;button&gt;</code> it is a filter: hover, <code>aria-pressed</code> selected (ink fill), disabled.</p>
+<p><b>Categorical hues.</b> Tones <code>--info</code> (blue), <code>--orange</code>, <code>--violet</code>, <code>--good</code>, <code>--warn</code>, <code>--bad</code>, <code>--neutral</code>, plus the solid black badge. <b>Finding: the token set supports 7 tinted hues, but only 4 are free of status meaning (blue, orange, violet, neutral); green, yellow and red mean good, warn and bad and collide with signal use. Orange and yellow sit close, and orange and red are close at 12px. A heavy analytics screen wanting 8 or more distinguishable category colours (Peec AI shows about 10) cannot be served by the tokens; do not invent colours. Violet has no ramp (one token), so its tint and light label are derived with <code>color-mix</code> from <code>--gw-color-chart-violet</code> (label contrast about 6.9:1 light).</b> Owner decision needed: add a violet ramp and more hues, or cap categories at 7 and use the neutral tag for the rest.</p>
+<p><b>Behaviour.</b> The remove button deletes the tag and fires cancelable <code>gd:tag-remove {label}</code> first. <b>Provenance.</b> NEW: reference Mobbin Peec AI; pending library review.</p>
+<h3 id="status-list">Status banner</h3>
+<p><b>Purpose.</b> The headline state of a system: &quot;All systems operational&quot; with icon, a live badge and the period selector. <b>Anatomy.</b> <code>.gd-status-banner[data-status=operational|degraded|outage|maintenance]</code> &gt; <code>.gd-status-icon</code>, <code>__text</code> (<code>__title</code> with live badge, <code>__sub</code>), <code>__period</code> (slot for a select from Inputs). A non-operational state tints the whole banner with the status pair. Icons (Phosphor fill): check-circle, warning, x-circle, wrench; always with the text, never colour alone. <b>Provenance.</b> NEW: reference Mobbin OpenAI status, Twingate, incident.io, Better Stack; pending library review.</p>
+<h3 id="incident-row">Status list</h3>
+<p><b>Purpose.</b> Components or services with a status each, expandable for detail (uptime, last incident). <b>Anatomy.</b> <code>ul.gd-status-list</code> &gt; <code>li[data-status]</code> &gt; <code>button.__head[data-gd-toggle][aria-expanded][aria-controls]</code> (status icon, <code>__name</code>, <code>__meta</code>, <code>__state</code>, chevron) and <code>__panel[hidden]</code>. A row with nothing to show is <code>disabled</code> and hides the chevron. States: rest, hover, expanded, disabled. Row height is <code>--gd-row-h</code>. <b>Behaviour.</b> shared disclosure. <b>Provenance.</b> NEW: reference Mobbin OpenAI platform, incident.io, Better Stack, Vapi; pending library review.</p>
+<h3 id="issue-summary">Incident row</h3>
+<p><b>Purpose.</b> One entry in an incident history: title, status, duration, relative time. <b>Anatomy.</b> <code>ul.gd-incident-list</code> &gt; <code>li.gd-incident-row[data-status][data-state=ongoing|resolved]</code> &gt; status icon, <code>__main</code> (<code>__title</code>, <code>__sub</code>), a badge (&quot;Investigating&quot;, &quot;Resolved&quot;), <code>__duration</code>, <code>&lt;time class=&quot;__time&quot;&gt;</code>. With a link title add <code>--link</code> for hover. An ongoing incident shows its duration in the status colour; resolved is muted and its badge is green. Columns are fixed so rows align. <b>Provenance.</b> NEW; same references as Status list.</p>
+<p><b>Phone.</b> Two columns: the status icon, then title, subtitle, badge, duration and time stacked under it.</p>
+<h3>Issue summary</h3>
+<p><b>Purpose.</b> A compact strip of counters: &quot;Critical 0, Warning 0, MTTR —&quot;. <b>Anatomy.</b> <code>ul.gd-issue-summary</code> &gt; <code>li.__item[data-severity=critical|warning|mttr]</code> (icon, <code>__label</code>, <code>__value</code>). <code>data-count=&quot;0&quot;</code> greys the icon. A counter that cannot be read is <code>data-state=&quot;unavailable&quot;</code>: the value is a dash with <code>gd-sr</code> text &quot;unavailable&quot;, never a zero (R20); a true zero shows 0. <b>Provenance.</b> NEW; reference Mobbin incident.io, Better Stack; pending library review.</p></div></main><div class="lb-toc"><b>On this page</b><a href="#card" class="l3">Card</a><a href="#stat-card" class="l3">Stat card</a><a href="#metric-strip" class="l3">Metric strip</a><a href="#delta-pill" class="l3">Delta pill</a><a href="#badge" class="l3">Badge</a><a href="#status-dot" class="l3">Status dot</a><a href="#progress-bar" class="l3">Progress bar</a><a href="#ring" class="l3">Ring</a><a href="#legend" class="l3">Legend</a><a href="#key-value-list" class="l3">Key value list</a><a href="#activity-timeline" class="l3">Activity timeline</a><a href="#checklist" class="l3">Checklist</a><a href="#avatar" class="l3">Avatar</a><a href="#avatar-group" class="l3">Avatar group</a><a href="#tag" class="l3">Tag</a><a href="#status-banner" class="l3">Status banner</a><a href="#status-list" class="l3">Status list</a><a href="#incident-row" class="l3">Incident row</a><a href="#issue-summary" class="l3">Issue summary</a></div></div>
 <script>
 (function(){
-  /* Theme: the same two localStorage keys the main site uses, so a choice made there
-     carries here and back. 'system' can still arrive from an older stored value and
-     resolves to light, matching shell.js. */
-  var PREF='gw-theme-pref', RES='gw-theme';
-  function pref(){try{var v=localStorage.getItem(PREF);
-    if(v==='light'||v==='dark')return v;
-    if(v==='system')return 'light';
-    var o=localStorage.getItem(RES);
-    return (o==='dark'||o==='light')?o:'light';}catch(e){return 'light'}}
-  function apply(p){var r=p==='dark'?'dark':'light';
+  /* Theme: the same keys as the main site. `gw-theme-choice` is what the person picked (light, dark or system) and is
+     written only when they pick; no choice means System, which follows the machine. `gw-theme` is the resolved
+     light or dark. This button toggles light and dark, so using it is a choice. */
+  var CH='gw-theme-choice', RES='gw-theme';
+  function pref(){try{var v=localStorage.getItem(CH);return (v==='light'||v==='dark'||v==='system')?v:'system'}catch(e){return 'system'}}
+  function res(p){return p==='dark'?'dark':p==='light'?'light':(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}
+  function apply(p,remember){var r=res(p);
     document.documentElement.setAttribute('data-theme',r);
-    try{localStorage.setItem(PREF,p);localStorage.setItem(RES,r)}catch(e){}
+    try{localStorage.setItem(RES,r);if(remember)localStorage.setItem(CH,p)}catch(e){}
     var b=document.getElementById('lb-theme');
     if(b)b.setAttribute('aria-label',r==='dark'?'Switch to light':'Switch to dark');}
   var btn=document.getElementById('lb-theme');
   if(btn)btn.addEventListener('click',function(){
-    apply(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
-  apply(pref());
+    apply(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark',true)});
+  apply(pref(),false);
+  try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){if(pref()==='system')apply('system',false)})}catch(e){}
 
   /* Rail filter. Narrows the inventory in place — it does not navigate, because the
      rail is a list of siblings and losing your place to search them is worse than
@@ -479,6 +527,17 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
       var t=f.value.trim().toLowerCase();
       rows.forEach(function(a){
         a.hidden=!!t&&a.getAttribute('data-q').indexOf(t)===-1});
+    });
+  }
+
+  /* Component list filter: hides rows that do not match, and a surface whose rows all went. */
+  var rf=document.getElementById('lb-rows');
+  if(rf){
+    var trs=[].slice.call(document.querySelectorAll('tr[data-q]')), secs=[].slice.call(document.querySelectorAll('section[data-cat]'));
+    rf.addEventListener('input',function(){
+      var t=rf.value.trim().toLowerCase();
+      trs.forEach(function(r){r.hidden=!!t&&r.getAttribute('data-q').indexOf(t)===-1});
+      secs.forEach(function(sc){sc.hidden=!sc.querySelector('tr[data-q]:not([hidden])')});
     });
   }
 

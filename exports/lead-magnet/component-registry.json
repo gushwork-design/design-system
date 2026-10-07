@@ -3,13 +3,13 @@
     "Per-component versions for the lead-magnet document surface. The plugin version tells someone the PLUGIN is",
     "stale; this tells them which of the components THEY used actually changed, which is the only",
     "thing that makes them act. Bump a component's version in the same commit that changes its spec",
-    "\u2014 scripts/check-drift.sh reads this file and a build's stamp, and reports the intersection.",
+    "— scripts/check-drift.sh reads this file and a build's stamp, and reports the intersection.",
     "",
     "version = the plugin version in which that component's spec last changed.",
     "breaking = true when a build using it will render WRONG until updated, as opposed to merely",
     "missing an improvement. It is the difference between a red notice and an amber one.",
     "",
-    "Seeded by deriving, for each spec doc, the first release that shipped its last change \u2014 not",
+    "Seeded by deriving, for each spec doc, the first release that shipped its last change — not",
     "by stamping everything at the current version, which would have told every existing build that",
     "all of its components moved at once."
   ],
@@ -38,6 +38,36 @@
       "changed": "2026-09-01",
       "breaking": false,
       "doc": "document.md"
+    }
+  },
+  "review": {
+    "closer": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "c44745e60b289e18",
+      "previewFingerprint": "a340e8be4ae4ad96"
+    },
+    "cover": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "53ed9d5504985b6d",
+      "previewFingerprint": "a0c491405537fae2"
+    },
+    "document": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "d3d9a5c3ada48ad0",
+      "previewFingerprint": "d486763d766e4f6d"
+    },
+    "interior": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "dbbb361eeb285e47",
+      "previewFingerprint": "f6a9b2fc816a42e6"
     }
   }
 }

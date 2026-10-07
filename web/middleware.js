@@ -25,9 +25,10 @@
 import { COOKIE, verify, readCookie, sessionSecret, authModes, GATE_ENABLED }
   from './api/_session.js';
 import { loadRules, decide } from './api/_access.js';
+import { recordVisit, recordPublicView } from './api/_log-visit.js';
 
 export const config = {
-  matcher: ['/internal/:path*', '/admin/:path*', '/library', '/library/:path*', '/agents', '/agents/:path*']
+  matcher: ['/internal/:path*', '/admin/:path*', '/library', '/library/:path*', '/previews/:path*', '/agents', '/agents/:path*']
 };
 
 /* ── THE GATE IS ON, 15 Sep 2026 ─────────────────────────────────────────────
@@ -45,6 +46,10 @@ export const config = {
    the ID card tool shipped with its own client-side password REMOVED on the understanding that
    Google auth would replace it. The old note here said to turn this back on BEFORE adding a
    genuinely private page. That page arrived, so it is on.
+
+   /previews is inside it (added 2 Oct 2026): the drawings the review drawer shows. The rule for it in _access.js had no
+   effect while the matcher left it out, so those files were public. The repo is public, so nothing secret was exposed,
+   but the gate should match what the access rules say.
 
    Still deliberately outside the matcher and still public: the per-surface
    component-registry.json files under /exports (written without a glob here, because the
@@ -120,12 +125,72 @@ function isPublic(pathname) {
   return PUBLIC_PATHS.some(p => pathname === p || pathname.startsWith(p + '/'));
 }
 
-export default async function middleware(request) {
+/* ── link previews from behind the gate ─────────────────────────────────────
+   A link-preview bot has no cookie, so it gets the sign-in bounce and unfurls
+   the home page's card for every gated link. For those bots only, answer with
+   a stub that holds the page's own title and card image and nothing else.
+   The pairs come from og-map.json, which scripts/_add_og.py writes at publish
+   from the pages' own og tags; an unmapped path gets no stub and is gated as
+   usual. What this reveals is a page's title and its card image (already
+   public) to anyone who sends a bot's User-Agent. Ruled by Utsav 1 Oct 2026. */
+const UNFURL_BOTS = /Slackbot|Slack-ImgProxy|LinkedInBot|Twitterbot|facebookexternalhit|Facebot|WhatsApp|Discordbot|TelegramBot|Applebot|SkypeUriPreview/i;
+
+const esc = v => String(v).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+
+async function unfurlStub(request, url) {
+  if (request.method !== 'GET' && request.method !== 'HEAD') return null;
+  if (!UNFURL_BOTS.test(request.headers.get('user-agent') || '')) return null;
+  try {
+    const res = await fetch(new URL('/og-map.json', url));
+    if (!res.ok) return null;
+    const map = await res.json();
+    const hit = map[url.pathname.replace(/\/+$/, '')];
+    if (!hit) return null;
+    const [title, image, desc] = hit;
+    const t = esc(title), i = esc(image), d = desc ? esc(desc) : '';
+    return new Response(
+      '<!doctype html><html><head><meta charset="utf-8"><title>' + t + '</title>' +
+      '<meta property="og:type" content="website">' +
+      '<meta property="og:site_name" content="Gushwork Design">' +
+      '<meta property="og:title" content="' + t + '">' +
+      (d ? '<meta property="og:description" content="' + d + '"><meta name="description" content="' + d + '">' : '') +
+      '<meta property="og:url" content="' + esc(url.origin + url.pathname) + '">' +
+      '<meta property="og:image" content="' + i + '">' +
+      '<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">' +
+      '<meta name="twitter:card" content="summary_large_image">' +
+      '<meta name="twitter:title" content="' + t + '"><meta name="twitter:image" content="' + i + '">' +
+      '</head><body></body></html>',
+      { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } }
+    );
+  } catch (e) {
+    return null;
+  }
+}
+
+/* A person opening a page, as opposed to the browser fetching a stylesheet or a prefetch. */
+function isPageView(request, url) {
+  if (request.method !== 'GET') return false;
+  if (url.pathname.indexOf('/admin/analytics') === 0) return false;
+  const last = url.pathname.split('/').pop() || '';
+  if (last.indexOf('.') !== -1 && !/\.html$/.test(last)) return false;
+  const h = request.headers;
+  if ((h.get('purpose') || h.get('sec-purpose') || '').toLowerCase().indexOf('prefetch') !== -1) return false;
+  const dest = h.get('sec-fetch-dest');
+  if (dest) return dest === 'document' || dest === 'iframe';
+  return (h.get('accept') || '').indexOf('text/html') !== -1;
+}
+
+export default async function middleware(request, context) {
+  const url = new URL(request.url);
+
   /* Returning undefined continues to the next handler, which serves the file. */
   if (!GATE_ENABLED) return undefined;
 
-  const url = new URL(request.url);
   if (isPublic(url.pathname)) return undefined;
+
+  const stub = await unfurlStub(request, url);
+  if (stub) return stub;
+
   const modes = authModes();
 
   /* Fail closed if there is no way in at all — an unconfigured gate must not
@@ -157,8 +222,8 @@ export default async function middleware(request) {
   if (!session) return toSignIn(url);
 
   /* Evaluated against the rules AS THEY ARE NOW, not against session.admin.
-     The cookie is signed for 12 hours, so trusting its claim would mean a
-     revoked admin kept the keys for the rest of the day and a newly granted
+     The cookie is signed for 30 days, so trusting its claim would mean a
+     revoked admin kept the keys for the rest of the month and a newly granted
      one had to sign out and back in to use them — neither is what "live" in
      /admin/access-control means. The rules come from Edge Config when a store
      is attached and from the compiled defaults when it is not, so this is the
@@ -167,6 +232,15 @@ export default async function middleware(request) {
   const verdict = decide(url.pathname, session, rules);
   if (verdict === 'forbid') return forbidden(session.email);
   if (verdict === 'signin') return toSignIn(url);
+
+  /* The owner's visit log (api/_log-visit.js): who opened which page. Pages only — not images,
+     scripts or fetches — and never the analytics page itself. Handed to waitUntil so it cannot delay
+     the response. */
+  if (isPageView(request, url)) {
+    const logged = recordVisit({ email: session.email || null, path: url.pathname, kind: 'view' });
+    if (context && typeof context.waitUntil === 'function') context.waitUntil(logged);
+    else await logged;   // no waitUntil in this runtime: a short wait beats a dropped row
+  }
 
   /* Returning nothing continues to the next handler, which serves the file. */
   return undefined;

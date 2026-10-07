@@ -3,9 +3,10 @@
    check who it is, and set the session cookie. */
 
 import {
-  COOKIE, MAX_AGE, sign, readCookie, serializeCookie,
+  COOKIE, MAX_AGE, sign, readCookie, serializeCookie, cookieDomain,
   safeNext, redirectUri, missingConfig, isInternal, isAdmin, allowedDomain
 } from '../_session.js';
+import { recordVisit } from '../_log-visit.js';
 
 const STATE_COOKIE = 'gw_oauth_state';
 
@@ -108,8 +109,9 @@ export default async function handler(req, res) {
     exp: Math.floor(Date.now() / 1000) + MAX_AGE
   };
 
+  await recordVisit({ email, path: '/', kind: 'signin', via: 'google' });
   res.setHeader('Set-Cookie', [
-    serializeCookie(COOKIE, await sign(payload, process.env.SESSION_SECRET), { maxAge: MAX_AGE }),
+    serializeCookie(COOKIE, await sign(payload, process.env.SESSION_SECRET), { maxAge: MAX_AGE, domain: cookieDomain() }),
     serializeCookie(STATE_COOKIE, '', { maxAge: 0 })
   ]);
   res.writeHead(302, { Location: safeNext(state.next) });

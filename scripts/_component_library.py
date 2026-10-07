@@ -298,7 +298,7 @@ PROV_RULE = {
 # 4. Review state — READ from the registry, never inferred
 # ---------------------------------------------------------------------------
 
-SURFACES = ["shared", "web", "dashboard", "lead-magnet", "slides", "ad-page"]
+SURFACES = ["shared", "web", "dashboard", "lead-magnet", "slides", "ad-page", "tools"]
 
 
 def load_registries():
@@ -321,7 +321,7 @@ def review_of(block, key):
     """The registry's word on one entry. Absent means pending — never 'fine'."""
     r = (block or {}).get(key) or {}
     state = r.get("reviewed", "pending")
-    if state not in ("passed", "pending", "rejected"):
+    if state not in ("passed", "pending", "rejected", "rework"):
         state = "pending"
     return {
         "state": state,
@@ -384,7 +384,7 @@ CSS = """
          padding:var(--gw-space-8) var(--gw-space-12);font:var(--gw-text-body-14-reg);
          color:var(--s-heading)}
 .cl-find::placeholder{color:var(--s-placeholder)}
-.cl-find:focus{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.cl-find:focus{outline:none;border-color:var(--gw-color-neutral-400)}
 .cl-filter{display:flex;gap:var(--gw-space-4);flex-wrap:wrap}
 .cl-f{font:var(--gw-text-body-12-med);color:var(--s-body);background:transparent;
       border:1px solid var(--s-field-border);border-radius:var(--gw-radius-full);
@@ -855,11 +855,13 @@ def render_gaps(items):
 USE_CASES = [
     ("web", "Landing pages", "Public marketing surfaces — heroes, folds, pricing, "
                              "case studies, ad landers.", "gushwork-web"),
-    ("dashboard", "Dashboards", "Logged-in product screens — KPI rows, tables, side nav, "
-                                "filters, toasts.", "gushwork-dashboard"),
+    ("dashboard", "Dashboards", "Logged-in analytics dashboards and web apps — tables, charts, "
+                                "filters, settings, sign-in.", "gushwork-dashboard"),
     ("lead-magnet", "Lead magnets", "The downloadable PDF behind an ad lander — covers, "
                                     "interiors, closers.", "gushwork-lead-magnet"),
     ("slides", "Slide decks", "Sales and discovery decks, 1920×1080.", "gushwork-slides"),
+    ("tools", "Hub tools", "The small internal tools on the design hub, like the email "
+                           "signature creator and the ID card generator.", "gushwork-tools"),
     ("shared", "Shared", "Held once and merged into every surface, so a change is "
                          "reported once rather than per surface.",
      "foundation/shared-components.md"),
@@ -921,17 +923,106 @@ def group_fingerprints(groups=None):
     return out
 
 
+def doc_section(body, key):
+    """The part of a shared spec doc that is about `key`: the doc's preamble (everything above the first `##`, the
+    rules every component in the doc shares) plus the `##`/`###` section whose heading names the key, up to the next
+    heading at the same level or higher. Returns None when no heading names it, and the caller hashes the whole doc,
+    exactly as before (5 Oct 2026). A heading names the key when its slug is the key, starts with "<key>-", or is
+    "the-<key>"."""
+    lines = body.splitlines()
+    heads = [(i, len(m.group(1)), re.sub(r"[^a-z0-9]+", "-", m.group(2).lower()).strip("-"))
+             for i, ln in enumerate(lines) for m in [re.match(r"^(#{2,3}) (.+?)\s*$", ln)] if m]
+    if not heads:
+        return None
+    hit = next((h for h in heads if h[2] == key or h[2].startswith(key + "-") or h[2] == "the-" + key), None)
+    if not hit:
+        return None
+    end = next((i for i, lvl, _ in heads if i > hit[0] and lvl <= hit[1]), len(lines))
+    return "\n".join(lines[:heads[0][0]] + lines[hit[0]:end])
+
+
+def spec_fingerprint(key, entry, body):
+    """The fingerprint of one component's spec, from its registry entry and its doc's text. Pure, so the review
+    backfill can compute it at any past revision."""
+    part = doc_section(body, key)
+    return fingerprint(f"{key}|{entry.get('version','')}|{entry.get('changed','')}|{body if part is None else part}")
+
+
+def legacy_spec_fingerprint(key, entry, body):
+    """The fingerprint before 5 Oct 2026: the WHOLE doc. Kept only so the backfill can find the revision an old
+    decision was made against."""
+    return fingerprint(f"{key}|{entry.get('version','')}|{entry.get('changed','')}|{body}")
+
+
+def component_doc_path(surface, entry):
+    base = "foundation" if surface == "shared" else os.path.join("exports", surface)
+    doc = entry.get("doc", "")
+    return os.path.join(base, doc) if doc else ""
+
+
 def component_fingerprint(surface, key, reg=None):
-    """A component's spec doc plus its registry entry. Re-measuring the doc, or
-    bumping the version, expires the pass."""
+    """A component's spec: its registry entry plus ITS OWN section of the doc (and the doc's shared preamble).
+    Re-measuring that section, or bumping the version, expires the pass. Until 5 Oct 2026 this hashed the whole doc,
+    so a rework of one component in a shared doc (navigation.md holds eight) expired all its neighbours' passes;
+    Utsav: "do both, and restore the expired ones to approved". A component whose doc has no heading naming it
+    still hashes the whole doc."""
     reg = reg or load_registries()
     block = (reg.get(surface) or {})
     entry = (block.get("components") or {}).get(key) or {}
-    base = "foundation" if surface == "shared" else os.path.join("exports", surface)
-    doc = entry.get("doc", "")
-    path = os.path.join(ROOT, base, doc) if doc else ""
+    rel = component_doc_path(surface, entry)
+    path = os.path.join(ROOT, rel) if rel else ""
     body = open(path, encoding="utf-8").read() if path and os.path.isfile(path) else ""
-    return fingerprint(f"{key}|{entry.get('version','')}|{entry.get('changed','')}|{body}")
+    return spec_fingerprint(key, entry, body)
+
+
+def rework_record_path(surface, key):
+    """Where a rework's fix record lives: web/previews/<surface>/<key>.reworked (R54 addendum, 5 Oct 2026).
+    One file per item, so two rework PRs never conflict over a shared ledger."""
+    return os.path.join(ROOT, "web", "previews", surface, key + ".reworked")
+
+
+def rework_record_for(rec, fixed):
+    """The record a fix writes: which send-back it answers, and when it was fixed. The note is stored as a
+    fingerprint, not as text, so the file says nothing the registry does not."""
+    out = {"fixed": fixed, "decidedOn": rec.get("reviewedOn", ""), "note": fingerprint(rec.get("note", ""))}
+    if rec.get("reviewedAt"):
+        out["decidedAt"] = rec["reviewedAt"]
+    return out
+
+
+def rework_fixed(surface, key, rec, record=None):
+    """True when a fix record answers THIS send-back: same decision date (and time, when the registry has one)
+    and the same note. A fix for an earlier send-back does not count for a later one."""
+    if record is None:
+        p = rework_record_path(surface, key)
+        if not os.path.isfile(p):
+            return False
+        try:
+            with open(p, encoding="utf-8") as fh:
+                record = json.load(fh)
+        except Exception:
+            return False
+    if not isinstance(record, dict) or not record.get("fixed"):
+        return False
+    want = rework_record_for(rec, record["fixed"])
+    return all(record.get(k) == v for k, v in want.items())
+
+
+def preview_fingerprint(surface, key):
+    """The drawing the reviewer was looking at: web/previews/<surface>/<key>.frag. Empty when
+    there is no drawing.
+
+    Kept SEPARATE from component_fingerprint on purpose (5 Oct 2026). The rework routine may
+    edit previews and nothing else, so a rework that only redrew the preview left the
+    fingerprint above untouched and the item could never read "redone" (R45). Folding the
+    preview into that fingerprint would have expired every pass on record at once; a second
+    fingerprint, stored with each decision from now on, compares only where both sides have
+    one, so older decisions keep working and nothing expires retroactively."""
+    p = os.path.join(ROOT, "web", "previews", surface, key + ".frag")
+    if not os.path.isfile(p):
+        return ""
+    with open(p, encoding="utf-8") as fh:
+        return fingerprint(fh.read())
 
 
 # ---------------------------------------------------------------------------
@@ -1024,12 +1115,16 @@ PARTS = [
     ("web", "Web", "Public marketing surfaces. Ad landers and brand pages both draw "
                    "from this one set — the difference is page-build's Type property, "
                    "not a different component.", "skills/gushwork-web"),
-    ("dashboard", "Dashboard", "Logged-in product screens. A separate Button and Avatar "
+    ("dashboard", "Dashboard", "Logged-in analytics dashboards and web apps, extracted from the "
+                               "design hub. A separate Button and Avatar "
                                "set from web, by design — never substitute one for the "
                                "other.", "skills/gushwork-dashboard"),
     ("slides", "Slides", "Sales and discovery decks, 1920×1080.", "skills/gushwork-slides"),
     ("lead-magnet", "Lead magnet", "The downloadable PDF behind an ad lander.",
      "skills/gushwork-lead-magnet"),
+    ("tools", "Tools", "The shell the hub's small internal tools share: a floating panel, "
+                       "one action pill, the hub's menus, progress beside a control.",
+     "skills/gushwork-tools"),
     ("shared", "Shared", "Held once and merged into every surface, so a change is "
                          "reported once rather than per surface.",
      "foundation/shared-components.md"),
@@ -1055,7 +1150,7 @@ RECIPES = [
      "it in rather than rebuilding it from folds.",
      "skills/gushwork-web/templates/case-study"),
     ("dashboard-screen", "Dashboard screen", "dashboard", "—",
-     "A logged-in product surface — KPI rows, tables, side nav, filters.",
+     "A logged-in analytics screen or web-app page — overview, explorer, list with filters, settings, detail.",
      "skills/gushwork-dashboard"),
     ("lead-magnet-doc", "Lead magnet", "lead-magnet", "print output",
      "The gated PDF itself — cover, interior, closer.", "skills/gushwork-lead-magnet"),

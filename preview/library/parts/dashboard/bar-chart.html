@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>bar-chart — Gushwork</title>
+<meta name="description" content="Dashboard · charts.md">
+<meta name="robots" content="noindex">
+<script>try{var c=localStorage.getItem('gw-theme-choice'),t=c==='dark'||c==='light'?c:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20x%3D%221%22%20y%3D%221%22%20width%3D%2278%22%20height%3D%2278%22%20rx%3D%2219%22%20fill%3D%22%230070ff%22%20stroke%3D%22%230061e0%22%20stroke-width%3D%222%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="../../../foundation/tokens.css">
+<link rel="stylesheet" href="../../../shell.css">
+<style>
+.cl{--cl-gap:var(--gw-space-40)}
+.cl h2{font:var(--gw-text-h5);color:var(--s-heading);margin:0}
+.cl h3{font:var(--gw-text-h7);color:var(--s-heading);margin:0}
+.cl h4{font:var(--gw-text-body-16-sem);color:var(--s-heading);margin:0}
+.cl p{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+      color:var(--s-body);margin:0;max-width:78ch}
+.cl code,.cl .mono{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px}
+
+/* --- page head ------------------------------------------------------------ */
+.cl-head{display:flex;flex-direction:column;gap:var(--gw-space-16)}
+.cl-head h1{font:var(--gw-text-h4);color:var(--s-heading);margin:0}
+.cl-lede{font:var(--gw-text-body-18-reg);letter-spacing:var(--gw-text-body-18-reg-tracking);
+         color:var(--s-body);margin:0;max-width:72ch}
+
+/* --- the tally ------------------------------------------------------------ */
+.cl-tally{display:flex;flex-wrap:wrap;gap:var(--gw-space-12)}
+.cl-stat{flex:1 1 150px;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-16) var(--gw-space-20);
+         display:flex;flex-direction:column;gap:var(--gw-space-4)}
+.cl-stat b{font:var(--gw-text-h6);color:var(--s-heading);font-feature-settings:"tnum" 1}
+.cl-stat span{font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-400);
+              text-transform:uppercase;letter-spacing:.06em}
+
+/* --- review queue --------------------------------------------------------- */
+.cl-queue{background:var(--s-card-bg);border:1px solid var(--gw-color-yellow-300);
+          border-left:3px solid var(--gw-color-yellow-400);border-radius:var(--gw-radius-12);
+          padding:var(--gw-space-20) var(--gw-space-24);display:flex;flex-direction:column;
+          gap:var(--gw-space-12)}
+.cl-queue h2{font:var(--gw-text-h7)}
+.cl-queue ul{margin:0;padding-left:var(--gw-space-20);display:flex;flex-direction:column;
+             gap:var(--gw-space-4)}
+.cl-queue li{font:var(--gw-text-body-14-reg);color:var(--s-body)}
+.cl-queue a{color:var(--gw-color-primary-600);text-decoration:none}
+.cl-queue a:hover{text-decoration:underline}
+.cl-pass{background:var(--s-card-bg);border:1px solid var(--gw-color-green-300);
+         border-left:3px solid var(--gw-color-green-400)}
+
+/* --- controls ------------------------------------------------------------- */
+.cl-bar{position:sticky;top:0;z-index:5;background:var(--s-page-bg);
+        padding:var(--gw-space-12) 0;display:flex;flex-wrap:wrap;gap:var(--gw-space-8);
+        align-items:center;border-bottom:1px solid var(--s-chrome-border)}
+.cl-find{flex:1 1 220px;min-width:180px;background:var(--s-field-bg);
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         padding:var(--gw-space-8) var(--gw-space-12);font:var(--gw-text-body-14-reg);
+         color:var(--s-heading)}
+.cl-find::placeholder{color:var(--s-placeholder)}
+.cl-find:focus{outline:none;border-color:var(--gw-color-neutral-400)}
+.cl-filter{display:flex;gap:var(--gw-space-4);flex-wrap:wrap}
+.cl-f{font:var(--gw-text-body-12-med);color:var(--s-body);background:transparent;
+      border:1px solid var(--s-field-border);border-radius:var(--gw-radius-full);
+      padding:6px var(--gw-space-12);cursor:pointer}
+.cl-f:hover{border-color:var(--gw-color-primary-500)}
+.cl-f[aria-pressed="true"]{background:var(--gw-color-black);color:var(--gw-color-white);
+                           border-color:var(--gw-color-black)}
+.cl-f:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.cl-count{font:var(--gw-text-body-12-reg);color:var(--gw-color-neutral-400);margin-left:auto}
+
+/* --- sections ------------------------------------------------------------- */
+.cl-sec{display:flex;flex-direction:column;gap:var(--gw-space-20);
+        scroll-margin-top:var(--gw-space-80)}
+.cl-sec[hidden]{display:none}
+.cl-sechead{display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--gw-space-12)}
+.cl-note{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+         color:var(--s-body);background:var(--gw-color-neutral-25);
+         border:1px solid var(--s-card-border);border-left:3px solid var(--gw-color-neutral-300);
+         border-radius:var(--gw-radius-8);padding:var(--gw-space-12) var(--gw-space-16);
+         white-space:pre-wrap;max-width:88ch}
+:root[data-theme="dark"] .cl-note{background:var(--gw-color-neutral-900)}
+.cl-sub{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.cl-sub[hidden]{display:none}
+
+/* --- chips ---------------------------------------------------------------- */
+.cl-chip{display:inline-flex;align-items:center;gap:6px;font:var(--gw-text-body-12-med);
+         border-radius:var(--gw-radius-full);padding:3px var(--gw-space-8);white-space:nowrap}
+.cl-chip--measured{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.cl-chip--transcribed{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.cl-chip--ruled{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+.cl-chip--passed{background:var(--gw-color-green-500);color:var(--gw-color-white)}
+.cl-chip--pending{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+.cl-chip--rejected{background:var(--gw-color-red-500);color:var(--gw-color-white)}
+.cl-chip--gap{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+:root[data-theme="dark"] .cl-chip--measured{background:var(--gw-color-green-900);
+                                            color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .cl-chip--transcribed{background:var(--gw-color-yellow-900);
+                                               color:var(--gw-color-yellow-100)}
+:root[data-theme="dark"] .cl-chip--ruled{background:var(--gw-color-primary-900);
+                                         color:var(--gw-color-primary-200)}
+:root[data-theme="dark"] .cl-chip--pending{background:var(--gw-color-neutral-800);
+                                           color:var(--gw-color-neutral-300)}
+:root[data-theme="dark"] .cl-chip--gap{background:var(--gw-color-red-900);
+                                       color:var(--gw-color-red-200)}
+
+/* --- colour --------------------------------------------------------------- */
+.cl-ramp{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));
+         gap:var(--gw-space-8)}
+.cl-sw{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+       border-radius:var(--gw-radius-10);overflow:hidden;display:flex;flex-direction:column}
+.cl-sw[hidden]{display:none}
+.cl-sw__chip{height:64px;border-bottom:1px solid var(--s-card-border);
+             background-image:linear-gradient(45deg,var(--gw-color-neutral-100) 25%,transparent 25%),
+                              linear-gradient(-45deg,var(--gw-color-neutral-100) 25%,transparent 25%),
+                              linear-gradient(45deg,transparent 75%,var(--gw-color-neutral-100) 75%),
+                              linear-gradient(-45deg,transparent 75%,var(--gw-color-neutral-100) 75%);
+             background-size:12px 12px;
+             background-position:0 0,0 6px,6px -6px,-6px 0}
+.cl-sw__fill{width:100%;height:100%}
+.cl-sw__body{padding:var(--gw-space-8) var(--gw-space-12);display:flex;
+             flex-direction:column;gap:3px}
+.cl-sw__name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;
+             color:var(--s-heading);word-break:break-all;line-height:1.35}
+.cl-sw__hex{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;
+            color:var(--gw-color-neutral-400);text-transform:uppercase}
+.cl-sw__ac{display:flex;gap:4px;margin-top:2px}
+.cl-ac{font-size:9.5px;font-weight:600;letter-spacing:.04em;border-radius:var(--gw-radius-4);
+       padding:1px 4px;line-height:1.5}
+.cl-ac--ok{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.cl-ac--no{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+:root[data-theme="dark"] .cl-ac--ok{background:var(--gw-color-green-900);color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .cl-ac--no{background:var(--gw-color-red-900);color:var(--gw-color-red-200)}
+
+/* --- type ----------------------------------------------------------------- */
+.cl-types{display:flex;flex-direction:column;gap:2px}
+.cl-t{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:var(--gw-space-20);
+      align-items:start;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+      border-radius:var(--gw-radius-10);padding:var(--gw-space-16) var(--gw-space-20)}
+.cl-t[hidden]{display:none}
+.cl-t__spec{color:var(--s-heading);min-width:0;overflow-wrap:anywhere}
+.cl-t__meta{display:flex;flex-direction:column;gap:2px;text-align:right}
+.cl-t__name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+            color:var(--gw-color-primary-600)}
+.cl-t__val{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10.5px;
+           color:var(--gw-color-neutral-400);line-height:1.5}
+@media (max-width:860px){.cl-t{grid-template-columns:1fr}.cl-t__meta{text-align:left}}
+
+/* --- faces ---------------------------------------------------------------- */
+.cl-faces{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+          gap:var(--gw-space-16)}
+.cl-face{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-24);
+         display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.cl-face__aa{font-size:52px;line-height:1.05;color:var(--s-heading)}
+.cl-face__wt{display:flex;flex-direction:column;gap:2px}
+.cl-face__wt span{color:var(--s-heading);font-size:19px;line-height:1.45}
+
+/* --- space / radius / shadow ---------------------------------------------- */
+.cl-rows{display:flex;flex-direction:column;gap:6px}
+.cl-row{display:grid;grid-template-columns:132px minmax(0,1fr) 60px;gap:var(--gw-space-16);
+        align-items:center;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-radius:var(--gw-radius-8);padding:var(--gw-space-8) var(--gw-space-16)}
+.cl-row[hidden]{display:none}
+.cl-row__n{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+           color:var(--gw-color-primary-600);word-break:break-all}
+.cl-row__v{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+           color:var(--gw-color-neutral-400);text-align:right}
+.cl-bararea{min-height:18px;display:flex;align-items:center}
+.cl-barfill{height:16px;background:var(--gw-color-primary-500);border-radius:var(--gw-radius-2);
+            max-width:100%}
+.cl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));
+         gap:var(--gw-space-12)}
+.cl-tile{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-10);padding:var(--gw-space-16);display:flex;
+         flex-direction:column;align-items:center;gap:var(--gw-space-8)}
+.cl-tile[hidden]{display:none}
+.cl-tile__demo{width:72px;height:72px;background:var(--gw-color-primary-100);
+               border:1.5px solid var(--gw-color-primary-500)}
+.cl-tile__sh{width:100%;height:64px;background:var(--gw-color-white);
+             border-radius:var(--gw-radius-8)}
+:root[data-theme="dark"] .cl-tile__sh{background:var(--gw-color-neutral-800)}
+/* The alpha checker is drawn in neutral-100, which is near-white and shouts on a
+   black ground. Same job, quieter, in dark. */
+:root[data-theme="dark"] .cl-sw__chip{
+  background-image:linear-gradient(45deg,var(--gw-color-neutral-800) 25%,transparent 25%),
+                   linear-gradient(-45deg,var(--gw-color-neutral-800) 25%,transparent 25%),
+                   linear-gradient(45deg,transparent 75%,var(--gw-color-neutral-800) 75%),
+                   linear-gradient(-45deg,transparent 75%,var(--gw-color-neutral-800) 75%)}
+
+/* --- tables --------------------------------------------------------------- */
+.cl-tbl{width:100%;border-collapse:collapse;background:var(--s-card-bg);
+        border:1px solid var(--s-card-border);border-radius:var(--gw-radius-10);
+        overflow:hidden;font:var(--gw-text-body-14-reg)}
+.cl-tblwrap{overflow-x:auto}
+.cl-tbl th{text-align:left;font:var(--gw-text-body-12-med);text-transform:uppercase;
+           letter-spacing:.06em;color:var(--gw-color-neutral-400);
+           padding:var(--gw-space-8) var(--gw-space-16);
+           border-bottom:1px solid var(--s-card-border);white-space:nowrap}
+.cl-tbl td{padding:var(--gw-space-8) var(--gw-space-16);color:var(--s-body);
+           border-bottom:1px solid var(--s-card-border);vertical-align:top}
+.cl-tbl tr:last-child td{border-bottom:none}
+.cl-tbl tr[hidden]{display:none}
+.cl-tbl .mono{color:var(--gw-color-primary-600)}
+.cl-tbl .num{font-feature-settings:"tnum" 1;white-space:nowrap}
+
+/* --- gaps ----------------------------------------------------------------- */
+.cl-gaps{display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.cl-gap{display:grid;grid-template-columns:28px minmax(0,1fr);gap:var(--gw-space-12);
+        background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-left:3px solid var(--gw-color-red-400);border-radius:var(--gw-radius-8);
+        padding:var(--gw-space-12) var(--gw-space-16)}
+.cl-gap__n{font:var(--gw-text-body-14-sem);color:var(--gw-color-red-500);
+           font-feature-settings:"tnum" 1}
+.cl-gap__t{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+           color:var(--s-body);white-space:pre-wrap;margin:0}
+
+/* --- use-case cards ------------------------------------------------------- */
+.cl-cases{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+          gap:var(--gw-space-12)}
+.cl-case{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-20);
+         display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.cl-case__n{display:flex;align-items:baseline;justify-content:space-between;gap:var(--gw-space-8)}
+.cl-case__list{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:4px}
+.cl-case__list li{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10.5px;
+                  color:var(--gw-color-neutral-600);background:var(--gw-color-neutral-25);
+                  border:1px solid var(--s-card-border);border-radius:var(--gw-radius-4);
+                  padding:1px 5px}
+:root[data-theme="dark"] .cl-case__list li{background:var(--gw-color-neutral-900)}
+
+/* --- misc ----------------------------------------------------------------- */
+.cl-src{display:flex;flex-wrap:wrap;gap:var(--gw-space-8)}
+.cl-src code{background:var(--s-code-bg);border:1px solid var(--s-code-border);
+             color:var(--s-code-fg);border-radius:var(--gw-radius-4);padding:2px 7px}
+.cl-empty{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-400);
+          border:1px dashed var(--s-field-border);border-radius:var(--gw-radius-10);
+          padding:var(--gw-space-24);text-align:center}
+.cl-jump{display:flex;flex-wrap:wrap;gap:6px}
+.cl-jump a{font:var(--gw-text-body-12-med);color:var(--s-body);text-decoration:none;
+           border:1px solid var(--s-field-border);border-radius:var(--gw-radius-full);
+           padding:5px var(--gw-space-12)}
+.cl-jump a:hover{border-color:var(--gw-color-primary-500);color:var(--gw-color-primary-600)}
+@media print{.cl-bar,.cl-jump{display:none}}
+
+*{box-sizing:border-box}
+/* Body/body-16-reg, the site-wide page default ruled 29 Sep 2026 (796:12917).
+   This sheet named the family but no size, so it fell to the browser's 16px at
+   `normal` leading — the right size by accident, the wrong line-height. */
+body{margin:0;background:var(--s-page-bg);
+     font:var(--gw-text-body-16-reg);
+     letter-spacing:var(--gw-text-body-16-reg-tracking);
+     color:var(--s-body);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
+
+/* ---- topbar ------------------------------------------------------------- */
+.lb-top{position:sticky;top:0;z-index:20;height:60px;display:flex;align-items:center;
+        gap:var(--gw-space-16);padding:0 var(--gw-space-24);
+        background:var(--s-chrome-bg);border-bottom:1px solid var(--s-chrome-border)}
+.lb-brand{display:flex;align-items:center;gap:var(--gw-space-12);text-decoration:none;
+          flex:none}
+.lb-brand__chip{width:32px;height:32px;border-radius:var(--gw-radius-8);
+                background:var(--gw-color-primary-500);color:var(--gw-color-white);
+                box-shadow:inset 0 0 0 1px var(--gw-color-primary-600);
+                display:grid;place-items:center;flex:none}
+.lb-brand__chip svg{width:16px;height:16px;display:block}
+.lb-brand__n{font:var(--gw-text-h7);color:var(--s-heading)}
+.lb-crumb{font:var(--gw-text-body-14-reg);color:var(--s-group-label);
+          white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-crumb a{color:var(--gw-color-primary-600);text-decoration:none}
+.lb-top__r{display:flex;align-items:center;gap:var(--gw-space-12);margin-left:auto}
+.lb-find{width:300px;height:36px;background:var(--s-field-bg);
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         padding:0 var(--gw-space-12);font:var(--gw-text-body-14-reg);color:var(--s-heading)}
+.lb-find::placeholder{color:var(--s-placeholder)}
+.lb-find:focus{outline:none;border-color:var(--gw-color-neutral-400)}
+.lb-tbtn{width:36px;height:36px;display:grid;place-items:center;background:transparent;
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         color:var(--s-body);cursor:pointer;flex:none}
+.lb-tbtn svg{width:18px;height:18px;display:block}
+.lb-tbtn:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+@media (max-width:820px){.lb-find{display:none}}
+
+/* ---- three columns ------------------------------------------------------- */
+.lb-3{display:grid;grid-template-columns:240px minmax(0,1fr) 212px;align-items:start;
+      max-width:1600px;margin:0 auto}
+.lb-rail{position:sticky;top:60px;max-height:calc(100vh - 60px);overflow-y:auto;
+         border-right:1px solid var(--s-chrome-border);padding:var(--gw-space-24) 0}
+.lb-rail__t{font:var(--gw-text-body-12-med);text-transform:uppercase;letter-spacing:.06em;
+            color:var(--s-group-label);padding:0 var(--gw-space-20) var(--gw-space-8)}
+.lb-rail a{display:flex;justify-content:space-between;gap:var(--gw-space-8);
+           font:var(--gw-text-body-14-reg);color:var(--s-body);text-decoration:none;
+           padding:6px var(--gw-space-20)}
+.lb-rail a:hover{background:var(--s-nav-hover);color:var(--s-heading)}
+.lb-rail a.on{background:var(--s-nav-sel);color:var(--s-heading);
+              font:var(--gw-text-body-14-sem)}
+.lb-rail a span{color:var(--gw-color-neutral-400);font:var(--gw-text-body-12-reg);flex:none}
+.lb-rail a.on span{color:var(--s-heading)}
+.lb-rail__sep{margin:var(--gw-space-12) var(--gw-space-20) var(--gw-space-8);
+              border-top:1px solid var(--s-chrome-border)}
+
+.lb-mid{grid-column:2;padding:var(--gw-space-32) var(--gw-space-40) var(--gw-space-80);
+        min-width:0;display:flex;flex-direction:column;gap:var(--gw-space-24)}
+.lb-toc{grid-column:3;position:sticky;top:60px;max-height:calc(100vh - 60px);overflow-y:auto;
+        padding:var(--gw-space-32) var(--gw-space-20);display:flex;flex-direction:column;
+        gap:5px}
+.lb-toc b{font:var(--gw-text-body-12-med);text-transform:uppercase;letter-spacing:.06em;
+          color:var(--gw-color-neutral-400);margin-bottom:3px}
+.lb-toc a{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-600);
+          text-decoration:none;line-height:1.35}
+.lb-toc a:hover{color:var(--gw-color-primary-600)}
+.lb-toc a.l3{padding-left:var(--gw-space-12)}
+@media (max-width:1180px){.lb-3{grid-template-columns:220px minmax(0,1fr)}
+                          .lb-toc{display:none}}
+@media (max-width:820px){.lb-3{grid-template-columns:minmax(0,1fr)}
+                         /* `.lb-mid{grid-column:2}` above made the grid two columns even here, so the rail
+                            was squeezed to 0 wide and there was no way to move between sections. Both
+                            go back to column 1, and the rail becomes one scrolling row of chips instead
+                            of a 400px list in front of the content. */
+                         .lb-mid,.lb-rail{grid-column:1}
+                         .lb-rail{position:static;max-height:none;border-right:0;
+                                  border-bottom:1px solid var(--s-chrome-border);
+                                  display:flex;flex-direction:row;align-items:center;gap:var(--gw-space-8);
+                                  overflow-x:auto;padding:var(--gw-space-12) var(--gw-space-20);
+                                  scrollbar-width:none}
+                         .lb-rail::-webkit-scrollbar{display:none}
+                         .lb-rail__t,.lb-rail__sep{display:none}
+                         .lb-rail a{flex:none;white-space:nowrap;gap:var(--gw-space-4);
+                                    padding:6px var(--gw-space-12);border-radius:var(--gw-radius-full);
+                                    border:1px solid var(--s-chrome-border)}
+                         .lb-mid{padding:var(--gw-space-24) var(--gw-space-20)}}
+@media (max-width:640px){.lb-crumb{display:none}}
+
+/* ---- page head ----------------------------------------------------------- */
+.lb-h{display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.lb-h h1{font:var(--gw-text-h4);margin:0}
+.lb-h .lede{font:var(--gw-text-body-16-reg);color:var(--s-body);margin:0;max-width:74ch}
+.lb-row{display:flex;flex-wrap:wrap;gap:var(--gw-space-8);align-items:center}
+.lb-rowfind{width:100%;max-width:360px;height:36px;padding:0 12px;margin:0 0 20px;border:0;border-radius:12px;background:var(--s-field-bg);
+  box-shadow:inset 0 0 0 1px var(--s-field-border);color:var(--s-heading);font:var(--gw-text-body-14-reg)}
+.lb-rowfind::placeholder{color:var(--s-placeholder)}
+.cat-name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px;color:var(--s-heading);font-weight:600}
+a.cat-name{color:var(--gw-color-primary-600);text-decoration:none}
+:root[data-theme="dark"] a.cat-name{color:var(--gw-color-primary-400)}
+.cat-note{display:block;margin-top:2px;font:var(--gw-text-body-12-reg);color:var(--s-body)}
+@media (max-width:760px){.lb-mid td a,.lb-mid th a{display:inline-flex;align-items:center;min-height:24px}}
+.cat-link{font:var(--gw-text-body-14-med);color:var(--gw-color-primary-600);text-decoration:none}
+:root[data-theme="dark"] .cat-link{color:var(--gw-color-primary-400)}
+.cat-link:hover{text-decoration:underline}
+.sec>.lb-meta{margin:4px 0 14px}
+.cat-dim{color:var(--s-body)}
+.chip--annotated{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+:root[data-theme="dark"] .chip--annotated{background:var(--gw-color-neutral-800);color:var(--gw-color-neutral-300)}
+.lb-meta{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+         color:var(--gw-color-neutral-400)}
+
+.chip{display:inline-flex;align-items:center;gap:5px;font:var(--gw-text-body-12-med);
+      border-radius:var(--gw-radius-full);padding:3px var(--gw-space-8);white-space:nowrap}
+.chip--measured{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.chip--transcribed{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.chip--ruled,.chip--extracted{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+.chip--structure{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.chip--built-here{background:var(--gw-color-orange-50);color:var(--gw-color-orange-700)}
+.chip--passed{background:var(--gw-color-green-500);color:var(--gw-color-white)}
+.chip--pending{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+.chip--rejected{background:var(--gw-color-red-500);color:var(--gw-color-white)}
+.chip--gap{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+.chip--web{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+:root[data-theme="dark"] .chip--measured{background:var(--gw-color-green-900);color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .chip--transcribed,
+:root[data-theme="dark"] .chip--structure{background:var(--gw-color-yellow-900);color:var(--gw-color-yellow-100)}
+:root[data-theme="dark"] .chip--ruled,
+:root[data-theme="dark"] .chip--extracted,
+:root[data-theme="dark"] .chip--web{background:var(--gw-color-primary-900);color:var(--gw-color-primary-200)}
+:root[data-theme="dark"] .chip--pending{background:var(--gw-color-neutral-800);color:var(--gw-color-neutral-300)}
+:root[data-theme="dark"] .chip--built-here{background:var(--gw-color-orange-900);color:var(--gw-color-orange-100)}
+:root[data-theme="dark"] .chip--gap{background:var(--gw-color-red-900);color:var(--gw-color-red-200)}
+
+/* ---- markdown ------------------------------------------------------------ */
+.md{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.md h2{font:var(--gw-text-h6);margin:var(--gw-space-20) 0 0;scroll-margin-top:80px}
+.md h3{font:var(--gw-text-h7);margin:var(--gw-space-16) 0 0;scroll-margin-top:80px}
+.md h4,.md h5,.md h6{font:var(--gw-text-body-16-sem);margin:var(--gw-space-12) 0 0}
+.md p{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+      color:var(--s-body);margin:0;max-width:80ch}
+.md ul,.md ol{margin:0;padding-left:var(--gw-space-20);display:flex;
+              flex-direction:column;gap:5px}
+.md li{font:var(--gw-text-body-14-reg);color:var(--s-body);max-width:78ch}
+.md code{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px;
+         background:var(--s-code-bg);border:1px solid var(--s-code-border);
+         color:var(--s-code-fg);border-radius:var(--gw-radius-4);padding:1px 5px}
+.md a{color:var(--gw-color-primary-600)}
+.md-pre{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-radius:var(--gw-radius-8);padding:var(--gw-space-16);overflow-x:auto;margin:0}
+.md-pre code{background:none;border:0;padding:0;color:var(--s-body);font-size:12px}
+.md-q{margin:0;border-left:3px solid var(--gw-color-neutral-300);
+      padding:var(--gw-space-8) var(--gw-space-16);font:var(--gw-text-body-14-reg);
+      color:var(--s-body)}
+.md-hr{border:0;border-top:1px solid var(--s-card-border);margin:var(--gw-space-12) 0}
+.md-tblwrap{overflow-x:auto}
+.md-tbl{width:100%;border-collapse:collapse;background:var(--s-card-bg);
+        border:1px solid var(--s-card-border);border-radius:var(--gw-radius-8);
+        overflow:hidden;font:var(--gw-text-body-14-reg)}
+.md-tbl th{text-align:left;font:var(--gw-text-body-12-med);text-transform:uppercase;
+           letter-spacing:.06em;color:var(--gw-color-neutral-400);
+           padding:var(--gw-space-8) var(--gw-space-12);
+           border-bottom:1px solid var(--s-card-border);white-space:nowrap}
+.md-tbl td{padding:var(--gw-space-8) var(--gw-space-12);color:var(--s-body);
+           border-bottom:1px solid var(--s-card-border);vertical-align:top}
+.md-tbl tr:last-child td{border-bottom:none}
+.md-tbl code{white-space:nowrap}
+
+.note{font:var(--gw-text-body-14-reg);color:var(--s-body);
+      background:var(--gw-color-neutral-25);border:1px solid var(--s-card-border);
+      border-left:3px solid var(--gw-color-neutral-300);border-radius:var(--gw-radius-8);
+      padding:var(--gw-space-12) var(--gw-space-16);white-space:pre-wrap;max-width:88ch}
+:root[data-theme="dark"] .note{background:var(--gw-color-neutral-900)}
+.note--find{border-left-color:var(--gw-color-yellow-400);white-space:normal}
+.empty{border:1px dashed var(--s-field-border);border-radius:var(--gw-radius-10);
+       padding:var(--gw-space-24);text-align:center;font:var(--gw-text-body-14-reg);
+       color:var(--gw-color-neutral-400)}
+.sec{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.sec h2{font:var(--gw-text-h6);margin:0;scroll-margin-top:80px}
+</style>
+</head>
+<body>
+<header class="lb-top">
+  <a class="lb-brand" href="/internal/design-system#library">
+    <span class="lb-brand__chip"><svg viewBox="0 0 80 80" fill="none" aria-hidden="true"><path d="M76.6088 4.56344C77.5025 2.36058 75.8495 0 73.4723 0H9.14286C4.0934 0 0 4.0934 0 9.14286V66.7778C0 72.018 5.17081 75.6829 9.9603 73.5568C40.8494 59.8449 64.3785 34.7075 76.6088 4.56344Z" fill="currentColor"/><path d="M32.5161 80C31.4022 80 30.9357 78.5531 31.8259 77.8835C54.9007 60.5265 71.4338 35.8047 78.7658 8.0522C78.9403 7.39154 80 7.51618 80 8.19951V70.8571C80 75.9066 75.9066 80 70.8571 80H32.5161Z" fill="currentColor"/></svg></span>
+    <span class="lb-brand__n">Component Library</span></a>
+  <span class="lb-crumb"><a href="../../index.html">Library</a> / <a href="index.html">Dashboard</a></span>
+  <div class="lb-top__r"><input class="lb-find" id="lb-find" type="search" placeholder="Filter this library" aria-label="Filter this library">
+    <button class="lb-tbtn" id="lb-theme" type="button" aria-label="Switch theme">
+      <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z"/></svg></button></div>
+</header>
+<div class="lb-3"><nav class="lb-rail"><div class="lb-rail__t">Dashboard · 118</div><a href="index.html" data-q="overview 117">Overview<span>117</span></a><div class="lb-rail__sep"></div><a href="access-denied-screen.html" data-q="access-denied-screen ">access-denied-screen</a><a href="account-row.html" data-q="account-row ">account-row</a><a href="action-button.html" data-q="action-button ">action-button</a><a href="activity-timeline.html" data-q="activity-timeline ">activity-timeline</a><a href="app-shell.html" data-q="app-shell ">app-shell</a><a href="area-chart.html" data-q="area-chart ">area-chart</a><a href="avatar.html" data-q="avatar ">avatar</a><a href="avatar-group.html" data-q="avatar-group ">avatar-group</a><a href="banner.html" data-q="banner ">banner</a><a href="bar-chart.html" data-q="bar-chart " class="on">bar-chart</a><a href="board.html" data-q="board ">board</a><a href="breadcrumbs.html" data-q="breadcrumbs ">breadcrumbs</a><a href="breakdown-bar.html" data-q="breakdown-bar ">breakdown-bar</a><a href="build-notice.html" data-q="build-notice ">build-notice</a><a href="bulk-action-bar.html" data-q="bulk-action-bar ">bulk-action-bar</a><a href="card.html" data-q="card ">card</a><a href="chart-frame.html" data-q="chart-frame ">chart-frame</a><a href="chart-tooltip.html" data-q="chart-tooltip ">chart-tooltip</a><a href="checkbox.html" data-q="checkbox ">checkbox</a><a href="checklist.html" data-q="checklist ">checklist</a><a href="coachmark.html" data-q="coachmark ">coachmark</a><a href="column-menu.html" data-q="column-menu ">column-menu</a><a href="combobox.html" data-q="combobox ">combobox</a><a href="command-palette.html" data-q="command-palette ">command-palette</a><a href="confirm-dialog.html" data-q="confirm-dialog ">confirm-dialog</a><a href="content-panel.html" data-q="content-panel ">content-panel</a><a href="data-table.html" data-q="data-table ">data-table</a><a href="date-range-picker.html" data-q="date-range-picker ">date-range-picker</a><a href="datetime-field.html" data-q="datetime-field ">datetime-field</a><a href="definition-tile.html" data-q="definition-tile ">definition-tile</a><a href="delta-pill.html" data-q="delta-pill ">delta-pill</a><a href="detail-view.html" data-q="detail-view ">detail-view</a><a href="docked-panel.html" data-q="docked-panel ">docked-panel</a><a href="donut-chart.html" data-q="donut-chart ">donut-chart</a><a href="drawer.html" data-q="drawer ">drawer</a><a href="empty-state.html" data-q="empty-state ">empty-state</a><a href="explorer-layout.html" data-q="explorer-layout ">explorer-layout</a><a href="filter-builder.html" data-q="filter-builder ">filter-builder</a><a href="filter-chip.html" data-q="filter-chip ">filter-chip</a><a href="form-field.html" data-q="form-field ">form-field</a><a href="form-section.html" data-q="form-section ">form-section</a><a href="funnel.html" data-q="funnel ">funnel</a><a href="google-button.html" data-q="google-button ">google-button</a><a href="growth-report-template.html" data-q="growth-report-template ">growth-report-template</a><a href="heatmap.html" data-q="heatmap ">heatmap</a><a href="histogram.html" data-q="histogram ">histogram</a><a href="horizontal-bar-chart.html" data-q="horizontal-bar-chart ">horizontal-bar-chart</a><a href="icon-button.html" data-q="icon-button ">icon-button</a><a href="incident-row.html" data-q="incident-row ">incident-row</a><a href="info-hint.html" data-q="info-hint ">info-hint</a><a href="issue-summary.html" data-q="issue-summary ">issue-summary</a><a href="key-value-list.html" data-q="key-value-list ">key-value-list</a><a href="legend.html" data-q="legend ">legend</a><a href="legend-table.html" data-q="legend-table ">legend-table</a><a href="line-chart.html" data-q="line-chart ">line-chart</a><a href="log-viewer.html" data-q="log-viewer ">log-viewer</a><a href="login-screen.html" data-q="login-screen ">login-screen</a><a href="menu.html" data-q="menu ">menu</a><a href="metric-strip.html" data-q="metric-strip ">metric-strip</a><a href="modal.html" data-q="modal ">modal</a><a href="multi-select.html" data-q="multi-select ">multi-select</a><a href="nav-group.html" data-q="nav-group ">nav-group</a><a href="nav-item.html" data-q="nav-item ">nav-item</a><a href="page-header.html" data-q="page-header ">page-header</a><a href="page-layout.html" data-q="page-layout ">page-layout</a><a href="pagination.html" data-q="pagination ">pagination</a><a href="period-select.html" data-q="period-select ">period-select</a><a href="popover.html" data-q="popover ">popover</a><a href="progress-bar.html" data-q="progress-bar ">progress-bar</a><a href="query-builder.html" data-q="query-builder ">query-builder</a><a href="radio.html" data-q="radio ">radio</a><a href="report-frame.html" data-q="report-frame ">report-frame</a><a href="report-source-line.html" data-q="report-source-line ">report-source-line</a><a href="ring.html" data-q="ring ">ring</a><a href="row-actions-menu.html" data-q="row-actions-menu ">row-actions-menu</a><a href="row-selection.html" data-q="row-selection ">row-selection</a><a href="saved-views.html" data-q="saved-views ">saved-views</a><a href="search-field.html" data-q="search-field ">search-field</a><a href="search-trigger.html" data-q="search-trigger ">search-trigger</a><a href="segmented-control.html" data-q="segmented-control ">segmented-control</a><a href="select.html" data-q="select ">select</a><a href="session-expired.html" data-q="session-expired ">session-expired</a><a href="setting-row.html" data-q="setting-row ">setting-row</a><a href="shortcut-key.html" data-q="shortcut-key ">shortcut-key</a><a href="sidebar.html" data-q="sidebar ">sidebar</a><a href="sidebar-collapsed.html" data-q="sidebar-collapsed ">sidebar-collapsed</a><a href="sign-in-modal.html" data-q="sign-in-modal ">sign-in-modal</a><a href="skeleton.html" data-q="skeleton ">skeleton</a><a href="sparkline.html" data-q="sparkline ">sparkline</a><a href="split-button.html" data-q="split-button ">split-button</a><a href="stat-card.html" data-q="stat-card ">stat-card</a><a href="status-banner.html" data-q="status-banner ">status-banner</a><a href="status-dot.html" data-q="status-dot ">status-dot</a><a href="status-list.html" data-q="status-list ">status-list</a><a href="sub-nav.html" data-q="sub-nav ">sub-nav</a><a href="support-ops-app-template.html" data-q="support-ops-app-template ">support-ops-app-template</a><a href="table-cell-types.html" data-q="table-cell-types ">table-cell-types</a><a href="table-states.html" data-q="table-states ">table-states</a><a href="table-toolbar.html" data-q="table-toolbar ">table-toolbar</a><a href="tabs-pill.html" data-q="tabs-pill ">tabs-pill</a><a href="tabs-underline.html" data-q="tabs-underline ">tabs-underline</a><a href="tag.html" data-q="tag ">tag</a><a href="text-input.html" data-q="text-input ">text-input</a><a href="textarea.html" data-q="textarea ">textarea</a><a href="theme-and-density.html" data-q="theme-and-density ">theme-and-density</a><a href="theme-menu.html" data-q="theme-menu ">theme-menu</a><a href="time-range-bar.html" data-q="time-range-bar ">time-range-bar</a><a href="timezone-select.html" data-q="timezone-select ">timezone-select</a><a href="toast.html" data-q="toast ">toast</a><a href="toggle.html" data-q="toggle ">toggle</a><a href="tooltip.html" data-q="tooltip ">tooltip</a><a href="topbar.html" data-q="topbar ">topbar</a><a href="unavailable-state.html" data-q="unavailable-state ">unavailable-state</a><a href="unsaved-changes-bar.html" data-q="unsaved-changes-bar ">unsaved-changes-bar</a><a href="uptime-bar.html" data-q="uptime-bar ">uptime-bar</a><a href="widget-grid.html" data-q="widget-grid ">widget-grid</a><a href="workspace-switcher.html" data-q="workspace-switcher ">workspace-switcher</a></nav><main class="lb-mid"><div class="lb-h"><h1>bar-chart</h1><p class="lede">Dashboard · charts.md</p><div class="lb-row"><span class="chip chip--extracted" title="Extracted from the design hub's shipped code and generalised, not measured off Figma. The hub is its source of truth. Elements marked NEW in the doc are not in the hub at all.">extracted</span><span class="chip chip--passed" title="2026-10-05 utsav.singh@gushwork.ai">passed</span><span class="pill">v2.0.0</span></div><div class="lb-meta">review: bash scripts/review-pass.sh dashboard bar-chart</div></div><div class="md"><h2 id="palette-finding">Charts</h2>
+<p>Charts for heavy analytics screens, drawn by hand with no library: SVG for paths, HTML for grid lines, bars, dots and labels. A builder never computes a path. It passes arrays to <code>GD.charts</code> (<code>js/55-charts.js</code>) and gets markup back, or puts <code>data-gd-chart=&quot;line&quot; data-gd-spec='{...}'</code> on a host element. Colour comes only from <code>--gw-color-chart-1/2/3</code> for categories (R11: three is the ceiling), <code>--gd-accent</code> for a single series, <code>--gd-good/warn/danger</code> for status, and neutrals for grid and axes. See &quot;Palette finding&quot; at the end: the owner needs to rule on it before heavy screens can plot more than three series. Every chart has a text alternative, a keyboard path, and a no-data state that removes the figure instead of drawing zeros. Preview frags for every key sit in <code>web/previews/dashboard/</code>.</p>
+<h3 id="chart-frame">Palette finding</h3>
+<p><b>Decision needed.</b> R11 caps categorical series at three: <code>chart-1</code> (primary-200), <code>chart-2</code> (violet), <code>chart-3</code> (yellow-200). Mixpanel, Amplitude and Peec routinely plot 5 to 8. Nothing was invented.</p>
+<p><b>Default behaviour.</b> <code>GD.charts</code> draws at most 3 categorical series. A fourth is not drawn, a footnote says &quot;Showing 3 of N series&quot;, and the console warns once. Donuts and ranked lists fold everything past the third into a neutral &quot;Other&quot;. Comparison series (dashed, neutral-400) and status-toned series do not use a slot.</p>
+<p><b>Opt-in, PENDING RULING.</b> <code>{palette:'extended'}</code> (or <code>GD.charts.config.palette = 'extended'</code>) switches to <code>--gd-series-x1…x8</code>, declared in <code>55-charts.css</code> and labelled pending. Ruling it in means changing those eight lines, nothing else.</p>
+<p><b>Recommended 8-hue ordered list, existing tokens only</b></p>
+<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>#</th><th>Token</th><th>Hex</th></tr></thead><tbody><tr><td>1</td><td><code>--gw-color-chart-1</code> (primary-200)</td><td>#99c6ff</td></tr><tr><td>2</td><td><code>--gw-color-chart-2</code> (violet)</td><td>#9784ff</td></tr><tr><td>3</td><td><code>--gw-color-chart-3</code> (yellow-200)</td><td>#fcd34d</td></tr><tr><td>4</td><td><code>--gw-color-green-500</code></td><td>#16a34a</td></tr><tr><td>5</td><td><code>--gw-color-neutral-700</code></td><td>#535a61</td></tr><tr><td>6</td><td><code>--gw-color-yellow-500</code></td><td>#d97706</td></tr><tr><td>7</td><td><code>--gw-color-primary-600</code></td><td>#0061e0</td></tr><tr><td>8</td><td><code>--gw-color-neutral-500</code></td><td>#878b94</td></tr></tbody></table></div>
+<p><b>The check that was run.</b> Pairwise CIELAB distance (dE76, D65) over every pair in the list, under normal vision and under protanopia, deuteranopia and tritanopia simulated with the Machado et al. 2009 matrices at full severity. The ordering is greedy: each next colour maximises the worst-case distance to those already chosen, drawn from primary, green, yellow, red and neutral steps 200 to 800 plus chart-violet. Results, worst pair across all four vision types: first 3 = 25.8 (20.0 deutan, 16.8 protan, 16.2 tritan for the full 8); 4 = 25.8; 5 = 22.2; 6 = 16.8; 8 = 16.2. Rule of thumb: above about 20 is easy to separate, 10 to 20 is separable side by side but not at a glance, below 10 is not safe. Series 7 and 8 are in the second band. Red is left out deliberately so it keeps meaning &quot;bad&quot;, and green-500 (series 4) is the one place status colour leaks into categories; the owner may prefer to drop it for green-600.</p>
+<p><b>Three more findings</b></p>
+<ol><li>The ruled three fail 3:1 non-text contrast on a white card: chart-1 1.77, chart-2 2.97, chart-3 1.44. They are pastel by design. On black they pass. Light-theme lines in these colours rely on position, the legend and the tooltip rather than on the hue alone. Options: darker steps for lines (primary-500, violet-ish none exists, yellow-500), or keep the pastels for fills and bars only.</li><li>The hub's own donut does not use the palette: it uses primary-500, primary-300, neutral-850, primary-200, neutral-400, neutral-200 (<code>web/admin/analytics.html:1459</code>). The generaliser follows R11 and the hub is the inconsistency.</li><li>Beyond about five series, colour stops being the answer. Prefer direct labels, the legend table with per-row toggling, small multiples, or top N plus &quot;Other&quot;.</li></ol>
+<h3 id="line-chart">Chart frame</h3>
+<p>Purpose. The shell every cartesian chart sits in: header (title, description, switcher, action, export menu), legend, body at 280, 400 or 456 tall, footnote. Use it for any chart that needs a title or controls. A sparkline, breakdown bar or ranked list inside a card does not need it and renders bare.</p>
+<p>Anatomy. <code>.gd-chart</code> (<code>--sm|--md|--lg</code>, <code>--card</code> adds the surface) &gt; <code>__head</code> (<code>__titles</code>: <code>__title</code>, <code>__desc</code>; <code>__tools</code>: <code>__switch</code>, <code>__actions</code>, <code>__menu</code>; <code>__legend</code> of <code>__key</code> buttons) + <code>__body</code> (<code>__body--xy</code> fixes the height) + <code>__foot</code>.</p>
+<pre class="md-pre"><code>&lt;div class=&quot;gd-chart gd-chart--sm gd-chart--card&quot; data-state=&quot;ready&quot; id=&quot;sessions&quot;&gt;
+  &lt;header class=&quot;gd-chart__head&quot;&gt;&lt;div class=&quot;gd-chart__titles&quot;&gt;&lt;h3 class=&quot;gd-chart__title&quot;&gt;Sessions&lt;/h3&gt;&lt;p class=&quot;gd-chart__desc&quot;&gt;Per day&lt;/p&gt;&lt;/div&gt;
+    &lt;div class=&quot;gd-chart__tools&quot;&gt;&lt;div class=&quot;gd-chart__switch&quot;&gt;…gd-seg…&lt;/div&gt;&lt;/div&gt;
+    &lt;ul class=&quot;gd-chart__legend&quot;&gt;&lt;li&gt;&lt;button class=&quot;gd-chart__key&quot; data-gd-series=&quot;0&quot; aria-pressed=&quot;true&quot;&gt;…&lt;/button&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/header&gt;
+  &lt;div class=&quot;gd-chart__body gd-chart__body--xy&quot;&gt;…figure…&lt;/div&gt;&lt;p class=&quot;gd-chart__foot&quot;&gt;Extrapolated from 9k samples&lt;/p&gt;&lt;/div&gt;</code></pre>
+<p>Slots (trusted HTML strings in the spec): <code>switcher</code> (the <code>gd-seg</code> control), <code>actions</code>, <code>menu</code>, <code>footnote</code>. Compare entries appear as dashed legend keys.</p>
+<p>States via <code>data-state</code>: <code>ready</code>, <code>loading</code> (ghost bars, <code>aria-busy</code>), <code>empty</code> (rounded-square badge, message, no figure), <code>error</code> (alert, &quot;Try again&quot;). Retry sets loading and fires <code>gd:chart-retry</code> on the root; the builder reloads and calls <code>GD.charts.state(host,'ready')</code> or <code>update</code>. Compact density scales the 280/400/456 heights by 0.8 and trims the card padding.</p>
+<p>Tokens: <code>--gd-card-pad</code>, <code>--gd-gap</code>, <code>--gd-control-h</code>, <code>--gd-border</code>, <code>--gd-text</code>, <code>--gd-text-muted</code>, <code>--gd-chart-scale</code>.</p>
+<p>Accessibility. Title is an <code>h3</code>; legend keys are real toggle buttons (<code>aria-pressed</code>); states use <code>role=&quot;status&quot;</code>/<code>alert</code>. At least one series must stay visible.</p>
+<p>Behaviour. Legend key click toggles a series, hover or focus isolates it. <code>GD.charts.mount|update|state|toggle|zoom</code>.</p>
+<p>Provenance. Extracted: <code>web/admin/analytics.html:228-236</code>, <code>:1296-1313</code>. Slots, empty and error states: NEW (Mobbin Mixpanel, Amplitude, Peec AI), pending library review.</p>
+<h3 id="area-chart">Line chart</h3>
+<p>Purpose. Change over time; one to three series (more only with the extended palette, once ruled). Not for categories (use bar) or part-to-whole.</p>
+<p>Anatomy. <code>.gd-xy</code> grid of y labels, <code>.gd-plot</code>, optional second y axis, x labels. Inside the plot: <code>.gd-gl</code> grid lines (HTML), one SVG with <code>preserveAspectRatio=&quot;none&quot;</code> and <code>vector-effect: non-scaling-stroke</code> so the 2px line stays 2px, <code>.gd-dot</code> HTML dots (an SVG circle would be squashed), <code>.gd-cross</code>, <code>.gd-tip</code>.</p>
+<p>Variants and options: single series (accent, 30% to 0% gradient); multi-series (chart-1/2/3); <code>smooth</code> (monotone cubic, no overshoot) or straight; comparison series (<code>comparison:true</code>, dashed neutral, takes no palette slot); forecast (<code>forecastFrom:i</code>, same hue, dotted, lower contrast); incomplete period (<code>incomplete:{from,label}</code>, hatched, &quot;Data still arriving&quot;, noted in the tooltip); reference line (<code>refs:[{value,label,tone}]</code>); event flags (<code>events:[{at,label,detail}]</code>, buttons on the baseline with their own tooltip); brush to zoom; dual y axis (max two, each axis coloured to its series, tick counts matched so grid lines align); log scale (<code>scale:'log'</code>); <code>format:'compact'</code> gives 1.2k and 3.4M, plus <code>prefix</code>/<code>unit</code>. Y ticks use &quot;nice&quot; rounding. Missing values (<code>null</code>) break the line.</p>
+<p>States: rest, hover (crosshair, dot per series, tooltip), focus-visible (same, via keyboard), series hidden, brushing, zoomed (&quot;Reset zoom&quot; appears), loading, empty, error.</p>
+<p>Tokens: <code>--gd-series-1/2/3</code>, <code>--gd-series-compare</code>, <code>--gd-accent</code>, <code>--gd-border</code>, <code>--gd-border-strong</code>, <code>--gd-tip-line</code>, <code>--gd-warn</code>.</p>
+<p>Accessibility. Plot is <code>role=&quot;img&quot;</code> with an <code>aria-label</code> that states title, kind, range, per-series low, high and latest, events, and the arrow-key hint; it is focusable. A live region announces the active point. A visually hidden table carries all values (omitted automatically above 400 cells, or with <code>table:false</code>). Ticks are tabular and thinned to the measured width so labels never collide.</p>
+<p>Behaviour. Pointer: crosshair snaps to the nearest point; drag selects a range and emits <code>gd:range {from,to,fromLabel,toLabel,labels}</code> (cancelable; if not cancelled the chart zooms itself). Keyboard: Left/Right, Home/End, PageUp/PageDown, Esc; Shift+arrows select a range, Enter commits. Performance: more points than pixels are decimated per bucket keeping every min and max; 8 series by 2,000 points mounts in about 16 ms and toggles in about 6 ms.</p>
+<p>Provenance. Extracted: <code>web/admin/analytics.html:238-267</code>, <code>:1294-1370</code>. Everything past one series: NEW (Mobbin Mixpanel, Amplitude, Peec AI).</p>
+<h3 id="bar-chart">Area chart</h3>
+<p>Purpose. Volume over time, or composition over time when stacked. Use overlaid only for two or three series that rarely cross; otherwise use lines.</p>
+<p>Anatomy and options as line chart. <code>mode:'stack'</code> stacks in series order from the baseline with a 30% flat fill and a line on each edge, and the tooltip adds a total. Stacked areas need non-negative data (otherwise the chart falls back to overlaid and warns). Overlaid uses the gradient fill per series.</p>
+<p>States, tokens, accessibility, behaviour: as line chart.</p>
+<p>Provenance. NEW: not in the hub (reference Mobbin Mixpanel, Amplitude); the gradient is the hub's.</p>
+<h3 id="horizontal-bar-chart">Bar chart</h3>
+<p>Purpose. Compare values per category or period; one to three series. Not for dozens of categories (it buckets and says so in the footnote; use line or area).</p>
+<p>Anatomy. Bars are HTML positioned from the zero line, so negatives hang below it. <code>.gd-cat</code> &gt; <code>.gd-slot</code> &gt; <code>.gd-bar</code> (2px radius on the outer end only). Hover shows a column band and a tooltip instead of a crosshair.</p>
+<p>Variants: grouped (default, 2px gap); <code>mode:'stack'</code> (1px card-coloured seam, positives up and negatives down); <code>mode:'waterfall'</code> (<code>items:[{label,value,total?}]</code>: increase green, decrease red, total muted, dashed connectors; the legend names the three); <code>diverging:true</code> (positive accent, negative neutral). Axis ticks, formats, thinning as line chart.</p>
+<p>Tokens: <code>--gd-series-*</code>, <code>--gd-accent/good/danger</code>, <code>--gd-hover-bg</code>, <code>--gd-card-bg</code>.</p>
+<p>Accessibility and behaviour as line chart (arrows move between categories). The hidden table for a waterfall lists change and running total.</p>
+<p>Provenance. Bar geometry extracted: <code>web/admin/analytics.html:268-279</code>; vertical, grouped, stacked, waterfall, diverging are NEW (Mobbin Zoho &quot;Revenue breakdown&quot;, Mixpanel).</p>
+<h3 id="donut-chart">Horizontal bar chart</h3>
+<p>Purpose. Ranked list: label, bar, value, share. Use for top pages, top keywords, any &quot;which is biggest&quot;.</p>
+<p>Anatomy. <code>ol.gd-hbar</code> &gt; <code>li</code> &gt; <code>.gd-hbar__row</code> (<code>label</code>, <code>track</code> &gt; <code>bar</code>, <code>val</code>, <code>share</code>). Bars are 10px (8 compact) with the trailing corners rounded. Rows become <code>&lt;a&gt;</code> when an item has <code>href</code>. The longest bar fills the track unless <code>max</code> fixes the scale, which a set of percentages should (<code>max: 100</code>), so 67% and 78% do not read as a tie; a value over <code>max</code> is clamped.</p>
+<p>Options: <code>top:n</code> folds the rest into a neutral &quot;Other&quot;; <code>share:false</code>; <code>diverging</code> (zero axis at 50%); <code>tone</code> per item; sorted descending unless <code>sort:false</code>.</p>
+<p>States: rest, link row hover (surface and edge), focus-visible, empty, loading, error.</p>
+<p>Accessibility. A native ordered list: the text of every row is the alternative, so it carries <code>aria-label</code> rather than <code>role=&quot;img&quot;</code> (which would hide the rows). Bars are decorative.</p>
+<p>Provenance. Extracted: <code>web/admin/analytics.html:268-279</code>, <code>:1385</code>. Share column, diverging, link rows: NEW.</p>
+<h3 id="breakdown-bar">Donut chart</h3>
+<p>Purpose. Part-to-whole with up to three categories plus &quot;Other&quot;. More slices than that read badly in any palette; use a ranked list.</p>
+<p>Anatomy. <code>.gd-donut</code> &gt; <code>figure.gd-donut__fig</code> (SVG circles with <code>stroke-dasharray</code>, 2px gaps, centre total) + <code>ul.gd-donut__legend</code> (swatch, name, value, share). Compact density scales the ring from 160 to 128.</p>
+<p>Options: items beyond three untoned are folded into &quot;Other&quot; in neutral; <code>tone</code> gives status colours; <code>totalLabel</code>.</p>
+<p>States: rest, hover or focus on a slice or legend row (others dim to 30%, the centre shows that slice), loading, empty, error.</p>
+<p>Accessibility. The figure is <code>role=&quot;img&quot;</code> with every slice and percentage in its label; legend rows are focusable and mirror the hover.</p>
+<p>Provenance. Extracted: <code>web/admin/analytics.html:330-345</code>, <code>:1445-1475</code>. Palette follows R11 (the hub does not; see finding 2).</p>
+<p><b>Phone.</b> The legend moves under the ring and takes the full width.</p>
+<h3 id="sparkline">Breakdown bar</h3>
+<p>Purpose. One horizontal bar split into proportions, read at a glance: a split, a status mix. Use when there are two to four parts and no axis is needed.</p>
+<p>Anatomy. <code>figure.gd-brk</code> &gt; <code>.gd-brk__bar</code> (12px pill, 2px gaps, flex weights) + <code>ul.gd-brk__key</code> (percent, label). <code>.gd-brk--lg</code> is 16px.</p>
+<p>Variants: two segments accent plus neutral (the hub); three categorical segments; status tones. Segment tones are set per segment.</p>
+<p>Accessibility. The bar is <code>role=&quot;img&quot;</code> with every value and percentage; the key repeats them as text.</p>
+<p>Provenance. Extracted: <code>web/admin/analytics.html:301-305</code>, <code>:1395-1405</code>. Three or more segments: NEW (Mobbin AirOps).</p>
+<h3 id="heatmap">Sparkline</h3>
+<p>Purpose. A trend inside a table cell, stat card or list row. No axes, no tooltip. Not for reading values.</p>
+<p>Anatomy. <code>span.gd-spark</code> (80px wide, <code>--gd-control-h</code> minus 12 tall; <code>--lg</code> 160) with an SVG line (1.5px, non-scaling) and an HTML last-point dot. Options: <code>tone</code> (accent, good, danger, neutral), <code>fill</code>, <code>smooth</code>, <code>size</code>.</p>
+<p>Accessibility. <code>role=&quot;img&quot;</code> with a label giving first, last, low and high. It is inline and non-interactive, so it never takes focus.</p>
+<p>Provenance. NEW: not in the hub (Mobbin Fresha, Mixpanel).</p>
+<h3 id="funnel">Heatmap</h3>
+<p>Purpose. Intensity across two dimensions: day by hour, cohort by week, or a GitHub-style calendar of activity. One quantity only.</p>
+<p>Anatomy. <code>.gd-heat</code> &gt; scrollable <code>.gd-heat__grid</code> (<code>role=&quot;grid&quot;</code>, rows of <code>role=&quot;gridcell&quot;</code> cells) + key (Less to More) + tooltip. Five steps of one hue, <code>--gd-seq-1…5</code>: darker means more on light, brighter means more on dark, so &quot;more&quot; always stands out from the ground. Zero and missing are different: empty is the sunken fill with a hairline, missing is <code>no data</code> in the label. <code>layout:'calendar'</code> runs weeks left to right in square cells with month labels; weeks start Monday (<code>weekStart</code>). Bins are linear (<code>bins:'quantile'</code> for skewed data).</p>
+<p>States: rest, hover (2px ring), focus-visible (a 1px outline, black on light and white on dark, so it reads on every step of the scale), empty, loading, error.</p>
+<p>Accessibility. It is a real grid, so it is not <code>role=&quot;img&quot;</code>: every cell has its own label (&quot;Tue, 14:00: 63 sessions&quot;). One cell is in the tab order; arrows move in two dimensions, Home/End jump to row ends, Esc hides the tip. Colour is never the only carrier: the value is in the label and tooltip.</p>
+<p>Provenance. NEW: not in the hub (Mobbin Mixpanel retention, GitHub contributions).</p>
+<h3 id="chart-tooltip">Funnel</h3>
+<p>Purpose. Step-to-step conversion. Horizontal for many steps or long labels; vertical for three to six steps where shape matters. A funnel table can be added for exact counts.</p>
+<p>Anatomy. <code>.gd-funnel</code> &gt; ordered list. Horizontal: label, track with fill, count, percent of first step; between rows &quot;63% continue, 870 left (37% drop-off)&quot;. Vertical (<code>layout:'vertical'</code>): columns, a hatched ghost of the previous step behind each fill, then count, label, continue and left. An abandonment row (&quot;Abandoned before Paid&quot;) closes it. <code>table:true</code> adds step, count, completion, drop-off, in the data table's look: no header fill, a small uppercase muted header over a strong rule, a hairline under every row, hover <code>--gd-row-hover</code>, first column in <code>--gd-text</code>.</p>
+<p>Accessibility. A list whose text carries every figure; fills are decorative.</p>
+<p>Provenance. NEW: not in the hub (Mobbin Calendly horizontal, Google Analytics vertical steps).</p>
+<p><b>Phone.</b> Each step's label gets its own line, with the bar and its figures under it, so a long step name is read in full.</p>
+<h3 id="legend-table">Chart tooltip</h3>
+<p>Purpose. The cursor tooltip every chart uses: a header, a row per series, an optional total, an optional note. Not for explaining a control; use the shared tooltip for that.</p>
+<p>Anatomy. <code>.gd-tip</code> &gt; <code>__h</code> (bold head, muted <code>__n</code> note), <code>__r</code> rows (swatch, <code>__k</code>, <code>__v</code> tabular), <code>__t</code> total after a dashed rule. <code>GD.charts.tipHTML({head,note,rows,total})</code> builds it; <code>.gd-tip--static</code> places it in flow. The surface is the sunken fill with a 1px <code>--gd-tip-line</code> edge and shadow S2, 12px text (the hub used 10).</p>
+<p>Behaviour. It flips to the other side of the cursor near the edge and never takes pointer events. <code>[data-gd-tip]</code> plus <code>data-gd-tip-body</code> on any element in a <code>[data-gd-tipbox]</code> gives it a tooltip on hover and focus.</p>
+<p>Accessibility. It repeats what the live region announces; it is never the only place a value appears.</p>
+<p>Provenance. Extracted: <code>web/admin/analytics.html:256-267</code>.</p>
+<h3 id="uptime-bar">Legend table</h3>
+<p>Purpose. A table under a chart, one row per series: checkbox, colour dot, name, value columns (total, average, latest by default). Ticking toggles the series. Use when there are more than three series or exact values matter.</p>
+<p>Anatomy. <code>table.gd-ltable[data-gd-for=&quot;#chart&quot;]</code> &gt; rows with <code>input[type=checkbox][data-gd-series]</code> inside <code>.gd-check</code> (Actions author), <code>th</code> name with <code>.gd-sw</code>, <code>td</code> values. Row classes are its own, but the look is the data table's: no header fill, a small uppercase muted header over a strong rule, a hairline under every row, hover <code>--gd-row-hover</code>, 12px medium cells. <code>legend:'table'</code> on a chart renders it below and wires it.</p>
+<p>States: rest, row hover (also isolates the series on the chart), hidden (<code>data-off</code>, muted, dimmed dot), focus-visible on the checkbox.</p>
+<p>Accessibility. The checkbox is labelled &quot;Show &lt;series&gt;&quot;; names are row headers. The last visible series cannot be unticked; the box reverts.</p>
+<p>Provenance. NEW: not in the hub (Mobbin Amplitude, Substack).</p>
+<p><b>Phone.</b> Cell padding tightens to 8 and the first column wraps.</p>
+<h3>Uptime bar</h3>
+<p>Purpose. Status over a run of days or hours: a strip of segments, green, amber, red, grey for no data, with the percentage.</p>
+<p>Anatomy. <code>figure.gd-uptime</code> &gt; head (name, percentage), <code>.gd-uptime__bar</code> of <code>.gd-uptime__seg[data-st]</code>, foot (start, end labels), tooltip. Percentage is periods not down over periods with data, or <code>percent</code> when supplied.</p>
+<p>States: rest, hover (ring), keyboard (the bar is focusable; Left/Right step, Home/End, Esc hides).</p>
+<p>Accessibility. <code>role=&quot;img&quot;</code> with an overall label; the tooltip names the status in words, so colour is never the only signal.</p>
+<p>Provenance. NEW: not in the hub (Mobbin Better Stack, OpenAI status).</p></div></main><div class="lb-toc"><b>On this page</b><a href="#palette-finding" class="l3">Palette finding</a><a href="#chart-frame" class="l3">Chart frame</a><a href="#line-chart" class="l3">Line chart</a><a href="#area-chart" class="l3">Area chart</a><a href="#bar-chart" class="l3">Bar chart</a><a href="#horizontal-bar-chart" class="l3">Horizontal bar chart</a><a href="#donut-chart" class="l3">Donut chart</a><a href="#breakdown-bar" class="l3">Breakdown bar</a><a href="#sparkline" class="l3">Sparkline</a><a href="#heatmap" class="l3">Heatmap</a><a href="#funnel" class="l3">Funnel</a><a href="#chart-tooltip" class="l3">Chart tooltip</a><a href="#legend-table" class="l3">Legend table</a><a href="#uptime-bar" class="l3">Uptime bar</a></div></div>
+<script>
+(function(){
+  /* Theme: the same keys as the main site. `gw-theme-choice` is what the person picked (light, dark or system) and is
+     written only when they pick; no choice means System, which follows the machine. `gw-theme` is the resolved
+     light or dark. This button toggles light and dark, so using it is a choice. */
+  var CH='gw-theme-choice', RES='gw-theme';
+  function pref(){try{var v=localStorage.getItem(CH);return (v==='light'||v==='dark'||v==='system')?v:'system'}catch(e){return 'system'}}
+  function res(p){return p==='dark'?'dark':p==='light'?'light':(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}
+  function apply(p,remember){var r=res(p);
+    document.documentElement.setAttribute('data-theme',r);
+    try{localStorage.setItem(RES,r);if(remember)localStorage.setItem(CH,p)}catch(e){}
+    var b=document.getElementById('lb-theme');
+    if(b)b.setAttribute('aria-label',r==='dark'?'Switch to light':'Switch to dark');}
+  var btn=document.getElementById('lb-theme');
+  if(btn)btn.addEventListener('click',function(){
+    apply(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark',true)});
+  apply(pref(),false);
+  try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){if(pref()==='system')apply('system',false)})}catch(e){}
+
+  /* Rail filter. Narrows the inventory in place — it does not navigate, because the
+     rail is a list of siblings and losing your place to search them is worse than
+     scrolling. */
+  var f=document.getElementById('lb-find');
+  if(f){
+    var rows=[].slice.call(document.querySelectorAll('.lb-rail a'));
+    f.addEventListener('input',function(){
+      var t=f.value.trim().toLowerCase();
+      rows.forEach(function(a){
+        a.hidden=!!t&&a.getAttribute('data-q').indexOf(t)===-1});
+    });
+  }
+
+  /* Component list filter: hides rows that do not match, and a surface whose rows all went. */
+  var rf=document.getElementById('lb-rows');
+  if(rf){
+    var trs=[].slice.call(document.querySelectorAll('tr[data-q]')), secs=[].slice.call(document.querySelectorAll('section[data-cat]'));
+    rf.addEventListener('input',function(){
+      var t=rf.value.trim().toLowerCase();
+      trs.forEach(function(r){r.hidden=!!t&&r.getAttribute('data-q').indexOf(t)===-1});
+      secs.forEach(function(sc){sc.hidden=!sc.querySelector('tr[data-q]:not([hidden])')});
+    });
+  }
+
+  /* Mark the on-this-page entry for whatever heading is currently at the top. */
+  var toc=[].slice.call(document.querySelectorAll('.lb-toc a'));
+  if(toc.length){
+    var heads=toc.map(function(a){return document.getElementById(a.hash.slice(1))})
+                 .filter(Boolean);
+    var tick=function(){
+      var best=0;
+      heads.forEach(function(h,i){if(h.getBoundingClientRect().top<=90)best=i});
+      toc.forEach(function(a,i){a.style.color=i===best?'var(--gw-color-primary-600)':''});
+    };
+    document.addEventListener('scroll',tick,{passive:true});tick();
+  }
+})();
+</script>
+</body></html>

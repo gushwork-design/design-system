@@ -89,16 +89,51 @@ except Exception: pass
 # for anyone who has not set up the Sheet.
 USAGE_URL="${GW_USAGE_URL:-https://gushwork-design.vercel.app/api/log-usage}"
 if [ -z "${GW_NO_USAGE_PING:-}" ]; then
-  # git's own identity: the same value that attributes every commit in this repo. Built with
-  # python3 rather than string-concatenation so a stray quote cannot produce invalid JSON.
-  USAGE_BODY="$(GW_EMAIL="$(git config --get user.email 2>/dev/null || true)" \
-    GW_VER="$LOCAL_VERSION" python3 -c '
-import json, os
-print(json.dumps({
-    "email": os.environ.get("GW_EMAIL", "")[:160],
+  # WHO. The signed-in Claude account first, git's user.email as the fallback. Git alone left
+  # over half the log blank (30 Sep 2026): a machine that has never run `git config user.email`
+  # returns nothing, and the desktop app sets none. The account address is the same identity
+  # the site's own sign-in uses. Only the address is read from ~/.claude.json, nothing else in
+  # it. CLAUDE_CONFIG_DIR is honoured because that is where Claude Code keeps it when set.
+  # Built with python3 rather than string-concatenation so a stray quote cannot produce
+  # invalid JSON.
+  #
+  # WHICH CHAT. The hook input on stdin names the session. It is hashed (a short one-way hash,
+  # the same one scripts/log-activity.sh sends) and sent as `sess`, so the Usage Logs page can
+  # put a chat's session start, skill runs and outputs in one group. Read only when stdin is a
+  # pipe, so running this by hand from a terminal does not wait for input.
+  # read -t, not run_capped: a capped command runs in the background, and a background command
+  # in a script gets /dev/null for stdin, so it would read nothing.
+  HOOK_IN=""
+  [ -t 0 ] || IFS= read -r -t 2 -d '' HOOK_IN 2>/dev/null || true
+  USAGE_BODY="$(GW_GIT_EMAIL="$(git config --get user.email 2>/dev/null || true)" \
+    GW_HOOK_IN="$HOOK_IN" GW_VER="$LOCAL_VERSION" python3 -c '
+import hashlib, json, os, re
+def account_email():
+    for base in (os.environ.get("CLAUDE_CONFIG_DIR"), os.path.expanduser("~")):
+        if not base:
+            continue
+        try:
+            with open(os.path.join(base, ".claude.json")) as f:
+                e = (json.load(f).get("oauthAccount") or {}).get("emailAddress")
+            if isinstance(e, str) and "@" in e:
+                return e.strip()
+        except Exception:
+            pass
+    return ""
+def session_hash():
+    try:
+        sid = re.sub(r"[^A-Za-z0-9_-]", "", str(json.loads(os.environ.get("GW_HOOK_IN") or "{}").get("session_id") or ""))[:64]
+    except Exception:
+        return ""
+    return hashlib.sha256(sid.encode()).hexdigest()[:12] if sid else ""
+row = {
+    "email": (account_email() or os.environ.get("GW_GIT_EMAIL", ""))[:160],
     "version": os.environ.get("GW_VER", "")[:32],
     "event": "session-start",
-}))' 2>/dev/null)"
+}
+if session_hash():
+    row["sess"] = session_hash()
+print(json.dumps(row))' 2>/dev/null)"
   if [ -n "$USAGE_BODY" ]; then
     ( nohup curl -fsS --max-time 3 -X POST \
         -H 'content-type: application/json' \
@@ -158,6 +193,7 @@ except Exception:
     sys.exit(0)
 print(json.dumps({
     "version": mk.get("metadata", {}).get("version"),
+    "notify": (lambda s: (json.loads(s) if s.strip() else None))(at_head(".claude-plugin/notify.json")),
     "components": {k: {"version": v.get("version"), "breaking": bool(v.get("breaking"))}
                    for k, v in reg.get("components", {}).items()},
 }))
@@ -202,6 +238,16 @@ lv, rv = semver(local), semver(remote)
 if not lv or not rv or rv <= lv:
     sys.exit(0)                                    # current, or unparseable — say nothing
 
+# Behind is not enough (R51, 5 Oct 2026). Utsav releases at night, and most bumps are site, hub
+# or log work that changes nothing a teammate builds with; auto-update carries those in silently.
+# The notice fires only when the newest release he FLAGGED — `notify` in version.json, written by
+# release.sh --notify after he said yes — is ahead of this copy. No flag, or a flag this copy
+# already has: say nothing. The autoUpdate flip below still runs, so the quiet path still updates.
+nf = d.get("notify") or {}
+nv = semver(nf.get("version"))
+flagged = bool(nv) and nv > lv
+
+
 # Which components moved since the copy this session is running, and which of those break a
 # build that used them. Same comparison check-drift.sh makes against a stamped artifact.
 must, also = [], []
@@ -210,7 +256,11 @@ for name, c in (d.get("components") or {}).items():
     if cv and cv > lv:
         (must if c.get("breaking") else also).append(name)
 
-print(json.dumps({"remote": remote, "breaking": sorted(must), "changed": sorted(also)}))
+print(json.dumps({"remote": remote, "flagged": flagged, "summary": (nf.get("summary") or "")[:200],
+                  "notify_version": nf.get("version") if flagged else None,
+                  "links": [l for l in (nf.get("links") or []) if isinstance(l, str) and l.startswith("http")][:4],
+                  "changelog": d.get("notice") or "",
+                  "breaking": sorted(must), "changed": sorted(also)}))
 PY
 )"
 [ -n "$VERDICT" ] || exit 0
@@ -239,6 +289,36 @@ print("yes")
 PY
 )"
 
+# ── pull it now, once a day ────────────────────────────────────────────────────────────────
+# Auto-update only fetches at startup and takes effect at the start AFTER, so a release lands one
+# chat late, and a quiet release says nothing in that chat (7 Oct 2026: a new chat opened on the
+# old copy hours after the release). Utsav's ruling (R63): when this machine is behind, the first
+# chat of the day runs the update itself, so the next chat starts on the new copy.
+#
+# It is a pull, not a schedule: nothing is installed on anyone's Mac, and nothing runs at 5 am.
+# · BEHIND ONLY. This point is reached only when the version check above found a newer release.
+# · ONCE A DAY. A stamp file, 20h, so a machine that is stuck behind is not hammered every chat.
+# · DETACHED AND SILENT. nohup + &, output discarded, never waited on, so the session cannot stall.
+# · OPT-OUT. GW_NO_AUTO_PULL=1 turns it off. GW_CLAUDE_BIN names the binary (the tests use a stub).
+if [ -z "${GW_NO_AUTO_PULL:-}" ]; then
+  PULL_STAMP="${GW_PULL_STAMP:-$CACHE_DIR/last-pull}"
+  PULL_BIN="${GW_CLAUDE_BIN:-}"
+  [ -n "$PULL_BIN" ] || PULL_BIN="$(command -v claude 2>/dev/null || true)"
+  [ -n "$PULL_BIN" ] || PULL_BIN="${CLAUDE_CODE_EXECPATH:-}"
+  [ -n "$PULL_BIN" ] || for c in "$HOME/.claude/local/claude" "$HOME/.local/bin/claude" /opt/homebrew/bin/claude /usr/local/bin/claude; do
+    [ -x "$c" ] && { PULL_BIN="$c"; break; }
+  done
+  if [ -n "$PULL_BIN" ] && [ -x "$PULL_BIN" ] \
+     && ! find "$PULL_STAMP" -mmin -1200 2>/dev/null | grep -q .; then
+    : > "$PULL_STAMP" 2>/dev/null
+    ( nohup "$PULL_BIN" plugin update gushwork-design@gushwork >/dev/null 2>&1 & ) >/dev/null 2>&1
+  fi
+fi
+
+# ── quiet path: behind, but not flagged — the flip above was the whole job ─────────────────
+VERDICT="$VERDICT" python3 -c 'import json,os,sys; sys.exit(0 if json.loads(os.environ["VERDICT"]).get("flagged") else 1)' \
+  2>/dev/null || exit 0
+
 # ── say it ─────────────────────────────────────────────────────────────────────────────────
 # systemMessage reaches the person; additionalContext reaches Claude, so it can answer "am I
 # current?" without re-deriving any of this. Plain stdout would land in both, unstructured.
@@ -250,7 +330,26 @@ local, remote = os.environ["LOCAL_VERSION"], v["remote"]
 breaking, changed = v["breaking"], v["changed"]
 flipped = os.environ.get("FLIPPED") == "yes"
 
-head = f"Gushwork design system v{remote} is out — this session is on v{local}."
+# A colleague's voice, not a status line (Utsav, 5 Oct 2026: "too mechanical — make it more humane").
+head = f"You're on Gushwork design system v{local}, and v{remote} is out."
+# Only the flagged release is described — Utsav (5 Oct 2026): "no need to tell about prev
+# versions, talk about what got added in the version that is getting added". The changelog
+# sheet is always linked for anyone who wants the rest; --link adds pages that explain it.
+nv = v.get("notify_version") or remote
+if v.get("summary"):
+    head += f" v{nv} brought {v['summary']}." if nv != remote else f" It brings {v['summary']}."
+links = [l for l in (v.get("links") or [])] + ([v["changelog"]] if v.get("changelog") else [])
+if links:
+    head += " Read more: " + " · ".join(links) + "."
+# How far behind, in minor releases, when the major matches: "11 releases behind" is a different
+# message from "1 behind", and the first is the one that gets acted on.
+try:
+    lm, rm = [int(x) for x in local.split(".")[:2]], [int(x) for x in remote.split(".")[:2]]
+    gap = rm[1] - lm[1] if lm[0] == rm[0] else 0
+    if gap >= 3:
+        head += f" You're {gap} releases back."
+except Exception:
+    pass
 bits = []
 if breaking:
     bits.append(f"{len(breaking)} breaking: " + ", ".join(breaking[:6])
@@ -261,27 +360,47 @@ if bits:
     head += " " + " · ".join(bits) + "."
 
 if flipped:
-    tail = ("Auto-update was off on this machine — it is on now, so the next start picks this up. "
-            "To take it now: claude plugin update gushwork-design@gushwork, then restart.")
+    tail = ("Auto-update was off on this machine; I turned it on, so the next start picks this up. "
+            "To take it now: claude plugin update gushwork-design@gushwork, then /reload-plugins in "
+            "the chat. No restart.")
 else:
-    tail = ("Auto-update is on, so this lands at your next start. To take it now: "
-            "claude plugin update gushwork-design@gushwork, then restart.")
+    tail = ("It lands on its own at your next start. To take it now: "
+            "claude plugin update gushwork-design@gushwork, then /reload-plugins in the chat. "
+            "No restart.")
 
-print(json.dumps({"hookSpecificOutput": {
+# `systemMessage` is a UNIVERSAL field and sits at the TOP LEVEL of the envelope. Inside
+# `hookSpecificOutput` it is silently ignored (confirmed against the hooks docs, 1 Oct 2026), which
+# is why this notice never reached anyone: only Claude saw it, through additionalContext.
+print(json.dumps({"systemMessage": head + " " + tail, "hookSpecificOutput": {
     "hookEventName": "SessionStart",
-    "systemMessage": head + " " + tail,
     "additionalContext": (
         f"Gushwork design system: running v{local}, v{remote} is available. "
+        + (f"What is new in v{nv}: {v['summary']}. " if v.get("summary") else "")
+        + "Say only what this flagged version adds; do not list earlier releases. "
         + (f"Breaking since v{local}: {', '.join(breaking)}. " if breaking else "")
         + (f"Also changed: {', '.join(changed)}. " if changed else "")
         + "If the user asks whether they are current, they are not. "
+        # The user may not see systemMessage in every client (the desktop app, a stripped terminal),
+        # so Claude says it once as well, in the first reply, in one sentence.
+        + "Open your first reply with it, before anything else, "
+          f"tell them in one or two warm sentences that they're on v{local} and v{remote} is out"
+        + (f", and what v{nv} brings" if v.get("summary") else "")
+        + ". Write it the way a colleague would — for example: \"You're on v1.58.0, and v1.61.0 "
+          "just landed with the ads skill. Worth grabbing before we start: click Run below, then type "
+          "/reload-plugins. No restart.\" Never say 'this session', 'notice', 'is available' or "
+          "'update step'. Directly under it put the update command, alone, in a fenced code block "
+          "tagged bash — the desktop app puts a Run button on it. "
+        + (("Then one line, 'Read more:', with these links: " + ", ".join(links) + ". ") if links else "")
+        + "Then carry on with what they asked; do not repeat any of it. "
         # Only claim components moved when some actually did. A release can bump the plugin
         # without touching a component doc, and pointing at "the components listed above" when
         # nothing was listed reads as a bug and costs the whole notice its credibility.
         + ("Anything you build with this version may use superseded specs for the components "
            "named above; say so rather than silently building. " if (breaking or changed) else "")
-        + "Update with: claude plugin update gushwork-design@gushwork "
-          "(a restart is required either way)."
+        # "A restart is required either way" was true until Claude Code grew /reload-plugins
+        # (present in 2.1.263, 5 Oct 2026). A restart still works; it is no longer the ask.
+        + "Update with: claude plugin update gushwork-design@gushwork, then /reload-plugins "
+          "(no restart needed)."
     ),
 }}))
 PY

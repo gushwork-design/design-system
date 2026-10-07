@@ -21,11 +21,10 @@
 #   /style-guide            holding page        public
 #   /downloads              holding page        public
 #   /internal/claude-plugin  = install.html     @gushwork.ai
-#   /internal/tools          tools + templates  @gushwork.ai
+#   /internal/tools          tools  @gushwork.ai
+#   /internal/templates      templates  @gushwork.ai
 #   /internal/changelog      = changelog-sheet  @gushwork.ai
-#   /admin/review-sheet      = review-sheet     ADMIN_EMAILS only
-#   /admin/catalogue         = catalogue        ADMIN_EMAILS only
-#   /admin/workflow          = workflow          ADMIN_EMAILS only
+#   /admin/workflow          = web/admin/workflow.html (built from Figma 661:5802)  ADMIN_EMAILS only
 #
 # THE SHEETS ARE STILL NEVER EDITED. They are generated, and release-log.sh
 # --check compares what is committed against what the generator produces.
@@ -47,22 +46,47 @@ case "${1:-}" in
   *) echo "unknown flag: $1" >&2; exit 2 ;;
 esac
 
+# A PRODUCTION PUBLISH SHIPS WHATEVER THIS CHECKOUT HOLDS. On 2 Oct 2026 it was run from a checkout sitting on an old
+# branch with uncommitted edits, and three deploys in a row put the old site (and an old Slack handler) over the live one.
+# So production publishes only from a clean copy of origin/main, exactly. Preview and dry runs are not affected. The escape
+# hatch is deliberate and loud: GW_PUBLISH_ANYWAY=1.
+if [ "$MODE" = prod ] && [ "${GW_PUBLISH_ANYWAY:-}" != 1 ]; then
+  if ! git fetch -q origin main 2>/dev/null; then
+    echo "Could not fetch origin/main to check this checkout. Publish refused (set GW_PUBLISH_ANYWAY=1 to override)." >&2
+    exit 1
+  fi
+  here="$(git rev-parse HEAD)"; main="$(git rev-parse origin/main)"
+  if [ "$here" != "$main" ] || [ -n "$(git status --porcelain)" ]; then
+    echo "Publish refused: this checkout is not a clean copy of origin/main." >&2
+    echo "  branch:   $(git branch --show-current || true)" >&2
+    echo "  HEAD:     ${here:0:9}   origin/main: ${main:0:9}" >&2
+    [ -n "$(git status --porcelain)" ] && echo "  and it has uncommitted changes" >&2
+    echo "Make a clean one and publish from there:" >&2
+    echo "  git fetch && git worktree add --detach /tmp/gw-publish origin/main && cd /tmp/gw-publish && bash scripts/publish-sheets.sh" >&2
+    exit 1
+  fi
+fi
+[ "${GW_PUBLISH_GUARD_ONLY:-}" = 1 ] && { echo "guard passed"; exit 0; }
+
 # Sheets that go up, and where they land. "<repo path>|<staged path>".
 # The staged paths are one directory deep, exactly like preview/ was, so the
 # sheets' own ../foundation/tokens.css links keep resolving.
 SHEETS=(
   "preview/install.html|internal/claude-plugin.html"
   "preview/changelog-sheet.html|internal/changelog.html"
-  "preview/review-sheet.html|admin/review-sheet.html"
-  "preview/catalogue.html|admin/catalogue.html"
-  "preview/workflow.html|admin/workflow.html"
 )
 
 # Social card images. A page's og:image must be an absolute URL for crawlers
 # to resolve it, so it never matches the ../assets/ grep further down. List it
 # here or the card 404s and the link unfurls blank.
 SOCIAL=(
-  assets/og/install.png
+  assets/og/hub.png
+  assets/og/id-card.png
+  assets/og/email-signature.png
+  assets/og/case-study-gen-studio.png
+  assets/og/crm-studio-deck.png
+  assets/og/homepage-neo.png
+  assets/og/social-creative.png
 )
 
 # The changelog sheet is generated, so a publish must not ship a stale one.
@@ -70,8 +94,14 @@ bash scripts/release-log.sh --check
 
 # The component library is generated from tokens.css, the registries and the measured
 # Figma. Publishing a stale one would show a reviewer values the system no longer holds,
-# which is worse than not publishing it at all.
-bash scripts/library-site.sh --check
+# which is worse than not publishing it at all. It used to refuse; it now REGENERATES, because
+# a review decision merged from the Design System page changes a registry and nothing else, and
+# a registry-only change is exactly what makes the committed library stale. The regenerated files
+# stay in the working tree (commit them, or discard them if this was a clean checkout).
+if ! bash scripts/library-site.sh --check >/dev/null 2>&1; then
+  echo "preview/library was behind its sources (a registry or token moved): regenerating it for this deploy."
+  bash scripts/library-site.sh
+fi
 
 # And the version fields must agree before anything goes out, because version.json below
 # becomes the number every machine compares itself against. v1.40.0 shipped with
@@ -106,6 +136,11 @@ mkdir -p "$STAGE"
 # 1. The site itself — pages, shell, auth functions, middleware, vercel.json.
 #    web/ mirrors the deploy root one-for-one, so this is a straight copy.
 # ---------------------------------------------------------------------------
+# The bell in the panel bar reads web/notifications.json, which is derived from
+# CHANGELOG.md. Regenerate before staging so a release can never ship with the
+# panel still advertising the one before it.
+bash scripts/notifications.sh
+
 cp -R web/. "$STAGE/"
 # README-auth.md is documentation for us, not a page. Don't serve it.
 rm -f "$STAGE/README-auth.md"
@@ -145,7 +180,6 @@ fi
 # How much of the library the review sheet actually draws, counted at publish time rather than
 # typed. It matters more since the 15 Sep ruling made the sheet a gate: a set it cannot draw is a
 # set nobody can pass. Stamped into the STAGED copy only, so the repo's file stays as authored.
-python3 scripts/_sheet_coverage.py "$STAGE/admin/review-sheet.html"
 
 # install.html's social card still points at the old /preview/install.html.
 # Rewrite it in the staged copy so the unfurl lands on the live page. The old
@@ -157,7 +191,7 @@ p = sys.argv[1]
 s = open(p, encoding="utf-8").read()
 before = s
 s = s.replace("https://gushwork-design.vercel.app/preview/install.html",
-              "https://gushwork-design.vercel.app/internal/claude-plugin")
+              "https://design.gushwork.ai/internal/claude-plugin")
 open(p, "w", encoding="utf-8").write(s)
 print("  rewrote og:url in claude-plugin.html" if s != before
       else "  og:url in claude-plugin.html already current")
@@ -193,6 +227,15 @@ for surface in shared dashboard web lead-magnet; do
   echo "  registry -> exports/$surface/component-registry.json"
 done
 
+# The dashboard's built stylesheet and script go up beside its registry. The review drawer loads
+# /exports/dashboard/dashboard.css to draw every dashboard component's preview, and a built
+# dashboard may link it instead of inlining it. They are generated from exports/dashboard/css and
+# /js by scripts/build-dashboard-css.sh; publishing stale ones draws stale previews, so stop here.
+bash scripts/build-dashboard-css.sh --check \
+  || { echo "  dashboard.css/js are out of date — run: bash scripts/build-dashboard-css.sh" >&2; exit 1; }
+cp exports/dashboard/dashboard.css exports/dashboard/dashboard.js "$STAGE/exports/dashboard/"
+echo "  dashboard.css, dashboard.js -> exports/dashboard/"
+
 # version.json — the other file here that is not for reading. The SessionStart hook in
 # hooks/hooks.json fetches it to find out whether the copy someone is running has been
 # superseded, and which components broke on the way. It sits at the ROOT of the deploy, so
@@ -224,9 +267,20 @@ VJ
 # the shell has been injected and the sheets renamed to their routes, so every result links to
 # a URL that exists on this deploy. Building it from the repo instead would index files whose
 # routes do not exist, miss the renames, and drift the first time a route changed.
+# The hub's Open Graph card goes on every staged page that does not already carry its own
+# og:image (assets/og/hub.png, Figma 818:5074). Landers, templates and the tools keep theirs.
+python3 scripts/_add_og.py "$STAGE"
+
 python3 scripts/_search_index.py "$STAGE" > "$STAGE/search-index.json"
 
 cp foundation/tokens.css "$STAGE/foundation/"
+
+# Live previews of the page templates — what the Preview links on /internal/templates open.
+# Generated into the STAGED copy from the templates themselves, so a preview is never edited
+# by hand and cannot drift from the template it shows. They sit under /internal/, so the gate
+# covers them. Their fonts and assets are staged by the sweep further down.
+echo "Template previews:"
+python3 scripts/template-previews.py "$STAGE/internal/templates"
 cp fonts/*.ttf "$STAGE/fonts/"
 
 # The /downloads page hands over files the grep below CANNOT see. It builds its
@@ -264,20 +318,23 @@ for a in "${SOCIAL[@]}"; do
   mkdir -p "$STAGE/$(dirname "$a")" && cp "$a" "$STAGE/$a"
 done
 
-# Any page that links tokens.css needs the real fonts; review-sheet and
-# catalogue inline their own. Copy whatever else the pages reference, so a new
+# Any page that links tokens.css needs the real fonts; the changelog inlines its own. Copy whatever else the pages reference, so a new
 # sheet with assets just works. Both ../assets/ (from a one-deep page) and
 # /assets/ (from the shell) are picked up.
 {
   for pair in "${SHEETS[@]}"; do
     grep -ohE '(href|src)="(\.\./|/)assets/[^"]+"' "$STAGE/${pair##*|}" 2>/dev/null || true
   done
-  grep -rohE '(href|src)="/assets/[^"]+"' "$STAGE"/*.html "$STAGE"/internal/*.html 2>/dev/null || true
+  # The library pages sit up to three folders deep and reach assets as ../../../assets/..., which
+  # none of the lines above match: hero-primary's two preview images 404ed on the live site for
+  # that reason. Only src= here, because the same pages' hrefs point at sibling pages.
+  grep -rohE 'src="(\.\./)+assets/[^"]+"' "$STAGE"/library 2>/dev/null || true
+  grep -rohE '(href|src)="/assets/[^"]+"' "$STAGE"/*.html "$STAGE"/admin/*.html "$STAGE"/internal/*.html "$STAGE"/internal/templates/*/index.html 2>/dev/null || true
   # CSS url() too — the style guide masks the logo through -webkit-mask to draw
   # the "don't" panel, and those references carry no href= or src= to match.
-  grep -rohE "url\(['\"]?/assets/[^)'\"]+" "$STAGE"/*.html "$STAGE"/internal/*.html 2>/dev/null \
+  grep -rohE "url\(['\"]?/assets/[^)'\"]+" "$STAGE"/*.html "$STAGE"/admin/*.html "$STAGE"/internal/*.html "$STAGE"/internal/templates/*/index.html 2>/dev/null \
     | sed "s|^url(['\"]\{0,1\}|src=\"|;s|$|\"|" || true
-} | sed 's/.*="//;s/"$//;s|^\.\./||;s|^/||' | sort -u | while read -r a; do
+} | sed 's/.*="//;s/"$//;s|^\(\.\./\)*||;s|^/||' | sort -u | while read -r a; do
   [ -n "$a" ] || continue
   [ -f "$a" ] || { echo "  MISSING asset referenced by a page: $a" >&2; continue; }
   mkdir -p "$STAGE/$(dirname "$a")" && cp "$a" "$STAGE/$a"

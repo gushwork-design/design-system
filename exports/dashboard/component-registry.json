@@ -1,203 +1,1514 @@
 {
   "$comment": [
-    "Per-component versions. The plugin version tells someone the PLUGIN is stale; this tells them",
-    "which of the components THEY used actually changed, which is the only thing that makes them",
-    "act. Bump a component's version in the same commit that changes its spec \u2014 scripts/check-drift.sh",
-    "reads this file and a build's stamp, and reports the intersection.",
-    "",
-    "version = the plugin version in which that component's spec last changed.",
-    "breaking = true when a build using it will render WRONG until updated, as opposed to merely",
-    "missing an improvement. Drift on a breaking change is reported as MUST, everything else as MAY."
+    "Per-component versions for the dashboard surface. Built by scripts/build-dashboard-css.sh from",
+    "registry-parts/*.json — edit the parts, never this file. Bump a component's version in the same",
+    "commit that changes its spec; scripts/check-drift.sh reads this and a build's stamp. breaking=true",
+    "when an existing build renders WRONG until updated. The review block is written by the review loop."
   ],
-  "registryVersion": "1.43.0",
+  "registryVersion": "2.0.0",
   "components": {
-    "card-shell": {
-      "version": "1.38.0",
-      "changed": "2026-08-13",
+    "access-denied-screen": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/cards-and-chrome.md"
+      "doc": "auth.md"
+    },
+    "account-row": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "navigation.md"
+    },
+    "action-button": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "actions.md"
+    },
+    "activity-timeline": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "data-display.md"
+    },
+    "analytics-overview-template": {
+      "version": "2.0.0",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "templates.md"
+    },
+    "app-shell": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "shell.md"
+    },
+    "area-chart": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "charts.md"
+    },
+    "avatar": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "data-display.md"
+    },
+    "avatar-group": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "data-display.md"
+    },
+    "banner": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "feedback.md"
+    },
+    "bar-chart": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "charts.md"
+    },
+    "board": {
+      "version": "2.0.1",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "feedback.md"
+    },
+    "breadcrumbs": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "navigation.md"
+    },
+    "breakdown-bar": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "charts.md"
+    },
+    "build-notice": {
+      "version": "2.0.0",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "note": "Update now opens Claude Code with the update prompt ready; Remind later brings the notice back on the next open",
+      "doc": "notice.md"
+    },
+    "bulk-action-bar": {
+      "version": "2.0.1",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "tables.md"
+    },
+    "card": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "data-display.md"
+    },
+    "chart-frame": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "charts.md"
+    },
+    "chart-tooltip": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "charts.md"
     },
     "checkbox": {
-      "version": "1.38.0",
-      "changed": "2026-08-13",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/primitives.md"
+      "doc": "inputs.md"
     },
-    "control": {
-      "version": "1.38.0",
-      "changed": "2026-08-13",
+    "checklist": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/controls.md"
+      "doc": "data-display.md"
     },
-    "dashboard-switcher": {
-      "version": "1.39.0",
-      "changed": "2026-08-15",
+    "coachmark": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/overlays.md",
-      "added": true
+      "doc": "overlays.md"
+    },
+    "column-menu": {
+      "version": "2.0.1",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "tables.md"
+    },
+    "combobox": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "inputs.md"
+    },
+    "command-palette": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "overlays.md"
+    },
+    "confirm-dialog": {
+      "version": "2.0.1",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "overlays.md"
+    },
+    "content-panel": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "shell.md"
+    },
+    "data-table": {
+      "version": "2.0.1",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "tables.md"
     },
     "date-range-picker": {
-      "version": "1.39.0",
-      "changed": "2026-08-15",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/overlays.md",
-      "added": true
+      "doc": "inputs.md"
     },
-    "divider": {
-      "version": "1.38.0",
-      "changed": "2026-08-13",
+    "datetime-field": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/primitives.md"
+      "doc": "inputs.md"
+    },
+    "definition-tile": {
+      "version": "2.0.3",
+      "changed": "2026-10-07",
+      "breaking": false,
+      "doc": "reports.md"
+    },
+    "delta-pill": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "data-display.md"
+    },
+    "detail-view": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "detail.md"
+    },
+    "docked-panel": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "overlays.md"
+    },
+    "donut-chart": {
+      "version": "2.0.1",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "charts.md"
+    },
+    "drawer": {
+      "version": "2.0.1",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "overlays.md"
     },
     "empty-state": {
-      "version": "1.38.0",
-      "changed": "2026-08-13",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": true,
+      "doc": "feedback.md"
+    },
+    "explorer-layout": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/feedback.md"
+      "doc": "shell.md"
+    },
+    "filter-builder": {
+      "version": "2.0.1",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "filtering.md"
+    },
+    "filter-chip": {
+      "version": "2.0.1",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "filtering.md"
+    },
+    "form-field": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "inputs.md"
+    },
+    "form-section": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "inputs.md"
+    },
+    "funnel": {
+      "version": "2.0.1",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "charts.md"
+    },
+    "google-button": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "auth.md"
+    },
+    "growth-report-template": {
+      "version": "2.0.3",
+      "changed": "2026-10-07",
+      "breaking": false,
+      "doc": "reports.md"
+    },
+    "heatmap": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "charts.md"
+    },
+    "histogram": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "tables.md"
+    },
+    "horizontal-bar-chart": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "charts.md"
     },
     "icon-button": {
-      "version": "1.38.0",
-      "changed": "2026-08-13",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/controls.md"
+      "doc": "actions.md"
     },
-    "icon-toggle-group": {
-      "version": "1.40.0",
-      "changed": "2026-08-26",
+    "incident-row": {
+      "version": "2.0.1",
+      "changed": "2026-10-05",
       "breaking": false,
-      "doc": "v2/phone.md",
-      "added": true,
-      "note": "was never registered. On phone the toggle moves OUT of the topbar to a bottom-left dock at 20/20 and carries a white fill, a 1px neutral/200 border and Shadows/S3 \u2014 the desktop version has none of the three."
+      "doc": "data-display.md"
     },
-    "input": {
-      "version": "1.38.0",
-      "changed": "2026-08-13",
+    "info-hint": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/controls.md"
+      "doc": "actions.md"
+    },
+    "issue-summary": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "data-display.md"
+    },
+    "key-value-list": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "data-display.md"
     },
     "legend": {
-      "version": "1.38.0",
-      "changed": "2026-08-13",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/cards-and-chrome.md"
+      "doc": "data-display.md"
     },
-    "metric-card": {
-      "version": "1.42.0",
-      "changed": "2026-08-28",
+    "legend-table": {
+      "version": "2.0.1",
+      "changed": "2026-10-05",
       "breaking": false,
-      "doc": "v2/overlays.md",
-      "note": "FINDING: does not fit card-layout's measured 196 analytics slot \u2014 content bottoms out ~104 against the 94 floor, so the pair lands ~214 and the lead exceeds its 198 ceiling. Gains a ruled unavailable state \u2014 a quantity that cannot be read is removed, never zeroed. Not breaking: existing builds render correctly, they have no failure treatment. See exports/dashboard/states.md."
+      "doc": "charts.md"
+    },
+    "line-chart": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "charts.md"
+    },
+    "log-viewer": {
+      "version": "2.0.1",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "tables.md"
+    },
+    "login-screen": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "auth.md"
+    },
+    "menu": {
+      "version": "2.0.1",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "actions.md"
+    },
+    "metric-strip": {
+      "version": "2.0.1",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "data-display.md"
     },
     "modal": {
-      "version": "1.38.0",
-      "changed": "2026-08-13",
+      "version": "2.0.1",
+      "changed": "2026-10-05",
       "breaking": false,
-      "doc": "v2/feedback.md"
+      "doc": "overlays.md"
+    },
+    "multi-select": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "inputs.md"
+    },
+    "nav-group": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "navigation.md"
+    },
+    "nav-item": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "navigation.md"
     },
     "page-header": {
-      "version": "1.39.0",
-      "changed": "2026-08-15",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/overlays.md",
-      "note": "the period pill ends in a 60% ring, not an icon"
+      "doc": "shell.md"
+    },
+    "page-layout": {
+      "version": "2.0.1",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "shell.md"
     },
     "pagination": {
-      "version": "1.39.0",
-      "changed": "2026-08-15",
+      "version": "2.0.1",
+      "changed": "2026-10-05",
       "breaking": false,
-      "doc": "v2/data-table.md",
-      "note": "page-size options now start at 5"
+      "doc": "tables.md"
+    },
+    "period-select": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "actions.md"
+    },
+    "popover": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "overlays.md"
     },
     "progress-bar": {
-      "version": "1.38.0",
-      "changed": "2026-08-13",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/primitives.md"
+      "doc": "data-display.md"
+    },
+    "query-builder": {
+      "version": "2.0.1",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "inputs.md"
+    },
+    "radio": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "inputs.md"
+    },
+    "report-frame": {
+      "version": "2.0.3",
+      "changed": "2026-10-07",
+      "breaking": false,
+      "doc": "reports.md"
+    },
+    "report-source-line": {
+      "version": "2.0.3",
+      "changed": "2026-10-07",
+      "breaking": false,
+      "doc": "reports.md"
     },
     "ring": {
-      "version": "1.39.0",
-      "changed": "2026-08-15",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/overlays.md",
-      "added": true
+      "doc": "data-display.md"
     },
-    "section-header": {
-      "version": "1.39.0",
-      "changed": "2026-08-15",
+    "row-actions-menu": {
+      "version": "2.0.1",
+      "changed": "2026-10-05",
       "breaking": false,
-      "doc": "v2/cards-and-chrome.md",
-      "note": "card-header subtext sits beside the title, gap 12 \u2014 not stacked under it"
+      "doc": "tables.md"
+    },
+    "row-selection": {
+      "version": "2.0.1",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "tables.md"
+    },
+    "saved-views": {
+      "version": "2.0.1",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "filtering.md"
+    },
+    "search-field": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "inputs.md"
+    },
+    "search-trigger": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "navigation.md"
+    },
+    "segmented-control": {
+      "version": "2.0.1",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "actions.md"
+    },
+    "select": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "inputs.md"
+    },
+    "session-expired": {
+      "version": "2.0.1",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "auth.md"
+    },
+    "setting-row": {
+      "version": "2.0.1",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "inputs.md"
+    },
+    "shortcut-key": {
+      "version": "2.0.0",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "actions.md"
     },
     "sidebar": {
-      "version": "1.40.0",
-      "changed": "2026-08-26",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/cards-and-chrome.md",
-      "note": "phone drawer measured: 240 anchored RIGHT below the topbar, 1.5px LEFT border, list-groups padding 12, no scrim, no user-card."
+      "doc": "shell.md"
+    },
+    "sidebar-collapsed": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "shell.md"
+    },
+    "sign-in-modal": {
+      "version": "2.0.1",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "auth.md"
     },
     "skeleton": {
-      "version": "1.38.0",
-      "changed": "2026-08-13",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/feedback.md"
+      "doc": "feedback.md"
+    },
+    "sparkline": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "charts.md"
+    },
+    "split-button": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "actions.md"
     },
     "stat-card": {
-      "version": "1.42.0",
-      "changed": "2026-08-28",
+      "version": "2.0.1",
+      "changed": "2026-10-05",
       "breaking": false,
-      "doc": "v2/cards-and-chrome.md",
-      "note": "Gains a ruled unavailable state \u2014 a quantity that cannot be read is removed, never zeroed. Not breaking: existing builds render correctly, they have no failure treatment. See exports/dashboard/states.md."
+      "doc": "data-display.md"
+    },
+    "status-banner": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "data-display.md"
     },
     "status-dot": {
-      "version": "1.38.0",
-      "changed": "2026-08-13",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/primitives.md"
+      "doc": "data-display.md"
     },
-    "tab-group": {
-      "version": "1.38.0",
-      "changed": "2026-08-13",
+    "status-list": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/controls.md"
+      "doc": "data-display.md"
     },
-    "tab-item": {
-      "version": "1.38.0",
-      "changed": "2026-08-13",
+    "sub-nav": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/controls.md"
+      "doc": "navigation.md"
     },
-    "table-cell": {
-      "version": "1.38.0",
-      "changed": "2026-08-13",
+    "support-ops-app-template": {
+      "version": "2.0.1",
+      "changed": "2026-10-06",
       "breaking": false,
-      "doc": "v2/data-table.md"
+      "doc": "templates.md"
     },
-    "table-row": {
-      "version": "1.40.0",
-      "changed": "2026-08-26",
-      "breaking": true,
-      "doc": "v2/data-table.md",
-      "note": "build rule corrected: 'leave the first column unsized' only holds in a SHARED grid. Where each row is its own grid, give every non-first track minmax(floor,1fr) or rows land on different column boundaries."
+    "table-cell-types": {
+      "version": "2.0.1",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "tables.md"
+    },
+    "table-states": {
+      "version": "2.0.1",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "tables.md"
+    },
+    "table-toolbar": {
+      "version": "2.0.1",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "filtering.md"
+    },
+    "tabs-pill": {
+      "version": "2.0.1",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "actions.md"
+    },
+    "tabs-underline": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "actions.md"
+    },
+    "tag": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "data-display.md"
+    },
+    "text-input": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "inputs.md"
+    },
+    "textarea": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "inputs.md"
+    },
+    "theme-and-density": {
+      "version": "2.0.0",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "base.md"
+    },
+    "theme-menu": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "navigation.md"
+    },
+    "time-range-bar": {
+      "version": "2.0.1",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "inputs.md"
+    },
+    "timezone-select": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "inputs.md"
     },
     "toast": {
-      "version": "1.38.0",
-      "changed": "2026-08-13",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "toast.md"
+      "doc": "feedback.md"
+    },
+    "toggle": {
+      "version": "2.0.1",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "inputs.md"
     },
     "tooltip": {
-      "version": "1.39.0",
-      "changed": "2026-08-15",
-      "breaking": true,
-      "doc": "v2/overlays.md",
-      "note": "light bubble is Neutral/900, not Neutral/black"
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "overlays.md"
     },
     "topbar": {
-      "version": "1.40.0",
-      "changed": "2026-08-26",
+      "version": "2.0.0",
+      "changed": "2026-10-03",
       "breaking": false,
-      "doc": "v2/cards-and-chrome.md",
-      "note": "phone variant measured: 375x60, 1.5px border, 20x20 scaled logo tile, 36x36 drawer trigger alone at right, Semibold 16 title (a sixth display size, no token)."
+      "doc": "shell.md"
+    },
+    "unavailable-state": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "feedback.md"
+    },
+    "unsaved-changes-bar": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "inputs.md"
+    },
+    "uptime-bar": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "charts.md"
+    },
+    "widget-grid": {
+      "version": "2.0.1",
+      "changed": "2026-10-05",
+      "breaking": false,
+      "doc": "shell.md"
+    },
+    "workspace-switcher": {
+      "version": "2.0.0",
+      "changed": "2026-10-03",
+      "breaking": false,
+      "doc": "navigation.md"
+    }
+  },
+  "review": {
+    "theme-and-density": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "c2b9465fd117f126"
+    },
+    "build-notice": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "7f2f753ffb6739be",
+      "previewFingerprint": "93b43e2da6e261fc"
+    },
+    "access-denied-screen": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "5a41d49eed752480",
+      "previewFingerprint": "d4a6b4145b6d3a6a"
+    },
+    "account-row": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "98afe4aca6fb3db0",
+      "previewFingerprint": "249198dadce2403d"
+    },
+    "action-button": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "636bbaf179fc8805",
+      "previewFingerprint": "d37ac498e879e680"
+    },
+    "activity-timeline": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "45700f1e6a15033e",
+      "previewFingerprint": "07ee6aa0ecc7137e"
+    },
+    "app-shell": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "1ddd776d4fadc449",
+      "previewFingerprint": "9ad4332151fd9e22"
+    },
+    "area-chart": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "17242ad2a091eb10",
+      "previewFingerprint": "8767f09b24ecd2e8"
+    },
+    "avatar": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "43b8bbb4728068f5",
+      "previewFingerprint": "f6cb6754ea637134"
+    },
+    "avatar-group": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "8ff8440efac8c54d",
+      "previewFingerprint": "7a6a210cbfd6270d"
+    },
+    "banner": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "47b27f08313c5b0d",
+      "previewFingerprint": "85c79c9ba5fb6bc6"
+    },
+    "bar-chart": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "44a417b8aecaf47a",
+      "previewFingerprint": "4d81d89759696dc3"
+    },
+    "board": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "754c188f0b2b9a3b",
+      "previewFingerprint": "c4ae905e7703e951"
+    },
+    "breadcrumbs": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "1f45729c37196399",
+      "previewFingerprint": "249dc21a2dc82fac"
+    },
+    "breakdown-bar": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "51b670396cffa36d",
+      "previewFingerprint": "e7c1f36f72c9f0a3"
+    },
+    "bulk-action-bar": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "bdf60fe529445f27",
+      "previewFingerprint": "c6a4d320327f93ee"
+    },
+    "card": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "7bc21bceab30b1d7",
+      "previewFingerprint": "9a9b5d4be9e153b6"
+    },
+    "chart-frame": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "f727f41820424428",
+      "previewFingerprint": "35fd337265b97c19"
+    },
+    "chart-tooltip": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "6fd3930467a0569c",
+      "previewFingerprint": "dd77a99db24165b8"
+    },
+    "checkbox": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "a62e686a9fafd393",
+      "previewFingerprint": "a89950b3422855e6"
+    },
+    "checklist": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "f38988f011922ddb",
+      "previewFingerprint": "83d449f1d87fdaab"
+    },
+    "coachmark": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "511d5e6a2fe03c16"
+    },
+    "column-menu": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "b3f899e837f03102",
+      "previewFingerprint": "47288681527102c9"
+    },
+    "combobox": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "6b923b4940b329d8",
+      "previewFingerprint": "f1d64a0d3626ce67"
+    },
+    "command-palette": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "75c7f5206730b017"
+    },
+    "confirm-dialog": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "606297411c3d3c0a",
+      "previewFingerprint": "fbb0f6c6896de662"
+    },
+    "content-panel": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "f545a8b249a3a659",
+      "previewFingerprint": "8956715143f3ccba"
+    },
+    "data-table": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "bc863e7bec7ca935",
+      "previewFingerprint": "afd408b238274c93"
+    },
+    "date-range-picker": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "a243e02cef70cbfe",
+      "previewFingerprint": "8dd4f6dec438f72a"
+    },
+    "datetime-field": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "f01becb6c2636ff7",
+      "previewFingerprint": "f375b58be3a59172"
+    },
+    "delta-pill": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "300a9a50544373b4",
+      "previewFingerprint": "6069893e410ef30d"
+    },
+    "detail-view": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "41379b02d398020d"
+    },
+    "docked-panel": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "0695b4b36e6d8376"
+    },
+    "donut-chart": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "97192557152007cd",
+      "previewFingerprint": "69194c195a016322"
+    },
+    "drawer": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "d468689db8072ebf",
+      "previewFingerprint": "3d4fd92d1a42d281"
+    },
+    "empty-state": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "843ed7bf3ad127f9",
+      "previewFingerprint": "5bb8b19b2e8e08dc"
+    },
+    "explorer-layout": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "baac8bf0a052b45f",
+      "previewFingerprint": "58fec5677c3dba48"
+    },
+    "filter-builder": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "1c8f5b8b76bc1663",
+      "previewFingerprint": "d976f1f6c8eb2e0d"
+    },
+    "filter-chip": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "dfc6bc4e37f5f266",
+      "previewFingerprint": "558602399f902290"
+    },
+    "form-field": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "ae6c305b585e60e2",
+      "previewFingerprint": "006752413ac3d17f"
+    },
+    "form-section": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "55baf60f47183569",
+      "previewFingerprint": "7243f0f41df0af93"
+    },
+    "funnel": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "e5806f5a7c461bcd",
+      "previewFingerprint": "eee7025a3dbe24a7"
+    },
+    "google-button": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "8b670a30a8fa2e00",
+      "previewFingerprint": "925b0b188bdebbbd"
+    },
+    "heatmap": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "fa2a8bb72a6217fb",
+      "previewFingerprint": "d4b296433e79deb6"
+    },
+    "histogram": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "4cf16196e4c978a0",
+      "previewFingerprint": "e9f85335f628b995"
+    },
+    "horizontal-bar-chart": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "0035934dfad11e39",
+      "previewFingerprint": "8b5786b408a9d5de"
+    },
+    "icon-button": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "889cf71c38c19189",
+      "previewFingerprint": "b564587d15b8027c"
+    },
+    "incident-row": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "9853a43f909af5c3",
+      "previewFingerprint": "95f0e45694e8e178"
+    },
+    "info-hint": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "2318e0fe144fc2eb",
+      "previewFingerprint": "c18d77ba97ef502e"
+    },
+    "issue-summary": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "79d67b3a3b2c182b",
+      "previewFingerprint": "d45969da7e6be322"
+    },
+    "key-value-list": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "319f51d8de3c1dc2",
+      "previewFingerprint": "1f8c0f8a461ba573"
+    },
+    "legend": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "0c05985716daa9c3",
+      "previewFingerprint": "78cc999e1f6dcf30"
+    },
+    "legend-table": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "76ebfeaa6e8982e3",
+      "previewFingerprint": "5702d27f4be5141e"
+    },
+    "line-chart": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "e0ea03d4e8c4d809",
+      "previewFingerprint": "5e71b06b18d9f49d"
+    },
+    "log-viewer": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "83b60db2e134fcb2",
+      "previewFingerprint": "45008eace9130fe3"
+    },
+    "login-screen": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "27c15fb9e4a764f1",
+      "previewFingerprint": "1a92a5f6403ff5cd"
+    },
+    "menu": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "dd994608c67a2630",
+      "previewFingerprint": "96a4187e7957d485"
+    },
+    "metric-strip": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "c341951a978d2070",
+      "previewFingerprint": "5a50738636c22de2"
+    },
+    "modal": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "659cb5862dd533c0",
+      "previewFingerprint": "9be07fee528d9e9e"
+    },
+    "multi-select": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "7840208ad6b4de07",
+      "previewFingerprint": "8abd539082d91257"
+    },
+    "nav-group": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "25c5538ffe474d13",
+      "previewFingerprint": "2f54516c6533cdc3"
+    },
+    "nav-item": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "99ab9440b400a9b8",
+      "previewFingerprint": "80a1b15624643439"
+    },
+    "page-header": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "783d8b52b2a7c197",
+      "previewFingerprint": "ff9678039ad333ed"
+    },
+    "page-layout": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "3bb3c37463cac2e5",
+      "previewFingerprint": "f62876dd58180c64"
+    },
+    "pagination": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "953ab5b5eadc7e69",
+      "previewFingerprint": "b42dd9ca8dc90738"
+    },
+    "period-select": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "165e2594abf3935f",
+      "previewFingerprint": "cda3843807c4ce93"
+    },
+    "popover": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "ffc112b8576717e7"
+    },
+    "progress-bar": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "3118a7fbeba372cb",
+      "previewFingerprint": "fe37c3277e9e584d"
+    },
+    "radio": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "279bf4382ad731c5",
+      "previewFingerprint": "b3c14d0cc68e03cd"
+    },
+    "ring": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "159396fdd6b75db5",
+      "previewFingerprint": "20cebb5b83d1c037"
+    },
+    "row-actions-menu": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "ba388feedaae14a3",
+      "previewFingerprint": "a63c0aeebc4c82db"
+    },
+    "row-selection": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "276d648cc9ffca2e",
+      "previewFingerprint": "de167baa2a38613c"
+    },
+    "saved-views": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "91a12ca36e4fcda4",
+      "previewFingerprint": "1ffea9a7542de82f"
+    },
+    "search-field": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "8322a87ba02c2a17",
+      "previewFingerprint": "b69a5e8a1bdb3402"
+    },
+    "search-trigger": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "7d850a3b54bb9a80",
+      "previewFingerprint": "53fe40e15fe5d22f"
+    },
+    "segmented-control": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "68277884ecc70e78",
+      "previewFingerprint": "a8749aabdbd28351"
+    },
+    "query-builder": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "5c451abef88cfad6",
+      "previewFingerprint": "f23d6e3163445471"
+    },
+    "select": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "e3c8630ee7760a43",
+      "previewFingerprint": "5810cde713465a3a"
+    },
+    "session-expired": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "4b0cf35931a7a49f",
+      "previewFingerprint": "909fa92d14785f2b"
+    },
+    "setting-row": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "4b3721cdc1b7704b",
+      "previewFingerprint": "98a663a302727f10"
+    },
+    "sidebar": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "e7195b0b3d59d8b6",
+      "previewFingerprint": "80ce4d3972e932b6"
+    },
+    "sidebar-collapsed": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "be4a7521b7fae397",
+      "previewFingerprint": "99e53f0740cffeb3"
+    },
+    "sign-in-modal": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "70348b7642347483",
+      "previewFingerprint": "25490e97b077a31a"
+    },
+    "skeleton": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "3bb534c86551efbe",
+      "previewFingerprint": "7112f536797fe5af"
+    },
+    "sparkline": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "9833e62da79557a1",
+      "previewFingerprint": "e6615ee0bb461f25"
+    },
+    "split-button": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "dbd0b622947502d1",
+      "previewFingerprint": "2755d761c69a0b51"
+    },
+    "stat-card": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "e71b14393a047f7c",
+      "previewFingerprint": "8c02a9bc62418882"
+    },
+    "status-banner": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "504ae7f89ca57fde",
+      "previewFingerprint": "77d2b9ab2b41ad91"
+    },
+    "status-dot": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "1459ba9f40c39786",
+      "previewFingerprint": "c0fd02259a23ca45"
+    },
+    "status-list": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "8db96d9bb8403888",
+      "previewFingerprint": "9fe4504b7839d2d9"
+    },
+    "sub-nav": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "2688d681f699ad82",
+      "previewFingerprint": "94320d300a3539bc"
+    },
+    "table-cell-types": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "1aa4ffdca91d8bf7",
+      "previewFingerprint": "144e7be72ce8a5f9"
+    },
+    "table-states": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "44c4db04d71a626a",
+      "previewFingerprint": "3f440539632b8130"
+    },
+    "table-toolbar": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "548651414e209dba",
+      "previewFingerprint": "6a67e8e4de945733"
+    },
+    "tabs-pill": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "d57c160a5c0f2a1e",
+      "previewFingerprint": "cd439066c376334c"
+    },
+    "tabs-underline": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "e9efbf5925bd78a8",
+      "previewFingerprint": "bbe13c82c0663d65"
+    },
+    "tag": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "9730e5d347dce66a",
+      "previewFingerprint": "970a536412a7d39b"
+    },
+    "text-input": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "845bd4e9a3c70836",
+      "previewFingerprint": "450c9808c96fa1cb"
+    },
+    "textarea": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "80210883ea6b867c",
+      "previewFingerprint": "b6a9019ec8aaaacd"
+    },
+    "theme-menu": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "2a3eb60de76fa17e",
+      "previewFingerprint": "c2b18cf82c2db924"
+    },
+    "time-range-bar": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "2b0fd4cab4f1894f",
+      "previewFingerprint": "b2c238296d3e3328"
+    },
+    "timezone-select": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "786a61a0cdbd37fb",
+      "previewFingerprint": "e55437d1236e550e"
+    },
+    "toast": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "ef3d68c28dc3430f",
+      "previewFingerprint": "842ad1864e4d1eeb"
+    },
+    "toggle": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "4c69b7bcda4e2fe7",
+      "previewFingerprint": "675be6215865ee70"
+    },
+    "tooltip": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "73168d8426005ac3"
+    },
+    "topbar": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "8d5ed4ce9ceb9f92",
+      "previewFingerprint": "5eeabbdd5d4a52d1"
+    },
+    "unavailable-state": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "26506eb94d3436c4",
+      "previewFingerprint": "63d7c14d0c9461e1"
+    },
+    "unsaved-changes-bar": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "6c26186e2462193f",
+      "previewFingerprint": "9750d82563c931c4"
+    },
+    "uptime-bar": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "a99d654bf47ee180",
+      "previewFingerprint": "40caaf527506fa58"
+    },
+    "widget-grid": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "540b72afc5eec1f2",
+      "previewFingerprint": "6ae9f32a7df0a3c8"
+    },
+    "workspace-switcher": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "85b3161fc7d72463",
+      "previewFingerprint": "4834659d12a9c468"
+    },
+    "analytics-overview-template": {
+      "reviewed": "rejected",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "bf45f626c9b12ab2",
+      "previewFingerprint": "410329c2eabe53a0",
+      "note": "may use later"
+    },
+    "shortcut-key": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "225c1933f37bd984",
+      "previewFingerprint": "97c3a2ac1deea9ca"
+    },
+    "support-ops-app-template": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-06",
+      "fingerprint": "ce893bef9441dc32",
+      "previewFingerprint": "1c70de60470b7b89"
     }
   }
 }

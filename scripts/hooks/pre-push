@@ -71,6 +71,16 @@ if [ -x "$ROOT/scripts/library-site.sh" ]; then
   "$ROOT/scripts/library-site.sh" --check >/dev/null 2>&1 \
     || echo "  ~ preview/library is out of date — run: bash scripts/library-site.sh"
 fi
+if [ -x "$ROOT/scripts/check-drawing-parity.sh" ]; then
+  # R60: a drawing must not carry style the shipped component lacks. WARN, not block, like the checks around it.
+  "$ROOT/scripts/check-drawing-parity.sh" >/dev/null 2>&1 || echo "  ~ web/previews/_sheet.css styles a shipped component (R60) — see: bash scripts/check-drawing-parity.sh"
+fi
+if [ -x "$ROOT/scripts/check-previews.sh" ]; then
+  # A reviewer cannot pass what they cannot see. Components with no drawn preview and no Figma render show
+  # "No visual yet" in the review drawer. WARN: the count, not the list (the list is long while previews are added).
+  N="$("$ROOT/scripts/check-previews.sh" --count 2>/dev/null || echo 0)"
+  [ "${N:-0}" -gt 0 ] 2>/dev/null && echo "  ~ $N components have no visual in the review drawer — list them: bash scripts/check-previews.sh"
+fi
 if [ -x "$ROOT/scripts/review-pass.sh" ]; then
   OUT="$("$ROOT/scripts/review-pass.sh" --check 2>&1 || true)"
   # Only the summary line and the expired rows. The full pending list is long by design

@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Website analytics - Gushwork</title>
+<script>try{var c=localStorage.getItem('gw-theme-choice');if(c==='light'||c==='dark')document.documentElement.setAttribute('data-theme',c)}catch(e){}</script>
+<link rel="stylesheet" href="/foundation/tokens.css">
+<link rel="stylesheet" href="/exports/dashboard/dashboard.css">
+<style>@media (max-width: 767px) { .gd-app .gd-grid > .gd-span-4.gd-span-4 { grid-column: span 12 !important; } } /* the shell gives spans of 6 or fewer two across on a phone; these two cards need the full width */
+html, body { margin: 0; overflow: hidden; } /* the shell owns the viewport; the UA body margin otherwise offsets and overflows it by 8px */</style>
+<!-- gushwork-build:{"pluginVersion":"2.0.0","createdBy":"Bruce (Slack, for Utsav)","createdAt":"5 Oct 2026","surface":"dashboard",
+  "registry":"https://gushwork-design.vercel.app/exports/dashboard/component-registry.json",
+  "changelog":"https://gushwork-design.vercel.app/changelog-sheet","components":["app-shell", "sidebar", "nav-item", "nav-group", "account-row", "theme-menu", "topbar", "content-panel", "page-header", "page-layout", "segmented-control", "stat-card", "delta-pill", "info-hint", "status-dot", "sparkline", "chart-frame", "line-chart", "legend", "horizontal-bar-chart", "breakdown-bar", "funnel", "chart-tooltip", "card", "data-table", "table-cell-types", "badge", "sidebar-collapsed", "theme-and-density"]} -->
+</head>
+<body class="gd" data-density="comfortable">
+<div class="gd-app">
+
+  <aside class="gd-sidebar" id="gd-rail" data-collapsed="false" data-gd-persist aria-label="Primary">
+    <div class="gd-sidebar__top">
+      <a class="gd-sidebar__brand" href="#" aria-label="Gushwork home"><span class="gd-sidebar__chip"><svg viewBox="0 0 80 80" fill="none" aria-hidden="true"><path d="M76.6088 4.56344C77.5025 2.36058 75.8495 0 73.4723 0H9.14286C4.0934 0 0 4.0934 0 9.14286V66.7778C0 72.018 5.17081 75.6829 9.9603 73.5568C40.8494 59.8449 64.3785 34.7075 76.6088 4.56344Z" fill="currentColor"/><path d="M32.5161 80C31.4022 80 30.9357 78.5531 31.8259 77.8835C54.9007 60.5265 71.4338 35.8047 78.7658 8.0522C78.9403 7.39154 80 7.51618 80 8.19951V70.8571C80 75.9066 75.9066 80 70.8571 80H32.5161Z" fill="currentColor"/></svg></span><span class="gd-sidebar__name">Gushwork</span></a>
+      <button class="gd-sidebar__toggle" type="button" data-gd-rail-toggle aria-expanded="true" aria-controls="gd-rail" aria-label="Collapse sidebar"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M205.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L131.31,128ZM51.31,128l74.35-74.34a8,8,0,0,0-11.32-11.32l-80,80a8,8,0,0,0,0,11.32l80,80a8,8,0,0,0,11.32-11.32Z"/></svg></button>
+    </div>
+    <nav class="gd-sidebar__nav" aria-label="Main">
+      <div class="gd-nav-group" role="group" aria-label="Analytics">
+        <div class="gd-nav-group__label">Analytics</div>
+        <a class="gd-nav-item" href="#" aria-current="page"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M232,208a8,8,0,0,1-8,8H32a8,8,0,0,1-8-8V48a8,8,0,0,1,16,0V156.69l50.34-50.35a8,8,0,0,1,11.32,0L128,132.69,180.69,80H160a8,8,0,0,1,0-16h40a8,8,0,0,1,8,8v40a8,8,0,0,1-16,0V91.31l-58.34,58.35a8,8,0,0,1-11.32,0L96,123.31l-56,56V200H224A8,8,0,0,1,232,208Z"/></svg><span class="gd-nav-item__text">Overview</span></a>
+        <a class="gd-nav-item" href="#"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M117.25,157.92a60,60,0,1,0-66.5,0A95.83,95.83,0,0,0,3.53,195.63a8,8,0,1,0,13.4,8.74,80,80,0,0,1,134.14,0,8,8,0,0,0,13.4-8.74A95.83,95.83,0,0,0,117.25,157.92ZM40,108a44,44,0,1,1,44,44A44.05,44.05,0,0,1,40,108Zm210.14,98.7a8,8,0,0,1-11.07-2.33A79.83,79.83,0,0,0,172,168a8,8,0,0,1,0-16,44,44,0,1,0-16.34-84.87,8,8,0,1,1-5.94-14.85,60,60,0,0,1,55.53,105.64,95.83,95.83,0,0,1,47.22,37.71A8,8,0,0,1,250.14,206.7Z"/></svg><span class="gd-nav-item__text">Pages</span></a>
+        <a class="gd-nav-item" href="#"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Zm-38.34-85.66a8,8,0,0,1,0,11.32l-48,48a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L116,164.69l42.34-42.35A8,8,0,0,1,169.66,122.34Z"/></svg><span class="gd-nav-item__text">Audience</span></a>
+      </div>
+      <div class="gd-nav-group" role="group" aria-label="Acquisition">
+        <div class="gd-nav-group__label">Acquisition</div>
+        <div class="gd-nav-group">
+          <button class="gd-nav-item gd-nav-group__head" type="button" data-gd-group-toggle aria-expanded="false" aria-controls="gd-nav-channels"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M248,120a48.05,48.05,0,0,0-48-48H160.2c-2.91-.17-53.62-3.74-101.91-44.24A16,16,0,0,0,32,40V200a16,16,0,0,0,26.29,12.25c37.77-31.68,77-40.76,93.71-43.3v31.72A16,16,0,0,0,159.12,214l11,7.33A16,16,0,0,0,194.5,212l11.77-44.36A48.07,48.07,0,0,0,248,120ZM48,199.93V40h0c42.81,35.91,86.63,45,104,47.24v65.48C134.65,155,90.84,164.07,48,199.93Zm131,8,0,.11-11-7.33V168h21.6ZM200,152H168V88h32a32,32,0,1,1,0,64Z"/></svg><span class="gd-nav-item__text">Channels</span><svg class="gd-nav-group__caret" width="12" height="12" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg></button>
+          <div class="gd-nav-group__items" id="gd-nav-channels" hidden>
+            <a class="gd-nav-item" href="#"><span class="gd-nav-item__text">Organic search</span></a>
+            <a class="gd-nav-item" href="#"><span class="gd-nav-item__text">Paid search</span></a>
+            <a class="gd-nav-item" href="#"><span class="gd-nav-item__text">Social</span></a>
+          </div>
+        </div>
+        <a class="gd-nav-item" href="#"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M254.3,107.91,228.78,56.85a16,16,0,0,0-21.47-7.15L182.44,62.13,130.05,48.27a8.14,8.14,0,0,0-4.1,0L73.56,62.13,48.69,49.7a16,16,0,0,0-21.47,7.15L1.7,107.9a16,16,0,0,0,7.15,21.47l27,13.51,55.49,39.63a8.06,8.06,0,0,0,2.71,1.25l64,16a8,8,0,0,0,7.6-2.1l55.07-55.08,26.42-13.21a16,16,0,0,0,7.15-21.46Zm-54.89,33.37L165,113.72a8,8,0,0,0-10.68.61C136.51,132.27,116.66,130,104,122L147.24,80h31.81l27.21,54.41ZM41.53,64,62,74.22,36.43,125.27,16,115.06Zm116,119.13L99.42,168.61l-49.2-35.14,28-56L128,64.28l9.8,2.59-45,43.68-.08.09a16,16,0,0,0,2.72,24.81c20.56,13.13,45.37,11,64.91-5L188,152.66Zm62-57.87-25.52-51L214.47,64,240,115.06Zm-87.75,92.67a8,8,0,0,1-7.75,6.06,8.13,8.13,0,0,1-1.95-.24L80.41,213.33a7.89,7.89,0,0,1-2.71-1.25L51.35,193.26a8,8,0,0,1,9.3-13l25.11,17.94L126,208.24A8,8,0,0,1,131.82,217.94Z"/></svg><span class="gd-nav-item__text">Referrals</span></a>
+      </div>
+      <div class="gd-nav-group" role="group" aria-label="Workspace">
+        <div class="gd-nav-group__label">Workspace</div>
+        <a class="gd-nav-item" href="#"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M232,96a7.89,7.89,0,0,0-.3-2.2L217.35,43.6A16.07,16.07,0,0,0,202,32H54A16.07,16.07,0,0,0,38.65,43.6L24.31,93.8A7.89,7.89,0,0,0,24,96h0v16a40,40,0,0,0,16,32v72a8,8,0,0,0,8,8H208a8,8,0,0,0,8-8V144a40,40,0,0,0,16-32V96ZM54,48H202l11.42,40H42.61Zm50,56h48v8a24,24,0,0,1-48,0Zm-16,0v8a24,24,0,0,1-35.12,21.26,7.88,7.88,0,0,0-1.82-1.06A24,24,0,0,1,40,112v-8ZM200,208H56V151.2a40.57,40.57,0,0,0,8,.8,40,40,0,0,0,32-16,40,40,0,0,0,64,0,40,40,0,0,0,32,16,40.57,40.57,0,0,0,8-.8Zm4.93-75.8a8.08,8.08,0,0,0-1.8,1.05A24,24,0,0,1,168,112v-8h48v8A24,24,0,0,1,204.93,132.2Z"/></svg><span class="gd-nav-item__text">Goals</span></a>
+        <a class="gd-nav-item" href="#"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Zm88-29.84q.06-2.16,0-4.32l14.92-18.64a8,8,0,0,0,1.48-7.06,107.21,107.21,0,0,0-10.88-26.25,8,8,0,0,0-6-3.93l-23.72-2.64q-1.48-1.56-3-3L186,40.54a8,8,0,0,0-3.94-6,107.71,107.71,0,0,0-26.25-10.87,8,8,0,0,0-7.06,1.49L130.16,40Q128,40,125.84,40L107.2,25.11a8,8,0,0,0-7.06-1.48A107.6,107.6,0,0,0,73.89,34.51a8,8,0,0,0-3.93,6L67.32,64.27q-1.56,1.49-3,3L40.54,70a8,8,0,0,0-6,3.94,107.71,107.71,0,0,0-10.87,26.25,8,8,0,0,0,1.49,7.06L40,125.84Q40,128,40,130.16L25.11,148.8a8,8,0,0,0-1.48,7.06,107.21,107.21,0,0,0,10.88,26.25,8,8,0,0,0,6,3.93l23.72,2.64q1.49,1.56,3,3L70,215.46a8,8,0,0,0,3.94,6,107.71,107.71,0,0,0,26.25,10.87,8,8,0,0,0,7.06-1.49L125.84,216q2.16.06,4.32,0l18.64,14.92a8,8,0,0,0,7.06,1.48,107.21,107.21,0,0,0,26.25-10.88,8,8,0,0,0,3.93-6l2.64-23.72q1.56-1.48,3-3L215.46,186a8,8,0,0,0,6-3.94,107.71,107.71,0,0,0,10.87-26.25,8,8,0,0,0-1.49-7.06Zm-16.1-6.5a73.93,73.93,0,0,1,0,8.68,8,8,0,0,0,1.74,5.48l14.19,17.73a91.57,91.57,0,0,1-6.23,15L187,173.11a8,8,0,0,0-5.1,2.64,74.11,74.11,0,0,1-6.14,6.14,8,8,0,0,0-2.64,5.1l-2.51,22.58a91.32,91.32,0,0,1-15,6.23l-17.74-14.19a8,8,0,0,0-5-1.75h-.48a73.93,73.93,0,0,1-8.68,0,8,8,0,0,0-5.48,1.74L100.45,215.8a91.57,91.57,0,0,1-15-6.23L82.89,187a8,8,0,0,0-2.64-5.1,74.11,74.11,0,0,1-6.14-6.14,8,8,0,0,0-5.1-2.64L46.43,170.6a91.32,91.32,0,0,1-6.23-15l14.19-17.74a8,8,0,0,0,1.74-5.48,73.93,73.93,0,0,1,0-8.68,8,8,0,0,0-1.74-5.48L40.2,100.45a91.57,91.57,0,0,1,6.23-15L69,82.89a8,8,0,0,0,5.1-2.64,74.11,74.11,0,0,1,6.14-6.14A8,8,0,0,0,82.89,69L85.4,46.43a91.32,91.32,0,0,1,15-6.23l17.74,14.19a8,8,0,0,0,5.48,1.74,73.93,73.93,0,0,1,8.68,0,8,8,0,0,0,5.48-1.74L155.55,40.2a91.57,91.57,0,0,1,15,6.23L173.11,69a8,8,0,0,0,2.64,5.1,74.11,74.11,0,0,1,6.14,6.14,8,8,0,0,0,5.1,2.64l22.58,2.51a91.32,91.32,0,0,1,6.23,15l-14.19,17.74A8,8,0,0,0,199.87,123.66Z"/></svg><span class="gd-nav-item__text">Settings</span></a>
+      </div>
+    </nav>
+    <div class="gd-sidebar__foot">
+      <div class="gd-account">
+        <span class="gd-account__av"><svg viewBox="0 0 40 40" aria-hidden="true" focusable="false"><rect width="40" height="40" rx="8" fill="currentColor"/><rect class="gd-account__dot" x="18" y="11" width="5" height="5" rx="1.5"/><rect class="gd-account__dot" x="25" y="11" width="5" height="5" rx="1.5"/><rect class="gd-account__dot" x="11" y="18" width="5" height="5" rx="1.5"/><rect class="gd-account__dot" x="18" y="18" width="5" height="5" rx="1.5"/><rect class="gd-account__dot" x="25" y="18" width="5" height="5" rx="1.5"/><rect class="gd-account__dot" x="18" y="25" width="5" height="5" rx="1.5"/></svg></span>
+        <span class="gd-account__txt"><span class="gd-account__name" title="utsav.singh@gushwork.ai">Utsav Singh</span><span class="gd-account__role">Admin</span></span>
+        <button class="gd-account__act" type="button" data-gd-signout aria-label="Sign out"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M120,216a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V40a8,8,0,0,1,8-8h64a8,8,0,0,1,0,16H56V208h56A8,8,0,0,1,120,216Zm109.66-93.66-40-40a8,8,0,0,0-11.32,11.32L204.69,120H112a8,8,0,0,0,0,16h92.69l-26.35,26.34a8,8,0,0,0,11.32,11.32l40-40A8,8,0,0,0,229.66,122.34Z"/></svg></button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="gd-app__main">
+    <header class="gd-topbar">
+      <div class="gd-topbar__start">
+        <button class="gd-topbar__btn gd-topbar__btn--box" type="button" data-gd-nav-toggle aria-expanded="false" aria-controls="gd-rail" aria-label="Open menu"><span class="gd-ico-open"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z"/></svg></span><span class="gd-ico-close"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></span></button>
+        <a class="gd-sidebar__brand" href="#" aria-label="Gushwork home"><span class="gd-sidebar__chip"><svg viewBox="0 0 80 80" fill="none" aria-hidden="true"><path d="M76.6088 4.56344C77.5025 2.36058 75.8495 0 73.4723 0H9.14286C4.0934 0 0 4.0934 0 9.14286V66.7778C0 72.018 5.17081 75.6829 9.9603 73.5568C40.8494 59.8449 64.3785 34.7075 76.6088 4.56344Z" fill="currentColor"/><path d="M32.5161 80C31.4022 80 30.9357 78.5531 31.8259 77.8835C54.9007 60.5265 71.4338 35.8047 78.7658 8.0522C78.9403 7.39154 80 7.51618 80 8.19951V70.8571C80 75.9066 75.9066 80 70.8571 80H32.5161Z" fill="currentColor"/></svg></span><span class="gd-sidebar__name">Gushwork</span></a>
+      </div>
+      <div class="gd-topbar__acts"><div class="gd-theme" data-gd-pop><button class="gd-theme__trigger" type="button" data-gd-pop-trigger data-pref="system" aria-haspopup="menu" aria-expanded="false" aria-label="Colour theme: System"><span data-gd-ico="system"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M208,40H48A24,24,0,0,0,24,64V176a24,24,0,0,0,24,24h72v16H96a8,8,0,0,0,0,16h64a8,8,0,0,0,0-16H136V200h72a24,24,0,0,0,24-24V64A24,24,0,0,0,208,40ZM48,56H208a8,8,0,0,1,8,8v80H40V64A8,8,0,0,1,48,56ZM208,184H48a8,8,0,0,1-8-8V160H216v16A8,8,0,0,1,208,184Z"/></svg></span><span data-gd-ico="light"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z"/></svg></span><span data-gd-ico="dark"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M233.54,142.23a8,8,0,0,0-8-2,88.08,88.08,0,0,1-109.8-109.8,8,8,0,0,0-10-10,104.84,104.84,0,0,0-52.91,37A104,104,0,0,0,136,224a103.09,103.09,0,0,0,62.52-20.88,104.84,104.84,0,0,0,37-52.91A8,8,0,0,0,233.54,142.23ZM188.9,190.34A88,88,0,0,1,65.66,67.11a89,89,0,0,1,31.4-26A106,106,0,0,0,96,56,104.11,104.11,0,0,0,200,160a106,106,0,0,0,14.92-1.06A89,89,0,0,1,188.9,190.34Z"/></svg></span></button><div class="gd-menu gd-menu--end gd-theme__menu" role="menu" aria-label="Colour theme" data-gd-pop-menu hidden><button class="gd-menu__item" type="button" role="menuitemradio" aria-checked="true" data-gd-theme="system"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M208,40H48A24,24,0,0,0,24,64V176a24,24,0,0,0,24,24h72v16H96a8,8,0,0,0,0,16h64a8,8,0,0,0,0-16H136V200h72a24,24,0,0,0,24-24V64A24,24,0,0,0,208,40ZM48,56H208a8,8,0,0,1,8,8v80H40V64A8,8,0,0,1,48,56ZM208,184H48a8,8,0,0,1-8-8V160H216v16A8,8,0,0,1,208,184Z"/></svg><span>System</span><span class="gd-menu__check" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></span></button><button class="gd-menu__item" type="button" role="menuitemradio" aria-checked="false" data-gd-theme="light"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z"/></svg><span>Light</span><span class="gd-menu__check" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></span></button><button class="gd-menu__item" type="button" role="menuitemradio" aria-checked="false" data-gd-theme="dark"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M233.54,142.23a8,8,0,0,0-8-2,88.08,88.08,0,0,1-109.8-109.8,8,8,0,0,0-10-10,104.84,104.84,0,0,0-52.91,37A104,104,0,0,0,136,224a103.09,103.09,0,0,0,62.52-20.88,104.84,104.84,0,0,0,37-52.91A8,8,0,0,0,233.54,142.23ZM188.9,190.34A88,88,0,0,1,65.66,67.11a89,89,0,0,1,31.4-26A106,106,0,0,0,96,56,104.11,104.11,0,0,0,200,160a106,106,0,0,0,14.92-1.06A89,89,0,0,1,188.9,190.34Z"/></svg><span>Dark</span><span class="gd-menu__check" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></span></button></div></div></div>
+    </header>
+
+    <section class="gd-panel" aria-label="Content">
+      <div class="gd-panel__bar"><div class="gd-panel__acts"><div class="gd-theme" data-gd-pop><button class="gd-theme__trigger" type="button" data-gd-pop-trigger data-pref="system" aria-haspopup="menu" aria-expanded="false" aria-label="Colour theme: System"><span data-gd-ico="system"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M208,40H48A24,24,0,0,0,24,64V176a24,24,0,0,0,24,24h72v16H96a8,8,0,0,0,0,16h64a8,8,0,0,0,0-16H136V200h72a24,24,0,0,0,24-24V64A24,24,0,0,0,208,40ZM48,56H208a8,8,0,0,1,8,8v80H40V64A8,8,0,0,1,48,56ZM208,184H48a8,8,0,0,1-8-8V160H216v16A8,8,0,0,1,208,184Z"/></svg></span><span data-gd-ico="light"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z"/></svg></span><span data-gd-ico="dark"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M233.54,142.23a8,8,0,0,0-8-2,88.08,88.08,0,0,1-109.8-109.8,8,8,0,0,0-10-10,104.84,104.84,0,0,0-52.91,37A104,104,0,0,0,136,224a103.09,103.09,0,0,0,62.52-20.88,104.84,104.84,0,0,0,37-52.91A8,8,0,0,0,233.54,142.23ZM188.9,190.34A88,88,0,0,1,65.66,67.11a89,89,0,0,1,31.4-26A106,106,0,0,0,96,56,104.11,104.11,0,0,0,200,160a106,106,0,0,0,14.92-1.06A89,89,0,0,1,188.9,190.34Z"/></svg></span></button><div class="gd-menu gd-menu--end gd-theme__menu" role="menu" aria-label="Colour theme" data-gd-pop-menu hidden><button class="gd-menu__item" type="button" role="menuitemradio" aria-checked="true" data-gd-theme="system"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M208,40H48A24,24,0,0,0,24,64V176a24,24,0,0,0,24,24h72v16H96a8,8,0,0,0,0,16h64a8,8,0,0,0,0-16H136V200h72a24,24,0,0,0,24-24V64A24,24,0,0,0,208,40ZM48,56H208a8,8,0,0,1,8,8v80H40V64A8,8,0,0,1,48,56ZM208,184H48a8,8,0,0,1-8-8V160H216v16A8,8,0,0,1,208,184Z"/></svg><span>System</span><span class="gd-menu__check" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></span></button><button class="gd-menu__item" type="button" role="menuitemradio" aria-checked="false" data-gd-theme="light"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z"/></svg><span>Light</span><span class="gd-menu__check" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></span></button><button class="gd-menu__item" type="button" role="menuitemradio" aria-checked="false" data-gd-theme="dark"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M233.54,142.23a8,8,0,0,0-8-2,88.08,88.08,0,0,1-109.8-109.8,8,8,0,0,0-10-10,104.84,104.84,0,0,0-52.91,37A104,104,0,0,0,136,224a103.09,103.09,0,0,0,62.52-20.88,104.84,104.84,0,0,0,37-52.91A8,8,0,0,0,233.54,142.23ZM188.9,190.34A88,88,0,0,1,65.66,67.11a89,89,0,0,1,31.4-26A106,106,0,0,0,96,56,104.11,104.11,0,0,0,200,160a106,106,0,0,0,14.92-1.06A89,89,0,0,1,188.9,190.34Z"/></svg><span>Dark</span><span class="gd-menu__check" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></span></button></div></div></div></div>
+      <div class="gd-panel__body">
+        <div class="gd-page">
+
+          <header class="gd-page-header">
+            <div class="gd-page-header__main">
+              <div class="gd-page-header__titles">
+                <h1 class="gd-page-header__title">Website analytics <span class="gd-page-header__status"><span class="gd-badge gd-badge--md gd-badge--warn">Sample data</span></span></h1>
+                <p class="gd-page-header__desc">How visitors find the site, whether they stay, and which pages they read. Every figure on this page is invented.</p>
+              </div>
+              <div class="gd-page-header__actions">
+                <div class="gd-seg" role="radiogroup" aria-label="Time range" id="range">
+                  <button type="button" class="gd-seg__item" role="radio" aria-checked="false" tabindex="-1" data-value="7">7D</button>
+                  <button type="button" class="gd-seg__item" role="radio" aria-checked="true" tabindex="0" data-value="30">30D</button>
+                  <button type="button" class="gd-seg__item" role="radio" aria-checked="false" tabindex="-1" data-value="90">90D</button>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <div class="gd-grid">
+
+            <div class="gd-stat-card gd-span-3" id="sc-sessions">
+              <div class="gd-stat-card__label"><span class="gd-status-dot gd-status-dot--info" aria-hidden="true"></span><span class="gd-stat-card__name">Sessions</span></div>
+              <div class="gd-stat-card__body">
+                <div class="gd-stat-card__row"><div class="gd-stat-card__value gd-num" data-v></div><span class="gd-stat-card__spark" data-spark></span></div>
+                <div class="gd-stat-card__meta" data-meta></div>
+              </div>
+            </div>
+            <div class="gd-stat-card gd-span-3" id="sc-engaged">
+              <div class="gd-stat-card__label"><span class="gd-status-dot gd-status-dot--info" aria-hidden="true"></span><span class="gd-stat-card__name">Engaged sessions</span></div>
+              <div class="gd-stat-card__body">
+                <div class="gd-stat-card__row"><div class="gd-stat-card__value gd-num" data-v></div><span class="gd-stat-card__spark" data-spark></span></div>
+                <div class="gd-stat-card__meta" data-meta></div>
+              </div>
+            </div>
+            <div class="gd-stat-card gd-span-3" id="sc-rate">
+              <div class="gd-stat-card__label"><span class="gd-status-dot gd-status-dot--info" aria-hidden="true"></span><span class="gd-stat-card__name">Engagement rate</span><span class="gd-stat-card__hint"><span class="gd-hint"><button class="gd-hint__btn" type="button" aria-label="About engagement rate" data-tip="Share of sessions that lasted over 10 seconds, viewed two pages or more, or converted."><svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm16-40a8,8,0,0,1-8,8,16,16,0,0,1-16-16V128a8,8,0,0,1,0-16,16,16,0,0,1,16,16v40A8,8,0,0,1,144,176ZM112,84a12,12,0,1,1,12,12A12,12,0,0,1,112,84Z"/></svg></button></span></span></div>
+              <div class="gd-stat-card__body">
+                <div class="gd-stat-card__row"><div class="gd-stat-card__value gd-num" data-v></div><span class="gd-stat-card__spark" data-spark></span></div>
+                <div class="gd-stat-card__meta" data-meta></div>
+              </div>
+            </div>
+            <div class="gd-stat-card gd-span-3" id="sc-time">
+              <div class="gd-stat-card__label"><span class="gd-status-dot gd-status-dot--info" aria-hidden="true"></span><span class="gd-stat-card__name">Avg. engaged time</span><span class="gd-stat-card__hint"><span class="gd-hint"><button class="gd-hint__btn" type="button" aria-label="About avg. engaged time" data-tip="Average time the page was in view during an engaged session."><svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm16-40a8,8,0,0,1-8,8,16,16,0,0,1-16-16V128a8,8,0,0,1,0-16,16,16,0,0,1,16,16v40A8,8,0,0,1,144,176ZM112,84a12,12,0,1,1,12,12A12,12,0,0,1,112,84Z"/></svg></button></span></span></div>
+              <div class="gd-stat-card__body">
+                <div class="gd-stat-card__row"><div class="gd-stat-card__value gd-num" data-v></div><span class="gd-stat-card__spark" data-spark></span></div>
+                <div class="gd-stat-card__meta" data-meta></div>
+              </div>
+            </div>
+
+            <div class="gd-span-8" id="ch-line"></div>
+            <div class="gd-span-4" id="ch-source"></div>
+            <div class="gd-span-8" id="ch-funnel"></div>
+            <div class="gd-span-4" id="ch-quality"></div>
+
+            <section class="gd-card gd-card--flush gd-span-12" aria-labelledby="pages-title">
+              <div class="gd-card__head"><div class="gd-card__titles"><h2 class="gd-card__title" id="pages-title">Top pages</h2><p class="gd-card__desc">Share of all sessions, with the source that sends the most</p></div></div>
+              <div class="gd-card__body gd-card__body--bleed">
+                <div class="gd-tview gd-tview--flush"><div class="gd-table-wrap">
+                  <div class="gd-table" role="table" aria-label="Top pages" style="--gd-cols:minmax(200px,1.6fr) minmax(130px,1fr) 140px 150px 160px; --gd-table-min:760px">
+                    <div class="gd-table__row gd-table__row--head" role="row">
+                      <div class="gd-table__th" role="columnheader" aria-sort="none" data-gd-col="page"><button class="gd-table__sort" type="button" data-gd-sort>Page</button></div><div class="gd-table__th" role="columnheader" aria-sort="none" data-gd-col="source"><button class="gd-table__sort" type="button" data-gd-sort>Top source</button></div><div class="gd-table__th gd-table__th--num" role="columnheader" aria-sort="descending" data-gd-col="share" data-gd-type="number"><button class="gd-table__sort" type="button" data-gd-sort>Sessions share</button></div><div class="gd-table__th gd-table__th--num" role="columnheader" aria-sort="none" data-gd-col="rate" data-gd-type="number"><button class="gd-table__sort" type="button" data-gd-sort>Engagement rate</button></div><div class="gd-table__th gd-table__th--num" role="columnheader" aria-sort="none" data-gd-col="time" data-gd-type="number"><button class="gd-table__sort" type="button" data-gd-sort>Avg. engaged time</button></div>
+                    </div>
+                    <div class="gd-table__body" role="rowgroup">
+                    <div class="gd-table__row" role="row" data-gd-id="p0">
+                      <div class="gd-table__cell gd-table__cell--strong" role="cell" data-gd-col="page" title="/">/</div>
+                      <div class="gd-table__cell" role="cell" data-gd-col="source">Direct</div>
+                      <div class="gd-table__cell gd-table__cell--num" role="cell" data-gd-col="share" data-gd-value="18.4">18.4%</div>
+                      <div class="gd-table__cell gd-table__cell--num" role="cell" data-gd-col="rate" data-gd-value="62.1">62.1%</div>
+                      <div class="gd-table__cell gd-table__cell--num" role="cell" data-gd-col="time" data-gd-value="112">1m 52s</div>
+                    </div>
+                    <div class="gd-table__row" role="row" data-gd-id="p1">
+                      <div class="gd-table__cell gd-table__cell--strong" role="cell" data-gd-col="page" title="/pricing">/pricing</div>
+                      <div class="gd-table__cell" role="cell" data-gd-col="source">Organic search</div>
+                      <div class="gd-table__cell gd-table__cell--num" role="cell" data-gd-col="share" data-gd-value="12.7">12.7%</div>
+                      <div class="gd-table__cell gd-table__cell--num" role="cell" data-gd-col="rate" data-gd-value="71.3">71.3%</div>
+                      <div class="gd-table__cell gd-table__cell--num" role="cell" data-gd-col="time" data-gd-value="151">2m 31s</div>
+                    </div>
+                    <div class="gd-table__row" role="row" data-gd-id="p2">
+                      <div class="gd-table__cell gd-table__cell--strong" role="cell" data-gd-col="page" title="/blog/ai-seo-guide">/blog/ai-seo-guide</div>
+                      <div class="gd-table__cell" role="cell" data-gd-col="source">Organic search</div>
+                      <div class="gd-table__cell gd-table__cell--num" role="cell" data-gd-col="share" data-gd-value="10.9">10.9%</div>
+                      <div class="gd-table__cell gd-table__cell--num" role="cell" data-gd-col="rate" data-gd-value="58.4">58.4%</div>
+                      <div class="gd-table__cell gd-table__cell--num" role="cell" data-gd-col="time" data-gd-value="184">3m 04s</div>
+                    </div>
+                    <div class="gd-table__row" role="row" data-gd-id="p3">
+                      <div class="gd-table__cell gd-table__cell--strong" role="cell" data-gd-col="page" title="/product/crm-studio">/product/crm-studio</div>
+                      <div class="gd-table__cell" role="cell" data-gd-col="source">Paid search</div>
+                      <div class="gd-table__cell gd-table__cell--num" role="cell" data-gd-col="share" data-gd-value="9.3">9.3%</div>
+                      <div class="gd-table__cell gd-table__cell--num" role="cell" data-gd-col="rate" data-gd-value="66.8">66.8%</div>
+                      <div class="gd-table__cell gd-table__cell--num" role="cell" data-gd-col="time" data-gd-value="130">2m 10s</div>
+                    </div>
+                    <div class="gd-table__row" role="row" data-gd-id="p4">
+                      <div class="gd-table__cell gd-table__cell--strong" role="cell" data-gd-col="page" title="/demo">/demo</div>
+                      <div class="gd-table__cell" role="cell" data-gd-col="source">Paid search</div>
+                      <div class="gd-table__cell gd-table__cell--num" role="cell" data-gd-col="share" data-gd-value="8.1">8.1%</div>
+                      <div class="gd-table__cell gd-table__cell--num" role="cell" data-gd-col="rate" data-gd-value="74.9">74.9%</div>
+                      <div class="gd-table__cell gd-table__cell--num" role="cell" data-gd-col="time" data-gd-value="167">2m 47s</div>
+                    </div>
+                    <div class="gd-table__row" role="row" data-gd-id="p5">
+                      <div class="gd-table__cell gd-table__cell--strong" role="cell" data-gd-col="page" title="/case-studies/dallas-hvac">/case-studies/dallas-hvac</div>
+                      <div class="gd-table__cell" role="cell" data-gd-col="source">Referrals</div>
+                      <div class="gd-table__cell gd-table__cell--num" role="cell" data-gd-col="share" data-gd-value="6.4">6.4%</div>
+                      <div class="gd-table__cell gd-table__cell--num" role="cell" data-gd-col="rate" data-gd-value="69.2">69.2%</div>
+                      <div class="gd-table__cell gd-table__cell--num" role="cell" data-gd-col="time" data-gd-value="200">3m 20s</div>
+                    </div>
+                    <div class="gd-table__row" role="row" data-gd-id="p6">
+                      <div class="gd-table__cell gd-table__cell--strong" role="cell" data-gd-col="page" title="/blog/aeo-explained">/blog/aeo-explained</div>
+                      <div class="gd-table__cell" role="cell" data-gd-col="source">Social</div>
+                      <div class="gd-table__cell gd-table__cell--num" role="cell" data-gd-col="share" data-gd-value="4.2">4.2%</div>
+                      <div class="gd-table__cell gd-table__cell--num" role="cell" data-gd-col="rate" data-gd-value="52.6">52.6%</div>
+                      <div class="gd-table__cell gd-table__cell--num" role="cell" data-gd-col="time" data-gd-value="98">1m 38s</div>
+                    </div>
+                    <div class="gd-table__row" role="row" data-gd-id="p7">
+                      <div class="gd-table__cell gd-table__cell--strong" role="cell" data-gd-col="page" title="/about">/about</div>
+                      <div class="gd-table__cell" role="cell" data-gd-col="source">Direct</div>
+                      <div class="gd-table__cell gd-table__cell--num" role="cell" data-gd-col="share" data-gd-value="3.8">3.8%</div>
+                      <div class="gd-table__cell gd-table__cell--num" role="cell" data-gd-col="rate" data-gd-value="60.3">60.3%</div>
+                      <div class="gd-table__cell gd-table__cell--num" role="cell" data-gd-col="time" data-gd-value="72">1m 12s</div>
+                    </div>
+                    </div>
+                  </div>
+                </div></div>
+              </div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script src="/exports/dashboard/dashboard.js"></script>
+<script>
+/* Page behaviour for the Website analytics mockup. Every figure is a seeded function of the date: invented, stable between
+   loads, and consistent across the cards, the chart, the funnel and the sources. */
+(function () {
+  'use strict';
+  var DAY = 864e5, END = Date.UTC(2026, 9, 3), MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var nf = function (n) { return Math.round(n).toLocaleString('en-US'); };
+  var short = function (t) { var d = new Date(t); return MON[d.getUTCMonth()] + ' ' + d.getUTCDate(); };
+  var dur = function (n) { n = Math.round(n); return Math.floor(n / 60) + 'm ' + (n % 60) + 's'; };
+  function hash(n) { n = Math.imul(n ^ (n >>> 15), 2246822507); n = Math.imul(n ^ (n >>> 13), 3266489909); return ((n ^ (n >>> 16)) >>> 0) / 4294967296; }
+  function rec(t) {
+    var d = Math.floor(t / DAY), dow = new Date(t).getUTCDay(), w = [0.58, 1.04, 1.12, 1.08, 1.02, 0.94, 0.64][dow];
+    var s = Math.round(1400 * w * (1 + (hash(d * 3 + 1) - 0.5) * 0.24)), r = 0.66 + (hash(d * 3 + 2) - 0.5) * 0.1;
+    return { t: t, s: s, e: Math.round(s * r), time: 128 + (hash(d * 3 + 3) - 0.5) * 30 };
+  }
+  function span(days, shift) { var a = []; for (var i = days - 1; i >= 0; i--) a.push(rec(END - (i + shift) * DAY)); return a; }
+  function tot(a) { var o = { s: 0, e: 0, time: 0 }; a.forEach(function (r) { o.s += r.s; o.e += r.e; o.time += r.time * r.e; }); o.rate = o.e / o.s; o.time = o.time / o.e; return o; }
+  var M = [
+    { id: 'sc-sessions', day: function (r) { return r.s; }, val: function (o) { return nf(o.s); }, num: function (o) { return o.s; }, name: 'Sessions per day' },
+    { id: 'sc-engaged', day: function (r) { return r.e; }, val: function (o) { return nf(o.e); }, num: function (o) { return o.e; }, name: 'Engaged sessions per day' },
+    { id: 'sc-rate', day: function (r) { return r.e / r.s * 100; }, val: function (o) { return (o.rate * 100).toFixed(1) + '%'; }, num: function (o) { return o.rate; }, pts: 1, name: 'Engagement rate per day' },
+    { id: 'sc-time', day: function (r) { return r.time; }, val: function (o) { return dur(o.time); }, num: function (o) { return o.time; }, name: 'Avg. engaged time per day' }
+  ];
+  function delta(m, a, b) {
+    var ch = m.pts ? (m.num(a) - m.num(b)) * 100 : (m.num(a) - m.num(b)) / m.num(b) * 100, dir = Math.abs(ch) < 0.05 ? 'flat' : ch > 0 ? 'up' : 'down';
+    var tone = dir === 'flat' ? 'neutral' : ch > 0 ? 'good' : 'bad', txt = Math.abs(ch).toFixed(1) + (m.pts ? ' pts' : '%');
+    var sr = dir === 'flat' ? 'No change' : (dir === 'up' ? 'Up ' : 'Down ') + txt.replace('%', ' percent') + ', ' + (tone === 'good' ? 'better' : 'worse') + ' than the previous period';
+    return '<span class="gd-delta gd-delta--' + tone + '"><span class="gd-delta__arrow" data-dir="' + dir + '"></span><span class="gd-delta__value">' + txt + '</span><span class="gd-sr">' + sr + '</span></span><span class="gd-stat-card__compare">vs previous period</span>';
+  }
+  var mounted = {};
+  function put(host, kind, spec) { if (mounted[host.id || host]) GD.charts.update(host, spec); else { GD.charts.mount(host, kind, spec); mounted[host.id || host] = 1; } }
+  function render(days) {
+    var cur = span(days, 0), prev = span(days, days), a = tot(cur), b = tot(prev), range = short(cur[0].t) + ' to ' + short(cur[cur.length - 1].t);
+    M.forEach(function (m) {
+      var card = $('#' + m.id), vals = cur.map(m.day), hostS = $('[data-spark]', card);
+      $('[data-v]', card).textContent = m.val(a);
+      $('[data-meta]', card).innerHTML = delta(m, a, b);
+      var spec = { values: vals.map(function (v) { return Math.round(v * 10) / 10; }), tone: 'accent', alt: m.name + ', ' + range };
+      if (hostS._m) GD.charts.update(hostS, spec); else { GD.charts.mount(hostS, 'spark', spec); hostS._m = 1; }
+    });
+    put($('#ch-line'), 'line', { title: 'Engaged sessions per day', description: range + ', against the previous period', size: 'sm', card: true, legend: true,
+      labels: cur.map(function (r) { return short(r.t); }), series: [{ name: 'This period', data: cur.map(function (r) { return r.e; }) }, { name: 'Previous period', data: prev.map(function (r) { return r.e; }), comparison: true }] });
+    var SRC = [['Organic search', 0.34], ['Direct', 0.24], ['Paid search', 0.18], ['Social', 0.1], ['Email', 0.08], ['Referrals', 0.06]];
+    put($('#ch-source'), 'hbar', { title: 'Engaged sessions by source', description: 'Share of all engaged sessions in the range', size: 'sm', card: true, items: SRC.map(function (x) { return { label: x[0], value: Math.round(a.e * x[1]) }; }) });
+    put($('#ch-funnel'), 'funnel', { title: 'From visit to demo request', description: 'Sessions that reach each step in the range', size: 'sm', card: true, steps: [{ label: 'Sessions', value: a.s }, { label: 'Engaged sessions', value: a.e }, { label: 'Viewed pricing or product', value: Math.round(a.e * 0.38) }, { label: 'Started the form', value: Math.round(a.e * 0.11) }, { label: 'Requested a demo', value: Math.round(a.e * 0.035) }] });
+    var bounced = Math.round((a.s - a.e) * 0.68);
+    put($('#ch-quality'), 'breakdown', { title: 'Session quality', description: 'Every session in the range', size: 'sm', card: true, segments: [{ label: 'Engaged', value: a.e }, { label: 'Bounced', value: bounced }, { label: 'Short visit', value: a.s - a.e - bounced }] });
+  }
+  var seg = $('#range');
+  seg.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-value]'); if (!b) return;
+    seg.querySelectorAll('[data-value]').forEach(function (x) { var on = x === b; x.setAttribute('aria-checked', on); x.tabIndex = on ? 0 : -1; });
+    render(+b.dataset.value);
+  });
+  render(30);
+})();
+</script>
+</body>
+</html>

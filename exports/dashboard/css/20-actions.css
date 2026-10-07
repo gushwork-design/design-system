@@ -1,0 +1,227 @@
+/* ============================================================================
+   Gushwork dashboard — 20 actions
+   Provenance, per component:
+     button          extracted: web/admin/analytics.html:357-359 (.ul-btn) + web/internal/design-system.html:754-764 (.rv-b);
+                     hover/disabled values from old button.md only where the hub agrees (neutral-850 primary hover).
+                     Danger = red label on the outline shape (owner ruling), not .rv-b--bad's red fill.
+     icon-button     extracted: web/admin/analytics.html:187-193 (.ul-ib edge), web/shell.css:1861-1899 (.gw-iconbtn + data-tip)
+     split-button    extracted: web/shell.css:2229-2260 (.pa__split/.pa__main/.pa__tog)
+     menu            extracted: web/shell.css:1910-1937 (.gw-pop), analytics.html:344-352 (.ul-menu), access-control.html:283-308 (.ac-dd)
+     segmented-control  NEW: not in the hub — reference Mobbin Linear/Mixpanel view switchers — pending library review
+     tabs-pill       extracted: web/admin/analytics.html:177-181 (.ul-tabs/.ul-tab)
+     tabs-underline  extracted: web/admin/access-control.html:24-32 (.ac-tabbar/.ac-tab; .an-tabs reuses .ul-tabs and is the pill)
+     period-select   extracted: web/admin/analytics.html:555-559 (period .ul-tabs); composition of tabs-pill
+     info-hint       NEW: not in the hub — reference Mobbin Square/GA/Fresha — pending library review
+
+   Every height flows from --gd-control-h; the edge is an inset box-shadow so a
+   button never grows 2px past its content. Hover is forced in previews with .is-hover.
+   Aliases declared here (light-dark, listed in the report):
+     --gd-ctl-hover  --gd-menu-hover  --gd-ink-disabled-bg  --gd-ink-disabled-fg  --gd-track-bg  --gd-track-hover  --gd-disabled-ink
+   ============================================================================ */
+
+.gd {
+  --gd-ctl-hover:        light-dark(var(--gw-color-neutral-35),  var(--gw-color-neutral-850));  /* outline/ghost hover: separates from white card AND from the grey page */
+  --gd-menu-hover:       light-dark(var(--gw-color-neutral-50),  var(--gw-color-neutral-850));  /* row hover inside a raised popover (the 55% hover-bg vanishes on neutral-900) */
+  --gd-ink-disabled-bg:  light-dark(var(--gw-color-neutral-200), var(--gw-color-neutral-850));
+  --gd-ink-disabled-fg:  light-dark(var(--gw-color-white),       var(--gw-color-neutral-500));
+  --gd-track-bg:         light-dark(var(--gw-color-neutral-50),  var(--gw-color-neutral-900));  /* the pill track */
+  --gd-track-hover:      light-dark(var(--gw-color-neutral-100), var(--gw-color-neutral-850));
+  --gd-disabled-ink:     light-dark(var(--gw-color-neutral-250), var(--gw-color-neutral-600));  /* --gd-disabled-fg is a fixed grey that reads as enabled in dark */
+  --gd-btn-r:            var(--gw-radius-12);
+  --gd-pill-pad:         var(--gw-space-4);
+}
+.gd[data-density="compact"], .gd [data-density="compact"] { --gd-btn-r: var(--gw-radius-8); --gd-pill-pad: var(--gw-space-2); }
+
+@keyframes gd-spin { to { transform: rotate(360deg); } }
+
+/* --- button ---------------------------------------------------------------- */
+.gd .gd-btn{
+  position: relative; display: inline-flex; align-items: center; justify-content: center; gap: var(--gw-space-8);
+  height: var(--gd-control-h); padding: 0 var(--gw-space-12); flex: none;
+  border: 0; border-radius: var(--gd-btn-r);
+  font: var(--gw-text-button-14); white-space: nowrap; text-decoration: none; cursor: pointer;
+  background: transparent; color: var(--gd-text);
+  box-shadow: inset 0 0 0 1px var(--gd-border-strong);
+  transition: background var(--gw-motion-fast), color var(--gw-motion-fast), box-shadow var(--gw-motion-fast);
+}
+.gd .gd-btn svg{ width: 16px; height: 16px; flex: none; display: block; }
+.gd .gd-btn:hover, .gd .gd-btn.is-hover{ background: var(--gd-ctl-hover); }
+.gd .gd-btn--primary{ background: var(--gd-ink); color: var(--gd-ink-fg); box-shadow: none; }
+.gd .gd-btn--primary:hover, .gd .gd-btn--primary.is-hover{ background: var(--gd-ink-hover); }
+
+/* SHORTCUT KEY CAP (R53). A keyboard shortcut is shown inside the control it triggers, after the label, never in a separate
+   hint line. The cap is the label's own colour at half strength on a faint 8% tint of it (the quiet chip the outline Rework button shows in light, on every button), so it reads on primary,
+   outline, ghost and danger alike. It is a filled shape, so the button's right padding is inset until the cap's gap to the
+   edge equals its gap above and below. Hidden on touch and on narrow screens, where there is no keyboard to press. */
+.gd .gd-btn__key{ margin-left: var(--gw-space-8); min-width: 18px; height: 18px; padding: 0 var(--gw-space-4); display: inline-grid; place-items: center; flex: none; border-radius: var(--gw-radius-4); background: color-mix(in srgb, currentColor 8%, transparent); opacity: .5; font: var(--gw-text-body-12-med); letter-spacing: 0; }
+.gd .gd-btn:has(> .gd-btn__key){ padding-right: calc((var(--gd-control-h) - 18px) / 2); }
+.gd .gd-btn--sm .gd-btn__key{ display: none; }
+@media (hover: none), (max-width: 767px){
+  .gd .gd-btn__key{ display: none; }
+  .gd .gd-btn:has(> .gd-btn__key){ padding-right: var(--gw-space-16); }
+}
+.gd .gd-btn--ghost{ box-shadow: none; }
+.gd .gd-btn--danger{ color: var(--gd-tone-bad-fg); box-shadow: inset 0 0 0 1px var(--gd-danger); }  /* red label + red edge on the neutral shape; the confirm dialog carries the weight */
+.gd .gd-btn--link{ height: auto; padding: 0; border-radius: var(--gw-radius-4); box-shadow: none; background: none; color: var(--gd-link); }
+.gd .gd-btn--link:hover, .gd .gd-btn--link.is-hover{ background: none; text-decoration: underline; text-underline-offset: 3px; }
+.gd .gd-btn--sm{ height: min(28px, var(--gd-control-h)); padding: 0 var(--gw-space-12); gap: var(--gw-space-4); font: var(--gw-text-button-12); border-radius: var(--gw-radius-8); }
+.gd .gd-btn--sm svg{ width: 14px; height: 14px; }
+.gd .gd-btn--link.gd-btn--sm{ height: auto; padding: 0; }
+.gd .gd-btn[aria-disabled="true"], .gd .gd-btn:disabled{ cursor: not-allowed; pointer-events: none; }
+.gd .gd-btn--primary[aria-disabled="true"], .gd .gd-btn--primary:disabled{ background: var(--gd-ink-disabled-bg); color: var(--gd-ink-disabled-fg); }
+.gd .gd-btn[aria-disabled="true"]:not(.gd-btn--primary), .gd .gd-btn:disabled:not(.gd-btn--primary){ color: var(--gd-disabled-ink); background: none; }
+.gd .gd-btn--danger[aria-disabled="true"], .gd .gd-btn--danger:disabled{ box-shadow: inset 0 0 0 1px var(--gd-border-strong); }
+/* Loading: a spinner replaces the glyph, the label stays so the width does not jump much. */
+.gd .gd-btn[aria-busy="true"]{ pointer-events: none; }
+.gd .gd-btn[aria-busy="true"] > svg{ display: none; }
+.gd .gd-btn[aria-busy="true"]::before{
+  content: ""; width: 14px; height: 14px; flex: none; border-radius: 50%;
+  border: 2px solid currentColor; border-top-color: transparent; animation: gd-spin 700ms linear infinite;
+}
+
+/* --- icon button ----------------------------------------------------------- */
+.gd .gd-iconbtn{
+  position: relative; display: inline-grid; place-items: center; flex: none; padding: 0;
+  width: var(--gd-control-h); height: var(--gd-control-h);
+  border: 0; border-radius: var(--gd-btn-r); background: none; color: var(--gd-text-muted); cursor: pointer;
+  transition: background var(--gw-motion-fast), color var(--gw-motion-fast);
+}
+.gd .gd-iconbtn svg{ width: 16px; height: 16px; display: block; }
+.gd .gd-iconbtn:hover, .gd .gd-iconbtn.is-hover, .gd .gd-iconbtn[aria-expanded="true"]{ background: var(--gd-ctl-hover); color: var(--gd-text); }
+.gd .gd-iconbtn--outline{ box-shadow: inset 0 0 0 1px var(--gd-border-strong); color: var(--gd-text); }
+.gd .gd-iconbtn--sm{ width: min(28px, var(--gd-control-h)); height: min(28px, var(--gd-control-h)); border-radius: var(--gw-radius-8); }
+.gd .gd-iconbtn--sm svg{ width: 14px; height: 14px; }
+.gd .gd-iconbtn[aria-disabled="true"], .gd .gd-iconbtn:disabled{ color: var(--gd-disabled-ink); cursor: not-allowed; pointer-events: none; }
+.gd .gd-iconbtn[aria-busy="true"] svg{ animation: gd-spin 1s linear infinite; }
+
+/* Tooltip drawn from data-tip (icon button and info-hint). Escape dismisses it (js: data-tip-dismissed). */
+.gd [data-tip]::after {
+  content: attr(data-tip); position: absolute; top: calc(100% + var(--gw-space-4)); left: 50%; transform: translateX(-50%);
+  padding: var(--gw-space-4) var(--gw-space-8); border-radius: var(--gw-radius-8);
+  background: var(--gd-raised-bg); color: var(--gd-text); box-shadow: inset 0 0 0 1px var(--gd-border-strong), var(--gw-shadow-s2);
+  font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); white-space: nowrap; text-align: left;
+  opacity: 0; visibility: hidden; pointer-events: none; z-index: 60;
+  transition: opacity var(--gw-motion-fast), visibility var(--gw-motion-fast);
+}
+.gd [data-tip-end]::after { left: auto; right: 0; transform: none; }
+.gd [data-tip]:hover::after, .gd [data-tip]:focus-visible::after, .gd [data-tip].is-hover::after { opacity: 1; visibility: visible; }
+.gd [data-tip][aria-expanded="true"]::after, .gd [data-tip][data-tip-dismissed]::after { opacity: 0; visibility: hidden; }
+
+/* --- menu (the popover list) ----------------------------------------------- */
+.gd .gd-pop{ position: relative; display: inline-flex; }
+.gd .gd-menu{
+  position: absolute; z-index: 60; top: calc(100% + var(--gw-space-4)); left: 0;
+  width: max-content; min-width: 180px; max-width: 360px; max-height: 320px; overflow-y: auto; padding: var(--gw-space-4);
+  display: flex; flex-direction: column; gap: 2px;
+  background: var(--gd-raised-bg); border-radius: var(--gw-radius-12);
+  box-shadow: inset 0 0 0 1px var(--gd-border-strong), var(--gw-shadow-s3);
+}
+.gd .gd-menu[hidden]{ display: none; }
+.gd .gd-menu--end{ left: auto; right: 0; }
+.gd .gd-pop.is-up > .gd-menu, .gd .gd-menu.is-up{ top: auto; bottom: calc(100% + var(--gw-space-4)); }
+.gd .gd-menu__item{
+  display: flex; align-items: center; gap: var(--gw-space-8); width: 100%; flex: none;
+  min-height: calc(var(--gd-control-h) - 4px); padding: var(--gw-space-4) var(--gw-space-8) var(--gw-space-4) var(--gw-space-12);
+  border: 0; border-radius: var(--gw-radius-8); background: none; color: var(--gd-text);
+  font: var(--gw-text-body-14-med); letter-spacing: var(--gw-text-body-14-med-tracking); text-align: left; text-decoration: none; cursor: pointer;
+}
+.gd[data-density="compact"] .gd-menu__item, .gd [data-density="compact"] .gd-menu__item { font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); }
+.gd .gd-menu__item svg{ width: 16px; height: 16px; flex: none; color: var(--gd-text-muted); }
+.gd .gd-menu__item:hover, .gd .gd-menu__item.is-hover, .gd .gd-menu__item.is-active, .gd .gd-menu__item:focus-visible{ background: var(--gd-menu-hover); outline: none; }
+.gd .gd-menu__text{ display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1 1 auto; }
+.gd .gd-menu__desc{ font: var(--gw-text-body-12-reg); color: var(--gd-text-muted); font-weight: 400; }
+.gd .gd-menu__check{ width: 14px; height: 14px; margin-left: auto; flex: none; color: var(--gd-ink); visibility: hidden; }
+.gd .gd-menu__item[aria-checked="true"] .gd-menu__check, .gd .gd-menu__item[aria-selected="true"] .gd-menu__check{ visibility: visible; }
+.gd .gd-menu__item[aria-checked="true"], .gd .gd-menu__item[aria-selected="true"]{ font-weight: 600; }
+.gd .gd-menu__item--danger, .gd .gd-menu__item--danger svg{ color: var(--gd-tone-bad-fg); }
+.gd .gd-menu__item[aria-disabled="true"]{ color: var(--gd-disabled-ink); cursor: not-allowed; }
+.gd .gd-menu__item[aria-disabled="true"]:hover{ background: none; }
+.gd .gd-menu__item[aria-disabled="true"] svg{ color: var(--gd-disabled-ink); }
+.gd .gd-menu__sep{ height: 1px; margin: var(--gw-space-4) calc(var(--gw-space-4) * -1); background: var(--gd-border); flex: none; }
+.gd .gd-menu__label{ padding: var(--gw-space-8) var(--gw-space-12) var(--gw-space-4); font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
+.gd .gd-menu__empty{ padding: var(--gw-space-8) var(--gw-space-12); font: var(--gw-text-body-12-reg); color: var(--gd-text-muted); }
+
+/* --- split button ---------------------------------------------------------- */
+.gd .gd-split{ position: relative; display: inline-flex; flex: none; }
+.gd .gd-split__main{ border-radius: var(--gd-btn-r) 0 0 var(--gd-btn-r); }
+.gd .gd-split__tog{ width: var(--gd-control-h); padding: 0; margin-left: -1px; border-radius: 0 var(--gd-btn-r) var(--gd-btn-r) 0; }
+.gd .gd-split__tog svg{ transition: transform var(--gw-motion-fast); }
+.gd .gd-split__tog[aria-expanded="true"] svg{ transform: rotate(180deg); }
+.gd .gd-split__tog[aria-expanded="true"]{ background: var(--gd-ctl-hover); }
+.gd .gd-split__main:focus-visible, .gd .gd-split__tog:focus-visible{ z-index: 1; }
+.gd .gd-split--primary .gd-split__tog{ box-shadow: inset 1px 0 0 color-mix(in srgb, var(--gd-ink-fg) 28%, transparent); margin-left: 0; }
+.gd .gd-split--primary .gd-split__tog[aria-expanded="true"]{ background: var(--gd-ink-hover); }
+.gd .gd-split > .gd-menu{ left: auto; right: 0; }
+.gd .gd-split.is-up > .gd-menu{ top: auto; bottom: calc(100% + var(--gw-space-4)); }
+
+/* --- segmented control (value switcher, optional icons) -------------------- */
+.gd .gd-seg{
+  display: inline-flex; gap: 2px; padding: var(--gd-pill-pad); height: var(--gd-control-h); flex: none; max-width: 100%;
+  border-radius: var(--gd-btn-r); background: var(--gd-card-bg); box-shadow: inset 0 0 0 1px var(--gd-border-strong);
+}
+.gd .gd-seg__item{
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--gw-space-4);
+  height: calc(var(--gd-control-h) - 2 * var(--gd-pill-pad)); min-width: calc(var(--gd-control-h) - 2 * var(--gd-pill-pad)); padding: 0 var(--gw-space-12);
+  border: 0; border-radius: var(--gw-radius-8); background: none; color: var(--gd-text-muted);
+  font: var(--gw-text-button-12); white-space: nowrap; cursor: pointer; transition: background var(--gw-motion-fast), color var(--gw-motion-fast);
+}
+.gd .gd-seg__item--icon{ padding: 0; }
+.gd .gd-seg__item svg{ width: 14px; height: 14px; flex: none; }
+.gd .gd-seg__item:hover, .gd .gd-seg__item.is-hover{ background: var(--gd-ctl-hover); color: var(--gd-text); }
+.gd .gd-seg__item[aria-checked="true"], .gd .gd-seg__item[aria-pressed="true"]{ background: var(--gd-selected-bg); color: var(--gd-text); }
+.gd .gd-seg__item[aria-disabled="true"], .gd .gd-seg__item:disabled{ color: var(--gd-disabled-ink); background: none; cursor: not-allowed; }
+
+/* --- tabs ------------------------------------------------------------------ */
+.gd .gd-tabs__tab{ border: 0; background: none; cursor: pointer; white-space: nowrap; transition: background var(--gw-motion-fast), color var(--gw-motion-fast); }
+.gd .gd-tabs__tab[aria-disabled="true"]{ color: var(--gd-disabled-ink); cursor: not-allowed; }
+.gd .gd-tabs__count{ margin-left: var(--gw-space-4); font-feature-settings: "tnum" 1; color: var(--gd-text-muted); }
+/* pill track: in-page view switching. 1px edge is an inset shadow so the 28px tabs still fit. */
+.gd .gd-tabs--pill{ display: inline-flex; gap: var(--gw-space-4); padding: var(--gd-pill-pad); height: var(--gd-control-h); max-width: 100%; flex: none;
+  border-radius: var(--gd-btn-r); background: var(--gd-track-bg); box-shadow: inset 0 0 0 1px var(--gd-border); }
+.gd .gd-tabs--pill .gd-tabs__tab{ height: calc(var(--gd-control-h) - 2 * var(--gd-pill-pad)); padding: 0 var(--gw-space-12); border-radius: var(--gw-radius-8);
+  font: var(--gw-text-button-12); color: var(--gd-nav-label); }
+.gd .gd-tabs--pill .gd-tabs__tab:hover, .gd .gd-tabs--pill .gd-tabs__tab.is-hover{ background: var(--gd-track-hover); }
+.gd .gd-tabs--pill .gd-tabs__tab[aria-selected="true"], .gd .gd-tabs--pill .gd-tabs__tab[aria-checked="true"]{ background: var(--gd-ink); color: var(--gd-ink-fg); }   /* aria-checked: the period select is a radiogroup */
+.gd .gd-tabs--pill .gd-tabs__tab[aria-selected="true"] .gd-tabs__count, .gd .gd-tabs--pill .gd-tabs__tab[aria-checked="true"] .gd-tabs__count{ color: inherit; opacity: .7; }
+.gd .gd-tabs--pill .gd-tabs__tab[aria-disabled="true"]:hover{ background: none; }
+/* underline: page-level sections on a full-width hairline */
+.gd .gd-tabs--underline{ display: flex; gap: var(--gw-space-24); overflow-x: auto; scrollbar-width: none; box-shadow: inset 0 -1px 0 var(--gd-border); }
+.gd .gd-tabs--underline::-webkit-scrollbar{ display: none; }
+.gd .gd-tabs--underline .gd-tabs__tab{ position: relative; flex: none; height: calc(var(--gd-control-h) + 4px); padding: 0 2px; font: var(--gw-text-body-14-med); color: var(--gd-text-muted); }
+.gd .gd-tabs--underline .gd-tabs__tab:hover, .gd .gd-tabs--underline .gd-tabs__tab.is-hover, .gd .gd-tabs--underline .gd-tabs__tab[aria-selected="true"]{ color: var(--gd-text); }
+.gd .gd-tabs--underline .gd-tabs__tab[aria-selected="true"]::after{ content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; border-radius: 2px 2px 0 0; background: var(--gd-ink); }
+.gd .gd-tabs--underline .gd-tabs__tab:focus-visible{ outline-offset: -2px; }
+.gd .gd-tabs__panel[hidden]{ display: none; }
+
+/* --- a selected state that moves ----------------------------------------------------------------------------------------------
+   In a segmented control, the period pills, the underline tabs and the saved views, choosing another option slides the selected
+   fill to it instead of swapping it, over --gw-motion-fast (which the reduced-motion preference turns to 0). js/20-actions.js sets
+   data-gd-slide on the group and measures the selected item into --gd-sx/-sy/-sw/-sh/-sr; the group's ::before is the fill. Without
+   the script the items draw their own selected state as before. Nothing else moves: this is the one place a state change has
+   somewhere to travel. */
+.gd [data-gd-slide]{ position: relative; }
+.gd .gd-page-header__tabs[data-gd-slide]{ position: sticky; }   /* the page tab strip stays pinned; sticky is as good an anchor for the sliding mark (fix 7 Oct 2026) */
+.gd [data-gd-slide]::before{ content: ""; position: absolute; left: 0; top: 0; width: var(--gd-sw, 0px); height: var(--gd-sh, 0px); border-radius: var(--gd-sr, 0);
+  transform: translate(var(--gd-sx, 0px), var(--gd-sy, 0px)); background: var(--gd-slide-bg); pointer-events: none; z-index: 0; }
+.gd [data-gd-slide="on"]::before{ transition: transform var(--gw-motion-fast), width var(--gw-motion-fast), height var(--gw-motion-fast); }
+.gd [data-gd-slide] > *{ position: relative; z-index: 1; }
+.gd .gd-seg[data-gd-slide], .gd .gd-views[data-gd-slide]{ --gd-slide-bg: var(--gd-selected-bg); }
+.gd .gd-tabs--pill[data-gd-slide], .gd .gd-tabs--underline[data-gd-slide]{ --gd-slide-bg: var(--gd-ink); }
+.gd .gd-seg[data-gd-slide] .gd-seg__item[aria-checked="true"], .gd .gd-views[data-gd-slide] .gd-views__tab[aria-selected="true"],
+.gd .gd-tabs--pill[data-gd-slide] .gd-tabs__tab[aria-selected="true"], .gd .gd-tabs--pill[data-gd-slide] .gd-tabs__tab[aria-checked="true"]{ background: none; }
+.gd .gd-tabs--underline[data-gd-slide] .gd-tabs__tab[aria-selected="true"]::after{ display: none; }
+
+/* --- period select: the pill track holding a period set; also the 'common case' control -- */
+.gd .gd-period{ display: inline-flex; align-items: center; gap: var(--gw-space-8); }
+.gd .gd-period__t{ font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
+
+/* --- info hint: dotted label + (i) trigger; the definition is a data-tip bubble ----- */
+.gd .gd-hint{ position: relative; display: inline-flex; align-items: center; gap: var(--gw-space-4); vertical-align: baseline; }   /* the bubble anchors to the whole hint */
+.gd .gd-hint__label{ text-decoration: none; }   /* the (i) is the only cue, no underline */
+.gd .gd-hint__btn{
+  display: inline-grid; place-items: center; flex: none; width: 16px; height: 16px; padding: 0;
+  border: 0; border-radius: 50%; background: none; color: var(--gd-text-muted); cursor: help; transition: color var(--gw-motion-fast);
+}
+.gd .gd-hint__btn svg{ width: 14px; height: 14px; display: block; }
+.gd .gd-hint__btn:hover, .gd .gd-hint__btn.is-hover{ color: var(--gd-text); }
+.gd .gd-hint__btn[data-tip]::after{ left: 50%; transform: translateX(-50%); width: max-content; max-width: 240px; white-space: normal; padding: var(--gw-space-8) var(--gw-space-12); font: var(--gw-text-body-12-reg); }   /* centred under the label and glyph together */

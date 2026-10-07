@@ -179,5 +179,169 @@
       "doc": "layouts.md",
       "note": "A real 'Thank You!' slide exists on the Sales Pitch page of GW-Slides but has not been measured. Measuring it is a breaking bump."
     }
+  },
+  "review": {
+    "annotation": {
+      "reviewed": "rejected",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "25aaac7d1d3af43c",
+      "note": "not needed",
+      "previewFingerprint": "bac01e8f3e73de81"
+    },
+    "content-card": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "3b868264e3a48c97",
+      "previewFingerprint": "87737a3c33331206"
+    },
+    "cover": {
+      "reviewed": "rejected",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "7a115e38e412f1cf",
+      "note": "wrong design",
+      "previewFingerprint": "bdfec0b8b066d444"
+    },
+    "eyebrow": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "57f132e826d5fc46",
+      "previewFingerprint": "e0c7693f26ae7902"
+    },
+    "feature-row": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "970817ddc0bb1380",
+      "previewFingerprint": "25cf4ebeac4d4e2b"
+    },
+    "ground": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "dc24d60b8deffe9f",
+      "previewFingerprint": "b1f1ed8d6b789c6a"
+    },
+    "icon-tile": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "d2f8a3f9dbc548ee",
+      "previewFingerprint": "1ca252989d17a4fb"
+    },
+    "layout-big-number": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "125a188464f8973d",
+      "previewFingerprint": "a12a3d8de8f4d8e7"
+    },
+    "layout-closer": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "3341a44085c955ae",
+      "note": "thank you will be bigger than this",
+      "previewFingerprint": "3fc7d8f3b6a97862"
+    },
+    "layout-divider": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "b0e94a69a22d3524",
+      "previewFingerprint": "23c9771646dd7ddc"
+    },
+    "layout-feature-list": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "f7fa52e0c2b18e70",
+      "previewFingerprint": "9efedbd4f8d8533b"
+    },
+    "layout-full-bleed": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "28beae3088ce8372",
+      "previewFingerprint": "cfbb58083e5c2aab"
+    },
+    "layout-pricing": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "34f701c388bfb2ca",
+      "previewFingerprint": "2905d60d98057a0f"
+    },
+    "layout-split-card": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "2e74d4f24d2eec3a",
+      "note": "wrong design",
+      "previewFingerprint": "592bc8b0864e9b6f"
+    },
+    "layout-step-row": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "19df15a7ece8d048",
+      "previewFingerprint": "16671d7d07261f44"
+    },
+    "layout-testimonial": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "16624532cf51a067",
+      "note": "wrong design",
+      "previewFingerprint": "ca8269cc6fb01b47"
+    },
+    "layout-two-up": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "2e8c19cda1fa1c21",
+      "note": "wrong design",
+      "previewFingerprint": "2af5d1304c9d9aac"
+    },
+    "lead-paragraph": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "901858e5c3c77947",
+      "previewFingerprint": "69c5edb4b80ff5db"
+    },
+    "media-well": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "0be9124389893861",
+      "note": "wtf is this",
+      "previewFingerprint": "1deaae76f54957b6"
+    },
+    "rule-label": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "18c150e1d219851c",
+      "previewFingerprint": "2bb0e9549828fd1b"
+    },
+    "step-card": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "db5b4af99865ad46",
+      "previewFingerprint": "4181ce4a32d80295"
+    },
+    "title-bar": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-05",
+      "fingerprint": "6674714dfabc41b6",
+      "note": "idk",
+      "previewFingerprint": "d394a5fb44ddc869"
+    }
   }
 }

@@ -167,7 +167,13 @@ in the GitHub UI.
 See the propagation table in [`README.md`](README.md). The short version:
 
 1. Change Figma **and** measure it into the repo in the same sitting. Figma alone ships nothing.
-2. **`bash scripts/release.sh 1.2.0 "what changed, in one line" --session "<uuid> <title>"`**
+2. **`bash scripts/release.sh 1.2.0 "what changed, in one line" --quiet --session "<uuid> <title>"`**
+
+   `--quiet` or `--notify "<one line for teammates>"` is required, and the default answer is
+   quiet. A bump no longer wakes anyone: the session-start notice fires only when the newest
+   release flagged with `--notify` is ahead of the copy a teammate runs (R51). **Claude asks Utsav
+   before passing `--notify`** — a new skill, a new template or a breaking component is worth
+   asking about; site, hub, log and script work is quiet without asking, said in one line.
 
    One command, because the steps below were written down, were correct, and still got done
    wrong. v1.40.0 moved `plugin.json` and both announce lines but not `marketplace.json` —
@@ -244,11 +250,12 @@ people tell you what they're running, not the delivery mechanism.
 
 Tag the release so the next run has a clean starting point: `git tag v1.2.0 && git push --tags`.
 
-## Every new component goes on the review sheet — before it counts as done
+## Every new component gets a drawing — before it counts as done
 
-`preview/review-sheet.html` renders each measured component from its measured values so Utsav can
-confirm it against Figma. **A measurement that has not been rendered has not been checked.** The
-export file and the sheet move together; adding one without the other is half the job.
+A component's drawing is `web/previews/<surface>/<key>.frag`: a small piece of HTML, drawn from its measured values with
+`foundation/tokens.css`, that the review drawer in the Design System page shows beside Pass, Rework and Reject. Utsav
+confirms it against Figma there. **A measurement that has not been drawn has not been checked.** The export file and the
+drawing move together; adding one without the other is half the job. `bash scripts/check-previews.sh` lists what is missing.
 
 So when you add or correct a component, element or pattern:
 
@@ -261,7 +268,7 @@ So when you add or correct a component, element or pattern:
    01 · Core                 building-blocks · shared-components
    02 · Web                  ↳ web/ component-library      112:414
    02 · Web                  ↳ web/ pattern-library        1658:22673
-   03 · Dashboard            ↳ dashboard/ component+pattern-library   1658:24112
+   03 · Dashboard            ↳ dashboard/ component+pattern-library   1658:24112   (retired as the dashboard source, 4 Oct 2026)
    ```
 
    Inside a page, the section is the **Figma group name** — `button`, `badge`, `card`,

@@ -1,0 +1,287 @@
+/* ============================================================================
+   Gushwork dashboard — 30 inputs
+   Provenance, per component:
+     text-input / search-field  extracted: web/admin/analytics.html:282-289 (.ul-input), access-control.html:158-185 (.ac-field); rules from foundation/text-field.md
+     textarea                   extracted: web/internal/design-system.html:751-753 (.rv-ta)
+     select                     extracted: analytics.html:290-356 (.ul-select + .ul-menu), access-control.html:261-308 (.ac-dd)
+     checkbox                   extracted: old v2/primitives.md checkbox (hub draws no checkbox; the hub toggle .an-me is below)
+     toggle                     extracted: analytics.html:503-512 (.an-me); sizes from old controls.md (Small 44x24, X-Small 36x20)
+     radio                      NEW: not in the hub — reference Mobbin Clerk/Squarespace settings — pending library review
+     multi-select, combobox     NEW: not in the hub — reference Mobbin Linear/Notion property pickers — pending library review
+     form-field                 NEW: not in the hub — reference Mobbin Clerk — pending library review
+     setting-row, form-section  NEW: not in the hub — reference Mobbin Clerk/Squarespace settings — pending library review
+     unsaved-changes-bar        NEW: not in the hub (hub access-control.html:923 has Discard/Save inline) — reference Mobbin Clerk/Etsy — pending library review
+     date-range-picker          NEW: not in the hub — reference Mobbin Mixpanel/Stripe; geometry from old v2/overlays.md date-range-picker
+     time-range-bar             NEW: not in the hub — reference Mobbin Mixpanel, Amplitude, Square, Hotjar, Cloudflare, Railway
+     datetime-field, timezone-select  NEW: not in the hub — reference Mobbin Okta system log
+     query-builder              NEW: not in the hub — reference Mobbin Sentry, Mixpanel, Amplitude, GA Explorations
+   Text fields: NO hover state, and focus is a 1px edge (--gd-border-focus), never a ring (R41).
+   Small-text tones use --gd-tone-*-fg from 50-data.css (contrast-checked); raw --gd-danger/--gd-warn only for edges and dots.
+   Aliases declared here (light-dark): --gd-field-bg --gd-track-off --gd-knob --gd-range-band
+   ============================================================================ */
+
+.gd {
+  --gd-field-bg:   light-dark(var(--gw-color-white),       var(--gw-color-neutral-900));
+  --gd-track-off:  light-dark(var(--gw-color-neutral-200), var(--gw-color-neutral-850));
+  --gd-knob:       light-dark(var(--gw-color-white),       var(--gw-color-neutral-100));
+  --gd-range-band: light-dark(var(--gw-color-neutral-100), var(--gw-color-neutral-850));
+  --gd-check-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M232.49 80.49l-128 128a12 12 0 0 1-17 0l-56-56a12 12 0 1 1 17-17L96 183 215.51 63.51a12 12 0 0 1 17 17z'/%3E%3C/svg%3E");
+  --gd-minus-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12z'/%3E%3C/svg%3E");
+}
+
+/* --- the field shell: text-input, search, select trigger, multi, combobox, date ------- */
+.gd .gd-input{
+  display: flex; align-items: center; gap: var(--gw-space-8); width: var(--gd-input-w, 100%); max-width: 100%;
+  height: var(--gd-control-h); padding: 0 var(--gw-space-12); border: 0; border-radius: var(--gw-radius-8);
+  background: var(--gd-field-bg); color: var(--gd-text); box-shadow: inset 0 0 0 1px var(--gd-border-strong);
+  font: var(--gw-text-body-14-reg); letter-spacing: var(--gw-text-body-14-reg-tracking); text-align: left; cursor: text;
+}
+.gd .gd-input--sm{ height: min(28px, var(--gd-control-h)); padding: 0 var(--gw-space-8); font: var(--gw-text-body-12-reg); letter-spacing: var(--gw-text-body-12-reg-tracking); }
+.gd .gd-input--auto{ width: auto; }
+.gd .gd-input:focus-within, .gd .gd-input.is-focus{ box-shadow: inset 0 0 0 1px var(--gd-border-focus); }
+.gd .gd-input__el{ flex: 1 1 auto; min-width: 0; height: 100%; padding: 0; border: 0; outline: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; }
+.gd .gd-input__el::placeholder{ color: var(--gd-placeholder); }
+.gd .gd-input__icon{ width: 16px; height: 16px; flex: none; color: var(--gd-placeholder); pointer-events: none; display: block; }
+.gd .gd-input__caret{ width: 12px; height: 12px; flex: none; color: var(--gd-text-muted); transition: transform var(--gw-motion-fast); }
+.gd .gd-input--invalid, .gd .gd-field[data-state="error"] .gd-input, .gd .gd-input:has([aria-invalid="true"]){ box-shadow: inset 0 0 0 1px var(--gd-danger); }
+.gd .gd-input--warn, .gd .gd-field[data-state="warn"] .gd-input{ box-shadow: inset 0 0 0 1px var(--gd-warn); }
+.gd .gd-input[aria-disabled="true"], .gd .gd-input:has(:disabled), .gd button.gd-input:disabled{ background: var(--gd-sunken-bg); color: var(--gd-disabled-ink); cursor: not-allowed; }
+.gd .gd-input:has(:disabled) .gd-input__icon{ color: var(--gd-disabled-ink); }
+.gd .gd-input__el:disabled{ cursor: not-allowed; }
+.gd .gd-input__spin{ width: 14px; height: 14px; flex: none; border-radius: 50%; border: 2px solid var(--gd-text-muted); border-top-color: transparent; animation: gd-spin 700ms linear infinite; }
+
+/* search: the clear X shows only while there is text, and clears it (js: data-gd-clear) */
+.gd .gd-input--search{ --gd-input-w: 240px; }
+.gd .gd-input--search input[type="search"]::-webkit-search-cancel-button, .gd .gd-input--search input[type="search"]::-webkit-search-decoration{ -webkit-appearance: none; appearance: none; }
+.gd .gd-input__clear{ flex: none; width: 20px; height: 20px; display: grid; place-items: center; padding: 0; border: 0; border-radius: var(--gw-radius-4); background: none; color: var(--gd-text-muted); cursor: pointer; }
+.gd .gd-input__clear svg{ width: 12px; height: 12px; }
+.gd .gd-input__clear:hover, .gd .gd-input__clear.is-hover{ background: var(--gd-ctl-hover); color: var(--gd-text); }
+.gd .gd-input__el:placeholder-shown ~ .gd-input__clear{ display: none; }
+
+/* textarea */
+.gd .gd-textarea{
+  display: block; width: var(--gd-input-w, 100%); min-height: 96px; padding: var(--gw-space-12); resize: vertical;
+  border: 0; border-radius: var(--gw-radius-12); outline: 0; background: var(--gd-field-bg); color: var(--gd-text);
+  box-shadow: inset 0 0 0 1px var(--gd-border-strong); font: 400 14px/1.5 var(--gw-font-body); letter-spacing: var(--gw-text-body-14-reg-tracking);
+}
+.gd .gd-textarea::placeholder{ color: var(--gd-placeholder); }
+.gd .gd-textarea:focus-visible, .gd .gd-textarea:focus{ box-shadow: inset 0 0 0 1px var(--gd-border-focus); }
+.gd .gd-textarea[aria-invalid="true"], .gd .gd-field[data-state="error"] .gd-textarea{ box-shadow: inset 0 0 0 1px var(--gd-danger); }
+.gd .gd-field[data-state="warn"] .gd-textarea{ box-shadow: inset 0 0 0 1px var(--gd-warn); }
+.gd .gd-textarea:disabled{ background: var(--gd-sunken-bg); color: var(--gd-disabled-ink); cursor: not-allowed; resize: none; }
+
+/* select (button + listbox) */
+.gd .gd-select, .gd .gd-combo, .gd .gd-multi-wrap{ position: relative; display: inline-block; width: var(--gd-input-w, 100%); max-width: 100%; }
+.gd .gd-select--auto{ width: auto; }
+.gd .gd-select > .gd-input, .gd .gd-combo > .gd-input, .gd .gd-multi-wrap > .gd-input{ width: 100%; }
+.gd button.gd-input{ cursor: pointer; font-feature-settings: normal; }
+.gd button.gd-input:hover, .gd button.gd-input.is-hover, .gd button.gd-input[aria-expanded="true"]{ box-shadow: inset 0 0 0 1px var(--gd-border-focus); }
+.gd button.gd-input:focus-visible{ outline: none; box-shadow: inset 0 0 0 1px var(--gd-border-focus); }   /* R41: a field shows its edge, not the ring; the select trigger is a button, so the shell's button ring had been landing on it */
+.gd button.gd-input:disabled:hover{ box-shadow: inset 0 0 0 1px var(--gd-border-strong); }
+.gd .gd-select__value{ flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gd .gd-select__value[data-empty]{ color: var(--gd-placeholder); }
+.gd .gd-input[aria-expanded="true"] .gd-input__caret, .gd .gd-combo.is-open .gd-input__caret{ transform: rotate(180deg); }
+.gd .gd-select > .gd-menu, .gd .gd-combo > .gd-menu, .gd .gd-multi-wrap > .gd-menu{ min-width: 100%; max-width: none; }
+.gd .gd-combo__toggle{ flex: none; width: 20px; height: 20px; display: grid; place-items: center; padding: 0; border: 0; background: none; color: var(--gd-text-muted); cursor: pointer; }
+
+/* multi-select: chips inside the shell */
+.gd .gd-input--multi{ --_chip-h: min(22px, calc(var(--gd-control-h) - 6px)); position: relative; height: auto; min-height: var(--gd-control-h); flex-wrap: wrap; gap: var(--gw-space-4);
+  /* top and bottom padding is what centres a single chip row in the control; keeping it when the chips wrap stops the rows crowding the edge. The right padding clears the arrow. */
+  padding: calc((var(--gd-control-h) - var(--_chip-h)) / 2) calc(var(--gw-space-8) + 12px + var(--gw-space-8)) calc((var(--gd-control-h) - var(--_chip-h)) / 2) var(--gw-space-8); cursor: text; }
+/* the arrow is pinned top right, level with the first row, however many rows the chips make */
+.gd .gd-input--multi > .gd-input__caret{ position: absolute; right: var(--gw-space-8); top: calc((var(--gd-control-h) - 12px) / 2); }
+.gd .gd-input--multi .gd-input__el{ flex: 1 1 72px; min-width: 72px; height: 22px; }
+.gd .gd-input__chip{
+  display: inline-flex; align-items: center; gap: var(--gw-space-4); height: var(--_chip-h, min(22px, calc(var(--gd-control-h) - 6px))); padding: 0 2px 0 var(--gw-space-8);
+  border-radius: var(--gw-radius-4); background: var(--gd-sunken-bg); color: var(--gd-text); box-shadow: inset 0 0 0 1px var(--gd-border-strong);
+  font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); white-space: nowrap; max-width: 100%;
+}
+.gd .gd-input__chip > span{ overflow: hidden; text-overflow: ellipsis; }
+.gd .gd-input__chip button{ flex: none; width: 16px; height: 16px; display: grid; place-items: center; padding: 0; border: 0; border-radius: var(--gw-radius-4); background: none; color: var(--gd-text-muted); cursor: pointer; }
+.gd .gd-input__chip button svg{ width: 10px; height: 10px; }
+.gd .gd-input__chip button:hover, .gd .gd-input__chip button.is-hover{ background: var(--gd-ctl-hover); color: var(--gd-text); }
+
+/* --- checkbox + radio ------------------------------------------------------ */
+.gd .gd-check, .gd .gd-radio{ --gd-check-s: 20px; position: relative; display: inline-flex; align-items: flex-start; gap: var(--gw-space-8); cursor: pointer; font: var(--gw-text-body-14-reg); color: var(--gd-text); }
+.gd[data-density="compact"] .gd-check, .gd [data-density="compact"] .gd-check, .gd[data-density="compact"] .gd-radio, .gd [data-density="compact"] .gd-radio { --gd-check-s: 16px; }
+.gd .gd-check input, .gd .gd-radio input{ position: absolute; left: 0; top: 0; width: var(--gd-check-s); height: var(--gd-check-s); margin: 0; opacity: 0; cursor: inherit; }
+.gd .gd-check__box, .gd .gd-radio__box{
+  flex: none; display: grid; place-items: center; width: var(--gd-check-s); height: var(--gd-check-s); margin-block: calc((20px - var(--gd-check-s)) / 2);
+  border-radius: var(--gw-radius-4); background: var(--gd-field-bg); box-shadow: inset 0 0 0 1px var(--gd-border-strong);
+  transition: background var(--gw-motion-fast), box-shadow var(--gw-motion-fast);
+}
+.gd .gd-check__box{ border-radius: calc(var(--gd-check-s) * .3); }
+.gd .gd-radio__box{ border-radius: 50%; }
+.gd .gd-check__box::after{ content: ""; width: 12px; height: 12px; background: var(--gd-ink-fg); -webkit-mask: var(--gd-check-mask) center / contain no-repeat; mask: var(--gd-check-mask) center / contain no-repeat; opacity: 0; }
+.gd .gd-radio__box::after{ content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--gd-ink-fg); opacity: 0; }
+.gd .gd-check:hover .gd-check__box, .gd .gd-radio:hover .gd-radio__box, .gd .gd-check.is-hover .gd-check__box, .gd .gd-radio.is-hover .gd-radio__box{ box-shadow: inset 0 0 0 1px var(--gd-border-focus); }
+.gd .gd-check input:checked + .gd-check__box, .gd .gd-check input:indeterminate + .gd-check__box, .gd .gd-check input[aria-checked="mixed"] + .gd-check__box,
+.gd .gd-radio input:checked + .gd-radio__box{ background: var(--gd-ink); box-shadow: none; }
+.gd .gd-check input:checked + .gd-check__box::after, .gd .gd-check input:indeterminate + .gd-check__box::after, .gd .gd-check input[aria-checked="mixed"] + .gd-check__box::after, .gd .gd-radio input:checked + .gd-radio__box::after{ opacity: 1; }
+.gd .gd-check input:indeterminate + .gd-check__box::after, .gd .gd-check input[aria-checked="mixed"] + .gd-check__box::after{ -webkit-mask-image: var(--gd-minus-mask); mask-image: var(--gd-minus-mask); }
+.gd .gd-check input:focus-visible + .gd-check__box, .gd .gd-radio input:focus-visible + .gd-radio__box{ outline: var(--gw-focus-ring); outline-offset: var(--gw-focus-offset); }
+.gd .gd-check__label{ padding-top: 0; }
+.gd .gd-check__help{ display: block; font: var(--gw-text-body-12-reg); color: var(--gd-text-muted); }
+.gd .gd-check:has(input:disabled), .gd .gd-radio:has(input:disabled){ color: var(--gd-disabled-ink); cursor: not-allowed; }
+.gd .gd-check input:disabled + .gd-check__box, .gd .gd-radio input:disabled + .gd-radio__box{ background: var(--gd-sunken-bg); box-shadow: inset 0 0 0 1px var(--gd-border); }
+.gd .gd-check input:disabled:checked + .gd-check__box, .gd .gd-radio input:disabled:checked + .gd-radio__box{ background: var(--gd-ink-disabled-bg); }
+.gd .gd-check input:disabled:checked + .gd-check__box::after, .gd .gd-radio input:disabled:checked + .gd-radio__box::after{ background: var(--gd-ink-disabled-fg); }
+
+/* --- toggle: On is ink, never blue ---------------------------------------- */
+.gd .gd-toggle{ --tg-w: 44px; --tg-h: 24px; --tg-k: 16px; --tg-pad: 4px; position: relative; display: inline-flex; align-items: center; gap: var(--gw-space-8); cursor: pointer; font: var(--gw-text-body-14-med); color: var(--gd-text); user-select: none; }
+.gd .gd-toggle--xs, .gd[data-density="compact"] .gd-toggle, .gd [data-density="compact"] .gd-toggle { --tg-w: 36px; --tg-h: 20px; --tg-k: 12px; }
+.gd .gd-toggle--xs{ font: var(--gw-text-body-12-med); }
+.gd .gd-toggle input{ position: absolute; width: 1px; height: 1px; opacity: 0; margin: 0; }
+.gd .gd-toggle__track{ position: relative; flex: none; width: var(--tg-w); height: var(--tg-h); border-radius: var(--gw-radius-full); background: var(--gd-track-off); transition: background var(--gw-motion-fast); }
+.gd .gd-toggle__track::after{
+  content: ""; position: absolute; left: var(--tg-pad); top: var(--tg-pad); width: var(--tg-k); height: var(--tg-k); border-radius: 50%;
+  background: var(--gd-knob); box-shadow: var(--gw-shadow-s2); transition: transform var(--gw-motion-fast), background var(--gw-motion-fast);
+}
+.gd .gd-toggle:hover input:not(:checked, :disabled) + .gd-toggle__track, .gd .gd-toggle.is-hover input:not(:checked) + .gd-toggle__track{ background: color-mix(in srgb, var(--gd-track-off), var(--gd-text) 14%); }
+.gd .gd-toggle input:checked + .gd-toggle__track{ background: var(--gd-ink); }
+.gd .gd-toggle:hover input:checked:not(:disabled) + .gd-toggle__track, .gd .gd-toggle.is-hover input:checked + .gd-toggle__track{ background: var(--gd-ink-hover); }
+.gd .gd-toggle input:checked + .gd-toggle__track::after{ transform: translateX(calc(var(--tg-w) - var(--tg-k) - 2 * var(--tg-pad))); background: var(--gd-ink-fg); box-shadow: none; }
+.gd .gd-toggle input:focus-visible + .gd-toggle__track{ outline: var(--gw-focus-ring); outline-offset: var(--gw-focus-offset); }
+.gd .gd-toggle:has(input:disabled){ color: var(--gd-disabled-ink); cursor: not-allowed; }
+.gd .gd-toggle input:disabled + .gd-toggle__track{ opacity: .5; }
+
+/* --- form field ------------------------------------------------------------ */
+.gd .gd-field{ display: flex; flex-direction: column; gap: var(--gw-space-8); min-width: 0; }
+.gd .gd-field__label{ display: inline-flex; align-items: center; gap: var(--gw-space-4); font: var(--gw-text-body-14-med); letter-spacing: var(--gw-text-body-14-med-tracking); color: var(--gd-text); }
+.gd .gd-field__req{ color: var(--gd-tone-bad-fg); }
+.gd .gd-field__opt{ font: var(--gw-text-body-12-reg); color: var(--gd-text-muted); }
+.gd .gd-field__help, .gd .gd-field__error{ margin: 0; font: var(--gw-text-body-12-reg); letter-spacing: var(--gw-text-body-12-reg-tracking); color: var(--gd-text-muted); }
+.gd .gd-field__error{ font: var(--gw-text-body-12-med); color: var(--gd-tone-bad-fg); display: flex; align-items: flex-start; gap: var(--gw-space-4); }
+.gd .gd-field__error svg{ width: 14px; height: 14px; flex: none; margin-top: 1px; }
+.gd .gd-field__error[hidden]{ display: none; }
+.gd .gd-field[data-state="warn"] .gd-field__error{ color: var(--gd-tone-warn-fg); }
+.gd .gd-field[data-state="error"] .gd-field__help{ display: none; }
+
+/* --- setting row + form section -------------------------------------------- */
+.gd .gd-setting{ display: flex; align-items: center; justify-content: space-between; gap: calc(var(--gd-gap) * 2); padding: var(--gd-gap) 0; }
+.gd .gd-setting + .gd-setting{ box-shadow: inset 0 1px 0 var(--gd-border); }
+.gd .gd-setting--top{ align-items: flex-start; }
+.gd .gd-setting__text{ flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.gd .gd-setting__label{ font: var(--gw-text-body-14-med); letter-spacing: var(--gw-text-body-14-med-tracking); color: var(--gd-text); }
+.gd .gd-setting__desc{ margin: 0; font: var(--gw-text-body-14-reg); letter-spacing: var(--gw-text-body-14-reg-tracking); color: var(--gd-text-muted); max-width: 60ch; }
+.gd[data-density="compact"] .gd-setting__desc, .gd [data-density="compact"] .gd-setting__desc { font: var(--gw-text-body-12-reg); }
+.gd .gd-setting__control{ flex: none; display: flex; align-items: center; gap: var(--gw-space-8); --gd-input-w: 240px; }
+@media (max-width: 640px) { .gd .gd-setting{ flex-direction: column; align-items: stretch; gap: var(--gw-space-12); } .gd .gd-setting__control{ --gd-input-w: 100%; } }
+
+.gd .gd-formsec{ display: flex; flex-direction: column; background: var(--gd-card-bg); border-radius: var(--gw-radius-16); box-shadow: inset 0 0 0 1px var(--gd-border); min-width: 0; }
+.gd .gd-formsec__head{ padding: var(--gd-card-pad) var(--gd-card-pad) 0; display: flex; align-items: flex-start; justify-content: space-between; gap: var(--gd-gap); }
+.gd .gd-formsec__title{ margin: 0; font: var(--gw-text-body-16-sem); letter-spacing: var(--gw-text-body-16-sem-tracking); color: var(--gd-text); }
+.gd .gd-formsec__desc{ margin: 2px 0 0; font: var(--gw-text-body-14-reg); color: var(--gd-text-muted); max-width: 64ch; }
+.gd .gd-formsec__body{ padding: 0 var(--gd-card-pad); display: flex; flex-direction: column; }
+.gd .gd-formsec__body > .gd-setting:first-child{ padding-top: var(--gd-card-pad); }
+.gd .gd-formsec__body > .gd-setting:last-child{ padding-bottom: var(--gd-card-pad); }
+.gd .gd-formsec__body--fields{ padding-block: var(--gd-card-pad); gap: var(--gd-gap); }
+.gd .gd-formsec__foot{ display: flex; align-items: center; justify-content: flex-end; gap: var(--gw-space-8); padding: var(--gw-space-12) var(--gd-card-pad); border-radius: 0 0 var(--gw-radius-16) var(--gw-radius-16); background: var(--gd-sunken-bg); box-shadow: inset 0 1px 0 var(--gd-border); }
+.gd .gd-formsec__foot-note{ margin-right: auto; font: var(--gw-text-body-12-reg); color: var(--gd-text-muted); }
+
+/* --- unsaved changes bar ---------------------------------------------------- */
+.gd .gd-savebar{
+  position: sticky; bottom: var(--gd-gap); z-index: 50; display: flex; align-items: center; justify-content: space-between; gap: var(--gd-gap);
+  width: min(640px, 100%); margin: var(--gd-gap) auto 0; padding: var(--gw-space-8) var(--gw-space-8) var(--gw-space-8) var(--gw-space-16);
+  border-radius: var(--gw-radius-16); background: var(--gd-raised-bg); box-shadow: inset 0 0 0 1px var(--gd-border-strong), var(--gw-shadow-s4);
+  animation: gd-savebar-in 160ms ease-out;
+}
+.gd .gd-savebar[hidden]{ display: none; }
+.gd .gd-savebar__msg{ display: flex; align-items: center; gap: var(--gw-space-8); font: var(--gw-text-body-14-med); color: var(--gd-text); }
+.gd .gd-savebar__msg::before{ content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--gd-warn); flex: none; }
+.gd .gd-savebar__acts{ display: flex; gap: var(--gw-space-8); flex: none; }
+@keyframes gd-savebar-in { from { opacity: 0; transform: translateY(8px); } }
+
+/* --- date range picker ------------------------------------------------------ */
+.gd .gd-drp{
+  --gd-day-h: calc(var(--gd-control-h) - 4px);
+  display: inline-flex; flex-direction: column; width: max-content; max-width: 100%; color: var(--gd-text);
+  background: var(--gd-raised-bg); border-radius: var(--gw-radius-16); box-shadow: inset 0 0 0 1px var(--gd-border-strong), var(--gw-shadow-s4);
+}
+.gd .gd-drp--pop{ position: absolute; z-index: 60; top: calc(100% + var(--gw-space-4)); left: 0; max-width: calc(100vw - 2 * var(--gw-space-8)); box-sizing: border-box; }   /* never wider than the screen, so it cannot run off the right edge */
+.gd .gd-drp--pop[hidden]{ display: none; }
+.gd .gd-drp__main{ display: flex; }
+.gd .gd-drp__presets{ flex: none; width: 176px; display: flex; flex-direction: column; gap: 2px; padding: var(--gw-space-12) var(--gw-space-8); box-shadow: inset -1px 0 0 var(--gd-border); }
+.gd .gd-drp__preset{
+  display: flex; align-items: center; height: var(--gd-control-h); padding: 0 var(--gw-space-12); border: 0; border-radius: var(--gw-radius-8); background: none; color: var(--gd-text);
+  font: var(--gw-text-body-14-med); text-align: left; white-space: nowrap; cursor: pointer;
+}
+.gd[data-density="compact"] .gd-drp__preset, .gd [data-density="compact"] .gd-drp__preset { font: var(--gw-text-body-12-med); }
+.gd .gd-drp__preset:hover, .gd .gd-drp__preset.is-hover{ background: var(--gd-menu-hover); }
+.gd .gd-drp__preset[aria-pressed="true"]{ background: var(--gd-track-hover); font-weight: 600; }
+.gd .gd-drp__cals{ display: flex; flex-direction: column; gap: var(--gw-space-12); padding: var(--gw-space-16); }
+.gd .gd-drp__fields{ display: flex; align-items: center; gap: var(--gw-space-8); font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
+.gd .gd-drp__fields .gd-input{ --gd-input-w: 132px; }
+.gd .gd-drp__months{ display: flex; gap: var(--gw-space-24); }
+.gd .gd-drp__month{ width: 252px; }
+.gd .gd-drp__mh{ display: flex; align-items: center; justify-content: space-between; height: var(--gd-control-h); }
+.gd .gd-drp__mt{ font: var(--gw-text-body-14-sem); color: var(--gd-text); }
+.gd .gd-drp__nav{ visibility: hidden; }
+.gd .gd-drp__nav.is-on{ visibility: visible; }
+.gd .gd-drp__grid{ display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.gd .gd-drp__dow{ height: 24px; display: grid; place-items: center; font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
+.gd .gd-drp__day{ position: relative; height: var(--gd-day-h); display: grid; place-items: center; }
+.gd .gd-drp__day::before{ content: ""; position: absolute; top: 2px; bottom: 2px; left: 0; right: 0; background: var(--gd-range-band); display: none; }
+.gd .gd-drp__day[data-range]::before{ display: block; }
+.gd .gd-drp__day[data-range="start"]::before{ left: 50%; }
+.gd .gd-drp__day[data-range="end"]::before{ right: 50%; }
+.gd .gd-drp__day[data-range="single"]::before{ display: none; }
+.gd .gd-drp__day button{
+  position: relative; width: calc(var(--gd-day-h) - 4px); height: calc(var(--gd-day-h) - 4px); padding: 0; border: 0; border-radius: var(--gw-radius-8); background: none; color: var(--gd-text);
+  font: var(--gw-text-body-12-med); font-feature-settings: "tnum" 1; cursor: pointer;
+}
+.gd .gd-drp__day button:hover, .gd .gd-drp__day button.is-hover{ background: var(--gd-menu-hover); }
+.gd .gd-drp__day[data-range="mid"] button:hover{ background: color-mix(in srgb, var(--gd-range-band), var(--gd-text) 12%); }
+.gd .gd-drp__day button[aria-current="date"]{ box-shadow: inset 0 0 0 1px var(--gd-border-strong); }
+/* selected ends: ink in light; in dark one step darker than ink (neutral-200, was neutral-100) so they stop glaring */
+.gd .gd-drp{ --gd-drp-sel: light-dark(var(--gd-ink), var(--gw-color-neutral-200)); --gd-drp-sel-hover: light-dark(var(--gd-ink-hover), var(--gw-color-neutral-100)); }
+.gd .gd-drp__day[data-range="start"] button, .gd .gd-drp__day[data-range="end"] button, .gd .gd-drp__day[data-range="single"] button{ background: var(--gd-drp-sel); color: var(--gd-ink-fg); box-shadow: none; }
+.gd .gd-drp__day[data-range="start"] button:hover, .gd .gd-drp__day[data-range="end"] button:hover, .gd .gd-drp__day[data-range="single"] button:hover{ background: var(--gd-drp-sel-hover); }
+.gd .gd-drp__day button:disabled{ color: var(--gd-disabled-ink); background: none; cursor: not-allowed; }
+.gd .gd-drp__foot{ display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-12); padding: var(--gw-space-12) var(--gw-space-16); box-shadow: inset 0 1px 0 var(--gd-border); }
+.gd .gd-drp__sum{ font: var(--gw-text-body-12-med); color: var(--gd-text-muted); font-feature-settings: "tnum" 1; }
+.gd .gd-drp__acts{ display: flex; gap: var(--gw-space-8); }
+@media (max-width: 760px) {
+  .gd .gd-drp{ width: 100%; } .gd .gd-drp__main{ flex-direction: column; }
+  .gd .gd-drp__presets{ width: auto; flex-direction: row; overflow-x: auto; box-shadow: inset 0 -1px 0 var(--gd-border); }
+  .gd .gd-drp__months{ gap: 0; } .gd .gd-drp__month{ width: 100%; } .gd .gd-drp__month + .gd-drp__month{ display: none; }
+  .gd .gd-drp__nav{ visibility: visible !important; }
+}
+
+/* --- time range bar --------------------------------------------------------- */
+.gd .gd-rangebar{ display: flex; align-items: center; flex-wrap: wrap; gap: var(--gw-space-8) var(--gd-gap); }
+.gd .gd-rangebar__grp{ display: flex; align-items: center; gap: var(--gw-space-8); position: relative; }
+.gd .gd-rangebar__grp--end{ margin-left: auto; }
+.gd .gd-rangebar__lbl{ font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
+.gd .gd-rangebar .gd-select{ width: auto; --gd-input-w: auto; }
+.gd .gd-rangebar .gd-seg{ overflow-x: auto; scrollbar-width: none; }
+
+/* --- datetime field ---------------------------------------------------------- */
+.gd .gd-datetime{ display: flex; flex-wrap: wrap; align-items: center; gap: var(--gw-space-8); }
+.gd .gd-datetime .gd-input:nth-child(1){ --gd-input-w: 168px; }
+.gd .gd-datetime .gd-input:nth-child(2){ --gd-input-w: 128px; }
+.gd .gd-datetime .gd-combo{ --gd-input-w: 248px; }
+.gd .gd-input__el[type="date"], .gd .gd-input__el[type="time"]{ font-feature-settings: "tnum" 1; }
+.gd .gd-input__el::-webkit-calendar-picker-indicator{ opacity: .6; cursor: pointer; }
+.gd .gd-input__el::-webkit-calendar-picker-indicator:hover{ opacity: 1; }
+
+/* --- query builder ----------------------------------------------------------- */
+.gd .gd-qb{ display: flex; flex-direction: column; background: var(--gd-card-bg); border-radius: var(--gw-radius-16); box-shadow: inset 0 0 0 1px var(--gd-border); min-width: 0; }
+.gd .gd-qb__sec{ display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: var(--gw-space-12); align-items: start; padding: var(--gw-space-12) var(--gd-card-pad); }
+.gd .gd-qb__sec + .gd-qb__sec{ box-shadow: inset 0 1px 0 var(--gd-border); }
+.gd .gd-qb__label{ padding-top: calc((min(28px, var(--gd-control-h)) - 16px) / 2); font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
+.gd .gd-qb__body{ position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: var(--gw-space-8); min-width: 0; }
+.gd .gd-qb__chip{
+  display: inline-flex; align-items: center; height: min(28px, var(--gd-control-h)); border-radius: var(--gw-radius-8); max-width: 100%;
+  background: var(--gd-sunken-bg); box-shadow: inset 0 0 0 1px var(--gd-border-strong); font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); color: var(--gd-text);
+}
+.gd .gd-qb__val{ display: inline-flex; align-items: center; gap: var(--gw-space-4); height: 100%; padding: 0 var(--gw-space-4) 0 var(--gw-space-12); border: 0; border-radius: var(--gw-radius-8) 0 0 var(--gw-radius-8); background: none; color: inherit; font: inherit; letter-spacing: inherit; cursor: pointer; min-width: 0; }
+.gd .gd-qb__val > span{ overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gd .gd-qb__val svg{ width: 12px; height: 12px; flex: none; color: var(--gd-text-muted); }
+.gd .gd-qb__x{ width: 24px; height: 100%; display: grid; place-items: center; padding: 0; border: 0; border-radius: 0 var(--gw-radius-8) var(--gw-radius-8) 0; background: none; color: var(--gd-text-muted); cursor: pointer; }
+.gd .gd-qb__x svg{ width: 10px; height: 10px; }
+.gd .gd-qb__val:hover, .gd .gd-qb__val.is-hover, .gd .gd-qb__x:hover, .gd .gd-qb__x.is-hover{ background: var(--gd-ctl-hover); color: var(--gd-text); }
+.gd .gd-qb__val:not(:has(+ .gd-qb__x)){ border-radius: var(--gw-radius-8); padding-right: var(--gw-space-8); }
+.gd .gd-qb__foot{ display: flex; align-items: center; gap: var(--gw-space-8); padding: var(--gw-space-12) var(--gd-card-pad); border-radius: 0 0 var(--gw-radius-16) var(--gw-radius-16); background: var(--gd-sunken-bg); box-shadow: inset 0 1px 0 var(--gd-border); }
+.gd .gd-qb__foot .gd-qb__run{ margin-left: auto; }
+@media (max-width: 640px) { .gd .gd-qb__sec{ grid-template-columns: minmax(0, 1fr); gap: var(--gw-space-8); } }

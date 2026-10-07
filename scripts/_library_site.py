@@ -29,7 +29,9 @@ Usage:  python3 scripts/_library_site.py     # writes preview/library/**
 import importlib.util
 import json
 import os
+import re
 import shutil
+import subprocess
 import sys
 from datetime import date
 
@@ -91,7 +93,12 @@ def href(from_page, to_path):
 
 CSS = """
 *{box-sizing:border-box}
-body{margin:0;background:var(--s-page-bg);font-family:var(--gw-font-body);
+/* Body/body-16-reg, the site-wide page default ruled 29 Sep 2026 (796:12917).
+   This sheet named the family but no size, so it fell to the browser's 16px at
+   `normal` leading — the right size by accident, the wrong line-height. */
+body{margin:0;background:var(--s-page-bg);
+     font:var(--gw-text-body-16-reg);
+     letter-spacing:var(--gw-text-body-16-reg-tracking);
      color:var(--s-body);-webkit-font-smoothing:antialiased}
 a{color:inherit}
 h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
@@ -103,11 +110,12 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
 .lb-brand{display:flex;align-items:center;gap:var(--gw-space-12);text-decoration:none;
           flex:none}
 .lb-brand__chip{width:32px;height:32px;border-radius:var(--gw-radius-8);
-                background:var(--gw-color-black);color:var(--gw-color-white);
+                background:var(--gw-color-primary-500);color:var(--gw-color-white);
+                box-shadow:inset 0 0 0 1px var(--gw-color-primary-600);
                 display:grid;place-items:center;flex:none}
 .lb-brand__chip svg{width:16px;height:16px;display:block}
 .lb-brand__n{font:var(--gw-text-h7);color:var(--s-heading)}
-.lb-crumb{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-400);
+.lb-crumb{font:var(--gw-text-body-14-reg);color:var(--s-group-label);
           white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lb-crumb a{color:var(--gw-color-primary-600);text-decoration:none}
 .lb-top__r{display:flex;align-items:center;gap:var(--gw-space-12);margin-left:auto}
@@ -115,7 +123,7 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
          border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
          padding:0 var(--gw-space-12);font:var(--gw-text-body-14-reg);color:var(--s-heading)}
 .lb-find::placeholder{color:var(--s-placeholder)}
-.lb-find:focus{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.lb-find:focus{outline:none;border-color:var(--gw-color-neutral-400)}
 .lb-tbtn{width:36px;height:36px;display:grid;place-items:center;background:transparent;
          border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
          color:var(--s-body);cursor:pointer;flex:none}
@@ -129,7 +137,7 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
 .lb-rail{position:sticky;top:60px;max-height:calc(100vh - 60px);overflow-y:auto;
          border-right:1px solid var(--s-chrome-border);padding:var(--gw-space-24) 0}
 .lb-rail__t{font:var(--gw-text-body-12-med);text-transform:uppercase;letter-spacing:.06em;
-            color:var(--gw-color-neutral-400);padding:0 var(--gw-space-20) var(--gw-space-8)}
+            color:var(--s-group-label);padding:0 var(--gw-space-20) var(--gw-space-8)}
 .lb-rail a{display:flex;justify-content:space-between;gap:var(--gw-space-8);
            font:var(--gw-text-body-14-reg);color:var(--s-body);text-decoration:none;
            padding:6px var(--gw-space-20)}
@@ -154,16 +162,45 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
 .lb-toc a.l3{padding-left:var(--gw-space-12)}
 @media (max-width:1180px){.lb-3{grid-template-columns:220px minmax(0,1fr)}
                           .lb-toc{display:none}}
-@media (max-width:820px){.lb-3{grid-template-columns:1fr}
+@media (max-width:820px){.lb-3{grid-template-columns:minmax(0,1fr)}
+                         /* `.lb-mid{grid-column:2}` above made the grid two columns even here, so the rail
+                            was squeezed to 0 wide and there was no way to move between sections. Both
+                            go back to column 1, and the rail becomes one scrolling row of chips instead
+                            of a 400px list in front of the content. */
+                         .lb-mid,.lb-rail{grid-column:1}
                          .lb-rail{position:static;max-height:none;border-right:0;
-                                  border-bottom:1px solid var(--s-chrome-border)}
+                                  border-bottom:1px solid var(--s-chrome-border);
+                                  display:flex;flex-direction:row;align-items:center;gap:var(--gw-space-8);
+                                  overflow-x:auto;padding:var(--gw-space-12) var(--gw-space-20);
+                                  scrollbar-width:none}
+                         .lb-rail::-webkit-scrollbar{display:none}
+                         .lb-rail__t,.lb-rail__sep{display:none}
+                         .lb-rail a{flex:none;white-space:nowrap;gap:var(--gw-space-4);
+                                    padding:6px var(--gw-space-12);border-radius:var(--gw-radius-full);
+                                    border:1px solid var(--s-chrome-border)}
                          .lb-mid{padding:var(--gw-space-24) var(--gw-space-20)}}
+@media (max-width:640px){.lb-crumb{display:none}}
 
 /* ---- page head ----------------------------------------------------------- */
 .lb-h{display:flex;flex-direction:column;gap:var(--gw-space-8)}
 .lb-h h1{font:var(--gw-text-h4);margin:0}
 .lb-h .lede{font:var(--gw-text-body-16-reg);color:var(--s-body);margin:0;max-width:74ch}
 .lb-row{display:flex;flex-wrap:wrap;gap:var(--gw-space-8);align-items:center}
+.lb-rowfind{width:100%;max-width:360px;height:36px;padding:0 12px;margin:0 0 20px;border:0;border-radius:12px;background:var(--s-field-bg);
+  box-shadow:inset 0 0 0 1px var(--s-field-border);color:var(--s-heading);font:var(--gw-text-body-14-reg)}
+.lb-rowfind::placeholder{color:var(--s-placeholder)}
+.cat-name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px;color:var(--s-heading);font-weight:600}
+a.cat-name{color:var(--gw-color-primary-600);text-decoration:none}
+:root[data-theme="dark"] a.cat-name{color:var(--gw-color-primary-400)}
+.cat-note{display:block;margin-top:2px;font:var(--gw-text-body-12-reg);color:var(--s-body)}
+@media (max-width:760px){.lb-mid td a,.lb-mid th a{display:inline-flex;align-items:center;min-height:24px}}
+.cat-link{font:var(--gw-text-body-14-med);color:var(--gw-color-primary-600);text-decoration:none}
+:root[data-theme="dark"] .cat-link{color:var(--gw-color-primary-400)}
+.cat-link:hover{text-decoration:underline}
+.sec>.lb-meta{margin:4px 0 14px}
+.cat-dim{color:var(--s-body)}
+.chip--annotated{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+:root[data-theme="dark"] .chip--annotated{background:var(--gw-color-neutral-800);color:var(--gw-color-neutral-300)}
 .lb-meta{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
          color:var(--gw-color-neutral-400)}
 
@@ -171,7 +208,7 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
       border-radius:var(--gw-radius-full);padding:3px var(--gw-space-8);white-space:nowrap}
 .chip--measured{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
 .chip--transcribed{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
-.chip--ruled{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+.chip--ruled,.chip--extracted{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
 .chip--structure{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
 .chip--built-here{background:var(--gw-color-orange-50);color:var(--gw-color-orange-700)}
 .chip--passed{background:var(--gw-color-green-500);color:var(--gw-color-white)}
@@ -183,6 +220,7 @@ h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
 :root[data-theme="dark"] .chip--transcribed,
 :root[data-theme="dark"] .chip--structure{background:var(--gw-color-yellow-900);color:var(--gw-color-yellow-100)}
 :root[data-theme="dark"] .chip--ruled,
+:root[data-theme="dark"] .chip--extracted,
 :root[data-theme="dark"] .chip--web{background:var(--gw-color-primary-900);color:var(--gw-color-primary-200)}
 :root[data-theme="dark"] .chip--pending{background:var(--gw-color-neutral-800);color:var(--gw-color-neutral-300)}
 :root[data-theme="dark"] .chip--built-here{background:var(--gw-color-orange-900);color:var(--gw-color-orange-100)}
@@ -288,24 +326,22 @@ INDEX_CSS = """
 
 JS = """
 (function(){
-  /* Theme: the same two localStorage keys the main site uses, so a choice made there
-     carries here and back. 'system' can still arrive from an older stored value and
-     resolves to light, matching shell.js. */
-  var PREF='gw-theme-pref', RES='gw-theme';
-  function pref(){try{var v=localStorage.getItem(PREF);
-    if(v==='light'||v==='dark')return v;
-    if(v==='system')return 'light';
-    var o=localStorage.getItem(RES);
-    return (o==='dark'||o==='light')?o:'light';}catch(e){return 'light'}}
-  function apply(p){var r=p==='dark'?'dark':'light';
+  /* Theme: the same keys as the main site. `gw-theme-choice` is what the person picked (light, dark or system) and is
+     written only when they pick; no choice means System, which follows the machine. `gw-theme` is the resolved
+     light or dark. This button toggles light and dark, so using it is a choice. */
+  var CH='gw-theme-choice', RES='gw-theme';
+  function pref(){try{var v=localStorage.getItem(CH);return (v==='light'||v==='dark'||v==='system')?v:'system'}catch(e){return 'system'}}
+  function res(p){return p==='dark'?'dark':p==='light'?'light':(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}
+  function apply(p,remember){var r=res(p);
     document.documentElement.setAttribute('data-theme',r);
-    try{localStorage.setItem(PREF,p);localStorage.setItem(RES,r)}catch(e){}
+    try{localStorage.setItem(RES,r);if(remember)localStorage.setItem(CH,p)}catch(e){}
     var b=document.getElementById('lb-theme');
     if(b)b.setAttribute('aria-label',r==='dark'?'Switch to light':'Switch to dark');}
   var btn=document.getElementById('lb-theme');
   if(btn)btn.addEventListener('click',function(){
-    apply(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
-  apply(pref());
+    apply(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark',true)});
+  apply(pref(),false);
+  try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){if(pref()==='system')apply('system',false)})}catch(e){}
 
   /* Rail filter. Narrows the inventory in place — it does not navigate, because the
      rail is a list of siblings and losing your place to search them is worse than
@@ -317,6 +353,17 @@ JS = """
       var t=f.value.trim().toLowerCase();
       rows.forEach(function(a){
         a.hidden=!!t&&a.getAttribute('data-q').indexOf(t)===-1});
+    });
+  }
+
+  /* Component list filter: hides rows that do not match, and a surface whose rows all went. */
+  var rf=document.getElementById('lb-rows');
+  if(rf){
+    var trs=[].slice.call(document.querySelectorAll('tr[data-q]')), secs=[].slice.call(document.querySelectorAll('section[data-cat]'));
+    rf.addEventListener('input',function(){
+      var t=rf.value.trim().toLowerCase();
+      trs.forEach(function(r){r.hidden=!!t&&r.getAttribute('data-q').indexOf(t)===-1});
+      secs.forEach(function(sc){sc.hidden=!sc.querySelector('tr[data-q]:not([hidden])')});
     });
   }
 
@@ -364,15 +411,20 @@ MARK = ('<svg viewBox="0 0 80 80" fill="none" aria-hidden="true">'
         '75.9066 75.9066 80 70.8571 80H32.5161Z" fill="currentColor"/></svg>')
 
 
+# What the pages know, kept as plain data for /library/data.json, which the Design System page reads so it can
+# list the library itself instead of framing these pages. Reset at the start of main().
+META = {"foundations": [], "surfaces": [], "catalogue": []}
+
+
 def chrome(page, extra_css=""):
     d = page.depth
     tokens = up(d) + "foundation/tokens.css"
     # shell.css is loaded for its --s-* surface layer only; its chrome rules are gated.
     shell = up(d) + "shell.css"
-    home = up(d) + "library/index.html"
+    home = "/internal/design-system#library"
     crumb = f'<span class="lb-crumb">{page.crumb}</span>' if page.crumb else ""
     find = ('<input class="lb-find" id="lb-find" type="search" '
-            'placeholder="Filter this library">' if page.rail else "")
+            'placeholder="Filter this library" aria-label="Filter this library">' if page.rail else "")
     rail = ""
     if page.rail:
         rows = []
@@ -382,8 +434,9 @@ def chrome(page, extra_css=""):
                 continue
             q = f"{label} {note}".lower()
             n = f"<span>{esc(note)}</span>" if note else ""
+            on_attr = ' class="on"' if on else ""
             rows.append(f'<a href="{esc(link)}" data-q="{esc(q)}"'
-                        f'{" class=\"on\"" if on else ""}>{esc(label)}{n}</a>')
+                        f'{on_attr}>{esc(label)}{n}</a>')
         rail = (f'<nav class="lb-rail"><div class="lb-rail__t">'
                 f'{esc(page.rail_title)}</div>{"".join(rows)}</nav>')
     toc = ""
@@ -394,10 +447,11 @@ def chrome(page, extra_css=""):
 
     head = ""
     if page.title:
+        lede = f'<p class="lede">{esc(page.lede)}</p>' if page.lede else ""
+        chips = f'<div class="lb-row">{page.chips}</div>' if page.chips else ""
+        meta = f'<div class="lb-meta">{page.meta}</div>' if page.meta else ""
         head = (f'<div class="lb-h"><h1>{esc(page.title)}</h1>'
-                f'{f"<p class=\"lede\">{esc(page.lede)}</p>" if page.lede else ""}'
-                f'{f"<div class=\"lb-row\">{page.chips}</div>" if page.chips else ""}'
-                f'{f"<div class=\"lb-meta\">{page.meta}</div>" if page.meta else ""}</div>')
+                f'{lede}{chips}{meta}</div>')
 
     if page.wide:
         body = f'<div class="lb-wrap">{page.body}</div>'
@@ -409,10 +463,9 @@ def chrome(page, extra_css=""):
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{esc(page.title or "Component Library")} — Gushwork</title>
+<meta name="description" content="{esc(page.lede or (page.title or "Component Library") + " in the Gushwork component library")}">
 <meta name="robots" content="noindex">
-<script>try{{var t=localStorage.getItem('gw-theme');if(t!=='dark')t='light';
-document.documentElement.setAttribute('data-theme',t)}}catch(e){{
-document.documentElement.setAttribute('data-theme','light')}}</script>
+<script>try{{var c=localStorage.getItem('gw-theme-choice'),t=c==='dark'||c==='light'?c:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}}catch(e){{document.documentElement.setAttribute('data-theme','light')}}</script>
 <link rel="icon" type="image/svg+xml" href="{CL.favicon()}">
 <link rel="stylesheet" href="{esc(tokens)}">
 <link rel="stylesheet" href="{esc(shell)}">
@@ -426,7 +479,7 @@ document.documentElement.setAttribute('data-theme','light')}}</script>
   {crumb}
   <div class="lb-top__r">{find}
     <button class="lb-tbtn" id="lb-theme" type="button" aria-label="Switch theme">
-      {ic('sun-dim')}</button></div>
+      {ic('sun')}</button></div>
 </header>
 {body}
 <script>{JS}</script>
@@ -445,10 +498,12 @@ PARTS = [
      "The folds that kept getting used across ad landers over the last four to five "
      "months, drawn up in GW-Ads-Library. Harvested from what shipped, not proposed."),
     ("dashboard", "Dashboard", "desktop",
-     "Logged-in product screens. A separate Button and Avatar set from web, by design."),
+     "Logged-in analytics dashboards and web apps, from the design hub. A separate Button and Avatar set from web, by design."),
     ("slides", "Slides", "stack-overflow-logo", "Sales and discovery decks, 1920×1080."),
     ("lead-magnet", "Lead magnet", "download-simple",
      "The downloadable PDF behind an ad lander."),
+    ("tools", "Tools", "wrench",
+     "The shell the hub's small internal tools share. Only what the library did not already have."),
     ("shared", "Shared", "check-circle",
      "Held once and merged into every surface, so a change is reported once."),
     ("ads", "Ad creatives", "toolbox",
@@ -464,7 +519,7 @@ RECIPES = [
     ("case-study", "Case study", "web", "measured page template",
      "One customer story. A measured template — copy it and fill it in."),
     ("dashboard-screen", "Dashboard screen", "dashboard", "—",
-     "A logged-in product surface — KPI rows, tables, side nav, filters."),
+     "A logged-in analytics screen or web-app page — overview, explorer, list with filters, settings, detail."),
     ("lead-magnet-doc", "Lead magnet", "lead-magnet", "print output",
      "The gated PDF itself — cover, interior, closer."),
     ("sales-deck", "Sales deck", "slides", "1920×1080", "A deck an AE drives on a call."),
@@ -644,6 +699,9 @@ PROV_RULE = dict(CL.PROV_RULE)
 PROV_RULE["built-here"] = ("Created here, not measured from Figma. The shipped page is "
                            "its source of truth. Has to be measured and passed before it "
                            "can enter skills/.")
+PROV_RULE["extracted"] = ("Extracted from the design hub's shipped code and generalised, not "
+                          "measured off Figma. The hub is its source of truth. Elements marked "
+                          "NEW in the doc are not in the hub at all.")
 PROV_RULE["structure"] = ("Node ids, the breakpoint split and every width and height are "
                           "node-traceable. No fill, radius or type style has been read "
                           "off these nodes yet.")
@@ -656,7 +714,7 @@ def chip(cls, label, title=""):
 
 def review_chip(rev):
     st = rev["state"]
-    label = {"passed": "passed", "rejected": "rejected"}.get(st, "not reviewed")
+    label = {"passed": "passed", "rejected": "archived"}.get(st, "not reviewed")
     who = f'{rev["on"]} {rev["by"]}'.strip()
     return chip(st, label, who or "Has not been through a review pass")
 
@@ -699,8 +757,11 @@ def build_foundations(groups, faces, reg, counts):
             n, unit = len(CL.parse_faces(faces)), "faces"
         prov = CL.provenance(g, g.subs[0] if g.subs else CL.Sub("", ""))
         rev = CL.review_of(fblock, key)
+        META["foundations"].append({"key": key, "title": CL.display_title(g), "count": n, "unit": unit,
+                                    "review": rev["state"], "href": f"foundations/{key}.html"})
         counts["rev_" + rev["state"]] = counts.get("rev_" + rev["state"], 0) + 1
-        if rev["state"] != "passed":
+        # A rejected group is archived, not waiting. Its tokens stay in use: foundations are not hidden from skills.
+        if rev["state"] not in ("passed", "rejected"):
             queue.append(("foundation", key, CL.display_title(g),
                           f"foundations/{key}", n, unit))
 
@@ -751,14 +812,23 @@ def build_parts(reg, counts, ad, adv, tok):
         comps = block.get("components") or {}
         rblock = block.get("review") or {}
         names = sorted(comps)
+        # Archived (R54 addendum, 5 Oct 2026): a rejected component keeps its files and its page, but the library
+        # stops listing it. It lives under Archived on the Review tab; passing or reworking it there brings it back.
+        archived = [n for n in names if CL.review_of(rblock, n)["state"] == "rejected"]
+        listed = [n for n in names if n not in archived]
 
-        rail = [("Overview", "index.html", False, str(len(names)) if names else "")]
+        rail = [("Overview", "index.html", False, str(len(listed)) if listed else "")]
         rail.append((None, "", False, ""))
-        rail += [(n, f"{n}.html", False, "") for n in names]
+        rail += [(n, f"{n}.html", False, "") for n in listed]
+
+        META["surfaces"].append({"key": skey, "title": stitle, "what": what, "components": [
+            {"name": n, "version": comps[n].get("version", ""), "changed": comps[n].get("changed", ""),
+             "breaking": bool(comps[n].get("breaking")), "doc": comps[n].get("doc", ""),
+             "review": CL.review_of(rblock, n)["state"], "href": f"parts/{skey}/{n}.html"} for n in names]})
 
         # --- surface overview -------------------------------------------------
         rows = []
-        for n in names:
+        for n in listed:
             e = comps[n]
             rev = CL.review_of(rblock, n)
             counts["components"] += 1
@@ -781,6 +851,10 @@ def build_parts(reg, counts, ad, adv, tok):
                      "<th>Component</th><th>Version</th><th>Spec last moved</th>"
                      "<th>Doc</th><th>Review</th></tr></thead><tbody>"
                      + "".join(rows) + "</tbody></table></div>")
+            if archived:
+                table += (f'<p class="md-p">{len(archived)} archived (rejected, not part of the system): '
+                          + ", ".join(f"<code>{esc(n)}</code>" for n in archived)
+                          + ". They are under Archived on the Review tab.</p>")
         else:
             table = ('<div class="empty">Nothing measured yet. This shelf is here rather '
                      "than absent so the gap is visible — an absent surface reads as one "
@@ -790,8 +864,8 @@ def build_parts(reg, counts, ad, adv, tok):
             title=stitle, lede=what,
             crumb='<a href="../../index.html">Library</a> / Parts',
             rail=[(l, h, h == "index.html", n) for l, h, _, n in rail],
-            rail_title=f"{stitle} · {len(names)}",
-            chips=f'<span class="pill">{len(names)} components</span>',
+            rail_title=f"{stitle} · {len(listed)}",
+            chips=f'<span class="pill">{len(listed)} components</span>',
             body=f'<section class="sec" id="inventory"><h2>What this library holds</h2>'
                  f"{table}</section>",
             toc=[(2, "What this library holds", "inventory")]))
@@ -826,7 +900,9 @@ def build_parts(reg, counts, ad, adv, tok):
                     body = ('<div class="empty">No spec doc for this component yet. '
                             "The registry knows it exists; nothing has been written "
                             "down.</div>")
-                prov = "measured"
+                # The dashboard set is extracted from the design hub's shipped code, not read
+                # off Figma, so calling it "measured" would claim a measurement nobody made.
+                prov = "extracted" if skey == "dashboard" else "measured"
 
             pages.append(Page(
                 path=f"parts/{skey}/{n}",
@@ -1060,7 +1136,7 @@ def ad_recipe(ad, reg):
             f'<div style="display:flex;flex-direction:column;gap:2px">'
             f'{"".join(rows)}</div></section>'
             f'<section class="sec" id="source"><h2>Source</h2>'
-            f'<div class="md"><table class="md-tbl"><tbody>'
+            f'<div class="md"><div class="md-tblwrap"><table class="md-tbl"><tbody>'
             f'<tr><td>Figma</td><td><code>{esc(src["fileName"])}</code> · '
             f'<code>{esc(src["fileKey"])}</code></td></tr>'
             f'<tr><td>Section</td><td><code>{esc(src["sectionName"])}</code> · '
@@ -1068,7 +1144,7 @@ def ad_recipe(ad, reg):
             f'<tr><td>Reference page</td><td><code>{esc(ref["page"])}</code></td></tr>'
             f'<tr><td>Measured</td><td>{esc(src["measured"])} · '
             f'{esc(src["method"])}</td></tr>'
-            f'</tbody></table></div></section>'
+            f'</tbody></table></div></div></section>'
             f'<section class="sec" id="findings"><h2>Findings</h2>'
             f'<div class="note note--find"><ul style="margin:0;padding-left:20px;'
             f'display:flex;flex-direction:column;gap:8px">{"".join(finds)}</ul></div>'
@@ -1100,6 +1176,8 @@ def build_index(reg, counts, groups_n, ad, gaps):
                     [f"{s} parts", pins if pins != "—" else "no pin"])
                for k, t, s, pins, _ in RECIPES]
 
+    c_card = card("components.html", "list", "All components",
+                  ["Every component, one list", "variants and verification"], big=True)
     stats = [("tokens", counts["tokens"]),
              ("components", counts["components"]),
              ("libraries", len(PARTS) + 1),
@@ -1113,9 +1191,9 @@ def build_index(reg, counts, groups_n, ad, gaps):
             f'<p>Last updated {date.today().strftime("%-d %b %Y")} · generated from '
             f'tokens.css, the registries and the measured Figma</p></div>'
             f'<div class="lb-ban__s">{stat_html}</div></div>'
-            f'<div class="lb-tier"><div class="lb-tier__h"><h2>Foundations</h2>'
-            f'<span>Shared by everything below</span></div>'
-            f'<div class="lb-grid">{f_card}</div></div>'
+            f'<div class="lb-tier"><div class="lb-tier__h"><h2>Start here</h2>'
+            f'<span>The tokens, and every component in one list</span></div>'
+            f'<div class="lb-grid">{f_card}{c_card}</div></div>'
             f'<div class="lb-tier"><div class="lb-tier__h"><h2>Parts</h2>'
             f'<span>Components, by the surface they render on</span></div>'
             f'<div class="lb-grid">{"".join(p_cards)}</div></div>'
@@ -1125,15 +1203,108 @@ def build_index(reg, counts, groups_n, ad, gaps):
     return Page(path="index", title="", body=body, wide=True)
 
 
+CAT_SURFACES = [("foundation", "Foundation"), ("web", "Web"), ("ad-page", "Ad page"),
+                ("dashboard", "Dashboard"), ("slides", "Slides"),
+                ("lead-magnet", "Lead magnet"), ("tools", "Tools"), ("shared", "Shared")]
+GROUP_LABEL = {"components": "Components", "folds": "Folds", "shell and elements": "Shell and elements", "foundation": ""}
+FID_LABEL = {"measured": ("measured", "Measured", "Read off the rendered component in Figma."),
+             "inventory": ("transcribed", "Inventory", "Variant matrix and rules only; not read off the render."),
+             "annotated": ("annotated", "Annotated", "From Figma annotations, not verified against the render.")}
+
+
+def build_components(reg, counts):
+    """Every component in one list: the Catalogue's rows (variants, how far each is verified)
+    joined to the registries' spec pages. A row with no `registry` match is in Figma and has no
+    spec page yet, and says so rather than being left out."""
+    cat = json.load(open(os.path.join(ROOT, "exports", "catalogue.json"), encoding="utf-8"))["entries"]
+    seen = {e["registry"] for e in cat if e.get("registry")}
+    rows = {s: [] for s, _ in CAT_SURFACES}
+    for e in cat:
+        rows[e["surface"]].append(dict(e))
+    archived = {f"{skey}/{key}" for skey, block in reg.items()
+                for key, r in ((block or {}).get("review") or {}).items() if (r or {}).get("reviewed") == "rejected"}
+    for skey in rows:
+        rows[skey] = [e for e in rows[skey] if e.get("registry") not in archived]
+    for skey, block in reg.items():
+        for key in sorted((block or {}).get("components") or {}):
+            if f"{skey}/{key}" not in seen and skey in rows and f"{skey}/{key}" not in archived:
+                rows[skey].append({"surface": skey, "group": "", "name": key, "note": "",
+                                   "node": (block["components"][key] or {}).get("node"),
+                                   "variants": None, "fidelity": None, "registry": f"{skey}/{key}"})
+    total = sum(len(v) for v in rows.values())
+    spec = sum(1 for v in rows.values() for e in v if e.get("registry") or e.get("page"))
+    fid = {k: sum(1 for v in rows.values() for e in v if e.get("fidelity") == k)
+           for k in ("measured", "inventory", "annotated")}
+    variants = sum(e["variants"] or 0 for v in rows.values() for e in v)
+    for skey, title in CAT_SURFACES:
+        for e in rows[skey]:
+            META["catalogue"].append({
+                "surface": skey, "title": title, "group": GROUP_LABEL.get(e.get("group") or "", e.get("group") or ""),
+                "name": e["name"], "note": e.get("note") or "", "node": e.get("node"), "variants": e.get("variants"),
+                "fidelity": e.get("fidelity"),
+                "href": e.get("page") or (f'parts/{e["registry"]}.html' if e.get("registry") else "")})
+
+    sections, rail, toc = [], [("All components", "components.html", True, str(total)), (None, "", False, "")], []
+    for skey, title in CAT_SURFACES:
+        items = rows[skey]
+        if not items:
+            continue
+        trs = []
+        for e in items:
+            name = esc(e["name"])
+            link = e.get("page") or (f'parts/{e["registry"]}.html' if e.get("registry") else "")
+            if link:
+                nm = f'<a class="cat-name" href="{esc(link)}">{name}</a>'
+                page = f'<a class="cat-link" href="{esc(link)}">{"Foundations" if e.get("page") else "Spec page"}</a>'
+            else:
+                nm = f'<span class="cat-name">{name}</span>'
+                page = chip("gap", "no spec page yet", "In Figma, but nothing in the library describes it yet.")
+            note = f'<span class="cat-note">{esc(e["note"])}</span>' if e.get("note") else ""
+            if e.get("fidelity"):
+                c, lab, tip = FID_LABEL[e["fidelity"]]
+                fchip = chip(c, lab, tip)
+            else:
+                fchip = '<span class="cat-dim">—</span>'
+            var = f'{e["variants"]:,}' if e.get("variants") else '<span class="cat-dim">—</span>'
+            node = f'<code>{esc(e["node"])}</code>' if e.get("node") else '<span class="cat-dim">—</span>'
+            q = f'{e["name"]} {e.get("note","")} {e.get("node") or ""} {e.get("group","")} {title}'.lower()
+            trs.append(f'<tr data-q="{esc(q)}"><td>{nm}{note}</td>'
+                       f'<td class="cat-dim">{esc(GROUP_LABEL.get(e.get("group") or "", e.get("group") or ""))}</td><td>{node}</td>'
+                       f'<td>{var}</td><td>{fchip}</td><td>{page}</td></tr>')
+        n_missing = sum(1 for e in items if not (e.get("registry") or e.get("page")))
+        sub = f'{len(items)} components' + (f' · {n_missing} without a spec page' if n_missing else "")
+        sections.append(
+            f'<section class="sec" id="{skey}" data-cat="{skey}"><h2>{esc(title)}</h2>'
+            f'<p class="lb-meta">{esc(sub)}</p>'
+            f'<div class="md-tblwrap"><table class="md-tbl"><thead><tr><th>Component</th><th>Group</th>'
+            f'<th>Node</th><th>Variants</th><th>Verified</th><th>Library</th></tr></thead><tbody>'
+            + "".join(trs) + "</tbody></table></div></section>")
+        rail.append((title, f"components.html#{skey}", False, str(len(items))))
+        toc.append((2, title, skey))
+
+    chips = (chip("pending", f"{total} components") + chip("pending", f"{variants:,} variants")
+             + chip("passed", f"{spec} with a spec page") + chip("gap", f"{total - spec} without")
+             + chip("measured", f"{fid['measured']} measured") + chip("transcribed", f"{fid['inventory']} inventory only")
+             + chip("annotated", f"{fid['annotated']} annotated only"))
+    body = ('<input class="lb-rowfind" id="lb-rows" type="search" placeholder="Filter components" aria-label="Filter components">'
+            + "".join(sections))
+    return Page(path="components", title="All components",
+                lede="Every component in the design system, how many variants it has, how far it has "
+                     "been checked against Figma, and whether the library has a spec page for it.",
+                crumb='<a href="index.html">Library</a> / Components',
+                rail=rail, rail_title=f"Components · {total}", chips=chips, body=body, toc=toc)
+
+
 def build_review(queue, reg, gaps):
     rows = []
     for scope, key, label, path, n, unit in queue:
         cnt = f"{n} {unit}" if n else ""
+        cnt_html = f'<br><span class="lb-meta">{esc(cnt)}</span>' if cnt else ""
         rows.append(
             f'<tr><td><a href="{esc(path)}.html" '
             f'style="color:var(--gw-color-primary-600);text-decoration:none">'
             f'<b>{esc(label)}</b></a>'
-            f'{f"<br><span class=\"lb-meta\">{esc(cnt)}</span>" if cnt else ""}</td>'
+            f'{cnt_html}</td>'
             f'<td>{esc(scope)}</td>'
             f'<td><code>bash scripts/review-pass.sh {esc(scope)} {esc(key)}</code></td>'
             f'</tr>')
@@ -1156,7 +1327,252 @@ def build_review(queue, reg, gaps):
                 toc=[(2, "Waiting", "waiting"), (2, "Known gaps", "gaps")])
 
 
+# A foundation group has a drawn view in the Design System page when its tokens are the kind that can be
+# drawn: swatches, a type scale, spacing bars, shapes, shadows, widths. The rest are named, not drawn yet.
+FOUNDATION_VIEW = {"color": "color", "typefaces": "faces", "type": "scale", "type-links": "links", "spacing": "spacing",
+                   "radius": "radius", "elevation": "elevation", "breakpoint": "bps", "content-width": "content",
+                   "ruled": "motion", "slides": "slides"}
+
+
+def review_state(state, rec, fp, pfp="", fixed=False):
+    """The state the Review tab shows. A pass whose source has moved since reads `expired`. A rework whose source
+    has moved since the note was written reads `redone`: someone has had a go at it, so it goes back to Waiting
+    with a tag. The registry still says `rework` until the owner decides again; nothing is written for `redone`.
+    A rework with no stored fingerprint cannot be compared, so it stays in rework.
+
+    "Source" is two things. The spec (`fingerprint`: registry entry + doc) and, since 5 Oct 2026, the drawing
+    (`previewFingerprint`: the .frag the reviewer saw). The drawing is compared only when the decision stored one
+    and a drawing exists now, so a decision made before that date behaves exactly as it did.
+
+    And a third signal (R54 addendum, 5 Oct 2026): `fixed`, a fix record for this exact send-back
+    (web/previews/<scope>/<key>.reworked). A fix that changed only shared hub CSS moves neither fingerprint, and
+    without the record it would sit in rework for good instead of coming back to Waiting."""
+    stored = rec.get("fingerprint")
+    stored_p = rec.get("previewFingerprint")
+    moved = stored != fp or bool(stored_p and pfp and stored_p != pfp)
+    if state == "passed" and moved:
+        return "expired"
+    if state == "rework" and (fixed or (stored and stored != fp) or (stored_p and pfp and stored_p != pfp)):
+        return "redone"
+    return state
+
+
+def load_used_for():
+    """web/previews/used-for.json: "surface/key" -> one plain sentence on what the component is used for, shown in the
+    Review drawer's Details. Kept in its own file, not the registry or the doc, because both feed the fingerprint and
+    adding a line to either would expire every pass at once (R45). A component with no entry shows no row."""
+    try:
+        with open(os.path.join(ROOT, "web", "previews", "used-for.json"), encoding="utf-8") as fh:
+            data = json.load(fh)
+        return {k: v.strip() for k, v in data.items() if isinstance(v, str) and v.strip()}
+    except (OSError, ValueError):
+        return {}
+
+
+def _git(*args):
+    return subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True, timeout=30).stdout
+
+
+def _merged_in(rev):
+    """The PR that brought `rev` to main: the oldest first-parent merge that contains it. None for a direct commit."""
+    for line in reversed(_git("log", "--first-parent", "--merges", "--ancestry-path", "--format=%s", f"{rev}..HEAD").splitlines()):
+        m = re.match(r"^Merge pull request #(\d+) ", line)
+        if m:
+            return int(m.group(1))
+        break
+    return None
+
+
+def source_moved(it):
+    """For an expired pass: the commit that moved it, so the Activity list says why it came back to Waiting (5 Oct
+    2026; Utsav, after account-row went back to Waiting with nothing in its history). Walks the commits that touched
+    its registry, its doc and its drawing, oldest first, and returns the first one after which the fingerprint no
+    longer matches the one the decision stored. Often that is another item's rework in the same doc."""
+    scope, key = it["scope"], it["key"]
+    if scope == "foundation":
+        return None
+    rp = f"exports/{scope}/component-registry.json"
+    try:
+        rec = (json.load(open(os.path.join(ROOT, rp), encoding="utf-8")).get("review") or {}).get(key) or {}
+        entry = json.load(open(os.path.join(ROOT, rp), encoding="utf-8"))["components"][key]
+    except (OSError, ValueError, KeyError):
+        return None
+    dp = CL.component_doc_path(scope, entry)
+    fr = f"web/previews/{scope}/{key}.frag"
+    spec_moved = rec.get("fingerprint") and rec["fingerprint"] != it.get("fp")
+    paths = [rp, dp] if spec_moved else [fr]
+    revs = _git("log", "--reverse", "--format=%H %aI %s", "-n", "300", "--", *[x for x in paths if x]).splitlines()
+    seen = False
+    for line in revs:
+        rev, at, subj = (line.split(" ", 2) + ["", ""])[:3]
+        if spec_moved:
+            try:
+                ent = json.loads(_git("show", f"{rev}:{rp}"))["components"].get(key)
+            except (ValueError, KeyError):
+                continue
+            if not ent:
+                continue
+            fp = CL.spec_fingerprint(key, ent, _git("show", f"{rev}:{CL.component_doc_path(scope, ent)}"))
+            want = rec["fingerprint"]
+        else:
+            fp, want = CL.fingerprint(_git("show", f"{rev}:{fr}")), rec.get("previewFingerprint")
+        if fp == want:
+            seen = True
+        elif seen:
+            return {"at": at, "what": "spec moved" if spec_moved else "drawing moved", "pr": _merged_in(rev), "note": subj}
+    return None
+
+
+def requested_times(items):
+    """When each item came up for review, to the minute (5 Oct 2026, Utsav: "show time in requested"). The registry's
+    `changed` is only a day, so walk main's own history (first parent, so a merge counts at the time it landed) for each surface's registry and docs, oldest first, and keep the
+    last one that moved the item's own spec fingerprint; a published fix (Activity) that is newer wins, since that is when
+    a reworked item came back. Only files a commit changed are re-read, and a fingerprint is computed once per (entry,
+    doc) pair, so this costs seconds, not minutes. No git means no times, not an error."""
+    blobs, fps = {}, {}
+    def blob(sha):
+        if sha not in blobs:
+            blobs[sha] = _git("cat-file", "-p", sha) if sha and set(sha) != {"0"} else ""
+        return blobs[sha]
+    by_surface = {}
+    for it in items:
+        if it["scope"] != "foundation":
+            by_surface.setdefault(it["scope"], []).append(it)
+    for scope, its in by_surface.items():
+        rp = f"exports/{scope}/component-registry.json"
+        base = os.path.dirname(CL.component_doc_path(scope, {"doc": "x"}))
+        try:
+            out = _git("log", "--reverse", "--first-parent", "-m", "--raw", "--no-abbrev", "--no-renames", "-n", "400", "--format=%x1e%cI", "--", rp, base)
+        except Exception:
+            continue
+        cur, comps, reg_sha = {}, {}, None
+        last = {it["key"]: (None, "") for it in its}
+        for rec in out.split("\x1e")[1:]:
+            lines = rec.strip().splitlines()
+            at, moved = lines[0].strip(), False
+            for ln in lines[1:]:
+                m = re.match(r"^:\S+ \S+ \S+ (\S+) \S+\t(.+)$", ln)
+                if m:
+                    cur[m.group(2)] = m.group(1); moved = True
+            if not moved:
+                continue
+            if cur.get(rp) != reg_sha:
+                reg_sha = cur.get(rp)
+                try:
+                    comps = json.loads(blob(reg_sha) or "{}").get("components") or {}
+                except ValueError:
+                    comps = {}
+            for it in its:
+                ent = comps.get(it["key"])
+                if not ent:
+                    continue
+                dp = CL.component_doc_path(scope, ent)
+                ck = (it["key"], json.dumps(ent, sort_keys=True), cur.get(dp))
+                if ck not in fps:
+                    fps[ck] = CL.spec_fingerprint(it["key"], ent, blob(cur.get(dp)))
+                if fps[ck] != last[it["key"]][0]:
+                    last[it["key"]] = (fps[ck], at)
+        for it in its:
+            fixed = next((a["at"] for a in it.get("activity") or [] if a["what"] == "fixed and published"), "")
+            at = last[it["key"]][1]
+            it["requestedAt"] = max(at, fixed, key=lambda v: _iso_ts(v)) if (at or fixed) else ""
+
+
+def _iso_ts(v):
+    try:
+        from datetime import datetime
+        return datetime.fromisoformat(v.replace("Z", "+00:00")).timestamp()
+    except Exception:
+        return 0
+
+
+def review_activity(items, limit=8):
+    """Each item's history for the review drawer's Activity list (R54 addendum, 5 Oct 2026), read from git, so it
+    costs nothing to keep: every decision the page saves is a commit "Review: <action> <scope>/<key> — <note>",
+    and every rework that shipped is a merge of a PR titled "Rework: <scope>/<key>" (the merge IS the publish).
+    Newest first, at most `limit` per item. No git (a tarball checkout) means no history, not an error."""
+    try:
+        out = subprocess.run(["git", "log", "--format=%x1e%aI%x1f%s%x1f%b", "-n", "4000"], cwd=ROOT,
+                             capture_output=True, text=True, timeout=30).stdout
+    except Exception:
+        return
+    ids = {f'{it["scope"]}/{it["key"]}': it for it in items}
+    by_branch = sorted(ids, key=len, reverse=True)
+    acts = {k: [] for k in ids}
+    verb = {"pass": "approved", "rework": "sent back", "reject": "rejected"}
+    for rec in out.split("\x1e"):
+        if not rec.strip():
+            continue
+        at, subj, body = (rec.split("\x1f") + ["", ""])[:3]
+        m = re.match(r"^Review: (pass|rework|reject) ([a-z0-9-]+/[a-z0-9-]+)(?: — (.*?))? \(([^)]*)\)$", subj.strip())
+        if m and m.group(2) in acts:
+            acts[m.group(2)].append({"at": at.strip(), "what": verb[m.group(1)], "note": m.group(3) or "", "by": m.group(4)})
+            continue
+        m = re.match(r"^Merge pull request #(\d+) from [^ /]+/(?:rework|nightly)/\d{4}-\d{2}-\d{2}-(\S+)$", subj.strip())
+        if not m:
+            continue
+        t = re.match(r"^Rework: ([a-z0-9-]+/[a-z0-9-]+)\s*$", body.strip().splitlines()[0] if body.strip() else "")
+        key = t.group(1) if t and t.group(1) in acts else next(
+            (k for k in by_branch if m.group(2) == k.replace("/", "-") or m.group(2).startswith(k.replace("/", "-") + "-")), None)
+        if key:
+            acts[key].append({"at": at.strip(), "what": "fixed and published", "pr": int(m.group(1))})
+    for k, it in ids.items():
+        if it.get("state") == "expired":
+            ev = source_moved(it)
+            # Its own rework already reads "fixed and published in #N"; a second line for the same PR says nothing new.
+            if ev and not any(a.get("pr") == ev["pr"] and a["what"] == "fixed and published" for a in acts[k] if ev["pr"]):
+                acts[k].append(ev)
+                acts[k].sort(key=lambda e: e["at"], reverse=True)
+    for k, it in ids.items():
+        # Commit subjects are cut at ~90 characters; the registry has the latest note whole.
+        for ev in acts[k]:
+            if ev.get("note") and it.get("note", "").startswith(ev["note"]):
+                ev["note"] = it["note"]
+        it["activity"] = acts[k][:limit]
+
+
+def review_items(reg, groups):
+    """Everything reviewable, with its state, who decided and when, and its current fingerprint. The queue above
+    lists only what is waiting; the Review tab needs the whole set to show passed, sent-back and expired too."""
+    out = []
+    used = load_used_for()
+    fps = CL.group_fingerprints(groups)
+    fblock = (reg.get("shared") or {}).get("foundations") or {}
+    for g in groups:
+        key = CL.foundation_key(g.title)
+        if not key or key not in fps:
+            continue
+        rec = fblock.get(key) or {}
+        rev = CL.review_of(fblock, key)
+        state = review_state(rev["state"], rec, fps[key], fixed=CL.rework_fixed("foundation", key, rec))
+        out.append({"scope": "foundation", "key": key, "label": CL.display_title(g), "kind": "foundation",
+                    "state": state, "by": rev["by"], "on": rev["on"], "at": rev["at"], "note": rev["note"], "fp": fps[key],
+                    "view": FOUNDATION_VIEW.get(key, ""), "href": f"foundations/{key}.html"})
+    for skey, stitle, glyph, what, *_ in PARTS:
+        block = reg.get(skey) or {}
+        comps = block.get("components") or {}
+        rblock = block.get("review") or {}
+        for n in sorted(comps):
+            e = comps[n]
+            rec = rblock.get(n) or {}
+            rev = CL.review_of(rblock, n)
+            fp = CL.component_fingerprint(skey, n, reg)
+            pfp = CL.preview_fingerprint(skey, n)
+            state = review_state(rev["state"], rec, fp, pfp, fixed=CL.rework_fixed(skey, n, rec))
+            prev = os.path.join(ROOT, "web", "previews", skey, n + ".frag")
+            # The ad-page folds have a Figma render each; two are filed under a shorter name.
+            stem = {"eyebrow-ad-page": "eyebrow", "footer-with-cta": "footer-cta"}.get(n, n)
+            fig = f"/assets/{skey}/{stem}-desktop.png" if os.path.isfile(os.path.join(ROOT, "assets", skey, stem + "-desktop.png")) else ""
+            out.append({"scope": skey, "key": n, "label": n, "kind": "component", "surface": stitle,
+                        "state": state, "by": rev["by"], "on": rev["on"], "at": rev["at"], "note": rev["note"], "refs": [r for r in (rec.get("refs") or []) if isinstance(r, str)], "fp": fp, "pfp": pfp,
+                        "version": e.get("version", ""), "changed": e.get("changed", ""), "doc": e.get("doc", ""),
+                        "breaking": bool(e.get("breaking")), "href": f"parts/{skey}/{n}.html", "use": used.get(f"{skey}/{n}", ""),
+                        "preview": f"/previews/{skey}/{n}.frag" if os.path.isfile(prev) else "", "figma": fig})
+    return out
+
+
 def main():
+    META["foundations"].clear(); META["surfaces"].clear(); META["catalogue"].clear()
     groups, faces, _ = CL.parse_tokens_css(
         os.path.join(ROOT, "foundation", "tokens.css"))
     reg = CL.load_registries()
@@ -1173,7 +1589,7 @@ def main():
     queue = f_queue + p_queue
     pages = ([build_index(reg, counts, groups_n, ad, gaps)]
              + f_pages + p_pages + r_pages
-             + [build_review(queue, reg, gaps)])
+             + [build_components(reg, counts), build_review(queue, reg, gaps)])
 
     # A clean rebuild: a renamed component must not leave its old page behind, served
     # and wrong, with nothing reporting it.
@@ -1187,6 +1603,29 @@ def main():
         with open(out, "w", encoding="utf-8") as fh:
             fh.write(chrome(pg, extra))
         written += 1
+
+    items = review_items(reg, groups)
+    review_activity(items)
+    requested_times(items)
+
+    # The same facts as plain data, for the Design System page to list natively.
+    data = {
+        "updated": date.today().isoformat(),
+        "stats": {"tokens": counts["tokens"], "components": counts["components"], "libraries": len(PARTS) + 1,
+                  "recipes": len(RECIPES), "passed": counts.get("rev_passed", 0) + counts["comp_passed"],
+                  "total": groups_n + counts["components"], "gaps": len(gaps)},
+        "foundations": META["foundations"],
+        "surfaces": META["surfaces"],
+        "recipes": [{"key": k, "title": t, "surface": sf, "pins": pins, "what": what, "href": f"recipes/{k}.html"}
+                    for k, t, sf, pins, what in RECIPES],
+        "queue": [{"scope": sc, "key": key, "label": label, "href": path + ".html", "count": n, "unit": unit}
+                  for sc, key, label, path, n, unit in queue],
+        "items": items,
+        "gaps": [{"n": num, "text": text} for num, text in gaps],
+        "catalogue": META["catalogue"],
+    }
+    with open(os.path.join(OUTDIR, "data.json"), "w", encoding="utf-8") as fh:
+        json.dump(data, fh, ensure_ascii=False, separators=(",", ":"))
 
     sys.stderr.write(
         f"  preview/library/ — {written} pages · {groups_n} foundation groups · "

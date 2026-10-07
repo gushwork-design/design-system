@@ -144,7 +144,7 @@ On phone, the comparison table becomes a stack of `table-phone-card`s rather tha
 scrolling grid.
 
 **These are the marketing comparison table, not a data grid.** For browsable product data
-use the dashboard's `section/table` — see `exports/dashboard/sections.md`.
+use the dashboard's `data-table` — see `exports/dashboard/tables.md`.
 
 ## `fold/fold-element/timeline-tab`
 

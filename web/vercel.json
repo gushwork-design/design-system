@@ -4,13 +4,33 @@
   "trailingSlash": false,
   "redirects": [
     {
-      "source": "/admin/ad-page-sheet",
-      "destination": "/library/recipes/ad-landing-page",
+      "source": "/internal/award-certificate",
+      "destination": "/internal/certificate-creator",
       "permanent": false
     },
     {
-      "source": "/admin/component-library",
-      "destination": "/library",
+      "source": "/internal/award-certificate/",
+      "destination": "/internal/certificate-creator",
+      "permanent": false
+    },
+    {
+      "source": "/internal/staging/award-certificate",
+      "destination": "/internal/certificate-creator",
+      "permanent": false
+    },
+    {
+      "source": "/internal/staging/award-certificate/",
+      "destination": "/internal/certificate-creator",
+      "permanent": false
+    },
+    {
+      "source": "/admin/design-system",
+      "destination": "/internal/design-system",
+      "permanent": false
+    },
+    {
+      "source": "/admin/ad-page-sheet",
+      "destination": "/library/recipes/ad-landing-page",
       "permanent": false
     },
     {
@@ -49,37 +69,94 @@
       "permanent": false
     },
     {
-      "source": "/admin/review",
-      "destination": "/admin/review-sheet",
-      "permanent": false
-    },
-    {
       "source": "/preview/review-sheet",
-      "destination": "/admin/review-sheet",
+      "destination": "/internal/design-system#review",
       "permanent": false
     },
     {
       "source": "/preview/review-sheet.html",
-      "destination": "/admin/review-sheet",
+      "destination": "/internal/design-system#review",
       "permanent": false
     },
     {
       "source": "/preview/catalogue",
-      "destination": "/admin/catalogue",
+      "destination": "/internal/design-system#library",
       "permanent": false
     },
     {
       "source": "/preview/catalogue.html",
-      "destination": "/admin/catalogue",
+      "destination": "/internal/design-system#library",
       "permanent": false
     },
     {
       "source": "/preview/:path*",
       "destination": "/",
       "permanent": false
+    },
+    {
+      "source": "/admin/usage-log",
+      "destination": "/admin/analytics#usage",
+      "permanent": false
+    },
+    {
+      "source": "/admin/visits",
+      "destination": "/admin/analytics#visits",
+      "permanent": false
+    },
+    {
+      "source": "/admin/insights",
+      "destination": "/admin/analytics#insights",
+      "permanent": false
+    },
+    {
+      "source": "/admin/component-library",
+      "destination": "/internal/design-system#library",
+      "permanent": false
+    },
+    {
+      "source": "/admin/catalogue",
+      "destination": "/internal/design-system#library",
+      "permanent": false
+    },
+    {
+      "source": "/admin/review",
+      "destination": "/internal/design-system#review",
+      "permanent": false
+    },
+    {
+      "source": "/admin/review-sheet",
+      "destination": "/internal/design-system#review",
+      "permanent": false
+    },
+    {
+      "source": "/library",
+      "destination": "/internal/design-system#library",
+      "permanent": false
+    },
+    {
+      "source": "/library/review",
+      "destination": "/internal/design-system#review",
+      "permanent": false
+    },
+    {
+      "source": "/library/components",
+      "destination": "/internal/design-system#library",
+      "permanent": false
+    },
+    {
+      "source": "/admin/workflow",
+      "destination": "/internal/design-system#workflow",
+      "permanent": false
     }
   ],
   "headers": [
+    {
+      "source": "/exports/dashboard/dashboard.:ext(css|js)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Cache-Control", "value": "public, max-age=300" }
+      ]
+    },
     {
       "source": "/exports/dashboard/component-registry.json",
       "headers": [
@@ -118,6 +195,18 @@
   ],
   "rewrites": [
     {
+      "source": "/api/log-output",
+      "destination": "/api/gw?action=log-output"
+    },
+    {
+      "source": "/api/visits",
+      "destination": "/api/gw?action=visits"
+    },
+    {
+      "source": "/api/review",
+      "destination": "/api/gw?action=review"
+    },
+    {
       "source": "/api/usage-log",
       "destination": "/api/gw?action=usage-log"
     },
@@ -134,8 +223,35 @@
       "destination": "/api/gw?action=slack-events"
     },
     {
+      "source": "/api/bruce-memory",
+      "destination": "/api/gw?action=bruce-memory"
+    },
+    {
       "source": "/api/approvals",
       "destination": "/api/gw?action=approvals"
+    },
+    {
+      "source": "/api/tools",
+      "destination": "/api/gw?action=tools"
+    },
+    {
+      "source": "/api/health",
+      "destination": "/api/gw?action=health"
+    },
+    {
+      "source": "/api/certificates",
+      "destination": "/api/gw?action=certificates"
+    }
+  ],
+  "functions": {
+    "api/gw.js": {
+      "includeFiles": "{assets/logo/**,assets/color/**,fonts/*.ttf,foundation/tokens.*,foundation/tailwind-theme.js,internal/templates.html,library/data.json}"
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/health?cron=1",
+      "schedule": "30 3 * * *"
     }
   ]
 }

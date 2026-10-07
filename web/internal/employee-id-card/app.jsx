@@ -32,30 +32,44 @@ const DEFAULTS = {
      • Nameplate  — the display-type voice of the name
    Each maps to a bundle that the card renderer consumes as one theme.
    ───────────────────────────────────────────────────────────────── */
+/* PRINT PALETTE — the card is printed, so its colours come from the brand guidelines' FOR PRINTS
+   column (design hub → Style Guide → Colors), not the FOR SCREENS hex:
+     Brandeis Blue   CMYK 100 45 0 19    Pantone 285 C   → PRINT_BLUE  #0072CE
+     Full White      CMYK 0 0 0 0        Pantone 000 C   → #FFFFFF
+     Flat Black      CMYK 0 0 0 95       Pantone Black 6 C → #0D0D0D
+   A browser can only draw RGB, so these are the sRGB renditions of those print specs (285 C is
+   #0072CE; the CMYK build computes to #0072CF). The old screen blue #0070FF is outside the CMYK
+   gamut and prints duller, which is why it is not used here. PRINT_MUTED is Flat Black at a 60%
+   tint (CMYK 0 0 0 57), the only derived value: the guidelines give no print grey. */
+const PRINT_BLUE = '#0072CE';
+const PRINT_BLUE_TINT = '#CCE3F5';   // 20% tint of the print blue
+const PRINT_BLACK = '#0D0D0D';
+const PRINT_MUTED = '#6E6E6E';
+
 const MOODS = {
   midnight: {
     label: 'Cobalt',
-    frame: '#0061E0', face: 'rgb(241, 242, 243)',
-    faceText: 'rgb(17, 24, 39)', faceMuted: 'rgb(106, 112, 119)',
-    accent: 'rgb(0, 112, 255)', onFrame: '#FFFFFF',
-    onFrameMuted: 'rgba(255, 255, 255, 0.74)', divider: '#3481E6',
-    backBorder: '#3481E6', swatch: ['#0061E0', '#F1F2F3', '#0070FF']
+    frame: PRINT_BLUE, face: '#FFFFFF',
+    faceText: PRINT_BLACK, faceMuted: PRINT_MUTED,
+    accent: PRINT_BLUE, onFrame: '#FFFFFF',
+    onFrameMuted: 'rgba(255, 255, 255, 0.74)', divider: 'rgba(255, 255, 255, 0.3)',
+    backBorder: 'rgba(255, 255, 255, 0.3)', swatch: [PRINT_BLUE, '#FFFFFF', PRINT_BLACK]
   },
   electric: {
     label: 'Electric',
-    frame: '#0070FF', face: '#FFFFFF',
-    faceText: '#0D0D0D', faceMuted: '#535A61',
-    accent: '#0070FF', onFrame: '#FFFFFF',
+    frame: PRINT_BLUE, face: '#FFFFFF',
+    faceText: PRINT_BLACK, faceMuted: PRINT_MUTED,
+    accent: PRINT_BLUE, onFrame: '#FFFFFF',
     onFrameMuted: 'rgba(255, 255, 255, 0.74)', divider: 'rgba(255, 255, 255, 0.3)',
-    backBorder: 'rgba(255, 255, 255, 0.42)', swatch: ['#0070FF', '#FFFFFF', '#CCE2FF']
+    backBorder: 'rgba(255, 255, 255, 0.42)', swatch: [PRINT_BLUE, '#FFFFFF', PRINT_BLUE_TINT]
   },
   ivory: {
     label: 'Ivory',
     frame: '#E7E1D4', face: '#FFFFFF',
     faceText: '#1B1A16', faceMuted: '#6B6555',
-    accent: '#0070FF', onFrame: '#2A2620',
+    accent: PRINT_BLUE, onFrame: '#2A2620',
     onFrameMuted: 'rgba(42, 38, 32, 0.62)', divider: 'rgba(42, 38, 32, 0.14)',
-    backBorder: 'rgba(42, 38, 32, 0.2)', swatch: ['#E7E1D4', '#1B1A16', '#0070FF']
+    backBorder: 'rgba(42, 38, 32, 0.2)', swatch: ['#E7E1D4', '#1B1A16', PRINT_BLUE]
   },
   forest: {
     label: 'Forest',
@@ -360,30 +374,23 @@ function PropSlider({ value, onChange, min, max, step = 1, onActiveChange }) {
 
 }
 
-/* PropYesNo — Yes/No segmented control. Used for boolean toggles like
-   "Polish photo". Pass a disabled flag to lock both buttons (e.g. while
-   the model is still processing). */
+/* PropYesNo — a boolean is a switch (library: controls/toggle, X-Small 36x20), not a two-tab
+   control. Used for "Remove background". `disabled` locks it while the model is processing.
+   yesLabel / noLabel are kept for callers; the switch reads them as its accessible name. */
 function PropYesNo({ value, onChange, disabled = false, yesLabel = 'On', noLabel = 'Off' }) {
   return (
-    <div className="prop-segmented" role="tablist">
-      <button
-        type="button"
-        className={value ? 'active' : ''}
-        onClick={() => !disabled && onChange(true)}
-        disabled={disabled} style={{ textAlign: "left" }}>
-        
-        {yesLabel}
-      </button>
-      <button
-        type="button"
-        className={!value ? 'active' : ''}
-        onClick={() => !disabled && onChange(false)}
-        disabled={disabled} style={{ textAlign: "left" }}>
-        
-        {noLabel}
-      </button>
-    </div>);
-
+    <button
+      type="button"
+      role="switch"
+      aria-checked={!!value}
+      aria-label={value ? yesLabel : noLabel}
+      className={`gw-switch${value ? ' on' : ''}`}
+      disabled={disabled}
+      onClick={() => !disabled && onChange(!value)}
+    >
+      <span className="gw-switch__knob" />
+    </button>
+  );
 }
 
 /* ── photo dropzone ─────────────────────────────────────────────── */
@@ -931,6 +938,15 @@ function openPrintForPdf(frontPng, backPng, docTitle) {
 }
 
 /* ── Main App ───────────────────────────────────────────────────── */
+/* New icon, pending library review: a Phosphor-style sidebar glyph for the panel collapse / reopen. */
+function SidebarIcon() {
+  return (
+    <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
+      <path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM40,56H80V200H40ZM216,200H96V56H216V200Z" />
+    </svg>
+  );
+}
+
 function App() {
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
   const cardTheme = buildCardTheme(t);
@@ -941,6 +957,7 @@ function App() {
   // Photo polish (background removal) — derived display URL is
   // `polishOn && polishedUrl ? polishedUrl : photoUrl`. We keep the
   // original photoUrl untouched so the user can toggle back instantly.
+  const [panelOpen, setPanelOpen] = useState(true); // floating editor panel
   const [polishOn, setPolishOn] = useState(false);
   const [polishedUrl, setPolishedUrl] = useState(null);
   const [polishState, setPolishState] = useState('idle'); // 'idle' | 'loading' | 'error'
@@ -1023,6 +1040,9 @@ function App() {
     (url, name) => {
       setPhotoUrl(url);
       setPhotoName(name);
+      // A new photo starts framed to fill the window (Zoom 100, centred, face-height pan) — the
+      // previous photo's zoom / pan no longer applies. Grayscale is a preference and is kept.
+      setPhotoXform((p) => ({ ...p, x: 50, y: 30, zoom: 100 }));
       setPolishedUrl(null);
       setPolishState('idle');
       setPolishProgress(0);
@@ -1275,16 +1295,35 @@ For printing, use the PDF and print at 100% scale (standard CR80, 54 × 85.6 mm)
   const emailState = actionKind === 'email' ? exportState : 'idle';
 
   return (
-    <div className="app">
-      {/* ── LEFT: brand card + form card ── */}
-      <div className="left-col">
-        <header className="brand-card">
+    <div className="app" data-panel={panelOpen ? 'open' : 'closed'}>
+      {/* collapsed: the panel folds to its own header (tool-panel, 5 Oct 2026) */}
+      <div className="panel-mini" aria-hidden={panelOpen}>
+        <a className="brand-link" href="/internal/tools" title="Back to Tools" aria-label="Back to Tools" tabIndex={panelOpen ? -1 : 0}>
           <svg className="brand-icon" width="32" height="32" viewBox="0 0 160 160" fill="none" aria-hidden>
-            <rect width="160" height="160" rx="20" fill="#0D0D0D" />
+            <rect className="brand-icon__bg" width="160" height="160" rx="20" fill="#0070FF" />
             <path d="M116.609 44.5634C117.503 42.3606 115.85 40 113.472 40H49.1429C44.0934 40 40 44.0934 40 49.1429V106.778C40 112.018 45.1708 115.683 49.9603 113.557C80.8494 99.8449 104.378 74.7075 116.609 44.5634Z" fill="white" />
             <path d="M72.5161 120C71.4022 120 70.9357 118.553 71.8259 117.884C94.9007 100.527 111.434 75.8047 118.766 48.0522C118.94 47.3915 120 47.5162 120 48.1995V110.857C120 115.907 115.907 120 110.857 120H72.5161Z" fill="white" />
           </svg>
+        </a>
+        <span className="panel-mini__name">Employee ID Card Generator</span>
+        <button type="button" className="panel-reopen" onClick={() => setPanelOpen(true)} aria-label="Open editor panel" title="Open editor panel" tabIndex={panelOpen ? -1 : 0}>
+          <SidebarIcon />
+        </button>
+      </div>
+      {/* ── LEFT: floating editor panel ── */}
+      <div className="left-col" aria-hidden={!panelOpen}>
+        <header className="brand-card">
+          <a className="brand-link" href="/internal/tools" title="Back to Tools" aria-label="Back to Tools">
+          <svg className="brand-icon" width="32" height="32" viewBox="0 0 160 160" fill="none" aria-hidden>
+            <rect className="brand-icon__bg" width="160" height="160" rx="20" fill="#0070FF" />
+            <path d="M116.609 44.5634C117.503 42.3606 115.85 40 113.472 40H49.1429C44.0934 40 40 44.0934 40 49.1429V106.778C40 112.018 45.1708 115.683 49.9603 113.557C80.8494 99.8449 104.378 74.7075 116.609 44.5634Z" fill="white" />
+            <path d="M72.5161 120C71.4022 120 70.9357 118.553 71.8259 117.884C94.9007 100.527 111.434 75.8047 118.766 48.0522C118.94 47.3915 120 47.5162 120 48.1995V110.857C120 115.907 115.907 120 110.857 120H72.5161Z" fill="white" />
+          </svg>
+          </a>
           <h1>Employee ID Card Generator</h1>
+          <button type="button" className="panel-collapse" onClick={() => setPanelOpen(false)} aria-label="Collapse editor panel" title="Collapse editor panel">
+            <SidebarIcon />
+          </button>
         </header>
 
         <aside className="form-card">
@@ -1351,40 +1390,37 @@ For printing, use the PDF and print at 100% scale (standard CR80, 54 × 85.6 mm)
                   }} />
                 
               </PropRow>
-              <PropRow label={<span className="polish-label"><span>Polish</span><SparkleIcon size={14} /></span>}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4, width: '100%' }}>
+              <PropRow label="Remove BG">
+                {/* The switch and its progress sit on one line: the percentage reads to the RIGHT of the
+                    toggle while the model runs, not underneath it. */}
+                <div className="polish-line">
                   <div className="polish-tip-wrap">
                     <PropYesNo
                       value={polishOn}
                       onChange={handlePolishToggle}
                       disabled={polishState === 'loading' || !photoUrl || photoUrl === DEFAULT_PHOTO}
-                      yesLabel="On"
-                      noLabel="Off" />
+                      yesLabel="Background removed"
+                      noLabel="Remove background" />
                     <div className="polish-tooltip" role="tooltip">
                       {!photoUrl || photoUrl === DEFAULT_PHOTO ?
-                      'Upload your own photo to use Polish — it removes the background and fits the face to the guide.' :
+                      'Upload your own photo to remove its background and fit the face to the guide.' :
                       'Removes the background and fits the face to the guide. You can fine-tune below.'}
                     </div>
                   </div>
-                  
                   {polishState === 'loading' &&
-                  <div className="polish-status">
+                  <div className="polish-status" role="status" title="The first run downloads a one-time model, about 25MB">
                       <span className="polish-spinner" aria-hidden="true" />
-                      <span>
-                        {polishProgress > 0 && polishProgress < 100 ?
-                      `Processing photo… ${polishProgress}%` :
-                      'Loading model… (one-time, ~25MB)'}
-                      </span>
+                      <span>{polishProgress > 0 && polishProgress < 100 ? `${polishProgress}%` : 'Loading…'}</span>
                     </div>
                   }
                   {polishState === 'error' &&
-                  <div className="polish-status polish-status--error">
-                      Polish failed. Try again or switch back to Off.
+                  <div className="polish-status polish-status--error" role="status" title="Background removal failed. Try again, or switch it off.">
+                      Failed. Try again
                     </div>
                   }
                   {polishState === 'idle' && polishOn && polishedUrl && polishJustDone &&
-                  <div className="polish-status polish-status--ok">
-                      Background removed.
+                  <div className="polish-status polish-status--ok" role="status">
+                      Done
                     </div>
                   }
                 </div>
@@ -1481,7 +1517,7 @@ For printing, use the PDF and print at 100% scale (standard CR80, 54 × 85.6 mm)
       </div>
 
       {/* ── RIGHT: preview surface ── */}
-      <main className="preview-col" style={{ alignItems: "center", padding: "56px 32px 140px" }}>
+      <main className="preview-col" style={{ alignItems: "center" }}>
         <div className="cards-stage">
           <div className="cards-row">
             <CardFrame caption="Front">

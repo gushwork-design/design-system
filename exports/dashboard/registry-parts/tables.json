@@ -1,0 +1,86 @@
+{
+  "data-table": {
+    "version": "2.0.1",
+    "changed": "2026-10-05",
+    "breaking": false,
+    "doc": "tables.md"
+  },
+  "table-cell-types": {
+    "version": "2.0.1",
+    "changed": "2026-10-05",
+    "breaking": false,
+    "doc": "tables.md"
+  },
+  "row-selection": {
+    "version": "2.0.1",
+    "changed": "2026-10-05",
+    "breaking": false,
+    "doc": "tables.md"
+  },
+  "bulk-action-bar": {
+    "version": "2.0.1",
+    "changed": "2026-10-05",
+    "breaking": false,
+    "doc": "tables.md"
+  },
+  "column-menu": {
+    "version": "2.0.1",
+    "changed": "2026-10-05",
+    "breaking": false,
+    "doc": "tables.md"
+  },
+  "row-actions-menu": {
+    "version": "2.0.1",
+    "changed": "2026-10-05",
+    "breaking": false,
+    "doc": "tables.md"
+  },
+  "pagination": {
+    "version": "2.0.1",
+    "changed": "2026-10-05",
+    "breaking": false,
+    "doc": "tables.md"
+  },
+  "table-states": {
+    "version": "2.0.1",
+    "changed": "2026-10-05",
+    "breaking": false,
+    "doc": "tables.md"
+  },
+  "log-viewer": {
+    "version": "2.0.1",
+    "changed": "2026-10-05",
+    "breaking": false,
+    "doc": "tables.md"
+  },
+  "histogram": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "tables.md"
+  },
+  "table-toolbar": {
+    "version": "2.0.1",
+    "changed": "2026-10-05",
+    "breaking": false,
+    "doc": "filtering.md"
+  },
+  "filter-chip": {
+    "version": "2.0.1",
+    "changed": "2026-10-05",
+    "breaking": false,
+    "doc": "filtering.md"
+  },
+  "filter-builder": {
+    "version": "2.0.1",
+    "changed": "2026-10-05",
+    "breaking": false,
+    "doc": "filtering.md"
+  },
+  "saved-views": {
+    "version": "2.0.1",
+    "changed": "2026-10-05",
+    "breaking": false,
+    "doc": "filtering.md"
+  }
+}

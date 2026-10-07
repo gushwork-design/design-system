@@ -9,7 +9,7 @@ You are building a **downloadable document**, not a web page. It is the asset be
 ad: someone clicked, gave an email, and now has a PDF open. It has to look considered on a
 laptop screen, survive being printed, and end on a reason to book.
 
-Announce at the start: **"Using the Gushwork lead-magnet skill — v1.49.0, updated 24 Sep 2026."**
+Announce at the start: **"Using the Gushwork lead-magnet skill — v2.0.3, updated 7 Oct 2026."**
 
 That version and date are stamped into this file, so **a stale copy reports its own stale date**
 rather than claiming to be current.
@@ -100,6 +100,8 @@ stamp without it is treated as a dashboard and diffed against the wrong componen
 `bash scripts/check-drift.sh <file-or-dir>` reads it and reports only the components this document
 uses that have since changed. Shared components — `badge`, the logo, the icon set — come from
 `exports/shared/component-registry.json`, merged in automatically.
+
+**Archived components and templates are not part of the system.** A registry entry whose `review` record says `"reviewed": "rejected"` was rejected and archived (R54 addendum); a template is a registry entry too, so an archived template is out as well. Never use one: do not compose from it, start from it, copy its markup, cite it, or reuse its spec as a proposal, and do not "take inspiration" from it either. Build from the approved library as if it did not exist, and if the screen needs that thing, treat it as a missing element and say so. Before starting from any template or component, check its `review` record in the registry; if it reads `rejected`, it is archived.
 
 The cover and closer are owned by Figma frames, so they drift when those frames move. Bump the
 matching registry entry in the same commit that re-measures them, and set `breaking: true` when an

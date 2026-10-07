@@ -36,6 +36,7 @@ fi
 CHANGED="$(git diff --name-only $RANGE 2>/dev/null || git diff --name-only HEAD~10..HEAD)"
 SURFACES=""
 printf '%s\n' "$CHANGED" | grep -q '^skills/gushwork-dashboard/' && SURFACES="dashboard"
+printf '%s\n' "$CHANGED" | grep -q '^skills/gushwork-reports/\|^templates/growth-report/' && SURFACES="${SURFACES:+$SURFACES and }reports"
 printf '%s\n' "$CHANGED" | grep -q '^skills/gushwork-lead-magnet/\|^templates/lead-magnet/\|^exports/lead-magnet/' && SURFACES="lead-magnet"
 printf '%s\n' "$CHANGED" | grep -q '^skills/gushwork-web/' && SURFACES="${SURFACES:+$SURFACES and }web"
 printf '%s\n' "$CHANGED" | grep -q '^foundation/tokens.css' && SURFACES="${SURFACES:+$SURFACES, plus }tokens"
@@ -54,8 +55,9 @@ fi
 
 cat <<'EOF'
 
-If you have auto-update on it arrives at your next restart. If not:
+If you have auto-update on it arrives at your next start. To take it now:
 `claude plugin marketplace update gushwork && claude plugin update gushwork-design@gushwork`
+then type /reload-plugins in the chat — no restart.
 
 Check what you're on: the skill says its version when it fires.
 ──────── to here ────────

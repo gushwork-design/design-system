@@ -1,0 +1,116 @@
+{
+  "activity-timeline": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "data-display.md"
+  },
+  "avatar": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "data-display.md"
+  },
+  "avatar-group": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "data-display.md"
+  },
+  "card": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "data-display.md"
+  },
+  "checklist": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "data-display.md"
+  },
+  "delta-pill": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "data-display.md"
+  },
+  "detail-view": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "detail.md"
+  },
+  "incident-row": {
+    "version": "2.0.1",
+    "changed": "2026-10-05",
+    "breaking": false,
+    "doc": "data-display.md"
+  },
+  "issue-summary": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "data-display.md"
+  },
+  "key-value-list": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "data-display.md"
+  },
+  "legend": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "data-display.md"
+  },
+  "metric-strip": {
+    "version": "2.0.1",
+    "changed": "2026-10-05",
+    "breaking": false,
+    "doc": "data-display.md"
+  },
+  "progress-bar": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "data-display.md"
+  },
+  "ring": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "data-display.md"
+  },
+  "stat-card": {
+    "version": "2.0.1",
+    "changed": "2026-10-05",
+    "breaking": false,
+    "doc": "data-display.md"
+  },
+  "status-banner": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "data-display.md"
+  },
+  "status-dot": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "data-display.md"
+  },
+  "status-list": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "data-display.md"
+  },
+  "tag": {
+    "version": "2.0.0",
+    "changed": "2026-10-03",
+    "breaking": false,
+    "doc": "data-display.md"
+  }
+}

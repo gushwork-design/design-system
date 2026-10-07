@@ -3,11 +3,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Style Guide — Gushwork Design</title>
 <meta name="description" content="The Gushwork style guide — the mark, the palette, the type scale, and the spacing and radius rules.">
-<script>try{var t=localStorage.getItem('gw-theme');if(t!=='dark')t='light';document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20width%3D%2280%22%20height%3D%2280%22%20rx%3D%2220%22%20fill%3D%22%230d0d0d%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<script>try{var c=localStorage.getItem('gw-theme-choice'),t=c==='dark'||c==='light'?c:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20x%3D%221%22%20y%3D%221%22%20width%3D%2278%22%20height%3D%2278%22%20rx%3D%2219%22%20fill%3D%22%230070ff%22%20stroke%3D%22%230061e0%22%20stroke-width%3D%222%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
 <link rel="stylesheet" href="/foundation/tokens.css">
-<link rel="stylesheet" href="/shell.css">
-<script src="/shell.js" defer></script>
+<link rel="stylesheet" href="/shell.css?v=ghost3">
+<script src="/shell.js?v=ghost1" defer></script>
 <style>
 /* ============================================================================
    Style Guide — built from Figma `Q9L6q38dEj3Qu1JkjiT13y` → page
@@ -25,36 +25,31 @@
      cards          r20 Neutral/100 · inner cards r16
    ========================================================================= */
 
-/* -- page frame: main + TOC, same split the changelog uses ---------------- */
-/* minmax(0,800px) — not a fixed 800 — so the main column gives way before the
-   TOC does. The content area here is the viewport minus the 240 rail, so a
-   hard 800 + 60 + 260 would overflow on anything under a 1440 screen. */
-.sg{
-  max-width:1200px;margin:0 auto;
-  padding:var(--gw-space-60) var(--gw-space-40) var(--gw-space-120);
-  /* `auto` for the rail, not a fixed 260 — collapsing it to 48 then widens
-     the main column to the measured 1012 with no extra rule. */
-  display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--gw-space-60);
-}
-.sg__main{min-width:0;display:flex;flex-direction:column;gap:var(--gw-space-32)}
+/* -- page frame -----------------------------------------------------------
+   `.sg` is THE SHARED PAGE LAYOUT in shell.css — the same grid downloads,
+   staging, tools and the changelog use. This page carried a private copy of it,
+   which is why collapsing the TOC stopped widening the content column here
+   after the layout was consolidated: a page <style> outranks the shell link, so
+   the local fixed 220 track quietly won. Removed rather than corrected.
+   -------------------------------------------------------------------------- */
+/* 60 between sections, measured across all eight in 796:9441 — every gap is 60. */
+.sg__main{min-width:0;display:flex;flex-direction:column;gap:var(--gw-space-60);
+          /* 796:9441 — the sections are 780 wide inside the 800 column. */
+          padding-left:var(--gw-space-20)}
 
-/* -- header (Frame 2147260129): inset 40, rule runs the full column ------- */
-/* The rule under the header is DOTTED, not solid. Measured on Line 14
-   (478:15076): strokeWeight 2, strokeCap ROUND, dashPattern [0.1, 4] — a
-   dash of essentially zero length under a round cap is a dot, 2px across
-   (the weight), repeating every 4.1px.
-   Drawn as a gradient rather than `border-bottom: 2px dotted`, because the
-   dot size and spacing of a CSS dotted border are left to the UA and differ
-   between engines; this pins both to the measured numbers. `closest-side`
-   makes the radius min(4.1,2)/2 = 1px, so the dot is exactly 2px wide. */
-.sg__hd{padding:0 var(--gw-space-40) var(--gw-space-32);
-        border-bottom:0;
-        background-image:radial-gradient(circle closest-side,
-                         var(--s-rule) 100%, transparent 100%);
-        background-size:4.1px 2px;
-        background-position:left bottom;
-        background-repeat:repeat-x;
-        display:flex;flex-direction:column;gap:var(--gw-space-20)}
+/* -- header (Frame 2147260129): inset 40,20 · rule runs the full column ---- */
+/* SOLID, 1px, Neutral/100. Re-measured on 796:10015: the rule at the header's
+   bottom edge is an unbroken run of #e7e8e9 across all 1106 — no breaks at all.
+   It used to be drawn as a dotted gradient from 478:15076, which is an older
+   node; that revision is gone. */
+.sg__hd{grid-column:1/-1;
+        /* Inner block at 40,20. 40 + (53 title + 16 + 20 meta) + 40 = 169; the
+           drawing says 171, and the last 2 are off the spacing scale. */
+        padding:var(--gw-space-40) 0 var(--gw-space-40) var(--gw-space-20);
+        border-bottom:1px solid var(--s-chrome-border);
+        background-image:none;
+        /* Title 53 tall, meta at y=69 — a 16 gap, measured 796:10016/10017. */
+        display:flex;flex-direction:column;gap:var(--gw-space-16)}
 .sg__title{margin:0;font:600 44px/1.2 var(--gw-font-display);letter-spacing:0;
            color:var(--s-heading)}
 .sg__meta{margin:0;font:var(--gw-text-body-14-med);
@@ -63,7 +58,7 @@
 
 /* -- sections ------------------------------------------------------------- */
 .sg__body{display:flex;flex-direction:column;gap:var(--gw-space-60)}
-.sg-sec{padding-left:var(--gw-space-40);display:flex;flex-direction:column;
+.sg-sec{padding-left:0;display:flex;flex-direction:column;
         gap:var(--gw-space-40);scroll-margin-top:var(--gw-space-24)}
 .sg-block{display:flex;flex-direction:column;gap:var(--gw-space-20)}
 .sg-sec :where(h2){margin:0;font:600 28px/1.2 var(--gw-font-display);letter-spacing:0;
@@ -73,8 +68,8 @@
 /* :where() so this contributes ZERO specificity. As `.sg-sec p` it scored
    0,1,1 and out-ranked every specimen class below (0,1,0) — which silently
    rendered the 40px Vert Grotesk display specimen as 18px Inter body copy. */
-.sg-sec :where(p){margin:0;font:var(--gw-text-body-18-med);
-          letter-spacing:var(--gw-text-body-18-med-tracking);color:var(--s-body)}
+.sg-sec :where(p){margin:0;font:var(--gw-text-body-16-reg);
+          letter-spacing:var(--gw-text-body-16-reg-tracking);color:var(--s-body)}
 .sg-head{display:flex;flex-direction:column;gap:var(--gw-space-12)}
 
 /* -- the standard specimen card ------------------------------------------ */
@@ -266,8 +261,8 @@
                color:var(--s-heading)}
 .sg-type__display{margin:0;font:700 40px/1.2 var(--gw-font-display);
                   letter-spacing:0;color:var(--s-heading)}
-.sg-type__para{margin:0;font:var(--gw-text-body-18-med);
-               letter-spacing:var(--gw-text-body-18-med-tracking);
+.sg-type__para{margin:0;font:var(--gw-text-body-16-reg);
+               letter-spacing:var(--gw-text-body-16-reg-tracking);
                color:var(--s-heading)}
 .sg-use{margin:0;font:var(--gw-text-body-16-med);
         letter-spacing:var(--gw-text-body-16-med-tracking);color:var(--s-body)}
@@ -370,6 +365,102 @@
    instead. Figma's canvas rect and page-background rect were stripped from it;
    they sit behind the card and would paint a hard rectangle on any surface. */
 .sg-ve{display:block;width:100%;height:auto;border-radius:var(--gw-radius-20)}
+
+/* -- the grid, one colourway at a time -------------------------------------
+   Replaces the static export (assets/visual-elements/grid-colourways.svg, kept
+   as the no-script fallback). The tiles of that card are shown one by one,
+   each drawn in and then doing what its filled cells mean: stepping diagonally
+   for movement, stacking into rising columns for growth.
+   Cell pitch is 40, the same as .gw-hero; the stage is 760x480 like the card,
+   so 19 x 12 cells. Three of the card's four tiles are shown (Flat Black, Primary and
+   one grey, Neutral/50) — Utsav's call, 3 Oct 2026; the near-white tile is dropped. Colours are the exported card's fills, bound to tokens.
+   The motion is a judgement call, not drawn in Figma: 6s per colourway, a 700ms
+   dissolve between them, 700ms line draw, 140ms between stepping cells. */
+.gv{display:block}
+.gv__stage{position:relative;aspect-ratio:760/480;overflow:hidden;isolation:isolate;
+           border-radius:var(--gw-radius-20);background:var(--gw-color-neutral-100)}
+/* a hairline so the Flat Black ground keeps an edge on a near-black page */
+.gv__stage::after{content:'';position:absolute;inset:0;z-index:6;pointer-events:none;
+                  border-radius:inherit}
+:root[data-theme="dark"] .gv__stage::after{box-shadow:inset 0 0 0 1px var(--s-card-border)}
+.gv__scene{position:absolute;inset:0;visibility:hidden;z-index:0;
+           background:var(--gv-bg)}
+.gv__scene.is-on,.gv__scene.is-prev{visibility:visible}
+.gv__scene.is-prev{z-index:1}
+.gv__scene.is-on{z-index:2}
+.gv__scene.is-fade{animation:gv-dissolve 700ms ease-in-out both}
+.gv__scene svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.gv__scene[data-way="black"]  {--gv-bg:var(--gw-color-black);      --gv-line:var(--gw-color-neutral-900);--gv-cell:var(--gw-color-neutral-900)}
+.gv__scene[data-way="primary"]{--gv-bg:var(--gw-color-primary-500); --gv-line:var(--gw-color-primary-400);--gv-cell:var(--gw-color-primary-400)}
+.gv__scene[data-way="n50"]    {--gv-bg:var(--gw-color-neutral-50);  --gv-line:var(--gw-color-neutral-100);--gv-cell:var(--gw-color-neutral-200)}
+.gv__ln{fill:none;stroke:var(--gv-line);stroke-width:1;stroke-dasharray:1;stroke-dashoffset:0}
+.is-on .gv__ln{animation:gv-draw 700ms cubic-bezier(.3,0,.2,1) both;
+               animation-delay:calc(var(--i) * 22ms)}
+/* stepping cells: a wave of fill travelling down the staircase */
+.gv__step{fill:var(--gv-cell);opacity:0}
+.is-on .gv__step{animation:gv-step 2800ms ease-in-out infinite;
+                 animation-delay:calc(500ms + var(--i) * 140ms)}
+/* rising columns: outlined cells, bottom first, left to right */
+/* cells sit exactly on the grid, so neighbours share one edge instead of two */
+.gv__rise{fill:color-mix(in srgb,var(--gv-cell) 22%,transparent);stroke:var(--gv-cell);stroke-width:1.5;opacity:0;
+          transform-box:fill-box;transform-origin:center}
+.is-prev .gv__rise{opacity:1}
+.is-on .gv__rise{animation:gv-rise 520ms cubic-bezier(.2,.9,.3,1.2) both;
+                 animation-delay:calc(450ms + var(--c) * 70ms + var(--k) * 55ms)}
+@keyframes gv-dissolve{from{opacity:0}to{opacity:1}}
+@keyframes gv-draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes gv-step{0%{opacity:0}10%{opacity:1}35%{opacity:.4}60%,100%{opacity:0}}
+@keyframes gv-rise{from{opacity:0;transform:translateY(18px) scale(.6)}to{opacity:1;transform:none}}
+
+/* The controls and the caption are part of the artwork, not content under it: they
+   float on the stage the way the logo card's tab pill floats on its card, 12 in from
+   the edge. They stay light in both themes because the stage is artwork, and the
+   artwork does not follow the page theme. */
+/* NOT A TOKEN. The elevation ramp's s3/s4 throw their shadow 16px straight down, and the
+   stage clips everything below the 12px the bar sits from its edge, so on the grey
+   colourway the pill has no visible edge. This one is centred and short so it shows
+   on all three grounds. #0d0d0d is Flat Black at 18% and 10%. */
+.gv__stage{--gv-lift:0 4px 14px 0 #0d0d0d2e,0 1px 2px 0 #0d0d0d1a}
+.gv__ui{position:absolute;inset:var(--gw-space-12);z-index:5;pointer-events:none}
+.gv__ui > *{pointer-events:auto}
+.gv__bar{position:absolute;left:0;bottom:0;max-width:100%;display:flex;align-items:center;
+         gap:var(--gw-space-4);padding:var(--gw-space-4);pointer-events:auto;
+         border-radius:var(--gw-radius-12);background:var(--gw-color-neutral-50);
+         box-shadow:var(--gv-lift)}
+.gv__tabs{display:flex;gap:var(--gw-space-4);min-width:0;overflow-x:auto;scrollbar-width:none}
+.gv__tabs::-webkit-scrollbar{display:none}
+.gv__tab{position:relative;flex:none;border:0;cursor:pointer;overflow:hidden;
+         display:flex;align-items:center;gap:var(--gw-space-8);
+         padding:0 var(--gw-space-12);height:28px;border-radius:var(--gw-radius-8);
+         background:none;font:var(--gw-text-button-12);line-height:16px;
+         color:var(--gw-color-neutral-700)}
+.gv__tab:hover{color:var(--gw-color-black)}
+.gv__tab[aria-selected="true"]{background:var(--gw-color-black);color:var(--gw-color-white)}
+.gv__dot{width:10px;height:10px;border-radius:50%;flex:none;
+         box-shadow:inset 0 0 0 1px var(--gw-color-neutral-300);background:var(--d)}
+.gv__tab[aria-selected="true"] .gv__dot{box-shadow:inset 0 0 0 1px var(--gw-color-neutral-600)}
+/* caption: a name card top-left, the three tokens top-right */
+.gv__cap{position:absolute;left:0;right:0;top:0;display:flex;justify-content:space-between;
+         align-items:flex-start;gap:var(--gw-space-12);pointer-events:none}
+.gv__cap > *{pointer-events:auto;animation:gv-fade 420ms ease both;
+             border-radius:var(--gw-radius-12);background:var(--gw-color-neutral-25);
+             box-shadow:var(--gv-lift)}
+.gv__info{padding:var(--gw-space-12) var(--gw-space-16);max-width:min(300px,60%)}
+.gv__name{margin:0 0 var(--gw-space-4);font:var(--gw-text-body-14-med);font-weight:600;color:var(--gw-color-black)}
+.gv__why{margin:0;font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-700)}
+.gv__toks{display:grid;gap:var(--gw-space-8);margin:0;padding:var(--gw-space-12) var(--gw-space-16);list-style:none;
+          font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-700)}
+.gv__toks li{display:flex;align-items:center;gap:var(--gw-space-8);white-space:nowrap}
+.gv__toks i{width:12px;height:12px;border-radius:4px;flex:none;
+            box-shadow:inset 0 0 0 1px var(--gw-color-neutral-300);background:var(--c)}
+.gv__toks b{font-weight:500;color:var(--gw-color-neutral-400);min-width:3.2em}
+@keyframes gv-fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (max-width:640px){.gv__toks,.gv__why{display:none}.gv__info{padding:var(--gw-space-8) var(--gw-space-12)}.gv__name{margin:0}}
+@media (prefers-reduced-motion: reduce){
+  .gv__scene.is-fade,.is-on .gv__ln,.is-on .gv__rise,.gv__cap > *{animation:none}
+  .is-on .gv__step{animation:none;opacity:1}
+  .gv__rise{opacity:1}
+}
 /* The shape studies (599:4385) ARE rebuilt, because the exported SVG handed over
    exact geometry: card 760x386 at radius 20 in Neutral/100; both shapes 242 tall
    from y=72 in Neutral/400; the left one 522 wide starting at x=-55, so it runs
@@ -377,14 +468,54 @@
    except the right shape's bottom-right, which sweeps at 136.125 — the curve
    that echoes the mark. None of those sit on the radius scale: they are artwork
    proportions, not UI radii, which is exactly why they are hard-coded here. */
-.sg-shapes{position:relative;overflow:hidden;height:386px;
-           border-radius:var(--gw-radius-20);
-           background:var(--gw-color-neutral-100)}
-.sg-shapes__a,.sg-shapes__b{position:absolute;top:72px;height:242px;
-                            background:var(--gw-color-neutral-400)}
-.sg-shapes__a{left:-55px;width:522px;border-radius:15.125px}
-.sg-shapes__b{left:476.075px;width:211.75px;
-              border-radius:15.125px 15.125px 136.125px 15.125px}
+/* Shape studies, redrawn as the two places the curve is used in the library.
+   The swept corner is the logo abstracted: one rounded shape with its bottom-right
+   corner opened. Image card = Card / Case Study and Blog, whose image takes the
+   sweep (12 12 80 12, measured on the Hover state). UI card = Card / Information,
+   Mobile, Image=With, Style 1 (343 wide, radius 12, pad 12, title 22/500, body
+   16/24), with the library image `traffic-trend` (610 x 346) in the slot and the
+   card's own bottom-right corner swept. Both are fluid in a 2-up, so they run 360
+   rather than the library's 384 and 343. The stage is white with a Neutral/100 hairline, as the
+   library's specimen stages are: the information card's Neutral/100 border would vanish on
+   a Neutral/100 ground. It is artwork, so it stays light in both themes. The sweep opens when the card first scrolls in
+   (a judgement call, not drawn); with no script or reduced motion it just rests open. */
+.shp{--body:var(--gw-font-body);--display:var(--gw-font-display);
+     --shp-sweep:80px;display:grid;grid-template-columns:1fr 1fr;gap:var(--gw-space-20);
+     align-items:start;padding:var(--gw-space-24);border-radius:var(--gw-radius-20);
+     background:var(--gw-color-white);box-shadow:inset 0 0 0 1px var(--gw-color-neutral-100)}
+.shp.is-pre{--shp-sweep:12px}
+.shp__fig{margin:0;display:flex;flex-direction:column;gap:var(--gw-space-12);min-width:0}
+.shp__cap{font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-600)}
+.shp__cap b{font-weight:600;color:var(--gw-color-neutral-900)}
+.shp-case{display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.shp-case__img{position:relative;aspect-ratio:384/200;overflow:hidden;
+               background:var(--gw-color-neutral-300);
+               border-radius:12px 12px var(--shp-sweep) 12px;
+               transition:border-radius 900ms cubic-bezier(.2,.8,.2,1)}
+.shp-case__img::before{content:'';position:absolute;inset:0;background:#0000004d}
+.shp-case__logo{position:absolute;left:50%;top:50%;width:129px;height:64px;
+                transform:translate(-50%,-50%);display:grid;place-items:center;
+                border:1.5px dashed #fffc;border-radius:8px;
+                font:var(--gw-text-body-12-med);color:var(--gw-color-white)}
+.shp-case__body{padding:var(--gw-space-8);display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.shp-case__meta{display:flex;align-items:center;gap:var(--gw-space-12);
+                font:var(--gw-text-body-12-med);line-height:1;color:var(--gw-color-primary-500)}
+.shp-case__meta i{width:4px;height:4px;border-radius:50%;background:currentColor}
+.shp-case__h{margin:0;font-family:var(--body);font-weight:600;font-size:20px;line-height:1.4;
+             letter-spacing:-.12px;color:var(--gw-color-black)}
+.shp-info{display:flex;flex-direction:column;gap:var(--gw-space-12);overflow:hidden;
+          background:var(--gw-color-neutral-25);border:1px solid var(--gw-color-neutral-100);
+          border-radius:12px 12px var(--shp-sweep) 12px;
+          transition:border-radius 900ms cubic-bezier(.2,.8,.2,1)}
+.shp-info__head{padding:var(--gw-space-12);display:flex;flex-direction:column;gap:var(--gw-space-16)}
+.shp-info__row{display:flex;align-items:center;justify-content:space-between;gap:var(--gw-space-12)}
+.shp-info__t{font-family:var(--display);font-weight:500;font-size:22px;line-height:1.4;color:var(--gw-color-black)}
+.shp-info__row svg{width:20px;height:20px;flex:none;color:var(--gw-color-neutral-900)}
+.shp-info__p{margin:0;font:var(--gw-text-body-16-reg);letter-spacing:var(--gw-text-body-16-reg-tracking);color:var(--gw-color-neutral-800)}
+.shp-info__img{position:relative;aspect-ratio:610/346;overflow:hidden;background:var(--gw-color-neutral-50)}
+.shp-info__img > div{position:absolute;left:0;top:0;transform-origin:0 0;transform:scale(var(--k,.58))}
+@media (max-width:700px){.shp{grid-template-columns:1fr}}
+@media (prefers-reduced-motion: reduce){.shp-case__img,.shp-info{transition:none}}
 
 
 /* Specimen surfaces. Neutral/100 on a Neutral/25 page is the measured light
@@ -409,7 +540,7 @@
 :root[data-theme="dark"]{
   /* Neutral/200 is a light grey — on the dark page it would read as a bright
      line. Steps to the border tone the rest of the chrome uses. */
-  --s-rule:var(--gw-color-neutral-800);
+  --s-rule:var(--gw-color-neutral-900);
 }
 
 /* Specimen ink. The frames above keep a light fill in dark mode, so everything
@@ -439,7 +570,7 @@
   --s-nav-label:var(--gw-color-neutral-900);
 }
 
-/* No narrow-viewport reflow here. exports/dashboard/build-rules.md rules that
+/* No narrow-viewport reflow here. exports/dashboard/shell.md rules that
    below 1440 the canvas SCALES rather than rearranges — reflow is listed there
    as a rejected attempt. shell.js sets --gw-fit and .gw-shell zooms the whole
    1440 layout, so this page keeps its 800 / 60 / 260 split at every width. */
@@ -458,6 +589,8 @@
   .sg-card--pad{padding:var(--gw-bp-pad-card-v) var(--gw-bp-pad-card-h)}
   .sg-logo{min-height:220px}
   .sg-logo img{width:150px}
+  /* the concept drawing is natural size on purpose (hairlines scale to grey), so the 150 above squeezed it */
+  .sg-logo--concept img{width:296.78px}
   /* One column of tiles at 343 content — two would put the caption on four
      lines inside a 158 tile. */
   .sg-grid{grid-template-columns:minmax(0,1fr)}
@@ -478,13 +611,20 @@
 <body data-gw-page="style-guide">
 
 <div class="sg">
+
+  <!-- Measured 796:10015: the header is 1106 wide — the FULL body width, above both
+       columns — not 800. It used to sit inside the content column. -->
+  <header class="sg__hd">
+    <div class="pa-top">
+      <h1 class="sg__title">Style Guide</h1>
+      <!-- data-bundle-default: Copy page here is the whole kit — this page plus the Downloads
+           page's files and the logo SVG source. See buildBrandKit in shell.js. -->
+      <div class="pa" data-page-actions="public" data-bundle="/downloads" data-bundle-role="guidelines" data-bundle-default></div>
+    </div>
+    <p class="sg__meta">Last updated 07th Oct, 2026</p>
+  </header>
+
   <div class="sg__main">
-
-    <header class="sg__hd">
-      <h1 class="sg__title">Gushwork Style Guide</h1>
-      <p class="sg__meta">Last updated 24th Sep, 2026</p>
-    </header>
-
     <div class="sg__body">
 
       <!-- intro (Frame 2147260245) -->
@@ -759,12 +899,21 @@
                this export and cannot be: it is a Figma WIDGET, not a vector layer, so
                the exporter has nothing to emit for it. If the cursor is meant to be
                part of the artwork it needs redrawing as a vector. -->
-          <img class="sg-ve" src="/assets/visual-elements/grid-colourways.svg"
-               width="760" height="480" alt="The grid in four colourways: Flat Black,
-               Primary blue with cells stacked into rising columns, Neutral/25, and
-               near-white.">
-          <p>The grid is the brand&rsquo;s visual element, and it runs in four
-             colourways &mdash; Flat Black, Primary, Neutral/25 and near-white. The
+          <div class="gv" data-gv>
+            <div class="gv__stage" data-gv-stage role="img"
+                 aria-label="The grid, shown one colourway at a time: Flat Black, Primary and Neutral/50.">
+              <noscript><img class="sg-ve" src="/assets/visual-elements/grid-colourways.svg"
+                   width="760" height="480" alt="The grid in colourways, including Flat Black and Primary."></noscript>
+              <div class="gv__ui">
+                <div class="gv__bar">
+                <div class="gv__tabs" role="tablist" aria-label="Grid colourway" data-gv-tabs></div>
+              </div>
+              <div class="gv__cap" aria-live="polite" data-gv-cap></div>
+              </div>
+            </div>
+          </div>
+          <p>The grid is the brand&rsquo;s visual element, and it runs in three
+             colourways &mdash; Flat Black, Primary and Neutral/50. The
              construction holds everywhere: square cells, a one-pixel line, a few cells
              filled to break the regularity. The pitch does not: it is set per surface,
              so the page hero runs 40px cells in Primary/600 while the OG card runs
@@ -772,14 +921,33 @@
              which is why that one ships as an exported vector rather than CSS. The
              filled cells carry the meaning: step them diagonally for movement, or
              stack them into rising columns for growth.</p>
-          <div class="sg-shapes">
-            <span class="sg-shapes__a"></span>
-            <span class="sg-shapes__b"></span>
+          <div class="shp" data-shp>
+            <figure class="shp__fig">
+              <div class="shp-case">
+                <div class="shp-case__img"><span class="shp-case__logo">client logo</span></div>
+                <div class="shp-case__body">
+                  <div class="shp-case__meta"><span>Industry or segment</span><i></i><span>Country</span></div>
+                  <p class="shp-case__h">A customer headline that leads with the result and how long it took</p>
+                </div>
+              </div>
+              <figcaption class="shp__cap"><b>Image card.</b> The case-study card, whose image takes the sweep.</figcaption>
+            </figure>
+            <figure class="shp__fig">
+              <div class="shp-info">
+                <div class="shp-info__head">
+                  <div class="shp-info__row"><span class="shp-info__t">Traffic from AI sources</span>
+                    <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M200,64V168a8,8,0,0,1-16,0V83.31L69.66,197.66a8,8,0,0,1-11.32-11.32L172.69,72H88a8,8,0,0,1,0-16H192A8,8,0,0,1,200,64Z"/></svg></div>
+                  <p class="shp-info__p">Which AI models send visitors to your pages, and how that moves over time.</p>
+                </div>
+                <div class="shp-info__img" data-shp-img role="img" aria-label="A traffic trend chart from the image library"><div style="width:610px;height:346px;background:#f1f2f3;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:20px 32px;box-sizing:border-box;flex:none"><div style="width:499.869px;border-radius:10.986px;overflow:hidden;display:flex;flex-direction:column;filter:drop-shadow(0 14.648px 14.648px rgba(88,92,95,.1));flex:none"><div style="width:100%;background:#fff;border-bottom:.652px solid #e7e8e9;display:flex;gap:2.607px;align-items:center;padding:7.822px 13.036px;box-sizing:border-box;flex:none"><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1.304px"><p style="margin:0;font-family:var(--body);font-weight:500;font-size:11.732px;line-height:1.6;letter-spacing:-.0235px;color:#0d0d0d;white-space:nowrap">Trend of Traffic from AI Sources</p><p style="margin:0;font-family:var(--body);font-weight:400;font-size:8.473px;line-height:1.4;letter-spacing:-.0508px;color:#878b94">Comparison of visitor traffic across AI models, for the selected time period</p></div><div style="width:104.288px;flex:none;background:#fff;border:.652px solid #e7e8e9;border-radius:5.214px;box-shadow:0 .652px 1.304px 0 rgba(0,0,0,.05);overflow:hidden;box-sizing:border-box"><div style="display:flex;align-items:center;justify-content:space-between;padding:5.214px 6.518px 5.214px 7.822px;border-left:.652px solid #e7e8e9"><p style="margin:0;font-family:var(--body);font-weight:500;font-size:9.125px;line-height:13.036px;letter-spacing:-.0183px;color:#0d0d0d;white-space:nowrap">All AI Models</p><div style="position:relative;width:13.036px;height:13.036px;flex:none"><svg viewBox="0 0 13.036 13.036" preserveAspectRatio="none" fill="none" style="display:block;overflow:visible;position:absolute;inset:0;width:100%;height:100%"><g id="i19xChevron down"><path id="i19xIcon" d="M10.3202 4.8885L6.51801 8.69067L2.71584 4.8885" stroke="#6A7077" stroke-width="0.814751" stroke-linecap="round" stroke-linejoin="round"/></g></svg></div></div></div></div><div style="width:100%;height:231.926px;background:#fff;filter:drop-shadow(0 1.304px 1.304px rgba(27,28,29,.04));display:flex;flex-direction:column;gap:10.986px;justify-content:center;padding:10.986px 14.648px;box-sizing:border-box;flex:none"><div style="flex:1;min-height:0;display:flex;flex-direction:column;gap:10.429px"><div style="display:flex;gap:3.911px;align-items:flex-end"><p style="margin:0;font-family:var(--display);font-weight:700;font-size:21.972px;line-height:1.4;letter-spacing:-.1318px;color:#0d0d0d;white-space:nowrap">6.8K</p><div style="display:flex;gap:2.607px;align-items:flex-end;padding-bottom:5.214px"><div style="display:flex;gap:1.304px;align-items:center"><div style="position:relative;width:9.125px;height:9.125px"><svg viewBox="0 0 9.12521 9.12521" preserveAspectRatio="none" fill="none" style="display:block;overflow:visible;position:absolute;inset:0;width:100%;height:100%"><g id="i25xArrow up"><path id="i25xIcon" fill-rule="evenodd" clip-rule="evenodd" d="M1.50242 4.42897C1.32424 4.25079 1.32424 3.9619 1.50242 3.78372L4.23998 1.04616C4.41816 0.867976 4.70705 0.867976 4.88523 1.04616L7.62279 3.78372C7.80097 3.9619 7.80097 4.25079 7.62279 4.42897C7.44461 4.60715 7.15572 4.60715 6.97754 4.42897L5.01887 2.47029L5.01887 7.75643C5.01887 8.00841 4.81459 8.21269 4.56261 8.21269C4.31062 8.21269 4.10634 8.00841 4.10634 7.75643L4.10634 2.47029L2.14767 4.42897C1.96949 4.60715 1.6806 4.60715 1.50242 4.42897Z" fill="#22C55E"/></g></svg></div><p style="margin:0;font-family:var(--body);font-weight:500;font-size:9.125px;line-height:13.036px;letter-spacing:-.0548px;color:#22c55e">6%</p></div><p style="margin:0;font-family:var(--body);font-weight:400;font-size:9.125px;line-height:13.036px;letter-spacing:-.0548px;color:#878b94;white-space:nowrap">vs last week</p></div></div><div style="flex:1;min-height:0;display:flex;gap:15.643px"><div style="display:flex;flex-direction:column;justify-content:space-between;padding-bottom:26.072px"><p style="margin:0;font-family:var(--body);font-size:7.822px;line-height:10.429px;color:#878b94;white-space:nowrap">7K</p><p style="margin:0;font-family:var(--body);font-size:7.822px;line-height:10.429px;color:#878b94;white-space:nowrap">5K</p><p style="margin:0;font-family:var(--body);font-size:7.822px;line-height:10.429px;color:#878b94;white-space:nowrap">3K</p><p style="margin:0;font-family:var(--body);font-size:7.822px;line-height:10.429px;color:#878b94;white-space:nowrap">1K</p></div><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:10.986px"><div style="position:relative;flex:1 1 0;min-height:0;overflow:hidden;width:100%"><div style="position:absolute;left:.13px;top:4.31px;width:441.277px;height:128.172px"><svg viewBox="0 0 441.277 128.823" preserveAspectRatio="none" fill="none" style="display:block;overflow:visible;position:absolute;inset:0;width:100%;height:100%"><g id="i20xFrame 2147225353"><line id="i20xLine 279" x1="3.14028e-05" y1="0.3259" x2="441.277" y2="0.3259" stroke="#F1F2F3" stroke-width="0.651801"/><line id="i20xLine 280" y1="21.6879" x2="441.277" y2="21.6879" stroke="#F1F2F3" stroke-width="0.651801"/><line id="i20xLine 281" y1="43.0498" x2="441.277" y2="43.0498" stroke="#F1F2F3" stroke-width="0.651801"/><line id="i20xLine 282" y1="64.4117" x2="441.277" y2="64.4117" stroke="#F1F2F3" stroke-width="0.651801"/><line id="i20xLine 283" y1="85.7737" x2="441.277" y2="85.7737" stroke="#F1F2F3" stroke-width="0.651801"/><line id="i20xLine 284" y1="107.136" x2="441.277" y2="107.136" stroke="#F1F2F3" stroke-width="0.651801"/><line id="i20xLine 285" y1="128.498" x2="441.277" y2="128.498" stroke="#F1F2F3" stroke-width="0.651801"/></g></svg></div><div style="position:absolute;left:-10.85px;bottom:-1.03px;width:452.263px;height:130.918px;display:flex;align-items:center;justify-content:center"><div style="flex:none;transform:rotate(90deg);position:relative;width:130.918px;height:452.263px"><svg viewBox="0 0 130.918 452.915" preserveAspectRatio="none" fill="none" style="display:block;overflow:visible;position:absolute;inset:0;width:100%;height:100%"><g id="i21xFrame 2147225354"><line id="i21xLine 279" y1="0.3259" x2="130.918" y2="0.3259" stroke="#F1F2F3" stroke-width="0.651801"/><line id="i21xLine 280" x1="1.03848e-05" y1="50.5774" x2="130.918" y2="50.5774" stroke="#F1F2F3" stroke-width="0.651801"/><line id="i21xLine 281" x1="1.25524e-05" y1="100.829" x2="130.918" y2="100.829" stroke="#F1F2F3" stroke-width="0.651801"/><line id="i21xLine 282" x1="1.472e-05" y1="151.08" x2="130.918" y2="151.08" stroke="#F1F2F3" stroke-width="0.651801"/><line id="i21xLine 285" x1="1.68876e-05" y1="201.332" x2="130.918" y2="201.332" stroke="#F1F2F3" stroke-width="0.651801"/><line id="i21xLine 286" x1="1.90552e-05" y1="251.583" x2="130.918" y2="251.583" stroke="#F1F2F3" stroke-width="0.651801"/><line id="i21xLine 287" x1="2.12227e-05" y1="301.834" x2="130.918" y2="301.834" stroke="#F1F2F3" stroke-width="0.651801"/><line id="i21xLine 288" x1="2.33903e-05" y1="352.086" x2="130.918" y2="352.086" stroke="#F1F2F3" stroke-width="0.651801"/><line id="i21xLine 283" x1="2.55579e-05" y1="402.337" x2="130.918" y2="402.337" stroke="#F1F2F3" stroke-width="0.651801"/><line id="i21xLine 284" x1="2.77255e-05" y1="452.589" x2="130.918" y2="452.589" stroke="#F1F2F3" stroke-width="0.651801"/></g></svg></div></div><div style="position:absolute;left:0.13px;bottom:-1.03px;width:443.108px;height:98.875px"><svg viewBox="0 0 444.023 98.8753" preserveAspectRatio="none" fill="none" style="display:block;overflow:visible;position:absolute;inset:0;width:100%;height:100%"><g id="i22xFrame 2147259560"><path id="i22xVector" d="M0.915748 71.4099L74.4619 50.2616L148.008 64.3605L221.554 29.1133L295.1 43.2121L368.646 0.915513L442.192 29.1133" stroke="#73EB2E" stroke-width="1.83102" stroke-linecap="round" stroke-linejoin="round"/><path id="i22xVector_2" d="M2.74677 70.6252L76.2929 49.4376L149.839 63.5627L223.385 28.2501L296.931 42.3751L370.477 1.64378e-06L444.023 28.2501V98.8753H2.74677V70.6252Z" fill="#73EB2E" fill-opacity="0.08"/></g></svg></div><div style="position:absolute;left:0.13px;bottom:-1.03px;width:443.108px;height:129.087px"><svg viewBox="0 0 443.108 129.087" preserveAspectRatio="none" fill="none" style="display:block;overflow:visible;position:absolute;inset:0;width:100%;height:100%"><g id="i23xFrame 2147225352" clip-path="url(#i23xclip0_0_6)"><path id="i23xVector 78" d="M49.9276 68.2056L-3.14028e-05 82.8538V129.545H443.108V52.1841H396.3L352.614 82.8538L308.303 76.9029L267.113 107.115L223.426 112.608L178.491 89.7201L137.301 96.1287L49.9276 68.2056Z" fill="#0070FF" fill-opacity="0.1"/><path id="i23xVector 77" d="M-3.14028e-05 83.7693L49.9276 69.1211L137.301 97.0442L178.491 90.6356L223.426 113.523L267.113 108.03L308.303 77.8185L352.614 83.7693L396.3 53.0996H443.108" stroke="#0070FF" stroke-width="2.74653"/></g><defs><clipPath id="i23xclip0_0_6"><rect width="443.108" height="129.087" fill="white"/></clipPath></defs></svg></div><div style="position:absolute;left:.13px;bottom:-1.03px;width:443.108px;height:42.114px;display:flex;align-items:center;justify-content:center"><div style="flex:none;transform:scaleY(-1) rotate(180deg);position:relative;width:443.108px;height:42.114px"><svg viewBox="0 0 444.939 42.1135" preserveAspectRatio="none" fill="none" style="display:block;overflow:visible;position:absolute;inset:0;width:100%;height:100%"><g id="i24xFrame 2147259559"><path id="i24xVector" d="M0.915639 10.9861L74.7669 22.2774L148.618 20.1412L222.469 33.5687L296.321 31.4325L370.172 35.7049L444.023 33.5687" stroke="#FFA626" stroke-width="1.83102" stroke-linecap="round" stroke-linejoin="round"/><path id="i24xVector_2" d="M0.915639 10.9861L74.7669 22.2774L148.618 20.1412L222.469 33.5687L296.321 31.4325L370.172 35.7049L444.023 33.5687V42.1135H0.915639L0.915639 10.9861Z" fill="#FFA626" fill-opacity="0.08"/></g></svg></div></div></div><div style="display:flex;justify-content:space-between;width:100%"><p style="margin:0;font-family:var(--body);font-size:7.822px;line-height:10.429px;color:#878b94">SEP</p><p style="margin:0;font-family:var(--body);font-size:7.822px;line-height:10.429px;color:#878b94">OCT</p><p style="margin:0;font-family:var(--body);font-size:7.822px;line-height:10.429px;color:#878b94">NOV</p><p style="margin:0;font-family:var(--body);font-size:7.822px;line-height:10.429px;color:#878b94">DEC</p><p style="margin:0;font-family:var(--body);font-size:7.822px;line-height:10.429px;color:#878b94">JAN</p><p style="margin:0;font-family:var(--body);font-size:7.822px;line-height:10.429px;color:#878b94">FEB</p></div></div></div></div><div style="display:flex;gap:10.547px;align-items:center;justify-content:center;padding-left:24.609px"><div style="display:flex;gap:3.259px;align-items:center"><span style="width:7.822px;height:7.822px;border-radius:13px;background:#22c55e;display:block"></span><p style="margin:0;font-family:var(--body);font-weight:500;font-size:7.822px;line-height:1.4;color:#535a61;white-space:nowrap">ChatGPT</p></div><div style="display:flex;gap:3.259px;align-items:center"><span style="width:7.822px;height:7.822px;border-radius:13px;background:#338cff;display:block"></span><p style="margin:0;font-family:var(--body);font-weight:500;font-size:7.822px;line-height:1.4;color:#535a61;white-space:nowrap">Gemini</p></div><div style="display:flex;gap:3.259px;align-items:center"><span style="width:7.822px;height:7.822px;border-radius:13px;background:#ffa626;display:block"></span><p style="margin:0;font-family:var(--body);font-weight:500;font-size:7.822px;line-height:1.4;color:#535a61;white-space:nowrap">Others</p></div></div></div></div></div></div>
+              </div>
+              <figcaption class="shp__cap"><b>UI card.</b> An information card carrying a product image, its corner swept.</figcaption>
+            </figure>
           </div>
-          <p>The shape studies pair a plain rounded slab with one whose bottom-right
-             corner sweeps open &mdash; that curve is our logo, abstracted. The shape
-             works as a placeholder that holds an image, as a graphic element on its
-             own, or as the block a layout is built from.</p>
+          <p>The shape pairs a plain rounded slab with one whose bottom-right corner
+             sweeps open &mdash; that curve is our logo, abstracted. It holds an image,
+             as the case-study card&rsquo;s does, or a product UI, as an information
+             card&rsquo;s does, and it works as the block a layout is built from.</p>
         </div>
       </section>
 
@@ -1083,8 +1251,178 @@
      scroll spy. It moved there on 29 Sep 2026 because each page had its own
      copy listening on `window`, and the window stopped scrolling when the
      content panel became its own scrollport. */
-  }, { passive: true });
-  spy();
+})();
+
+/* The grid, one colourway at a time. Scenes are built here rather than typed out:
+   19 x 12 cells at a 40 pitch, so the stage is the 760 x 480 of the exported card.
+   A 100ms tick counts up to six seconds and advances; it stands still while paused,
+   off screen or in a background tab. */
+(function () {
+  'use strict';
+  var host = document.querySelector('[data-gv]');
+  if (!host) return;
+  var stage = host.querySelector('[data-gv-stage]');
+  var tabsEl = host.querySelector('[data-gv-tabs]');
+  var capEl = host.querySelector('[data-gv-cap]');
+  var NS = 'http://www.w3.org/2000/svg', COLS = 19, ROWS = 12, P = 40;
+  var still = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var DUR = 6000;
+
+  /* the cells that carry the meaning, as [col,row]. Steps run corner to corner;
+     columns are heights, bottom-anchored, from col 6 to the right edge. */
+  var STAIR_A = [[8,1],[9,1],[9,2],[10,2],[10,3],[11,3],[11,4],[12,4],[12,5],[13,5]];
+  var STAIR_B = [[13,1],[12,1],[12,2],[11,2],[11,3],[10,3],[10,4],[9,4],[9,5],[8,5]];
+  var HEIGHTS = [1,2,3,5,4,6,5,4,6,5,7,4,3];
+
+  var WAYS = [
+    { id: 'black',   name: 'Flat Black', why: 'The filled cells step diagonally, for movement.',
+      kind: 'step', cells: STAIR_A,
+      toks: [['Ground','Black','--gw-color-black'],['Line','Neutral/900','--gw-color-neutral-900'],['Cells','Neutral/900','--gw-color-neutral-900']] },
+    { id: 'primary', name: 'Primary', why: 'The cells stack into rising columns, for growth.',
+      kind: 'rise', cols: HEIGHTS,
+      toks: [['Ground','Primary/500','--gw-color-primary-500'],['Line','Primary/400','--gw-color-primary-400'],['Cells','Primary/400','--gw-color-primary-400']] },
+    { id: 'n50',     name: 'Neutral/50', why: 'The filled cells step diagonally, for movement.',
+      kind: 'step', cells: STAIR_B,
+      toks: [['Ground','Neutral/50','--gw-color-neutral-50'],['Line','Neutral/100','--gw-color-neutral-100'],['Cells','Neutral/200','--gw-color-neutral-200']] }
+  ];
+
+  function el(tag, attrs, parent) {
+    var n = document.createElementNS(NS, tag);
+    for (var k in attrs) n.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(n);
+    return n;
+  }
+
+  function scene(w) {
+    var div = document.createElement('div');
+    div.className = 'gv__scene';
+    div.setAttribute('data-way', w.id);
+    var svg = el('svg', { viewBox: '0 0 ' + COLS * P + ' ' + ROWS * P, preserveAspectRatio: 'xMidYMid slice', 'aria-hidden': 'true' }, div);
+    var i = 0, c, r;
+    /* cells go under the lines, as in the card */
+    var cells = el('g', {}, svg);
+    if (w.kind === 'step') {
+      w.cells.forEach(function (rc, n) {
+        var q = el('rect', { 'class': 'gv__step', x: rc[0] * P, y: rc[1] * P, width: P, height: P }, cells);
+        q.style.setProperty('--i', n);
+      });
+    } else {
+      w.cols.forEach(function (h, ci) {
+        for (var k = 0; k < h; k++) {
+          var q = el('rect', { 'class': 'gv__rise', x: (COLS - w.cols.length + ci) * P, y: (ROWS - 1 - k) * P, width: P, height: P }, cells);
+          q.style.setProperty('--c', ci);
+          q.style.setProperty('--k', k);
+        }
+      });
+    }
+    var lines = el('g', {}, svg);
+    for (c = 1; c < COLS; c++) { var v = el('path', { 'class': 'gv__ln', d: 'M' + c * P + ' 0V' + ROWS * P, pathLength: 1 }, lines); v.style.setProperty('--i', i++); }
+    for (r = 1; r < ROWS; r++) { var h = el('path', { 'class': 'gv__ln', d: 'M0 ' + r * P + 'H' + COLS * P, pathLength: 1 }, lines); h.style.setProperty('--i', i++); }
+    stage.appendChild(div);
+    return div;
+  }
+
+  var scenes = [], tabs = [], cur = -1, wipeTimer = 0, held = 0;
+
+  WAYS.forEach(function (w, i) {
+    scenes.push(scene(w));
+    var b = document.createElement('button');
+    b.className = 'gv__tab'; b.type = 'button'; b.setAttribute('role', 'tab');
+    b.setAttribute('aria-selected', 'false'); b.tabIndex = -1; b.id = 'gv-tab-' + w.id;
+    b.innerHTML = '<span class="gv__dot" style="--d:var(' + w.toks[0][2] + ')"></span>' + w.name;
+    b.addEventListener('click', function () { show(i, true); });
+    b.addEventListener('keydown', function (e) {
+      var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (!d) return;
+      e.preventDefault();
+      var n = (i + d + WAYS.length) % WAYS.length;
+      show(n, true); tabs[n].focus();
+    });
+    tabsEl.appendChild(b); tabs.push(b);
+  });
+
+  function caption(w) {
+    capEl.innerHTML =
+      '<div class="gv__info"><h3 class="gv__name">' + w.name + '</h3><p class="gv__why">' + w.why + '</p></div>' +
+      '<ul class="gv__toks">' + w.toks.map(function (t) {
+        return '<li><i style="--c:var(' + t[2] + ')"></i><b>' + t[0] + '</b>' + t[1] + '</li>';
+      }).join('') + '</ul>';
+  }
+
+  function show(i, byUser) {
+    if (i === cur && !byUser) return;
+    var prev = cur;
+    cur = i;
+    held = 0;
+    clearTimeout(wipeTimer);
+    scenes.forEach(function (s, n) {
+      if (n === i) return;
+      s.classList.remove('is-fade');
+      if (n === prev) s.classList.add('is-prev'); else s.classList.remove('is-prev');
+      s.classList.remove('is-on');
+    });
+    var s = scenes[i];
+    s.classList.remove('is-prev', 'is-on', 'is-fade');
+    void s.offsetWidth;                       /* restart the draw and the cells */
+    s.classList.add('is-on');
+    if (prev > -1 && !still.matches) s.classList.add('is-fade');
+    wipeTimer = setTimeout(function () {
+      scenes.forEach(function (x) { x.classList.remove('is-prev'); });
+    }, 900);
+    tabs.forEach(function (b, n) {
+      var on = n === i;
+      b.setAttribute('aria-selected', on ? 'true' : 'false');
+      b.tabIndex = on ? 0 : -1;
+    });
+    /* on a phone the tab row scrolls: keep the live one in view without moving the page */
+    var t = tabs[i], box = tabsEl;
+    if (t.offsetLeft < box.scrollLeft || t.offsetLeft + t.offsetWidth > box.scrollLeft + box.clientWidth) {
+      box.scrollTo({ left: t.offsetLeft - 4, behavior: still.matches ? 'auto' : 'smooth' });
+    }
+    caption(WAYS[i]);
+  }
+
+  /* no pause button: pointing at the stage or focusing a tab holds the sequence */
+  function hold(on) { if (on) host.setAttribute('data-hold', ''); else host.removeAttribute('data-hold'); }
+  stage.addEventListener('pointerenter', function () { hold(true); });
+  stage.addEventListener('pointerleave', function () { hold(host.contains(document.activeElement) && document.activeElement.matches(':focus-visible')); });
+  host.addEventListener('focusin', function (e) { if (e.target.matches(':focus-visible')) hold(true); });
+  host.addEventListener('focusout', function () { hold(false); });
+
+  /* off screen, the sequence waits where it is */
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (es) {
+      if (es[0].isIntersecting) host.removeAttribute('data-offscreen'); else host.setAttribute('data-offscreen', '');
+    }, { threshold: 0.25 }).observe(stage);
+  }
+
+  setInterval(function () {
+    if (still.matches || document.hidden || host.hasAttribute('data-hold') || host.hasAttribute('data-offscreen')) return;
+    held += 100;
+    if (held >= DUR) show((cur + 1) % WAYS.length, false);
+  }, 100);
+
+  show(0, true);
+})();
+
+/* Shape studies: scale the library image to the card, and open the sweep once, the first
+   time the cards scroll into view. */
+(function () {
+  'use strict';
+  var host = document.querySelector('[data-shp]');
+  if (!host) return;
+  var box = host.querySelector('[data-shp-img]');
+  function fit() { box.style.setProperty('--k', (box.clientWidth / 610).toFixed(4)); }
+  fit();
+  if ('ResizeObserver' in window) new ResizeObserver(fit).observe(box); else window.addEventListener('resize', fit);
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
+  host.classList.add('is-pre');
+  var io = new IntersectionObserver(function (es) {
+    if (!es[0].isIntersecting) return;
+    io.disconnect();
+    requestAnimationFrame(function () { host.classList.remove('is-pre'); });
+  }, { threshold: 0.35 });
+  io.observe(host);
 })();
 </script>
 </body></html>

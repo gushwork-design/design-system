@@ -21,7 +21,7 @@ export default async function handler(req, res) {
                                                 gate: GATE_ENABLED }));
   }
 
-  /* Live, not the cookie's 12-hour-old claim — the same rules middleware.js
+  /* Live, not the cookie's up-to-30-day-old claim — the same rules middleware.js
      enforces. Drawing an ADMIN group the edge would then 403 is worse than
      drawing nothing, and that is exactly what a stale claim produces the
      moment access-control is used to grant or revoke someone. */

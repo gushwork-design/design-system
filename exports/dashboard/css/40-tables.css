@@ -1,0 +1,324 @@
+/* ============================================================================
+   Gushwork dashboard — 40 tables, filtering and logs
+   Provenance per component (extracted = the hub's shipped code; NEW = not in the hub):
+     data-table          extracted: web/admin/analytics.html:362-428,457 (.ul-tbl/.ul-row/.ul-th/.ul-c/.ul-grp), web/admin/access-control.html:105-157 (.ac-row/.ac-head).
+                         Sticky header, sticky first column, --gd-cols, totals row, tree rows, grouped headers, rank cell, heat cells: NEW — reference Mobbin Semrush, Causal, Substack, Mixpanel — pending library review
+     table-cell-types    extracted: .ul-c, .ul-badge, .ul-c--who, .ul-c--out a (analytics.html:378-397). Avatar+name, progress, sparkline, trend-delta cells NEW — reference Mobbin Mixpanel, Fresha — pending library review
+     row-selection       NEW: not in the hub — reference Mobbin Calendly, Midday — pending library review
+     bulk-action-bar     NEW: not in the hub — reference Mobbin Calendly, Midday, Aboard — pending library review
+     column-menu         NEW: not in the hub — reference Mobbin Midday, Neon — pending library review (menu itself is 20-actions)
+     row-actions-menu    extracted: access-control.html:188-196 (.ac-icbtn trigger); menu is 20-actions
+     pagination          extracted: analytics.html:459-461 (.ul-pg), access-control.html:82-91 (.ac-pg). Items-per-page menu, first/last, jump input NEW — reference Mobbin Semrush — pending library review
+     table-toolbar       extracted: analytics.html:281-290 (.ul-tools/.ul-input). Columns, view switcher, export NEW
+     filter-chip         NEW: not in the hub — reference Mobbin Neon, Aboard — pending library review
+     filter-builder      NEW: not in the hub — reference Mobbin Neon, Aboard — pending library review
+     saved-views         NEW: not in the hub — reference Mobbin Aboard — pending library review
+     table-states        extracted: analytics.html:1585-1586 (loading ghost rows), :1613 (empty), .ul-empty:466. Error and no-results NEW
+     log-viewer          NEW: not in the hub — reference Mobbin Railway, Cloudflare, Supabase, Modal, Okta, Sentry — pending library review
+     histogram           NEW: not in the hub — reference Mobbin Sentry, Datadog log explorer — pending library review
+
+   Aliases added here (all under .gd, light-dark()):
+     --gd-row-hover      table row hover. Hub values (neutral-25 / neutral-900). --gd-hover-bg is too faint on a black card.
+     --gd-row-selected   selected row overlay: primary/alpha-10 (the old data-table ruling; the hub draws no selected row)
+     --gd-bulk-hover     hover fill on the ink bulk bar
+     --gd-bulk-danger    red label that is legible on the ink bar in both themes
+     --gd-font-mono      the hub's code stack. tokens.css has no monospace token: FINDING, not a token.
+   Hover is forced for previews with .is-hover. Rows are rules, not boxes: no per-row shadow, transition or :has().
+   ============================================================================ */
+
+.gd {
+  --gd-row-hover:    light-dark(var(--gw-color-neutral-25), var(--gw-color-neutral-900));
+  --gd-row-selected: var(--gw-color-primary-alpha-10);
+  --gd-bulk-hover:   color-mix(in srgb, var(--gd-ink-fg) 14%, transparent);
+  --gd-bulk-danger:  light-dark(var(--gw-color-red-300), var(--gw-color-red-600));
+  --gd-font-mono:    ui-monospace, Menlo, monospace;
+
+  [hidden] { display: none !important; }
+
+  /* ===================================================== data-table ======= */
+  .gd-tview { display: flex; flex-direction: column; min-width: 0; position: relative; background: var(--gd-card-bg);
+    border: 1px solid var(--gd-border); border-radius: var(--gw-radius-12); overflow: hidden; }
+  .gd-tview--flush { border: 0; border-radius: 0; background: none; }
+  .gd-table-wrap { position: relative; isolation: isolate; overflow: auto; max-height: var(--gd-table-max-h, none); min-width: 0; }
+
+  .gd-table { --_ov: transparent; --gd-sel-w: calc(var(--gd-cell-px) * 2 + 16px); width: 100%; min-width: var(--gd-table-min, 0); }
+  .gd-table__row {
+    display: grid; grid-template-columns: var(--gd-cols); align-items: center; height: var(--gd-row-h);
+    background-color: var(--gd-card-bg); background-image: linear-gradient(var(--_ov), var(--_ov));
+    box-shadow: inset 0 -1px 0 var(--gd-border);
+  }
+  .gd-table__body > .gd-table__row:hover, .gd-table__group > .gd-table__row:hover, .gd-table__row.is-hover, .gd-table__row[data-gd-active] { --_ov: var(--gd-row-hover); }
+  .gd-table__row[aria-selected="true"] { --_ov: var(--gd-row-selected); }
+  .gd-table--lazy .gd-table__body > .gd-table__row { content-visibility: auto; contain-intrinsic-size: auto var(--gd-row-h); }
+
+  /* header: no fill (hub's final style), a firmer rule, sticky so it stays while the body scrolls */
+  .gd-table__row--head { position: sticky; top: 0; z-index: 2; height: var(--gd-head-h); --_ov: transparent; box-shadow: inset 0 -1px 0 var(--gd-border-strong); }
+  .gd-table__row--head2 { top: var(--gd-head-h); }
+  .gd-table__row--head:has(+ .gd-table__row--head2) { box-shadow: none; }   /* two-level header: only the lower row carries the strong rule, the group label keeps its own hairline */
+  .gd-table__th {
+    display: flex; align-items: center; gap: var(--gw-space-4); min-width: 0; padding: 0 var(--gd-cell-px);
+    font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); text-transform: uppercase; color: var(--gd-text-muted); white-space: nowrap;
+  }
+  .gd-table__th--num { justify-content: flex-end; text-align: right; }
+  .gd-table__th--group { justify-content: center; align-self: stretch; box-shadow: inset 0 -1px 0 var(--gd-border); }
+  .gd-table__sort {
+    display: inline-flex; align-items: center; gap: var(--gw-space-4); max-width: 100%; height: calc(var(--gd-head-h) - 8px); padding: 0; border: 0; background: none;
+    font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; cursor: pointer; white-space: nowrap;
+  }
+  .gd-table__sort:hover, .gd-table__sort.is-hover, .gd-table__th[aria-sort="ascending"], .gd-table__th[aria-sort="descending"] { color: var(--gd-text); }
+  .gd-table__sort svg { width: 12px; height: 12px; flex: none; color: var(--gd-text-muted); }
+  .gd-table__sort:hover svg { color: var(--gd-text); }
+  .gd-table__th[aria-sort="ascending"] svg, .gd-table__th[aria-sort="descending"] svg { color: var(--gd-accent); }   /* hub: the sorted column's glyph is primary/500 */
+  .gd-table__th[aria-sort="ascending"] .gd-sort-dn, .gd-table__th[aria-sort="descending"] .gd-sort-up { opacity: .3; }
+
+  .gd-table__cell {
+    min-width: 0; padding: 0 var(--gd-cell-px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); color: var(--gd-text-body);
+  }
+  .gd-table__cell--strong { color: var(--gd-text); }
+  .gd-table__cell--muted { color: var(--gd-text-muted); }
+  .gd-table__cell--num { text-align: right; font-feature-settings: "tnum" 1; }
+  .gd-table__cell--flex { display: flex; align-items: center; gap: var(--gw-space-8); }
+  .gd-table__cell--flex.gd-table__cell--num { justify-content: flex-end; }
+  .gd-table__cell--check { display: flex; align-items: center; justify-content: center; padding: 0; overflow: visible; }
+  .gd-table__cell--rank { color: var(--gd-text-muted); font-feature-settings: "tnum" 1; text-align: right; }
+  .gd-table__cell--actions { display: flex; align-items: center; justify-content: flex-end; padding-right: calc(var(--gd-cell-px) / 2); overflow: visible; }
+  .gd-table__trunc { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .gd-table__link { color: var(--gd-text); text-decoration: underline; text-underline-offset: 2px; }
+  .gd-table__link:hover { text-decoration-thickness: 2px; }
+
+  /* sticky first column(s). The overlay layer keeps hover / selected opaque over scrolled content. */
+  .gd-table--sticky-first :is(.gd-table__row, .gd-table__group > .gd-table__row) > :first-child,
+  .gd-table--sticky-select :is(.gd-table__row, .gd-table__group > .gd-table__row) > :nth-child(-n+2) {
+    position: sticky; left: 0; z-index: 1; background-color: var(--gd-card-bg); background-image: linear-gradient(var(--_ov), var(--_ov));
+  }
+  .gd-table--sticky-select :is(.gd-table__row, .gd-table__group > .gd-table__row) > :nth-child(2) { left: var(--gd-sel-w); }   /* same specificity as the pin above, so it wins by coming later: column 2 sits after the checkbox column, not under it */
+  .gd-table--sticky-first .gd-table__row > :first-child, .gd-table--sticky-select .gd-table__row > :nth-child(2) { box-shadow: inset -1px 0 0 var(--gd-border); }
+  .gd-table--sticky-select .gd-table__row > :first-child { box-shadow: none; }
+  .gd-table--sticky-first .gd-table__row--head > :first-child, .gd-table--sticky-select .gd-table__row--head > :nth-child(-n+2) { z-index: 3; }
+
+  /* the hub's inset look: rows inset 8, hover radius 12, hairline as a pseudo-element. Not compatible with sticky columns. */
+  .gd-table--inset .gd-table__body > .gd-table__row { position: relative; margin-inline: var(--gw-space-8); border-radius: var(--gw-radius-12); box-shadow: none; }
+  .gd-table--inset .gd-table__body > .gd-table__row + .gd-table__row::before { content: ""; position: absolute; top: 0; left: var(--gd-cell-px); right: var(--gd-cell-px); height: 1px; background: var(--gd-border); }
+  .gd-table--inset .gd-table__body > .gd-table__row:hover::before, .gd-table--inset .gd-table__body > .gd-table__row:hover + .gd-table__row::before { display: none; }
+  .gd-table--inset .gd-table__row--head { margin-inline: var(--gw-space-8); }
+
+  /* expandable row groups (hub .ul-grp) */
+  .gd-table__group { box-shadow: inset 0 -1px 0 var(--gd-border); }
+  .gd-table__group > .gd-table__row { box-shadow: none; cursor: pointer; }
+  .gd-table__group[data-open] > .gd-table__row { --_ov: var(--gd-sunken-bg); }
+  .gd-table__caret { display: inline-grid; place-items: center; width: 20px; height: 20px; flex: none; padding: 0; border: 0; border-radius: var(--gw-radius-4); background: none; color: var(--gd-text-muted); cursor: pointer; }
+  .gd-table__caret svg { width: 12px; height: 12px; transition: transform var(--gw-motion-fast); }
+  .gd-table__caret:hover { color: var(--gd-text); background: var(--gd-ctl-hover); }
+  .gd-table__group > [aria-expanded="true"] .gd-table__caret svg { transform: rotate(180deg); }
+  .gd-table__detail { padding: var(--gw-space-4) var(--gd-cell-px) var(--gd-card-pad); background: var(--gd-sunken-bg); font: var(--gw-text-body-12-med); color: var(--gd-text-body); }
+
+  /* tree rows: depth is --lvl on the row (0 = root); the caret sits in the first text cell */
+  .gd-table__row[data-gd-collapsed] { display: none; }
+  .gd-table__tree { display: flex; align-items: center; gap: var(--gw-space-4); min-width: 0; padding-left: calc(var(--lvl, 0) * var(--gw-space-16)); }
+  .gd-table__tree > .gd-table__caret[hidden] { display: inline-block !important; visibility: hidden; }   /* a leaf keeps the caret's room so labels align */
+  .gd-table__row[aria-expanded="false"] .gd-table__tree .gd-table__caret svg { transform: rotate(-90deg); }
+  .gd-table__row[data-level="0"] > .gd-table__cell:first-of-type { color: var(--gd-text); }
+
+  /* totals row: pinned under the header or at the foot */
+  .gd-table__row--total { font-weight: 600; box-shadow: inset 0 1px 0 var(--gd-border-strong); }
+  .gd-table__row--total .gd-table__cell { color: var(--gd-text); font-weight: 600; font-feature-settings: "tnum" 1; }
+  .gd-table__row--pin-top { position: sticky; top: var(--gd-head-h); z-index: 2; box-shadow: inset 0 -1px 0 var(--gd-border-strong); }
+  .gd-table__row--pin-bottom { position: sticky; bottom: 0; z-index: 2; }
+
+  /* heat cells: the charts author's --gd-seq-1…5 ramp (one hue, light-dark), plus 0 = empty. The value is always printed; the fill is never the only carrier. */
+  .gd-table__cell--heat { padding: 0 var(--gw-space-4); text-align: center; font-feature-settings: "tnum" 1; color: var(--gd-text); box-shadow: inset 0 0 0 1px var(--gd-card-bg); }
+  .gd-table__cell--heat[data-heat="0"] { background: transparent; color: var(--gd-text-muted); }
+  .gd-table__cell--heat[data-heat="1"] { background: var(--gd-seq-1); }
+  .gd-table__cell--heat[data-heat="2"] { background: var(--gd-seq-2); }
+  .gd-table__cell--heat[data-heat="3"] { background: var(--gd-seq-3); }
+  .gd-table__cell--heat[data-heat="4"] { background: var(--gd-seq-4); color: light-dark(var(--gw-color-white), var(--gw-color-neutral-900)); }
+  .gd-table__cell--heat[data-heat="5"] { background: var(--gd-seq-5); color: light-dark(var(--gw-color-white), var(--gw-color-neutral-900)); }
+
+  /* cell types */
+  .gd-table__avatar { width: 24px; height: 24px; flex: none; display: inline-grid; place-items: center; border-radius: var(--gw-radius-full);
+    background: var(--gd-selected-bg); color: var(--gd-text); font: var(--gw-text-body-10-sem); letter-spacing: var(--gw-text-body-10-sem-tracking); }
+  .gd-table__who { display: flex; flex-direction: column; min-width: 0; line-height: 16px; }
+  .gd-table__who > b { font-weight: inherit; color: var(--gd-text); overflow: hidden; text-overflow: ellipsis; }
+  .gd-table__who > small { font: var(--gw-text-body-12-reg); color: var(--gd-text-muted); overflow: hidden; text-overflow: ellipsis; }
+  .gd-table__prog { display: flex; align-items: center; gap: var(--gw-space-8); }
+  .gd-table__meter { flex: 1 1 auto; min-width: 48px; height: 4px; border-radius: var(--gw-radius-full); background: var(--gd-border-strong); overflow: hidden; }
+  .gd-table__meter > i { display: block; height: 100%; width: var(--v, 0%); border-radius: inherit; background: var(--gd-accent); }
+  .gd-table__prog > span { min-width: 3ch; text-align: right; font-feature-settings: "tnum" 1; }
+  .gd-table__spark { width: 72px; height: 20px; flex: none; color: var(--gd-accent); overflow: visible; }
+  .gd-table__spark path { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+  .gd-table__spark--up { color: var(--gd-good); }
+  .gd-table__spark--down { color: var(--gd-danger); }
+  .gd-table__spark--flat { color: var(--gd-text-muted); }
+  .gd-table[data-gd-sparklines="off"] .gd-table__spark { display: none; }
+  .gd-table__more { position: relative; display: inline-grid; place-items: center; width: var(--gd-control-h); height: var(--gd-control-h); padding: 0;
+    border: 0; border-radius: var(--gw-radius-8); background: none; color: var(--gd-text-muted); cursor: pointer; }
+  .gd-table__more::after { content: ""; position: absolute; inset: min(0px, calc((var(--gd-control-h) - 44px) / 2)); }   /* 44 hit target without growing the row */
+  .gd-table__more svg { width: 16px; height: 16px; display: block; }
+  .gd-table__more:hover, .gd-table__more.is-hover, .gd-table__more[aria-expanded="true"] { background: var(--gd-ctl-hover); color: var(--gd-text); }
+  .gd-table__more:disabled { color: var(--gd-disabled-fg); cursor: not-allowed; }
+
+  /* ================================================== table-states ======= */
+  .gd-table__body--ghost { display: none; }
+  .gd-tview[data-state="loading"] .gd-table__body--ghost { display: block; }
+  .gd-tview[data-state] .gd-table__body:not(.gd-table__body--ghost) { display: none; }
+  .gd-tview[data-state="loading"] .gd-table__body--ghost { display: block; }
+  .gd-table__row--ghost { box-shadow: inset 0 -1px 0 var(--gd-border); }   /* bars inside are .gd-ghost (60-feedback) */
+  .gd-tstate { display: none; }
+  .gd-tview[data-state="empty"] .gd-tstate--empty, .gd-tview[data-state="error"] .gd-tstate--error, .gd-tview[data-state="noresults"] .gd-tstate--noresults { display: block; }
+  .gd-tstate .gd-btn--primary, .gd-fbuilder .gd-btn--primary { color: var(--gd-ink-fg); }   /* 00-base's `.gd button { color: inherit }` outranks .gd-btn--primary: FINDING for the Actions author */
+  /* a quantity that cannot be read is removed, never shown as zero */
+  .gd-tview[data-state="loading"] [data-gd-count], .gd-tview[data-state="error"] [data-gd-count] { display: none; }
+  .gd-tview[data-state] > .gd-pager { display: none; }
+
+  /* ================================================== row-selection ====== */
+  .gd-table__row--head .gd-table__cell--check { background-color: var(--gd-card-bg); }
+
+  /* ================================================ bulk-action-bar ====== */
+  .gd-bulk { position: sticky; bottom: var(--gd-gap); z-index: 1; display: flex; flex-wrap: wrap; align-items: center; gap: var(--gw-space-4); width: fit-content; max-width: calc(100% - 2 * var(--gd-gap));   /* wraps onto a second row when the count and the actions do not fit, so Clear is never pushed off screen */
+    margin: var(--gd-gap) auto; padding: var(--gw-space-4) var(--gw-space-4) var(--gw-space-4) var(--gw-space-16);
+    border-radius: var(--gw-radius-12); background: var(--gd-ink); color: var(--gd-ink-fg); box-shadow: var(--gw-shadow-s3); }
+  .gd-bulk--fixed { position: fixed; left: 50%; bottom: var(--gw-space-24); margin: 0; transform: translateX(-50%); max-width: calc(100vw - 2 * var(--gw-space-16)); }
+  .gd-bulk__n { margin-right: var(--gw-space-12); font: var(--gw-text-body-14-med); letter-spacing: var(--gw-text-body-14-med-tracking); font-feature-settings: "tnum" 1; white-space: nowrap; }
+  .gd-bulk__btn { display: inline-flex; align-items: center; gap: var(--gw-space-8); height: var(--gd-control-h); padding: 0 var(--gw-space-12); border: 0; border-radius: var(--gw-radius-8);
+    background: none; color: inherit; font: var(--gw-text-button-14); white-space: nowrap; cursor: pointer; }
+  .gd-bulk__btn svg { width: 16px; height: 16px; flex: none; }
+  .gd-bulk__btn:hover, .gd-bulk__btn.is-hover { background: var(--gd-bulk-hover); }
+  .gd-bulk__btn--danger { color: var(--gd-bulk-danger); }
+  .gd-bulk__btn--icon { width: var(--gd-control-h); padding: 0; justify-content: center; margin-left: var(--gw-space-4); }
+  .gd-bulk :focus-visible { outline: 2px solid var(--gd-ink-fg); outline-offset: -2px; }
+
+  /* ===================================================== pagination ====== */
+  .gd-pager { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-8) var(--gd-gap); flex-wrap: wrap; padding: var(--gw-space-12); }
+  .gd-pager__l, .gd-pager__r { display: flex; align-items: center; gap: var(--gw-space-8); }
+  .gd-pager__t { font: var(--gw-text-button-14); color: var(--gd-text-muted); font-feature-settings: "tnum" 1; white-space: nowrap; }
+  .gd-pager__btn { display: inline-grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; border-radius: var(--gw-radius-8); background: transparent;
+    box-shadow: inset 0 0 0 1px var(--gd-border-strong); color: var(--gd-text); cursor: pointer; }
+  .gd-pager__btn svg { width: 12px; height: 12px; display: block; }
+  .gd-pager__btn:hover:not(:disabled), .gd-pager__btn.is-hover { background: var(--gd-ctl-hover); }
+  .gd-pager__btn:disabled { opacity: .4; cursor: not-allowed; }
+  .gd-pager__per { height: 28px; gap: var(--gw-space-4); }      /* a .gd-btn--sm trigger for the items-per-page menu */
+  .gd-pager__jump { width: 48px; height: 28px; padding: 0 var(--gw-space-8); border: 0; border-radius: var(--gw-radius-8); background: var(--gd-card-bg); color: var(--gd-text);
+    box-shadow: inset 0 0 0 1px var(--gd-border-strong); font: var(--gw-text-button-14); font-feature-settings: "tnum" 1; text-align: center; -moz-appearance: textfield; }
+  .gd-pager__jump::-webkit-inner-spin-button, .gd-pager__jump::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  .gd-pager__jump:focus { outline: none; box-shadow: inset 0 0 0 1px var(--gd-border-focus); }   /* R41: a text field shows its edge, not a ring */
+  .gd-pager__jump:disabled { color: var(--gd-disabled-fg); }
+
+  /* ================================================== table-toolbar ====== */
+  .gd-tbar { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-8) var(--gd-gap); flex-wrap: wrap; padding: var(--gw-space-12); }
+  .gd-tbar__g { display: flex; align-items: center; gap: var(--gw-space-8); flex-wrap: wrap; min-width: 0; }
+  .gd-tbar__search { position: relative; display: block; }
+  .gd-tbar__search > svg { position: absolute; left: var(--gw-space-12); top: 50%; width: 16px; height: 16px; margin-top: -8px; color: var(--gd-placeholder); pointer-events: none; }
+  .gd-tbar__search input { width: 240px; max-width: 100%; height: var(--gd-control-h); padding: 0 calc(var(--gw-space-12) + 24px) 0 calc(var(--gw-space-12) + 24px);
+    border: 0; border-radius: var(--gd-btn-r); background: var(--gd-card-bg); color: var(--gd-text); box-shadow: inset 0 0 0 1px var(--gd-border-strong); font: var(--gw-text-button-14); }
+  .gd-tbar__search input::placeholder { color: var(--gd-placeholder); }
+  .gd-tbar__search input:focus { outline: none; box-shadow: inset 0 0 0 1px var(--gd-border-focus); }
+  .gd-tbar__clear { position: absolute; right: var(--gw-space-4); top: 50%; width: 20px; height: 20px; margin-top: -10px; display: grid; place-items: center; padding: 0; border: 0; border-radius: var(--gw-radius-4); background: none; color: var(--gd-text-muted); cursor: pointer; }
+  .gd-tbar__clear:hover { background: var(--gd-ctl-hover); color: var(--gd-text); }
+  .gd-tbar__clear svg { width: 10px; height: 10px; }
+  .gd-tbar__n { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 var(--gw-space-4); border-radius: var(--gw-radius-full); background: var(--gd-ink); color: var(--gd-ink-fg);
+    font: var(--gw-text-body-10-sem); font-feature-settings: "tnum" 1; }
+
+  /* ===================================================== filter-chip ===== */
+  .gd-chips { display: flex; align-items: center; flex-wrap: wrap; gap: var(--gw-space-8); padding: 0 var(--gw-space-12) var(--gw-space-12); }
+  .gd-chip { display: inline-flex; align-items: center; gap: var(--gw-space-4); height: min(28px, var(--gd-control-h)); padding: 0 var(--gw-space-4) 0 var(--gw-space-8); max-width: 100%;
+    border-radius: var(--gw-radius-8); background: var(--gd-card-bg); box-shadow: inset 0 0 0 1px var(--gd-border-strong); font: var(--gw-text-body-12-med); white-space: nowrap; }
+  .gd-chip__f { color: var(--gd-text-muted); }
+  .gd-chip__op { color: var(--gd-text-muted); font-weight: 400; }
+  .gd-chip__v { min-width: 0; overflow: hidden; text-overflow: ellipsis; color: var(--gd-text); font-weight: 600; }
+  .gd-chip__x { display: grid; place-items: center; width: 20px; height: 20px; flex: none; padding: 0; border: 0; border-radius: var(--gw-radius-4); background: none; color: var(--gd-text-muted); cursor: pointer; }
+  .gd-chip__x svg { width: 10px; height: 10px; }
+  .gd-chip__x:hover, .gd-chip__x.is-hover { background: var(--gd-ctl-hover); color: var(--gd-text); }
+  .gd-chip:hover, .gd-chip.is-hover { background: var(--gd-row-hover); }
+
+  /* =================================================== filter-builder ==== */
+  .gd-fbuilder { position: absolute; z-index: 60; top: calc(100% + var(--gw-space-4)); left: 0; width: min(560px, calc(100vw - 16px)); padding: var(--gd-card-pad); display: flex; flex-direction: column; gap: var(--gd-gap);
+    background: var(--gd-raised-bg); border-radius: var(--gw-radius-12); box-shadow: inset 0 0 0 1px var(--gd-border-strong), var(--gw-shadow-s3); }
+  .gd-fbuilder--static { position: static; }
+  .gd-fbuilder__rows { display: flex; flex-direction: column; gap: var(--gw-space-8); }
+  .gd-fbuilder__row { display: grid; grid-template-columns: 44px minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.2fr) auto; align-items: center; gap: var(--gw-space-8); }
+  .gd-fbuilder__lead { font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
+  .gd-fbuilder__sel { position: relative; display: block; min-width: 0; }
+  .gd-fbuilder__sel > svg { position: absolute; right: var(--gw-space-8); top: 50%; width: 12px; height: 12px; margin-top: -6px; color: var(--gd-text-muted); pointer-events: none; }
+  .gd-fbuilder__field { width: 100%; min-width: 0; height: var(--gd-control-h); padding: 0 var(--gw-space-12); border: 0; border-radius: var(--gw-radius-8); background: var(--gd-card-bg); color: var(--gd-text);
+    box-shadow: inset 0 0 0 1px var(--gd-border-strong); font: var(--gw-text-button-12); }
+  select.gd-fbuilder__field { appearance: none; -webkit-appearance: none; padding-right: calc(var(--gw-space-8) + 20px); cursor: pointer; }
+  .gd-fbuilder__field::placeholder { color: var(--gd-placeholder); }
+  .gd-fbuilder__field:focus { outline: none; box-shadow: inset 0 0 0 1px var(--gd-border-focus); }
+  .gd-fbuilder__field[aria-invalid="true"] { box-shadow: inset 0 0 0 1px var(--gd-danger); }
+  .gd-fbuilder__x { display: grid; place-items: center; width: var(--gd-control-h); height: var(--gd-control-h); padding: 0; border: 0; border-radius: var(--gw-radius-8); background: none; color: var(--gd-text-muted); cursor: pointer; }
+  .gd-fbuilder__x svg { width: 14px; height: 14px; }
+  .gd-fbuilder__x:hover, .gd-fbuilder__x.is-hover { background: var(--gd-ctl-hover); color: var(--gd-text); }
+  .gd-fbuilder__none { margin: 0; font: var(--gw-text-body-12-reg); color: var(--gd-text-muted); }
+  .gd-fbuilder__foot { display: flex; align-items: center; gap: var(--gw-space-8); }
+  .gd-fbuilder__foot > .gd-fbuilder__sp { flex: 1 1 auto; }
+  .gd-fbuilder__foot > .gd-btn--ghost:first-child { margin-left: calc(var(--gw-space-12) * -1); }   /* the ghost button's own 12px padding no longer pushes "Add filter" in from the Where / And labels */
+
+  /* ===================================================== saved-views ===== */
+  .gd-views { display: flex; align-items: center; gap: var(--gw-space-4); flex-wrap: wrap; padding: 0 var(--gw-space-12); }
+  .gd-views__tab { display: inline-flex; align-items: center; gap: var(--gw-space-8); height: var(--gd-control-h); padding: 0 var(--gw-space-12); border: 0; border-radius: var(--gw-radius-8); background: none;
+    color: var(--gd-text-muted); font: var(--gw-text-button-14); white-space: nowrap; cursor: pointer; }
+  .gd-views__tab:hover, .gd-views__tab.is-hover { background: var(--gd-ctl-hover); color: var(--gd-text); }
+  .gd-views__tab[aria-selected="true"] { background: var(--gd-selected-bg); color: var(--gd-text); }
+  .gd-views__n { font: var(--gw-text-body-12-med); font-feature-settings: "tnum" 1; color: var(--gd-text-muted); }   /* a read zero stays: "Archived 0". An unreadable count is removed. */
+  .gd-views__input { width: 160px; height: var(--gd-control-h); padding: 0 var(--gw-space-12); border: 0; border-radius: var(--gw-radius-8); background: var(--gd-card-bg); color: var(--gd-text);
+    box-shadow: inset 0 0 0 1px var(--gd-border-focus); font: var(--gw-text-button-14); outline: none; }
+
+  /* ===================================================== log-viewer ====== */
+  .gd-logs { --gd-log-h: calc(var(--gd-row-h) / 2); --gd-log-cols: 4px 180px 72px 120px minmax(0, 1fr); display: flex; flex-direction: column; min-width: 0; position: relative;
+    background: var(--gd-card-bg); border: 1px solid var(--gd-border); border-radius: var(--gw-radius-12); overflow: hidden;
+    font: 12px/var(--gd-log-h) var(--gd-font-mono); color: var(--gd-text-body); }
+  .gd-logs--select { --gd-log-cols: 4px var(--gd-sel-w, 36px) 180px 72px 120px minmax(0, 1fr); }
+  .gd-logs__bar { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-8); flex-wrap: wrap; padding: var(--gw-space-8) var(--gw-space-12); border-bottom: 1px solid var(--gd-border);
+    font: var(--gw-text-body-12-med); }
+  .gd-logs__g { display: flex; align-items: center; gap: var(--gw-space-8); }
+  .gd-logs__live { display: inline-flex; align-items: center; gap: var(--gw-space-8); }
+  .gd-logs__dot { width: 8px; height: 8px; border-radius: var(--gw-radius-full); background: var(--gd-good); }
+  .gd-logs[data-live="on"] .gd-logs__dot { animation: gd-pulse 1.6s ease-in-out infinite; }
+  .gd-logs[data-live="paused"] .gd-logs__dot { background: var(--gd-warn); }
+  .gd-logs[data-live="off"] .gd-logs__dot { background: var(--gd-placeholder); }
+  .gd-logs__scroll { position: relative; overflow: auto; max-height: var(--gd-logs-max-h, 360px); }
+  .gd-logs__head, .gd-logs__row { display: grid; grid-template-columns: var(--gd-log-cols); align-items: center; column-gap: var(--gw-space-12); min-width: var(--gd-logs-min, 640px); }
+  .gd-logs__head { position: sticky; top: 0; z-index: 2; height: var(--gd-head-h); background: var(--gd-card-bg); box-shadow: inset 0 -1px 0 var(--gd-border-strong);
+    font: var(--gw-text-body-12-med); text-transform: uppercase; color: var(--gd-text-muted); }
+  .gd-logs__row { --_lvl: var(--gd-placeholder); --_ov: transparent; height: var(--gd-log-h); position: relative; cursor: pointer;
+    background-color: var(--gd-card-bg); background-image: linear-gradient(var(--_ov), var(--_ov)); content-visibility: auto; contain-intrinsic-size: auto var(--gd-log-h); }
+  .gd-logs__row::before { content: ""; align-self: stretch; background: var(--_lvl); }   /* severity marker bar */
+  .gd-logs__row[data-level="debug"] { --_lvl: var(--gd-border-strong); }
+  .gd-logs__row[data-level="info"]  { --_lvl: var(--gd-placeholder); }
+  .gd-logs__row[data-level="ok"]    { --_lvl: var(--gd-good); }
+  .gd-logs__row[data-level="warn"]  { --_lvl: var(--gd-warn); }
+  .gd-logs__row[data-level="error"], .gd-logs__row[data-level="fatal"] { --_lvl: var(--gd-danger); }
+  .gd-logs__row:hover, .gd-logs__row.is-hover, .gd-logs__row[aria-expanded="true"] { --_ov: var(--gd-row-hover); }
+  .gd-logs__row[aria-selected="true"] { --_ov: var(--gd-row-selected); }
+  .gd-logs__c { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .gd-logs__c--time { color: var(--gd-text-muted); font-feature-settings: "tnum" 1; }
+  .gd-logs__c--svc { color: var(--gd-text-muted); }
+  .gd-logs__c--msg { color: var(--gd-text); }
+  .gd-logs__c--check { display: flex; align-items: center; overflow: visible; }
+  .gd-logs[data-wrap="on"] .gd-logs__row { height: auto; min-height: var(--gd-log-h); align-items: start; content-visibility: visible; }
+  .gd-logs[data-wrap="on"] .gd-logs__c--msg { white-space: pre-wrap; overflow-wrap: anywhere; }
+  .gd-logs__detail { padding: var(--gw-space-8) var(--gw-space-16) var(--gw-space-12) calc(4px + var(--gw-space-12)); background: var(--gd-sunken-bg); box-shadow: inset 0 -1px 0 var(--gd-border); line-height: 18px; min-width: var(--gd-logs-min, 640px); }
+  .gd-logs__kv { display: grid; grid-template-columns: minmax(96px, 200px) minmax(0, 1fr); gap: 2px var(--gw-space-16); margin: 0; }
+  .gd-logs__kv dt { color: var(--gd-text-muted); }
+  .gd-logs__kv dd { margin: 0; color: var(--gd-text); overflow-wrap: anywhere; }
+  .gd-logs__older { display: flex; justify-content: center; padding: var(--gw-space-8); border-bottom: 1px solid var(--gd-border); font-family: var(--gw-font-body); }
+  .gd-logs__jump { position: absolute; right: var(--gw-space-16); bottom: var(--gw-space-16); z-index: 3; }
+  .gd-logs[data-live]:not([data-live="paused"]) .gd-logs__jump { display: none; }
+  .gd-logs__empty { padding: calc(var(--gd-card-pad) * 2); text-align: center; font: var(--gw-text-body-12-reg); color: var(--gd-text-muted); }
+
+  /* ===================================================== histogram ======= */
+  .gd-hist { --gd-hist-h: 72px; position: relative; display: flex; flex-direction: column; gap: var(--gw-space-4); padding: var(--gw-space-12); background: var(--gd-card-bg); border: 1px solid var(--gd-border); border-radius: var(--gw-radius-12); }
+  .gd-hist__plot { position: relative; display: flex; align-items: flex-end; gap: 2px; height: var(--gd-hist-h); cursor: crosshair; touch-action: none; user-select: none; }
+  .gd-hist__plot:focus-visible { outline: var(--gw-focus-ring); outline-offset: var(--gw-focus-offset); border-radius: var(--gw-radius-4); }
+  .gd-hist__bar { flex: 1 1 0; min-width: 2px; height: var(--h, 0%); border-radius: 1px;   /* stack = three gradient stops: --i info %, --w warn %, the rest error. One element per bucket. */
+    background: linear-gradient(to top, var(--gd-accent) calc(var(--i, 100) * 1%), var(--gd-warn) 0 calc((var(--i, 100) + var(--w, 0)) * 1%), var(--gd-danger) 0); }
+  .gd-hist__bar:hover { filter: brightness(1.15); }
+  .gd-hist__bar.is-cursor { outline: 1px solid var(--gd-text); outline-offset: 1px; }
+  .gd-hist__brush { position: absolute; top: 0; bottom: 0; left: var(--l, 0%); width: var(--w, 0%); background: color-mix(in srgb, var(--gd-text) 10%, transparent);
+    box-shadow: inset 1px 0 0 var(--gd-text), inset -1px 0 0 var(--gd-text); pointer-events: none; }
+  .gd-hist__axis { display: flex; justify-content: space-between; font: var(--gw-text-body-10-med); color: var(--gd-text-muted); font-feature-settings: "tnum" 1; }
+  .gd-hist__range { display: flex; align-items: center; gap: var(--gw-space-8); font: var(--gw-text-body-12-med); color: var(--gd-text); }
+  .gd-hist__legend { display: flex; gap: var(--gw-space-12); font: var(--gw-text-body-10-med); color: var(--gd-text-muted); }
+  .gd-hist__legend i { display: inline-block; width: 8px; height: 8px; margin-right: var(--gw-space-4); border-radius: 2px; background: var(--c); }
+}
