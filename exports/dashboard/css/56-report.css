@@ -81,7 +81,7 @@
 @media print {
   @page { size: 1200px 4200px; margin: 0; }          /* the template's render.sh sets the height that fits its content */
   .gd { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .gd .gd-report { padding-inline: calc(var(--gd-gap) * 2.5); }
+  .gd .gd-report { padding-inline: calc(var(--gd-gap) * 2.5); padding-bottom: var(--gw-space-20); }   /* a page, not a screen: no 64 px of ground under the sheet */
   .gd .gd-report .gd-page-header__tabs, .gd .gd-report [data-gd-print="hide"] { display: none !important; }
   .gd .gd-report .gd-tabs__panel[hidden] { display: grid !important; }
   .gd .gd-report .gd-tabs__panel[data-gd-title]::before {

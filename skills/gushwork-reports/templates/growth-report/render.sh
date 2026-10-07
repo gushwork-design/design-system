@@ -1,6 +1,6 @@
 #!/bin/bash
 # Renders growth-report.html -> growth-report.pdf: every tab on one continuous page, 1200 px wide. Run from this folder.
-# Needs Google Chrome. Takes about a minute: it looks for the shortest page height that holds the report on one page.
+# Needs Google Chrome. Takes about half a minute: it searches for the shortest page height that holds the report on one page.
 #
 #   bash render.sh [file.html]       default: growth-report.html
 #
@@ -24,14 +24,23 @@ sed -E "s/max-width: *767px/max-width: 0px/g; s#url\(\"\.\./\.\./assets/#url(\"f
 
 pages() { python3 -c "import re,sys; print(len(re.findall(rb'/Type\s*/Page[^s]', open(sys.argv[1],'rb').read())))" "$1"; }
 
-for H in $(seq 3000 150 9000); do
+# one run: prints the page at height $1 and says how many pages came out
+try() {
   # the page: pointed at the throwaway stylesheet, with this height as its page size (it overrides the stylesheet's default)
   # (the stamp's registry URL is blanked too, so a PDF never carries the "design has moved on" notice)
-  sed "s#../../../../exports/dashboard/dashboard.css#file://$TMP/dashboard.print.css#; s#\"registry\":\"https://[^\"]*\"#\"registry\":\"\"#; s#</head>#<style>@page{size:1200px ${H}px;margin:0}</style></head>#" "$FILE" > "$TMPHTML"
+  sed "s#../../../../exports/dashboard/dashboard.css#file://$TMP/dashboard.print.css#; s#\"registry\":\"https://[^\"]*\"#\"registry\":\"\"#; s#</head>#<style>@page{size:1200px ${1}px;margin:0}</style></head>#" "$FILE" > "$TMPHTML"
   "$CHROME" --headless=new --disable-gpu --no-pdf-header-footer --allow-file-access-from-files \
     --window-size=1280,1000 --run-all-compositor-stages-before-draw --virtual-time-budget=8000 --hide-scrollbars \
     --print-to-pdf="$OUT" "file://$PWD/$TMPHTML" >/dev/null 2>&1
-  if [ "$(pages "$OUT")" = "1" ]; then echo "wrote $OUT (1200 x ${H} px, one page)"; exit 0; fi
+  pages "$OUT"
+}
+
+# Binary search for the shortest page that holds the report on one page (a shorter page gives two). Within 20 px.
+LO=2000; HI=9000
+[ "$(try $HI)" = "1" ] || { echo "the report did not fit one page at $HI px; wrote that attempt to $OUT" >&2; exit 1; }
+while [ $((HI - LO)) -gt 20 ]; do
+  MID=$(( (LO + HI) / 2 ))
+  if [ "$(try $MID)" = "1" ]; then HI=$MID; else LO=$MID; fi
 done
-echo "the report did not fit one page up to 9000 px; wrote the last attempt to $OUT" >&2
-exit 1
+try $HI >/dev/null
+echo "wrote $OUT (1200 x ${HI} px, one page)"
