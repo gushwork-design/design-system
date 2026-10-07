@@ -475,6 +475,14 @@
       "fingerprint": "e91e2ec29cf9a996",
       "previewFingerprint": "95ddfc69c70d0e37",
       "note": "i've updated this in the file, check and updated"
+    },
+    "agent-package-builder": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-07",
+      "fingerprint": "ba7ca776772528b5",
+      "previewFingerprint": "f049a80dc4bbaa17",
+      "note": "the modal is updated, check and fix"
     }
   }
 }
