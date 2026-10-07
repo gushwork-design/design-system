@@ -1987,19 +1987,34 @@
        below falls back to a timer there instead of waiting for a frame that may not come until someone looks. */
     function later(fn) { if (document.hidden) setTimeout(fn, 30); else requestAnimationFrame(fn); }
 
-    /* One indicator per underlined tab row (.an-bar .an-tabs on the dashboards, .tl-tabs on Templates). It is placed with transform only, and a row
+    /* One indicator per underlined tab row. It is placed with transform only, and a row
        it has not yet placed itself in gets no transition, so the first paint never slides in from the left. */
+    /* Any tab row whose open tab draws a thin line along its bottom edge is an underlined row, whatever its class
+       (.an-tabs, .tl-tabs, .ac-tabbar, a template's own). Filled-pill rows draw no such line and are left alone. */
+    function underlined(row) {
+      var tab = row.querySelector('[role="tab"][aria-selected="true"]');
+      if (!tab) return false;
+      var a = getComputedStyle(tab, '::after');
+      var h = parseFloat(a.height), b = parseFloat(a.bottom);   /* a zoomed page reports 1.99px, not 2 */
+      return a.content !== 'none' && a.position === 'absolute' && h >= 1 && h <= 3 && Math.abs(b) < 1;
+    }
     function place(row) {
       var ind = row.querySelector(':scope > .gw-tab-ind');
       var tab = row.querySelector('[role="tab"][aria-selected="true"]');
       if (!ind || !tab || !tab.offsetWidth) return;                     /* hidden panel: try again when it is shown */
-      ind.style.transform = 'translateX(' + tab.offsetLeft + 'px) scaleX(' + tab.offsetWidth + ')';
+      var line = getComputedStyle(tab, '::after').backgroundColor;      /* the page's own underline colour, theme included */
+      if (line && line !== 'rgba(0, 0, 0, 0)') ind.style.background = line;
+      ind.style.transform = row.__gwLast = 'translateX(' + tab.offsetLeft + 'px) scaleX(' + tab.offsetWidth + ')';
       if (row.getAttribute('data-gw-ind') !== 'on') later(function () { row.setAttribute('data-gw-ind', 'on'); });
     }
     function attach(row) {
       if (!row.querySelector(':scope > .gw-tab-ind')) {
         var ind = document.createElement('span'); ind.className = 'gw-tab-ind'; ind.setAttribute('aria-hidden', 'true');
+        /* A page that redraws its tab buttons (Design System does, on every click) wipes the indicator. The new one
+           starts where the old one stopped, so the line still glides from the previous tab, not in from the first. */
+        if (row.__gwLast) ind.style.transform = row.__gwLast;
         row.appendChild(ind);
+        if (row.__gwLast) void ind.offsetWidth;     /* commit the starting position before place() moves it */
       }
       if (!row.hasAttribute('data-gw-ind')) row.setAttribute('data-gw-ind', 'off');
       if (getComputedStyle(row).position === 'static') row.style.position = 'relative';   /* the indicator is placed inside it */
@@ -2018,7 +2033,7 @@
     var scanQueued = false;
     function scan() {
       scanQueued = false;
-      [].forEach.call(document.querySelectorAll('.an-bar .an-tabs, .tl-tabs'), attach);
+      [].forEach.call(document.querySelectorAll('[role="tablist"]'), function (row) { if (row.__gwInd || underlined(row)) attach(row); });
     }
     function queueScan() { if (!scanQueued) { scanQueued = true; later(scan); } }
 
@@ -2054,6 +2069,11 @@
       if (root.classList && root.classList.contains('ul-num')) count(root);
       [].forEach.call(root.querySelectorAll('.ul-num'), count);
     }
+
+    /* The line takes its colour from the page's own underline, so a theme switch has to re-read it. */
+    new MutationObserver(function () {
+      [].forEach.call(document.querySelectorAll('[role="tablist"][data-gw-ind]'), place);
+    }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
     new MutationObserver(function (list) {
       queueScan();
