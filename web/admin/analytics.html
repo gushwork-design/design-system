@@ -387,7 +387,7 @@ body[data-gw-page="analytics"] .sg__main > * { min-width: 0; }
 .ul-badge--bad { background: var(--gw-color-red-alpha-10); color: var(--gw-color-red-600); }
 .ul-badge--warn { background: var(--gw-color-yellow-alpha-10); color: var(--gw-color-yellow-600); }
 :root[data-theme="dark"] .ul-badge--warn { color: var(--gw-color-yellow-300); }
-/* New visitor: first seen in the last 7 days. Primary tint, like the other badges' Alpha/10 fill with a /600 label (/400 in dark). */
+/* New visitor: first seen in the last day. Primary tint, like the other badges' Alpha/10 fill with a /600 label (/400 in dark). */
 .ul-badge--new { background: var(--gw-color-primary-alpha-10); color: var(--gw-color-primary-600); height: 20px; flex: none; }
 :root[data-theme="dark"] .ul-badge--new { color: var(--gw-color-primary-400); }
 .ul-c--whotag { display: flex; align-items: center; gap: var(--gw-space-8); color: var(--ul-value); min-width: 0; }
@@ -2121,13 +2121,13 @@ window.__anRefilter = {};
   }
   function cell(t, cls, title) { return '<div class="ul-c ' + (cls || '') + '" role="cell" title="' + esc(title || t) + '">' + esc(t) + '</div>'; }
   function who(e) { return e === '(shared password)' ? 'Shared password' : e; }
-  /* The person cell, with a New tag for anyone first seen in the last 7 days. */
+  /* The person cell, with a New tag for anyone first seen in the last day. */
   function whoCell(e, isNew) {
     return '<div class="ul-c ul-c--whotag" role="cell" title="' + esc(e) + '"><span>' + esc(who(e)) + '</span>' + (isNew ? '<span class="ul-badge ul-badge--new">New</span>' : '') + '</div>';
   }
-  /* A person is New for a week after the first time we ever logged them. It reads every row, not just this period, so a
+  /* A person is New for a day after the first time we ever logged them. It reads every row, not just this period, so a
      regular is not called new because they were quiet last month. */
-  var NEW_DAYS = 7;
+  var NEW_DAYS = 1;
   function firstSeen() {
     var first = {};
     S.rows.forEach(function (r) { if (r.email && (!first[r.email] || r.at < first[r.email])) first[r.email] = r.at; });
