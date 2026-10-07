@@ -2144,6 +2144,95 @@ a.gd-hbar__row:hover, a.gd-hbar__row.is-hover { background: var(--gd-hover-bg); 
 .gd-uptime__seg:hover, .gd-uptime__seg.is-hover, .gd-uptime__seg[data-on] { box-shadow: 0 0 0 2px var(--gd-card-bg), 0 0 0 3px var(--gd-text); position: relative; z-index: 1; }
 .gd-uptime__foot { display: flex; justify-content: space-between; font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
 
+/* ==== 56-report.css ==== */
+/* ============================================================================
+   Gushwork dashboard — 56 report
+
+   PROVENANCE (per component). All three are NEW, pending library review (R43): none exists in the hub.
+   report-frame        The one-pager's top bar (templates/one-pager: logo left, small grey label right) lifted onto the grey
+                       ground above the white sheet, with the sheet itself. Reference: Swapnil Sinha's report, 7 Oct 2026, and
+                       Mobbin Toggl Track, Fresha, Gumloop (a shareable page with a header, not an app shell).
+   report-source-line  Reference: Mobbin Gumloop ("Snapshot from ... Loaded ..."), Fresha ("Last updated").
+   definition-tile     Reference: Mobbin Sprig ("Report details"). Borrows the empty state's rounded-square badge geometry.
+
+   A report is one scrolling page with no rail, so the app shell does not apply. The frame takes the shell's container NAME
+   (gd-app) so the dashboard's phone reflow (span-3 tiles pair up, gutter 20, full-width actions) works inside it without a
+   second set of rules. Everything else is existing components.
+
+   Tokens only; no value here is new. Sizes that have no token are the logo's own size step (24) and the measure (1120), both
+   said so in reports.md.
+   ============================================================================ */
+
+/* ---- report-frame -------------------------------------------------------- */
+.gd .gd-report {
+  container: gd-app / inline-size;
+  box-sizing: border-box; padding: var(--gw-space-8) var(--gw-space-16) calc(var(--gd-gap) * 4);
+  background: var(--gd-page-bg);
+}
+.gd .gd-report__bar {
+  --gd-page-px: calc(var(--gd-gap) * 2.5);
+  box-sizing: border-box; max-width: 1120px; margin: 0 auto var(--gw-space-8);
+  display: flex; align-items: center; justify-content: space-between; gap: var(--gd-gap);
+  padding: var(--gw-space-12) calc(var(--gd-page-px) + 1px);       /* the sheet's 1px edge: logo and date line up with the content */
+}
+.gd .gd-report__logo {
+  display: block; flex: none; width: 126px; height: 24px; background: var(--gw-color-neutral-500);
+  -webkit-mask: url("../../assets/logo/gushwork-logo-dark.svg") left center / contain no-repeat;
+          mask: url("../../assets/logo/gushwork-logo-dark.svg") left center / contain no-repeat;   /* the real logo file, so it takes the grey; 421:80 is its aspect */
+}
+.gd .gd-report__date { font: var(--gw-text-body-12-med); color: var(--gw-color-neutral-500); white-space: nowrap; }
+.gd .gd-report__sheet {
+  max-width: 1120px; margin: 0 auto; background: var(--gd-panel-bg);
+  border: 1px solid var(--gd-border); border-radius: var(--gw-radius-16);
+}
+/* The header's own top padding is the title's inset, so the page adds none above it; the bottom matches the gutter. */
+.gd .gd-report__sheet > .gd-page { padding-block: 0 var(--gd-page-px, calc(var(--gd-gap) * 2.5)); }
+.gd .gd-report .gd-page-header__main { padding-top: var(--gd-page-px, calc(var(--gd-gap) * 2.5)); }   /* top inset = side gutter at every width */
+
+@container gd-app (max-width: 767px) {
+  .gd .gd-report__bar { --gd-page-px: var(--gw-space-20); }
+  .gd .gd-report__source { flex-direction: column; align-items: flex-start; }                /* two lines, no separator left dangling */
+  .gd .gd-report__source > [aria-hidden="true"] { display: none; }
+}
+
+/* ---- report-source-line -------------------------------------------------- */
+.gd .gd-report__source {
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--gw-space-4) var(--gw-space-8);
+  margin: var(--gw-space-8) 0 0; font: var(--gw-text-body-12-med); color: var(--gd-text-muted);
+}
+
+/* A short list inside a card: limits, notes. The system has no list component, so this is the one rule for it. */
+.gd .gd-report__list { margin: var(--gw-space-8) 0 0; padding-left: var(--gw-space-20); display: flex; flex-direction: column; gap: var(--gw-space-8); }
+
+/* ---- definition-tile ----------------------------------------------------- */
+.gd .gd-def { display: flex; flex-direction: column; gap: var(--gd-gap); }
+.gd .gd-def__head { display: flex; align-items: flex-start; gap: var(--gd-gap); }
+.gd .gd-def__badge {                 /* a rounded square, the corner radius token, never a circle */
+  width: 40px; height: 40px; border-radius: var(--gw-radius-12); display: grid; place-items: center; flex: none;
+  background: var(--gd-selected-bg); color: var(--gd-text-muted);
+}
+.gd .gd-def__badge svg { width: 16px; height: 16px; display: block; }
+.gd .gd-def__formula {
+  display: flex; flex-direction: column; gap: var(--gw-space-4); margin-top: auto; padding: var(--gw-space-12);
+  border-radius: var(--gw-radius-8); background: var(--gd-sunken-bg); font: var(--gw-text-body-14-med); color: var(--gd-text);
+}
+.gd .gd-def__label { font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
+
+/* ---- print: a report is shared as a PDF, so every tab prints, one after another, on one page ---------------------------
+   The tab strip and the Export button are screen controls. Chrome applies the dashboard's phone breakpoint when it prints, so
+   a plain browser print stacks the tables; the template's render.sh prints from a copy with that breakpoint switched off. */
+@media print {
+  @page { size: 1200px 4200px; margin: 0; }          /* the template's render.sh sets the height that fits its content */
+  .gd { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .gd .gd-report { padding-inline: calc(var(--gd-gap) * 2.5); }
+  .gd .gd-report .gd-page-header__tabs, .gd .gd-report [data-gd-print="hide"] { display: none !important; }
+  .gd .gd-report .gd-tabs__panel[hidden] { display: grid !important; }
+  .gd .gd-report .gd-tabs__panel[data-gd-title]::before {
+    content: attr(data-gd-title); grid-column: 1 / -1; font: var(--gw-text-h6-bold); color: var(--gd-text);
+  }
+  .gd .gd-report :is(.gd-card, .gd-chart, .gd-stat-card, .gd-banner) { break-inside: avoid; }
+}
+
 /* ==== 60-feedback.css ==== */
 /* ============================================================================
    Gushwork dashboard — 60 feedback, overlays and views

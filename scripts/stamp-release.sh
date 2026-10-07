@@ -10,6 +10,7 @@
 #   .claude-plugin/marketplace.json  version   <- the marketplace entry
 #   skills/gushwork-web/SKILL.md     announce line
 #   skills/gushwork-dashboard/SKILL.md
+#   skills/gushwork-reports/SKILL.md
 #   skills/gushwork-tools/SKILL.md
 #   skills/gushwork-lead-magnet/SKILL.md
 #   skills/gushwork-slides/SKILL.md
@@ -54,7 +55,7 @@ p.write_text(json.dumps(m, indent=2) + "\n")
 print(f"  marketplace.json     -> {v}")
 
 pat = re.compile(r'(Using the Gushwork [\w-]+ skill — v)[0-9.]+(, updated )[^."]+')
-for name in ("gushwork-web", "gushwork-dashboard", "gushwork-tools", "gushwork-lead-magnet", "gushwork-slides", "gushwork-brand"):
+for name in ("gushwork-web", "gushwork-dashboard", "gushwork-reports", "gushwork-tools", "gushwork-lead-magnet", "gushwork-slides", "gushwork-brand"):
     p = root / "skills" / name / "SKILL.md"
     t = p.read_text()
     t2, n = pat.subn(lambda x: f"{x.group(1)}{v}{x.group(2)}{d}", t)
