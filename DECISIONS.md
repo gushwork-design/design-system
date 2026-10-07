@@ -1389,3 +1389,13 @@ Ruled by Utsav, 7 Oct 2026: "lets remove this from every chat, lets greet and se
 - **What goes.** The new-chat greeting from R48 ("Hey Utsav, fresh chat — you're on Gushwork design system v2.0.1"). `scripts/greet.sh` is deleted and its `SessionStart` entry is out of `hooks/hooks.json`.
 - **What stays.** `check-update.sh` is now the only thing that speaks at the start of a chat. It still fires only when a flagged release (`.claude-plugin/notify.json`, R51) is ahead of the running copy, and it now opens the first reply itself, with the Run block and `/reload-plugins`, instead of following a greeting line.
 - **What this costs.** A teammate on a current version gets no sign that the plugin is loaded until a skill fires. That was R48's reason for the greeting; Utsav ruled it out of every chat anyway.
+
+## R63 — when a machine is behind, the first chat of the day pulls the update
+Ruled by Utsav, 7 Oct 2026, after asking for a daily 5 am auto-update on every machine. A plugin cannot schedule anything: a hook only runs when a chat starts, and a 5 am run would mean installing a launchd job on each teammate's Mac. He picked the option that installs nothing.
+
+- **What it does.** In `check-update.sh`, once the version check finds a newer release, the hook starts `claude plugin update gushwork-design@gushwork` in the background. Auto-update alone takes effect one start late, so the next chat then opens on the new copy.
+- **Not a schedule.** There is no 5 am run and nothing is installed on anyone's machine. A teammate who does not open Claude is not updated.
+- **Once a day.** A stamp file at `~/.claude/gushwork/last-pull` limits it to one run per 20 hours, so a machine that is stuck behind is not hit every chat.
+- **Quiet or flagged, it pulls.** The pull runs for every release, not just `--notify` ones. What stays R51's call is who is told; the update itself no longer waits for the next start.
+- **Safe by construction.** Detached, output discarded, never waited on; it skips silently if `claude` cannot be found. `GW_NO_AUTO_PULL=1` turns it off, and `GW_CLAUDE_BIN` and `GW_PULL_STAMP` let the tests use a stub, so no test updates the machine it runs on.
+- **Who gets it.** Only copies that contain this hook. A machine on an older release still relies on auto-update for the first hop.
