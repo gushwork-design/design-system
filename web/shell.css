@@ -2476,10 +2476,38 @@ html:has(script[src*="shell.js"]):not(.gw-shell-ready) body::before { background
   /* Underlined tabs: shell.js adds one indicator per tab row and slides it, so the line glides
      to the new tab instead of jumping. Without the script the tab's own ::after still draws it. */
   .an-tabs[data-gw-ind] { position: relative; }
-  .sg__main .an-bar .an-tabs[data-gw-ind] .ul-tab[aria-selected="true"]::after { display: none; }
+  .sg__main .an-bar .an-tabs[data-gw-ind] .ul-tab[aria-selected="true"]::after,
+  .tl-tabs[data-gw-ind] .tl-tab[aria-selected="true"]::after { display: none; }
   .gw-tab-ind { position: absolute; left: 0; bottom: 0; height: 2px; width: 1px; border-radius: 2px 2px 0 0; background: var(--ul-value, currentColor);
     transform-origin: 0 0; pointer-events: none; }
-  .an-tabs[data-gw-ind="on"] .gw-tab-ind { transition: transform var(--hub-dur-enter) var(--hub-ease); }
+  .tl-tabs > .gw-tab-ind { background: var(--s-heading); }
+  [data-gw-ind="on"] > .gw-tab-ind { transition: transform var(--hub-dur-enter) var(--hub-ease); }
+
+  /* Coverage (8 Oct 2026, after an audit of every hub page). Overview and Login have their own wrappers, so they
+     get their own entrance; Templates swaps whole groups in and out, so a shown group fades in. */
+  html.gw-shell-ready .gw-col > .gw-hero { animation: hub-fade var(--hub-dur-enter) ease-out backwards; }
+  html.gw-shell-ready .gw-col > :not(.gw-hero) { animation: hub-rise var(--hub-dur-enter) var(--hub-ease) 60ms backwards; }
+  html.gw-shell-ready .gw-login__card { animation: hub-rise var(--hub-dur-enter) var(--hub-ease) 60ms backwards; }
+  .tl-grp:not([hidden]) { animation: hub-fade var(--hub-dur-enter) ease-out; }
+
+  /* Every control gets an eased colour change by default. :where() has no specificity, so a component that sets its
+     own transition keeps it and only the ones that snapped before are touched. Press feedback is NOT global: a button
+     that positions itself with transform would jump, so it is listed below by name. */
+  :where(button, a[href], [role="button"], [role="tab"], summary) {
+    transition: background-color var(--gw-motion-fast), border-color var(--gw-motion-fast), color var(--gw-motion-fast),
+                box-shadow var(--gw-motion-fast), opacity var(--gw-motion-fast);
+  }
+  /* The named buttons and tabs: the same list, plus transform so the press eases in and back out. html body raises
+     the specificity above the page's own single-class rules, which load after this sheet. */
+  html body :is(.dl-btn, .dl-all, .tuse, .tl-go--sec, .ul-btn, .sh-btn, .gw-modal__btn, .gw-login__google, .gw-login__submit,
+                .gw-burger, .gw-modal__x, .gw-pal__x, .ul-dlg__x, .sg-tab, .gv__tab, .tl-tab, .gw-theme__opt, .st-open, .pa__main, .pa__tog) {
+    transition: background-color var(--gw-motion-fast), border-color var(--gw-motion-fast), color var(--gw-motion-fast),
+                box-shadow var(--gw-motion-fast), opacity var(--gw-motion-fast), transform var(--hub-dur) var(--hub-ease);
+  }
+  html body :is(.dl-btn, .dl-all, .tuse, .tl-go--sec, .ul-btn, .sh-btn, .gw-modal__btn, .gw-login__google, .gw-login__submit,
+                .st-open, .pa__main):active:not(:disabled) { transform: scale(.97); }
+  html body :is(.gw-burger, .gw-modal__x, .gw-pal__x, .ul-dlg__x):active:not(:disabled) { transform: scale(.92); }
+  html body :is(.sg-tab, .gv__tab, .tl-tab, .gw-theme__opt):active:not([aria-selected="true"]):not([aria-pressed="true"]):not(.is-on) { transform: scale(.96); }
 
   /* Overlays arrive; they do not leave (the page hides them at once). */
   .gw-pop__menu:not([hidden]) { transform-origin: top right; animation: hub-pop 160ms var(--hub-ease); }
