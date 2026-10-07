@@ -39,7 +39,7 @@ export default async function handler(req, res) {
   const email = String(session.email).toLowerCase();
 
   /* Deliberately evaluated against the LIVE rules, not the cookie's `admin`
-     claim. The cookie is signed for 12 hours; a revoked admin holding one
+     claim. The cookie is signed for 30 days; a revoked admin holding one
      must not still be able to write here. */
   if (!isAdmin(email, rules)) {
     return json(res, 403, { error: 'Admins only.' });

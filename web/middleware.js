@@ -221,8 +221,8 @@ export default async function middleware(request, context) {
   if (!session) return toSignIn(url);
 
   /* Evaluated against the rules AS THEY ARE NOW, not against session.admin.
-     The cookie is signed for 12 hours, so trusting its claim would mean a
-     revoked admin kept the keys for the rest of the day and a newly granted
+     The cookie is signed for 30 days, so trusting its claim would mean a
+     revoked admin kept the keys for the rest of the month and a newly granted
      one had to sign out and back in to use them — neither is what "live" in
      /admin/access-control means. The rules come from Edge Config when a store
      is attached and from the compiled defaults when it is not, so this is the
