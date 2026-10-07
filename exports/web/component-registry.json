@@ -551,6 +551,14 @@
       "fingerprint": "c8f94f433978ae07",
       "previewFingerprint": "aa933f609435460a",
       "note": "i've updated this, check and fix"
+    },
+    "agent-section-header": {
+      "reviewed": "rework",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-07",
+      "fingerprint": "798a5a1a11331609",
+      "previewFingerprint": "09c7d46e66cf8b43",
+      "note": "i've updated this, check and fix"
     }
   }
 }
