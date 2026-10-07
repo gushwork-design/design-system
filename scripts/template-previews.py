@@ -3,7 +3,7 @@
 
     python3 scripts/template-previews.py <outdir>
 
-Writes <outdir>/<slug>/index.html for ad-page, ad-page-signup, support-ops-app, case-study, slide-deck, lead-magnet and one-pager — the
+Writes <outdir>/<slug>/index.html for ad-page, ad-page-signup, support-ops-app, growth-report, case-study, slide-deck, lead-magnet and one-pager — the
 templates' own HTML, not a screenshot of it. Two things are done to each copy, and nothing else:
 
   1. Paths. The templates reference ../../fonts and ../../../../assets from where they live in
@@ -169,6 +169,9 @@ def main(out):
         '<meta http-equiv="refresh" content="0; url=/internal/templates/support-ops-app/overview">'
         '<a href="/internal/templates/support-ops-app/overview">Open the support operations app</a>'), encoding='utf-8')
     print('  templates/support-ops-app/ (' + str(len(list(dst.iterdir()))) + ' files)')
+    # Growth report: one page, so no folder of scripts. build-dashboard-css.sh writes its served copy (links absolute, the stamp's registry
+    # URL blanked) to web/previews/dashboard/pages/growth-report.html; the route serves that same file.
+    write(out, 'growth-report', (ROOT / 'web/previews/dashboard/pages/growth-report.html').read_text(encoding='utf-8'))
     # One-pager: screen-first single page. Its own assets/ sit beside it, so the route needs a base.
     t = sitepaths((ROOT / 'templates/one-pager/one-pager.html').read_text(encoding='utf-8'), 2)
     t = t.replace('<meta charset="utf-8">', '<meta charset="utf-8">\n<base href="/internal/templates/one-pager/">', 1)
