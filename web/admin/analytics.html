@@ -2142,9 +2142,9 @@ window.__anRefilter = {};
     var views = rows.filter(function (r) { return r.kind === 'view'; });
     var people = {}, pages = {};
     rows.forEach(function (r) {
-      var p = people[r.email] || (people[r.email] = { email: r.email, views: 0, signins: 0, last: r.at, areas: {} });
+      var p = people[r.email] || (people[r.email] = { email: r.email, views: 0, signins: 0, last: r.at, pages: {} });
       if (r.at > p.last) p.last = r.at;
-      if (r.kind === 'signin') p.signins++; else { p.views++; var a = areaOf(r.path); p.areas[a] = (p.areas[a] || 0) + 1; }
+      if (r.kind === 'signin') p.signins++; else { p.views++; p.pages[r.path] = (p.pages[r.path] || 0) + 1; }
     });
     views.forEach(function (r) {
       var g = pages[r.path] || (pages[r.path] = { path: r.path, views: 0, who: {}, last: r.at });
@@ -2161,14 +2161,16 @@ window.__anRefilter = {};
 
     $('vs-q-people').textContent = (plist.length + (plist.length === 1 ? ' person' : ' people'));
     if (PG._p !== S.period + '|' + S.area) PG = { _p: S.period + '|' + S.area };   /* a new period or area starts every table on page 1 */
-    var topArea = function (p) { return Object.keys(p.areas).sort(function (a, b) { return p.areas[b] - p.areas[a]; })[0] || ''; };
+    /* The page itself, not its area: "Staging" or "Hub" says where, the name says what. */
+    var topPath = function (p) { return Object.keys(p.pages).sort(function (a, b) { return p.pages[b] - p.pages[a]; })[0] || ''; };
+    var topName = function (p) { var t = topPath(p); return t ? pageName(t) : ''; };
     paged('vs-people', 'people', 'minmax(200px,1.6fr) 100px 100px minmax(120px,1fr) minmax(120px,1fr)', ['Person', 'Sign-ins', 'Page views', 'Last seen', 'Opens most'],
       plist, function (p) {
-        var top = topArea(p);
-        return '<div class="ul-row ul-row--d" role="row">' + whoCell(p.email, isNew(p.email)) + cell(String(p.signins)) + cell(String(p.views)) + cell(ago(Date.now() - p.last.getTime()), '', p.last.toISOString()) + cell(top) + '</div>';
+        var top = topPath(p);
+        return '<div class="ul-row ul-row--d" role="row">' + whoCell(p.email, isNew(p.email)) + cell(String(p.signins)) + cell(String(p.views)) + cell(ago(Date.now() - p.last.getTime()), '', p.last.toISOString()) + cell(top ? pageName(top) : '', '', top) + '</div>';
       }, 'No visits in this view', [
         { get: function (p) { return p.email; }, dir: 1 }, { get: function (p) { return p.signins; }, dir: -1 }, { get: function (p) { return p.views; }, dir: -1 },
-        { get: function (p) { return p.last.getTime(); }, dir: -1 }, { get: topArea, dir: 1 }]);
+        { get: function (p) { return p.last.getTime(); }, dir: -1 }, { get: topName, dir: 1 }]);
 
     $('vs-q-pages').textContent = sortNote('pages', ['Page', 'Area', 'Views', 'People', 'Last opened'], 'most opened') + ', ' + plural(glist.length, 'page');
     paged('vs-pages', 'pages', 'minmax(220px,2fr) 110px 90px 90px minmax(120px,1fr)', ['Page', 'Area', 'Views', 'People', 'Last opened'],
