@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Drop Studio | Gushwork</title>
+<meta name="description" content="Meet the Drop family: every Gushwork agent's Drop picture, with a link and a download for each.">
+<meta name="robots" content="noindex, nofollow">
+<base href="/internal/staging/drop-studio/">
+<script>try{var c=localStorage.getItem('gw-theme-choice'),t=c==='dark'||c==='light'?c:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20x%3D%221%22%20y%3D%221%22%20width%3D%2278%22%20height%3D%2278%22%20rx%3D%2219%22%20fill%3D%22%230070ff%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="/foundation/tokens.css">
+<link rel="stylesheet" href="/exports/dashboard/dashboard.css">
+<!-- gushwork-build:{"pluginVersion":"2.0.3","surface":"dashboard","createdBy":"utsav.singh@gushwork.ai","createdAt":"2026-10-08","registry":"https://gushwork-design.vercel.app/exports/dashboard/component-registry.json","components":["action-button","icon-button","search-field","tabs-pill","toast","theme-menu"]} -->
+<!-- Built from the dashboard library (search field, buttons, icon buttons, pill tabs, badges, toast, theme menu) plus three page-local pieces: the picture-first agent card (NEW, pending review), the bundle rail (follows agent-filter-rail's category rows) and the quick view (follows agent-listing-panel). Layout is Version C of the Drop Studio wireframes, chosen by Utsav. Phase 1: browse, link and download. Creating agents is phase 2. -->
+<style>
+*{box-sizing:border-box}
+body.gd{
+  --s-bg:light-dark(var(--gw-color-neutral-50),var(--gw-color-black));
+  --s-bar:light-dark(var(--gw-color-white),var(--gw-color-black));
+  --s-card:light-dark(var(--gw-color-white),var(--gw-color-neutral-900));
+  --s-line:light-dark(var(--gw-color-neutral-100),var(--gw-color-neutral-850));
+  --s-text:light-dark(var(--gw-color-black),var(--gw-color-white));
+  --s-body:light-dark(var(--gw-color-neutral-700),var(--gw-color-neutral-400));
+  --s-muted:var(--gw-color-neutral-500);
+  --s-pic:light-dark(var(--gw-color-neutral-50),var(--gw-color-neutral-850));
+  --s-hover:light-dark(var(--gw-color-neutral-50),var(--gw-color-neutral-850));
+  --s-scrim:light-dark(rgba(13,13,13,.5),rgba(0,0,0,.65));
+  margin:0;background:var(--s-bg);color:var(--s-text);min-height:100vh;
+}
+body.lock{overflow:hidden}
+img{display:block;max-width:100%}
+[hidden]{display:none!important}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.i{display:block;width:1em;height:1em;flex:none}
+
+/* top bar */
+.bar{position:sticky;top:0;z-index:20;height:60px;background:var(--s-bar);border-bottom:1px solid var(--s-line);display:grid;grid-template-columns:1fr minmax(0,560px) 1fr;align-items:center;gap:var(--gw-space-16);padding:0 var(--gw-space-48)}
+.brand{display:flex;align-items:center;gap:var(--gw-space-12);min-width:0}
+.tile{width:32px;height:32px;border-radius:var(--gw-radius-8);background:var(--gw-color-primary-500);color:var(--gw-color-white);display:grid;place-items:center;flex:none}
+.tile svg{width:16px;height:16px}
+.brand b{font:var(--gw-text-h7-bold);white-space:nowrap}
+.bar .gd-input--search{--gd-input-w:100%;width:100%}
+.acts{display:flex;align-items:center;gap:var(--gw-space-12);justify-self:end}
+
+/* page */
+.page{max-width:1536px;margin:0 auto;padding:var(--gw-space-24) var(--gw-space-48) var(--gw-space-80)}
+h1{font:var(--gw-text-h3);letter-spacing:var(--gw-text-h3-tracking);margin:var(--gw-space-20) 0 var(--gw-space-32)}
+.cols{display:grid;grid-template-columns:240px minmax(0,1fr);gap:var(--gw-space-32);align-items:start}
+.main{display:flex;flex-direction:column;gap:var(--gw-space-20);min-width:0}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--gw-space-16)}
+
+/* bundle rail: the category rows of agent-filter-rail. 240 sticky column, 36px rows, count in neutral-500,
+   the selected row white with a 1px stroke and --gw-shadow-s2, the others bare on the ground */
+.rail{position:sticky;top:84px;display:flex;flex-direction:column;gap:var(--gw-space-4)}
+.rail button{height:36px;padding:0 var(--gw-space-12);display:flex;align-items:center;justify-content:space-between;gap:var(--gw-space-8);border-radius:var(--gw-radius-8);border:1px solid transparent;background:none;cursor:pointer;font:var(--gw-text-body-14-med);color:var(--s-body);text-align:left}
+.rail button:hover{color:var(--s-text)}
+.rail button[aria-selected="true"]{background:var(--s-card);border-color:var(--s-line);box-shadow:var(--gw-shadow-s2);color:var(--s-text)}
+.rail em{font:var(--gw-text-body-12-med);font-style:normal;color:var(--s-muted)}
+.gd .gd-tabs.strip{display:none;overflow-x:auto;scrollbar-width:none;align-self:stretch}
+.strip::-webkit-scrollbar{display:none}
+.gd #status{align-self:flex-start}
+
+/* picture-first agent card (NEW). Outer 16 = inner 8 + padding 8 */
+.card{position:relative;background:var(--s-card);border:1px solid var(--s-line);border-radius:var(--gw-radius-16);padding:var(--gw-space-8);display:flex;flex-direction:column;gap:var(--gw-space-12);min-width:0;cursor:pointer}
+.card .pic{position:relative;aspect-ratio:1/1;border-radius:var(--gw-radius-8);overflow:hidden;background:var(--s-pic);display:block;width:100%;padding:0;border:0;cursor:pointer}
+.card .pic img{width:100%;height:100%;object-fit:cover}
+.card .meta{padding:0 var(--gw-space-8) var(--gw-space-8);display:flex;flex-direction:column;gap:2px;min-width:0}
+.card .row{display:flex;align-items:center;justify-content:space-between;gap:var(--gw-space-8)}
+.card h2{font:var(--gw-text-body-16-sem);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .sub{font:var(--gw-text-body-12-reg);color:var(--s-body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hov{position:absolute;right:var(--gw-space-8);top:var(--gw-space-8);display:flex;gap:6px;opacity:0;transform:translateY(-2px);transition:opacity .12s,transform .12s}
+.card:hover .hov,.card:focus-within .hov{opacity:1;transform:none}
+.hov .gd-iconbtn{background:var(--s-card);box-shadow:var(--gw-shadow-s2)}
+@media (hover:none){.hov{opacity:1;transform:none}}
+.empty{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;gap:var(--gw-space-12);text-align:center;padding:var(--gw-space-60) var(--gw-space-24);background:var(--s-card);border:1px solid var(--s-line);border-radius:var(--gw-radius-20)}
+.empty h2{font:var(--gw-text-h7-bold);margin:0}
+.empty p{margin:0;font:var(--gw-text-body-14-reg);color:var(--s-body)}
+
+/* quick view: the shell of agent-listing-panel (centered, 820 at most, previous and next outside the edges,
+   a bottom sheet on a phone) holding a large picture and the two actions this page has */
+dialog{border:0;background:transparent;color:inherit;max-width:none;max-height:none;width:100%;height:100%;padding:var(--gw-space-24);margin:0;overflow:hidden}
+dialog:not([open]){display:none}
+dialog::backdrop{background:var(--s-scrim)}
+.qwrap{position:relative;width:100%;height:100%;display:grid;place-items:center}
+.qv{position:relative;width:min(820px,100%);max-height:100%;overflow:auto;background:var(--s-card);color:var(--s-text);border-radius:var(--gw-radius-24);box-shadow:var(--gw-shadow-s4);padding:var(--gw-space-16);display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:var(--gw-space-24)}
+.qv .big{aspect-ratio:1/1;border-radius:var(--gw-radius-12);overflow:hidden;background:var(--s-pic)}
+.qv .big img{width:100%;height:100%;object-fit:cover}
+.qv .r{display:flex;flex-direction:column;gap:var(--gw-space-16);padding:var(--gw-space-4) var(--gw-space-8) var(--gw-space-8) 0;min-width:0}
+.qv .top{display:flex;align-items:center;justify-content:space-between;gap:var(--gw-space-12);min-height:28px}
+.qv .top .l{display:flex;align-items:center;gap:var(--gw-space-12);font:var(--gw-text-body-12-med);color:var(--s-muted)}
+.qv h2{font:var(--gw-text-h5);letter-spacing:var(--gw-text-h5-tracking);margin:0}
+.qv .state{margin-top:var(--gw-space-8)}
+.qv p.bl{margin:0;font:var(--gw-text-body-16-reg);color:var(--s-body)}
+.kv{display:grid;grid-template-columns:72px 1fr;gap:var(--gw-space-8) var(--gw-space-12);font:var(--gw-text-body-14-reg);margin:0}
+.kv dt{color:var(--s-muted)}.kv dd{margin:0;color:var(--s-text);font:var(--gw-text-body-14-med);overflow-wrap:anywhere}
+.qv .btns{margin-top:auto;display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.qv .btns .two{display:grid;grid-template-columns:1fr 1fr;gap:var(--gw-space-8)}
+.qv .btns .gd-btn{width:100%}
+.nav{position:absolute;top:50%;width:44px;height:44px;margin-top:-22px;border-radius:50%;background:var(--s-card);color:var(--s-text);display:grid;place-items:center;box-shadow:var(--gw-shadow-s3);border:0;cursor:pointer}
+.nav:hover{background:var(--s-hover)}
+.nav .i{font-size:20px}
+.nav.prev{left:0}.nav.next{right:0}
+
+@media (max-width:1280px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:1000px){
+  .bar{grid-template-columns:1fr auto;height:auto;padding:var(--gw-space-12) var(--gw-space-16);row-gap:var(--gw-space-12)}
+  .bar .gd-input--search{grid-column:1/-1;grid-row:2}
+  .page{padding:var(--gw-space-20) var(--gw-space-16) var(--gw-space-60)}
+  h1{font:var(--gw-text-h5);letter-spacing:var(--gw-text-h5-tracking);margin:var(--gw-space-8) 0 var(--gw-space-20)}
+  .cols{grid-template-columns:minmax(0,1fr);gap:var(--gw-space-16)}
+  .rail{display:none}
+  .gd .gd-tabs.strip{display:inline-flex}
+  .nav{display:none}
+  .bar .lbl{display:none}
+}
+@media (max-width:700px){
+  dialog{padding:0}
+  .qwrap{place-items:end center}
+  .qv{width:100%;max-height:94vh;border-radius:var(--gw-radius-24) var(--gw-radius-24) 0 0;grid-template-columns:minmax(0,1fr);gap:var(--gw-space-16)}
+  .qv .r{padding:0 var(--gw-space-8) var(--gw-space-8)}
+}
+@media (max-width:560px){.grid{gap:var(--gw-space-12)}.card .meta{padding:0 4px 4px}.card h2{font:var(--gw-text-body-14-sem)}.hov{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body class="gd" data-density="comfortable">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></g></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-dl" viewBox="0 0 24 24"><path d="M12 4v11m0 0-4-4m4 4 4-4M4 20h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14-4M4 5v4h4M4 13a8 8 0 0 0 14 4m2 2v-4h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="gw-mark" viewBox="0 0 80 80"><path d="M76.6088 4.56344C77.5025 2.36058 75.8495 0 73.4723 0H9.14286C4.0934 0 0 4.0934 0 9.14286V66.7778C0 72.018 5.17081 75.6829 9.9603 73.5568C40.8494 59.8449 64.3785 34.7075 76.6088 4.56344Z" fill="currentColor"/><path d="M32.5161 80C31.4022 80 30.9357 78.5531 31.8259 77.8835C54.9007 60.5265 71.4338 35.8047 78.7658 8.0522C78.9403 7.39154 80 7.51618 80 8.19951V70.8571C80 75.9066 75.9066 80 70.8571 80H32.5161Z" fill="currentColor"/></symbol>
+<symbol id="gdi-check" viewBox="0 0 256 256"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></symbol>
+<symbol id="gdi-desktop" viewBox="0 0 256 256"><path d="M208,40H48A24,24,0,0,0,24,64V176a24,24,0,0,0,24,24h72v16H96a8,8,0,0,0,0,16h64a8,8,0,0,0,0-16H136V200h72a24,24,0,0,0,24-24V64A24,24,0,0,0,208,40ZM48,56H208a8,8,0,0,1,8,8v80H40V64A8,8,0,0,1,48,56ZM208,184H48a8,8,0,0,1-8-8V160H216v16A8,8,0,0,1,208,184Z"/></symbol>
+<symbol id="gdi-moon" viewBox="0 0 256 256"><path d="M233.54,142.23a8,8,0,0,0-8-2,88.08,88.08,0,0,1-109.8-109.8,8,8,0,0,0-10-10,104.84,104.84,0,0,0-52.91,37A104,104,0,0,0,136,224a103.09,103.09,0,0,0,62.52-20.88,104.84,104.84,0,0,0,37-52.91A8,8,0,0,0,233.54,142.23ZM188.9,190.34A88,88,0,0,1,65.66,67.11a89,89,0,0,1,31.4-26A106,106,0,0,0,96,56,104.11,104.11,0,0,0,200,160a106,106,0,0,0,14.92-1.06A89,89,0,0,1,188.9,190.34Z"/></symbol>
+<symbol id="gdi-sun" viewBox="0 0 256 256"><path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z"/></symbol>
+</defs></svg>
+
+<header class="bar">
+  <div class="brand"><span class="tile"><svg><use href="#gw-mark"/></svg></span><b>Drop Studio</b></div>
+  <div class="gd-input gd-input--search"><svg class="i" aria-hidden="true"><use href="#i-search"/></svg><input class="gd-input__el" id="q" type="search" aria-label="Search the Drop family" placeholder="Search the Drop family" autocomplete="off"><button type="button" class="gd-input__clear" aria-label="Clear search" data-gd-clear><svg class="i" aria-hidden="true"><use href="#i-x"/></svg></button></div>
+  <div class="acts">
+    <button class="gd-btn gd-btn--primary" id="create" type="button" aria-disabled="true" title="Creating agents arrives in the next phase"><svg class="i" aria-hidden="true"><use href="#i-plus"/></svg><span class="lbl">Create new agent</span></button>
+    <div class="gd-theme" data-gd-pop><button class="gd-theme__trigger" type="button" data-gd-pop-trigger data-pref="system" aria-haspopup="menu" aria-expanded="false" aria-label="Colour theme: System"><span data-gd-ico="system"><svg viewBox="0 0 256 256" width="16" height="16" fill="currentColor" aria-hidden="true" focusable="false"><use href="#gdi-desktop"/></svg></span><span data-gd-ico="light"><svg viewBox="0 0 256 256" width="16" height="16" fill="currentColor" aria-hidden="true" focusable="false"><use href="#gdi-sun"/></svg></span><span data-gd-ico="dark"><svg viewBox="0 0 256 256" width="16" height="16" fill="currentColor" aria-hidden="true" focusable="false"><use href="#gdi-moon"/></svg></span></button><div class="gd-menu gd-menu--end gd-theme__menu" role="menu" aria-label="Colour theme" data-gd-pop-menu hidden><button class="gd-menu__item" type="button" role="menuitemradio" aria-checked="true" data-gd-theme="system"><svg viewBox="0 0 256 256" width="16" height="16" fill="currentColor" aria-hidden="true" focusable="false"><use href="#gdi-desktop"/></svg><span style="width:8px"></span><span>System</span><span class="gd-menu__check" aria-hidden="true"><svg viewBox="0 0 256 256" width="14" height="14" fill="currentColor" aria-hidden="true" focusable="false"><use href="#gdi-check"/></svg></span></button><button class="gd-menu__item" type="button" role="menuitemradio" aria-checked="false" data-gd-theme="light"><svg viewBox="0 0 256 256" width="16" height="16" fill="currentColor" aria-hidden="true" focusable="false"><use href="#gdi-sun"/></svg><span style="width:8px"></span><span>Light</span><span class="gd-menu__check" aria-hidden="true"><svg viewBox="0 0 256 256" width="14" height="14" fill="currentColor" aria-hidden="true" focusable="false"><use href="#gdi-check"/></svg></span></button><button class="gd-menu__item" type="button" role="menuitemradio" aria-checked="false" data-gd-theme="dark"><svg viewBox="0 0 256 256" width="16" height="16" fill="currentColor" aria-hidden="true" focusable="false"><use href="#gdi-moon"/></svg><span style="width:8px"></span><span>Dark</span><span class="gd-menu__check" aria-hidden="true"><svg viewBox="0 0 256 256" width="14" height="14" fill="currentColor" aria-hidden="true" focusable="false"><use href="#gdi-check"/></svg></span></button></div></div>
+  </div>
+</header>
+
+<main class="page">
+  <h1>Meet the Drop family</h1>
+  <div class="cols">
+    <aside class="rail" id="rail" role="tablist" aria-orientation="vertical" aria-label="Bundles"></aside>
+    <section class="main">
+      <div class="gd-tabs gd-tabs--pill strip" id="strip" role="tablist" aria-label="Bundles"></div>
+      <div class="gd-tabs gd-tabs--pill" id="status" role="tablist" aria-label="Status">
+        <button type="button" role="tab" class="gd-tabs__tab" aria-selected="true" tabindex="0" data-value="all">All<span class="gd-tabs__count">0</span></button>
+        <button type="button" role="tab" class="gd-tabs__tab" aria-selected="false" tabindex="-1" data-value="approved">Approved<span class="gd-tabs__count">0</span></button>
+        <button type="button" role="tab" class="gd-tabs__tab" aria-selected="false" tabindex="-1" data-value="review">To review<span class="gd-tabs__count">0</span></button>
+        <button type="button" role="tab" class="gd-tabs__tab" aria-selected="false" tabindex="-1" data-value="requested">Requested<span class="gd-tabs__count">0</span></button>
+      </div>
+      <div class="grid" id="grid" aria-live="polite"></div>
+    </section>
+  </div>
+</main>
+
+<dialog id="qv" aria-labelledby="qv-name">
+  <div class="qwrap" id="qwrap">
+    <button class="nav prev" type="button" id="qprev" aria-label="Previous agent"><svg class="i"><use href="#i-left"/></svg></button>
+    <button class="nav next" type="button" id="qnext" aria-label="Next agent"><svg class="i"><use href="#i-right"/></svg></button>
+    <div class="qv" id="qbox">
+      <div class="big"><img id="qimg" alt=""></div>
+      <div class="r">
+        <div class="top"><div class="l"><span class="gd-badge" id="qbundle"></span><span id="qpos"></span></div><button class="gd-iconbtn" type="button" id="qclose" aria-label="Close" autofocus><svg class="i"><use href="#i-x"/></svg></button></div>
+        <div><h2 id="qv-name"></h2><div class="state" id="qchip"></div></div>
+        <p class="bl" id="qblurb"></p>
+        <dl class="kv"><dt>Picture</dt><dd>Current picture on /agents</dd><dt>File</dt><dd id="qfile"></dd></dl>
+        <div class="btns">
+          <button class="gd-btn gd-btn--primary" type="button" id="qdl"><svg class="i"><use href="#i-dl"/></svg>Download picture</button>
+          <div class="two">
+            <button class="gd-btn" type="button" id="qcopy"><svg class="i"><use href="#i-link"/></svg>Copy link</button>
+            <button class="gd-btn" type="button" id="qreq" aria-disabled="true" title="Requesting a new picture arrives in the next phase"><svg class="i"><use href="#i-refresh"/></svg>Request new picture</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<script src="agents.js"></script>
+<script src="/exports/dashboard/dashboard.js"></script>
+<script>
+(function(){
+  var D=window.DROP_STUDIO, agents=D.agents, bundles=D.bundles;
+  var ALL='All bundles';
+  var BADGE={approved:['gd-badge--good','Approved'],review:['gd-badge--solid','To review'],requested:['gd-badge--warn','Requested']};
+  var state={q:'',bundle:ALL,status:'all'};
+  var $=function(id){return document.getElementById(id)};
+  var ic=function(n){return '<svg class="i" aria-hidden="true"><use href="#i-'+n+'"/></svg>'};
+  var esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+  var toast=function(m){if(window.GD&&GD.toast) GD.toast(m,{type:'info'})};
+  var badge=function(a){var b=a.status&&BADGE[a.status]; return b?'<span class="gd-badge '+b[0]+'">'+(a.label||b[1])+'</span>':''};
+
+  function matches(a,skipBundle,skipStatus){
+    if(!skipBundle&&state.bundle!==ALL&&a.bundle!==state.bundle) return false;
+    if(!skipStatus&&state.status!=='all'&&a.status!==state.status) return false;
+    if(state.q){var h=(a.name+' '+a.bundle+' '+a.line+' '+a.blurb).toLowerCase(); if(h.indexOf(state.q)<0) return false}
+    return true;
+  }
+  function visible(){return agents.filter(function(a){return matches(a)})}
+
+  /* the tab groups are drawn once; only counts and the disabled state change, so the library's selection stays intact */
+  var railItems=[ALL].concat(bundles);
+  $('rail').innerHTML=railItems.map(function(b,i){return '<button type="button" role="tab" aria-selected="'+(i===0)+'" tabindex="'+(i===0?0:-1)+'" data-value="'+esc(b)+'">'+esc(b)+'<em></em></button>'}).join('');
+  $('strip').innerHTML=railItems.map(function(b,i){return '<button type="button" role="tab" class="gd-tabs__tab" aria-selected="'+(i===0)+'" tabindex="'+(i===0?0:-1)+'" data-value="'+esc(b)+'">'+esc(b)+'<span class="gd-tabs__count"></span></button>'}).join('');
+
+  function counts(){
+    var inBundle=agents.filter(function(a){return matches(a,true,false)});
+    [].forEach.call(document.querySelectorAll('#rail [role=tab], #strip [role=tab]'),function(t){
+      var v=t.getAttribute('data-value'), n=v===ALL?inBundle.length:inBundle.filter(function(a){return a.bundle===v}).length;
+      t.querySelector('em,.gd-tabs__count').textContent=n;
+    });
+    var inStatus=agents.filter(function(a){return matches(a,false,true)});
+    [].forEach.call(document.querySelectorAll('#status [role=tab]'),function(t){
+      var v=t.getAttribute('data-value'), n=v==='all'?inStatus.length:inStatus.filter(function(a){return a.status===v}).length;
+      t.querySelector('.gd-tabs__count').textContent=n;
+      if(v!=='all'&&n===0) t.setAttribute('aria-disabled','true'); else t.removeAttribute('aria-disabled');
+    });
+  }
+  function cardHTML(a){
+    return '<article class="card" data-id="'+a.id+'">'+
+      '<button type="button" class="pic" data-open="'+a.id+'" aria-label="Open '+esc(a.name)+'"><img src="img/'+a.id+'.jpg" alt="" loading="lazy" decoding="async"></button>'+
+      '<div class="hov"><button type="button" class="gd-iconbtn gd-iconbtn--outline" data-copy="'+a.id+'" data-tip="Copy link" data-tip-end aria-label="Copy link to '+esc(a.name)+'">'+ic('link')+'</button><button type="button" class="gd-iconbtn gd-iconbtn--outline" data-dl="'+a.id+'" data-tip="Download picture" data-tip-end aria-label="Download '+esc(a.name)+' picture">'+ic('dl')+'</button></div>'+
+      '<div class="meta"><div class="row"><h2>'+esc(a.name)+'</h2>'+badge(a)+'</div><div class="sub">'+esc(a.line)+'</div></div></article>';
+  }
+  function render(){
+    counts();
+    var list=visible();
+    $('grid').innerHTML=list.length?list.map(cardHTML).join(''):
+      '<div class="empty"><h2>No agents match</h2><p>Try a different word, or clear the filters.</p><button class="gd-btn" type="button" id="clear">Clear filters</button></div>';
+  }
+
+  /* selection comes from the library's tab handler as gd:tab; the bundle rail and the phone strip mirror each other */
+  function mirror(value){[].forEach.call(document.querySelectorAll('#rail [role=tab], #strip [role=tab]'),function(t){var on=t.getAttribute('data-value')===value; t.setAttribute('aria-selected',on); t.tabIndex=on?0:-1})}
+  document.addEventListener('gd:tab',function(e){
+    var g=e.target&&e.target.id, v=e.detail&&e.detail.value;
+    if(g==='status'){state.status=v}
+    else if(g==='rail'||g==='strip'){state.bundle=v; mirror(v)}
+    else return;
+    render();
+  });
+  $('q').addEventListener('input',function(){state.q=this.value.trim().toLowerCase(); render()});
+  document.addEventListener('keydown',function(e){if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('q').focus();$('q').select()}});
+
+  /* link + download. Copy feedback is on the button itself: a toast would sit behind the open quick view. */
+  function linkFor(id){return location.origin+location.pathname+'?agent='+encodeURIComponent(id)}
+  function flash(btn){
+    if(!btn) return; clearTimeout(btn._t);
+    if(btn.id==='qcopy'){
+      if(!btn._html) btn._html=btn.innerHTML;
+      btn.innerHTML=ic('check')+'Link copied';
+      btn._t=setTimeout(function(){btn.innerHTML=btn._html;btn._html=null},2000);
+    }else{
+      if(!btn._html){btn._html=btn.innerHTML;btn._tip=btn.getAttribute('data-tip')}
+      btn.innerHTML=ic('check'); btn.setAttribute('data-tip','Link copied');
+      btn._t=setTimeout(function(){btn.innerHTML=btn._html;btn.setAttribute('data-tip',btn._tip);btn._html=null},2000);
+    }
+  }
+  function copy(id,btn){
+    var url=linkFor(id), done=function(){flash(btn)};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(done,function(){fallback(url,done)})}else fallback(url,done);
+  }
+  function fallback(text,done){var t=document.createElement('textarea'); t.value=text; t.style.position='fixed'; t.style.opacity='0'; document.body.appendChild(t); t.select(); try{document.execCommand('copy'); done()}catch(e){if(window.GD&&GD.toast) GD.toast('Copy failed. Copy the address bar instead.',{type:'error'})} t.remove()}
+  function download(id){var a=document.createElement('a'); a.href='img/'+id+'.jpg'; a.download=id+'.jpg'; document.body.appendChild(a); a.click(); a.remove(); toast('Downloading '+id+'.jpg')}
+
+  /* quick view */
+  var dlg=$('qv'), cur=null;
+  function byId(id){for(var i=0;i<agents.length;i++) if(agents[i].id===id) return agents[i]}
+  function open(id){
+    var a=byId(id); if(!a) return; cur=a.id;
+    $('qimg').src='img/'+a.id+'.jpg'; $('qimg').alt=a.name+', the Drop picture';
+    $('qimg').onload=function(){$('qfile').textContent=a.id+'.jpg · '+this.naturalWidth+' x '+this.naturalHeight};
+    $('qfile').textContent=a.id+'.jpg';
+    $('qv-name').textContent=a.name; $('qbundle').textContent=a.bundle; $('qblurb').textContent=a.blurb;
+    $('qchip').innerHTML=badge(a);
+    var list=visible(), pos=0; for(var k=0;k<list.length;k++) if(list[k].id===a.id) pos=k+1; $('qpos').textContent=pos?pos+' of '+list.length:'';
+    if(!dlg.open){dlg.showModal(); document.body.classList.add('lock')}
+    history.replaceState(null,'',location.pathname+'?agent='+encodeURIComponent(a.id));
+  }
+  function teardown(){document.body.classList.remove('lock'); if(location.search) history.replaceState(null,'',location.pathname); cur=null}
+  function close(){if(dlg.open) dlg.close(); teardown()}
+  dlg.addEventListener('close',teardown); dlg.addEventListener('cancel',teardown);
+  function step(d){var list=visible(); var i=-1; for(var k=0;k<list.length;k++) if(list[k].id===cur) i=k; if(i<0||!list.length) return; open(list[(i+d+list.length)%list.length].id)}
+  $('qprev').addEventListener('click',function(e){e.stopPropagation();step(-1)}); $('qnext').addEventListener('click',function(e){e.stopPropagation();step(1)});
+  $('qclose').addEventListener('click',close);
+  $('qwrap').addEventListener('click',function(e){if(e.target===this) close()});
+  dlg.addEventListener('keydown',function(e){if(e.key==='ArrowLeft') step(-1); else if(e.key==='ArrowRight') step(1)});
+  $('qdl').addEventListener('click',function(){if(cur) download(cur)});
+  $('qcopy').addEventListener('click',function(){if(cur) copy(cur,this)});
+  $('qreq').addEventListener('click',function(){toast('Requesting a new picture arrives in the next phase')});
+  $('create').addEventListener('click',function(){toast('Creating agents arrives in the next phase')});
+
+  $('grid').addEventListener('click',function(e){
+    var c=e.target.closest('[data-copy]'); if(c){e.stopPropagation(); copy(c.getAttribute('data-copy'),c); return}
+    var d=e.target.closest('[data-dl]'); if(d){e.stopPropagation(); download(d.getAttribute('data-dl')); return}
+    if(e.target.id==='clear'){state.q='';state.bundle=ALL;state.status='all'; $('q').value=''; mirror(ALL); [].forEach.call(document.querySelectorAll('#status [role=tab]'),function(t){var on=t.getAttribute('data-value')==='all'; t.setAttribute('aria-selected',on); t.tabIndex=on?0:-1}); render(); return}
+    var card=e.target.closest('.card'); if(card) open(card.getAttribute('data-id'));
+  });
+
+  render();
+  var want=new URLSearchParams(location.search).get('agent');
+  if(want){ if(byId(want)) open(want); else history.replaceState(null,'',location.pathname) }
+})();
+</script>
+</body>
+</html>

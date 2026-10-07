@@ -277,6 +277,12 @@
       "changed": "2026-10-07",
       "breaking": false,
       "doc": "agent-store.md"
+    },
+    "drop-agent-card": {
+      "version": "2.0.3",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "drop-studio.md"
     }
   },
   "review": {
