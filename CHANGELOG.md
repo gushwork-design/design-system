@@ -24,6 +24,7 @@ reports its own stale date.**
 
 | Version | Date | What changed | Commit | Session |
 |---|---|---|---|---|
+| **v2.0.4** | 08 Oct 2026 01:45 | Skills carry the hub's motion rules, and underlined tabs glide on every page | [`d60a33c`](https://github.com/gushwork-design/design-system/commit/d60a33c6383ecc61cf7071bbfe8f93398a015302) | [Opens most page name and no new-chat greeting](claude://resume/16dfcbc4-fd1c-497a-bc67-d1c7fb2da3ac) |
 | **v2.0.3** | 07 Oct 2026 13:40 | Machines that are behind pull the update themselves, once a day | [`8d21245`](https://github.com/gushwork-design/design-system/commit/8d212450c25b0e6f08aa439d3cd0ef2ab4e27d87) | [Opens most page name and no new-chat greeting](claude://resume/16dfcbc4-fd1c-497a-bc67-d1c7fb2da3ac) |
 | **v2.0.2** | 07 Oct 2026 13:18 | Analytics shows the page name in Opens most, and new chats are no longer greeted | [`1aaeeb1`](https://github.com/gushwork-design/design-system/commit/1aaeeb1ff606b0c5ff34578b4ac4a86be6b738a2) | [Opens most page name and no new-chat greeting](claude://resume/16dfcbc4-fd1c-497a-bc67-d1c7fb2da3ac) |
 | **v2.0.1** | 06 Oct 2026 10:09 | Alfred fixes and ships reworks, Bruce is a Slack agent, and dashboards get a phone layer | [`9a66c62`](https://github.com/gushwork-design/design-system/commit/9a66c62006f497fae41dbc4706a537281ffa4ae3) | [Bruce, Alfred and the review flow](claude://resume/90c10569-130a-44f3-9d47-4f2fda19a3f0) |
