@@ -1082,6 +1082,16 @@ function renderBuilder(keep){
   if(S.bp.open){const q=$('#bpq');if(q&&keep&&keep.q){q.focus({preventScroll:true});const n=q.value.length;try{q.setSelectionRange(n,n)}catch(_){}}}
   if(keep&&keep.id){const e=document.querySelector(`[data-vol="${keep.id}"]`);if(e){e.focus();try{e.setSelectionRange(keep.pos,keep.pos)}catch(_){}}}
 }
+// Only the numbers that depend on volume change while someone types; nothing is rebuilt.
+function updCredits(){
+  const l=selected();if(!l.length)return;
+  const p=pricing(l), used=Math.min(1,p.estimated/p.best.total);
+  const t=$('.sheet .cm-t b');if(t)t.textContent=`${p.estimated.toLocaleString()} / ${p.credits}`;
+  const bar=$('.sheet .cm-b i');if(bar)bar.style.width=(used*100)+'%';
+  let w=$('.sheet .cm-w');
+  if(p.packs){if(!w){w=document.createElement('p');w.className='cm-w';const m=$('.sheet .cmeter');if(m)m.appendChild(w);}if(w)w.textContent=p.packs;}
+  else if(w)w.remove();
+}
 function renderAll(){renderRail();renderResults();renderBar();renderPanel();renderBuilder();}
 let tt; function toast(t,label,fn){
   const e=$('#toast');e.textContent=t;
@@ -1178,7 +1188,11 @@ $('#q').addEventListener('input',e=>{S.q=e.target.value;renderResults();});
 document.addEventListener('input',e=>{if(e.target.id==='bpq'){S.bp.q=e.target.value;const l=$('#bpklist');if(l)l.innerHTML=pickRows(S.bp.q);return;}
   if(e.target.id==='pkq'){S.pick.q=e.target.value;const l=$('#pklist');if(l)l.innerHTML=pickRows(S.pick.q);return;}
   if(e.target.dataset&&e.target.dataset.mvol){S.vol[e.target.dataset.mvol]=e.target.value;updVol(e.target.dataset.mvol,false);return;}
-  if(e.target.dataset&&e.target.dataset.vol){const pos=e.target.selectionStart;S.vol[e.target.dataset.vol]=e.target.value;renderBuilder({id:e.target.dataset.vol,pos});}});
+  if(e.target.dataset&&e.target.dataset.vol){
+    // Do not re-render the sheet while typing: a number input loses its caret when it is replaced, so digits landed at the front ("001").
+    let v=e.target.value.replace(/[^\d]/g,'').replace(/^0+(?=\d)/,'');
+    if(v!==e.target.value)e.target.value=v;
+    S.vol[e.target.dataset.vol]=v;updCredits();}});
 /* navbar goes solid on scroll (ad-page rule: after 32px); the rail follows the section in view */
 const navEl=$('#nav');let tick=false;
 const heroBg=document.querySelector('.hero .bg'), heroEl=document.querySelector('.hero'), calm=matchMedia('(prefers-reduced-motion:reduce)').matches;
