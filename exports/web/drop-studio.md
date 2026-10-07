@@ -14,13 +14,14 @@ replaced, and two elements first registered for this page (`drop-bundle-rail`, `
 
 | Part of the page | Library piece it uses |
 |---|---|
-| Search at the top | dashboard `search-field` (`gd-input--search`, with its own clear button) |
+| Search at the top | dashboard `search-field` (`gd-input--search`, with its own clear button). The `⌘K` hint is the `search-trigger`'s key cap (`gd-search__key`); it reads `Ctrl K` off a Mac, hides while the field is focused or has text, and is hidden on touch. The page sets `data-gd-palette-off`, so the library's own `⌘K` command palette does not open over the page's search. |
 | Create new agent, Download picture, Copy link, Request new picture | dashboard `action-button` (`gd-btn`, primary and outline) |
 | Copy link and Download on a card, the close button | dashboard `icon-button` (`gd-iconbtn--outline`, `data-tip`) |
 | Status filter, and the bundle strip on a phone | dashboard `tabs-pill`, with counts |
 | Status chips on a card | shared `badge` (`--good`, `--solid`, `--warn`) |
 | Messages (download, next-phase notes, a failed copy) | dashboard `toast` (`GD.toast`), which sits above an open dialog |
 | Appearance (System, Light, Dark) | dashboard `theme-menu` |
+| Help | the hub's own Help: the question-mark button with a two-row menu, `Send an email` (design@gushwork.ai) and `Message on Slack`, as `shell.js` and `tool-chrome.js` draw it, built here from the library's `gd-pop` and `menu` |
 | Bundle rail on desktop | follows `agent-filter-rail`'s category rows: a 240px sticky column, 36px rows in `--gw-text-body-14-med`, the count in `--gw-color-neutral-500`, the selected row white with a 1px stroke and `--gw-shadow-s2`, the others bare on the ground. Here the rows filter in place instead of scrolling to a section. |
 | Quick view | follows `agent-listing-panel`'s shell: a centered modal 820px at most, previous and next as 44px round buttons outside the edges (`--gw-shadow-s3`), a bottom sheet on a phone, a header with the bundle badge, the position (`2 of 33`) and close. It holds a large picture with Download and Copy link instead of the package controls. |
 
