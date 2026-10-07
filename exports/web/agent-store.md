@@ -123,6 +123,40 @@ Version 2 with one change: the category tabs become a **pill toggle**, `agent-ca
 section and the active one follows you down the page. The industry dropdown sits at the right end of the bar, above
 the package panel, with a white fill. From the pill toggle on the Agent Store idea board.
 
+## AI Marketplace (`/internal/staging/ai-marketplace`)
+
+The store as a **marketplace page**, built from Utsav's Figma (`1m3ozYgQqR6KFYGb8eVRy3`, nodes `215:15115`, `323:21368`, `325:22087`, `337:22102`). Own assets; versions 1 to 3 are untouched. Column 1240px with a **100px minimum gutter** on desktop (16px on phone). A hero (500px), then one row holding the category toggle and the industry picker, then the cards on the left and the package panel on the right (360px). Below 1400px the panel is 320px and the cards go two across.
+
+### `agent-store-hero`
+
+500px banner, `--gw-radius-20` bottom corners, primary-500 behind. The picture (Figma `image 52`, 1594 x 597 at x -34, y -53) **drifts down at 0.24x the scroll** (parallax, `translate3d`, off under reduced motion). A 40% black gradient runs left to right over 85% of the width. Title 80px Vert Grotesk Display bold (off-token: the ramp stops at 60px), subtitle `--gw-text-body-22-med` at 90% white. 100px of page ground below it.
+
+### `agent-checkout-panel`
+
+The package as a checkout, sticky in the right column. 20px padding, `--gw-radius-16`, 1px `--gw-color-neutral-100`, `--gw-shadow-s2`. Header `--gw-text-body-18-sem` plus a **Clear** text button (empties the package, 5s Undo toast). Rows: 32px square thumbnail (`--gw-color-neutral-100` when there is no art), name, a Premium pill, a 16px trash icon; **premium agents are always on top**. Under the list an **Add agent** row (plus, "Included in plan" or "+$175 / mo") opens `agent-picker`. A 1px rule, then the plan row (dotted underline, hover shows all three plans in a tooltip and "Add or remove agents to switch plans"), premium, extra and free-agent rows, a dashed rule, "Total per month" with the total in 32px Vert Grotesk Display medium that counts to its new value, and `Build your package`. **Empty:** a resting agent, a small Add agents button, total $0, and a Build button that does nothing. Phone: hidden; the bottom bar takes over.
+
+### `agent-picker`
+
+A popover that adds an agent without leaving the panel: white, 1px `--gw-color-neutral-200`, `--gw-radius-12`, `--gw-shadow-s3`, 4px padding. Up to four 40px rows (32px thumbnail, name, Premium pill) that scroll, and a 40px search field on `--gw-color-neutral-50` underneath. Opens upward from the Add agent row. Popular picks first, agents that fill plan slots before free ones, premium last. Enter adds the first match, Esc closes. Also used inline inside the package builder.
+
+### `agent-saving-line`
+
+One line in the panel and the builder that appears once the package has an extra agent: an up-arrow icon and "Save $25 · add 2 more agents for $325" on `--gw-color-primary-25` with a `--gw-color-primary-100` stroke. The saving is what filling the next plan costs less than buying the same agents as $175 extras; the price moves with every agent added. In the builder it carries an Add agent button.
+
+### `agent-step-timeline`
+
+The "How it works" steps in the agent quick view as a plain vertical timeline: 9px dots on a 1px `--gw-color-neutral-100` line, a 12px gray label (Trigger, Reads, Decides, Does, Approval) over 14px text, the last dot solid black; the hovered step gets a solid dot and darker text. Next to it the talk track is a neutral-25 card with a hairline, no icon. The whole section is folded behind one row until opened (`H`).
+
+### `shortcut-key-cap`
+
+The dashboard's R53 pattern on the web surface: the key sits **inside its control, after the label**, 18px, `--gw-radius-4`, the label colour at 8% on a tint and 50% strength, hidden on touch and below 768px. Shown on "Add to package" (A) and the How it works row (H). Other shortcuts live in tooltips ("Industry (I)", "Clear the package (C)", category number keys) and in a sheet opened with `?`.
+
+### Changes to existing elements
+
+- `agent-category-toggle` is now a segmented control that fills the column (neutral-25, 12px radius, white active tab with `--gw-shadow-s2`, Figma `215:15120`).
+- `agent-package-builder` is two columns: the agents with optional monthly volumes on the left (scrolls), a fixed summary with the total and Send proposal on the right. No stat cards, no tier compare.
+- `agent-listing-panel` has a name, price, description, volume row and add button on top, and the steps and talk track folded below. Premium agents are priced "$1,000 / mo".
+
 ## Known gaps
 
 - None of the six is a Figma component yet.
@@ -134,3 +168,4 @@ the package panel, with a white fill. From the pill toggle on the Agent Store id
   sentence case per `foundation/voice.md`.
 - The page `<title>` and description are proposals awaiting sign-off.
 - No favicon set or social card yet: layout pass only, and `/internal/*` cannot be scraped anyway.
+- AI Marketplace: Paid Ad Agent's modal description and the wording of `agent-saving-line` are my drafts; the Distributor popular picks are my pick; only SEO, Paid Ad and Email Marketing have Figma art, every other tile is gray.

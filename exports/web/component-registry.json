@@ -208,13 +208,13 @@
     },
     "agent-listing-panel": {
       "version": "2.0.1",
-      "changed": "2026-10-06",
+      "changed": "2026-10-07",
       "breaking": false,
       "doc": "agent-store.md"
     },
     "agent-package-builder": {
       "version": "2.0.1",
-      "changed": "2026-10-06",
+      "changed": "2026-10-07",
       "breaking": false,
       "doc": "agent-store.md"
     },
@@ -232,13 +232,49 @@
     },
     "agent-package-panel": {
       "version": "2.0.1",
-      "changed": "2026-10-06",
+      "changed": "2026-10-07",
       "breaking": false,
       "doc": "agent-store.md"
     },
     "agent-category-toggle": {
       "version": "2.0.1",
-      "changed": "2026-10-06",
+      "changed": "2026-10-07",
+      "breaking": false,
+      "doc": "agent-store.md"
+    },
+    "agent-checkout-panel": {
+      "version": "2.0.1",
+      "changed": "2026-10-07",
+      "breaking": false,
+      "doc": "agent-store.md"
+    },
+    "agent-picker": {
+      "version": "2.0.1",
+      "changed": "2026-10-07",
+      "breaking": false,
+      "doc": "agent-store.md"
+    },
+    "agent-saving-line": {
+      "version": "2.0.1",
+      "changed": "2026-10-07",
+      "breaking": false,
+      "doc": "agent-store.md"
+    },
+    "agent-step-timeline": {
+      "version": "2.0.1",
+      "changed": "2026-10-07",
+      "breaking": false,
+      "doc": "agent-store.md"
+    },
+    "agent-store-hero": {
+      "version": "2.0.1",
+      "changed": "2026-10-07",
+      "breaking": false,
+      "doc": "agent-store.md"
+    },
+    "shortcut-key-cap": {
+      "version": "2.0.1",
+      "changed": "2026-10-07",
       "breaking": false,
       "doc": "agent-store.md"
     }

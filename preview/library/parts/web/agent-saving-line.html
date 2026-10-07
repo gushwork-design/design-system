@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>agent-saving-line — Gushwork</title>
+<meta name="description" content="Web · agent-store.md">
+<meta name="robots" content="noindex">
+<script>try{var c=localStorage.getItem('gw-theme-choice'),t=c==='dark'||c==='light'?c:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20x%3D%221%22%20y%3D%221%22%20width%3D%2278%22%20height%3D%2278%22%20rx%3D%2219%22%20fill%3D%22%230070ff%22%20stroke%3D%22%230061e0%22%20stroke-width%3D%222%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="../../../foundation/tokens.css">
+<link rel="stylesheet" href="../../../shell.css">
+<style>
+.cl{--cl-gap:var(--gw-space-40)}
+.cl h2{font:var(--gw-text-h5);color:var(--s-heading);margin:0}
+.cl h3{font:var(--gw-text-h7);color:var(--s-heading);margin:0}
+.cl h4{font:var(--gw-text-body-16-sem);color:var(--s-heading);margin:0}
+.cl p{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+      color:var(--s-body);margin:0;max-width:78ch}
+.cl code,.cl .mono{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px}
+
+/* --- page head ------------------------------------------------------------ */
+.cl-head{display:flex;flex-direction:column;gap:var(--gw-space-16)}
+.cl-head h1{font:var(--gw-text-h4);color:var(--s-heading);margin:0}
+.cl-lede{font:var(--gw-text-body-18-reg);letter-spacing:var(--gw-text-body-18-reg-tracking);
+         color:var(--s-body);margin:0;max-width:72ch}
+
+/* --- the tally ------------------------------------------------------------ */
+.cl-tally{display:flex;flex-wrap:wrap;gap:var(--gw-space-12)}
+.cl-stat{flex:1 1 150px;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-16) var(--gw-space-20);
+         display:flex;flex-direction:column;gap:var(--gw-space-4)}
+.cl-stat b{font:var(--gw-text-h6);color:var(--s-heading);font-feature-settings:"tnum" 1}
+.cl-stat span{font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-400);
+              text-transform:uppercase;letter-spacing:.06em}
+
+/* --- review queue --------------------------------------------------------- */
+.cl-queue{background:var(--s-card-bg);border:1px solid var(--gw-color-yellow-300);
+          border-left:3px solid var(--gw-color-yellow-400);border-radius:var(--gw-radius-12);
+          padding:var(--gw-space-20) var(--gw-space-24);display:flex;flex-direction:column;
+          gap:var(--gw-space-12)}
+.cl-queue h2{font:var(--gw-text-h7)}
+.cl-queue ul{margin:0;padding-left:var(--gw-space-20);display:flex;flex-direction:column;
+             gap:var(--gw-space-4)}
+.cl-queue li{font:var(--gw-text-body-14-reg);color:var(--s-body)}
+.cl-queue a{color:var(--gw-color-primary-600);text-decoration:none}
+.cl-queue a:hover{text-decoration:underline}
+.cl-pass{background:var(--s-card-bg);border:1px solid var(--gw-color-green-300);
+         border-left:3px solid var(--gw-color-green-400)}
+
+/* --- controls ------------------------------------------------------------- */
+.cl-bar{position:sticky;top:0;z-index:5;background:var(--s-page-bg);
+        padding:var(--gw-space-12) 0;display:flex;flex-wrap:wrap;gap:var(--gw-space-8);
+        align-items:center;border-bottom:1px solid var(--s-chrome-border)}
+.cl-find{flex:1 1 220px;min-width:180px;background:var(--s-field-bg);
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         padding:var(--gw-space-8) var(--gw-space-12);font:var(--gw-text-body-14-reg);
+         color:var(--s-heading)}
+.cl-find::placeholder{color:var(--s-placeholder)}
+.cl-find:focus{outline:none;border-color:var(--gw-color-neutral-400)}
+.cl-filter{display:flex;gap:var(--gw-space-4);flex-wrap:wrap}
+.cl-f{font:var(--gw-text-body-12-med);color:var(--s-body);background:transparent;
+      border:1px solid var(--s-field-border);border-radius:var(--gw-radius-full);
+      padding:6px var(--gw-space-12);cursor:pointer}
+.cl-f:hover{border-color:var(--gw-color-primary-500)}
+.cl-f[aria-pressed="true"]{background:var(--gw-color-black);color:var(--gw-color-white);
+                           border-color:var(--gw-color-black)}
+.cl-f:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.cl-count{font:var(--gw-text-body-12-reg);color:var(--gw-color-neutral-400);margin-left:auto}
+
+/* --- sections ------------------------------------------------------------- */
+.cl-sec{display:flex;flex-direction:column;gap:var(--gw-space-20);
+        scroll-margin-top:var(--gw-space-80)}
+.cl-sec[hidden]{display:none}
+.cl-sechead{display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--gw-space-12)}
+.cl-note{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+         color:var(--s-body);background:var(--gw-color-neutral-25);
+         border:1px solid var(--s-card-border);border-left:3px solid var(--gw-color-neutral-300);
+         border-radius:var(--gw-radius-8);padding:var(--gw-space-12) var(--gw-space-16);
+         white-space:pre-wrap;max-width:88ch}
+:root[data-theme="dark"] .cl-note{background:var(--gw-color-neutral-900)}
+.cl-sub{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.cl-sub[hidden]{display:none}
+
+/* --- chips ---------------------------------------------------------------- */
+.cl-chip{display:inline-flex;align-items:center;gap:6px;font:var(--gw-text-body-12-med);
+         border-radius:var(--gw-radius-full);padding:3px var(--gw-space-8);white-space:nowrap}
+.cl-chip--measured{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.cl-chip--transcribed{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.cl-chip--ruled{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+.cl-chip--passed{background:var(--gw-color-green-500);color:var(--gw-color-white)}
+.cl-chip--pending{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+.cl-chip--rejected{background:var(--gw-color-red-500);color:var(--gw-color-white)}
+.cl-chip--gap{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+:root[data-theme="dark"] .cl-chip--measured{background:var(--gw-color-green-900);
+                                            color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .cl-chip--transcribed{background:var(--gw-color-yellow-900);
+                                               color:var(--gw-color-yellow-100)}
+:root[data-theme="dark"] .cl-chip--ruled{background:var(--gw-color-primary-900);
+                                         color:var(--gw-color-primary-200)}
+:root[data-theme="dark"] .cl-chip--pending{background:var(--gw-color-neutral-800);
+                                           color:var(--gw-color-neutral-300)}
+:root[data-theme="dark"] .cl-chip--gap{background:var(--gw-color-red-900);
+                                       color:var(--gw-color-red-200)}
+
+/* --- colour --------------------------------------------------------------- */
+.cl-ramp{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));
+         gap:var(--gw-space-8)}
+.cl-sw{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+       border-radius:var(--gw-radius-10);overflow:hidden;display:flex;flex-direction:column}
+.cl-sw[hidden]{display:none}
+.cl-sw__chip{height:64px;border-bottom:1px solid var(--s-card-border);
+             background-image:linear-gradient(45deg,var(--gw-color-neutral-100) 25%,transparent 25%),
+                              linear-gradient(-45deg,var(--gw-color-neutral-100) 25%,transparent 25%),
+                              linear-gradient(45deg,transparent 75%,var(--gw-color-neutral-100) 75%),
+                              linear-gradient(-45deg,transparent 75%,var(--gw-color-neutral-100) 75%);
+             background-size:12px 12px;
+             background-position:0 0,0 6px,6px -6px,-6px 0}
+.cl-sw__fill{width:100%;height:100%}
+.cl-sw__body{padding:var(--gw-space-8) var(--gw-space-12);display:flex;
+             flex-direction:column;gap:3px}
+.cl-sw__name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;
+             color:var(--s-heading);word-break:break-all;line-height:1.35}
+.cl-sw__hex{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;
+            color:var(--gw-color-neutral-400);text-transform:uppercase}
+.cl-sw__ac{display:flex;gap:4px;margin-top:2px}
+.cl-ac{font-size:9.5px;font-weight:600;letter-spacing:.04em;border-radius:var(--gw-radius-4);
+       padding:1px 4px;line-height:1.5}
+.cl-ac--ok{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.cl-ac--no{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+:root[data-theme="dark"] .cl-ac--ok{background:var(--gw-color-green-900);color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .cl-ac--no{background:var(--gw-color-red-900);color:var(--gw-color-red-200)}
+
+/* --- type ----------------------------------------------------------------- */
+.cl-types{display:flex;flex-direction:column;gap:2px}
+.cl-t{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:var(--gw-space-20);
+      align-items:start;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+      border-radius:var(--gw-radius-10);padding:var(--gw-space-16) var(--gw-space-20)}
+.cl-t[hidden]{display:none}
+.cl-t__spec{color:var(--s-heading);min-width:0;overflow-wrap:anywhere}
+.cl-t__meta{display:flex;flex-direction:column;gap:2px;text-align:right}
+.cl-t__name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+            color:var(--gw-color-primary-600)}
+.cl-t__val{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10.5px;
+           color:var(--gw-color-neutral-400);line-height:1.5}
+@media (max-width:860px){.cl-t{grid-template-columns:1fr}.cl-t__meta{text-align:left}}
+
+/* --- faces ---------------------------------------------------------------- */
+.cl-faces{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+          gap:var(--gw-space-16)}
+.cl-face{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-24);
+         display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.cl-face__aa{font-size:52px;line-height:1.05;color:var(--s-heading)}
+.cl-face__wt{display:flex;flex-direction:column;gap:2px}
+.cl-face__wt span{color:var(--s-heading);font-size:19px;line-height:1.45}
+
+/* --- space / radius / shadow ---------------------------------------------- */
+.cl-rows{display:flex;flex-direction:column;gap:6px}
+.cl-row{display:grid;grid-template-columns:132px minmax(0,1fr) 60px;gap:var(--gw-space-16);
+        align-items:center;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-radius:var(--gw-radius-8);padding:var(--gw-space-8) var(--gw-space-16)}
+.cl-row[hidden]{display:none}
+.cl-row__n{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+           color:var(--gw-color-primary-600);word-break:break-all}
+.cl-row__v{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+           color:var(--gw-color-neutral-400);text-align:right}
+.cl-bararea{min-height:18px;display:flex;align-items:center}
+.cl-barfill{height:16px;background:var(--gw-color-primary-500);border-radius:var(--gw-radius-2);
+            max-width:100%}
+.cl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));
+         gap:var(--gw-space-12)}
+.cl-tile{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-10);padding:var(--gw-space-16);display:flex;
+         flex-direction:column;align-items:center;gap:var(--gw-space-8)}
+.cl-tile[hidden]{display:none}
+.cl-tile__demo{width:72px;height:72px;background:var(--gw-color-primary-100);
+               border:1.5px solid var(--gw-color-primary-500)}
+.cl-tile__sh{width:100%;height:64px;background:var(--gw-color-white);
+             border-radius:var(--gw-radius-8)}
+:root[data-theme="dark"] .cl-tile__sh{background:var(--gw-color-neutral-800)}
+/* The alpha checker is drawn in neutral-100, which is near-white and shouts on a
+   black ground. Same job, quieter, in dark. */
+:root[data-theme="dark"] .cl-sw__chip{
+  background-image:linear-gradient(45deg,var(--gw-color-neutral-800) 25%,transparent 25%),
+                   linear-gradient(-45deg,var(--gw-color-neutral-800) 25%,transparent 25%),
+                   linear-gradient(45deg,transparent 75%,var(--gw-color-neutral-800) 75%),
+                   linear-gradient(-45deg,transparent 75%,var(--gw-color-neutral-800) 75%)}
+
+/* --- tables --------------------------------------------------------------- */
+.cl-tbl{width:100%;border-collapse:collapse;background:var(--s-card-bg);
+        border:1px solid var(--s-card-border);border-radius:var(--gw-radius-10);
+        overflow:hidden;font:var(--gw-text-body-14-reg)}
+.cl-tblwrap{overflow-x:auto}
+.cl-tbl th{text-align:left;font:var(--gw-text-body-12-med);text-transform:uppercase;
+           letter-spacing:.06em;color:var(--gw-color-neutral-400);
+           padding:var(--gw-space-8) var(--gw-space-16);
+           border-bottom:1px solid var(--s-card-border);white-space:nowrap}
+.cl-tbl td{padding:var(--gw-space-8) var(--gw-space-16);color:var(--s-body);
+           border-bottom:1px solid var(--s-card-border);vertical-align:top}
+.cl-tbl tr:last-child td{border-bottom:none}
+.cl-tbl tr[hidden]{display:none}
+.cl-tbl .mono{color:var(--gw-color-primary-600)}
+.cl-tbl .num{font-feature-settings:"tnum" 1;white-space:nowrap}
+
+/* --- gaps ----------------------------------------------------------------- */
+.cl-gaps{display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.cl-gap{display:grid;grid-template-columns:28px minmax(0,1fr);gap:var(--gw-space-12);
+        background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-left:3px solid var(--gw-color-red-400);border-radius:var(--gw-radius-8);
+        padding:var(--gw-space-12) var(--gw-space-16)}
+.cl-gap__n{font:var(--gw-text-body-14-sem);color:var(--gw-color-red-500);
+           font-feature-settings:"tnum" 1}
+.cl-gap__t{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+           color:var(--s-body);white-space:pre-wrap;margin:0}
+
+/* --- use-case cards ------------------------------------------------------- */
+.cl-cases{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+          gap:var(--gw-space-12)}
+.cl-case{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-20);
+         display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.cl-case__n{display:flex;align-items:baseline;justify-content:space-between;gap:var(--gw-space-8)}
+.cl-case__list{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:4px}
+.cl-case__list li{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10.5px;
+                  color:var(--gw-color-neutral-600);background:var(--gw-color-neutral-25);
+                  border:1px solid var(--s-card-border);border-radius:var(--gw-radius-4);
+                  padding:1px 5px}
+:root[data-theme="dark"] .cl-case__list li{background:var(--gw-color-neutral-900)}
+
+/* --- misc ----------------------------------------------------------------- */
+.cl-src{display:flex;flex-wrap:wrap;gap:var(--gw-space-8)}
+.cl-src code{background:var(--s-code-bg);border:1px solid var(--s-code-border);
+             color:var(--s-code-fg);border-radius:var(--gw-radius-4);padding:2px 7px}
+.cl-empty{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-400);
+          border:1px dashed var(--s-field-border);border-radius:var(--gw-radius-10);
+          padding:var(--gw-space-24);text-align:center}
+.cl-jump{display:flex;flex-wrap:wrap;gap:6px}
+.cl-jump a{font:var(--gw-text-body-12-med);color:var(--s-body);text-decoration:none;
+           border:1px solid var(--s-field-border);border-radius:var(--gw-radius-full);
+           padding:5px var(--gw-space-12)}
+.cl-jump a:hover{border-color:var(--gw-color-primary-500);color:var(--gw-color-primary-600)}
+@media print{.cl-bar,.cl-jump{display:none}}
+
+*{box-sizing:border-box}
+/* Body/body-16-reg, the site-wide page default ruled 29 Sep 2026 (796:12917).
+   This sheet named the family but no size, so it fell to the browser's 16px at
+   `normal` leading — the right size by accident, the wrong line-height. */
+body{margin:0;background:var(--s-page-bg);
+     font:var(--gw-text-body-16-reg);
+     letter-spacing:var(--gw-text-body-16-reg-tracking);
+     color:var(--s-body);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
+
+/* ---- topbar ------------------------------------------------------------- */
+.lb-top{position:sticky;top:0;z-index:20;height:60px;display:flex;align-items:center;
+        gap:var(--gw-space-16);padding:0 var(--gw-space-24);
+        background:var(--s-chrome-bg);border-bottom:1px solid var(--s-chrome-border)}
+.lb-brand{display:flex;align-items:center;gap:var(--gw-space-12);text-decoration:none;
+          flex:none}
+.lb-brand__chip{width:32px;height:32px;border-radius:var(--gw-radius-8);
+                background:var(--gw-color-primary-500);color:var(--gw-color-white);
+                box-shadow:inset 0 0 0 1px var(--gw-color-primary-600);
+                display:grid;place-items:center;flex:none}
+.lb-brand__chip svg{width:16px;height:16px;display:block}
+.lb-brand__n{font:var(--gw-text-h7);color:var(--s-heading)}
+.lb-crumb{font:var(--gw-text-body-14-reg);color:var(--s-group-label);
+          white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-crumb a{color:var(--gw-color-primary-600);text-decoration:none}
+.lb-top__r{display:flex;align-items:center;gap:var(--gw-space-12);margin-left:auto}
+.lb-find{width:300px;height:36px;background:var(--s-field-bg);
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         padding:0 var(--gw-space-12);font:var(--gw-text-body-14-reg);color:var(--s-heading)}
+.lb-find::placeholder{color:var(--s-placeholder)}
+.lb-find:focus{outline:none;border-color:var(--gw-color-neutral-400)}
+.lb-tbtn{width:36px;height:36px;display:grid;place-items:center;background:transparent;
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         color:var(--s-body);cursor:pointer;flex:none}
+.lb-tbtn svg{width:18px;height:18px;display:block}
+.lb-tbtn:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+@media (max-width:820px){.lb-find{display:none}}
+
+/* ---- three columns ------------------------------------------------------- */
+.lb-3{display:grid;grid-template-columns:240px minmax(0,1fr) 212px;align-items:start;
+      max-width:1600px;margin:0 auto}
+.lb-rail{position:sticky;top:60px;max-height:calc(100vh - 60px);overflow-y:auto;
+         border-right:1px solid var(--s-chrome-border);padding:var(--gw-space-24) 0}
+.lb-rail__t{font:var(--gw-text-body-12-med);text-transform:uppercase;letter-spacing:.06em;
+            color:var(--s-group-label);padding:0 var(--gw-space-20) var(--gw-space-8)}
+.lb-rail a{display:flex;justify-content:space-between;gap:var(--gw-space-8);
+           font:var(--gw-text-body-14-reg);color:var(--s-body);text-decoration:none;
+           padding:6px var(--gw-space-20)}
+.lb-rail a:hover{background:var(--s-nav-hover);color:var(--s-heading)}
+.lb-rail a.on{background:var(--s-nav-sel);color:var(--s-heading);
+              font:var(--gw-text-body-14-sem)}
+.lb-rail a span{color:var(--gw-color-neutral-400);font:var(--gw-text-body-12-reg);flex:none}
+.lb-rail a.on span{color:var(--s-heading)}
+.lb-rail__sep{margin:var(--gw-space-12) var(--gw-space-20) var(--gw-space-8);
+              border-top:1px solid var(--s-chrome-border)}
+
+.lb-mid{grid-column:2;padding:var(--gw-space-32) var(--gw-space-40) var(--gw-space-80);
+        min-width:0;display:flex;flex-direction:column;gap:var(--gw-space-24)}
+.lb-toc{grid-column:3;position:sticky;top:60px;max-height:calc(100vh - 60px);overflow-y:auto;
+        padding:var(--gw-space-32) var(--gw-space-20);display:flex;flex-direction:column;
+        gap:5px}
+.lb-toc b{font:var(--gw-text-body-12-med);text-transform:uppercase;letter-spacing:.06em;
+          color:var(--gw-color-neutral-400);margin-bottom:3px}
+.lb-toc a{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-600);
+          text-decoration:none;line-height:1.35}
+.lb-toc a:hover{color:var(--gw-color-primary-600)}
+.lb-toc a.l3{padding-left:var(--gw-space-12)}
+@media (max-width:1180px){.lb-3{grid-template-columns:220px minmax(0,1fr)}
+                          .lb-toc{display:none}}
+@media (max-width:820px){.lb-3{grid-template-columns:minmax(0,1fr)}
+                         /* `.lb-mid{grid-column:2}` above made the grid two columns even here, so the rail
+                            was squeezed to 0 wide and there was no way to move between sections. Both
+                            go back to column 1, and the rail becomes one scrolling row of chips instead
+                            of a 400px list in front of the content. */
+                         .lb-mid,.lb-rail{grid-column:1}
+                         .lb-rail{position:static;max-height:none;border-right:0;
+                                  border-bottom:1px solid var(--s-chrome-border);
+                                  display:flex;flex-direction:row;align-items:center;gap:var(--gw-space-8);
+                                  overflow-x:auto;padding:var(--gw-space-12) var(--gw-space-20);
+                                  scrollbar-width:none}
+                         .lb-rail::-webkit-scrollbar{display:none}
+                         .lb-rail__t,.lb-rail__sep{display:none}
+                         .lb-rail a{flex:none;white-space:nowrap;gap:var(--gw-space-4);
+                                    padding:6px var(--gw-space-12);border-radius:var(--gw-radius-full);
+                                    border:1px solid var(--s-chrome-border)}
+                         .lb-mid{padding:var(--gw-space-24) var(--gw-space-20)}}
+@media (max-width:640px){.lb-crumb{display:none}}
+
+/* ---- page head ----------------------------------------------------------- */
+.lb-h{display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.lb-h h1{font:var(--gw-text-h4);margin:0}
+.lb-h .lede{font:var(--gw-text-body-16-reg);color:var(--s-body);margin:0;max-width:74ch}
+.lb-row{display:flex;flex-wrap:wrap;gap:var(--gw-space-8);align-items:center}
+.lb-rowfind{width:100%;max-width:360px;height:36px;padding:0 12px;margin:0 0 20px;border:0;border-radius:12px;background:var(--s-field-bg);
+  box-shadow:inset 0 0 0 1px var(--s-field-border);color:var(--s-heading);font:var(--gw-text-body-14-reg)}
+.lb-rowfind::placeholder{color:var(--s-placeholder)}
+.cat-name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px;color:var(--s-heading);font-weight:600}
+a.cat-name{color:var(--gw-color-primary-600);text-decoration:none}
+:root[data-theme="dark"] a.cat-name{color:var(--gw-color-primary-400)}
+.cat-note{display:block;margin-top:2px;font:var(--gw-text-body-12-reg);color:var(--s-body)}
+@media (max-width:760px){.lb-mid td a,.lb-mid th a{display:inline-flex;align-items:center;min-height:24px}}
+.cat-link{font:var(--gw-text-body-14-med);color:var(--gw-color-primary-600);text-decoration:none}
+:root[data-theme="dark"] .cat-link{color:var(--gw-color-primary-400)}
+.cat-link:hover{text-decoration:underline}
+.sec>.lb-meta{margin:4px 0 14px}
+.cat-dim{color:var(--s-body)}
+.chip--annotated{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+:root[data-theme="dark"] .chip--annotated{background:var(--gw-color-neutral-800);color:var(--gw-color-neutral-300)}
+.lb-meta{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+         color:var(--gw-color-neutral-400)}
+
+.chip{display:inline-flex;align-items:center;gap:5px;font:var(--gw-text-body-12-med);
+      border-radius:var(--gw-radius-full);padding:3px var(--gw-space-8);white-space:nowrap}
+.chip--measured{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.chip--transcribed{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.chip--ruled,.chip--extracted{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+.chip--structure{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.chip--built-here{background:var(--gw-color-orange-50);color:var(--gw-color-orange-700)}
+.chip--passed{background:var(--gw-color-green-500);color:var(--gw-color-white)}
+.chip--pending{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+.chip--rejected{background:var(--gw-color-red-500);color:var(--gw-color-white)}
+.chip--gap{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+.chip--web{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+:root[data-theme="dark"] .chip--measured{background:var(--gw-color-green-900);color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .chip--transcribed,
+:root[data-theme="dark"] .chip--structure{background:var(--gw-color-yellow-900);color:var(--gw-color-yellow-100)}
+:root[data-theme="dark"] .chip--ruled,
+:root[data-theme="dark"] .chip--extracted,
+:root[data-theme="dark"] .chip--web{background:var(--gw-color-primary-900);color:var(--gw-color-primary-200)}
+:root[data-theme="dark"] .chip--pending{background:var(--gw-color-neutral-800);color:var(--gw-color-neutral-300)}
+:root[data-theme="dark"] .chip--built-here{background:var(--gw-color-orange-900);color:var(--gw-color-orange-100)}
+:root[data-theme="dark"] .chip--gap{background:var(--gw-color-red-900);color:var(--gw-color-red-200)}
+
+/* ---- markdown ------------------------------------------------------------ */
+.md{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.md h2{font:var(--gw-text-h6);margin:var(--gw-space-20) 0 0;scroll-margin-top:80px}
+.md h3{font:var(--gw-text-h7);margin:var(--gw-space-16) 0 0;scroll-margin-top:80px}
+.md h4,.md h5,.md h6{font:var(--gw-text-body-16-sem);margin:var(--gw-space-12) 0 0}
+.md p{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+      color:var(--s-body);margin:0;max-width:80ch}
+.md ul,.md ol{margin:0;padding-left:var(--gw-space-20);display:flex;
+              flex-direction:column;gap:5px}
+.md li{font:var(--gw-text-body-14-reg);color:var(--s-body);max-width:78ch}
+.md code{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px;
+         background:var(--s-code-bg);border:1px solid var(--s-code-border);
+         color:var(--s-code-fg);border-radius:var(--gw-radius-4);padding:1px 5px}
+.md a{color:var(--gw-color-primary-600)}
+.md-pre{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-radius:var(--gw-radius-8);padding:var(--gw-space-16);overflow-x:auto;margin:0}
+.md-pre code{background:none;border:0;padding:0;color:var(--s-body);font-size:12px}
+.md-q{margin:0;border-left:3px solid var(--gw-color-neutral-300);
+      padding:var(--gw-space-8) var(--gw-space-16);font:var(--gw-text-body-14-reg);
+      color:var(--s-body)}
+.md-hr{border:0;border-top:1px solid var(--s-card-border);margin:var(--gw-space-12) 0}
+.md-tblwrap{overflow-x:auto}
+.md-tbl{width:100%;border-collapse:collapse;background:var(--s-card-bg);
+        border:1px solid var(--s-card-border);border-radius:var(--gw-radius-8);
+        overflow:hidden;font:var(--gw-text-body-14-reg)}
+.md-tbl th{text-align:left;font:var(--gw-text-body-12-med);text-transform:uppercase;
+           letter-spacing:.06em;color:var(--gw-color-neutral-400);
+           padding:var(--gw-space-8) var(--gw-space-12);
+           border-bottom:1px solid var(--s-card-border);white-space:nowrap}
+.md-tbl td{padding:var(--gw-space-8) var(--gw-space-12);color:var(--s-body);
+           border-bottom:1px solid var(--s-card-border);vertical-align:top}
+.md-tbl tr:last-child td{border-bottom:none}
+.md-tbl code{white-space:nowrap}
+
+.note{font:var(--gw-text-body-14-reg);color:var(--s-body);
+      background:var(--gw-color-neutral-25);border:1px solid var(--s-card-border);
+      border-left:3px solid var(--gw-color-neutral-300);border-radius:var(--gw-radius-8);
+      padding:var(--gw-space-12) var(--gw-space-16);white-space:pre-wrap;max-width:88ch}
+:root[data-theme="dark"] .note{background:var(--gw-color-neutral-900)}
+.note--find{border-left-color:var(--gw-color-yellow-400);white-space:normal}
+.empty{border:1px dashed var(--s-field-border);border-radius:var(--gw-radius-10);
+       padding:var(--gw-space-24);text-align:center;font:var(--gw-text-body-14-reg);
+       color:var(--gw-color-neutral-400)}
+.sec{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.sec h2{font:var(--gw-text-h6);margin:0;scroll-margin-top:80px}
+</style>
+</head>
+<body>
+<header class="lb-top">
+  <a class="lb-brand" href="/internal/design-system#library">
+    <span class="lb-brand__chip"><svg viewBox="0 0 80 80" fill="none" aria-hidden="true"><path d="M76.6088 4.56344C77.5025 2.36058 75.8495 0 73.4723 0H9.14286C4.0934 0 0 4.0934 0 9.14286V66.7778C0 72.018 5.17081 75.6829 9.9603 73.5568C40.8494 59.8449 64.3785 34.7075 76.6088 4.56344Z" fill="currentColor"/><path d="M32.5161 80C31.4022 80 30.9357 78.5531 31.8259 77.8835C54.9007 60.5265 71.4338 35.8047 78.7658 8.0522C78.9403 7.39154 80 7.51618 80 8.19951V70.8571C80 75.9066 75.9066 80 70.8571 80H32.5161Z" fill="currentColor"/></svg></span>
+    <span class="lb-brand__n">Component Library</span></a>
+  <span class="lb-crumb"><a href="../../index.html">Library</a> / <a href="index.html">Web</a></span>
+  <div class="lb-top__r"><input class="lb-find" id="lb-find" type="search" placeholder="Filter this library" aria-label="Filter this library">
+    <button class="lb-tbtn" id="lb-theme" type="button" aria-label="Switch theme">
+      <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z"/></svg></button></div>
+</header>
+<div class="lb-3"><nav class="lb-rail"><div class="lb-rail__t">Web · 43</div><a href="index.html" data-q="overview 41">Overview<span>41</span></a><div class="lb-rail__sep"></div><a href="agent-card.html" data-q="agent-card ">agent-card</a><a href="agent-category-tabs.html" data-q="agent-category-tabs ">agent-category-tabs</a><a href="agent-category-toggle.html" data-q="agent-category-toggle ">agent-category-toggle</a><a href="agent-checkout-panel.html" data-q="agent-checkout-panel ">agent-checkout-panel</a><a href="agent-filter-rail.html" data-q="agent-filter-rail ">agent-filter-rail</a><a href="agent-listing-panel.html" data-q="agent-listing-panel ">agent-listing-panel</a><a href="agent-package-bar.html" data-q="agent-package-bar ">agent-package-bar</a><a href="agent-package-builder.html" data-q="agent-package-builder ">agent-package-builder</a><a href="agent-package-panel.html" data-q="agent-package-panel ">agent-package-panel</a><a href="agent-picker.html" data-q="agent-picker ">agent-picker</a><a href="agent-saving-line.html" data-q="agent-saving-line " class="on">agent-saving-line</a><a href="agent-section-header.html" data-q="agent-section-header ">agent-section-header</a><a href="agent-step-timeline.html" data-q="agent-step-timeline ">agent-step-timeline</a><a href="agent-store-hero.html" data-q="agent-store-hero ">agent-store-hero</a><a href="ai-agents.html" data-q="ai-agents ">ai-agents</a><a href="button.html" data-q="button ">button</a><a href="card-case-study.html" data-q="card-case-study ">card-case-study</a><a href="card-information.html" data-q="card-information ">card-information</a><a href="card-review.html" data-q="card-review ">card-review</a><a href="card-testimonial.html" data-q="card-testimonial ">card-testimonial</a><a href="cards-grid.html" data-q="cards-grid ">cards-grid</a><a href="cards-grid-small.html" data-q="cards-grid-small ">cards-grid-small</a><a href="case-study-page.html" data-q="case-study-page ">case-study-page</a><a href="client-avatar.html" data-q="client-avatar ">client-avatar</a><a href="client-logos.html" data-q="client-logos ">client-logos</a><a href="comparison-table.html" data-q="comparison-table ">comparison-table</a><a href="cta.html" data-q="cta ">cta</a><a href="eyebrow.html" data-q="eyebrow ">eyebrow</a><a href="faqs.html" data-q="faqs ">faqs</a><a href="fold-other.html" data-q="fold-other ">fold-other</a><a href="footer.html" data-q="footer ">footer</a><a href="form.html" data-q="form ">form</a><a href="hero.html" data-q="hero ">hero</a><a href="image.html" data-q="image ">image</a><a href="inline-input.html" data-q="inline-input ">inline-input</a><a href="input-fields.html" data-q="input-fields ">input-fields</a><a href="navbar.html" data-q="navbar ">navbar</a><a href="shortcut-key-cap.html" data-q="shortcut-key-cap ">shortcut-key-cap</a><a href="timeline.html" data-q="timeline ">timeline</a><a href="video.html" data-q="video ">video</a><a href="with-image.html" data-q="with-image ">with-image</a></nav><main class="lb-mid"><div class="lb-h"><h1>agent-saving-line</h1><p class="lede">Web · agent-store.md</p><div class="lb-row"><span class="chip chip--measured" title="Read off the bound Figma variables. Safe to build from.">measured</span><span class="chip chip--pending" title="Has not been through a review pass">not reviewed</span><span class="pill">v2.0.1</span></div><div class="lb-meta">review: bash scripts/review-pass.sh web agent-saving-line</div></div><div class="md"><h2 id="page-frame-from-the-figma-not-registered-separately">Agent Store elements</h2>
+<p><b>Status: pending review.</b> Six elements for the Agent Store at <code>web/internal/staging/agent-store/</code>. The layout, the card, the rail, the section header and every state follow Utsav's Figma file <code>1m3ozYgQqR6KFYGb8eVRy3</code>, node <code>136:9794</code> (&quot;AI-Agent---Nugget&quot;, version 1.0), measured from the node's properties on 6 Oct 2026. The listing panel, package bar and package builder are not in that file; they are composed from tokens. Until the six pass in Design System → Review, any page that uses one must say it is unreviewed.</p>
+<p>The page has no template, by Utsav's call.</p>
+<h3 id="agent-card">Page frame (from the Figma, not registered separately)</h3>
+<p>A 60px navbar in a 1240 column with the logo and a <code>Login</code> button. It is <b>transparent over the hero</b> (white logo, white button) and, once the page has scrolled 32px, fades over 0.4s to the ad-page navbar: <code>--gw-color-neutral-25</code> with a 1px <code>--gw-color-neutral-100</code> bottom stroke, the original logo and a <code>Black</code> button. It is the page's only navigation. A 460px hero with a photo, a left shade of 863px (<code>--gw-color-neutral-alpha-50-black</code> to transparent; Figma binds a raw 60% black with no token) over a PROGRESSIVE blur (Figma radius 8, about 4px in CSS, easing to 0 by 82% across; built as four masked copies of the photo) and <code>Heading/h1</code> plus <code>Body/body-20-med</code>, rounded <code>--gw-radius-20</code> at the bottom. The page ends with the short ad-page footer: a black bar, <code>--gw-radius-8</code> top corners, padding <code>--gw-space-16</code>, one centred line <code>© 2026 Gushwork | All Rights Reserved</code> in <code>--gw-text-body-12-med</code>, <code>--gw-color-neutral-600</code> (as the ad pages ship it; R9 asks for neutral-400). Below the hero a 1200 column of a 240 rail, a 48 gap and a 912 main area, 80px under the hero, on <code>--gw-color-neutral-50</code>.</p>
+<h3 id="agent-section-header"><code>agent-card</code></h3>
+<p>296 × auto. White, 1px <code>--gw-color-neutral-100</code>, <code>--gw-radius-12</code>, padding <code>--gw-space-16</code>, gap 16. Top row: a 60px mascot tile (<code>--gw-radius-8</code>, 0.5px <code>--gw-color-neutral-100</code>, the image at 70px, centred and clipped) then the name (<code>--gw-text-body-16-sem</code>) over a one-liner (<code>--gw-text-body-12-med</code>, <code>--gw-color-neutral-400</code>). Below: the description, <code>--gw-text-body-14-reg</code> in <code>--gw-color-neutral-600</code>, three lines, never a fourth. A 24px add button sits at top 12, right 12: <code>--gw-color-neutral-25</code>, 0.5px stroke, a 12px plus.</p>
+<ul><li><b>Selected:</b> only the button changes, to <code>--gw-color-primary-500</code> with a white check. The card does not.</li><li><b>Premium:</b> border <code>--gw-color-primary-100</code> and <code>--gw-shadow-s2</code>, and the one-liner slot carries the price,</li></ul>
+<p><code>From $1,000 / mo</code>, in <code>--gw-color-primary-500</code>.</p>
+<p>Off-token, reported: the button radius is 5.33px in Figma (built as <code>--gw-radius-4</code>).</p>
+<h3 id="agent-filter-rail"><code>agent-section-header</code></h3>
+<p><code>--gw-text-h7</code> heading, <code>--gw-space-12</code> gap, an optional <code>Premium</code> pill (<code>--gw-color-primary-25</code> fill, 0.5px <code>--gw-color-primary-100</code> stroke, <code>--gw-text-body-12-med</code> in <code>--gw-color-primary-500</code>, 24px, full radius), and the bundle button on the right. The button is 36px, <code>--gw-radius-8</code>, <code>--gw-text-button-14</code>, with a 1.5px <code>--gw-color-neutral-100</code> stroke and a plus (<code>Add whole bundle</code>). When every agent in the bundle is selected it becomes <code>--gw-color-primary-500</code> with white text and a check, reading <code>Added</code>; clicking it again removes them.</p>
+<h3 id="agent-listing-panel"><code>agent-filter-rail</code></h3>
+<p>A 240px sticky column. The industry picker is a <b>custom dropdown</b>, not the browser's: the trigger is the 44px <code>--gw-color-neutral-25</code> field, and the list is a white <code>--gw-radius-12</code> panel with <code>--gw-shadow-s4</code>, 36px rows in <code>--gw-text-body-14-med</code>, a hover fill of <code>--gw-color-neutral-50</code>, a check on the selected industry and unavailable industries in <code>--gw-color-neutral-400</code>. Arrow keys, Enter and Escape work. The page has <b>no focus styling</b>, by Utsav's call. <b>Rows are tabs that scroll to their section; every section stays on the page, so there is no &quot;All agents&quot; row.</b> The row of the section in view is highlighted as you scroll. Search filters the cards across all sections and drops empty sections. An <code>Industry</code> label (<code>--gw-text-body-12-med</code>, <code>--gw-color-neutral-600</code>) over a 44px select (<code>--gw-color-neutral-25</code>, 1px <code>--gw-color-neutral-100</code>, <code>--gw-radius-8</code>). Then <code>Category</code>: 36px rows, <code>--gw-text-body-14-med</code>, a 16px icon and a count in <code>--gw-color-neutral-500</code>. The selected row is white with a 1px <code>--gw-color-neutral-100</code> stroke and <code>--gw-shadow-s2</code>; the others carry a <code>--gw-color-neutral-50</code> stroke so they are invisible on the ground. The last row, <code>Build your own agent</code>, is coming soon and shows <code>Soon</code> where the count would be. On phone the rail sits behind a <code>Filters</code> button.</p>
+<h3 id="agent-package-bar"><code>agent-listing-panel</code></h3>
+<p>A store-style <b>quick view</b>: a centered modal, 820px wide at most, over a <code>--gw-color-neutral-alpha-50-black</code> backdrop (a bottom sheet at 94vh on phone). The header holds the bundle <code>badge</code>, the position (<code>4 of 31</code>) and close. <b>Previous and next are 44px round white buttons outside the modal's left and right edges on desktop</b> (<code>--gw-shadow-s3</code>); below 1000px they move into the header. They step through the agents in page order, respect the search and wrap round; left and right arrow keys do the same.</p>
+<p>The body has <b>two stacked parts</b>. The <b>upper part</b> is the picture (a 240px square) beside the name, cost line (blue for premium), blurb, the <b>monthly volume stepper</b> (for agents with a credit cost: minus, a typed number and plus, in steps of 50, with &quot;about N credits&quot;; the value is the same one the package builder's estimator uses) and a full-width <code>Black</code> <code>Add to package</code>. Premium agents show a &quot;Priced alone, outside the package tiers&quot; note in place of the stepper; the free agent has neither. The <b>lower part</b> sits on white, under a 1px <code>--gw-color-neutral-100</code> rule: <code>How it works</code> as a <code>details</code> element (open on desktop, closed on phone) on the left, and on the right the <code>Talk track</code> block (<code>--gw-color-primary-25</code>, always visible), a <code>Fits</code> row and the dashed proof slot. Nothing is stated twice: the unit appears in the cost line only, and the bundle appears in the header only. On phone the parts stack into one column.</p>
+<h3 id="agent-package-builder"><code>agent-package-bar</code></h3>
+<p>The package bag, in two forms that read the same selection. <b>Desktop: a summary card</b> in the sticky rail, under the categories (chosen from the package bar wireframes, option P2). White, 1px <code>--gw-color-neutral-100</code>, <code>--gw-radius-12</code>, <code>--gw-shadow-s2</code>, padding <code>--gw-space-12</code>. It holds: <code>Your package</code> and the agent count; a row of mascots (28px, round, white ring, <code>+N</code> after seven); a 6px meter in <code>--gw-color-primary-500</code> showing the tier's slots, with a line under it (&quot;All slots used&quot;, &quot;2 slots still open&quot; or &quot;2 extra agents at $175 each&quot;); the recommended tier and its monthly price; &quot;Priced separately&quot; with the premium agents' total when any are selected; a <code>Small</code> <code>Black</code> button <code>Build package</code>; and a <code>Clear</code> link. It appears with the first agent and leaves when the package is empty. <b>Phone and narrow screens (1000px and below): a bottom bar</b>, <code>--gw-color-black</code>, <code>--gw-radius-16</code>, <code>--gw-shadow-s4</code>, with the count, the tier and price, <code>Clear</code> and a white <code>Build package</code> button. <code>Clear</code> empties the package and shows a five-second <code>Undo</code> toast that restores it.</p>
+<h3 id="version-2-internal-staging-agent-store-v2"><code>agent-package-builder</code></h3>
+<p>A modal sheet (bottom sheet on phone). Three figures (monthly, agents, credits), an upgrade nudge, a tier comparison with the best price marked, an optional &quot;priced separately&quot; list and a credit estimator with one volume field per agent. <b>The pricing maths is the original file's, unchanged:</b> Starter 3 agents $600 / 1,000 credits, Growth 6 / $1,100 / 2,500, Scale 12 / $2,100 / 6,000; $175 and 350 credits per extra agent; credit packs $150 per 1,000; lead-gen agents priced alone from $1,000. <code>Send proposal</code> is not wired, as in the original.</p>
+<h3 id="agent-category-tabs">Version 2 (<code>/internal/staging/agent-store-v2</code>)</h3>
+<p>Same page, cards, modal and builder; a different frame, at Utsav's request. Version 1 stays live beside it. Both versions use <b>100px page margins</b> (a 1240px column on 1440) and the right-hand package panel is <b>320px wide</b> with larger type, 32px mascots, 36px tier rows and a 44px <code>Build package</code> button. The &quot;Build your own agent&quot; tab and section are removed from version 2 and version 3.</p>
+<h4><code>agent-category-tabs</code></h4>
+<p>One sticky bar across the whole 1200 column (<code>top: 0</code>, on the page ground, 1px <code>--gw-color-neutral-100</code> underneath). The <b>navbar is not sticky</b>: it sits over the hero and scrolls away with the page, so the bar is the only thing that stays. On the left, <b>every category as an underlined tab</b>, all visible with no sideways scrolling at 1440: 48px high, <code>--gw-text-body-14-med</code>, <code>--gw-color-neutral-600</code>, a count in <code>--gw-color-neutral-400</code>, and a 2px <code>--gw-color-black</code> underline on the tab in view. Tabs scroll to their section and every section stays on the page; the active tab follows you as you scroll. On the right of the bar sits the <b>industry dropdown</b> (184px, the same custom list as version 1, with an inline &quot;Industry&quot; label). <b>Search is hidden</b> in this version; the markup is kept so it can come back. On phone the industry picker and the tab strip stack and the strip stays sticky, with a fade when it scrolls sideways.</p>
+<h4><code>agent-package-panel</code></h4>
+<p>The package builder, <b>sticky in the right column</b> (<code>top: 72px</code>, under the bar), always visible: empty at first (&quot;Add agents to build a package. The tier and price update as you go.&quot;) with a disabled <code>Build package</code>. With agents it lists them (24px round mascot, name, a remove control), then the slots meter and note, a <b>tier ladder</b> (Starter, Growth, Scale with their base prices, the best price lit in <code>--gw-color-primary-25</code> with a <code>--gw-color-primary-100</code> stroke), the recommended tier and monthly total in <code>--gw-text-h6-bold</code>, &quot;Priced separately&quot; for premium agents, <code>Build package</code> and <code>Clear</code> (with the same Undo toast). Hidden on phone, where the bottom bar takes over.</p>
+<h3 id="agent-package-panel">Version 3 (<code>/internal/staging/agent-store-v3</code>)</h3>
+<p>Version 2 with one change: the category tabs become a <b>pill toggle</b>, <code>agent-category-toggle</code>. A white capsule (1px <code>--gw-color-neutral-100</code> stroke, <code>--gw-radius-full</code>, <code>--gw-shadow-s2</code>, 4px padding) holds a pill per category: 36px high, 12px side padding, <code>--gw-text-body-14-med</code> in <code>--gw-color-neutral-700</code>, a count in <code>--gw-color-neutral-400</code>. <b>The pill in view is <code>--gw-color-black</code> with white text.</b> Pills still scroll to their section and the active one follows you down the page. The industry dropdown sits at the right end of the bar, above the package panel, with a white fill. From the pill toggle on the Agent Store idea board.</p>
+<h3 id="version-3-internal-staging-agent-store-v3">AI Marketplace (<code>/internal/staging/ai-marketplace</code>)</h3>
+<p>The store as a <b>marketplace page</b>, built from Utsav's Figma (<code>1m3ozYgQqR6KFYGb8eVRy3</code>, nodes <code>215:15115</code>, <code>323:21368</code>, <code>325:22087</code>, <code>337:22102</code>). Own assets; versions 1 to 3 are untouched. Column 1240px with a <b>100px minimum gutter</b> on desktop (16px on phone). A hero (500px), then one row holding the category toggle and the industry picker, then the cards on the left and the package panel on the right (360px). Below 1400px the panel is 320px and the cards go two across.</p>
+<h4><code>agent-store-hero</code></h4>
+<p>500px banner, <code>--gw-radius-20</code> bottom corners, primary-500 behind. The picture (Figma <code>image 52</code>, 1594 x 597 at x -34, y -53) <b>drifts down at 0.24x the scroll</b> (parallax, <code>translate3d</code>, off under reduced motion). A 40% black gradient runs left to right over 85% of the width. Title 80px Vert Grotesk Display bold (off-token: the ramp stops at 60px), subtitle <code>--gw-text-body-22-med</code> at 90% white. 100px of page ground below it.</p>
+<h4><code>agent-checkout-panel</code></h4>
+<p>The package as a checkout, sticky in the right column. 20px padding, <code>--gw-radius-16</code>, 1px <code>--gw-color-neutral-100</code>, <code>--gw-shadow-s2</code>. Header <code>--gw-text-body-18-sem</code> plus a <b>Clear</b> text button (empties the package, 5s Undo toast). Rows: 32px square thumbnail (<code>--gw-color-neutral-100</code> when there is no art), name, a Premium pill, a 16px trash icon; <b>premium agents are always on top</b>. Under the list an <b>Add agent</b> row (plus, &quot;Included in plan&quot; or &quot;+$175 / mo&quot;) opens <code>agent-picker</code>. A 1px rule, then the plan row (dotted underline, hover shows all three plans in a tooltip and &quot;Add or remove agents to switch plans&quot;), premium, extra and free-agent rows, a dashed rule, &quot;Total per month&quot; with the total in 32px Vert Grotesk Display medium that counts to its new value, and <code>Build your package</code>. <b>Empty:</b> a resting agent, a small Add agents button, total $0, and a Build button that does nothing. Phone: hidden; the bottom bar takes over.</p>
+<h4><code>agent-picker</code></h4>
+<p>A popover that adds an agent without leaving the panel: white, 1px <code>--gw-color-neutral-200</code>, <code>--gw-radius-12</code>, <code>--gw-shadow-s3</code>, 4px padding. Up to four 40px rows (32px thumbnail, name, Premium pill) that scroll, and a 40px search field on <code>--gw-color-neutral-50</code> underneath. Opens upward from the Add agent row. Popular picks first, agents that fill plan slots before free ones, premium last. Enter adds the first match, Esc closes. Also used inline inside the package builder.</p>
+<h4><code>agent-saving-line</code></h4>
+<p>One line in the panel and the builder that appears once the package has an extra agent: an up-arrow icon and &quot;Save $25 · add 2 more agents for $325&quot; on <code>--gw-color-primary-25</code> with a <code>--gw-color-primary-100</code> stroke. The saving is what filling the next plan costs less than buying the same agents as $175 extras; the price moves with every agent added. In the builder it carries an Add agent button.</p>
+<h4><code>agent-step-timeline</code></h4>
+<p>The &quot;How it works&quot; steps in the agent quick view as a plain vertical timeline: 9px dots on a 1px <code>--gw-color-neutral-100</code> line, a 12px gray label (Trigger, Reads, Decides, Does, Approval) over 14px text, the last dot solid black; the hovered step gets a solid dot and darker text. Next to it the talk track is a neutral-25 card with a hairline, no icon. The whole section is folded behind one row until opened (<code>H</code>).</p>
+<h4><code>shortcut-key-cap</code></h4>
+<p>The dashboard's R53 pattern on the web surface: the key sits <b>inside its control, after the label</b>, 18px, <code>--gw-radius-4</code>, the label colour at 8% on a tint and 50% strength, hidden on touch and below 768px. Shown on &quot;Add to package&quot; (A) and the How it works row (H). Other shortcuts live in tooltips (&quot;Industry (I)&quot;, &quot;Clear the package (C)&quot;, category number keys) and in a sheet opened with <code>?</code>.</p>
+<h4>Changes to existing elements</h4>
+<ul><li><code>agent-category-toggle</code> is now a segmented control that fills the column (neutral-25, 12px radius, white active tab with <code>--gw-shadow-s2</code>, Figma <code>215:15120</code>).</li><li><code>agent-package-builder</code> is two columns: the agents with optional monthly volumes on the left (scrolls), a fixed summary with the total and Send proposal on the right. No stat cards, no tier compare.</li><li><code>agent-listing-panel</code> has a name, price, description, volume row and add button on top, and the steps and talk track folded below. Premium agents are priced &quot;$1,000 / mo&quot;.</li></ul>
+<h3 id="ai-marketplace-internal-staging-ai-marketplace">Known gaps</h3>
+<ul><li>None of the six is a Figma component yet.</li><li>The 33 one-liners are drafted from each blurb and are not in the source data. They need review.</li><li><code>access</code> codes (M, R, W, D, P) and the <code>day1</code> flag are in the data and deliberately not shown.</li><li>The category list in Figma ends with <code>Build your own agent</code> and a count of 4. The 4 has no data behind it,</li></ul>
+<p>so the row shows <code>Soon</code>.</p>
+<ul><li>Figma writes <code>All Agents</code>, <code>Add Whole Bundle</code> and <code>Build Your Own Agent</code> in title case; the page uses</li></ul>
+<p>sentence case per <code>foundation/voice.md</code>.</p>
+<ul><li>The page <code>&lt;title&gt;</code> and description are proposals awaiting sign-off.</li><li>No favicon set or social card yet: layout pass only, and <code>/internal/*</code> cannot be scraped anyway.</li><li>AI Marketplace: Paid Ad Agent's modal description and the wording of <code>agent-saving-line</code> are my drafts; the Distributor popular picks are my pick; only SEO, Paid Ad and Email Marketing have Figma art, every other tile is gray.</li></ul></div></main><div class="lb-toc"><b>On this page</b><a href="#page-frame-from-the-figma-not-registered-separately" class="l3">Page frame (from the Figma, not registered separately)</a><a href="#agent-card" class="l3">agent-card</a><a href="#agent-section-header" class="l3">agent-section-header</a><a href="#agent-filter-rail" class="l3">agent-filter-rail</a><a href="#agent-listing-panel" class="l3">agent-listing-panel</a><a href="#agent-package-bar" class="l3">agent-package-bar</a><a href="#agent-package-builder" class="l3">agent-package-builder</a><a href="#version-2-internal-staging-agent-store-v2" class="l3">Version 2 (/internal/staging/agent-store-v2)</a><a href="#agent-category-tabs" class="l3">agent-category-tabs</a><a href="#agent-package-panel" class="l3">agent-package-panel</a><a href="#version-3-internal-staging-agent-store-v3" class="l3">Version 3 (/internal/staging/agent-store-v3)</a><a href="#ai-marketplace-internal-staging-ai-marketplace" class="l3">AI Marketplace (/internal/staging/ai-marketplace)</a><a href="#agent-store-hero" class="l3">agent-store-hero</a><a href="#agent-checkout-panel" class="l3">agent-checkout-panel</a><a href="#agent-picker" class="l3">agent-picker</a><a href="#agent-saving-line" class="l3">agent-saving-line</a><a href="#agent-step-timeline" class="l3">agent-step-timeline</a><a href="#shortcut-key-cap" class="l3">shortcut-key-cap</a><a href="#changes-to-existing-elements" class="l3">Changes to existing elements</a><a href="#known-gaps" class="l3">Known gaps</a></div></div>
+<script>
+(function(){
+  /* Theme: the same keys as the main site. `gw-theme-choice` is what the person picked (light, dark or system) and is
+     written only when they pick; no choice means System, which follows the machine. `gw-theme` is the resolved
+     light or dark. This button toggles light and dark, so using it is a choice. */
+  var CH='gw-theme-choice', RES='gw-theme';
+  function pref(){try{var v=localStorage.getItem(CH);return (v==='light'||v==='dark'||v==='system')?v:'system'}catch(e){return 'system'}}
+  function res(p){return p==='dark'?'dark':p==='light'?'light':(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}
+  function apply(p,remember){var r=res(p);
+    document.documentElement.setAttribute('data-theme',r);
+    try{localStorage.setItem(RES,r);if(remember)localStorage.setItem(CH,p)}catch(e){}
+    var b=document.getElementById('lb-theme');
+    if(b)b.setAttribute('aria-label',r==='dark'?'Switch to light':'Switch to dark');}
+  var btn=document.getElementById('lb-theme');
+  if(btn)btn.addEventListener('click',function(){
+    apply(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark',true)});
+  apply(pref(),false);
+  try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){if(pref()==='system')apply('system',false)})}catch(e){}
+
+  /* Rail filter. Narrows the inventory in place — it does not navigate, because the
+     rail is a list of siblings and losing your place to search them is worse than
+     scrolling. */
+  var f=document.getElementById('lb-find');
+  if(f){
+    var rows=[].slice.call(document.querySelectorAll('.lb-rail a'));
+    f.addEventListener('input',function(){
+      var t=f.value.trim().toLowerCase();
+      rows.forEach(function(a){
+        a.hidden=!!t&&a.getAttribute('data-q').indexOf(t)===-1});
+    });
+  }
+
+  /* Component list filter: hides rows that do not match, and a surface whose rows all went. */
+  var rf=document.getElementById('lb-rows');
+  if(rf){
+    var trs=[].slice.call(document.querySelectorAll('tr[data-q]')), secs=[].slice.call(document.querySelectorAll('section[data-cat]'));
+    rf.addEventListener('input',function(){
+      var t=rf.value.trim().toLowerCase();
+      trs.forEach(function(r){r.hidden=!!t&&r.getAttribute('data-q').indexOf(t)===-1});
+      secs.forEach(function(sc){sc.hidden=!sc.querySelector('tr[data-q]:not([hidden])')});
+    });
+  }
+
+  /* Mark the on-this-page entry for whatever heading is currently at the top. */
+  var toc=[].slice.call(document.querySelectorAll('.lb-toc a'));
+  if(toc.length){
+    var heads=toc.map(function(a){return document.getElementById(a.hash.slice(1))})
+                 .filter(Boolean);
+    var tick=function(){
+      var best=0;
+      heads.forEach(function(h,i){if(h.getBoundingClientRect().top<=90)best=i});
+      toc.forEach(function(a,i){a.style.color=i===best?'var(--gw-color-primary-600)':''});
+    };
+    document.addEventListener('scroll',tick,{passive:true});tick();
+  }
+})();
+</script>
+</body></html>
