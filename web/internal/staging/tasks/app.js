@@ -279,15 +279,22 @@
   const currentView = () => viewsList().find((v) => sameFilters(v.filters, S.filters));
 
   /* ------------------------------------------------------------------ small html blocks */
+  // A profile is the hub's generated mark (gd-avatar): a 3x3 dot pattern and a tone taken from the seed (an agent's id, a person's
+  // email), so Bruce, Alfred and every person look different and look the same on every device. Only "unassigned" stays an empty slot.
+  function mark(seed, o) {
+    o = o || {};
+    const cls = ['gd-avatar', 'gd-avatar--team']; if (o.sm) cls.push('gd-avatar--sm'); if (o.lg) cls.push('gd-avatar--lg');
+    const a11y = o.decor ? ' aria-hidden="true"' : ' role="img" aria-label="' + esc(o.label || '') + '"' + (o.label ? ' data-gd-tooltip="' + esc(o.label) + '"' : '');
+    return '<span class="' + cls.join(' ') + '" data-gd-avatar="' + esc(seed) + '"' + a11y + '></span>';
+  }
   function avHtml(a, o) {
     o = o || {};
-    const cls = ['gd-av']; if (o.sm) cls.push('gd-av--sm'); if (o.lg) cls.push('gd-av--lg'); if (o.btn) cls.push('gd-av--btn');
-    let inner = '', label = nameOf(a);
-    if (!a) { cls.push('gd-av--ghost'); label = 'Unassigned'; }
-    else if (isAgent(a)) { cls.push('gd-av--agent', a === 'a:bruce' ? 'gd-av--ink' : 'gd-av--outline'); inner = esc(nameOf(a).charAt(0)); }
-    else inner = esc(initials(nameOf(a)));
-    const attrs = (o.attrs || '') + (o.btn ? '' : ' role="img"') + ' aria-label="' + esc(label) + '"';
-    return o.btn ? '<button type="button" class="' + cls.join(' ') + '"' + attrs + '>' + inner + '</button>' : '<span class="' + cls.join(' ') + '"' + attrs + ' data-gd-tooltip="' + esc(label) + '">' + inner + '</span>';
+    if (!a) {
+      const attrs = (o.attrs || '') + (o.btn ? '' : ' role="img"') + ' aria-label="Unassigned"';
+      return o.btn ? '<button type="button" class="gd-av gd-av--ghost gd-av--btn' + (o.sm ? ' gd-av--sm' : '') + '"' + attrs + '></button>' : '<span class="gd-av gd-av--ghost' + (o.sm ? ' gd-av--sm' : '') + '"' + attrs + ' data-gd-tooltip="Unassigned"></span>';
+    }
+    const label = nameOf(a), m = mark(a.slice(2), { sm: true, lg: o.lg, label: o.btn ? '' : label, decor: !!o.btn });
+    return o.btn ? '<button type="button" class="tk-avbtn"' + (o.attrs || '') + ' aria-label="' + esc(label) + '">' + m + '</button>' : m;
   }
   function prioHtml(p) {
     if (!p) return '';
@@ -310,7 +317,7 @@
     return '<span class="gd-badge' + cls + '" title="' + esc(fmtLong(t.due)) + '">' + esc(relDay(t.due, S.today)) + (withGuess && t.guessed && t.guessed.due ? ' \u00b7 guessed' : '') + '</span>';
   }
   const srcHtml = (t) => t.source && t.source.channel ? '<span class="gd-badge" title="From Slack, ' + esc(t.source.channel) + '">' + esc(t.source.channel) + '</span>' : '';
-  const bruceMark = (t) => t.createdBy === 'bruce' && t.assignee !== 'a:bruce' ? '<span class="gd-av gd-av--agent gd-av--ink gd-av--sm" role="img" aria-label="Bruce added this" data-gd-tooltip="Bruce added this">B</span>' : '';
+  const bruceMark = (t) => t.createdBy === 'bruce' && t.assignee !== 'a:bruce' ? mark('bruce', { sm: true, label: 'Bruce added this' }) : '';
   const itemBtn = (cls, act, text, extra) => '<button type="button" class="gd-menu__item' + (cls ? ' ' + cls : '') + '" role="menuitem" data-value="' + act + '"' + (extra || '') + '><span>' + text + '</span></button>';
 
   function cardMenu(t) {
@@ -464,7 +471,7 @@
       let list = sorted(vis.filter((t) => t.status === l));
       if (l === 'done') list = list.sort((a, b) => String(b.doneAt).localeCompare(String(a.doneAt)));
       if (l === 'suggested' && S.display.showDismissed) list = list.concat(sorted(vis.filter((t) => t.status === 'dismissed')));
-      const by = l === 'suggested' ? '<span class="gd-lane__by"><span class="gd-av gd-av--agent gd-av--ink gd-av--sm" aria-hidden="true">B</span>Bruce</span>' : '';
+      const by = l === 'suggested' ? '<span class="gd-lane__by">' + mark('bruce', { sm: true, decor: true }) + 'Bruce</span>' : '';
       return '<section class="gd-lane' + (l === 'suggested' ? ' gd-lane--suggested' : '') + '" data-lane="' + l + '"' + (S.lane === l ? ' data-active="true"' : '') + ' aria-label="' + STATUS_NAME[l] + ', ' + list.length + '">' +
         '<header class="gd-lane__head"><h2 class="gd-lane__name">' + STATUS_NAME[l] + '</h2><span class="gd-lane__count gd-num">' + list.length + '</span>' + by + (l === 'suggested' && list.length > 1 ? '<button type="button" class="gd-btn gd-btn--ghost gd-btn--sm tk-accept-all" data-accept-all>Accept all</button>' : '') + '</header>' +
         '<div class="gd-lane__list" data-lane-list="' + l + '">' + (list.length ? list.map(cardHtml).join('') : '<div class="gd-lane__empty">' + empties[l] + '</div>') + '</div>' +
@@ -535,7 +542,7 @@
   }
   function tlRow(t, start, days) {
     return '<div class="gd-gantt__row" data-id="' + t.id + '"><div class="gd-gantt__label">' + (t.priority === 'urgent' ? '<span class="gd-badge gd-badge--solid">Urgent</span>' : prioHtml(t.priority) || '<span class="gd-prio" data-level="0" aria-hidden="true"><i></i><i></i><i></i></span>') +
-      '<button type="button" class="gd-gantt__name" data-open="' + t.id + '">' + esc(t.title) + '</button>' + (t.status === 'suggested' ? '<span class="gd-av gd-av--agent gd-av--ink gd-av--sm" role="img" aria-label="Suggested by Bruce">B</span>' : avHtml(t.assignee, { sm: true })) +
+      '<button type="button" class="gd-gantt__name" data-open="' + t.id + '">' + esc(t.title) + '</button>' + (t.status === 'suggested' ? mark('bruce', { sm: true, label: 'Suggested by Bruce' }) : avHtml(t.assignee, { sm: true })) +
       '</div><div class="gd-gantt__cells">' + barHtml(t, start, days) + '</div></div>';
   }
   function timelineHtml() {
@@ -573,7 +580,7 @@
     const why = cur.why ? '<div class="gd-banner gd-banner--neutral"><div class="gd-banner__body"><span class="gd-banner__title">Why Bruce thinks it is a task</span><span>' + esc(cur.why) + '</span></div></div>' : '';
     return '<div class="gd-inbox"><div class="gd-inbox__list" role="list" aria-label="Suggested tasks">' + rows +
       '<div class="gd-inbox__foot">Dismissed today: <span class="gd-num">' + dismissedToday() + '</span>' + (last ? ' · <button type="button" class="gd-btn gd-btn--link gd-btn--sm" data-inbox-undo>Undo last</button>' : '') + '</div></div>' +
-      '<div class="gd-inbox__pane"><div class="gd-inbox__head"><span class="gd-av gd-av--agent gd-av--ink" aria-hidden="true">B</span><b>Bruce suggested this</b><span>· ' + esc(ago(cur.createdAt)) + '</span><span class="gd-inbox__keys"><kbd class="gd-kbd">J</kbd><kbd class="gd-kbd">K</kbd>next or previous</span></div>' +
+      '<div class="gd-inbox__pane"><div class="gd-inbox__head">' + mark('bruce', { decor: true }) + '<b>Bruce suggested this</b><span>· ' + esc(ago(cur.createdAt)) + '</span><span class="gd-inbox__keys"><kbd class="gd-kbd">J</kbd><kbd class="gd-kbd">K</kbd>next or previous</span></div>' +
       quote + why +
       '<textarea class="gd-inbox__title" id="tk-ib-title" data-id="' + cur.id + '" rows="1" aria-label="Task title" maxlength="200">' + esc(cur.title) + '</textarea>' +
       propsHtml(cur, 'ib') +
@@ -614,7 +621,7 @@
     }
     if (kind === 'priority') {
       const rows = ['urgent', 'high', 'med', 'low', ''].map((p, i) => pickRow(p || 'none', (p === 'urgent' ? '<span class="gd-badge gd-badge--solid">Urgent</span><span class="gd-picker__text"></span>' : '<span class="gd-prio" data-level="' + PR_LEVEL[p] + '" aria-hidden="true"><i></i><i></i><i></i></span><span class="gd-picker__text"><b>' + PR_NAME[p] + '</b></span>') + '<span class="gd-picker__key">' + (p ? i + 1 : 0) + '</span>', (t.priority || '') === p));
-      const sug = t.guessed && t.guessed.priority && t.priority ? '<div class="gd-picker__suggest"><b><span class="gd-av gd-av--agent gd-av--ink gd-av--sm" aria-hidden="true">B</span>Bruce suggests ' + PR_NAME[t.priority] + '</b><span>' + esc(t.why || 'He read the message and judged the priority from it.') + '</span><div><button type="button" class="gd-btn gd-btn--primary gd-btn--sm" data-pick="' + t.priority + '">Apply</button><button type="button" class="gd-btn gd-btn--ghost gd-btn--sm" data-pop-close>Ignore</button></div></div>' : '';
+      const sug = t.guessed && t.guessed.priority && t.priority ? '<div class="gd-picker__suggest"><b>' + mark('bruce', { sm: true, decor: true }) + 'Bruce suggests ' + PR_NAME[t.priority] + '</b><span>' + esc(t.why || 'He read the message and judged the priority from it.') + '</span><div><button type="button" class="gd-btn gd-btn--primary gd-btn--sm" data-pick="' + t.priority + '">Apply</button><button type="button" class="gd-btn gd-btn--ghost gd-btn--sm" data-pop-close>Ignore</button></div></div>' : '';
       return '<div class="gd-picker" role="menu" aria-label="Priority">' + rows.join('') + (sug ? '<div class="gd-picker__sep"></div>' + sug : '') + '</div>';
     }
     if (kind === 'assignee') {
@@ -740,7 +747,7 @@
   function activityHtml(t, label) {
     const items = (t.activity || []).slice().reverse().map((a) => {
       const agent = a.by === 'bruce' || a.by === 'alfred';
-      const av = agent ? '<span class="gd-av gd-av--agent gd-av--sm ' + (a.by === 'bruce' ? 'gd-av--ink' : 'gd-av--outline') + '" aria-hidden="true">' + esc(actorName(a.by).charAt(0)) + '</span>' : '<span class="gd-av gd-av--sm" aria-hidden="true">' + esc(initials(actorName(a.by))) + '</span>';
+      const av = mark(a.by, { sm: true, decor: true });
       return '<li class="gd-timeline__item"><span class="gd-timeline__node">' + av + '</span><div class="gd-timeline__body"><span><span class="gd-timeline__actor">' + esc(actorName(a.by)) + '</span> ' + esc(a.text) + '</span></div><time class="gd-timeline__time" datetime="' + esc(a.at) + '" title="' + esc(new Date(a.at).toLocaleString()) + '">' + esc(ago(a.at)) + '</time></li>';
     }).join('');
     return '<div class="tk-sec"><span class="tk-sec__label">' + label + '</span><ol class="gd-timeline tk-feed">' + (items || '<li class="tk-agentnote">Nothing yet.</li>') + '</ol></div>';
@@ -972,14 +979,14 @@
     if (m.role === 'user') {
       return '<div class="gd-ask__msg gd-ask__msg--me">' + (m.tags.length ? '<div class="gd-ask__tags">' + m.tags.map((t) => tagChip(t)).join('') + '</div>' : '') + (m.text ? '<div class="gd-ask__bubble">' + esc(m.text) + '</div>' : '') + '</div>';
     }
-    return '<div class="gd-ask__msg gd-ask__msg--bruce"><span class="gd-av gd-av--agent gd-av--ink gd-av--sm" aria-hidden="true">B</span><div class="gd-ask__bubble' + (m.error ? ' gd-ask__bubble--error' : '') + '">' + (m.error ? esc(m.content) : answerHtml(m.content)) + (m.plan ? planHtml(i, m.plan) : '') + '</div></div>';
+    return '<div class="gd-ask__msg gd-ask__msg--bruce">' + mark('bruce', { sm: true, decor: true }) + '<div class="gd-ask__bubble' + (m.error ? ' gd-ask__bubble--error' : '') + '">' + (m.error ? esc(m.content) : answerHtml(m.content)) + (m.plan ? planHtml(i, m.plan) : '') + '</div></div>';
   }
   function renderThread(stick) {
     const th = $('#tk-ask-thread');
     const empty = !A.msgs.length && !A.pending;
     const near = th.scrollHeight - th.scrollTop - th.clientHeight < 80;
     th.innerHTML = empty ? '<div class="gd-ask__empty"><span>Ask about your tasks, or tell me what to change. I will show a plan before I touch anything.</span><div class="gd-ask__starters">' + ['What is due this week?', 'What is overdue?', 'Move everything in To do to Doing'].map((q) => '<button type="button" class="gd-btn gd-btn--outline gd-btn--sm" data-starter="' + esc(q) + '">' + esc(q) + '</button>').join('') + '</div></div>'
-      : A.msgs.map(msgHtml).join('') + (A.pending ? '<div class="gd-ask__msg gd-ask__msg--bruce"><span class="gd-av gd-av--agent gd-av--ink gd-av--sm" aria-hidden="true">B</span><div class="gd-ask__bubble"><span class="gd-ask__typing">Looking</span></div></div>' : '');
+      : A.msgs.map(msgHtml).join('') + (A.pending ? '<div class="gd-ask__msg gd-ask__msg--bruce">' + mark('bruce', { sm: true, decor: true }) + '<div class="gd-ask__bubble"><span class="gd-ask__typing">Looking</span></div></div>' : '');
     if (stick || near) th.scrollTop = th.scrollHeight;
     $('#tk-ask-newchat').hidden = !A.msgs.length;
   }
@@ -1078,6 +1085,7 @@
       closePop(p, true); if (t.status === 'suggested') refresh(); return; }
     if (q('[data-pop-close]')) { closePop(q('.gd-popover'), true); return; }
     if (q('[data-open-notyet]')) { openNotYet(); return; }
+    if (q('#tk-keys-btn')) { openKeys(); return; }
     if (q('[data-open-settings]') || q('#tk-launch-status')) { openSettings(); return; }
 
     /* date picker */
@@ -1234,12 +1242,47 @@
   }
 
   /* ------------------------------------------------------------------ keyboard */
+  const KEYS = [
+    ['General', [['Ask Bruce', ['\u2318', 'K']], ['Show these shortcuts', ['?']], ['New task', ['C']], ['Search', ['/']], ['Filter', ['F']], ['Display', ['D']], ['Switch theme', ['\u21e7', 'T']]]],
+    ['Views', [['Board', ['1']], ['List', ['2']], ['Timeline', ['3']], ['Inbox', ['4']]]],
+    ['Tasks', [['Next task', ['J']], ['Previous task', ['K']], ['Open the task', ['Enter']], ['Move a card to the next lane', ['\u2325', '\u2192']], ['Move a card to the previous lane', ['\u2325', '\u2190']], ['Set priority, in its menu', ['0\u20134']]]],
+    ['Inbox', [['Accept the suggestion', ['A']], ['Dismiss the suggestion', ['D']], ['Next or previous', ['J', 'K']]]],
+    ['Timeline', [['Move a bar a day', ['\u2190', '\u2192']], ['Resize a bar', ['\u21e7', '\u2190', '\u2192']]]],
+    ['Anywhere', [['Close a panel or menu', ['Esc']]]],
+  ];
+  function openKeys() {
+    const body = $('#tk-keys-body');
+    if (!body.firstChild) body.innerHTML = KEYS.map(([g, rows]) => '<section class="tk-keys__group"><h3 class="tk-keys__title">' + g + '</h3><dl>' + rows.map(([n, ks]) => '<div class="tk-keys__row"><dt>' + n + '</dt><dd>' + ks.map((k) => '<kbd class="gd-kbd">' + k + '</kbd>').join('') + '</dd></div>').join('') + '</dl></section>').join('');
+    $$('.gd-popover:not([hidden])').forEach((p) => closePop(p)); GD.feedback.open($('#tk-keys'));
+  }
+  function cycleTheme() {
+    const tr = $('.gd-theme__trigger'), order = ['system', 'light', 'dark'], next = order[(order.indexOf(tr ? tr.dataset.pref : 'system') + 1) % 3], it = $('[data-gd-theme="' + next + '"]');
+    if (it) { it.click(); toast('Theme: ' + cap1(next), { type: 'success' }); }
+  }
+  function moveTask(d) {
+    const list = $$('.gd-taskcard__open, .gd-tasklist__open, .gd-gantt__name', $('#tk-view')).filter((n) => n.offsetParent);
+    if (!list.length) return false;
+    const i = list.indexOf(doc.activeElement), n = list[i < 0 ? (d > 0 ? 0 : list.length - 1) : Math.max(0, Math.min(list.length - 1, i + d))];
+    n.focus(); n.scrollIntoView({ block: 'nearest' }); return true;
+  }
   const typing = () => { const a = doc.activeElement; return a && (a.matches('input, textarea, select, [contenteditable]')); };
   doc.addEventListener('keydown', (ev) => {
     const k = ev.key, mod = ev.metaKey || ev.ctrlKey;
     if (mod && k.toLowerCase() === 'k') { ev.preventDefault(); if (S.status === 'ready') toggleAsk(); return; }
     if (mod && k === '/') { ev.preventDefault(); if (S.status === 'ready' && !$('#tk-search').hidden) openSearch(); return; }
 
+    // plain keys, only when nothing is being typed and no dialog is open
+    if (!mod && !ev.altKey && S.status === 'ready' && !typing() && !doc.querySelector('dialog[open]') && !(ev.target.closest && ev.target.closest('.gd-popover:not([hidden]), .gd-menu'))) {
+      const inbox = S.view === 'inbox', onBar = (id) => { const b = $(id); return b && !b.closest('[hidden]') ? b : null; };
+      if (k === '?') { ev.preventDefault(); openKeys(); return; }
+      if (/^[1-4]$/.test(k)) { const v = VIEWS[+k - 1]; if (v && !(v === 'timeline' && isPhone())) { ev.preventDefault(); setView(v); } return; }
+      if (k === 'c') { ev.preventDefault(); openNew(); return; }
+      if (k === '/') { ev.preventDefault(); if (!$('#tk-search').hidden) openSearch(); return; }
+      if (k === 'f' && onBar('#tk-filter-btn')) { ev.preventDefault(); $('#tk-filter-btn').click(); return; }
+      if (k === 'd' && !inbox && onBar('#tk-display-btn')) { ev.preventDefault(); $('#tk-display-btn').click(); return; }
+      if (k === 'T') { ev.preventDefault(); cycleTheme(); return; }
+      if ((k === 'j' || k === 'k') && !inbox && moveTask(k === 'j' ? 1 : -1)) { ev.preventDefault(); return; }
+    }
     const t = ev.target;
     // composer
     if (t.id === 'tk-ask-input') {

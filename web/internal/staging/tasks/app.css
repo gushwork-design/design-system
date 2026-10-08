@@ -116,3 +116,21 @@ html, body { margin: 0; overflow: hidden; }
 
 /* Accept all sits at the right end of the Suggested lane's head */
 .tk-accept-all { margin-left: auto; }
+
+/* an assignee avatar that filters the board: the generated mark inside a bare button, with a ring when it is the one showing */
+.tk-avbtn { display: inline-grid; place-items: center; padding: 0; border: 0; background: none; border-radius: 20%; cursor: pointer; font: inherit; color: inherit; }
+.tk-avbtn[aria-pressed="true"] .gd-avatar { box-shadow: 0 0 0 2px var(--gd-panel-bg), 0 0 0 4px var(--gd-ink); }
+.tk-avbtn:focus-visible { outline: 2px solid var(--gd-border-focus); outline-offset: 2px; }
+.gd-av-stack > .tk-avbtn { box-shadow: 0 0 0 2px var(--gd-panel-bg); position: relative; }
+
+/* the keyboard shortcuts sheet: groups in two columns, each row a name and its key caps */
+.tk-keys { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gd-gap) calc(var(--gd-gap) * 2); }
+.tk-keys__title { margin: 0 0 var(--gw-space-8); font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); text-transform: uppercase; color: var(--gd-text-muted); }
+.tk-keys dl { margin: 0; }
+.tk-keys__row { display: flex; align-items: center; justify-content: space-between; gap: var(--gd-gap); min-height: var(--gd-control-h); border-bottom: 1px solid var(--gd-border); }
+.tk-keys__row dt { color: var(--gd-text); font: var(--gw-text-body-14-reg); }
+.tk-keys__row dd { margin: 0; display: inline-flex; gap: var(--gw-space-4); }
+@media (max-width: 767px) { .tk-keys { grid-template-columns: 1fr; } }
+
+/* a phone has no keyboard: the shortcuts button is dropped there (the keys still work with a keyboard attached) */
+@media (max-width: 767px) { #tk-keys-btn { display: none; } }
