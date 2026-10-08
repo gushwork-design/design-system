@@ -51,5 +51,11 @@
     "basis": "About 40,000 tokens a run, assumed: the checks he runs and the report. A run is a scheduled Monday or Thursday.",
     "run": 40000,
     "measured": []
+  },
+  "avatar": {
+    "src": "/assets/agents/doc.jpg",
+    "x": 50,
+    "y": 14,
+    "zoom": 1.45
   }
 }

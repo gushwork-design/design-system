@@ -59,5 +59,11 @@
     "basis": "About 60,000 tokens a run, assumed: his instructions, the item, the files he changes, the check and his comment. A run is one comment he posts.",
     "run": 60000,
     "measured": []
+  },
+  "avatar": {
+    "src": "/assets/agents/alfred.jpg",
+    "x": 50,
+    "y": 18,
+    "zoom": 1.45
   }
 }
