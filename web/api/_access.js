@@ -256,13 +256,14 @@ export function grantPage(rules, pathname, email) {
   const base = exact || rule;
   /* `admin` and `internal` carry no list of their own: the page becomes a people rule, and admins still pass
      because the admin check comes before the rule in decide(). */
-  const keep = base.access === 'people';
+  const keep = base.access === 'people' || base.access === 'lane';
   const next = {
     path,
-    access: 'people',
+    access: base.access === 'lane' ? 'lane' : 'people',
     groups: keep ? [...base.groups] : [],
     people: keep ? [...base.people] : []
   };
+  if (base.access === 'lane') next.lane = base.lane;      // still the team's page; the person is added beside the team
   if (next.people.includes(who)) return { rules, already: true };
   next.people.push(who);
   const routes = exact ? rules.routes.map(r => (r.path === path ? next : r)) : [...rules.routes, next];
@@ -297,20 +298,47 @@ export function normalise(raw) {
          which is why the level had to be added here before the page could offer it:
          a stored `owner` rule would otherwise be silently loosened to any verified
          @gushwork.ai account on the very next read. */
-      const access = ['public', 'internal', 'admin', 'owner', 'people'].includes(r.access)
+      let access = ['public', 'internal', 'admin', 'owner', 'people', 'lane'].includes(r.access)
         ? r.access : 'internal';
-      return {
+      /* `lane`: this page is private to a staging lane's team (see the lanes below). A lane rule that names no real lane
+         fails CLOSED, to admins only, rather than to anyone: a malformed rule must never open a private page. */
+      const lane = access === 'lane' ? String((r && r.lane) || '').trim().toLowerCase() : '';
+      if (access === 'lane' && !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(lane)) access = 'admin';
+      const out = {
         path: path.replace(/\/+$/, '') || '/',
         access,
         groups: (Array.isArray(r.groups) ? r.groups : [])
           .map(s => String(s).trim().toLowerCase()).filter(Boolean),
         people: emails(r.people)
       };
+      if (access === 'lane') {
+        out.lane = lane;
+        /* Who published the page. The request for access goes to them and the owner, and only they can answer. */
+        const c = String((r && r.creator) || '').trim().toLowerCase();
+        if (c.includes('@')) out.creator = c;
+      }
+      return out;
     })
     .filter(Boolean);
 
+  /* Staging lanes: a team's folder under /internal/staging/<lane>/ and who may PUBLISH into it. Viewing is not
+     decided here, it is the ordinary /internal rule above. A lane is a slug, and its list is people and groups
+     in the same shape a page rule uses, so the page's one picker serves both. Only an owner may change this
+     (api/access.js): it decides who can put code on the site. */
+  const lanes = {};
+  if (raw.lanes && typeof raw.lanes === 'object') {
+    for (const [name, v] of Object.entries(raw.lanes)) {
+      const key = String(name).trim().toLowerCase();
+      if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(key) || key.length > 40) continue;
+      lanes[key] = {
+        groups: (Array.isArray(v && v.groups) ? v.groups : []).map(s => String(s).trim().toLowerCase()).filter(Boolean),
+        people: emails(v && v.people)
+      };
+    }
+  }
+
   if (!routes.length) return null;
-  return { version: 1, admins: emails(raw.admins), groups, routes };
+  return { version: 1, admins: emails(raw.admins), groups, routes, lanes };
 }
 
 /* ── deciding ─────────────────────────────────────────────────────────────── */
@@ -345,6 +373,105 @@ export function groupsFor(email, rules) {
     if ((members || []).includes(e)) out.push(name);
   }
   return out;
+}
+
+/* May this person publish into this lane? Owners always can (they are the ones who set lanes up). An admin is NOT
+   automatically a publisher: publishing is its own grant, listed per lane, so a person is added to the lanes they
+   work in and no wider. Read against the live rules on every call, never from the cookie. */
+export function canPublish(email, lane, rules) {
+  if (!email || !lane) return false;
+  const e = String(email).toLowerCase();
+  if (isOwner(e)) return true;
+  const l = (rules.lanes || {})[lane];
+  if (!l) return false;
+  if ((l.people || []).includes(e)) return true;
+  const mine = groupsFor(e, rules);
+  return (l.groups || []).some(g => mine.includes(g));
+}
+
+/* The lanes this person may publish into, in order. */
+export function lanesFor(email, rules) {
+  return Object.keys(rules.lanes || {}).sort().filter(l => canPublish(email, l, rules));
+}
+
+/* Everyone on a lane: its people and the members of its groups, one address each. Used to tell the team about a request. */
+export function laneMembers(rules, lane) {
+  const l = (rules.lanes || {})[lane];
+  if (!l) return [];
+  const out = new Set((l.people || []));
+  for (const g of l.groups || []) for (const e of (rules.groups || {})[g] || []) out.add(e);
+  return [...out];
+}
+
+/* A publisher chooses who can open their page: only their lane's team, or everyone in the organisation.
+
+   They can only NARROW, and only for their own page. A page is 'org' by default (the ordinary /internal rule), so
+   'lane' adds one rule for that page's exact path and 'org' removes that same rule; nothing else is ever written.
+   Opening a private page back up is the page's creator's to do (or the owner's), so another member of the lane cannot widen
+   it or wipe the people an approved request added. A rule the owner set (a people list, admins, owners, public) is never
+   replaced, and a stricter rule on the lane itself is never loosened by a page inside it: in both cases the page is left
+   as the owner set it and the note says so.
+
+   Pure: returns { rules, changed, note }. */
+export function setPageVisibility(rules, lane, page, visibility, actor = '', actorIsOwner = false) {
+  const path = `/internal/staging/${lane}/${page}`;
+  const exact = rules.routes.find(r => r.path === path);
+  const ours = exact && exact.access === 'lane' && exact.lane === lane;
+  const creator = String(actor || '').toLowerCase();
+  if (visibility === 'lane') {
+    if (ours) return { rules, changed: false, note: '' };
+    if (exact) return { rules, changed: false, note: 'The owner has already set who can open this page, so it was left as is.' };
+    const above = ruleFor(path, rules);
+    if (above && above.access !== 'internal') {
+      return { rules, changed: false, note: above.access === 'public'
+        ? 'This page sits under a public rule the owner set, so it was left as is.'
+        : 'The owner has already set who can open this lane, so the page follows that.' };
+    }
+    return { rules: { ...rules, routes: [...rules.routes, { path, access: 'lane', lane, ...(creator ? { creator } : {}), groups: [], people: [] }] }, changed: true, note: '' };
+  }
+  if (ours) {
+    if (exact.creator && creator !== exact.creator && !actorIsOwner) {
+      return { rules, changed: false, note: 'Only the person who published it, or the owner, can open it to everyone, so it stays private to the team.' };
+    }
+    return { rules: { ...rules, routes: rules.routes.filter(r => r !== exact) }, changed: true, note: '' };
+  }
+  return { rules, changed: false, note: '' };
+}
+
+/* Read the rules to CHANGE them, or refuse. loadRules() falls back to the compiled defaults when the store cannot be read, which is
+   right for serving a page and wrong for saving: writing back "the defaults plus my change" over a store that merely failed to
+   answer would erase every lane, group and private page rule. So a writer reads through this, which says no unless the store
+   really answered (`ok`, or `empty` for a store that has never been saved). */
+export async function loadRulesForWrite() {
+  invalidate();
+  const rules = await loadRules();
+  const st = readStatus().state;
+  if (st !== 'ok' && st !== 'empty') {
+    const e = new Error('rules unreadable'); e.code = 'rules-unreadable'; throw e;
+  }
+  return rules;
+}
+
+/* Change the rules and check the change took. `mutate(rules)` returns { rules, changed, ... } (pure); `holds(rules)` says whether
+   the saved rules show the change. Two writers (a publish and an Approve, or two publishes) can each read, change and save the
+   whole ruleset in the same moment, and the second save would silently drop the first's rule; so after saving it reads again,
+   and if its change is missing it starts over from what is there now. Returns { ok, changed, out, rules } or { ok: false, status, error }. */
+export async function updateRules(mutate, holds) {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    let cur;
+    try { cur = await loadRulesForWrite(); }
+    catch { return { ok: false, status: 503, error: 'The access rules could not be read just now, so nothing was changed. Try again in a minute.' }; }
+    const out = mutate(cur);
+    if (!out || !out.changed) return { ok: true, changed: false, out, rules: cur };
+    const saved = await saveRules(out.rules);
+    if (!saved.ok) return { ok: false, status: saved.status || 502, error: saved.error };
+    const settle = Number(process.env.RULES_SETTLE_MS ?? 250);
+    if (settle > 0) await new Promise((r) => setTimeout(r, settle));
+    invalidate();
+    const after = await loadRules();
+    if (holds(after)) return { ok: true, changed: true, out, rules: after };
+  }
+  return { ok: false, status: 502, error: 'The access rules did not settle after saving. Try again.' };
 }
 
 /** The most specific rule covering a path — longest matching prefix. */
@@ -406,6 +533,16 @@ export function decide(pathname, session, rules) {
       return 'forbid';
     case 'internal':
       return isInternal(email) ? 'allow' : 'forbid';
+    case 'lane': {
+      /* A page private to a lane: the people who can publish to that lane (read live, so leaving the lane closes the
+         page at once), plus anyone named on the rule itself, which is what an approved request adds. */
+      if (canPublish(email, rule.lane, rules)) return 'allow';
+      if (rule.people.includes(email)) return 'allow';
+      for (const g of rule.groups) {
+        if ((rules.groups[g] || []).includes(email)) return 'allow';
+      }
+      return 'forbid';
+    }
     case 'people': {
       if (rule.people.includes(email)) return 'allow';
       for (const g of rule.groups) {
@@ -442,6 +579,7 @@ export function describeAccess(rule) {
     case 'internal': return { level, label: 'For everyone', restricted: false };
     case 'admin':    return { level, label: 'Admins only', restricted: true };
     case 'owner':    return { level, label: 'Owners only', restricted: true };
+    case 'lane':     return { level, label: `Only for the ${rule.lane} team`, restricted: true };
     case 'people': {
       const groups = (rule.groups || []).map(groupLabel).filter(Boolean);
       const n = (rule.people || []).length;

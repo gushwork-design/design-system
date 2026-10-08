@@ -512,8 +512,13 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
       '<div class="ac-row" data-i="' + i + '">' +
         '<div class="ac-row__path">' + pathHTML(r.path) +
           (r.path === '/admin' ? '<small>Includes this page</small>' : '') + '</div>' +
-        '<div class="ac-row__who">' + ddHTML(r.path, r.access, locked) + '</div>' +
-        '<div class="ac-row__people">' + peopleFieldHTML(r) + '</div>' +
+        /* A page its publisher made private to a staging lane (api/_publish.js): the rule follows the lane's team live, so there is
+           no list to edit here. Removing the row opens the page to the whole organisation again. */
+        '<div class="ac-row__who">' + (r.access === 'lane'
+          ? '<span class="ac-tag" style="font:var(--gw-text-body-14-med)">Private to the ' + esc(r.lane) + ' team</span>'
+          : ddHTML(r.path, r.access, locked)) + '</div>' +
+        '<div class="ac-row__people">' + (r.access === 'lane'
+          ? ((r.people || []).length ? '<small>+ ' + plural(r.people.length, 'approved person') + '</small>' : '') : peopleFieldHTML(r)) + '</div>' +
         '<div class="ac-row__del"><button class="ac-icbtn" type="button" data-act="drop" ' +
           (r.path === '/admin' ? 'disabled title="The admin area cannot be ungated here"' :
             'aria-label="Remove the rule for ' + esc(r.path) + '"') +
@@ -826,6 +831,96 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
     return card;
   }
 
+  /* -- staging lanes ----------------------------------------------------------- */
+
+  /* A lane is a team's folder under /internal/staging/<lane>/, and this list is who may PUBLISH into it from their
+     own Claude with the plugin. Viewing is not decided here: everything under /internal is open to the
+     organisation unless a Pages rule narrows it. Only an owner may change a lane (api/access.js refuses anyone else),
+     because it decides who can put pages on the site, so for an admin the card is read-only. Names that cannot be a
+     lane are the same as RESERVED in api/_staging-rules.js. */
+  var LANE_RESERVED = ['new', 'api', 'admin', 'assets', 'internal', 'template', 'templates', 'index', 'publish', 'connect'];
+
+  function lanesCard() {
+    var lanes = draft.lanes || (draft.lanes = {});
+    var names = Object.keys(lanes).sort();
+    var canEdit = !!meta.you.owner;
+    var card = el(
+      '<section class="ac-card">' +
+        '<div class="ac-card__hd">' +
+          '<div><h3>Staging lanes</h3><p>A team&rsquo;s folder under <code>/internal/staging/</code>. Everyone listed, ' +
+            'or in a listed group, can publish pages into it from their own Claude. ' +
+            'Everyone in the organisation can still open the pages.' +
+            (canEdit ? '' : ' Only an owner can change a lane.') + '</p></div>' +
+          '<span class="ac-card__n">' + plural(names.length, 'lane') + '</span>' +
+        '</div>' +
+        '<div class="ac-card__body"><div data-lanes></div></div>' +
+        (canEdit ?
+        '<div class="ac-card__ft">' +
+          '<input class="ac-field" data-newlane placeholder="gtm" aria-label="Lane name" ' +
+            'style="max-width:200px" data-1p-ignore="true" data-lpignore="true" data-form-type="other">' +
+          '<button class="ac-btn" type="button" data-addlane>' + icon('plus') + '<span>Add a lane</span></button>' +
+          '<small data-lanemsg style="color:var(--s-nav-label)"></small>' +
+        '</div>' : '') +
+      '</section>'
+    );
+
+    var mount = card.querySelector('[data-lanes]');
+    /* The card's own header is hidden once the cards are tabs, so the one thing a reader must know goes in the body. */
+    mount.appendChild(el('<div class="ac-note" style="margin-bottom:8px">' + icon('info') +
+      '<span>Who can publish pages into each team&rsquo;s folder, from their own Claude with the plugin. They connect once, signed in as themselves. ' +
+      'Everyone in the organisation can still open the pages.' + (canEdit ? '' : ' Only an owner can change a lane.') + '</span></div>'));
+    if (!names.length) {
+      mount.appendChild(el('<p style="margin:12px 0 0;font:var(--gw-text-body-14-reg);' +
+        'color:var(--s-nav-label)">No lanes yet.</p>'));
+    }
+    names.forEach(function (name) {
+      var l = lanes[name];
+      var who = [].concat((l.groups || []).map(function (g) { return '@' + g; }), l.people || []).join(', ');
+      mount.appendChild(el(
+        '<div class="ac-row" style="grid-template-columns:minmax(120px,240px) minmax(0,1fr) 44px">' +
+          '<div class="ac-row__path">' + pathHTML('/internal/staging/' + name) + '</div>' +
+          '<div><input class="ac-field" data-lane="' + esc(name) + '" data-suggest="people" autocomplete="off" ' +
+            'value="' + esc(who) + '" ' + (canEdit ? '' : 'disabled ') +
+            'aria-label="Who can publish to the ' + esc(name) + ' lane" ' +
+            'placeholder="name@' + esc(meta.domain) + ', @group" ' +
+            'data-1p-ignore="true" data-lpignore="true" data-form-type="other"></div>' +
+          '<div>' + (canEdit ? '<button class="ac-icbtn" type="button" data-droplane="' + esc(name) + '" ' +
+            'aria-label="Remove the ' + esc(name) + ' lane. Pages already published stay."' + '>' + icon('trash') + '</button>' : '') + '</div>' +
+        '</div>'
+      ));
+    });
+
+    mount.addEventListener('change', function (ev) {
+      var name = ev.target.dataset.lane; if (!name || !canEdit) return;
+      var parts = ev.target.value.split(',').map(function (x) { return x.trim(); }).filter(Boolean);
+      lanes[name] = {
+        groups: parts.filter(function (x) { return x.charAt(0) === '@'; }).map(function (x) { return x.slice(1).toLowerCase(); }),
+        people: parts.filter(function (x) { return x.charAt(0) !== '@'; }).map(function (x) { return x.toLowerCase(); })
+      };
+      paintBar();
+    });
+    mount.addEventListener('click', function (ev) {
+      var btn = ev.target.closest('[data-droplane]'); if (!btn || !canEdit) return;
+      delete lanes[btn.dataset.droplane];
+      render();
+    });
+
+    if (canEdit) card.querySelector('[data-addlane]').addEventListener('click', function () {
+      var input = card.querySelector('[data-newlane]'), msg = card.querySelector('[data-lanemsg]');
+      var name = input.value.trim().toLowerCase();
+      if (!name) return;
+      if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(name) || name.length > 40 || LANE_RESERVED.indexOf(name) > -1) {
+        msg.textContent = 'Use lowercase words joined by hyphens, like gtm or customer-success.';
+        return;
+      }
+      if (lanes[name]) { input.value = ''; msg.textContent = ''; return; }
+      lanes[name] = { groups: [], people: [] };
+      render();
+    });
+
+    return card;
+  }
+
   function adminsCard() {
     var owners = (meta.owners || []).map(function (e) { return e.toLowerCase(); });
     var extra = (draft.admins || []).filter(function (e) { return owners.indexOf(e) === -1; });
@@ -1083,6 +1178,7 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
       (draft.groups[g] || []).forEach(function (e) { add(e, '@' + g); });
     });
     draft.routes.forEach(function (r) { (r.people || []).forEach(function (e) { add(e, null); }); });
+    Object.keys(draft.lanes || {}).forEach(function (l) { ((draft.lanes[l] || {}).people || []).forEach(function (e) { add(e, null); }); });
     if (meta.you) add(meta.you.email, 'You');
     return who;
   }
@@ -1299,12 +1395,13 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
     mount.appendChild(templatesCard());
     mount.appendChild(pagesCard());
     mount.appendChild(groupsCard());
+    mount.appendChild(lanesCard());
     mount.appendChild(adminsCard());
     paintTabs();
     paintBar();
   }
 
-  /* The five cards become five tabs, in the order they were already in. A tab's label is its card's own
+  /* The cards become tabs, in the order they were already in. A tab's label is its card's own
      title, so the two cannot drift; the open tab is kept in the address (#pages) and survives a re-render. */
   var activeTab = '';
   function paintTabs() {
@@ -1354,9 +1451,12 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
       var r = out.b.rules || {};
       r.admins = r.admins || [];
       r.groups = r.groups || {};
+      r.lanes = r.lanes || {};
       r.routes = (r.routes || []).map(function (x) {
-        return { path: x.path, access: x.access,
-                 groups: x.groups || [], people: x.people || [] };
+        var row = { path: x.path, access: x.access,
+                    groups: x.groups || [], people: x.people || [] };
+        if (x.access === 'lane') { row.lane = x.lane; if (x.creator) row.creator = x.creator; }
+        return row;
       });
       state = clone(r);
       draft = clone(r);

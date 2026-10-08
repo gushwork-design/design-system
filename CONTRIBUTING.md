@@ -5,6 +5,44 @@ not need Figma — everything measured is in `exports/`. Stop here.
 
 Read on only if you are adding a component, correcting a measurement, or re-pulling tokens.
 
+## Adding a staging page (anyone on a lane, from the plugin)
+
+A page you want to show the team goes at `design.gushwork.ai/internal/staging/<lane>/<page>`, behind the
+sign-in. The owner does not review it and you do not need repo access.
+
+A **lane** is a team's folder (`gtm`, `customer-success`). The owner creates it, and lists who may publish into it, in
+Access Control, Staging lanes. Everyone in the organisation can open the pages.
+
+**You tell your Claude:** "publish this to the gtm lane". With the design plugin installed, it scaffolds the page
+(`scripts/new-staging-page.sh`), runs the checks (`scripts/publish-staging.sh --check`) and publishes it.
+
+**The first time on a computer** it connects itself: the script prints a code and opens
+`/internal/staging/connect`. You sign in as yourself, type the code, press Connect. That is the only step you do;
+it is remembered for 90 days (`publish-staging.sh logout` disconnects).
+
+**Where it goes.** When you say "publish this", Claude first asks whether you mean your lane's staging (it lists your lanes) or somewhere else. It only publishes to a staging lane you are on; anywhere else, including the live site, is the owner's call.
+
+**Private is private on the hub, not in git.** The repo is public, so a private page's files (and its `staging.json`, with the title,
+the line about it and who published it) can be read on GitHub by anyone. Keep anything confidential out of lane pages.
+
+**Who can open it.** Your Claude asks, and the answer is saved in `staging.json` (`visibility`): *only your team* (the people
+on the lane) or *everyone at Gushwork*. A private page gets one rule that follows the lane's team live, so leaving the
+lane closes it at once; you can only narrow your own page, and a rule the owner set is never overridden. Someone outside
+the team who opens it sees "Restricted page" and can ask for access; Bruce messages the owner and the person who published the page
+(and no one else) in Slack with Approve and Decline, and either can answer.
+
+The page is live a minute or two after it says Committed, and the Staging index lists it under Team pages by
+itself, from the `staging.json` the script writes. Publishing the same name again replaces its files.
+
+What keeps it safe, all in `web/api/_staging-rules.js` and `_publish.js`: the person must be on the lane (read live
+from Access Control on every call, so removing them stops their token at once); it writes only under
+`web/internal/staging/<lane>/<page>/` and never into a folder that is already a page of its own; it deletes
+nothing; static files only, 3 MB in all; no key-shaped strings; no reference to the hub's `/api/` or `/admin/`
+(a page there runs on the hub's domain with the viewer's session; this is a scan, not a sandbox); the same font
+rule the deploy enforces. The connect code is typed rather than linked, and the token is minted when the script
+collects it, so the store only ever holds hashes. Anything beyond that (deleting a page, a bigger file, a new lane)
+is the owner's. `node scripts/staging-publish.test.mjs` runs the tests, including the font rule against `check-fonts.sh`.
+
 ## The one rule that has cost the most
 
 **Read the component *set*, or a variant `<symbol>` inside it. Never an instance.**

@@ -34,6 +34,7 @@ import certificates from './_certificates.js';
 import bruceMemory from './_bruce-memory.js';
 import dropStudio from './_drop-studio.js';
 import accessRequest from './_access-request.js';
+import publish from './_publish.js';
 
 const ROUTES = {
   'log-usage': logUsage,
@@ -50,6 +51,7 @@ const ROUTES = {
   'bruce-memory': bruceMemory,
   'drop-studio': dropStudio,
   'access-request': accessRequest,
+  'publish': publish,
 };
 
 export default async function handler(req, res) {

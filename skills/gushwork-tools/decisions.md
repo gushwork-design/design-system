@@ -161,6 +161,28 @@ The email signature creator and the employee ID card generator were redesigned i
     people, change roles and general access; viewers open the same dialog read-only ("Who has
     access"); delete stays with the owner and hub admins (Utsav, 6 Oct 2026).
 
+48. **Staging lanes: a team publishes its own pages from the plugin, with no review and no page to open (Utsav, 8 Oct 2026).**
+    A lane is a team's folder under `/internal/staging/<lane>/`; Access Control, Staging lanes, lists who may publish
+    into it (people and groups, owner-edited). The person's own Claude does the work: `scripts/publish-staging.sh`
+    checks the page on the server and writes it to `main` through the hub's GitHub token, falling back to an open pull
+    request when the token may not write to `main`. A first version was a Publish tool with an upload panel, a live
+    preview and a token page; it was cut before it shipped, because the plugin already holds the files and `--check`
+    returns the same checks. What remains of it is one screen, `/internal/staging/connect`, the library's access-denied
+    screen with a code field: the first time, the script prints a code, the person signs in as themselves, types it
+    and presses Connect, and the script keeps a personal token for 90 days. The code is typed, not linked, so a link
+    carrying someone else's code cannot be approved by accident. One gate: the lane list, read live on every call.
+
+49. **A staging page is open to the company or private to its lane's team, and the publisher chooses (Utsav, 8 Oct 2026).**
+    `staging.json` carries `visibility`: `lane` or `org`; publishing without it is refused, so nobody ends up public or hidden
+    by accident. `lane` writes one rule for that page, access `lane`, that the gate reads live (the people who can publish
+    to the lane, plus anyone an approved request added), so leaving the lane closes the page at once. A publisher can only
+    narrow, only their own page, and a rule the owner set is never replaced or loosened. The rule is written before the
+    commit, so a private page is never open to the company, even briefly. A private page is not in the static Staging
+    index; the hub tells the index which ones each person may see. Someone refused asks for access from the Restricted
+    screen, and Bruce DMs the owner and the person who published the page, and no one else, with Approve and Decline; either
+    answers and the other message changes to say who did. Private hides the page on the hub only: the repo is public, so its files are readable on GitHub, which Claude says before publishing a private page. A publish never deletes a file; removing one is the owner's. Asked first, before every publish: the staging lane, or somewhere else
+    (which this does not do).
+
 ## Left open (the owner's call)
 
 - **A third typeface in the signature preview** (Plus Jakarta Sans). In the artefact, not the chrome.

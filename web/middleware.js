@@ -66,7 +66,7 @@ export const config = {
 function forbidden(session, url, rules) {
   const rule = ruleFor(url.pathname, rules);
   return new Response(
-    restrictedPage({ email: session.email, path: url.pathname, canRequest: !!rule && rule.access !== 'owner' }),
+    restrictedPage({ email: session.email, path: url.pathname, canRequest: !!rule && rule.access !== 'owner', lane: rule && rule.access === 'lane' ? rule.lane : '' }),
     { status: 403, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store, private' } }
   );
 }

@@ -95,6 +95,16 @@ async function slack(token, method, body, form = false) {
 export async function handleAction(payload, deps) {
   const { token, allowed, email, record, root } = deps;
   const user = payload.user && payload.user.id;
+  /* Request access (R66) is the one button anyone may press: a request for a page private to a staging lane goes to that
+     lane's team too, so who may answer is decided by answerRequest (the owner, or someone on that lane), not by the
+     allow-list below, which is for design decisions and stays the owner's. */
+  if (payload.type === 'block_actions') {
+    const first = (payload.actions || [])[0] || {};
+    if (first.action_id === 'gw_access_approve' || first.action_id === 'gw_access_decline') {
+      await answerRequest(payload, first.action_id === 'gw_access_approve', token, allowed);
+      return undefined;
+    }
+  }
   if (!allowed.has(user) || !email) {
     if (payload.type === 'view_submission') return { response_action: 'errors', errors: { note: 'Only Utsav can decide from Slack.' } };
     return undefined;
@@ -113,12 +123,6 @@ export async function handleAction(payload, deps) {
   if (payload.type === 'block_actions') {
     const act = (payload.actions || [])[0] || {};
     if (act.action_id === 'gw_open') return undefined;
-    /* Request access (R66): Approve or Decline on a DM from the restricted page. The sender is already known to be the
-       owner (the allowlist above); the request itself is looked up by its id, never read from the button. */
-    if (act.action_id === 'gw_access_approve' || act.action_id === 'gw_access_decline') {
-      await answerRequest(payload, act.action_id === 'gw_access_approve', token);
-      return undefined;
-    }
     let v = {};
     try { v = JSON.parse(act.action_id === 'gw_menu' ? act.selected_option.value : act.value); } catch { return undefined; }
     if (!/^[a-z0-9-]{1,32}$/.test(v.s || '') || !/^[a-z0-9-]{1,80}$/.test(v.k || '') || !VERB[v.a]) return undefined;

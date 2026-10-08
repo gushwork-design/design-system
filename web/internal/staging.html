@@ -295,6 +295,8 @@
           </table>
       </section>
 
+      <!-- team-pages:section -->
+
     </div>
   </div>
 
@@ -313,8 +315,40 @@
       <a href="#site-pages">Site pages</a>
       <a href="#decks">Decks</a>
       <a href="#apps">Apps</a>
+      <!-- team-pages:toc -->
     </div>
   </nav>
 </div>
+
+
+<!-- Pages a team made private to its own lane are not in this file: it is the same for everyone, and their titles are for the
+     team. The hub says which ones THIS person may open (api/_publish.js, op=private-index, filtered by the same rule the gate
+     uses), and they are added to Team pages here. -->
+<script>
+(function () {
+  fetch('/api/publish?op=private-index', { credentials: 'same-origin' })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (j) {
+      var sec = document.getElementById('team-pages');
+      if (!j || !j.pages || !j.pages.length || !sec) return;
+      var tb = sec.querySelector('tbody');
+      var ICON = '<span class="st-pv" style="display:grid;place-items:center"><svg viewBox="0 0 256 256" fill="var(--gw-color-neutral-400)" aria-hidden="true" style="width:24px;height:24px"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z"/></svg></span>';
+      var ARROW = '<svg viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg>';
+      j.pages.forEach(function (p) {
+        var tr = document.createElement('tr');
+        tr.innerHTML = '<td class="c-prev">' + ICON + '</td><td class="c-name"><span data-t></span><br><span data-l style="color:var(--gw-color-neutral-500);font-weight:400"></span></td>' +
+          '<td class="u"><span data-b></span> <span data-o style="color:var(--gw-color-neutral-500)"></span></td><td class="c-act"><a class="st-open" data-a>Open ' + ARROW + '</a></td>';
+        tr.querySelector('[data-t]').textContent = p.title;
+        tr.querySelector('[data-l]').textContent = p.lane + ' · private to the team';
+        tr.querySelector('[data-b]').textContent = p.blurb;
+        tr.querySelector('[data-o]').textContent = p.owner ? 'By ' + p.owner + '.' : '';
+        tr.querySelector('[data-a]').href = p.path;
+        tb.appendChild(tr);
+      });
+      sec.hidden = false;
+      var t = document.getElementById('toc-team-pages'); if (t) t.hidden = false;
+    }).catch(function () { /* the index still lists everything that is open to the organisation */ });
+})();
+</script>
 
 </body></html>

@@ -270,6 +270,10 @@ VJ
 # routes do not exist, miss the renames, and drift the first time a route changed.
 # The hub's Open Graph card goes on every staged page that does not already carry its own
 # og:image (assets/og/hub.png, Figma 818:5074). Landers, templates and the tools keep theirs.
+# The Staging index lists every page added through the staging lane (web/internal/staging/<name>/
+# staging.json) without anyone editing staging.html. Staged copy only; see scripts/_staging_index.py.
+python3 scripts/_staging_index.py "$STAGE"
+
 python3 scripts/_add_og.py "$STAGE"
 
 python3 scripts/_search_index.py "$STAGE" > "$STAGE/search-index.json"

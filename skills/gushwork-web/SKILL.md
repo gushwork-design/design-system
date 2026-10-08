@@ -386,6 +386,51 @@ See `assets/ads/README.md`.
 for anyone not signed in. That is expected on staging; check the card on the public URL
 once the page moves, not before.
 
+## Publishing a page to a team's staging lane
+
+A page built for the team to look at goes to `design.gushwork.ai/internal/staging/<lane>/<page>`, behind
+the sign-in, and the owner does not review it. A **lane** is a team's folder (`gtm`, `customer-success`);
+who may publish into which lane is set in Access Control, Staging lanes. Do not commit it to the repo and do
+not make a Vercel project for it. When the person says "publish this to the gtm lane" (or "to staging"), this is the job.
+
+The scripts are in the plugin's `scripts/` folder: this skill's base directory (shown when it loads) is
+`.../skills/gushwork-web`, so they are at `../../scripts/`. Call them by that full path.
+
+0. **Ask where it is going, before anything else.** When the person says "publish this", ask one question with
+   options: *the <lane> staging lane* or *somewhere else*. Find their lane or lanes with
+   `bash <scripts>/publish-staging.sh lanes`; if they are on more than one, offer each by name, and if they are on none,
+   tell them to ask the owner to add them in Access Control. This publishes only to a team's staging lane. If they
+   say *somewhere else* (another team's lane they are not on, the live site, anywhere that is not staging), do not
+   publish: say plainly that this only puts pages on their own staging lane, that going anywhere else is the owner's
+   call, and offer to keep the page ready.
+1. **Ask who can open it, then start from the scaffold,** which already passes the checks. One question, with two
+   options: *only the <lane> team* or *everyone at Gushwork*. Do not guess it and do not default it; a page nobody
+   chose a setting for is open or hidden by accident. Then:
+   `bash <scripts>/new-staging-page.sh <lane> <page> "<Title>" "<one line>" "<their name>" <team|everyone>`
+   makes `./<page>/` with an `index.html` and a `staging.json` (`team` = only the lane's team, `everyone` = the whole
+   company). Build in that folder only, from the template (the fold set or the ad-page template), as for any page.
+   **Say this when they choose `team`:** "Only the <lane> team can open it on the hub. The page's files are still stored in the
+   company's public GitHub repo, so don't put anything confidential in it." Private hides the page on the hub, not in git.
+   Publishing again with the other word changes who can open it; a page can be made narrower or opened back up, and
+   a setting the owner has put on the page or the lane is never overridden (the publish says so).
+2. **Check first:** `bash <scripts>/publish-staging.sh --check <lane> <page> ./<page>` runs the server's
+   checks and publishes nothing. Fix what it lists, then run it again without `--check`.
+3. **The first time on a computer, it connects itself.** There is no token to make or paste. The script prints a
+   code, opens `design.gushwork.ai/internal/staging/connect`, and waits. Tell the person plainly: "Approve in the
+   browser: sign in, type the code, press Connect." Run it with a long timeout (600000 ms) or in the background,
+   because it waits for them. After that it is remembered for 90 days and nothing is asked again. Never read,
+   print or copy the token file (`~/.config/gushwork/publish-token`) into a page, a commit or a message.
+   `bash <scripts>/publish-staging.sh logout` disconnects.
+4. The page is live a minute or two after it says Committed. Publishing the same name again replaces its files.
+   A person outside the team who opens a private page sees a Restricted screen and can ask for access; Bruce then
+   messages the owner and the person who published the page, and either of them can approve or decline.
+
+What the checks refuse, so the page is built right the first time: a missing `index.html`, a `<base href>` that
+is not `/internal/staging/<lane>/<page>/`, no `noindex`, any file type that is not static, any file over 3 MB
+(3 MB in all), a key-shaped string, any reference to the hub's `/api/` or `/admin/` (the page runs on the hub's
+domain with the viewer's session), and anything that fails the type rule (link `/foundation/tokens.css`). A 403
+"You cannot publish to the … lane" means the person is not on that lane: tell them to ask the owner, do not retry.
+
 ## Surface defaults
 
 These sit above the individual component rules.

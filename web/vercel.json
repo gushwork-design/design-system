@@ -235,6 +235,10 @@
       "destination": "/api/gw?action=access-request"
     },
     {
+      "source": "/api/publish",
+      "destination": "/api/gw?action=publish"
+    },
+    {
       "source": "/api/tools",
       "destination": "/api/gw?action=tools"
     },

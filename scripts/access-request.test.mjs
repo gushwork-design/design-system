@@ -13,6 +13,7 @@ process.env.SLACK_BOT_TOKEN = 'xoxb-test';
 process.env.OWNER_SLACK_ID = 'UOWNER';
 process.env.VERCEL_API_TOKEN = 'vercel-test';
 process.env.EDGE_CONFIG = 'https://edge-config.vercel.com/ecfg_test?token=abc';
+process.env.RULES_SETTLE_MS = '0';      // no pause between saving the rules and reading them back
 
 const { normalise, decide, grantPage, ruleFor } = await import('../web/api/_access.js');
 const { sign, COOKIE } = await import('../web/api/_session.js');
@@ -106,6 +107,7 @@ t('titleFor a file', titleFor('/internal/staging.html'), 'Staging');
 const kv = new Map();           // the key-value store
 let slackCalls = [];            // every Slack API call, in order
 let edgePatches = [];           // every Edge Config write
+let edgeStore = null;           // what the fake Edge Config holds (null: a store that has never been saved)
 let slackFails = false, lookupWorks = true;
 
 const realFetch = globalThis.fetch;
@@ -132,7 +134,8 @@ globalThis.fetch = async (url, init = {}) => {
     if (method === 'users.lookupByEmail') return lookupWorks ? reply({ ok: true, user: { id: 'UREQ' } }) : reply({ ok: false, error: 'users_not_found' });
     return reply({ ok: true, ts: '1.1' });
   }
-  if (u.startsWith('https://api.vercel.com/v1/edge-config/')) { edgePatches.push(JSON.parse(init.body)); return reply({ status: 'ok' }); }
+  if (u.startsWith('https://edge-config.vercel.com')) return reply(edgeStore ? { access: edgeStore } : {});
+  if (u.startsWith('https://api.vercel.com/v1/edge-config/')) { const b = JSON.parse(init.body); edgePatches.push(b); edgeStore = b.items[0].value; return reply({ status: 'ok' }); }
   return realFetch(url, init);
 };
 

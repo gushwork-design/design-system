@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!-- gushwork-build:{"pluginVersion":"2.0.7","surface":"dashboard","createdBy":"Utsav Singh","createdAt":"2026-10-08","registry":"https://design.gushwork.ai/exports/dashboard/component-registry.json"} -->
+<!-- Connect Claude: the one screen a person sees when their own Claude asks to publish staging pages as them. It is the
+     library's access-denied-screen pattern (the auth page and card, an empty-state badge, who is signed in, two actions)
+     with a code field, so nothing here is new. The person types the code their Claude showed; typing it, not following a
+     link, is what stops someone else's code being approved by mistake. api/_publish.js does the work. -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<base href="/internal/staging/connect/">
+<title>Connect Claude</title>
+<script>try{var c=localStorage.getItem('gw-theme-choice'),t=c==='dark'||c==='light'?c:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
+<link rel="stylesheet" href="/foundation/tokens.css">
+<link rel="stylesheet" href="/exports/dashboard/dashboard.css">
+<!-- the field takes the card's width, as the sign-in form's fields do -->
+<style>.gd .gd-auth__form,.gd .gd-auth__form .gd-field{width:100%}.gd #code{letter-spacing:.12em;text-align:center}</style>
+</head>
+<body style="margin:0">
+<div class="gd"><div class="gd-auth"><div class="gd-auth__grid" aria-hidden="true"></div>
+  <div class="gd-auth__card gd-auth__card--denied" id="card" aria-live="polite">
+    <div class="gd-empty gd-empty--no-access" id="empty">
+      <div class="gd-empty__badge"><svg viewBox="0 0 256 256" width="20" height="20" fill="currentColor" aria-hidden="true" id="glyph"></svg></div>
+      <div class="gd-empty__copy"><h1 class="gd-empty__title" id="title">Connect Claude</h1><p class="gd-empty__text" id="text"></p></div>
+    </div>
+    <form class="gd-auth__form" id="form" novalidate hidden>
+      <div class="gd-field" id="field">
+        <label class="gd-field__label" for="code">Code from Claude</label>
+        <div class="gd-input"><input id="code" class="gd-input__el" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="9" placeholder="BCDF-GHJK" aria-describedby="err" data-1p-ignore="true" data-lpignore="true" data-form-type="other"></div>
+        <p class="gd-field__error" id="err" role="alert" hidden></p>
+      </div>
+    </form>
+    <div class="gd-auth__facts" id="facts" hidden></div>
+    <div class="gd-auth__foot" id="foot"></div>
+    <a class="gd-btn gd-btn--link gd-btn--sm" href="/">Back to Gushwork Design</a>
+  </div>
+</div></div>
+<script>(function () {
+  var $ = function (i) { return document.getElementById(i); };
+  var GLYPH = { term: '<path d="M117.31,134l-72,64a8,8,0,1,1-10.63-12L100,128,34.69,70A8,8,0,1,1,45.32,58l72,64a8,8,0,0,1,0,12ZM216,184H120a8,8,0,0,0,0,16h96a8,8,0,0,0,0-16Z"/>', lock: '<path d="M128,112a28,28,0,0,0-8,54.83V184a8,8,0,0,0,16,0V166.83A28,28,0,0,0,128,112Zm0,40a12,12,0,1,1,12-12A12,12,0,0,1,128,152Zm80-72H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z"/>', check: '<path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/>' };
+  var COPY = {
+    ready:  { g: 'term',  title: 'Connect Claude', text: 'Type the code your Claude is showing. It lets that Claude publish pages to your team\u2019s staging lane as you, until you stop it.' },
+    done:   { g: 'check', title: 'Claude is connected', text: 'Go back to Claude. It carries on by itself, and this tab can close.' },
+    nolane: { g: 'lock',  title: 'You\u2019re not on a lane yet', text: 'Publishing to staging is given per team. Ask the owner to add you to your team\u2019s lane in Access Control.' },
+    off:    { g: 'lock',  title: 'Connecting isn\u2019t working yet', text: 'The hub isn\u2019t set up to publish yet. Ask the owner.' }
+  };
+  var OWNER = 'https://gushwork.slack.com/team/U06UAR183TR';
+  var me = null;
+  function show(k) {
+    var c = COPY[k];
+    $('title').textContent = c.title; $('text').textContent = c.text;
+    $('glyph').innerHTML = GLYPH[c.g];
+    $('empty').classList.toggle('gd-empty--sent', k === 'done');
+  }
+  function facts(list) {
+    var f = $('facts'); f.innerHTML = '';
+    list.forEach(function (t) { var s = document.createElement('span'); s.className = 'gd-auth__who'; s.textContent = t; f.appendChild(s); });
+    f.hidden = !list.length;
+  }
+  function btn(label, cls, fn, href) {
+    var b = document.createElement(href ? 'a' : 'button');
+    b.className = 'gd-btn ' + cls; b.textContent = label;
+    if (href) b.href = href; else { b.type = 'button'; b.addEventListener('click', fn); }
+    return b;
+  }
+  function foot() { var f = $('foot'); f.innerHTML = ''; [].slice.call(arguments).forEach(function (b) { f.appendChild(b); }); }
+  function err(t) {
+    var e = $('err'); e.textContent = t || ''; e.hidden = !t;
+    $('field').setAttribute('data-state', t ? 'error' : '');
+    $('code').setAttribute('aria-invalid', t ? 'true' : 'false');
+  }
+  function api(op, body) {
+    return fetch('/api/publish?op=' + op, { method: body ? 'POST' : 'GET', credentials: 'same-origin', headers: { 'Content-Type': 'application/json', 'x-gw-publish': '1' }, body: body ? JSON.stringify(body) : undefined })
+      .then(function (r) { return r.json().then(function (j) { return { s: r.status, ok: r.ok, j: j }; }); });
+  }
+  /* 8 letters, shown as BCDF-GHJK as they are typed */
+  $('code').addEventListener('input', function (e) {
+    var v = e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 8);
+    e.target.value = v.length > 4 ? v.slice(0, 4) + '-' + v.slice(4) : v;
+    err('');
+  });
+  function connect() {
+    var b = $('foot').querySelector('[data-go]'), v = $('code').value;
+    if (v.replace(/[^A-Z]/g, '').length !== 8) { err('The code is 8 letters, like BCDF-GHJK.'); $('code').focus(); return; }
+    b.setAttribute('aria-busy', 'true'); b.setAttribute('aria-disabled', 'true');
+    api('device-approve', { code: v }).then(function (r) {
+      b.removeAttribute('aria-busy'); b.removeAttribute('aria-disabled');
+      if (r.ok) { $('form').hidden = true; show('done'); facts(['Signed in as ' + me.email]); foot(); return; }
+      if (r.s === 401) { location.href = '/?signin=required&next=' + encodeURIComponent(location.pathname); return; }
+      if (r.s === 403) { $('form').hidden = true; show('nolane'); facts(['Signed in as ' + me.email]); foot(btn('Ask the owner', 'gd-btn--primary', null, OWNER)); return; }
+      err(r.j.error || 'That did not work. Try again.'); $('code').focus();
+    }).catch(function () { b.removeAttribute('aria-busy'); b.removeAttribute('aria-disabled'); err('Could not reach the hub. Try again.'); });
+  }
+  $('form').addEventListener('submit', function (e) { e.preventDefault(); connect(); });
+  api('me').then(function (r) {
+    if (r.s === 401) { location.href = '/?signin=required&next=' + encodeURIComponent(location.pathname); return; }
+    me = r.j;
+    if (!r.ok) { show('off'); foot(btn('Ask the owner', 'gd-btn--primary', null, OWNER)); return; }
+    if (!me.lanes.length) { show('nolane'); facts(['Signed in as ' + me.email]); foot(btn('Ask the owner', 'gd-btn--primary', null, OWNER)); return; }
+    show('ready'); facts(['Signed in as ' + me.email, (me.lanes.length === 1 ? 'Lane: ' : 'Lanes: ') + me.lanes.join(', ')]);
+    $('form').hidden = false;
+    var go = btn('Connect', 'gd-btn--primary', connect); go.setAttribute('data-go', '');
+    foot(go, btn('Cancel', 'gd-btn--outline', null, '/'));
+    $('code').focus();
+  }).catch(function () { show('off'); foot(btn('Ask the owner', 'gd-btn--primary', null, OWNER)); });
+})();</script>
+</body>
+</html>
