@@ -373,8 +373,9 @@ a.ag-row:hover { background: var(--s-nav-hover); }
   }
 
   function renderBruce() {
-    var s = summary('bruce'), a = s.a, html = hero(s);
-    if (!s.known) return html + healthBlock(s) + about(a);
+    var s = summary('bruce'), a = s.a, html = '';
+    /* No picture-and-sentence header on his tab: the tab already names him. It shows only when his log cannot be read, because it says why. */
+    if (!s.known) return hero(s) + healthBlock(s) + about(a);
     /* His analytics (conversations, what people use him for, what it costs, the asks worth a look) live in bruce-panel.js and are moved into
        this slot after the page is drawn; see mountBruce. */
     /* Five things: conversations, who is new, usage and tokens, what he worked on, what he needs from you (the last is in the panel). Health only
