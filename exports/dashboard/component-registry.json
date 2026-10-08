@@ -31,6 +31,12 @@
       "breaking": false,
       "doc": "data-display.md"
     },
+    "agent-card": {
+      "version": "2.0.8",
+      "changed": "2026-10-09",
+      "breaking": false,
+      "doc": "data-display.md"
+    },
     "analytics-overview-template": {
       "version": "2.0.0",
       "changed": "2026-10-05",
