@@ -1,0 +1,33 @@
+# Bruce sends a DM to a teammate (8 Oct 2026). Manual only: start it with the recipient's Slack user id and the exact text
+# Utsav approved. The message goes out as Bruce through the same SLACK_BOT_TOKEN as bruce-pings.yml, never from a person's
+# own account. Inputs reach the script as environment variables, never spliced into the shell.
+name: Bruce send
+
+on:
+  workflow_dispatch:
+    inputs:
+      to:
+        description: Slack user id of the recipient, e.g. U06KMA1BQV8
+        required: true
+      text:
+        description: The exact message, as approved
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      TO: ${{ inputs.to }}
+      TEXT: ${{ inputs.text }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Send the DM
+        run: node scripts/bruce-send.mjs
