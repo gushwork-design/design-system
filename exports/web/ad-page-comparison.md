@@ -78,6 +78,10 @@ Who does each step, as a card (`.steps-card`, `.steps`, `.steps-h`, `.eyebrow--g
 
 Five rows beside a review rating (`.dist`): the star level in `body-12-med`, a bar 8 high on `neutral-100` filled to the share in a ramp colour (`green-500`, `green-400`, `yellow-500`, `orange-500`, `red-500`), and the percentage right-aligned. 280 wide on desktop, full width on phone. The bar grows with a `scaleX` as the card arrives. New on the Gushwork vs Athena page, pending review.
 
+## `review-grid`
+
+The reviews as a rail beside a grid (`.rv-layout`, `.rv-rail`, `.rv-cards`, `.rv-card`): a `card--gw` rail 300 wide with the source tile and name, the rating in `h3`, the star row, the review count and the `rating-breakdown`, sticky under the navbar while the cards are read; and four `card`s in two columns, each a star row with its topic, the quote in `body-18-med` and the reviewer line in `body-14-reg`. One column on phone, the rail first. It links nowhere: the source is named, not linked. An alternative to `review-card`, which stacks the four reviews under one profile strip. New on the Gushwork vs Athena page, pending review.
+
 ## `cta-bar`
 
 Black (`--gw-color-black`), 1240 × 136, radius 20, padding 40 (`.bar`); the line is `h5-bold` in white, the

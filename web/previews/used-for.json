@@ -196,5 +196,6 @@
  "web/cta-comparison-card": "Shows a small comparison inside the closing call to action, clipped by the frame",
  "web/page-mock": "Draws a web page as a browser bar, a title and a stack of blocks inside a picture well, in place of a screenshot",
  "web/steps-card": "Shows who does each step of a job on each side of a comparison, as a card of rows with a pill naming who does it",
- "web/rating-breakdown": "Shows how a company's reviews split across one to five stars, as five filled bars with their percentages"
+ "web/rating-breakdown": "Shows how a company's reviews split across one to five stars, as five filled bars with their percentages",
+ "web/review-grid": "Lays reviews out as a rating summary rail beside a two by two grid of review cards, with no link out to the review site"
 }

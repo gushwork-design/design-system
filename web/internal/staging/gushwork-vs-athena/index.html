@@ -1400,13 +1400,36 @@ details p{margin-top:var(--gw-space-12);padding:0;font:var(--gw-text-body-16-med
 
 /* NEW, pending library review: the rating breakdown (.dist) and the review count */
 .score small{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);color:var(--gw-color-neutral-500)}
-.prof-txt .view{align-self:flex-start}
 .dist{margin-left:auto;display:flex;flex-direction:column;gap:var(--gw-space-4);width:280px;flex:none}
 .dist div{display:grid;grid-template-columns:28px minmax(0,1fr) 36px;align-items:center;gap:var(--gw-space-8);
   font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking);color:var(--gw-color-neutral-600)}
 .dist i{display:block;height:var(--gw-space-8);border-radius:var(--gw-radius-full);background:var(--gw-color-neutral-100);position:relative;overflow:hidden}
 .dist i::after{content:"";position:absolute;inset:0;width:var(--v);background:var(--c);border-radius:inherit;transform-origin:left}
 .dist b{text-align:right;font-weight:600}
+
+
+/* NEW, pending library review: the reviews as a rating rail beside a grid of cards (.rv-layout).
+   The rail holds the rating and breakdown and stays in view while the cards are read. */
+.rv-layout{width:100%;display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:var(--gw-space-20);align-items:start}
+.rv-rail{padding:var(--gw-space-24);display:flex;flex-direction:column;gap:var(--gw-space-16);position:sticky;top:calc(var(--nav-h) + var(--gw-space-20))}
+.rv-rail-head{display:flex;align-items:center;gap:var(--gw-space-12)}
+.rv-rail-head h3{font:var(--gw-text-h8-bold);letter-spacing:var(--gw-text-h8-bold-tracking);color:var(--gw-color-black)}
+.rv-rail-head .prof-tile{width:48px;height:48px}
+.rv-rail-head .prof-tile--gw img{width:24px;height:24px}
+.rv-score{display:flex;align-items:baseline;gap:var(--gw-space-8)}
+.rv-score b{font:var(--gw-text-h3);letter-spacing:var(--gw-text-h3-tracking);color:var(--gw-color-black)}
+.rv-score small{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);color:var(--gw-color-neutral-500)}
+.rv-rail .dist{margin-left:0;width:100%}
+.rv-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--gw-space-20)}
+.rv-card{padding:var(--gw-space-24);display:flex;flex-direction:column;justify-content:space-between;gap:var(--gw-space-16)}
+.rv-card q{quotes:none;font:var(--gw-text-body-18-med);letter-spacing:var(--gw-text-body-18-med-tracking);color:var(--gw-color-neutral-800)}
+.rv-card small{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);color:var(--gw-color-neutral-500)}
+
+@media (max-width:767px){
+  .rv-layout{grid-template-columns:minmax(0,1fr)}
+  .rv-rail{position:static}
+  .rv-cards{grid-template-columns:minmax(0,1fr);gap:var(--gw-space-12)}
+}
 
 /* ---------- motion (R64): arrive, never leave; opacity and transform only; 8px, 320ms ---------- */
 @media (prefers-reduced-motion: no-preference){
@@ -1428,8 +1451,8 @@ details p{margin-top:var(--gw-space-12);padding:0;font:var(--gw-text-body-16-med
   .rise.in .dist i::after{animation:bar-grow var(--hub-dur-enter) var(--hub-ease) backwards}
   .btn{transition:background-color .15s ease,transform var(--hub-dur) var(--hub-ease)}
   .btn:active{transform:scale(.97)}
-  .vs > .card{transition:transform var(--hub-dur) var(--hub-ease)}
-  .vs > .card:hover{transform:translateY(-2px)}
+  .vs > .card,.rv-cards > .card{transition:transform var(--hub-dur) var(--hub-ease)}
+  .vs > .card:hover,.rv-cards > .card:hover{transform:translateY(-2px)}
 }
 </style>
 </head>
@@ -1625,12 +1648,21 @@ details p{margin-top:var(--gw-space-12);padding:0;font:var(--gw-text-body-16-med
         <h2 class="h3">Don’t take our word for it, read the reviews</h2>
         <p class="sub">Here’s what Gushwork customers say on Trustpilot.</p>
       </div>
-      <div class="stack"><div class="vs vs--one">
-        <div class="card card--reviews card--gw">
-          <div class="prof"><span class="prof-tile prof-tile--gw"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgODAgODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+Cgo8ZyBpZD0iZ3VzaHdvcmstbG9nbyI+Cgo8ZyBpZD0iQ29tcG9uZW50IEZyYW1lIj4KCjxnIGlkPSJndXNod29yay1sb2dvXzIiPgoKPGcgaWQ9IlNpemU9ODAgcHgsIFR5cGU9T3JpZ2luYWwsIE9ubHkgU3ltYm9sPXllcyI+CjxnIGlkPSJGcmFtZSAyMTQ3MjIzOTM3Ij4KPGcgaWQ9IlN1YnRyYWN0Ij4KPHBhdGggZD0iTTc2LjYwODggNC41NjM0NEM3Ny41MDI1IDIuMzYwNTggNzUuODQ5NSAwIDczLjQ3MjMgMEg5LjE0Mjg2QzQuMDkzNCAwIDAgNC4wOTM0IDAgOS4xNDI4NlY2Ni43Nzc4QzAgNzIuMDE4IDUuMTcwODEgNzUuNjgyOSA5Ljk2MDMgNzMuNTU2OEM0MC44NDk0IDU5Ljg0NDkgNjQuMzc4NSAzNC43MDc1IDc2LjYwODggNC41NjM0NFoiIGZpbGw9IiNGRkZGRkYiLz4KPHBhdGggZD0iTTMyLjUxNjEgODBDMzEuNDAyMiA4MCAzMC45MzU3IDc4LjU1MzEgMzEuODI1OSA3Ny44ODM1QzU0LjkwMDcgNjAuNTI2NSA3MS40MzM4IDM1LjgwNDcgNzguNzY1OCA4LjA1MjJDNzguOTQwMyA3LjM5MTU0IDgwIDcuNTE2MTggODAgOC4xOTk1MVY3MC44NTcxQzgwIDc1LjkwNjYgNzUuOTA2NiA4MCA3MC44NTcxIDgwSDMyLjUxNjFaIiBmaWxsPSIjRkZGRkZGIi8+CjwvZz4KPC9nPgo8L2c+CjwvZz4KPC9nPgo8L2c+Cjwvc3ZnPgo=" alt=""></span><div class="prof-txt"><h3>Gushwork on Trustpilot</h3><div class="score"><span class="tp tp--lg" data-r="4.5" style="--r:4.5" role="img" aria-label="4.5 out of 5 stars"><i></i><i></i><i></i><i></i><i></i></span><span>4.5</span><small>31 reviews</small></div><a class="eyebrow eyebrow--blue view" href="https://www.trustpilot.com/review/gushwork.ai" target="_blank" rel="noopener">View reviews <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M204,64V168a12,12,0,0,1-24,0V93L72.49,200.49a12,12,0,0,1-17-17L163,76H88a12,12,0,0,1,0-24H192A12,12,0,0,1,204,64Z"/></svg></a></div><div class="dist" role="img" aria-label="Rating breakdown: 5 stars 84%, 4 stars 10%, 3 stars 0%, 2 stars 0%, 1 star 6%"><div><span>5&#9733;</span><i style="--v:84%;--c:var(--gw-color-green-500)"></i><b>84%</b></div><div><span>4&#9733;</span><i style="--v:10%;--c:var(--gw-color-green-400)"></i><b>10%</b></div><div><span>3&#9733;</span><i style="--v:0%;--c:var(--gw-color-yellow-500)"></i><b>0%</b></div><div><span>2&#9733;</span><i style="--v:0%;--c:var(--gw-color-orange-500)"></i><b>0%</b></div><div><span>1&#9733;</span><i style="--v:6%;--c:var(--gw-color-red-500)"></i><b>6%</b></div></div></div>
-          <div class="rvs"><article class="rv"><div class="rv-top"><span class="tp" data-r="5" style="--r:5" role="img" aria-label="5 out of 5 stars"><i></i><i></i><i></i><i></i><i></i></span><span>for Leads</span></div><q>we have been receiving new leads through our website on a weekly basis.</q><small>Cory &middot; US &middot; Aug 13, 2026</small></article><article class="rv"><div class="rv-top"><span class="tp" data-r="5" style="--r:5" role="img" aria-label="5 out of 5 stars"><i></i><i></i><i></i><i></i><i></i></span><span>for AI search</span></div><q>generated a great visibility for us over google and LLMs.</q><small>Dinesh A. &middot; IN &middot; Aug 11, 2026</small></article><article class="rv"><div class="rv-top"><span class="tp" data-r="5" style="--r:5" role="img" aria-label="5 out of 5 stars"><i></i><i></i><i></i><i></i><i></i></span><span>for Communication</span></div><q>Their response time has been excellent</q><small>Yana &middot; US &middot; Jul 31, 2026</small></article><article class="rv"><div class="rv-top"><span class="tp" data-r="5" style="--r:5" role="img" aria-label="5 out of 5 stars"><i></i><i></i><i></i><i></i><i></i></span><span>for Billing</span></div><q>accurate in their billing, focused and articulate with their communications</q><small>Bob H. &middot; US &middot; Aug 14, 2026</small></article></div>
+      <div class="stack"><!-- NEW, pending library review: .rv-layout, a rating rail beside a two by two grid of review cards. -->
+        <div class="rv-layout">
+          <aside class="card card--gw rv-rail">
+            <div class="rv-rail-head"><span class="prof-tile prof-tile--gw"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgODAgODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+Cgo8ZyBpZD0iZ3VzaHdvcmstbG9nbyI+Cgo8ZyBpZD0iQ29tcG9uZW50IEZyYW1lIj4KCjxnIGlkPSJndXNod29yay1sb2dvXzIiPgoKPGcgaWQ9IlNpemU9ODAgcHgsIFR5cGU9T3JpZ2luYWwsIE9ubHkgU3ltYm9sPXllcyI+CjxnIGlkPSJGcmFtZSAyMTQ3MjIzOTM3Ij4KPGcgaWQ9IlN1YnRyYWN0Ij4KPHBhdGggZD0iTTc2LjYwODggNC41NjM0NEM3Ny41MDI1IDIuMzYwNTggNzUuODQ5NSAwIDczLjQ3MjMgMEg5LjE0Mjg2QzQuMDkzNCAwIDAgNC4wOTM0IDAgOS4xNDI4NlY2Ni43Nzc4QzAgNzIuMDE4IDUuMTcwODEgNzUuNjgyOSA5Ljk2MDMgNzMuNTU2OEM0MC44NDk0IDU5Ljg0NDkgNjQuMzc4NSAzNC43MDc1IDc2LjYwODggNC41NjM0NFoiIGZpbGw9IiNGRkZGRkYiLz4KPHBhdGggZD0iTTMyLjUxNjEgODBDMzEuNDAyMiA4MCAzMC45MzU3IDc4LjU1MzEgMzEuODI1OSA3Ny44ODM1QzU0LjkwMDcgNjAuNTI2NSA3MS40MzM4IDM1LjgwNDcgNzguNzY1OCA4LjA1MjJDNzguOTQwMyA3LjM5MTU0IDgwIDcuNTE2MTggODAgOC4xOTk1MVY3MC44NTcxQzgwIDc1LjkwNjYgNzUuOTA2NiA4MCA3MC44NTcxIDgwSDMyLjUxNjFaIiBmaWxsPSIjRkZGRkZGIi8+CjwvZz4KPC9nPgo8L2c+CjwvZz4KPC9nPgo8L2c+Cjwvc3ZnPgo=" alt=""></span><h3>Gushwork on Trustpilot</h3></div>
+            <div class="rv-score"><b>4.5</b><small>31 reviews</small></div>
+            <span class="tp tp--lg" data-r="4.5" style="--r:4.5" role="img" aria-label="4.5 out of 5 stars"><i></i><i></i><i></i><i></i><i></i></span>
+            <div class="dist" role="img" aria-label="Rating breakdown: 5 stars 84%, 4 stars 10%, 3 stars 0%, 2 stars 0%, 1 star 6%"><div><span>5&#9733;</span><i style="--v:84%;--c:var(--gw-color-green-500)"></i><b>84%</b></div><div><span>4&#9733;</span><i style="--v:10%;--c:var(--gw-color-green-400)"></i><b>10%</b></div><div><span>3&#9733;</span><i style="--v:0%;--c:var(--gw-color-yellow-500)"></i><b>0%</b></div><div><span>2&#9733;</span><i style="--v:0%;--c:var(--gw-color-orange-500)"></i><b>0%</b></div><div><span>1&#9733;</span><i style="--v:6%;--c:var(--gw-color-red-500)"></i><b>6%</b></div></div>
+          </aside>
+          <div class="rv-cards">
+            <article class="card rv-card"><div class="rv-top"><span class="tp" data-r="5" style="--r:5" role="img" aria-label="5 out of 5 stars"><i></i><i></i><i></i><i></i><i></i></span><span>for Leads</span></div><q>we have been receiving new leads through our website on a weekly basis.</q><small>Cory &middot; US &middot; Aug 13, 2026</small></article>
+            <article class="card rv-card"><div class="rv-top"><span class="tp" data-r="5" style="--r:5" role="img" aria-label="5 out of 5 stars"><i></i><i></i><i></i><i></i><i></i></span><span>for AI search</span></div><q>generated a great visibility for us over google and LLMs.</q><small>Dinesh A. &middot; IN &middot; Aug 11, 2026</small></article>
+            <article class="card rv-card"><div class="rv-top"><span class="tp" data-r="5" style="--r:5" role="img" aria-label="5 out of 5 stars"><i></i><i></i><i></i><i></i><i></i></span><span>for Communication</span></div><q>Their response time has been excellent</q><small>Yana &middot; US &middot; Jul 31, 2026</small></article>
+            <article class="card rv-card"><div class="rv-top"><span class="tp" data-r="5" style="--r:5" role="img" aria-label="5 out of 5 stars"><i></i><i></i><i></i><i></i><i></i></span><span>for Billing</span></div><q>accurate in their billing, focused and articulate with their communications</q><small>Bob H. &middot; US &middot; Aug 14, 2026</small></article>
+          </div>
         </div>
-      </div>
         <p class="sub fold-note">Want to hear it firsthand? <a href="#demo">Ask us to connect you with a customer in your industry.</a></p></div>
       <div class="cta-stack"><a class="btn btn--blue btn--lg" href="#demo" data-cta="fold">Book a Demo <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M204,64V168a12,12,0,0,1-24,0V93L72.49,200.49a12,12,0,0,1-17-17L163,76H88a12,12,0,0,1,0-24H192A12,12,0,0,1,204,64Z"/></svg></a><p class="cta-cap">Starts at $900 per month</p></div>
     </div>
@@ -2026,7 +2058,7 @@ details p{margin-top:var(--gw-space-12);padding:0;font:var(--gw-text-body-16-med
    under prefers-reduced-motion, or when IntersectionObserver is missing, so the page is whole without it. */
 (function(){
   if(matchMedia('(prefers-reduced-motion: reduce)').matches||!('IntersectionObserver' in window)) return;
-  var sel='.fold-shell .heading,.fold-shell .vs > .card,.fold-shell .cmp3,.fold-shell .fold-note,.fold-shell .cta-stack,.fold-shell .bar,.faq-head,.faq-list,.footer .cta-body,.footer .ccard';
+  var sel='.fold-shell .heading,.fold-shell .vs > .card,.fold-shell .rv-rail,.fold-shell .rv-cards > .card,.fold-shell .cmp3,.fold-shell .fold-note,.fold-shell .cta-stack,.fold-shell .bar,.faq-head,.faq-list,.footer .cta-body,.footer .ccard';
   var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12,rootMargin:'0px 0px -6% 0px'});
   document.querySelectorAll(sel).forEach(function(el){
     var i=0,p=el.previousElementSibling; while(p&&i<4){if(p.matches(sel))i++;p=p.previousElementSibling}
