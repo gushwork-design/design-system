@@ -3,21 +3,14 @@
    Bruce tab with mountBrucePanel(element); the styles are bruce-panel.css. "Hide my activity" is the same preference Analytics keeps. */
 (function () {
   'use strict';
-  var SKELETON = "    <div class=\"ul-bar\" id=\"br-bar\">\n      <div class=\"vs-areas\">\n        <div class=\"ul-tabs\" role=\"tablist\" aria-label=\"Period\">\n          <button class=\"ul-tab\" role=\"tab\" data-period=\"today\" aria-selected=\"false\">Today</button>\n          <button class=\"ul-tab\" role=\"tab\" data-period=\"7\"  aria-selected=\"false\">7 days</button>\n          <button class=\"ul-tab\" role=\"tab\" data-period=\"30\" aria-selected=\"true\">30 days</button>\n          <button class=\"ul-tab\" role=\"tab\" data-period=\"all\" aria-selected=\"false\">All time</button>\n        </div>\n      </div>\n      <div class=\"ul-refresh an-hide\"><label class=\"gd-toggle gd-toggle--xs\" id=\"br-me\" title=\"Leaves your own asks out of everything below\"><input type=\"checkbox\" role=\"switch\" id=\"br-me-box\"><span class=\"gd-toggle__track\" aria-hidden=\"true\"></span><span class=\"gd-toggle__t\">Hide my activity</span></label>\n        <span class=\"ul-refresh__t\" id=\"br-updated\" aria-live=\"polite\"></span>\n        <button class=\"gw-iconbtn\" id=\"br-refresh\" type=\"button\" aria-label=\"Refresh\" data-tip=\"Refresh\" data-tip-end></button>\n      </div>\n    </div>\n\n    <div id=\"br-blocked\" hidden></div>\n\n    <div id=\"br-app\">\n      <div class=\"ul-metrics br-m4\" id=\"br-metrics\"></div>\n\n      <section class=\"ul-sec\" style=\"margin-top: var(--gw-space-24)\" aria-labelledby=\"br-h-conv\">\n        <div class=\"ul-sh\"><div class=\"ul-sh__t\"><h2 id=\"br-h-conv\">Conversations</h2><span class=\"ul-sh__q\" id=\"br-q-conv\"></span></div>\n          <button class=\"ul-link\" id=\"br-clear\" type=\"button\" hidden>Clear filter</button></div>\n        <div id=\"br-convs\"></div>\n      </section>\n\n      <section class=\"ul-sec\" style=\"margin-top: var(--gw-space-24)\" aria-labelledby=\"br-h-use\">\n        <div class=\"ul-sh\"><div class=\"ul-sh__t\"><h2 id=\"br-h-use\">What people use it for</h2><span class=\"ul-sh__q\" id=\"br-q-use\"></span></div></div>\n        <div class=\"br-use\" id=\"br-use\"></div>\n      </section>\n\n      <section class=\"ul-sec\" style=\"margin-top: var(--gw-space-24)\" aria-labelledby=\"br-h-talk\">\n        <div class=\"ul-sh\"><div class=\"ul-sh__t\"><h2 id=\"br-h-talk\">How they talk to him</h2><span class=\"ul-sh__q\" id=\"br-q-talk\"></span></div></div>\n        <div class=\"ul-metrics br-m4\" id=\"br-talk\"></div>\n      </section>\n\n      <section class=\"ul-sec\" style=\"margin-top: var(--gw-space-24)\" aria-labelledby=\"br-h-cost\">\n        <div class=\"ul-sh\"><div class=\"ul-sh__t\"><h2 id=\"br-h-cost\">What it costs</h2><span class=\"ul-sh__q\" id=\"br-q-cost\">estimated, not measured</span></div></div>\n        <div class=\"ul-metrics br-m4\" id=\"br-cost\"></div>\n        <details class=\"br-how\"><summary>How the estimate works</summary><div id=\"br-how\"></div></details>\n      </section>\n\n      <section class=\"ul-sec\" style=\"margin-top: var(--gw-space-24)\" aria-labelledby=\"br-h-look\">\n        <div class=\"ul-sh\"><div class=\"ul-sh__t\"><h2 id=\"br-h-look\">Worth a look</h2><span class=\"ul-sh__q\" id=\"br-q-look\"></span></div></div>\n        <div class=\"br-what\"><p class=\"br-note\">Asks that may not have gone well. Open one to read the whole conversation. If most of them are your own tests, turn on Hide my activity.</p><dl><dt>No clear lane</dt><dd>The words did not match any of his topics (brand files, build a page, access, status and so on). Topics are sorted by plain keywords, so this does <b>not</b> mean he failed, and he still answered. Read it: if it is real work he should own, ask for a lane to be added; if it is chat or a test, leave it.</dd><dt>Failed</dt><dd>His run did not start. Check Bruce on System health, then ask again.</dd><dt>Hit the daily cap</dt><dd>That person used up their runs for the day. Nothing to fix unless the cap is too low.</dd></dl></div>\n        <div class=\"br-lks\" id=\"br-look\"></div>\n      </section>\n\n      <div class=\"br-scrim\" id=\"br-scrim\" hidden></div>\n      <aside class=\"br-rv\" id=\"br-drawer\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"br-d-t\" tabindex=\"-1\" hidden>\n        <div class=\"br-h\">\n          <div class=\"br-h__t\"><div class=\"br-h__s\" id=\"br-d-s\">Conversation</div><h2 id=\"br-d-t\">Conversation</h2></div>\n          <div class=\"br-h__r\">\n            <button type=\"button\" class=\"br-x\" id=\"br-d-prev\" aria-label=\"Previous conversation\" title=\"Previous (\u2190)\">\u2039</button>\n            <button type=\"button\" class=\"br-x\" id=\"br-d-next\" aria-label=\"Next conversation\" title=\"Next (\u2192)\">\u203a</button>\n            <button type=\"button\" class=\"br-ex\" id=\"br-d-ex\" aria-expanded=\"false\" aria-keyshortcuts=\"E\"></button>\n            <button type=\"button\" class=\"br-x\" id=\"br-d-x\" aria-label=\"Close\" title=\"Close (Esc)\">&times;</button>\n          </div>\n        </div>\n        <div class=\"br-dtabs\"><div class=\"ul-tabs\" role=\"tablist\" aria-label=\"Conversation views\">\n          <button class=\"ul-tab\" role=\"tab\" data-dt=\"chat\" aria-selected=\"true\">Conversation</button>\n          <button class=\"ul-tab\" role=\"tab\" data-dt=\"shared\" aria-selected=\"false\" id=\"br-t-shared\">Shared</button>\n          <button class=\"ul-tab\" role=\"tab\" data-dt=\"log\" aria-selected=\"false\">Log</button></div></div>\n        <div class=\"br-body\" id=\"br-d-b\" aria-live=\"polite\"></div>\n      </aside>\n    </div>";
+  var SKELETON = "    <div class=\"ul-bar\" id=\"br-bar\">\n      <div class=\"vs-areas\">\n        <div class=\"ul-tabs\" role=\"tablist\" aria-label=\"Period\">\n          <button class=\"ul-tab\" role=\"tab\" data-period=\"today\" aria-selected=\"false\">Today</button>\n          <button class=\"ul-tab\" role=\"tab\" data-period=\"7\"  aria-selected=\"false\">7 days</button>\n          <button class=\"ul-tab\" role=\"tab\" data-period=\"30\" aria-selected=\"true\">30 days</button>\n          <button class=\"ul-tab\" role=\"tab\" data-period=\"all\" aria-selected=\"false\">All time</button>\n        </div>\n      </div>\n      <div class=\"ul-refresh\">\n        <span class=\"ul-refresh__t\" id=\"br-updated\" aria-live=\"polite\"></span>\n        <button class=\"gw-iconbtn\" id=\"br-refresh\" type=\"button\" aria-label=\"Refresh\" data-tip=\"Refresh\" data-tip-end></button>\n      </div>\n    </div>\n\n    <div id=\"br-blocked\" hidden></div>\n\n    <div id=\"br-app\">\n      <section class=\"ul-sec\" aria-labelledby=\"br-h-conv\">\n        <div class=\"ul-sh\"><div class=\"ul-sh__t\"><h2 id=\"br-h-conv\">Conversations</h2><span class=\"ul-sh__q\" id=\"br-q-conv\"></span></div></div>\n        <div id=\"br-convs\"></div>\n      </section>\n\n      <section class=\"ul-sec\" style=\"margin-top: var(--gw-space-24)\" aria-labelledby=\"br-h-new\">\n        <div class=\"ul-sh\"><div class=\"ul-sh__t\"><h2 id=\"br-h-new\">New on Bruce</h2><span class=\"ul-sh__q\" id=\"br-q-new\"></span></div></div>\n        <div id=\"br-new\"></div>\n      </section>\n\n      <section class=\"ul-sec\" style=\"margin-top: var(--gw-space-24)\" aria-labelledby=\"br-h-cost\">\n        <div class=\"ul-sh\"><div class=\"ul-sh__t\"><h2 id=\"br-h-cost\">Usage and tokens</h2><span class=\"ul-sh__q\" id=\"br-q-cost\"></span></div></div>\n        <div class=\"ul-metrics br-m4\" id=\"br-cost\"></div>\n        <details class=\"br-how\"><summary>How the estimate works</summary><div id=\"br-how\"></div></details>\n      </section>\n\n      <section class=\"ul-sec\" style=\"margin-top: var(--gw-space-24)\" aria-labelledby=\"br-h-work\">\n        <div class=\"ul-sh\"><div class=\"ul-sh__t\"><h2 id=\"br-h-work\">What he worked on</h2><span class=\"ul-sh__q\" id=\"br-q-work\"></span></div></div>\n        <div class=\"br-lks\" id=\"br-work\"></div>\n      </section>\n\n      <section class=\"ul-sec\" style=\"margin-top: var(--gw-space-24)\" aria-labelledby=\"br-h-look\">\n        <div class=\"ul-sh\"><div class=\"ul-sh__t\"><h2 id=\"br-h-look\">Needs from you</h2><span class=\"ul-sh__q\" id=\"br-q-look\"></span></div></div>\n        <div class=\"br-what\"><p class=\"br-note\">Asks that may not have gone well. Open one to read the whole conversation. If most of them are your own tests, turn on Hide my activity.</p><dl><dt>No clear lane</dt><dd>The words did not match any of his topics (brand files, build a page, access, status and so on). Topics are sorted by plain keywords, so this does <b>not</b> mean he failed, and he still answered. Read it: if it is real work he should own, ask for a lane to be added; if it is chat or a test, leave it.</dd><dt>Failed</dt><dd>His run did not start. Check Bruce on Doc's tab, then ask again.</dd><dt>Hit the daily cap</dt><dd>That person used up their runs for the day. Nothing to fix unless the cap is too low.</dd></dl></div>\n        <div class=\"br-lks\" id=\"br-look\"></div>\n      </section>\n\n      <div class=\"br-scrim\" id=\"br-scrim\" hidden></div>\n      <aside class=\"br-rv\" id=\"br-drawer\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"br-d-t\" tabindex=\"-1\" hidden>\n        <div class=\"br-h\">\n          <div class=\"br-h__t\"><div class=\"br-h__s\" id=\"br-d-s\">Conversation</div><h2 id=\"br-d-t\">Conversation</h2></div>\n          <div class=\"br-h__r\">\n            <button type=\"button\" class=\"br-x\" id=\"br-d-prev\" aria-label=\"Previous conversation\" title=\"Previous (\u2190)\">\u2039</button>\n            <button type=\"button\" class=\"br-x\" id=\"br-d-next\" aria-label=\"Next conversation\" title=\"Next (\u2192)\">\u203a</button>\n            <button type=\"button\" class=\"br-ex\" id=\"br-d-ex\" aria-expanded=\"false\" aria-keyshortcuts=\"E\"></button>\n            <button type=\"button\" class=\"br-x\" id=\"br-d-x\" aria-label=\"Close\" title=\"Close (Esc)\">&times;</button>\n          </div>\n        </div>\n        <div class=\"br-dtabs\"><div class=\"ul-tabs\" role=\"tablist\" aria-label=\"Conversation views\">\n          <button class=\"ul-tab\" role=\"tab\" data-dt=\"chat\" aria-selected=\"true\">Conversation</button>\n          <button class=\"ul-tab\" role=\"tab\" data-dt=\"shared\" aria-selected=\"false\" id=\"br-t-shared\">Shared</button>\n          <button class=\"ul-tab\" role=\"tab\" data-dt=\"log\" aria-selected=\"false\">Log</button></div></div>\n        <div class=\"br-body\" id=\"br-d-b\" aria-live=\"polite\"></div>\n      </aside>\n    </div>";
   window.anMe = window.anMe || { on: false, pub: false, email: '', shared: ['design@gushwork.ai'], ready: Promise.resolve() };
   try { window.anMe.on = localStorage.getItem('gw-analytics-hide-me') === '1'; } catch (e) { /* off */ }
   window.mountBrucePanel = function (mountEl) {
     var api = {};
     mountEl.innerHTML = SKELETON;
-    var box = mountEl.querySelector('#br-me-box');
-    box.checked = window.anMe.on;
-    box.addEventListener('change', function () {
-      window.anMe.on = box.checked;
-      try { localStorage.setItem('gw-analytics-hide-me', box.checked ? '1' : '0'); } catch (e) { /* not remembered */ }
-      if (api.refilter) api.refilter();
-      if (api.onHide) api.onHide(box.checked);
-    });
-    api.setHide = function (v) { box.checked = !!v; window.anMe.on = !!v; };
+    /* Hide my activity lives in the page's sticky bar (agents.html), which calls setHide and refilter. */
+    api.setHide = function (v) { window.anMe.on = !!v; };
     var up = mountEl.querySelector('#br-updated'), rf = mountEl.querySelector('#br-refresh');
     if (up && rf) {
       var sync = function () { var t = up.textContent.trim(); rf.setAttribute('data-tip', t ? t + ' \u00b7 click to refresh' : 'Refresh'); };
@@ -31,7 +24,7 @@
   function icon(n) { return '<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">' + (ICON[n] || '') + '</svg>'; }
   function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
   function $(id) { return document.getElementById(id); }
-  function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
+  function plural(n, w, many) { return n + ' ' + (n === 1 ? w : (many || w + 's')); }
   var DAY = 86400000;
   function ago(ms) {
     var s = Math.max(0, Math.round(ms / 1000));
@@ -91,24 +84,10 @@
 
   function renderAll() {
     var rows = scoped(), asks = rows.filter(isAsk), convs = conversations(rows); S.convs = convs;
-    var today = new Date().toISOString().slice(0, 10);
-    var runs = asks.filter(function (r) { return r.kind === 'run'; }).length, chats = asks.filter(function (r) { return r.kind === 'chat'; }).length;
-    var follow = asks.filter(function (r) { return r.thread; }).length;
-    var tc = {}; asks.forEach(function (r) { tc[r.topic] = (tc[r.topic] || 0) + 1; });
-    var tops = Object.keys(tc).sort(function (a, b) { return tc[b] - tc[a]; });
-    var lanes = tops.filter(function (t) { return t !== 'other'; });   /* "no clear lane" is a gap, never the top use */
-    var talkedToday = convs.filter(function (c) { return c.last.toISOString().slice(0, 10) === today; }).length;
-    $('br-metrics').innerHTML =
-      metric('Conversations', String(convs.length), talkedToday ? talkedToday + ' talked to him today' : (convs.length ? 'last one ' + ago(Date.now() - convs[0].last.getTime()) : 'nobody has asked yet')) +
-      metric('Runs', String(runs), 'real work: a build, a check, a rework or an edit' + (chats ? '. Plus ' + plural(chats, 'chat') + ', which cost little' : '')) +
-      metric('Follow-ups', pct(follow, asks.length), 'asked inside an existing thread') +
-      metric('Top use', lanes.length ? TOPIC[lanes[0]] : '—', lanes.length ? pct(tc[lanes[0]], asks.length) + ' of asks' : 'nothing yet');
-
     /* conversations, newest first, optionally narrowed to one topic */
     var shown = S.topic ? convs.filter(function (c) { return c.topics[S.topic]; }) : convs;
     S.order = shown.map(function (c) { return c.user; });
     $('br-q-conv').textContent = plural(shown.length, 'conversation') + ', latest first' + (S.topic ? ', about ' + TOPIC[S.topic].toLowerCase() : '');
-    $('br-clear').hidden = !S.topic;
     $('br-convs').innerHTML = shown.length ? '<ul class="br-cl">' + shown.map(function (c) {
       var tags = topTopics(c, 3).map(function (t) { return tag(t, c.topics[t]); }).join('');
       return '<li><button type="button" class="br-ci" data-u="' + esc(c.user) + '" aria-label="Open the conversation with ' + esc(c.name) + '"><span class="br-av" aria-hidden="true">' + initial(c.name) + '</span>' +
@@ -117,25 +96,25 @@
         '<span class="br-ci__meta"><time datetime="' + c.last.toISOString() + '" title="' + esc(fmtWhen(c.last)) + '">' + esc(ago(Date.now() - c.last.getTime())) + '</time><span>' + esc(plural(c.asks.length, 'ask')) + '</span></span></button></li>';
     }).join('') + '</ul>' : '<p class="br-empty">' + (S.topic ? 'Nobody asked about this in the period.' : 'Nobody has talked to Bruce in this period.') + '</p>';
 
-    /* what people use it for */
-    $('br-q-use').textContent = asks.length ? plural(asks.length, 'ask') + ' sorted by what they were about' : '';
-    var latestBy = {}; asks.slice().sort(function (a, b) { return b.at - a.at; }).forEach(function (r) { if (!latestBy[r.topic]) latestBy[r.topic] = r; });
-    $('br-use').innerHTML = tops.length ? tops.map(function (t) {
-      return '<button type="button" class="br-ub" data-t="' + t + '" aria-pressed="' + (S.topic === t) + '"><span class="br-ub__l">' + esc(TOPIC[t]) + '</span>' +
-        '<span class="br-ub__bar" aria-hidden="true"><i style="width:' + Math.max(3, Math.round(tc[t] / asks.length * 100)) + '%"></i></span><span class="br-ub__n">' + tc[t] + '</span>' +
-        '<span class="br-ub__ex">Latest: ' + esc(clip(latestBy[t].text, 110)) + '</span></button>';
-    }).join('') : '<p class="br-empty">Nothing to sort yet.</p>';
+    /* new people: whose first ask in the log falls in the period (everyone, newest first, when the period is all time) */
+    var firstBy = {};
+    S.rows.filter(isAsk).forEach(function (r) { var f = firstBy[r.user]; if (!f || r.at < f.at) firstBy[r.user] = r; });
+    var cut = S.period === 'all' ? 0 : S.period === 'today' ? new Date().setHours(0, 0, 0, 0) : Date.now() - (+S.period) * DAY;
+    var fresh = Object.keys(firstBy).map(function (k) { return firstBy[k]; }).filter(function (r) { return r.at.getTime() >= cut; }).sort(function (a, b) { return b.at - a.at; });
+    $('br-q-new').textContent = fresh.length ? plural(fresh.length, 'person', 'people') + ' asked him for the first time' : '';
+    $('br-new').innerHTML = fresh.length ? '<ul class="br-cl">' + fresh.slice(0, 8).map(function (r) {
+      return '<li><button type="button" class="br-ci" data-u="' + esc(r.user) + '" aria-label="Open the conversation with ' + esc(r.name) + '"><span class="br-av" aria-hidden="true">' + initial(r.name) + '</span>' +
+        '<span><span class="br-ci__top"><b>' + esc(r.name) + '</b>' + (r.role === 'owner' ? '<span class="ul-badge">Owner</span>' : '') + '</span><span class="br-ci__last">' + esc(r.text || '—') + '</span></span>' +
+        '<span class="br-ci__meta"><time datetime="' + r.at.toISOString() + '" title="' + esc(fmtWhen(r.at)) + '">' + esc(ago(Date.now() - r.at.getTime())) + '</time><span>first ask</span></span></button></li>';
+    }).join('') + '</ul>' + (fresh.length > 8 ? '<p class="br-note">And ' + (fresh.length - 8) + ' more. Counted from the start of the log, which keeps his most recent turns.</p>' : '')
+      : '<p class="br-empty">Nobody new has asked him in this period.</p>';
 
-    /* how they talk */
-    var words = asks.map(function (r) { return (r.text.trim().match(/\S+/g) || []).length; }).filter(function (n) { return n > 0; });
-    var qs = asks.filter(function (r) { return /\?\s*$/.test(r.text); }).length;
-    var back = convs.filter(function (c) { var days = {}; c.asks.forEach(function (r) { days[r.at.toISOString().slice(0, 10)] = 1; }); return Object.keys(days).length > 1; }).length;
-    $('br-q-talk').textContent = asks.length ? 'from the first line of each ask' : '';
-    $('br-talk').innerHTML =
-      metric('Typical ask', words.length ? Math.round(median(words)) + ' words' : '—', 'half of asks are shorter than this') +
-      metric('Asked as a question', pct(qs, asks.length), 'the rest are instructions') +
-      metric('Asks per person', convs.length ? (asks.length / convs.length).toFixed(1) : '—', 'more than one means it is being reused') +
-      metric('Came back', pct(back, convs.length), 'people who asked on more than one day');
+    /* what he worked on: the runs (real work), newest first */
+    var work = asks.filter(function (r) { return r.kind === 'run'; }).sort(function (a, b) { return b.at - a.at; });
+    $('br-q-work').textContent = work.length ? plural(work.length, 'run') + (work.length > 8 ? ', latest 8' : '') + ', newest first' : '';
+    $('br-work').innerHTML = work.length ? work.slice(0, 8).map(function (r) {
+      return '<button type="button" class="br-lk" data-u="' + esc(r.user) + '"><span>' + esc(fmtWhen(r.at)) + '</span><span>' + esc(r.name) + '</span>' + tag(r.topic, 0) + '<span>' + (r.thread ? '↳ ' : '') + esc(r.text || '—') + '</span></button>';
+    }).join('') : '<p class="br-empty">He has not built or changed anything in this period.</p>';
 
     /* what it costs: an estimate, per the TOK constants above */
     var u = S.usage, resetAt = u && u.weekly && Date.parse(u.weekly.resetsAt) ? Date.parse(u.weekly.resetsAt) : 0;
@@ -148,8 +127,7 @@
     $('br-cost').innerHTML =
       metric('Tokens, this period', started ? '≈ ' + tok(periodTok) : '—', started ? 'about ' + tok(periodTok / started) + ' for each of ' + plural(started, 'session') + ' he started' : 'no sessions yet') +
       metric('Tokens, this week', '≈ ' + tok(weekTok), resetAt ? 'since the weekly limit reset on ' + new Date(weekFrom).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }) : 'the last 7 days') +
-      metric('Your weekly limit', u && u.weekly ? u.weekly.percentUsed + '% used' : '—', u && u.weekly ? 'everything on your account, as of ' + fmtWhen(new Date(u.at)) + (snapAge > 2 * DAY ? ' (' + Math.round(snapAge / DAY) + ' days old)' : '') + '. Resets in ' + Math.max(0, Math.round((resetAt - Date.now()) / DAY * 10) / 10) + ' days' : 'no snapshot found') +
-      metric('Bruce’s share of it', 'Not known', 'the plan reports a percentage of a limit it does not publish in tokens, so a share would be a guess');
+      metric('Your weekly limit', u && u.weekly ? u.weekly.percentUsed + '% used' : '—', u && u.weekly ? 'everything on your account, as of ' + fmtWhen(new Date(u.at)) + (snapAge > 2 * DAY ? ' (' + Math.round(snapAge / DAY) + ' days old)' : '') + '. Resets in ' + Math.max(0, Math.round((resetAt - Date.now()) / DAY * 10) / 10) + ' days' : 'no snapshot found');
     $('br-how').innerHTML = '<ul>' +
       '<li><b>' + tok(TOK.start) + ' tokens to start, measured.</b> Before he does anything, every DM makes him read his instructions (4.5k), CONTRIBUTING.md (5.1k), DECISIONS.md from R45 on (18.1k) and voice.md (1.3k). Sizes are taken from the repo files at about 4 characters a token. This is most of what a chat costs.</li>' +
       '<li><b>+' + tok(TOK.chat) + ' for a chat, assumed.</b> Reading the thread, one reply, a memory note.</li>' +
@@ -323,7 +301,6 @@
     if (t.hasAttribute('data-u')) { openConv(t.getAttribute('data-u')); return; }
     var topic = t.getAttribute('data-t'); S.topic = S.topic === topic ? '' : topic; renderAll();
   });
-  $('br-clear').addEventListener('click', function () { S.topic = ''; renderAll(); });
   syncWide();
 
   function renderBlocked(kind) {

@@ -135,6 +135,7 @@ a.ag-row:hover { background: var(--s-nav-hover); }
 #ag-bruce-slot { min-width: 0; }
 .ag-ctrl[hidden] { display: none; }
 .ag-ctrl__r { display: flex; align-items: center; gap: var(--gw-space-16); }
+.ag-bar__r { margin-left: auto; flex: none; }
 #ag-bruce-slot .ul-sec { margin-top: var(--gw-space-8); }
 #ag-bruce-slot .br-m4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .ag-btn[data-tab] { font: inherit; font: var(--gw-text-button-12, var(--gw-text-body-12-med)); }
@@ -173,12 +174,13 @@ a.ag-row:hover { background: var(--s-nav-hover); }
   <main class="sg__main">
     <div class="ag-bar">
       <div class="ag-tabs" id="ag-tabs" role="tablist" aria-label="Agents"></div>
+      <div class="an-hide ag-bar__r"><label class="gd-toggle gd-toggle--xs" title="Leaves your own asks to Bruce out of the counts"><input type="checkbox" role="switch" id="ag-me-box"><span class="gd-toggle__track" aria-hidden="true"></span><span class="gd-toggle__t">Hide my activity</span></label></div>
     </div>
     <div id="ag-state"></div>
     <div id="ag-app" hidden>
       <div class="ag-ctrl" id="ag-ctrl">
         <div class="ag-pills" role="tablist" aria-label="Period"><button type="button" class="ag-pill" role="tab" data-p="today" aria-selected="false">Today</button><button type="button" class="ag-pill" role="tab" data-p="7" aria-selected="true">7 days</button><button type="button" class="ag-pill" role="tab" data-p="30" aria-selected="false">30 days</button></div>
-        <div class="ag-ctrl__r an-hide"><label class="gd-toggle gd-toggle--xs" title="Leaves your own asks to Bruce out of the counts"><input type="checkbox" role="switch" id="ag-me-box"><span class="gd-toggle__track" aria-hidden="true"></span><span class="gd-toggle__t">Hide my activity</span></label>
+        <div class="ag-ctrl__r">
         <button class="gw-iconbtn" id="ag-refresh" type="button" aria-label="Refresh" data-tip="Refresh" data-tip-end><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z"/></svg></button></div>
       </div>
       <div id="ag-panel" role="tabpanel" tabindex="-1"></div>
@@ -249,7 +251,7 @@ a.ag-row:hover { background: var(--s-nav-hover); }
     var worse = function (s) { var rank = { ok: 0, unknown: 1, warn: 2, fail: 3 }; if ((rank[s] || 0) > (rank[out.state] || 0)) out.state = s; };
     if (id === 'bruce') {
       if (!S.bruce) { out.known = false; out.state = 'unknown'; out.doing = S.bruceErr || 'Reading his log'; return out; }
-      var rows = bruceRows(), all = (S.bruce || []).filter(function (r) { return r.kind !== 'sent'; }), gaps = rows.filter(isGap), people = {};
+      var rows = bruceRows(), all = (S.bruce || []).filter(function (r) { return r.kind !== 'sent' && !(hideOn() && S.owner && r.user === S.owner); }), gaps = rows.filter(isGap), people = {};
       rows.forEach(function (r) { people[r.user] = 1; });
       out.sessions = rows.filter(function (r) { return r.kind === 'run' || r.kind === 'chat'; }).length; out.tokens = rows.reduce(function (n, r) { return n + bruceTokens(r, a); }, 0);
       var latest = all.slice().sort(function (x, y) { return y.at - x.at; })[0]; out.last = latest ? latest.at.getTime() : 0;
@@ -375,7 +377,10 @@ a.ag-row:hover { background: var(--s-nav-hover); }
     if (!s.known) return html + healthBlock(s) + about(a);
     /* His analytics (conversations, what people use him for, what it costs, the asks worth a look) live in bruce-panel.js and are moved into
        this slot after the page is drawn; see mountBruce. */
-    return html + needsBlock(s) + '<div id="ag-bruce-slot"></div>' + healthBlock(s) + about(a);
+    /* Five things: conversations, who is new, usage and tokens, what he worked on, what he needs from you (the last is in the panel). Health only
+       appears when a check is failing, so a healthy Bruce is not a row of green. */
+    var bad = healthOf('bruce').rows.some(function (c) { return c.status !== 'ok'; });
+    return html + '<div id="ag-bruce-slot"></div>' + (bad ? healthBlock(s) : '') + about(a);
   }
   var brucePanel = null;
   function parkBruce() { var h = $('ag-bruce'); if (h && h.parentNode !== $('ag-park')) $('ag-park').appendChild(h); }
