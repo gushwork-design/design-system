@@ -24,8 +24,34 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
 .ag-bar { position: sticky; top: 0; z-index: 6; background: var(--s-panel-bg); margin-top: calc(var(--gw-space-8) * -1); padding-top: var(--gw-space-8); align-self: stretch;
   display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-16); }
 .ag-bar > .gd-tabs { flex: 1 1 auto; min-width: 0; }
+.ag-bar > .gd-tabs--underline { box-shadow: none; }   /* the hairline belongs to the bar (as Analytics' bar), so it runs under the toggle too and closes the bar's bottom edge while content scrolls under it */
+.ag-bar { box-shadow: inset 0 -1px 0 var(--gd-border); }
 .ag-bar > .gd-toggle { flex: none; }
-@media (max-width: 767px) { .ag-bar { top: 76px; } }
+/* tables: nothing is cut off. A cell wraps, a row grows past the library's row height, tags wrap under each other, and avatar initials stay at 11px */
+#ag-panel .gd-table__row { height: auto; min-height: var(--gd-row-h); }
+#ag-panel .gd-table__body > .gd-table__row { padding-block: var(--gw-space-8); }
+#ag-panel .gd-table__cell { overflow: visible; white-space: normal; text-overflow: clip; overflow-wrap: break-word; }
+#ag-panel .gd-table__cell--flex { flex-wrap: wrap; row-gap: var(--gw-space-4); }
+#ag-panel .gd-table__avatar { font-size: 11px; }
+/* a collapsed card shows a chevron at its right edge: down while closed, up while open */
+#ag-panel .gd-card__titles:has(> .gd-card__toggle) { flex: 1 1 auto; }
+#ag-panel .gd-card__toggle { width: 100%; justify-content: space-between; }
+#ag-panel .gd-card__toggle > svg { width: 16px; height: 16px; }
+#ag-panel .gd-card__toggle[aria-expanded="false"] > svg { transform: none; }
+#ag-panel .gd-card__toggle[aria-expanded="true"] > svg { transform: rotate(180deg); }
+/* the header rule ends where the row dividers end (the library draws it edge to edge of the inset row, the dividers a cell's padding in) */
+#ag-panel .gd-table--inset .gd-table__row--head { box-shadow: none; }
+#ag-panel .gd-table--inset .gd-table__row--head::after { content: ""; position: absolute; left: var(--gd-cell-px); right: var(--gd-cell-px); bottom: 0; height: 1px; background: var(--gd-border-strong); }
+@media (max-width: 767px) {
+  .ag-bar { top: 76px; flex-wrap: wrap; row-gap: 0; }   /* the toggle drops under the tabs, so every tab stays reachable */
+  .ag-bar > .gd-tabs { flex: 1 1 100%; }
+  .ag-bar > .gd-toggle { padding-block: var(--gw-space-8); }
+  /* the library collapses its grid at 767 only inside its app shell; this page is not in one, so the same rule is here */
+  #ag-panel .gd-grid > [class*="gd-span-"] { grid-column: span 12 !important; }
+  #ag-panel .gd-table__body > .gd-table__row { padding-block: var(--gw-space-12); }
+  #ag-panel .gd-table__row--head { display: none; }   /* these tables do not sort, so no Sort chip row */
+  #ag-panel .gd-table__row:not(.gd-table__row--head) > .ag-wide { grid-column: 1 / -1; }   /* long text takes the whole card row, not half of it */
+}
 .ag-ctrl { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-16); flex-wrap: wrap; }
 .ag-ctrl[hidden] { display: none; }
 </style>
@@ -121,7 +147,7 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
   }
   /* a collapsed card: the title is the button (the library's collapsible card) */
   function foldCard(id, title, body) {
-    return '<section class="gd-card"><div class="gd-card__head"><div class="gd-card__titles"><button type="button" class="gd-card__toggle" data-gd-toggle aria-expanded="false" aria-controls="' + id + '"><h3 class="gd-card__title">' + esc(title) + '</h3></button></div></div><div class="gd-card__body" id="' + id + '" hidden>' + body + '</div></section>';
+    return '<section class="gd-card"><div class="gd-card__head"><div class="gd-card__titles"><button type="button" class="gd-card__toggle" data-gd-toggle aria-expanded="false" aria-controls="' + id + '"><h3 class="gd-card__title">' + esc(title) + '</h3>' + svg('caret', 16) + '</button></div></div><div class="gd-card__body" id="' + id + '" hidden>' + body + '</div></section>';
   }
   /* cols: [{h:'Person', w:'minmax(0,1fr)', num:true}]; rows: [{cells:[html], strong:0, attrs:''}] */
   function table(label, cols, rows) {
@@ -129,7 +155,7 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
     var head = '<div class="gd-table__row gd-table__row--head" role="row">' + cols.map(function (c) { return '<div class="gd-table__th' + (c.num ? ' gd-table__th--num' : '') + '" role="columnheader">' + esc(c.h) + '</div>'; }).join('') + '</div>';
     var body = rows.map(function (r) {
       return '<div class="gd-table__row" role="row"' + (r.attrs || '') + '>' + r.cells.map(function (h, i) {
-        var c = cols[i], cls = 'gd-table__cell' + (c.num ? ' gd-table__cell--num' : '') + (c.flex ? ' gd-table__cell--flex' : '') + (c.strong ? ' gd-table__cell--strong' : '') + (c.muted ? ' gd-table__cell--muted' : '');
+        var c = cols[i], cls = 'gd-table__cell' + (c.title ? ' ag-wide' : '') + (c.num ? ' gd-table__cell--num' : '') + (c.flex ? ' gd-table__cell--flex' : '') + (c.strong ? ' gd-table__cell--strong' : '') + (c.muted ? ' gd-table__cell--muted' : '');
         return '<div class="' + cls + '" role="cell"' + (c.title && r.t ? ' title="' + esc(r.t[i] || '') + '"' : '') + '>' + h + '</div>';
       }).join('') + '</div>';
     }).join('');
