@@ -200,7 +200,7 @@ export default async function handler(req, res) {
   const body = typeof req.body === 'string' ? (() => { try { return JSON.parse(req.body); } catch { return null; } })() : req.body;
 
   if (!token()) {
-    if (op === 'state' || !op) return json(res, 200, { configured: false, work: {}, approved: {}, created: [] });
+    if (op === 'state' || !op) return json(res, 200, { configured: false, owner, work: {}, approved: {}, created: [] });
     return json(res, 503, { error: 'Drop Studio is not connected to drop-reference yet.' });
   }
 
@@ -214,7 +214,7 @@ export default async function handler(req, res) {
         const last = cs[cs.length - 1];
         w.question = last ? String(last.body || '').slice(0, MAX.answer) : '';
       }
-      return json(res, 200, { configured: true, ...state });
+      return json(res, 200, { configured: true, owner, ...state });
     }
 
     if (req.method === 'GET' && op === 'image') {

@@ -118,7 +118,7 @@ async function call(method, op, { cookie = owner, body, query = {} } = {}) {
 
 delete process.env.DROP_REFERENCE_TOKEN;
 let r = await call('GET', 'state');
-t('no token: state says not connected', [r.status, r.body.configured], [200, false]);
+t('no token: state says not connected', [r.status, r.body.configured, r.body.owner], [200, false, true]);
 r = await call('POST', 'create', { body: ok });
 t('no token: a write is refused', r.status, 503);
 r = await call('GET', 'state', { cookie: '' });
