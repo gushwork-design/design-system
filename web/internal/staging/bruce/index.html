@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!-- gushwork-build:{"pluginVersion":"2.0.7","surface":"web","createdBy":"utsav.singh@gushwork.ai","createdAt":"2026-10-08","registry":"https://gushwork-design.vercel.app/exports/web/component-registry.json","changelog":"https://gushwork-design.vercel.app/preview/changelog-sheet.html","components":["button","eyebrow"]} -->
+<!-- Bruce page, creative pass (8 Oct 2026). Brand parts are fixed: tokens, Vert Grotesk Display + Inter, the real logo files.
+     Concept, layout and motion are free. Every fold below is new and pending review. Three values are off the type ramp on
+     purpose and named: the giant hero wordmark, the closing "Say hello", and the card flip duration. -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bruce, Gushwork’s design agent | Gushwork</title>
+<meta name="description" content="Gushwork’s design agent in Slack. Brand files in seconds, a page in minutes, an honest account of what he did, and a daily report to his creator.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/assets/logo/gushwork-symbol-original.svg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Gushwork">
+<meta property="og:title" content="Bruce, Gushwork’s design agent">
+<meta property="og:description" content="Gushwork’s design agent in Slack. Brand files in seconds, a page in minutes, an honest account of what he did, and a daily report to his creator.">
+<meta property="og:url" content="https://design.gushwork.ai/internal/staging/bruce/">
+<!-- No og:image yet: a second pass, per the layout-before-polish rule. -->
+<link rel="stylesheet" href="/foundation/tokens.css">
+<style>
+@font-face{font-family:'Vert Grotesk Display';src:url('/fonts/Vert_Grotesk_Display_VF.ttf') format('truetype-variations');font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:'Inter';src:url('/fonts/Inter-VariableFont_opsz_wght.ttf') format('truetype-variations');font-weight:100 900;font-style:normal;font-display:swap}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--gw-color-neutral-25);color:var(--gw-color-black);font:var(--gw-text-body-16-reg);letter-spacing:var(--gw-text-body-16-reg-tracking);-webkit-font-smoothing:antialiased;overflow-x:clip}
+h1,h2,h3,h4,p,ul,ol,figure,blockquote{margin:0;padding:0}
+ul,ol{list-style:none}
+a{color:inherit;text-decoration:none}
+button,input{font:inherit;color:inherit}
+button{background:none;border:0;padding:0;cursor:pointer}
+img{display:block;max-width:100%}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--gw-color-primary-500);outline-offset:2px}
+.wrap{width:100%;max-width:var(--gw-content-width);margin:0 auto;padding:0 var(--gw-space-16)}
+@media (min-width:768px){.wrap{padding:0 var(--gw-space-20)}}
+.dots{background-image:radial-gradient(var(--gw-color-neutral-200) 1px,transparent 1.5px);background-size:24px 24px}
+
+/* ---------- type ---------- */
+.eyebrow{display:inline-flex;align-self:flex-start;padding:var(--gw-space-4) var(--gw-space-8);background:var(--gw-color-white);border:.5px solid var(--gw-color-neutral-100);border-radius:var(--gw-radius-full);font:500 12px/1 var(--gw-font-body);color:var(--gw-color-neutral-900)}
+.eyebrow--dark{background:transparent;border-color:var(--gw-color-neutral-700);color:var(--gw-color-neutral-200)}
+.h2{font:var(--gw-text-h5-bold);letter-spacing:var(--gw-text-h5-bold-tracking)}
+@media (min-width:768px){.h2{font:var(--gw-text-h4);letter-spacing:var(--gw-text-h4-tracking)}}
+.lede{font:var(--gw-text-body-18-reg);letter-spacing:var(--gw-text-body-18-reg-tracking);color:var(--gw-color-neutral-700)}
+.sec{padding:var(--gw-space-60) 0}
+@media (min-width:900px){.sec{padding:var(--gw-space-100) 0}}
+.head{display:flex;flex-direction:column;gap:var(--gw-space-16);margin-bottom:var(--gw-space-40);max-width:720px}
+
+/* ---------- buttons: Medium 44, radius 8, label button-16 ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--gw-space-8);height:44px;padding:var(--gw-space-16) var(--gw-space-20);border-radius:var(--gw-radius-8);font:var(--gw-text-button-16);white-space:nowrap;box-shadow:var(--gw-shadow-s2)}
+.btn svg{width:16px;height:16px;fill:currentColor;flex:none}
+.btn--black{background:var(--gw-color-black);color:var(--gw-color-white)}.btn--black:hover{background:var(--gw-color-neutral-900)}
+.btn--out{color:var(--gw-color-black);box-shadow:inset 0 0 0 2px var(--gw-color-neutral-100);background:var(--gw-color-white)}.btn--out:hover{background:var(--gw-color-neutral-25)}
+.btn--blue{background:var(--gw-color-primary-500);color:var(--gw-color-white)}.btn--blue:hover{background:var(--gw-color-primary-600)}
+.btn--white{background:var(--gw-color-white);color:var(--gw-color-black)}.btn--white:hover{background:var(--gw-color-neutral-50)}
+.btn--outw{color:var(--gw-color-white);box-shadow:inset 0 0 0 2px var(--gw-color-neutral-alpha-10-white)}.btn--outw:hover{background:var(--gw-color-neutral-alpha-10-white)}
+.ctas{display:flex;flex-wrap:wrap;gap:var(--gw-space-12)}
+@media (max-width:767px){.ctas .btn{width:100%}}
+
+/* ---------- nav: a floating card ---------- */
+.nav{position:fixed;z-index:50;top:var(--gw-space-12);left:50%;transform:translateX(-50%);width:min(calc(100% - 24px),1240px);height:56px;display:flex;align-items:center;justify-content:space-between;gap:var(--gw-space-16);padding:0 var(--gw-space-12) 0 var(--gw-space-20);background:var(--gw-color-white);border:1px solid var(--gw-color-neutral-100);border-radius:var(--gw-radius-16);box-shadow:var(--gw-shadow-s3)}
+.nav img{height:24px;width:auto}
+.nav-links{display:none;gap:var(--gw-space-4)}
+@media (min-width:768px){.nav-links{display:flex}}
+.nav-links a{font:var(--gw-text-body-14-med);padding:var(--gw-space-8) var(--gw-space-12);border-radius:var(--gw-radius-8)}
+.nav-links a:hover{background:var(--gw-color-neutral-50)}
+.nav .btn{height:36px;padding:var(--gw-space-8) var(--gw-space-12);font:var(--gw-text-button-14)}
+
+/* ---------- hero ---------- */
+.hero{position:relative;min-height:max(100svh,720px);overflow:hidden;background-color:var(--gw-color-neutral-25)}
+.hero-copy{position:relative;z-index:4;padding-top:calc(56px + var(--gw-space-60));display:flex;flex-direction:column;gap:var(--gw-space-16);max-width:420px}
+.hero-copy h1{font:var(--gw-text-h5-bold);letter-spacing:var(--gw-text-h5-bold-tracking)}
+.hero-copy p{font:var(--gw-text-body-16-reg);color:var(--gw-color-neutral-700)}
+.hero-copy .ctas{margin-top:var(--gw-space-8)}
+/* OFF THE RAMP, chosen: the giant wordmark. Family and weight are the brand's; only the size is a flourish. */
+.hero-word{position:absolute;z-index:1;left:0;right:0;bottom:-.1em;text-align:center;font:700 clamp(150px,30vw,470px)/.8 var(--gw-font-display);letter-spacing:-.02em;color:var(--gw-color-black);pointer-events:none;user-select:none}
+.hero-m{position:absolute;z-index:3;left:50%;bottom:2%;width:min(54vw,600px);transform:translateX(-50%)}
+.hero-m .tilt{transition:transform .2s ease-out;will-change:transform}
+.hero-m img{width:100%;height:auto;animation:bob 5s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.hero-m::after{content:"";position:absolute;left:18%;right:18%;bottom:1.5%;height:5%;background:var(--gw-color-black);opacity:.12;border-radius:50%;z-index:-1;filter:blur(8px)}
+.bubble{position:absolute;z-index:5;right:-2%;top:2%;width:268px;background:var(--gw-color-white);border:1px solid var(--gw-color-neutral-100);border-radius:var(--gw-radius-16);box-shadow:var(--gw-shadow-s4);padding:var(--gw-space-12) var(--gw-space-16);font:var(--gw-text-body-14-med);min-height:68px}
+.bubble::after{content:"";position:absolute;left:22px;bottom:-7px;width:12px;height:12px;background:var(--gw-color-white);border-right:1px solid var(--gw-color-neutral-100);border-bottom:1px solid var(--gw-color-neutral-100);transform:rotate(45deg)}
+.bubble span{display:block;transition:opacity .32s,transform .32s}
+.bubble.out span{opacity:0;transform:translateY(6px)}
+.fc{position:absolute;z-index:4;display:flex;align-items:center;gap:var(--gw-space-8);padding:var(--gw-space-8) var(--gw-space-12);background:var(--gw-color-white);border:1px solid var(--gw-color-neutral-100);border-radius:var(--gw-radius-12);box-shadow:var(--gw-shadow-s3);font:var(--gw-text-body-14-med);white-space:nowrap;transition:transform .25s ease-out;will-change:transform}
+.fc i{width:8px;height:8px;border-radius:var(--gw-radius-4);background:var(--gw-color-primary-500);flex:none}
+.fc--k i{background:var(--gw-color-black)}
+@media (max-width:899px){.fc{display:none}}
+@media (max-width:767px){
+  .hero{min-height:max(100svh,780px)}
+  .hero-copy{padding-top:calc(56px + var(--gw-space-40))}
+  .hero-m{width:min(88vw,420px);bottom:1%}
+  .bubble{right:0;top:-6%;width:220px}
+}
+
+/* ---------- marquee ---------- */
+.marq{background:var(--gw-color-primary-500);color:var(--gw-color-white);overflow:hidden;padding:var(--gw-space-20) 0;position:relative;z-index:6}
+.marq-t{display:flex;width:max-content;gap:var(--gw-space-40);animation:marq 46s linear infinite}
+.marq:hover .marq-t{animation-play-state:paused}
+.marq-t span{display:flex;align-items:center;gap:var(--gw-space-40);font:var(--gw-text-h5-bold);white-space:nowrap}
+.marq-t span::after{content:"";width:12px;height:12px;border-radius:var(--gw-radius-4);background:var(--gw-color-white);flex:none}
+@keyframes marq{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.marq-t{animation:none;flex-wrap:wrap;width:auto;padding:0 var(--gw-space-16)}.hero-m img{animation:none}}
+
+/* ---------- reveal ---------- */
+.js .rv{opacity:0;transform:translateY(8px);transition:opacity .32s,transform .32s}
+.js .rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.js .rv{opacity:1;transform:none;transition:none}}
+
+/* ---------- messages ---------- */
+.av{--s:32px;width:var(--s);height:var(--s);flex:none;border-radius:var(--gw-radius-8);background:var(--gw-color-primary-50) url(assets/bruce-cutout.png) 50% calc(var(--s) * -.19) / 360% no-repeat}
+.ph{--s:32px;width:var(--s);height:var(--s);flex:none;border-radius:var(--gw-radius-8);background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700);display:grid;place-items:center;font:var(--gw-text-body-14-sem)}
+.m{display:grid;grid-template-columns:32px 1fr;gap:var(--gw-space-12);animation:in .32s ease-out both}
+@keyframes in{from{opacity:0;transform:translateY(6px)}}
+@media (prefers-reduced-motion:reduce){.m{animation:none}}
+.m .n{font:var(--gw-text-body-14-sem);display:flex;align-items:center;gap:var(--gw-space-8)}
+.m .n i{font:var(--gw-text-body-12-med);font-style:normal;color:var(--gw-color-neutral-600)}
+.tag{font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-700);background:var(--gw-color-neutral-100);border-radius:var(--gw-radius-4);padding:0 var(--gw-space-4)}
+.m p{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-900);margin-top:var(--gw-space-2);white-space:pre-wrap;overflow-wrap:anywhere}
+.file{display:inline-block;margin-top:var(--gw-space-8);font:var(--gw-text-body-14-med);color:var(--gw-color-primary-600);background:var(--gw-color-primary-50);border-radius:var(--gw-radius-8);padding:var(--gw-space-4) var(--gw-space-12)}
+.typing{display:inline-flex;gap:4px;padding:var(--gw-space-8) 0}
+.typing b{width:6px;height:6px;border-radius:var(--gw-radius-4);background:var(--gw-color-neutral-400);animation:tp 1s infinite ease-in-out}
+.typing b:nth-child(2){animation-delay:.15s}.typing b:nth-child(3){animation-delay:.3s}
+@keyframes tp{0%,60%,100%{transform:none;opacity:.5}30%{transform:translateY(-4px);opacity:1}}
+@media (prefers-reduced-motion:reduce){.typing b{animation:none}}
+
+/* ---------- the desk: prompts + a real chat window ---------- */
+.pg{display:grid;gap:var(--gw-space-24)}
+@media (min-width:960px){.pg{grid-template-columns:360px 1fr;gap:var(--gw-space-40);align-items:start}}
+.pg-list{display:flex;gap:var(--gw-space-8);overflow-x:auto;padding-bottom:var(--gw-space-4)}
+@media (min-width:960px){.pg-list{flex-direction:column;overflow:visible;gap:var(--gw-space-4)}}
+.pg-p{display:grid;gap:var(--gw-space-2);text-align:left;padding:var(--gw-space-12) var(--gw-space-16);border-radius:var(--gw-radius-12);border:1px solid transparent;min-width:220px;color:var(--gw-color-neutral-600);transition:color .2s,background-color .2s}
+@media (min-width:960px){.pg-p{min-width:0}}
+.pg-p b{font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-400)}
+.pg-p span{font:var(--gw-text-body-16-med)}
+.pg-p:hover{background:var(--gw-color-white);color:var(--gw-color-black)}
+.pg-p[aria-pressed="true"]{background:var(--gw-color-white);border-color:var(--gw-color-neutral-100);box-shadow:var(--gw-shadow-s2);color:var(--gw-color-black)}
+.pg-p[aria-pressed="true"] b{color:var(--gw-color-primary-500)}
+.win{background:var(--gw-color-white);border:1px solid var(--gw-color-neutral-100);border-radius:var(--gw-radius-20);box-shadow:var(--gw-shadow-card);overflow:hidden;display:grid;grid-template-rows:auto 1fr auto auto}
+.win-bar{display:flex;align-items:center;gap:var(--gw-space-12);padding:var(--gw-space-12) var(--gw-space-20);border-bottom:1px solid var(--gw-color-neutral-100)}
+.win-bar .av{--s:36px}
+.win-bar strong{font:var(--gw-text-body-14-sem);display:flex;gap:var(--gw-space-8);align-items:center}
+.win-bar small{display:block;font:var(--gw-text-body-12-reg);color:var(--gw-color-neutral-600)}
+.pill{margin-left:auto;font:var(--gw-text-body-12-med);padding:var(--gw-space-2) var(--gw-space-8);border-radius:var(--gw-radius-full);background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+.pill--live{background:var(--gw-color-primary-50);color:var(--gw-color-primary-600)}
+.feed{display:flex;flex-direction:column;gap:var(--gw-space-16);padding:var(--gw-space-20);height:360px;overflow-y:auto;background:var(--gw-color-white)}
+.compose{display:flex;gap:var(--gw-space-8);padding:var(--gw-space-12) var(--gw-space-16);border-top:1px solid var(--gw-color-neutral-100)}
+.compose input{flex:1;min-width:0;height:44px;border:1px solid var(--gw-color-neutral-200);border-radius:var(--gw-radius-8);padding:0 var(--gw-space-12);background:var(--gw-color-white);font:var(--gw-text-body-14-reg)}
+.compose input:focus{outline:2px solid var(--gw-color-primary-500);outline-offset:-1px;border-color:transparent}
+.compose .btn{height:44px}
+.compose .btn[disabled]{opacity:.5;cursor:default}
+.win-note{padding:0 var(--gw-space-20) var(--gw-space-12);font:var(--gw-text-body-12-reg);color:var(--gw-color-neutral-600)}
+.get{margin-top:var(--gw-space-16);background:var(--gw-color-primary-50);border-radius:var(--gw-radius-12);padding:var(--gw-space-16)}
+.get b{display:block;font:var(--gw-text-body-14-sem);color:var(--gw-color-primary-600)}
+.get p{font:var(--gw-text-body-14-reg);margin-top:var(--gw-space-4);color:var(--gw-color-neutral-900)}
+
+/* ---------- the deck: agent cards ---------- */
+.fan{display:flex;justify-content:center;padding:var(--gw-space-24) 0 var(--gw-space-40)}
+.tc{position:relative;width:272px;height:404px;margin:0 -6px;perspective:1100px;transform:rotate(var(--r)) translateY(var(--y));transition:transform .32s ease-out;cursor:pointer;z-index:var(--z)}
+.tc:hover,.tc:focus-visible{transform:rotate(0) translateY(-18px);z-index:9}
+.tc-in{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .42s ease-in-out}
+.tc.flip .tc-in{transform:rotateY(180deg)}
+.tc-f,.tc-b{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:var(--gw-radius-20);padding:var(--gw-space-16);display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.tc-f{background:var(--gw-color-white);border:1px solid var(--gw-color-neutral-100);box-shadow:var(--gw-shadow-card)}
+.tc-b{background:var(--gw-color-black);color:var(--gw-color-white);transform:rotateY(180deg)}
+.tc-top{display:flex;justify-content:space-between;font:500 11px/1 var(--gw-font-body);letter-spacing:.08em;text-transform:uppercase;color:var(--gw-color-neutral-600)}
+.tc-art{flex:1;min-height:0;border-radius:var(--gw-radius-12);background:var(--gw-color-primary-50);display:grid;place-items:end center;overflow:hidden;position:relative}
+.tc-art img{width:96%;height:auto}
+.tc-art .big{font:700 140px/.9 var(--gw-font-display);color:var(--gw-color-primary-500);align-self:center}
+.tc h3{font:var(--gw-text-h5-bold);letter-spacing:var(--gw-text-h5-bold-tracking)}
+.tc-role{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-700);margin-top:calc(-1 * var(--gw-space-8))}
+.tc-cols{display:grid;grid-template-columns:1fr 1fr;gap:var(--gw-space-12);border-top:1px solid var(--gw-color-neutral-100);padding-top:var(--gw-space-12)}
+.tc-cols b{display:block;font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-600)}
+.tc-cols span{font:var(--gw-text-body-12-reg);color:var(--gw-color-neutral-900)}
+.tc-b h3{color:var(--gw-color-white);font:var(--gw-text-body-18-sem)}
+.tc-b dl{margin:0;display:grid;gap:var(--gw-space-12)}
+.tc-b dt{font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-400)}
+.tc-b dd{margin:0;font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-100)}
+.tc-b .hint{margin-top:auto;font:var(--gw-text-body-12-reg);color:var(--gw-color-neutral-400)}
+.tc--empty .tc-f{background:transparent;border:1.5px dashed var(--gw-color-neutral-300);box-shadow:none}
+.tc--empty .tc-art{background:transparent;color:var(--gw-color-neutral-300);place-items:center}
+.tc--empty .tc-art .big{color:var(--gw-color-neutral-300)}
+@media (prefers-reduced-motion:reduce){.tc,.tc-in{transition:none}}
+@media (max-width:899px){
+  .fan{justify-content:flex-start;overflow-x:auto;scroll-snap-type:x mandatory;padding:var(--gw-space-24) var(--gw-space-16) var(--gw-space-40)}
+  .tc{margin:0 var(--gw-space-8);flex:none;transform:none;scroll-snap-align:center}
+  .tc:hover,.tc:focus-visible{transform:none}
+}
+.flow{display:flex;flex-wrap:wrap;gap:var(--gw-space-12);align-items:center;justify-content:center;font:var(--gw-text-body-14-med)}
+.flow span{background:var(--gw-color-white);border:1px solid var(--gw-color-neutral-100);border-radius:var(--gw-radius-12);padding:var(--gw-space-8) var(--gw-space-16)}
+.flow svg{width:20px;height:20px;fill:var(--gw-color-neutral-400)}
+
+/* ---------- the rules: dark ---------- */
+.dark{background:var(--gw-color-black);color:var(--gw-color-white)}
+.dark .lede{color:var(--gw-color-neutral-300)}
+.rules{display:grid;gap:var(--gw-space-24)}
+@media (min-width:960px){.rules{grid-template-columns:380px 1fr;gap:var(--gw-space-40);align-items:start}}
+.try{display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.try button{text-align:left;padding:var(--gw-space-12) var(--gw-space-16);border-radius:var(--gw-radius-12);border:1px solid var(--gw-color-neutral-700);font:var(--gw-text-body-16-med);color:var(--gw-color-white);transition:background-color .2s}
+.try button:hover{background:var(--gw-color-neutral-900)}
+.try button[aria-pressed="true"]{background:var(--gw-color-white);color:var(--gw-color-black);border-color:var(--gw-color-white)}
+.verdict{background:var(--gw-color-neutral-900);border:1px solid var(--gw-color-neutral-700);border-radius:var(--gw-radius-20);padding:var(--gw-space-24);display:grid;gap:var(--gw-space-20);min-height:300px;align-content:start}
+.verdict .m p{color:var(--gw-color-neutral-100)}
+.verdict .m .n{color:var(--gw-color-white)}
+.verdict .ph{background:var(--gw-color-neutral-700);color:var(--gw-color-white)}
+.verdict .tag{background:var(--gw-color-neutral-700);color:var(--gw-color-neutral-100)}
+.tier{display:inline-flex;align-self:flex-start;justify-self:start;font:var(--gw-text-body-12-med);padding:var(--gw-space-4) var(--gw-space-12);border-radius:var(--gw-radius-full)}
+.tier--never{background:var(--gw-color-white);color:var(--gw-color-black)}
+.tier--ask{box-shadow:inset 0 0 0 1.5px var(--gw-color-white);color:var(--gw-color-white)}
+.tier--do{background:var(--gw-color-primary-500);color:var(--gw-color-white)}
+.legend{display:grid;gap:var(--gw-space-16);margin-top:var(--gw-space-40)}
+@media (min-width:768px){.legend{grid-template-columns:repeat(3,1fr)}}
+.legend div{border-top:1px solid var(--gw-color-neutral-700);padding-top:var(--gw-space-16);display:grid;gap:var(--gw-space-8)}
+.legend p{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-300)}
+
+/* ---------- voice ---------- */
+.vt{display:flex;flex-wrap:wrap;gap:var(--gw-space-8)}
+.vt button{font:var(--gw-text-body-16-med);padding:var(--gw-space-8) var(--gw-space-20);border-radius:var(--gw-radius-full);border:1px solid var(--gw-color-neutral-200);background:var(--gw-color-white);color:var(--gw-color-neutral-700)}
+.vt button[aria-selected="true"]{background:var(--gw-color-black);border-color:var(--gw-color-black);color:var(--gw-color-white)}
+.quote{margin-top:var(--gw-space-40);display:grid;gap:var(--gw-space-16);max-width:960px}
+.quote q{display:block;font:var(--gw-text-h5-bold);letter-spacing:var(--gw-text-h5-bold-tracking);quotes:"\201C" "\201D"}
+@media (min-width:768px){.quote q{font:var(--gw-text-h4);letter-spacing:var(--gw-text-h4-tracking)}}
+.quote p{font:var(--gw-text-body-16-reg);color:var(--gw-color-neutral-700);max-width:60ch}
+.quote>*{transition:opacity .32s,transform .32s}
+.quote.out>*{opacity:0;transform:translateY(6px)}
+.never{display:flex;flex-wrap:wrap;gap:var(--gw-space-8);align-items:center;margin-top:var(--gw-space-48)}
+.never b{font:var(--gw-text-body-14-med);color:var(--gw-color-neutral-600);margin-right:var(--gw-space-8)}
+.never span{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-600);text-decoration:line-through;text-decoration-color:var(--gw-color-neutral-400);border:1px solid var(--gw-color-neutral-200);border-radius:var(--gw-radius-full);padding:var(--gw-space-4) var(--gw-space-12);background:var(--gw-color-white)}
+
+/* ---------- close ---------- */
+.close{background:var(--gw-color-primary-500);color:var(--gw-color-white);position:relative;overflow:hidden;padding:var(--gw-space-60) 0 0}
+@media (min-width:900px){.close{padding-top:var(--gw-space-100)}}
+.close .wrap{position:relative;z-index:2;padding-bottom:var(--gw-space-60)}
+/* OFF THE RAMP, chosen: the closing line, same reason as the hero wordmark. */
+.close h2{font:700 clamp(72px,13vw,200px)/.9 var(--gw-font-display);letter-spacing:-.02em}
+.close p{font:var(--gw-text-body-18-reg);color:var(--gw-color-primary-50);margin:var(--gw-space-24) 0 var(--gw-space-32);max-width:36ch}
+.close-m{position:absolute;right:max(var(--gw-space-16),calc((100% - 1240px)/2 + var(--gw-space-20)));bottom:-6%;width:min(46vw,460px);z-index:1}
+.close-m img{width:100%;height:auto;animation:bob 5s ease-in-out infinite}
+@media (max-width:767px){.close .wrap{padding-bottom:300px}.close-m{width:min(78vw,340px);right:50%;transform:translateX(50%)}}
+footer{background:var(--gw-color-black);color:var(--gw-color-neutral-400);padding:var(--gw-space-32) 0}
+footer .wrap{display:flex;flex-wrap:wrap;gap:var(--gw-space-16);align-items:center;justify-content:space-between;font:var(--gw-text-body-12-med)}
+footer img{height:24px;width:auto}
+</style>
+</head>
+<body>
+<script>document.documentElement.classList.add('js')</script>
+
+<nav class="nav" aria-label="Main">
+  <a href="#top" aria-label="Gushwork"><img src="/assets/logo/gushwork-logo-original.svg" alt="Gushwork"></a>
+  <div class="nav-links"><a href="#ask">Try the desk</a><a href="#team">The deck</a><a href="#rules">The rules</a><a href="#voice">His voice</a></div>
+  <a class="btn btn--black" href="https://gushwork.slack.com">Message Bruce</a>
+</nav>
+
+<main id="top">
+<!-- HERO -->
+<section class="hero dots" id="hero" aria-labelledby="h1">
+  <div class="wrap">
+    <div class="hero-copy">
+      <span class="eyebrow">Gushwork’s design agent, in Slack</span>
+      <h1 id="h1">He hands over the file, the page or the answer</h1>
+      <p>Brand files in seconds, a finished page in a few minutes, and an honest account of what he did. And every day he reports to his creator, Utsav.</p>
+      <div class="ctas">
+        <a class="btn btn--black" href="https://gushwork.slack.com">Message Bruce <svg viewBox="0 0 256 256" aria-hidden="true"><path d="M204,64V168a12,12,0,0,1-24,0V93L72.49,200.49a12,12,0,0,1-17-17L163,76H88a12,12,0,0,1,0-24H192A12,12,0,0,1,204,64Z"/></svg></a>
+        <a class="btn btn--out" href="#ask">Try the desk</a>
+      </div>
+    </div>
+  </div>
+  <div class="hero-word" aria-hidden="true">Bruce</div>
+  <div class="hero-m" id="mascot">
+    <div class="bubble" id="bubble" aria-live="polite"><span>Here it is, white on transparent.</span></div>
+    <div class="tilt" id="tilt"><img src="assets/bruce-cutout.png" alt="Bruce, a round blue fluffy character in a black cat-eared cap, smiling" width="1386" height="1135"></div>
+  </div>
+  <div class="fc" data-d="18" style="top:26%;right:7%"><i></i>gushwork-logo-white.svg</div>
+  <div class="fc fc--k" data-d="26" style="top:44%;right:3%"><i></i>Passed on. Slack confirmed it.</div>
+  <div class="fc" data-d="14" style="top:63%;right:12%"><i></i>3 builds a day each</div>
+  <div class="fc fc--k" data-d="22" style="top:62%;left:6%"><i></i>Ask first</div>
+  <div class="fc" data-d="30" style="top:77%;left:16%"><i></i>Rework: agent-card</div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marq" aria-hidden="true"><div class="marq-t" id="marq"></div></div>
+
+<!-- THE DESK: scripted sketches and a live chat -->
+<section class="sec" id="ask" aria-labelledby="h-ask">
+  <div class="wrap">
+    <div class="head rv">
+      <span class="eyebrow">Try the desk</span>
+      <h2 class="h2" id="h-ask">Pick a question, or type your own</h2>
+      <p class="lede">The prompts on the left are sketches of what he does in Slack. Type your own and you are talking to the real Bruce, in words only, when you are signed in to the hub.</p>
+    </div>
+    <div class="pg">
+      <div>
+        <div class="pg-list" id="prompts" role="group" aria-label="Example questions"></div>
+        <div class="get rv" id="get"><b>What you get</b><p></p></div>
+      </div>
+      <div class="win rv" aria-label="Chat with Bruce">
+        <div class="win-bar"><span class="av" role="img" aria-label="Bruce"></span><div><strong>Bruce <span class="tag">APP</span></strong><small>Design agent</small></div><span class="pill" id="pill">Sketch</span></div>
+        <div class="feed" id="feed" aria-live="polite" aria-relevant="additions"></div>
+        <form class="compose" id="compose" autocomplete="off">
+          <input id="msg" type="text" maxlength="500" placeholder="Message Bruce" aria-label="Message Bruce">
+          <button class="btn btn--black" id="send" type="submit">Send</button>
+        </form>
+        <div class="win-note" id="note">In words only: from this window he cannot build, send or check anything. That happens in Slack.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- THE DECK -->
+<section class="sec dots" id="team" aria-labelledby="h-team" style="border-top:1px solid var(--gw-color-neutral-100)">
+  <div class="wrap">
+    <div class="head rv">
+      <span class="eyebrow">The deck</span>
+      <h2 class="h2" id="h-team">One front door, and a deck that is still growing</h2>
+      <p class="lede">You talk to Bruce. When the work belongs to another agent, he hands it over and brings the answer back. Flip a card.</p>
+    </div>
+    <div class="fan rv">
+      <article class="tc" style="--r:-5deg;--y:10px;--z:2" tabindex="0" role="button" aria-pressed="false" aria-label="Alfred, agent card 0002. Press to flip.">
+        <div class="tc-in">
+          <div class="tc-f"><div class="tc-top"><span>Agent</span><span>0002</span></div>
+            <div class="tc-art"><span class="big" aria-hidden="true">A</span></div>
+            <h3>Alfred</h3><p class="tc-role">Rework</p>
+            <div class="tc-cols"><div><b>Good for</b><span>Sending review items back fixed</span></div><div><b>Vibes</b><span>Overnight, methodical</span></div></div></div>
+          <div class="tc-b"><div class="tc-top" style="color:var(--gw-color-neutral-400)"><span>Agent</span><span>0002</span></div><h3>Alfred</h3>
+            <dl><div><dt>Good for</dt><dd>Reworks Utsav sends back: on a send-back, on a reply, and in a 9pm IST sweep.</dd></div>
+            <div><dt>Won’t</dt><dd>Touch anything outside the hub’s own pages.</dd></div>
+            <div><dt>Reports to</dt><dd>Utsav, through Bruce</dd></div></dl><p class="hint">Press to flip back</p></div>
+        </div>
+      </article>
+      <article class="tc" style="--r:0deg;--y:-8px;--z:3" tabindex="0" role="button" aria-pressed="false" aria-label="Bruce, agent card 0001. Press to flip.">
+        <div class="tc-in">
+          <div class="tc-f"><div class="tc-top"><span>Agent</span><span>0001</span></div>
+            <div class="tc-art"><img src="assets/bruce-cutout.png" alt=""></div>
+            <h3>Bruce</h3><p class="tc-role">Lead, front door</p>
+            <div class="tc-cols"><div><b>Good for</b><span>Files, pages, answers</span></div><div><b>Vibes</b><span>Crisp, dry, honest</span></div></div></div>
+          <div class="tc-b"><div class="tc-top" style="color:var(--gw-color-neutral-400)"><span>Agent</span><span>0001</span></div><h3>Bruce</h3>
+            <dl><div><dt>Good for</dt><dd>Brand files in seconds, a page in minutes, passing a message to Utsav, an honest account of what he did.</dd></div>
+            <div><dt>Won’t</dt><dd>Merge anyone else’s PR, release the plugin, record a review decision, or print a token.</dd></div>
+            <div><dt>Reports to</dt><dd>Utsav, his creator, every day</dd></div></dl><p class="hint">Press to flip back</p></div>
+        </div>
+      </article>
+      <article class="tc tc--empty" style="--r:5deg;--y:10px;--z:1" tabindex="0" role="button" aria-pressed="false" aria-label="Open seat, agent card 0003. Press to flip.">
+        <div class="tc-in">
+          <div class="tc-f"><div class="tc-top"><span>Agent</span><span>0003</span></div>
+            <div class="tc-art"><span class="big" aria-hidden="true">?</span></div>
+            <h3>An open seat</h3><p class="tc-role">Next up</p>
+            <div class="tc-cols"><div><b>Good for</b><span>The next job</span></div><div><b>Vibes</b><span>To be decided</span></div></div></div>
+          <div class="tc-b"><div class="tc-top" style="color:var(--gw-color-neutral-400)"><span>Agent</span><span>0003</span></div><h3>An open seat</h3>
+            <dl><div><dt>How it fills</dt><dd>The next job Bruce takes on gets a card here, with its own owner and its own limits.</dd></div></dl><p class="hint">Press to flip back</p></div>
+        </div>
+      </article>
+    </div>
+    <div class="flow rv" aria-label="How work moves"><span>You</span><svg viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg><span>Bruce</span><svg viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg><span>The agent who owns it</span></div>
+  </div>
+</section>
+
+<!-- THE RULES -->
+<section class="sec dark" id="rules" aria-labelledby="h-rules">
+  <div class="wrap">
+    <div class="head rv">
+      <span class="eyebrow eyebrow--dark">The rules</span>
+      <h2 class="h2" id="h-rules">Try to make him break one</h2>
+      <p class="lede">Pick something he should not do. He has three levels of freedom, and you will see which one you hit.</p>
+    </div>
+    <div class="rules rv">
+      <div class="try" id="try" role="group" aria-label="Things to ask him"></div>
+      <div class="verdict" id="verdict" aria-live="polite"></div>
+    </div>
+    <div class="legend rv">
+      <div><span class="tier tier--do">Does it, then tells you</span><p>Looks things up, answers, builds in staging, replies to whoever asked for a file or link, passes a message to Utsav.</p></div>
+      <div><span class="tier tier--ask">Asks first</span><p>Any message to anyone on Utsav’s behalf, any post in a channel. He shows the exact text and waits for send.</p></div>
+      <div><span class="tier tier--never">Never</span><p>Merges, releases, review decisions, settings, secrets, and deleting anything for a teammate.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- VOICE -->
+<section class="sec" id="voice" aria-labelledby="h-voice">
+  <div class="wrap">
+    <div class="head rv">
+      <span class="eyebrow">His voice</span>
+      <h2 class="h2" id="h-voice">Crisp, dry, smart and honest</h2>
+    </div>
+    <div class="vt rv" id="vt" role="tablist" aria-label="Voice traits"></div>
+    <div class="quote" id="quote" aria-live="polite"><q></q><p></p></div>
+    <div class="never rv"><b>He never says</b><span>Happy to help</span><span>Great question</span><span>Absolutely</span><span>As an AI</span><span>Exclamation marks</span><span>Emoji</span><span>Sign-offs</span></div>
+  </div>
+</section>
+
+<!-- CLOSE -->
+<section class="close" aria-labelledby="h-close">
+  <div class="wrap">
+    <h2 id="h-close">Say hello</h2>
+    <p>He answers in the thread you asked in, and he tells you what he did.</p>
+    <div class="ctas"><a class="btn btn--white" href="https://gushwork.slack.com">Message Bruce <svg viewBox="0 0 256 256" aria-hidden="true"><path d="M204,64V168a12,12,0,0,1-24,0V93L72.49,200.49a12,12,0,0,1-17-17L163,76H88a12,12,0,0,1,0-24H192A12,12,0,0,1,204,64Z"/></svg></a><a class="btn btn--outw" href="#ask">Try the desk</a></div>
+  </div>
+  <div class="close-m" aria-hidden="true"><img src="assets/bruce-cutout.png" alt=""></div>
+</section>
+</main>
+
+<footer><div class="wrap"><img src="/assets/logo/gushwork-logo-white.svg" alt="Gushwork"><span>Bruce is built on the Gushwork design system.</span></div></footer>
+
+<script>
+(function () {
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return [].slice.call((r || document).querySelectorAll(s)); };
+  var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  var sleep = function (ms) { return new Promise(function (r) { setTimeout(r, reduce ? 0 : ms); }); };
+
+  /* marquee */
+  var words = ['Brand files', 'Landing pages', 'One-pagers', 'Decks', 'Which template', 'Pass-ons', 'Reworks', 'System checks', 'Morning digest', 'Access notices', 'Status updates', 'An honest log'];
+  var mt = $('#marq'), once = words.map(function (w) { return '<span>' + w + '</span>'; }).join('');
+  mt.innerHTML = once + once;
+
+  /* reveal on scroll */
+  if ('IntersectionObserver' in window) {
+    var ro = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); ro.unobserve(e.target); } }); }, { threshold: .12 });
+    $$('.rv').forEach(function (n) { ro.observe(n); });
+  } else { $$('.rv').forEach(function (n) { n.classList.add('in'); }); }
+
+  /* hero: speech bubble, tilt toward the pointer, chips drift */
+  var lines = ['Here it is, white on transparent.', 'Done, it’s live. Swap the placeholder first.', 'Passed on. Slack confirmed it.', 'I can’t from here. Here’s what I can do.'], li = 0, bub = $('#bubble');
+  if (!reduce) setInterval(function () { bub.classList.add('out'); setTimeout(function () { li = (li + 1) % lines.length; $('span', bub).textContent = lines[li]; bub.classList.remove('out'); }, 320); }, 3600);
+  var hero = $('#hero'), tilt = $('#tilt'), chips = $$('.fc'), raf = 0, nx = 0, ny = 0;
+  if (!reduce && matchMedia('(pointer: fine)').matches) {
+    hero.addEventListener('pointermove', function (e) {
+      var r = hero.getBoundingClientRect(); nx = (e.clientX - r.left) / r.width * 2 - 1; ny = (e.clientY - r.top) / r.height * 2 - 1;
+      if (!raf) raf = requestAnimationFrame(function () {
+        raf = 0; tilt.style.transform = 'rotate(' + (nx * 2.2).toFixed(2) + 'deg) translateX(' + (nx * 10).toFixed(1) + 'px)';
+        chips.forEach(function (c) { var d = +c.dataset.d; c.style.transform = 'translate(' + (nx * d * -1).toFixed(1) + 'px,' + (ny * d * -.6).toFixed(1) + 'px)'; });
+      });
+    });
+    hero.addEventListener('pointerleave', function () { tilt.style.transform = ''; chips.forEach(function (c) { c.style.transform = ''; }); });
+  }
+
+  /* ---------- the desk ---------- */
+  var SK = [
+    { tag: 'Brand files', ask: 'Send me the logo, white, svg.', rep: [{ t: 'Here it is, white on transparent. The symbol on its own is a separate file if you need it.', f: 'gushwork-logo-white.svg' }], get: 'The logo in any colour and format, the colours, the fonts and the tokens. He answers himself, with no build behind it.' },
+    { tag: 'A page, built', ask: 'One-pager for sales. Audience: ops leads at plumbing firms. Offer: a free audit.', rep: [{ t: 'On it, give me a few minutes.' }, { t: 'Done, it’s live. The hero copy is a placeholder, so swap it before anyone important sees it.', f: 'staging link + screenshots', w: 1400 }], get: 'A link and a screenshot of a page on the design system, never a PR to merge. If the brief is missing something he asks one question first. Three builds a day each.' },
+    { tag: 'Which template', ask: 'Which template do I use for a webinar page?', rep: [{ t: 'The ad page with the form-first hero. Start from that template and use the prompt below to fill it.', f: 'template + prompt' }], get: 'The template to start from and the prompt to use with it in Claude. He looks it up in the repo, he does not guess.' },
+    { tag: 'Pass it on', ask: 'Tell Utsav the pricing page is live.', rep: [{ t: 'Passed on. Slack confirmed it, with your name and a link to this thread.' }], get: 'A real DM to Utsav with your name, your message and a link back to the thread. He says “passed on” only after Slack confirms. If it fails, he says so.' },
+    { tag: 'Status', ask: 'Status of this?', rep: [{ t: 'Live. The publish finished, and the page matches what you approved.' }], get: 'He checks the real state, the PRs, the publish and the site, and reports it. If he cannot tell what “this” is, he asks one short question.' },
+    { tag: 'What he did', ask: 'Whom did you message today?', rep: [{ t: 'Two people. Priya got the staging link at 17:42 and you got the test DM at 18:10. That is from my own log, so I cannot vouch for anything outside it.' }], get: 'Every message he reports sending, who got it, and what he cannot see. When Utsav asks he tells him all of it, including what he got wrong.' }
+  ];
+  var feed = $('#feed'), input = $('#msg'), send = $('#send'), form = $('#compose'), pill = $('#pill'), note = $('#note'), getBox = $('#get'), plist = $('#prompts');
+  var history = [], run = 0, busy = false, live = false;
+  plist.innerHTML = SK.map(function (s, i) { return '<button class="pg-p" type="button" data-i="' + i + '" aria-pressed="false"><b>' + s.tag + '</b><span>' + esc(s.ask.length > 46 ? s.ask.slice(0, 44) + '…' : s.ask) + '</span></button>'; }).join('');
+  function msg(who, text, file) {
+    var d = document.createElement('div'); d.className = 'm';
+    d.innerHTML = (who === 'Bruce' ? '<span class="av" role="img" aria-label="Bruce"></span>' : '<span class="ph">' + esc(who[0]) + '</span>') +
+      '<div><div class="n">' + esc(who) + (who === 'Bruce' ? ' <span class="tag">APP</span>' : '') + '</div><p>' + esc(text) + '</p>' + (file ? '<span class="file">' + esc(file) + '</span>' : '') + '</div>';
+    feed.appendChild(d); feed.scrollTop = feed.scrollHeight; return d;
+  }
+  function typing() { var d = document.createElement('div'); d.className = 'm'; d.innerHTML = '<span class="av" role="img" aria-label="Bruce"></span><div><div class="n">Bruce <span class="tag">APP</span></div><span class="typing" aria-label="Bruce is typing"><b></b><b></b><b></b></span></div>'; feed.appendChild(d); feed.scrollTop = feed.scrollHeight; return d; }
+  function setBusy(b) { busy = b; send.disabled = b; input.disabled = b; if (!b && matchMedia('(pointer: fine)').matches) input.focus({ preventScroll: true }); }
+  function setGet(t) { $('p', getBox).textContent = t; }
+  function mark(i) { $$('.pg-p', plist).forEach(function (b) { b.setAttribute('aria-pressed', String(+b.dataset.i === i)); }); }
+  function setLive(on) { live = on; pill.textContent = on ? 'Live' : 'Sketch'; pill.classList.toggle('pill--live', on); }
+
+  async function playSketch(i) {
+    if (busy) return; var s = SK[i], my = ++run; setBusy(true); mark(i); setGet(s.get);
+    for (var k = 0; k <= s.ask.length && !reduce; k++) { if (my !== run) return; input.value = s.ask.slice(0, k); await sleep(16); }
+    input.value = ''; if (my !== run) return;
+    msg('You', s.ask); history.push({ role: 'user', content: s.ask });
+    for (var j = 0; j < s.rep.length; j++) {
+      var t = typing(); await sleep(s.rep[j].w || 800); t.remove(); if (my !== run) return;
+      msg('Bruce', s.rep[j].t, s.rep[j].f); history.push({ role: 'assistant', content: s.rep[j].t });
+    }
+    setBusy(false);
+  }
+  plist.addEventListener('click', function (e) { var b = e.target.closest('.pg-p'); if (b) playSketch(+b.dataset.i); });
+
+  async function ask(text) {
+    run++; mark(-1); setBusy(true); msg('You', text); history.push({ role: 'user', content: text });
+    var t = typing(), out, ok = false;
+    try {
+      var r = await fetch('/api/bruce-chat', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ messages: history.slice(-12) }) });
+      var j = {}; try { j = await r.json(); } catch (_) {}
+      if (r.ok && j.answer) { out = j.answer; ok = true; setLive(true); if (j.cap && j.used) note.textContent = 'Live. ' + j.used + ' of ' + j.cap + ' messages today. In words only: building, sending and checking happen in Slack.'; }
+      else if (!j.error) out = 'The live chat is not switched on here yet. The sketches on the left still work, and in Slack I answer for real.';
+      else out = j.error || 'I could not answer that just now. Try me in Slack.';
+    } catch (_) { out = 'The live chat is not switched on here yet. The sketches on the left still work, and in Slack I answer for real.'; }
+    await sleep(ok ? 150 : 500); t.remove(); msg('Bruce', out); if (ok) history.push({ role: 'assistant', content: out }); else history.pop();
+    setBusy(false);
+  }
+  form.addEventListener('submit', function (e) { e.preventDefault(); var v = input.value.trim(); if (!v || busy) return; input.value = ''; ask(v); });
+  if ('IntersectionObserver' in window) {
+    var po = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { po.disconnect(); playSketch(0); } }, { threshold: .4 }); po.observe(feed);
+  } else { playSketch(0); }
+
+  /* ---------- cards ---------- */
+  $$('.tc').forEach(function (c) {
+    function flip() { var on = c.classList.toggle('flip'); c.setAttribute('aria-pressed', String(on)); }
+    c.addEventListener('click', flip);
+    c.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flip(); } });
+  });
+
+  /* ---------- the rules ---------- */
+  var TRY = [
+    { a: 'Delete the case-study template', t: 'never', l: 'Never, for a teammate', r: 'Only Utsav can delete a template or change the library. I can pass that on to him, with your name on it, if you want.' },
+    { a: 'Merge Priya’s PR', t: 'never', l: 'Never', r: 'I only merge my own PRs, and only through the guard script. Priya’s needs a reviewer.' },
+    { a: 'Show me the Slack token', t: 'never', l: 'Never', r: 'No. I never print a token, to anyone, including Utsav.' },
+    { a: 'Release the plugin', t: 'never', l: 'Never', r: 'That is Utsav’s call each time. I can offer it and stop.' },
+    { a: 'Approve agent-card for me', t: 'never', l: 'Never', r: 'Review decisions are Utsav’s, on the Design System page or his Slack buttons. Not mine, and not yours to hand me.' },
+    { a: 'Post the launch note in #general', t: 'ask', l: 'Asks first', r: 'I will show you the exact text and the channel, then wait for Utsav’s send. An edit is not a yes.' },
+    { a: 'Send me the colours', t: 'do', l: 'Does it, then tells you', r: 'Here they are, from the tokens. The brand blue is the one to reach for first.' }
+  ];
+  var tryBox = $('#try'), ver = $('#verdict');
+  tryBox.innerHTML = TRY.map(function (x, i) { return '<button type="button" data-i="' + i + '" aria-pressed="false">' + esc(x.a) + '</button>'; }).join('');
+  function showTry(i) {
+    var x = TRY[i]; $$('button', tryBox).forEach(function (b, k) { b.setAttribute('aria-pressed', String(k === i)); });
+    ver.innerHTML = '<div class="m"><span class="ph">Y</span><div><div class="n">You</div><p>' + esc(x.a) + '</p></div></div>' +
+      '<div class="m"><span class="av" role="img" aria-label="Bruce"></span><div><div class="n">Bruce <span class="tag">APP</span></div><p>' + esc(x.r) + '</p></div></div>' +
+      '<span class="tier tier--' + x.t + '">' + esc(x.l) + '</span>';
+  }
+  tryBox.addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) showTry(+b.dataset.i); });
+  showTry(0);
+
+  /* ---------- voice ---------- */
+  var V = [
+    { n: 'Crisp', q: 'Done, it’s live: the link. The hero copy is a placeholder, so swap it before anyone important sees it.', r: 'One plain sentence with the answer. Then at most three short bullets, only if they earn their place.' },
+    { n: 'Dry', q: 'I can’t reach the live site from here, so this is from the repo. Main says 2.0.0; if the site disagrees, the publish is the suspect.', r: 'At most one line of wit a message, after the answer, about the work and never the person. Understatement beats a punchline.' },
+    { n: 'Smart', q: 'Two things are off, the rest is healthy. The health test has been broken since this morning, and I can fix it. Want the full list?', r: 'When asked to pick, he picks and says why in half a line, and adds the one thing you did not ask but should know.' },
+    { n: 'Honest', q: 'The earlier answer was wrong: I couldn’t list other DMs, so I said only you. I checked directly and there was more.', r: 'He admits a mistake in one line, fixes it and moves on. He says “I can’t from here” plainly, then says what he can do.' }
+  ];
+  var vt = $('#vt'), qb = $('#quote');
+  vt.innerHTML = V.map(function (v, i) { return '<button type="button" role="tab" aria-selected="' + (i === 0) + '" data-i="' + i + '">' + v.n + '</button>'; }).join('');
+  function showV(i, first) {
+    $$('button', vt).forEach(function (b, k) { b.setAttribute('aria-selected', String(k === i)); });
+    function set() { $('q', qb).textContent = V[i].q; $('p', qb).textContent = V[i].r; qb.classList.remove('out'); }
+    if (first || reduce) set(); else { qb.classList.add('out'); setTimeout(set, 320); }
+  }
+  vt.addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) showV(+b.dataset.i); });
+  showV(0, true);
+})();
+</script>
+</body>
+</html>
