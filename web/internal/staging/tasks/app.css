@@ -106,3 +106,7 @@ html, body { margin: 0; overflow: hidden; }
   .gd .gd-filterpop { grid-template-columns: 120px minmax(0, 1fr); }
   .tk-tltools .gd-gantt__legend { display: none; }
 }
+
+/* the one-line note above an empty board: text on the left, the settings button on the right */
+.tk-intro { display: flex; align-items: center; justify-content: space-between; gap: var(--gd-gap); margin-bottom: var(--gd-gap); }
+.tk-intro .gd-banner__body { flex: 1; min-width: 0; }
