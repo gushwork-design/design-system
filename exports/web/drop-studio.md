@@ -5,7 +5,7 @@ The page was drawn first as wireframes (Version C chosen by Utsav on 8 Oct 2026,
 Unsplash and unDraw). Nothing here is measured from a Figma file; sizes are tokens and the builder's choice. Until
 `drop-agent-card` or `drop-stepper` passes in Design System → Review, any page that uses it must say it is unreviewed.
 
-The page has no template. It is owner-only while it is staged.
+The page has no template. It is open to everyone in the organisation while it is staged (an `internal` rule, from 9 Oct 2026). Anyone signed in can browse, download, make a picture request and answer ChatGPT's question; accepting, changing or discarding a picture is the owner's alone, checked by the API.
 
 ## What the page reuses (and so does not register)
 

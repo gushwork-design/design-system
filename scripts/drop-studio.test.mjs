@@ -104,7 +104,8 @@ function pretend() {
   return g;
 }
 const owner = COOKIE + '=' + await sign({ email: 'utsav.singh@gushwork.ai', exp: Math.floor(Date.now() / 1000) + 600 }, 'test-secret');
-const other = COOKIE + '=' + await sign({ email: 'someone@gushwork.ai', exp: Math.floor(Date.now() / 1000) + 600 }, 'test-secret');
+const teammate = COOKIE + '=' + await sign({ email: 'someone@gushwork.ai', exp: Math.floor(Date.now() / 1000) + 600 }, 'test-secret');
+const other = COOKIE + '=' + await sign({ email: 'someone@example.com', exp: Math.floor(Date.now() / 1000) + 600 }, 'test-secret');
 async function call(method, op, { cookie = owner, body, query = {} } = {}) {
   const out = { status: 0, headers: {}, body: null };
   const res = {
@@ -128,6 +129,8 @@ process.env.DROP_REFERENCE_TOKEN = 'tok'; process.env.DROP_REFERENCE_REPO = 'o/r
 let g = pretend();
 r = await call('GET', 'state', { cookie: other });
 t('a signed-in account the gate does not let in is refused', r.status, 403);
+r = await call('GET', 'state', { cookie: teammate });
+t('a teammate in the organisation is let in, and is not the owner', [r.status, r.body.owner], [200, false]);
 
 g.issues = [issue(3, 'quote-builder', ['image-request'], 'open'), issue(2, 'margin-guard', ['image-ready'], 'closed'), issue(1, 'cash-desk', ['needs-input'], 'open')];
 g.tree = files('masters/agent-portrait-seo.png', 'explorations/agents/margin-guard-v1.png');
@@ -191,6 +194,13 @@ r = await call('POST', 'decide', { body: { agentId: 'nobody', action: 'accept' }
 t('an agent with nothing waiting is a 409', r.status, 409);
 r = await call('POST', 'decide', { body: { agentId: 'Quote Builder', action: 'accept' } });
 t('a bad id is a 400', r.status, 400);
+
+g = pretend();
+r = await call('POST', 'create', { cookie: teammate, body: { ...ok, name: 'Rate Checker' } });
+t('a teammate can make a request', [r.status, r.body.agentId], [200, 'rate-checker']);
+g.issues[0].labels = [{ name: 'image-ready' }]; g.issues[0].state = 'closed'; g.tree = files('explorations/agents/rate-checker-v1.png');
+r = await call('POST', 'decide', { cookie: teammate, body: { agentId: 'rate-checker', action: 'accept' } });
+t('a teammate cannot accept, change or discard a picture', [r.status, g.puts.length], [403, 0]);
 
 g = pretend(); g.fail = 403;
 r = await call('GET', 'state');
