@@ -172,8 +172,9 @@
     "ai-agents": {
       "reviewed": "passed",
       "reviewedBy": "utsav-gushwork",
-      "reviewedOn": "2026-09-24",
-      "fingerprint": "3e6cc593af555197"
+      "reviewedOn": "2026-10-08",
+      "fingerprint": "3e6cc593af555197",
+      "previewFingerprint": "d3150b75381ad2e9"
     },
     "comparison-table": {
       "reviewed": "passed",
