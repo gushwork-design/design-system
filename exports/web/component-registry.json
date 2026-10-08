@@ -338,6 +338,24 @@
       "breaking": false,
       "doc": "ad-page-comparison.md"
     },
+    "steps-card": {
+      "version": "2.0.6",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "ad-page-comparison.md"
+    },
+    "rating-breakdown": {
+      "version": "2.0.6",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "ad-page-comparison.md"
+    },
+    "review-grid": {
+      "version": "2.0.6",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "ad-page-comparison.md"
+    },
     "rating-stars": {
       "version": "2.0.6",
       "changed": "2026-10-08",
