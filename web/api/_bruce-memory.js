@@ -29,6 +29,13 @@
    the owner (GET ?sent=1, owner token only). It is the run's own report, not an interception of Slack: a send that is
    not reported is not logged, so the prompt makes the report part of the send.
 
+   CONVERSATIONS (Utsav, 8 Oct 2026: "i want to track all conversations of people with Bruce, to understand what people
+   are using it for, how they communicate, how I can improve Bruce"). The Analytics Bruce tab is now a list of
+   conversations, one per person like a DM list, latest first. Every ask is tagged with a TOPIC when it is logged
+   (topicOf, plain rules, no model), so the tab can say what people use Bruce for and which asks fell in no lane. A click
+   opens a drawer: the whole DM read live from Slack (readDM, owner only, nothing stored) beside the log's own turns.
+   The privacy line is unchanged: what Bruce ANSWERED still lives only in Slack.
+
    THE CAP. Everyone may DM Bruce (Utsav: "let's open it for all people"), every run spends his account, so each person
    other than him gets BRUCE_DAILY_CAP runs a day (default 3, his call). The count is per person per day, kept here too.
    ========================================================================= */
@@ -126,6 +133,25 @@ export async function slackName(token, user, f = fetch) {
   return name || user;
 }
 
+/* What an ask is about, from its words. First rule wins, so the order matters. Plain rules on purpose: it has to be
+   free, instant and explainable, and "other" is useful on its own, it is the list of asks Bruce has no lane for. */
+export const TOPICS = ['pass-on', 'status', 'access', 'brand', 'build', 'template', 'hub', 'about', 'other'];
+const TOPIC_RULES = [
+  ['pass-on', /\b(tell|ask|let|inform|message|ping|dm|notify|remind)\b.{0,30}\butsav\b|\bpass(ed)?\s+(it\s+|that\s+)?on\b|\b(say|said|says)\s+hi\b|\bproof\b.{0,24}\b(send|sent|sending)\b/i],
+  ['status', /\b(status|progress|any update|an update|done yet|is it (live|done|ready|merged|published)|live yet|ready yet|published|merged|deployed)\b|^\W*(and|so|well|any|done|status)\W*$/i],
+  ['access', /\b(access|permission|permissions|can'?t open|cannot open|sign ?in|log ?in|invite|let me in)\b/i],
+  ['brand', /\b(logos?|colou?rs?|palette|fonts?|typefaces?|tokens?|brand|svg|png|jpe?g|favicon|assets?|download)\b/i],
+  ['build', /\b(build|make|create|design|draft|mock ?up)\b|\b(one-?pagers?|landing|lander|pages?|deck|slides?|banner|poster|flyer|email|newsletter)\b/i],
+  ['template', /\b(templates?|tools?|library|components?|prompt|which|where do i|how do i|how to)\b/i],
+  ['hub', /\b(rework|checks?|drift|tests?|release|merge|delete|remove|rename|staging|hub|review|approve|approval)\b/i],
+  ['about', /\b(who are you|what (can|do|are) you|how do you|help|hello|hi|hey|thanks?|thank you)\b/i],
+];
+export function topicOf(text) {
+  const t = String(text || '').trim();
+  for (const [name, re] of TOPIC_RULES) if (re.test(t)) return name;
+  return 'other';
+}
+
 /* One row per turn Bruce was asked for. `kind`: run (a Bruce run started), capped (refused at the daily cap),
    to-alfred (a reply passed to Alfred's thread), failed (the trigger did not fire), sent (a message Bruce reported sending
    to `to`; `user` is who the run was for). Never throws. */
@@ -133,6 +159,7 @@ export async function logRun(row, f = fetch) {
   const cfg = store(); if (!cfg) return false;
   const r = { at: new Date().toISOString(), user: String(row.user || ''), name: String(row.name || row.user || ''), role: row.role === 'owner' ? 'owner' : 'teammate',
     kind: String(row.kind || 'run'), thread: row.thread ? 1 : 0, text: String(row.text || '').replace(/\s+/g, ' ').trim().slice(0, 200), used: Number(row.used) || 0 };
+  if (r.kind !== 'sent') r.topic = TOPICS.includes(row.topic) ? row.topic : topicOf(r.text);
   if (UID.test(String(row.to || '')) || CH.test(String(row.to || ''))) { r.to = String(row.to); r.toName = String(row.toName || row.to).replace(/\s+/g, ' ').trim().slice(0, 80); }
   if (CH.test(String(row.ch || ''))) r.ch = String(row.ch);
   if (TS.test(String(row.ts || ''))) r.ts = String(row.ts);
@@ -223,6 +250,66 @@ export async function readConversation({ token, user, ch, ts, at }, f = fetch) {
   return { ok: true, channel, ts: root, person, messages };
 }
 
+/* Links and files, kept as data (Utsav, 8 Oct 2026: "keep links and files shared there too"). Links come from Slack's own
+   <url|label> markup before plain() flattens it; files carry the Slack permalink, which opens for anyone in the workspace. */
+const LINK_RE = /<(https?:\/\/[^>|\s]+)(?:\|([^>]*))?>/g;
+export function linksOf(raw) {
+  const out = [], seen = new Set();
+  String(raw || '').replace(LINK_RE, (m, url, label) => {
+    const u = url.replace(/&amp;/g, '&');
+    if (!seen.has(u) && out.length < 10) { seen.add(u); out.push({ url: u, label: label ? plain(label) : '' }); }
+    return m;
+  });
+  return out;
+}
+export function fileOf(x) {
+  return { name: String(x.name || x.title || 'file').slice(0, 120), type: String(x.filetype || x.pretty_type || '').slice(0, 20),
+    url: /^https:\/\//.test(String(x.permalink || '')) ? String(x.permalink) : '', size: Number(x.size) || 0 };
+}
+
+/**
+ * The whole DM with one person, newest messages last: { ok: true, channel, person, messages: [{ from, name, text, at, thread,
+ * reply, links: [{ url, label }], files: [{ name, type, url, size }] }], truncated } or { ok: false, reason, detail }. Read live from Slack with the bot token for the owner's drawer
+ * and kept nowhere. History is paged (3 pages of 200 at most) and the newest 25 threads are opened for their replies, which keeps
+ * a long conversation inside Slack's rate limits. `truncated` says the older end was cut off.
+ */
+export async function readDM({ token, user, ch }, f = fetch) {
+  if (!token) return { ok: false, reason: 'slack', detail: 'The Slack app is not connected to the site.' };
+  if (!UID.test(String(user || ''))) return { ok: false, reason: 'input', detail: 'No person.' };
+  let channel = CH.test(String(ch || '')) ? String(ch) : '';
+  if (!channel) {
+    const o = await slackForm(token, 'conversations.open', { users: user }, f);
+    if (!o.ok) return failure(o, 'open the DM');
+    channel = o.channel && o.channel.id;
+  }
+  const top = []; let cursor = '', pages = 0;
+  do {
+    const h = await slackForm(token, 'conversations.history', { channel, limit: '200', ...(cursor ? { cursor } : {}) }, f);
+    if (!h.ok) return failure(h, 'read the DM');
+    top.push(...(h.messages || []));
+    cursor = (h.has_more && h.response_metadata && h.response_metadata.next_cursor) || '';
+    pages++;
+  } while (cursor && pages < 3);
+  const all = new Map(); top.forEach((m) => all.set(m.ts, m));
+  const parents = top.filter((m) => Number(m.reply_count) > 0 && (!m.thread_ts || m.thread_ts === m.ts)).slice(0, 25);
+  for (const p of parents) {
+    const r = await slackForm(token, 'conversations.replies', { channel, ts: p.ts, limit: '100' }, f);
+    if (r.ok) (r.messages || []).forEach((m) => { if (!all.has(m.ts)) all.set(m.ts, m); });   /* the parent is in both; keep the history copy */
+  }
+  const person = await slackName(token, user, f);
+  const messages = [...all.values()].sort((a, b) => Number(a.ts) - Number(b.ts)).map((m) => ({
+    from: m.user === user ? 'person' : 'bruce',
+    name: m.user === user ? person : 'Bruce',
+    text: plain(m.text),
+    at: Math.round(Number(m.ts) * 1000),
+    thread: m.thread_ts && m.thread_ts !== m.ts ? m.thread_ts : (Number(m.reply_count) > 0 ? m.ts : ''),
+    reply: !!(m.thread_ts && m.thread_ts !== m.ts),
+    links: linksOf(m.text),
+    files: (m.files || []).slice(0, 6).map(fileOf),
+  })).filter((m) => m.text || m.files.length);
+  return { ok: true, channel, person, messages: messages.slice(-400), truncated: !!cursor || messages.length > 400 };
+}
+
 /* ---- the endpoint: GET reads the caller's notes, POST { notes: [...] } adds to them. Bearer = the per-run token. ---- */
 export default async function handler(req, res) {
   // ?log=1: the owner's view of every Bruce turn, for /admin/analytics#bruce. Session cookie, owner only, like the usage log.
@@ -233,6 +320,7 @@ export default async function handler(req, res) {
     try {
       const rows = await readLog();
       if (rows === null) return res.status(200).json({ configured: false, rows: [] });
+      for (const r of rows) if (r.kind !== 'sent' && !r.topic) r.topic = topicOf(r.text);   /* rows logged before topics existed */
       return res.status(200).json({ configured: true, rows, owner: String(process.env.OWNER_SLACK_ID || ''), cap: dailyCap() });
     } catch { return res.status(502).json({ error: 'Could not read the log.' }); }
   }
@@ -245,6 +333,17 @@ export default async function handler(req, res) {
     try {
       const q = req.query;
       return res.status(200).json(await readConversation({ token: process.env.SLACK_BOT_TOKEN, user: String(q.user || ''), ch: String(q.ch || ''), ts: String(q.ts || ''), at: Number(q.at) || 0 }));
+    } catch { return res.status(502).json({ ok: false, reason: 'slack', detail: 'Could not reach Slack.' }); }
+  }
+  // ?dm=1&user=U…[&ch=D…]: the owner reads one person's whole DM, live from Slack, for the Analytics drawer. Nothing is kept.
+  if (req.method === 'GET' && req.query && req.query.dm) {
+    const session = await verify(readCookie(req.headers.cookie, COOKIE), sessionSecret());
+    if (!session || !session.email) return res.status(401).json({ error: 'Not signed in.' });
+    if (!isOwner(session.email)) return res.status(403).json({ error: 'Owners only.' });
+    res.setHeader('Cache-Control', 'no-store, private');
+    try {
+      const q = req.query;
+      return res.status(200).json(await readDM({ token: process.env.SLACK_BOT_TOKEN, user: String(q.user || ''), ch: String(q.ch || '') }));
     } catch { return res.status(502).json({ ok: false, reason: 'slack', detail: 'Could not reach Slack.' }); }
   }
   const token = String(req.headers.authorization || '').replace(/^Bearer\s+/i, '');

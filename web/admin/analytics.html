@@ -330,6 +330,78 @@ body[data-gw-page="analytics"] .sg__main > * { min-width: 0; }
 .br-msg--bruce .br-msg__t { background: var(--ul-tabs-bg); color: var(--ul-value); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }   /* the edge, because the fill equals the dialog in dark */
 .br-msg--person .br-msg__t { background: var(--ul-tab-on-bg); color: var(--ul-tab-on-fg); }
 .br-msg__f { font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+/* Bruce conversations (8 Oct 2026): a DM-style list, one row per person, latest first; a click opens a drawer. */
+.br-m4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 900px) { .br-m4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .br-m4 { grid-template-columns: minmax(0, 1fr); } }
+.br-cl { list-style: none; margin: 0; padding: 0 var(--gw-space-4); display: flex; flex-direction: column; }
+.br-ci { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: var(--gw-space-12); align-items: center; width: 100%; text-align: left;
+  padding: var(--gw-space-12) var(--gw-space-8); border: 0; border-radius: var(--gw-radius-8); background: none; cursor: pointer; color: inherit;
+  box-shadow: inset 0 -1px 0 var(--ul-row-line); transition: background var(--gw-motion-fast); }
+.br-ci:hover { background: var(--ul-row-hover); }
+.br-ci:focus-visible, .br-ub:focus-visible, .br-lk:focus-visible { outline: 2px solid var(--gw-color-primary-500); outline-offset: -2px; }
+.br-av { width: 40px; height: 40px; border-radius: var(--gw-radius-10); background: var(--ul-circle); color: var(--ul-value); display: grid; place-items: center; font: var(--gw-text-body-14-sem); flex: none; }
+.br-av--lg { width: 48px; height: 48px; border-radius: var(--gw-radius-12); }
+.br-ci__top { display: flex; align-items: center; gap: var(--gw-space-8); min-width: 0; }
+.br-ci__top b { font: var(--gw-text-body-14-sem); color: var(--ul-value); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.br-ci__last { display: block; font: var(--gw-text-body-14-reg); color: var(--ul-cell); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 2px; }
+.br-ci__tags { display: flex; gap: var(--gw-space-4); margin-top: var(--gw-space-8); flex-wrap: wrap; }
+.br-ci__meta { display: flex; flex-direction: column; gap: var(--gw-space-4); align-items: flex-end; font: var(--gw-text-body-12-med); color: var(--ul-sub); white-space: nowrap; }
+.br-tag { display: inline-flex; align-items: center; height: 20px; padding: 0 var(--gw-space-8); border-radius: var(--gw-radius-4); background: var(--ul-b-no-bg); color: var(--ul-b-no-fg); font: var(--gw-text-body-12-med); white-space: nowrap; }
+.br-tag--gap { background: var(--gw-color-yellow-alpha-10); color: var(--gw-color-yellow-600); }
+.br-use { display: flex; flex-direction: column; gap: var(--gw-space-4); padding: 0 var(--gw-space-4) var(--gw-space-8); }
+.br-ub { display: grid; grid-template-columns: 160px minmax(0, 1fr) 44px; gap: var(--gw-space-4) var(--gw-space-12); align-items: center; width: 100%; border: 0; background: none; border-radius: var(--gw-radius-8);
+  padding: var(--gw-space-8) var(--gw-space-8); cursor: pointer; text-align: left; color: inherit; transition: background var(--gw-motion-fast); }
+.br-ub:hover { background: var(--ul-row-hover); }
+.br-ub[aria-pressed="true"] { background: var(--ul-tabs-bg); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }
+.br-ub__l { font: var(--gw-text-body-14-med); color: var(--ul-value); }
+.br-ub__bar { height: 8px; border-radius: var(--gw-radius-4); background: var(--ul-track); overflow: hidden; }
+.br-ub__bar i { display: block; height: 100%; border-radius: var(--gw-radius-4); background: var(--gw-color-primary-500); }
+.br-ub[data-t="other"] .br-ub__bar i { background: var(--gw-color-yellow-500); }
+.br-ub__n { font: var(--gw-text-body-14-med); color: var(--ul-sub); text-align: right; }
+.br-ub__ex { grid-column: 2 / 4; font: var(--gw-text-body-12-reg); color: var(--ul-sub); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 600px) { .br-ub { grid-template-columns: 110px minmax(0, 1fr) 32px; } }
+.br-lks { padding: 0 var(--gw-space-4) var(--gw-space-8); display: flex; flex-direction: column; }
+.br-lk { display: grid; grid-template-columns: 120px 140px auto minmax(0, 1fr); gap: var(--gw-space-12); align-items: center; width: 100%; text-align: left; border: 0; background: none; cursor: pointer; color: inherit;
+  padding: var(--gw-space-12) var(--gw-space-8); border-radius: var(--gw-radius-8); box-shadow: inset 0 -1px 0 var(--ul-row-line); transition: background var(--gw-motion-fast); }
+.br-lk:hover { background: var(--ul-row-hover); }
+.br-lk > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--gw-text-body-14-reg); color: var(--ul-cell); }
+.br-lk > span:nth-child(2) { color: var(--ul-value); font-weight: 500; }
+@media (max-width: 760px) { .br-lk { grid-template-columns: minmax(0, 1fr) auto; } .br-lk > span:nth-child(1), .br-lk > span:nth-child(2) { grid-column: 1 / -1; } }
+.br-note { padding: 0 var(--gw-space-8); font: var(--gw-text-body-14-reg); color: var(--ul-sub); }
+.br-empty { padding: var(--gw-space-24) var(--gw-space-8); font: var(--gw-text-body-14-reg); color: var(--ul-sub); }
+/* the drawer: a dialog pinned to the right edge, so focus is trapped, Esc closes and the backdrop dims the page */
+.br-drawer { position: fixed; inset: 0 0 0 auto; margin: 0; width: min(580px, 100vw); max-width: none; height: 100dvh; max-height: none; padding: 0; border: 0; border-radius: var(--gw-radius-16) 0 0 var(--gw-radius-16);
+  background: var(--ul-field-bg); color: var(--ul-value); box-shadow: inset 0 0 0 1px var(--ul-hdr-line), var(--gw-shadow-s4); display: none; flex-direction: column; }
+.br-drawer[open] { display: flex; animation: br-slide 320ms ease-out; }
+.br-drawer::backdrop { background: rgba(0, 0, 0, 0.4); }
+@keyframes br-slide { from { transform: translateX(24px); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .br-drawer[open] { animation: none; } }
+@media (max-width: 600px) { .br-drawer { border-radius: 0; } }
+.br-dh { display: flex; gap: var(--gw-space-12); align-items: center; padding: var(--gw-space-20) var(--gw-space-16) var(--gw-space-12) var(--gw-space-24); }
+.br-dh h2 { margin: 0; font: var(--gw-text-body-18-sem); color: var(--ul-value); display: flex; gap: var(--gw-space-8); align-items: center; }
+.br-dh p { margin: 2px 0 0; font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
+.br-dh .ul-dlg__x { margin-left: auto; }
+.br-dtags { display: flex; flex-wrap: wrap; gap: var(--gw-space-4); padding: 0 var(--gw-space-24) var(--gw-space-12); }
+.br-dtabs { padding: 0 var(--gw-space-24) var(--gw-space-12); }
+.br-db { flex: 1; min-height: 0; overflow-y: auto; padding: 0 var(--gw-space-24) var(--gw-space-24); border-top: 1px solid var(--ul-hdr-line); }
+.br-day { align-self: center; font: var(--gw-text-body-12-med); color: var(--ul-sub); background: var(--ul-tabs-bg); border-radius: var(--gw-radius-full); padding: 2px var(--gw-space-12); margin: var(--gw-space-8) 0; position: sticky; top: var(--gw-space-8); }
+.br-thr { font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.br-log { display: flex; flex-direction: column; padding-top: var(--gw-space-8); }
+.br-lr { display: grid; grid-template-columns: 112px auto minmax(0, 1fr); gap: var(--gw-space-12); align-items: baseline; padding: var(--gw-space-12) 0; box-shadow: inset 0 -1px 0 var(--ul-row-line); }
+.br-lr time { font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.br-lr p { margin: 0; font: var(--gw-text-body-14-reg); color: var(--ul-value); overflow-wrap: anywhere; }
+.br-lr .br-tag { margin-top: 0; }
+.br-msg__t a { color: inherit; text-decoration: underline; text-underline-offset: 2px; overflow-wrap: anywhere; }
+.br-fc { display: inline-block; margin: var(--gw-space-4) var(--gw-space-4) 0 0; padding: 2px var(--gw-space-8); border-radius: var(--gw-radius-4); background: var(--ul-b-no-bg); color: var(--ul-value); font: var(--gw-text-body-12-med); text-decoration: none; }
+a.br-fc:hover { text-decoration: underline; text-underline-offset: 2px; }
+.br-shg h3 { margin: var(--gw-space-20) 0 var(--gw-space-4); font: var(--gw-text-body-14-sem); color: var(--ul-value); }
+.br-sh { display: flex; justify-content: space-between; align-items: center; gap: var(--gw-space-12); padding: var(--gw-space-12) 0; box-shadow: inset 0 -1px 0 var(--ul-row-line); }
+.br-sh > div { min-width: 0; }
+.br-sh b { display: block; font: var(--gw-text-body-14-med); color: var(--ul-value); overflow-wrap: anywhere; }
+.br-sh small { display: block; margin-top: 2px; font: var(--gw-text-body-12-reg); color: var(--ul-sub); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.br-sh a { flex: none; font: var(--gw-text-body-14-med); color: var(--ul-value); text-decoration: underline; text-underline-offset: 2px; }
+.br-dnote { margin: var(--gw-space-12) 0 0; font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
 .ul-old { display: flex; flex-direction: column; }
 .ul-old__r { display: grid; grid-template-columns: minmax(0, 1fr) 112px 148px; align-items: center; column-gap: var(--gw-space-16); padding: var(--gw-space-12) 0; }
 .ul-old__r + .ul-old__r { border-top: 1px solid var(--ul-hdr-line); }
@@ -793,23 +865,42 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
     <div id="br-blocked" hidden></div>
 
     <div id="br-app">
-      <div class="ul-metrics" id="br-metrics"></div>
+      <div class="ul-metrics br-m4" id="br-metrics"></div>
 
-      <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="br-h-people">
-        <div class="ul-sh"><div class="ul-sh__t"><h2 id="br-h-people">People</h2><span class="ul-sh__q" id="br-q-people"></span></div></div>
-        <div class="ul-scroll vs-t" id="br-people"></div>
+      <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="br-h-conv">
+        <div class="ul-sh"><div class="ul-sh__t"><h2 id="br-h-conv">Conversations</h2><span class="ul-sh__q" id="br-q-conv"></span></div>
+          <button class="ul-link" id="br-clear" type="button" hidden>Clear filter</button></div>
+        <div id="br-convs"></div>
       </section>
 
-      <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="br-h-recent">
-        <div class="ul-sh"><div class="ul-sh__t"><h2 id="br-h-recent">Recent</h2><span class="ul-sh__q" id="br-q-recent"></span></div></div>
-        <div class="ul-scroll vs-t" id="br-recent"></div>
-        <div class="vs-more" id="br-more"></div>
+      <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="br-h-use">
+        <div class="ul-sh"><div class="ul-sh__t"><h2 id="br-h-use">What people use it for</h2><span class="ul-sh__q" id="br-q-use"></span></div></div>
+        <div class="br-use" id="br-use"></div>
       </section>
-      <dialog class="ul-dlg ul-dlg--conv" id="br-conv" aria-labelledby="br-conv-t">
-        <div class="ul-dlg__h"><h2 id="br-conv-t">Conversation</h2><span class="ul-sh__q" id="br-conv-q"></span>
-          <button type="button" class="ul-dlg__x" id="br-conv-x" aria-label="Close">&times;</button></div>
-        <div class="ul-dlg__b" id="br-conv-b"></div>
+
+      <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="br-h-talk">
+        <div class="ul-sh"><div class="ul-sh__t"><h2 id="br-h-talk">How they talk to him</h2><span class="ul-sh__q" id="br-q-talk"></span></div></div>
+        <div class="ul-metrics br-m4" id="br-talk"></div>
+      </section>
+
+      <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="br-h-look">
+        <div class="ul-sh"><div class="ul-sh__t"><h2 id="br-h-look">Worth a look</h2><span class="ul-sh__q" id="br-q-look"></span></div></div>
+        <p class="br-note">Asks he had no clear lane for, and runs that failed or hit the cap. Each one is a gap to fill or a skill to teach him.</p>
+        <div class="br-lks" id="br-look"></div>
+      </section>
+
+      <dialog class="br-drawer" id="br-drawer" aria-labelledby="br-d-t">
+        <div class="br-dh"><span class="br-av br-av--lg" id="br-d-av" aria-hidden="true"></span>
+          <div><h2 id="br-d-t">Conversation</h2><p id="br-d-sub"></p></div>
+          <button type="button" class="ul-dlg__x" id="br-d-x" aria-label="Close">&times;</button></div>
+        <div class="br-dtags" id="br-d-tags"></div>
+        <div class="br-dtabs"><div class="ul-tabs" role="tablist" aria-label="Conversation views">
+          <button class="ul-tab" role="tab" data-dt="chat" aria-selected="true">Conversation</button>
+          <button class="ul-tab" role="tab" data-dt="shared" aria-selected="false" id="br-t-shared">Shared</button>
+          <button class="ul-tab" role="tab" data-dt="log" aria-selected="false">Log</button></div></div>
+        <div class="br-db" id="br-d-b" aria-live="polite"></div>
       </dialog>
+    </div>
     </div>
 
   </section>
@@ -2339,10 +2430,10 @@ window.__anRefilter = {};
 </script>
 
 <script>
-/* Bruce. Reads /api/bruce-memory?log=1 (owner only): one row per turn Bruce was asked for in Slack. A "run" spent one
-   cloud session on Utsav's account; "capped" is an ask refused at the daily cap; "to Alfred" is a reply passed to an
-   item's thread; "failed" is a run that did not start; "sent" is a message Bruce reported sending to someone (the run's own report). People are Slack display names, not emails, so the Hide-my-
-   activity switch hides the owner's Slack id instead. */
+/* Bruce, as conversations (8 Oct 2026). Reads /api/bruce-memory?log=1 (owner only): one row per turn Bruce was asked for in Slack,
+   each tagged with a topic when it was logged. One row here is one PERSON, like a DM list, newest first. A click opens a drawer with
+   the whole DM, read live from Slack when it is opened and kept nowhere, beside the log's own turns. People are Slack display names,
+   not emails, so the Hide-my-activity switch hides the owner's Slack id instead. */
 (function () {
   'use strict';
   var ROOT = document.getElementById('an-bruce');
@@ -2361,84 +2452,211 @@ window.__anRefilter = {};
     return Math.round(h / 24) + ' days ago';
   }
   function fmtWhen(d) { return d.toLocaleString(undefined, { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }); }
+  function fmtDay(d) { return d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }); }
+  function fmtTime(d) { return d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }); }
+  function clip(t, n) { t = String(t || ''); return t.length > n ? t.slice(0, n - 1) + '…' : t; }
   var KIND = { run: 'Run', capped: 'Capped', 'to-alfred': 'To Alfred', failed: 'Failed', sent: 'Sent' };
-  var S = { status: 'loading', rows: [], rowsAll: [], period: '30', page: 1, per: 25, busy: false, fetchedAt: 0, owner: '', cap: 3 };
-  var ICON_NAV = { 'arrow-left': '<path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"/>',
-    'arrow-right': '<path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/>' };
-  function navIcon(n) { return '<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">' + ICON_NAV[n] + '</svg>'; }
+  var TOPIC = { 'pass-on': 'Pass on to Utsav', status: 'Status check', access: 'Access', brand: 'Brand files', build: 'Build a page', template: 'Templates and tools', hub: 'Hub and system', about: 'About Bruce', other: 'No clear lane' };
+  var S = { status: 'loading', rows: [], rowsAll: [], period: '30', busy: false, fetchedAt: 0, owner: '', cap: 3, topic: '', convs: [], dm: {}, seq: 0, openUser: '', tab: 'chat' };
 
   function parse(raw) {
     var out = [];
     raw.forEach(function (r) {
       var d = new Date(r.at); if (isNaN(d.getTime())) return;
-      out.push({ at: d, user: String(r.user || ''), name: String(r.name || r.user || ''), role: r.role === 'owner' ? 'owner' : 'teammate',
-        kind: KIND[r.kind] ? r.kind : 'run', thread: !!r.thread, text: String(r.text || ''), to: String(r.toName || ''), ch: String(r.ch || ''), ts: String(r.ts || '') });
+      var kind = KIND[r.kind] ? r.kind : 'run';
+      out.push({ at: d, user: String(r.user || ''), name: String(r.name || r.user || ''), role: r.role === 'owner' ? 'owner' : 'teammate', kind: kind, thread: !!r.thread,
+        text: String(r.text || ''), topic: TOPIC[r.topic] ? r.topic : (kind === 'sent' ? '' : 'other'), to: String(r.toName || ''), ch: String(r.ch || ''), ts: String(r.ts || '') });
     });
     return out;
   }
   function hideMe(rows) { return window.anMe.on && S.owner ? rows.filter(function (r) { return r.user !== S.owner; }) : rows; }
+  function isAsk(r) { return r.kind !== 'sent'; }
   function scoped() {
     var cut = S.period === 'all' ? 0 : Date.now() - (+S.period) * DAY;
     return S.rows.filter(function (r) { return r.at.getTime() >= cut; });
   }
+  function conversations(rows) {
+    var by = {};
+    rows.forEach(function (r) {
+      var c = by[r.user] || (by[r.user] = { user: r.user, name: r.name, role: r.role, asks: [], topics: {}, last: r.at, ask: null });
+      if (isAsk(r)) { c.asks.push(r); c.topics[r.topic] = (c.topics[r.topic] || 0) + 1; if (!c.ask || r.at > c.ask.at) c.ask = r; }
+      if (r.at > c.last) c.last = r.at; if (r.role === 'owner') c.role = 'owner';
+    });
+    return Object.keys(by).map(function (k) { return by[k]; }).filter(function (c) { return c.asks.length; }).sort(function (a, b) { return b.last - a.last; });
+  }
+  function topTopics(c, n) { return Object.keys(c.topics).sort(function (a, b) { return c.topics[b] - c.topics[a]; }).slice(0, n); }
   function metric(label, value, note) {
     return '<div class="ul-metric"><span class="ul-lab">' + esc(label) + '</span><div class="ul-metric__body"><span class="ul-num">' + esc(value) +
       '</span><span class="ul-note">' + esc(note) + '</span></div></div>';
   }
-  function th(t) { return '<div role="columnheader"><span class="ul-th"><span class="ul-th--plain">' + esc(t) + '</span></span></div>'; }
-  function cell(t, cls, title) { return '<div class="ul-c ' + (cls || '') + '" role="cell" title="' + esc(title || t) + '">' + esc(t) + '</div>'; }
-  function who(r) { return '<div class="ul-c ul-c--whotag" role="cell" title="' + esc(r.user) + '"><span>' + esc(r.name) + '</span>' + (r.role === 'owner' ? '<span class="ul-badge">Owner</span>' : '') + '</div>'; }
-  function kindCell(k) { var cls = k === 'capped' ? ' ul-badge--warn' : k === 'failed' ? ' ul-badge--bad' : k === 'run' ? ' ul-badge--ok' : ''; return '<div class="ul-c" role="cell"><span class="ul-badge' + cls + '">' + esc(KIND[k]) + '</span></div>'; }
-  function table(cols, heads, rows, empty) {
-    return '<div class="ul-tbl" role="table" style="--vs-cols:' + cols + '"><div class="ul-row ul-row--h" role="row">' + heads.map(th).join('') + '</div>' +
-      (rows.length ? rows.join('') : '<div class="ul-empty"><div class="ul-empty__copy"><h2>' + esc(empty) + '</h2></div></div>') + '</div>';
-  }
+  function initial(n) { return esc(String(n || '?').trim().charAt(0).toUpperCase() || '?'); }
+  function tag(t, n) { return '<span class="br-tag' + (t === 'other' ? ' br-tag--gap' : '') + '">' + esc(TOPIC[t] || t) + (n > 1 ? ' ×' + n : '') + '</span>'; }
+  function badge(k) { var cls = k === 'capped' ? ' ul-badge--warn' : k === 'failed' ? ' ul-badge--bad' : k === 'run' ? ' ul-badge--ok' : ''; return '<span class="ul-badge' + cls + '">' + esc(KIND[k]) + '</span>'; }
+  function median(a) { if (!a.length) return 0; a = a.slice().sort(function (x, y) { return x - y; }); var m = a.length >> 1; return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2; }
+  function pct(n, d) { return d ? Math.round(n / d * 100) + '%' : '—'; }
 
   function renderAll() {
-    var rows = scoped();
-    var runs = rows.filter(function (r) { return r.kind === 'run'; });
-    var capped = rows.filter(function (r) { return r.kind === 'capped'; });
-    var people = {};
-    rows.forEach(function (r) {
-      var p = people[r.user] || (people[r.user] = { user: r.user, name: r.name, role: r.role, runs: 0, capped: 0, last: r.at });
-      if (r.kind === 'run') p.runs++; if (r.kind === 'capped') p.capped++; if (r.at > p.last) p.last = r.at;
-    });
-    var plist = Object.keys(people).map(function (k) { return people[k]; }).sort(function (a, b) { return b.runs - a.runs || b.last - a.last; });
+    var rows = scoped(), asks = rows.filter(isAsk), convs = conversations(rows); S.convs = convs;
     var today = new Date().toISOString().slice(0, 10);
-    var todayRuns = S.rows.filter(function (r) { return r.kind === 'run' && r.at.toISOString().slice(0, 10) === today; }).length;
-    var lastAt = rows.length ? rows.reduce(function (m, r) { return r.at > m ? r.at : m; }, rows[0].at) : null;
+    var runs = asks.filter(function (r) { return r.kind === 'run'; }).length;
+    var follow = asks.filter(function (r) { return r.thread; }).length;
+    var tc = {}; asks.forEach(function (r) { tc[r.topic] = (tc[r.topic] || 0) + 1; });
+    var tops = Object.keys(tc).sort(function (a, b) { return tc[b] - tc[a]; });
+    var lanes = tops.filter(function (t) { return t !== 'other'; });   /* "no clear lane" is a gap, never the top use */
+    var talkedToday = convs.filter(function (c) { return c.last.toISOString().slice(0, 10) === today; }).length;
     $('br-metrics').innerHTML =
-      metric('Runs', String(runs.length), 'each one a cloud session on your account, ' + todayRuns + ' today') +
-      metric('People', String(plist.length), lastAt ? 'last ask ' + ago(Date.now() - lastAt.getTime()) : 'nobody has asked yet') +
-      metric('Hit the cap', String(capped.length), capped.length ? (function (n) { return n + (n === 1 ? ' person' : ' people'); })(Object.keys(capped.reduce(function (o, r) { o[r.user] = 1; return o; }, {})).length) + ' asked past ' + S.cap + ' a day' : 'the cap is ' + S.cap + ' a day each');
+      metric('Conversations', String(convs.length), talkedToday ? talkedToday + ' talked to him today' : (convs.length ? 'last one ' + ago(Date.now() - convs[0].last.getTime()) : 'nobody has asked yet')) +
+      metric('Asks', String(asks.length), runs + ' runs, each a cloud session on your account') +
+      metric('Follow-ups', pct(follow, asks.length), 'asked inside an existing thread') +
+      metric('Top use', lanes.length ? TOPIC[lanes[0]] : '—', lanes.length ? pct(tc[lanes[0]], asks.length) + ' of asks' : 'nothing yet');
 
-    $('br-q-people').textContent = plist.length + (plist.length === 1 ? ' person' : ' people') + ', most runs first';
-    $('br-people').innerHTML = table('minmax(200px,1.6fr) 90px 110px minmax(120px,1fr)', ['Person', 'Runs', 'Hit the cap', 'Last ask'],
-      plist.map(function (p) { return '<div class="ul-row ul-row--d" role="row">' + who(p) + cell(String(p.runs)) + cell(p.capped ? String(p.capped) : '—') + cell(ago(Date.now() - p.last.getTime()), '', p.last.toISOString()) + '</div>'; }),
-      'Nobody has asked Bruce in this period');
+    /* conversations, newest first, optionally narrowed to one topic */
+    var shown = S.topic ? convs.filter(function (c) { return c.topics[S.topic]; }) : convs;
+    $('br-q-conv').textContent = plural(shown.length, 'conversation') + ', latest first' + (S.topic ? ', about ' + TOPIC[S.topic].toLowerCase() : '');
+    $('br-clear').hidden = !S.topic;
+    $('br-convs').innerHTML = shown.length ? '<ul class="br-cl">' + shown.map(function (c) {
+      var tags = topTopics(c, 3).map(function (t) { return tag(t, c.topics[t]); }).join('');
+      return '<li><button type="button" class="br-ci" data-u="' + esc(c.user) + '" aria-label="Open the conversation with ' + esc(c.name) + '"><span class="br-av" aria-hidden="true">' + initial(c.name) + '</span>' +
+        '<span><span class="br-ci__top"><b>' + esc(c.name) + '</b>' + (c.role === 'owner' ? '<span class="ul-badge">Owner</span>' : '') + '</span>' +
+        '<span class="br-ci__last">' + (c.ask.thread ? '↳ ' : '') + esc(c.ask.text || '—') + '</span><span class="br-ci__tags">' + tags + '</span></span>' +
+        '<span class="br-ci__meta"><time datetime="' + c.last.toISOString() + '" title="' + esc(fmtWhen(c.last)) + '">' + esc(ago(Date.now() - c.last.getTime())) + '</time><span>' + esc(plural(c.asks.length, 'ask')) + '</span></span></button></li>';
+    }).join('') + '</ul>' : '<p class="br-empty">' + (S.topic ? 'Nobody asked about this in the period.' : 'Nobody has talked to Bruce in this period.') + '</p>';
 
-    var recent = rows.slice().sort(function (a, b) { return b.at - a.at; });
-    var pages = Math.max(1, Math.ceil(recent.length / S.per)); S.page = Math.min(S.page, pages);
-    $('br-q-recent').textContent = 'newest first, ' + plural(recent.length, 'turn');
-    S.recent = recent;
-    var from = (S.page - 1) * S.per;
-    $('br-recent').innerHTML = table('150px minmax(160px,1.2fr) 100px minmax(240px,3fr) 110px', ['When', 'Person', 'Kind', 'What they asked, or what he sent', 'Conversation'],
-      recent.slice(from, S.page * S.per).map(function (r, i) {
-        return '<div class="ul-row ul-row--d" role="row">' + cell(fmtWhen(r.at), '', r.at.toISOString()) + who(r) + kindCell(r.kind) +
-          cell(r.kind === 'sent' ? '\u2192 ' + (r.to || 'someone') + ': ' + (r.text || '\u2014') : (r.thread ? '\u21b3 ' : '') + (r.text || '\u2014'), '', r.text) +
-          (r.kind === 'sent' ? cell('\u2014') : '<div class="ul-c" role="cell"><button type="button" class="ul-link" data-conv="' + (from + i) + '">View</button></div>') + '</div>';
-      }), 'Nothing in this period');
-    /* The same pager as the Usage log: page count and two arrow buttons, outside the table's scroller. */
-    $('br-more').innerHTML = pages > 1 ? '<div class="ul-pg" style="width:100%"><div class="ul-pg__l"><span class="ul-pg__t">' + S.per + ' per page</span></div>' +
-      '<div class="ul-pg__r"><span class="ul-pg__t">Page ' + S.page + ' of ' + pages + '</span>' +
-      '<button class="ul-ib" id="br-prev" type="button" aria-label="Previous page"' + (S.page <= 1 ? ' disabled' : '') + '>' + navIcon('arrow-left') + '</button>' +
-      '<button class="ul-ib" id="br-next" type="button" aria-label="Next page"' + (S.page >= pages ? ' disabled' : '') + '>' + navIcon('arrow-right') + '</button></div></div>' : '';
-    var pv = $('br-prev'), nx = $('br-next');
-    if (pv) pv.addEventListener('click', function () { S.page--; renderAll(); });
-    if (nx) nx.addEventListener('click', function () { S.page++; renderAll(); });
+    /* what people use it for */
+    $('br-q-use').textContent = asks.length ? plural(asks.length, 'ask') + ' sorted by what they were about' : '';
+    var latestBy = {}; asks.slice().sort(function (a, b) { return b.at - a.at; }).forEach(function (r) { if (!latestBy[r.topic]) latestBy[r.topic] = r; });
+    $('br-use').innerHTML = tops.length ? tops.map(function (t) {
+      return '<button type="button" class="br-ub" data-t="' + t + '" aria-pressed="' + (S.topic === t) + '"><span class="br-ub__l">' + esc(TOPIC[t]) + '</span>' +
+        '<span class="br-ub__bar" aria-hidden="true"><i style="width:' + Math.max(3, Math.round(tc[t] / asks.length * 100)) + '%"></i></span><span class="br-ub__n">' + tc[t] + '</span>' +
+        '<span class="br-ub__ex">Latest: ' + esc(clip(latestBy[t].text, 110)) + '</span></button>';
+    }).join('') : '<p class="br-empty">Nothing to sort yet.</p>';
+
+    /* how they talk */
+    var words = asks.map(function (r) { return (r.text.trim().match(/\S+/g) || []).length; }).filter(function (n) { return n > 0; });
+    var qs = asks.filter(function (r) { return /\?\s*$/.test(r.text); }).length;
+    var back = convs.filter(function (c) { var days = {}; c.asks.forEach(function (r) { days[r.at.toISOString().slice(0, 10)] = 1; }); return Object.keys(days).length > 1; }).length;
+    $('br-q-talk').textContent = asks.length ? 'from the first line of each ask' : '';
+    $('br-talk').innerHTML =
+      metric('Typical ask', words.length ? Math.round(median(words)) + ' words' : '—', 'half of asks are shorter than this') +
+      metric('Asked as a question', pct(qs, asks.length), 'the rest are instructions') +
+      metric('Asks per person', convs.length ? (asks.length / convs.length).toFixed(1) : '—', 'more than one means it is being reused') +
+      metric('Came back', pct(back, convs.length), 'people who asked on more than one day');
+
+    /* worth a look */
+    var gaps = asks.filter(function (r) { return r.topic === 'other' || r.kind === 'failed' || r.kind === 'capped'; }).sort(function (a, b) { return b.at - a.at; }).slice(0, 8);
+    $('br-q-look').textContent = gaps.length ? plural(gaps.length, 'ask') + ', newest first' : '';
+    $('br-look').innerHTML = gaps.length ? gaps.map(function (r) {
+      return '<button type="button" class="br-lk" data-u="' + esc(r.user) + '"><span>' + esc(fmtWhen(r.at)) + '</span><span>' + esc(r.name) + '</span>' +
+        (r.kind === 'run' ? tag(r.topic, 0) : badge(r.kind)) + '<span>' + (r.thread ? '↳ ' : '') + esc(r.text || '—') + '</span></button>';
+    }).join('') : '<p class="br-empty">Nothing to fix. Every ask landed in a lane.</p>';
   }
+
+  /* ---------- the drawer ---------- */
+  var dlg = $('br-drawer');
+  function personRows(user) { return S.rowsAll.filter(function (r) { return r.user === user; }).sort(function (a, b) { return b.at - a.at; }); }
+  function drawerHead(c, all) {
+    var asks = all.filter(isAsk), first = all.length ? all[all.length - 1].at : c.last, tc = {};
+    asks.forEach(function (r) { tc[r.topic] = (tc[r.topic] || 0) + 1; });
+    $('br-d-av').textContent = String(c.name || '?').trim().charAt(0).toUpperCase() || '?';
+    $('br-d-t').innerHTML = esc(c.name) + (c.role === 'owner' ? ' <span class="ul-badge">Owner</span>' : '');
+    $('br-d-sub').textContent = plural(asks.length, 'ask') + ' in all · first asked ' + fmtWhen(first) + ' · last ' + ago(Date.now() - c.last.getTime());
+    $('br-d-tags').innerHTML = Object.keys(tc).sort(function (a, b) { return tc[b] - tc[a]; }).map(function (t) { return tag(t, tc[t]); }).join('');
+  }
+  function note(title, text) { return '<p class="br-empty"><b>' + esc(title) + '</b><br>' + esc(text) + '</p>'; }
+  function linkify(t) { return esc(t).replace(/(https?:\/\/[^\s<]*[^\s<.,;:!?)\]'"])/g, function (u) { return '<a href="' + u + '" target="_blank" rel="noopener noreferrer">' + u + '</a>'; }); }
+  function kb(n) { return n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB' : n >= 1024 ? Math.round(n / 1024) + ' KB' : n ? n + ' B' : ''; }
+  function fileChip(f) {
+    var label = esc(f.name) + (f.type ? ' \u00b7 ' + esc(f.type) : '');
+    return f.url && /^https:\/\//.test(f.url) ? '<a class="br-fc" href="' + esc(f.url) + '" target="_blank" rel="noopener noreferrer">' + label + '</a>' : '<span class="br-fc">' + label + '</span>';
+  }
+  function bubble(m, prev) {
+    var inThread = m.reply;
+    return '<div class="br-msg br-msg--' + (m.from === 'bruce' ? 'bruce' : 'person') + '"><span class="br-msg__who">' + esc(m.name) + ' \u00b7 ' + esc(fmtTime(new Date(m.at))) + (inThread ? ' \u00b7 <span class="br-thr">\u21b3 in a thread</span>' : '') + '</span>' +
+      (m.text ? '<p class="br-msg__t">' + linkify(m.text) + '</p>' : '') + (m.files && m.files.length ? '<span class="br-msg__f">' + m.files.map(fileChip).join('') + '</span>' : '') + '</div>';
+  }
+  function host(u) { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (e) { return u; } }
+  function sharedOf(j) {
+    var files = [], links = [], seen = {};
+    j.messages.forEach(function (m) {
+      (m.files || []).forEach(function (f) { files.push({ f: f, m: m }); });
+      (m.links || []).forEach(function (l) { if (!seen[l.url]) { seen[l.url] = 1; links.push({ l: l, m: m }); } });
+    });
+    return { files: files.reverse(), links: links.reverse() };
+  }
+  function setShared(j) { var n = j && j.ok ? (function (x) { return x.files.length + x.links.length; })(sharedOf(j)) : 0; $('br-t-shared').textContent = 'Shared' + (n ? ' ' + n : ''); }
+  function renderShared(j) {
+    var b = $('br-d-b');
+    if (!j) { b.innerHTML = '<p class="br-empty">Reading the DM from Slack\u2026</p>'; return; }
+    if (!j.ok) { renderChat(j); return; }
+    var sh = sharedOf(j);
+    if (!sh.files.length && !sh.links.length) { b.innerHTML = note('No links or files yet', 'Nothing has been shared in this DM.'); return; }
+    function who(x) { return esc(x.m.name) + ' \u00b7 ' + esc(fmtWhen(new Date(x.m.at))); }
+    var html = '<div class="br-shg">';
+    if (sh.files.length) html += '<h3>Files (' + sh.files.length + ')</h3>' + sh.files.map(function (x) {
+      return '<div class="br-sh"><div><b>' + esc(x.f.name) + '</b><small>' + who(x) + (x.f.type ? ' \u00b7 ' + esc(x.f.type) : '') + (x.f.size ? ' \u00b7 ' + esc(kb(x.f.size)) : '') + '</small></div>' +
+        (x.f.url && /^https:\/\//.test(x.f.url) ? '<a href="' + esc(x.f.url) + '" target="_blank" rel="noopener noreferrer">Open in Slack</a>' : '') + '</div>';
+    }).join('');
+    if (sh.links.length) html += '<h3>Links (' + sh.links.length + ')</h3>' + sh.links.map(function (x) {
+      return '<div class="br-sh"><div><b>' + esc(x.l.label || host(x.l.url)) + '</b><small>' + who(x) + ' \u00b7 ' + esc(host(x.l.url)) + '</small></div>' +
+        '<a href="' + esc(x.l.url) + '" target="_blank" rel="noopener noreferrer">Open</a></div>';
+    }).join('');
+    b.innerHTML = html + '</div>'; b.scrollTop = 0;
+  }
+  function renderChat(j) {
+    var b = $('br-d-b');
+    if (!j) { b.innerHTML = '<p class="br-empty">Reading the DM from Slack…</p>'; return; }
+    if (!j.ok) {
+      b.innerHTML = j.reason === 'scope' ? note('Slack won’t let the site read this yet', 'Bruce’s Slack app is missing a permission' + (j.needed ? ' (' + j.needed + ')' : '') + '. Add it in the app’s settings, reinstall the app, then open this again. The Log tab still works.')
+        : note('Could not read this conversation', j.detail || j.error || 'Try again in a moment. The Log tab still works.');
+      return;
+    }
+    if (!j.messages.length) { b.innerHTML = note('Nothing in this DM', 'Slack returned no messages.'); return; }
+    var html = '<div class="br-msgs">', day = '', prev = null;
+    if (j.truncated) html += '<p class="br-dnote">Showing the newest ' + j.messages.length + ' messages. Older ones are in Slack.</p>';
+    j.messages.forEach(function (m) {
+      var d = new Date(m.at), dl = fmtDay(d); if (dl !== day) { day = dl; html += '<span class="br-day">' + esc(dl) + '</span>'; }
+      html += bubble(m, prev); prev = m;
+    });
+    b.innerHTML = html + '</div>';
+    b.scrollTop = b.scrollHeight;
+  }
+  function renderLog() {
+    var all = personRows(S.openUser), b = $('br-d-b');
+    b.innerHTML = all.length ? '<div class="br-log">' + all.map(function (r) {
+      return '<div class="br-lr"><time datetime="' + r.at.toISOString() + '">' + esc(fmtWhen(r.at)) + '</time><span>' + (r.kind === 'sent' ? '<span class="ul-badge">Sent</span>' : badge(r.kind) + ' ' + tag(r.topic, 0)) + '</span>' +
+        '<p>' + (r.kind === 'sent' ? '→ ' + esc(r.to || 'someone') + ': ' : (r.thread ? '↳ ' : '')) + esc(r.text || '—') + '</p></div>';
+    }).join('') + '</div><p class="br-dnote">Everything the log holds for this person: the first 200 characters of each ask, and each message Bruce reported sending. What he answered is in the Conversation tab, and what was shared is in Shared.</p>' : '<p class="br-empty">No logged turns.</p>';
+    b.scrollTop = 0;
+  }
+  function showTab(t) {
+    S.tab = t;
+    dlg.querySelectorAll('.ul-tab[data-dt]').forEach(function (x) { x.setAttribute('aria-selected', String(x.getAttribute('data-dt') === t)); });
+    if (t === 'log') renderLog(); else if (t === 'shared') renderShared(S.dm[S.openUser] || null); else renderChat(S.dm[S.openUser] || null);
+  }
+  function openConv(user) {
+    var c = S.convs.filter(function (x) { return x.user === user; })[0];
+    if (!c) { c = { user: user, name: (S.rowsAll.filter(function (r) { return r.user === user; })[0] || {}).name || user, role: 'teammate', last: new Date(), asks: [], topics: {} }; }
+    S.openUser = user; var all = personRows(user); drawerHead(c, all); setShared(S.dm[user]); showTab('chat');
+    if (!dlg.open) dlg.showModal();
+    if (S.dm[user]) { renderChat(S.dm[user]); return; }
+    var seq = ++S.seq, ch = (all.filter(function (r) { return r.ch; })[0] || {}).ch || '';
+    fetch('/api/bruce-memory?dm=1&user=' + encodeURIComponent(user) + (ch ? '&ch=' + encodeURIComponent(ch) : ''), { credentials: 'same-origin', cache: 'no-store' })
+      .then(function (res) { return res.json().catch(function () { return { ok: false, reason: 'slack', detail: 'Unexpected answer.' }; }); })
+      .then(function (j) { if (j && j.ok) S.dm[user] = j; if (seq !== S.seq || S.openUser !== user) return; setShared(j); if (S.tab === 'chat') renderChat(j); else if (S.tab === 'shared') renderShared(j); })
+      .catch(function () { if (seq === S.seq && S.tab !== 'log') renderChat({ ok: false, detail: 'Try again in a moment.' }); });
+  }
+  dlg.querySelectorAll('.ul-tab[data-dt]').forEach(function (b) { b.addEventListener('click', function () { showTab(b.getAttribute('data-dt')); }); });
+  $('br-d-x').addEventListener('click', function () { dlg.close(); });
+  dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });   /* a click on the backdrop */
+  ROOT.addEventListener('click', function (e) {
+    var t = e.target.closest && e.target.closest('[data-u], [data-t]'); if (!t || !ROOT.contains(t)) return;
+    if (t.hasAttribute('data-u')) { openConv(t.getAttribute('data-u')); return; }
+    var topic = t.getAttribute('data-t'); S.topic = S.topic === topic ? '' : topic; renderAll();
+  });
+  $('br-clear').addEventListener('click', function () { S.topic = ''; renderAll(); });
+
   function renderBlocked(kind) {
-    var copy = { signin: ['Sign in to see this', 'Bruce\u2019s log is for the owner.'], forbidden: ['Owners only', 'Bruce\u2019s log shows who asked him what. Only an owner can see it.'],
+    var copy = { signin: ['Sign in to see this', 'Bruce’s log is for the owner.'], forbidden: ['Owners only', 'Bruce’s log shows who asked him what. Only an owner can see it.'],
       unconfigured: ['No store connected', 'The site has no KV store, so nothing is logged yet.'], error: ['Could not load the log', 'Try again in a moment.'] }[kind];
     $('br-blocked').innerHTML = '<div class="ul-empty"><div class="ul-empty__copy"><h2>' + esc(copy[0]) + '</h2><p>' + esc(copy[1]) + '</p></div></div>';
     $('br-blocked').hidden = false; $('br-app').hidden = true;
@@ -2451,7 +2669,7 @@ window.__anRefilter = {};
   }
   function updated() { $('br-updated').textContent = S.fetchedAt ? 'Updated ' + ago(Date.now() - S.fetchedAt) : ''; }
   function load() {
-    if (S.busy) return; S.busy = true; $('br-refresh').setAttribute('aria-busy', 'true');
+    if (S.busy) return; S.busy = true; S.dm = {}; $('br-refresh').setAttribute('aria-busy', 'true');
     fetch(API, { credentials: 'same-origin', cache: 'no-store' }).then(function (r) {
       if (r.status === 401) { S.status = 'signin'; return null; }
       if (r.status === 403) { S.status = 'forbidden'; return null; }
@@ -2466,43 +2684,12 @@ window.__anRefilter = {};
     }).catch(function () { S.status = 'error'; }).then(function () { S.busy = false; $('br-refresh').removeAttribute('aria-busy'); render(); });
   }
   $('br-refresh').innerHTML = icon('arrow-clockwise');
-  ROOT.querySelectorAll('.ul-tab[data-period]').forEach(function (b) { b.addEventListener('click', function () { S.period = b.getAttribute('data-period'); S.page = 1; render(); }); });
+  ROOT.querySelectorAll('.ul-tab[data-period]').forEach(function (b) { b.addEventListener('click', function () { S.period = b.getAttribute('data-period'); render(); }); });
   $('br-refresh').addEventListener('click', load);
-
-  /* The Conversation view: one thread of the DM, read from Slack when it is opened. Nothing is stored here. */
-  var dlg = $('br-conv'), convSeq = 0;
-  function bubble(m) {
-    return '<div class="br-msg br-msg--' + (m.from === 'bruce' ? 'bruce' : 'person') + '"><span class="br-msg__who">' + esc(m.name) + ' \u00b7 ' + esc(fmtWhen(new Date(m.at))) + '</span>' +
-      (m.text ? '<p class="br-msg__t">' + esc(m.text) + '</p>' : '') +
-      (m.files && m.files.length ? '<span class="br-msg__f">' + esc(m.files.join(', ')) + '</span>' : '') + '</div>';
-  }
-  function convEmpty(title, text) { return '<div class="ul-empty"><div class="ul-empty__copy"><h2>' + esc(title) + '</h2><p>' + esc(text) + '</p></div></div>'; }
-  function openConv(r) {
-    var seq = ++convSeq;
-    $('br-conv-t').textContent = 'Conversation with ' + r.name;
-    $('br-conv-q').textContent = fmtWhen(r.at);
-    $('br-conv-b').innerHTML = '<div class="ul-empty"><div class="ul-empty__copy"><h2>Reading the thread from Slack</h2></div></div>';
-    if (!dlg.open) dlg.showModal();
-    var q = 'conversation=1&user=' + encodeURIComponent(r.user) + '&at=' + r.at.getTime() + (r.ch && r.ts ? '&ch=' + encodeURIComponent(r.ch) + '&ts=' + encodeURIComponent(r.ts) : '');
-    fetch('/api/bruce-memory?' + q, { credentials: 'same-origin', cache: 'no-store' }).then(function (res) { return res.json().catch(function () { return { ok: false, reason: 'slack', detail: 'Unexpected answer.' }; }); })
-      .then(function (j) {
-        if (seq !== convSeq) return;                                  /* another row was opened meanwhile */
-        var b = $('br-conv-b');
-        if (j && j.ok) { b.innerHTML = j.messages.length ? '<div class="br-msgs">' + j.messages.map(bubble).join('') + '</div>' : convEmpty('Nothing in this thread', 'Slack returned no messages for it.'); return; }
-        if (j && j.reason === 'scope') b.innerHTML = convEmpty('Slack won\u2019t let the site read this yet', 'Bruce\u2019s Slack app is missing a permission' + (j.needed ? ' (' + j.needed + ')' : '') + '. Add it in the app\u2019s settings, reinstall the app, then open this again.');
-        else b.innerHTML = convEmpty('Could not read this conversation', (j && j.detail) || (j && j.error) || 'Try again in a moment.');
-      }).catch(function () { if (seq === convSeq) $('br-conv-b').innerHTML = convEmpty('Could not read this conversation', 'Try again in a moment.'); });
-  }
-  $('br-recent').addEventListener('click', function (e) {
-    var b = e.target.closest && e.target.closest('[data-conv]'); if (!b) return;
-    var r = (S.recent || [])[+b.getAttribute('data-conv')]; if (r) openConv(r);
-  });
-  $('br-conv-x').addEventListener('click', function () { dlg.close(); });
-  dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });   /* a click on the backdrop */
   setInterval(updated, 10000);
   window.__an = window.__an || {};
   window.__an.bruce = function () { render(); load(); };
-  window.__anRefilter.bruce = function () { S.rows = hideMe(S.rowsAll || []); S.page = 1; render(); };
+  window.__anRefilter.bruce = function () { S.rows = hideMe(S.rowsAll || []); render(); };
 })();
 </script>
 

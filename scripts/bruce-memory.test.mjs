@@ -110,4 +110,60 @@ ok('a teammate token cannot read what Bruce sent', h.status === 403 && !h.out.se
 h = await call('GET', 'U0PRIYA01', { query: {} });
 ok('and plain GET still returns only their notes', h.status === 200 && Array.isArray(h.out.notes) && !h.out.sent);
 globalThis.fetch = realFetch;
+// conversations: what an ask is about, and the whole DM (R55 addendum, 8 Oct 2026)
+const T = (text, want) => ok(`topic: "${text}" is ${want}`, M.topicOf(text) === want, M.topicOf(text));
+T('Send me the brand colours and fonts', 'brand'); T('send me the logo, white, svg', 'brand');
+T('tell utsav i said hi', 'pass-on'); T('do you have a proof of sending him hi?', 'pass-on'); T('Please let Utsav know the deck is blocked', 'pass-on');
+T('status of this?', 'status'); T('and?', 'status'); T('is it live yet', 'status');
+T('One-pager for sales, audience ops leads', 'build'); T('make me a landing page', 'build');
+T('which template should I use for a webinar', 'template'); T('rework agent-card', 'hub'); T('can I get access to the staging page', 'access');
+T('what can you do', 'about'); T('purple elephants', 'other'); T('', 'other');
+ok('topic rules are only the names the page knows', ['pass-on', 'status', 'access', 'brand', 'build', 'template', 'hub', 'about', 'other'].join() === M.TOPICS.join());
+store['gw:bruce:log'] = [];
+await M.logRun({ user: 'U9', name: 'Priya', kind: 'run', text: 'send me the logo' }, f);
+await M.logRun({ user: 'U9', name: 'Priya', kind: 'capped', text: 'purple elephants' }, f);
+await M.logRun({ user: 'U9', name: 'Priya', kind: 'sent', to: 'U0PRIYA01', toName: 'Priya', text: 'the logo files' }, f);
+let tl = await M.readLog(f);
+ok('an ask is stored with its topic', tl.find((x) => x.text === 'send me the logo').topic === 'brand' && tl.find((x) => x.text === 'purple elephants').topic === 'other');
+ok('a sent row has no topic (it is not an ask)', tl.find((x) => x.kind === 'sent').topic === undefined);
+
+const dmCalls = []; let dmMode = 'ok';
+const dmF = async (url, init) => {
+  const u = String(url); const body = Object.fromEntries(new URLSearchParams(init.body || ''));
+  if (!u.startsWith('https://slack.com/api/')) return f(url, init);
+  const method = u.split('/api/')[1].split('?')[0]; dmCalls.push(method + (body.cursor ? ':' + body.cursor : ''));
+  const J = (o) => ({ ok: true, json: async () => o });
+  if (method === 'users.info') return J({ ok: true, user: { profile: { display_name: 'Priya' } } });
+  if (method === 'conversations.open') return dmMode === 'scope' ? J({ ok: false, error: 'missing_scope', needed: 'im:write' }) : J({ ok: true, channel: { id: 'D0ABC1234' } });
+  if (method === 'conversations.history') {
+    if (dmMode === 'scope-history') return J({ ok: false, error: 'missing_scope', needed: 'im:history' });
+    if (!body.cursor) return J({ ok: true, has_more: true, response_metadata: { next_cursor: 'c2' }, messages: [
+      { user: 'U0PRIYA01', ts: '1800000300.000100', text: 'second ask &amp; more' },
+      { user: 'UBRUCE', ts: '1800000010.000100', text: 'Here is the logo, and <https://design.gushwork.ai/internal/staging/ai-team?a=1&amp;b=2|the staging page>', reply_count: 1, thread_ts: '1800000010.000100', files: [{ name: 'logo.svg', filetype: 'svg', size: 2048, permalink: 'https://gushwork.slack.com/files/U1/F1/logo.svg' }, { name: 'bad.txt', permalink: 'javascript:alert(1)' }] }] });
+    return J({ ok: true, has_more: false, messages: [{ user: 'U0PRIYA01', ts: '1800000000.000100', text: 'send me the logo', reply_count: 2, thread_ts: '1800000000.000100' }, { subtype: 'channel_join', user: 'U0PRIYA01', ts: '1799999000.000100', text: '' }] });
+  }
+  if (method === 'conversations.replies') return J({ ok: true, messages: body.ts === '1800000000.000100'
+    ? [{ user: 'U0PRIYA01', ts: '1800000000.000100', text: 'send me the logo', thread_ts: '1800000000.000100' }, { user: 'UBRUCE', ts: '1800000005.000100', thread_ts: '1800000000.000100', text: 'On it' }]
+    : [{ user: 'UBRUCE', ts: '1800000010.000100', thread_ts: '1800000010.000100', text: 'Here is the logo, and <https://design.gushwork.ai/internal/staging/ai-team?a=1&amp;b=2|the staging page>' }, { user: 'U0PRIYA01', ts: '1800000011.000100', thread_ts: '1800000010.000100', text: 'thanks' }] });
+  return J({ ok: false, error: 'unknown' });
+};
+let d = await M.readDM({ token: 'xoxb', user: 'U0PRIYA01' }, dmF);
+ok('the whole DM reads, oldest first, across pages', d.ok && d.messages.length === 5 && d.messages.map((m) => m.at).every((x, i, a) => !i || a[i - 1] <= x), JSON.stringify(d.messages && d.messages.map((m) => m.text)));
+ok('it paged: opened the DM, two history pages, and the threads', dmCalls[0] === 'conversations.open' && dmCalls.includes('conversations.history:c2') && dmCalls.filter((c) => c === 'conversations.replies').length === 2, JSON.stringify(dmCalls));
+ok('person and Bruce are told apart, text is plain, files are named', d.messages[0].from === 'person' && d.messages[0].name === 'Priya' && d.messages.some((m) => m.from === 'bruce' && m.files[0] && m.files[0].name === 'logo.svg') && d.messages.some((m) => m.text === 'second ask & more'));
+const withFiles = (await M.readDM({ token: 'xoxb', user: 'U0PRIYA01' }, dmF)).messages.find((m) => m.files.length);
+ok('files are kept as data: name, type, size and the Slack permalink', withFiles && withFiles.files[0].name === 'logo.svg' && withFiles.files[0].type === 'svg' && withFiles.files[0].size === 2048 && withFiles.files[0].url === 'https://gushwork.slack.com/files/U1/F1/logo.svg', JSON.stringify(withFiles));
+ok('a file with an unsafe permalink keeps its name but no link', withFiles.files[1].name === 'bad.txt' && withFiles.files[1].url === '');
+const withLinks = (await M.readDM({ token: 'xoxb', user: 'U0PRIYA01' }, dmF)).messages.find((m) => m.links.length);
+ok('links are kept as data, entities undone, label from the markup', withLinks && withLinks.links[0].url === 'https://design.gushwork.ai/internal/staging/ai-team?a=1&b=2' && withLinks.links[0].label === 'the staging page', JSON.stringify(withLinks && withLinks.links));
+ok('linksOf takes bare links, de-duplicates and ignores other schemes', M.linksOf('<https://a.test> <https://a.test|again> <mailto:x@y.test> <#C1234567|general>').length === 1);
+ok('replies know they are replies, and the empty join message is gone', d.messages.some((m) => m.reply && m.text === 'On it') && !d.messages.some((m) => !m.text && !m.files.length));
+ok('it says when nothing was cut off', d.truncated === false);
+dmMode = 'scope'; d = await M.readDM({ token: 'xoxb', user: 'U0PRIYA01' }, dmF);
+ok('a missing permission to open the DM is named', !d.ok && d.reason === 'scope' && d.needed === 'im:write');
+dmMode = 'scope-history'; d = await M.readDM({ token: 'xoxb', user: 'U0PRIYA01', ch: 'D0ABC1234' }, dmF);
+ok('a missing permission to read it is named, and a known channel skips conversations.open', !d.ok && d.needed === 'im:history' && dmCalls[dmCalls.length - 1] === 'conversations.history');
+ok('a bad person is refused before Slack is asked', (await M.readDM({ token: 'xoxb', user: 'x"; drop' }, dmF)).reason === 'input');
+const gateDm = async (cookie) => { let status = 0; await M.default({ method: 'GET', query: { dm: '1', user: 'U0PRIYA01' }, headers: { cookie } }, { status(s) { status = s; return this; }, json() {}, setHeader() {}, end() {} }); return status; };
+ok('the dm endpoint: signed out is 401, a teammate 403', await gateDm('') === 401 && await gateDm(await ck('sam@gushwork.ai')) === 403);
 console.log(`${pass} passed, ${fail} failed`); process.exit(fail ? 1 : 0);
