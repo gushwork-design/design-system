@@ -80,5 +80,11 @@
     "measured": [
       "start"
     ]
+  },
+  "avatar": {
+    "src": "/assets/agents/bruce.jpg",
+    "x": 50,
+    "y": 10,
+    "zoom": 1.45
   }
 }
