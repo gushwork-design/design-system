@@ -11,6 +11,11 @@
 #   scopes  im:history (read DMs), im:write (open the DM), reactions:write (tick a reply)
 #   event   message.im
 #   home    the Messages tab, writable, so people can DM him
+#
+# What the sent log added (8 Oct 2026, "whom did you message"): im:read, mpim:read, channels:read and groups:read, so Bruce can
+# LIST the conversations he is in and read back what he sent, instead of only checking a person he already suspects. They
+# are read-only and cover only conversations the bot is already a member of. After saving this manifest, reinstall the app
+# to the workspace (Install App -> Reinstall) or the bot token keeps its old scopes.
 display_information:
   name: Bruce
   description: Design Assistant
@@ -46,8 +51,12 @@ oauth_config:
       - chat:write
       - files:write
       - groups:history
+      - groups:read
+      - channels:read
       - im:history
+      - im:read
       - im:write
+      - mpim:read
       - incoming-webhook
       - users:read
       - assistant:write
