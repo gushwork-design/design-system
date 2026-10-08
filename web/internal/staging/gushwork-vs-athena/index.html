@@ -1227,6 +1227,7 @@ details p{margin-top:var(--gw-space-12);padding:0;font:var(--gw-text-body-16-med
 .footer .legal{font:var(--gw-text-body-12-med);line-height:12px;letter-spacing:var(--gw-text-body-12-med-tracking);color:var(--gw-color-neutral-600)}
 
 @media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
   *,*::before,*::after{animation:none!important;transition:none!important}
   .logos-track,.agents-row{transform:none}
 }
@@ -1458,6 +1459,28 @@ details p{margin-top:var(--gw-space-12);padding:0;font:var(--gw-text-body-16-med
   .rise.in .pg-blk em{animation:pg-btn var(--hub-dur-enter) var(--hub-ease) 360ms backwards,pg-press var(--hub-dur-enter) var(--hub-ease) 1000ms backwards}
   .pg-blk{transition:transform var(--hub-dur) var(--hub-ease)}
   .pg-blk:hover{transform:translateX(2px)}
+  /* the closing card slides up from beneath the call to action's frame, which clips it. Travel is
+     longer than R64's 8px and the run is 480ms, because the card has to cross its own clip: a
+     deliberate exception, once, and only opacity and transform move. */
+  @keyframes ccard-rise{from{opacity:0;transform:translateX(-50%) translateY(48px)}}
+  .ccard.rise.in{animation:ccard-rise 480ms var(--hub-ease) backwards}
+  /* smoothness: one curve everywhere, compositor properties only, every control eased */
+  .btn svg{transition:transform var(--hub-dur) var(--hub-ease)}
+  .btn:hover svg{transform:translateX(2px)}
+  .field{transition:border-color var(--gw-motion-fast),background-color var(--gw-motion-fast)}
+  .radio{transition:background-color var(--gw-motion-fast),border-color var(--gw-motion-fast),transform var(--hub-dur) var(--hub-ease)}
+  .radio:active{transform:scale(.97)}
+  details,.ask-row{transition:border-color var(--gw-motion-fast)}
+  summary{transition:transform var(--hub-dur) var(--hub-ease)}
+  summary:active{transform:scale(.99)}
+  .caret svg{transition:transform var(--hub-dur-enter) var(--hub-ease)}
+  details[open] > p{animation:hub-rise var(--hub-dur-enter) var(--hub-ease) backwards}
+  .ask-go{transition:transform var(--hub-dur) var(--hub-ease),color var(--gw-motion-fast)}
+  .ask-go:active{transform:scale(.92)}
+  .rise.in .ccard li{animation:hub-rise var(--hub-dur-enter) var(--hub-ease) backwards}
+  .rise.in .ccard li:nth-child(1){animation-delay:280ms}.rise.in .ccard li:nth-child(2){animation-delay:320ms}
+  .rise.in .ccard li:nth-child(3){animation-delay:360ms}.rise.in .ccard li:nth-child(4){animation-delay:400ms}
+  .rise.in .ccard li:nth-child(5){animation-delay:440ms}
   .btn{transition:background-color .15s ease,transform var(--hub-dur) var(--hub-ease)}
   .btn:active{transform:scale(.97)}
   .vs > .card,.rv-cards > .card{transition:transform var(--hub-dur) var(--hub-ease)}
