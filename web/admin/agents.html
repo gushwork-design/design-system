@@ -137,7 +137,8 @@ a.ag-row:hover { background: var(--s-nav-hover); }
 .ag-ctrl__r { display: flex; align-items: center; gap: var(--gw-space-16); }
 .ag-bar__r { margin-left: auto; flex: none; }
 #ag-bruce-slot .ul-sec { margin-top: var(--gw-space-8); }
-#ag-bruce-slot .br-m4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+#ag-bruce-slot .br-m4 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 900px) { #ag-bruce-slot .br-m4 { grid-template-columns: minmax(0, 1fr); } }
 .ag-btn[data-tab] { font: inherit; font: var(--gw-text-button-12, var(--gw-text-body-12-med)); }
 
 /* about, folded away */

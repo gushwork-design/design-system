@@ -191,7 +191,7 @@
 @media (max-width: 600px) { .br-m4 { grid-template-columns: minmax(0, 1fr); } }
 .br-cl { list-style: none; margin: 0; padding: 0 var(--gw-space-4); display: flex; flex-direction: column; }
 .br-ci { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: var(--gw-space-12); align-items: center; width: 100%; text-align: left;
-  padding: var(--gw-space-12) var(--gw-space-8); border: 0; border-bottom: 1px solid var(--ul-row-line); border-radius: 0; background: none; cursor: pointer; color: inherit;
+  position: relative; padding: var(--gw-space-12) var(--gw-space-12); border: 0; border-radius: var(--gw-radius-10); background: none; cursor: pointer; color: inherit;
   transition: background var(--gw-motion-fast); }
 .br-ci:hover { background: var(--ul-row-hover); }
 .br-cl li:last-child .br-ci, .br-lks .br-lk:last-child { border-bottom: 0; }
@@ -219,7 +219,7 @@
 @media (max-width: 600px) { .br-ub { grid-template-columns: 110px minmax(0, 1fr) 32px; } }
 .br-lks { padding: 0 var(--gw-space-4) var(--gw-space-8); display: flex; flex-direction: column; }
 .br-lk { display: grid; grid-template-columns: 120px 140px auto minmax(0, 1fr); gap: var(--gw-space-12); align-items: center; width: 100%; text-align: left; border: 0; background: none; cursor: pointer; color: inherit;
-  padding: var(--gw-space-12) var(--gw-space-8); border-bottom: 1px solid var(--ul-row-line); border-radius: 0; transition: background var(--gw-motion-fast); }
+  position: relative; padding: var(--gw-space-12) var(--gw-space-12); border-radius: var(--gw-radius-10); transition: background var(--gw-motion-fast); }
 .br-lk:hover { background: var(--ul-row-hover); }
 .br-lk > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--gw-text-body-14-reg); color: var(--ul-cell); }
 .br-lk > span:nth-child(2) { color: var(--ul-value); font-weight: 500; }
@@ -342,3 +342,8 @@ a.br-fc:hover { text-decoration: underline; text-underline-offset: 2px; }
 .br-what dd { margin: 0; font: var(--gw-text-body-14-reg); color: var(--ul-cell); }
 .br-what dd b { color: var(--ul-value); font-weight: 600; }
 @media (max-width: 640px) { .br-what dl { grid-template-columns: minmax(0, 1fr); } .br-what dt { margin-top: var(--gw-space-8); } }
+
+/* Rows are rounded like the other lists; the divider is an inset hairline that steps aside for the hovered row (as on Access Control). */
+.br-cl li + li .br-ci::before, .br-lk + .br-lk::before { content: ""; position: absolute; top: 0; left: var(--gw-space-12); right: var(--gw-space-12); height: 1px; background: var(--ul-row-line); }
+.br-ci:hover::before, .br-cl li:hover + li .br-ci::before, .br-lk:hover::before, .br-lk:hover + .br-lk::before { background: transparent !important; }
+.br-ci:hover .br-av { background: color-mix(in srgb, var(--ul-value) 10%, var(--ul-row-hover)); }
