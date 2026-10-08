@@ -389,6 +389,130 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
   .ac-tab { white-space: nowrap; flex: none; }
   .ac-tool__pv { width: 56px; }
 }
+
+/* ── people: avatars, the picker, suggestions, and the People tab ───────────────────────────────────────────────────────
+   Tokens and the page's own --s-* pairs only, so both themes come for free. Avatars are a photo when Slack has one, otherwise
+   initials on the neutral well; nothing here introduces a colour. */
+.ac-av { flex: none; width: 24px; height: 24px; border-radius: var(--gw-radius-full); display: inline-grid; place-items: center; overflow: hidden;
+  background: var(--s-lock-bg); color: var(--s-body); font: var(--gw-text-body-10-sem); letter-spacing: 0; }
+.ac-av img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ac-av--lg { width: 36px; height: 36px; font: var(--gw-text-body-12-sem); }
+.ac-av--team svg { width: 14px; height: 14px; }
+
+/* The picker: a field that holds what is chosen as pills, with the search where the cursor goes. */
+.ac-pickwrap { min-width: 0; }
+.ac-pick { display: flex; flex-wrap: wrap; align-items: center; gap: var(--gw-space-4); min-height: 40px; box-sizing: border-box;
+  padding: var(--gw-space-4) var(--gw-space-8); border: 1px solid var(--s-field-border); border-radius: var(--gw-radius-10);
+  background: var(--s-field-bg); box-shadow: var(--gw-shadow-s2); cursor: text; transition: border-color var(--gw-motion-fast); }
+.ac-pick:hover { border-color: var(--gw-color-neutral-300); }
+.ac-pick:focus-within { border-color: var(--gw-color-neutral-400); }
+.ac-pick__pp { display: contents; }
+.ac-pick__in { flex: 1 1 140px; min-width: 120px; height: 28px; border: 0; background: none; outline: none; padding: 0 var(--gw-space-4);
+  color: var(--s-heading); font: var(--gw-text-body-14-reg); }
+.ac-pick__in::placeholder { color: var(--s-placeholder); }
+.ac-pick__in:disabled { cursor: not-allowed; }
+.ac-pick__none { padding: 0 var(--gw-space-4); font: var(--gw-text-body-14-reg); color: var(--s-placeholder); }
+.ac-pick__note { margin-top: var(--gw-space-8); font: var(--gw-text-body-12-med); color: var(--s-body); }
+.ac-pick__note[hidden] { display: none; }
+.ac-pp { display: inline-flex; align-items: center; gap: var(--gw-space-8); height: 28px; padding: 0 var(--gw-space-4); max-width: 100%;
+  border-radius: var(--gw-radius-full); background: var(--s-card-bg); border: 1px solid var(--s-card-border); color: var(--s-heading);
+  font: var(--gw-text-body-12-med); white-space: nowrap; }
+.ac-pp > span:not(.ac-av) { overflow: hidden; text-overflow: ellipsis; }
+.ac-pp--team { padding-left: var(--gw-space-8); gap: var(--gw-space-4); }
+.ac-pp--team > svg { width: 14px; height: 14px; flex: none; color: var(--s-nav-label); }
+.ac-pp.is-gone { opacity: .6; text-decoration: line-through; }
+.ac-pp button { width: 20px; height: 20px; display: grid; place-items: center; padding: 0; border: 0; background: none; border-radius: var(--gw-radius-full);
+  color: var(--s-nav-label); cursor: pointer; }
+.ac-pp button:hover { color: var(--s-danger); background: var(--s-nav-hover); }
+.ac-pp button svg { width: 10px; height: 10px; }
+.ac-pp__tag { font-style: normal; padding: 1px var(--gw-space-8); border-radius: var(--gw-radius-4); background: var(--s-lock-bg); color: var(--s-body);
+  font: var(--gw-text-body-12-med); }
+.ac-pp__tag--guest { background: var(--s-note-bg, var(--s-lock-bg)); }
+
+/* The suggestion list, fixed so a card never clips it. */
+.ac-sg { position: fixed; z-index: 60; max-height: 340px; overflow: auto; padding: var(--gw-space-4); box-sizing: border-box;
+  background: var(--s-card-bg); border: 1px solid var(--s-card-border); border-radius: var(--gw-radius-12); box-shadow: var(--gw-shadow-s4); }
+.ac-sg[hidden] { display: none; }
+.ac-sg__h { padding: var(--gw-space-8) var(--gw-space-12) var(--gw-space-4); font: var(--gw-text-body-12-med); text-transform: uppercase; color: var(--gw-color-neutral-600); }
+:root[data-theme="dark"] .ac-sg__h { color: var(--gw-color-neutral-400); }
+.ac-sg__o { display: flex; align-items: center; gap: var(--gw-space-12); width: 100%; padding: var(--gw-space-8) var(--gw-space-12); border: 0;
+  background: none; border-radius: var(--gw-radius-8); text-align: left; cursor: pointer; color: var(--s-heading); }
+.ac-sg__o:hover, .ac-sg__o[aria-selected="true"] { background: var(--s-nav-hover); }
+.ac-sg__o .ac-av { width: 28px; height: 28px; font: var(--gw-text-body-12-sem); }
+.ac-sg__t { display: flex; flex-direction: column; min-width: 0; }
+.ac-sg__n { font: var(--gw-text-body-14-med); }
+.ac-sg__e { font: var(--gw-text-body-12-reg); color: var(--s-body); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ac-sg__x { display: flex; gap: var(--gw-space-8); padding: var(--gw-space-12); font: var(--gw-text-body-12-reg); color: var(--s-body); }
+.ac-sg__x svg { width: 14px; height: 14px; flex: none; margin-top: 2px; }
+.ac-sg__f { margin-top: var(--gw-space-4); padding: var(--gw-space-8) var(--gw-space-12); border-top: 1px solid var(--s-card-border); font: var(--gw-text-body-12-reg); color: var(--s-body); }
+.ac-sg code { font-size: .92em; }
+
+/* A lane row: its folder, who publishes, and remove. */
+.ac-row--lane { grid-template-columns: minmax(160px, 260px) minmax(0, 1fr) 44px; align-items: start; }
+.ac-row--lane .ac-icbtn { margin-top: 0; }
+
+/* The People tab: groups of people on the left, the chosen one on the right. */
+.ac-ppl { display: grid; grid-template-columns: 232px minmax(0, 1fr); gap: var(--gw-space-32); align-items: start; padding-top: var(--gw-space-8); }
+.ac-ppl__rail { display: flex; flex-direction: column; gap: 2px; position: sticky; top: 64px; }
+.ac-ppl__sec { padding: var(--gw-space-16) var(--gw-space-12) var(--gw-space-4); font: var(--gw-text-body-12-med); text-transform: uppercase; color: var(--gw-color-neutral-600); }
+:root[data-theme="dark"] .ac-ppl__sec { color: var(--gw-color-neutral-400); }
+.ac-ppl__sec:first-child { padding-top: 0; }
+.ac-ppl__it { display: flex; align-items: center; gap: var(--gw-space-8); width: 100%; height: 40px; padding: 0 var(--gw-space-12); border: 0; border-radius: var(--gw-radius-10);
+  background: none; text-align: left; cursor: pointer; color: var(--s-body); font: var(--gw-text-body-14-med); transition: background var(--gw-motion-fast); }
+.ac-ppl__it:hover { background: var(--s-nav-hover); }
+.ac-ppl__it[aria-current="true"] { background: var(--s-lock-bg); color: var(--s-heading); }
+.ac-ppl__it svg { width: 16px; height: 16px; flex: none; }
+.ac-ppl__it span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ac-ppl__it small { margin-left: auto; font: var(--gw-text-body-12-med); color: var(--s-nav-label); }
+.ac-ppl__empty { margin: 0; padding: var(--gw-space-4) var(--gw-space-12); font: var(--gw-text-body-14-reg); color: var(--s-placeholder); }
+.ac-ppl__new { display: flex; gap: var(--gw-space-4); padding: var(--gw-space-8) 0 0; }
+.ac-ppl__new .ac-field { min-height: 36px; font: var(--gw-text-body-14-reg); }
+.ac-ppl__new .ac-btn { min-height: 36px; padding: 0 var(--gw-space-12); }
+.ac-ppl__main { min-width: 0; display: flex; flex-direction: column; gap: var(--gw-space-20); }
+.ac-ppl__hd h3 { margin: 0; display: flex; align-items: center; gap: var(--gw-space-8); font: var(--gw-text-body-18-med); color: var(--s-heading); }
+.ac-ppl__hd h3 svg { width: 18px; height: 18px; color: var(--s-nav-label); }
+.ac-ppl__n { padding: 2px var(--gw-space-8); border-radius: var(--gw-radius-4); background: var(--s-lock-bg); font: var(--gw-text-body-12-med); color: var(--s-body); }
+.ac-ppl__hd p { margin: var(--gw-space-4) 0 0; max-width: 64ch; font: var(--gw-text-body-14-reg); color: var(--s-body); }
+.ac-ppl__list { display: flex; flex-direction: column; }
+.ac-ppl__none { padding: var(--gw-space-16) 0; font: var(--gw-text-body-14-reg); color: var(--s-placeholder); }
+.ac-mem { position: relative; display: grid; grid-template-columns: 36px minmax(0, 1fr) auto 44px; align-items: center; gap: var(--gw-space-12);
+  margin: 0 calc(var(--gw-space-12) * -1); padding: var(--gw-space-8) var(--gw-space-12); border-radius: var(--gw-radius-10); }
+.ac-mem + .ac-mem::before { content: ""; position: absolute; top: 0; left: var(--gw-space-12); right: var(--gw-space-12); height: 1px; background: var(--s-card-border); }
+.ac-mem:hover { background: var(--s-nav-hover); }
+.ac-mem:hover::before, .ac-mem:hover + .ac-mem::before { background: transparent; }
+.ac-mem__t { display: flex; flex-direction: column; min-width: 0; }
+.ac-mem__n { font: var(--gw-text-body-14-med); color: var(--s-heading); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ac-mem__e { font: var(--gw-text-body-12-reg); color: var(--s-body); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ac-mem__r { display: flex; align-items: center; gap: var(--gw-space-8); }
+.ac-mem__exp { font: var(--gw-text-body-12-reg); color: var(--s-body); white-space: nowrap; }
+.ac-mem__exp.is-gone { color: var(--s-danger); }
+.ac-mem__lock { width: 44px; display: grid; place-items: center; color: var(--s-nav-label); }
+.ac-mem__lock svg { width: 14px; height: 14px; }
+.ac-ppl__use { padding-top: var(--gw-space-8); border-top: 1px solid var(--s-chrome-border); }
+.ac-ppl__use h4 { margin: var(--gw-space-12) 0 var(--gw-space-8); font: var(--gw-text-body-14-sem); color: var(--s-heading); }
+.ac-ppl__use ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--gw-space-8); }
+.ac-ppl__use li { display: flex; align-items: center; gap: var(--gw-space-8); font: var(--gw-text-body-14-reg); color: var(--s-body); }
+.ac-ppl__use li svg { width: 14px; height: 14px; flex: none; color: var(--s-nav-label); }
+.ac-ppl__acts { display: flex; gap: var(--gw-space-8); }
+.ac-confirm { display: flex; flex-wrap: wrap; align-items: center; gap: var(--gw-space-12); padding: var(--gw-space-16); border: 1px solid var(--s-card-border);
+  border-radius: var(--gw-radius-12); background: var(--s-lock-bg); }
+.ac-confirm p { margin: 0; flex: 1 1 100%; font: var(--gw-text-body-14-reg); color: var(--s-body); }
+.ac-confirm > div { display: flex; gap: var(--gw-space-8); }
+.ac-confirm .ac-field { max-width: 240px; }
+.ac-btn--sm { min-height: 32px; padding: 0 var(--gw-space-12); font: var(--gw-text-body-12-med); }
+.ac-btn--danger { color: var(--s-danger); }
+
+@media (max-width: 760px) {
+  .ac-ppl { grid-template-columns: 1fr; gap: var(--gw-space-16); }
+  .ac-ppl__rail { position: static; flex-direction: row; flex-wrap: wrap; gap: var(--gw-space-4); }
+  .ac-ppl__sec { display: none; }
+  .ac-ppl__it { width: auto; }
+  .ac-ppl__new { flex: 1 1 100%; }
+  .ac-mem { grid-template-columns: 36px minmax(0, 1fr) 44px; }
+  .ac-mem__r { display: none; }
+  .ac-row--lane { grid-template-columns: minmax(0, 1fr) 44px; }
+  .ac-row--lane .ac-row__path { grid-column: 1; }
+}
 </style>
 </head>
 <body data-gw-page="access-control">
@@ -423,6 +547,9 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
     lock: 'M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Zm-68-56a12,12,0,1,1-12-12A12,12,0,0,1,140,152Z',
     x: 'M208.49,191.51a12,12,0,0,1-17,17L128,145,64.49,208.49a12,12,0,0,1-17-17L111,128,47.51,64.49a12,12,0,0,1,17-17L128,111l63.51-63.52a12,12,0,0,1,17,17L145,128Z',
     plus: 'M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z',
+    users: 'M117.25,157.92a60,60,0,1,0-66.5,0A95.83,95.83,0,0,0,3.53,195.63a8,8,0,1,0,13.4,8.74,80,80,0,0,1,134.14,0,8,8,0,0,0,13.4-8.74A95.83,95.83,0,0,0,117.25,157.92ZM40,108a44,44,0,1,1,44,44A44.05,44.05,0,0,1,40,108Zm210.14,98.7a8,8,0,0,1-11.07-2.33A79.83,79.83,0,0,0,172,168a8,8,0,0,1,0-16,44,44,0,1,0-16.34-84.87,8,8,0,1,1-5.94-14.85,60,60,0,0,1,55.53,105.64,95.83,95.83,0,0,1,47.22,37.71A8,8,0,0,1,250.14,206.7Z',
+    shield: 'M208,40H48A16,16,0,0,0,32,56v58.78c0,89.61,75.82,119.34,91,124.39a15.53,15.53,0,0,0,10,0c15.2-5.05,91-34.78,91-124.39V56A16,16,0,0,0,208,40Zm0,74.79c0,78.42-66.35,104.62-80,109.18-13.53-4.51-80-30.69-80-109.18V56l160,0Z',
+    globe: 'M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24ZM101.63,168h52.74C149,186.34,140,202.87,128,215.89,116,202.87,107,186.34,101.63,168ZM98,152a145.72,145.72,0,0,1,0-48h60a145.72,145.72,0,0,1,0,48ZM40,128a87.61,87.61,0,0,1,3.33-24H81.79a161.79,161.79,0,0,0,0,48H43.33A87.61,87.61,0,0,1,40,128ZM154.37,88H101.63C107,69.66,116,53.13,128,40.11,140,53.13,149,69.66,154.37,88Zm19.84,16h38.46a88.15,88.15,0,0,1,0,48H174.21a161.79,161.79,0,0,0,0-48Zm32.16-16H170.94a142.39,142.39,0,0,0-20.26-45A88.37,88.37,0,0,1,206.37,88ZM105.32,43A142.39,142.39,0,0,0,85.06,88H49.63A88.37,88.37,0,0,1,105.32,43ZM49.63,168H85.06a142.39,142.39,0,0,0,20.26,45A88.37,88.37,0,0,1,49.63,168Zm101.05,45a142.39,142.39,0,0,0,20.26-45h35.43A88.37,88.37,0,0,1,150.68,213Z',
     info: 'M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm16-40a8,8,0,0,1-8,8,16,16,0,0,1-16-16V128a8,8,0,0,1,0-16,16,16,0,0,1,16,16v40A8,8,0,0,1,144,176ZM112,84a12,12,0,1,1,12,12A12,12,0,0,1,112,84Z'
   };
   function icon(n) {
@@ -491,16 +618,17 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
     '</div>';
   }
 
+  /* The people cell of a page or tool row: a placeholder, filled with a picker once the row exists (see mountPeople). */
   function peopleFieldHTML(r) {
-    if (r.access !== 'people') return '';
-    var people = [].concat(
-      (r.groups || []).map(function (g) { return '@' + g; }),
-      r.people || []
-    ).join(', ');
-    return '<input class="ac-field" data-act="people" data-suggest="people" autocomplete="off" value="' + esc(people) + '" ' +
-      'placeholder="name@' + esc(meta.domain) + ', @group" ' +
-      'aria-label="People and groups for ' + esc(r.path) + '" ' +
-      'data-1p-ignore="true" data-lpignore="true" data-form-type="other">';
+    return r && r.access === 'people' ? '<div data-pk></div>' : '';
+  }
+  function mountPeople(row, r, path) {
+    var host = row.querySelector('[data-pk]'); if (!host || !r) return;
+    host.appendChild(buildPicker({
+      people: r.people, groups: r.groups, guests: true, label: 'People and teams for ' + path,
+      locked: !meta.you.owner && r.access === 'owner',
+      onChange: function (v) { r.people = v.people; r.groups = v.groups; paintBar(); }
+    }));
   }
 
   function routeRow(r, i) {
@@ -508,7 +636,7 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
        owners tier — the server enforces it; this just says so before the click. */
     var locked = !meta.you.owner && r.access === 'owner';
 
-    return el(
+    var row = el(
       '<div class="ac-row" data-i="' + i + '">' +
         '<div class="ac-row__path">' + pathHTML(r.path) +
           (r.path === '/admin' ? '<small>Includes this page</small>' : '') + '</div>' +
@@ -525,6 +653,8 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
           '>' + icon('trash') + '</button></div>' +
       '</div>'
     );
+    mountPeople(row, r, r.path);
+    return row;
   }
 
   /* Ten rules to a page; the pager shows only when there is more than a page. */
@@ -573,19 +703,6 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
       });
     }
 
-    rows.addEventListener('change', function (ev) {
-      var row = ev.target.closest('.ac-row'); if (!row) return;
-      var r = draft.routes[+row.dataset.i];
-      if (ev.target.dataset.act === 'people') {
-        var parts = ev.target.value.split(',').map(function (s) { return s.trim(); })
-          .filter(Boolean);
-        r.groups = parts.filter(function (s) { return s.charAt(0) === '@'; })
-          .map(function (s) { return s.slice(1).toLowerCase(); });
-        r.people = parts.filter(function (s) { return s.charAt(0) !== '@'; })
-          .map(function (s) { return s.toLowerCase(); });
-        paintBar();
-      }
-    });
     rows.addEventListener('click', function (ev) {
       var trig = ev.target.closest('[data-act="ddbtn"]');
       if (trig && !trig.disabled) { toggleDD(trig.closest('[data-dd]')); return; }
@@ -663,7 +780,7 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
        dropdown shows a level nobody set on this row and it looks like a guess. */
     var sub = own ? esc(t.path) : '<span title="Has no rule of its own, so it follows ' + esc(eff.path) + '">' + esc(t.path) + '</span>';
 
-    return el(
+    var trow = el(
       '<div class="ac-row" data-tool="' + esc(t.path) + '">' +
         '<div class="ac-row__path ac-tool">' +
           (t.img ? '<img class="ac-tool__pv" src="' + esc(t.img) + '" alt="" loading="lazy">'
@@ -671,13 +788,15 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
           '<div><div>' + esc(t.name) + '</div><small>' + sub + '</small></div>' +
         '</div>' +
         '<div class="ac-row__who">' + ddHTML(t.path, eff.access, locked) + '</div>' +
-        '<div class="ac-row__people">' + peopleFieldHTML(own || { path: t.path, access: 'x' }) + '</div>' +
+        '<div class="ac-row__people">' + peopleFieldHTML(own) + '</div>' +
         '<div class="ac-row__del"><button class="ac-icbtn" type="button" data-act="drop" ' +
           (own ? 'aria-label="Remove the rule for ' + esc(t.name) + ' so it follows its parent again"'
                : 'disabled title="Already following its parent — nothing to remove"') +
           '>' + icon('trash') + '</button></div>' +
       '</div>'
     );
+    mountPeople(trow, own, t.path);
+    return trow;
   }
 
   function toolsCard() {
@@ -744,91 +863,433 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
       }
     });
 
-    rows.addEventListener('change', function (ev) {
-      if (ev.target.dataset.act !== 'people') return;
-      var path = ev.target.closest('.ac-row').dataset.tool, r = null;
-      draft.routes.forEach(function (x) { if (x.path === path) r = x; });
-      if (!r) return;
-      var parts = ev.target.value.split(',').map(function (x) { return x.trim(); }).filter(Boolean);
-      r.groups = parts.filter(function (x) { return x.charAt(0) === '@'; })
-        .map(function (x) { return x.slice(1).toLowerCase(); });
-      r.people = parts.filter(function (x) { return x.charAt(0) !== '@'; })
-        .map(function (x) { return x.toLowerCase(); });
-      paintBar();
-    });
 
     return card;
   }
 
-  function groupsCard() {
-    var names = Object.keys(draft.groups || {}).sort();
-    var card = el(
-      '<section class="ac-card">' +
-        '<div class="ac-card__hd">' +
-          '<div><h3>Groups</h3><p>A named list of people, so a page can be handed to a ' +
-            'team rather than to seven addresses. Referred to as ' +
-            '<code>@name</code> above.</p></div>' +
-          '<span class="ac-card__n">' + plural(names.length, 'group') + '</span>' +
-        '</div>' +
-        '<div class="ac-card__body"><div data-groups></div></div>' +
-        '<div class="ac-card__ft">' +
-          '<input class="ac-field" data-newgroup placeholder="gtm" aria-label="Group name" ' +
-            'style="max-width:200px" data-1p-ignore="true" data-lpignore="true" ' +
-            'data-form-type="other">' +
-          '<button class="ac-btn" type="button" data-addgroup>' + icon('plus') +
-            '<span>Add a group</span></button>' +
-        '</div>' +
-      '</section>'
-    );
+  /* -- people: the directory, the picker, and the People tab ------------------------------------------------------------ */
 
-    var mount = card.querySelector('[data-groups]');
-    if (!names.length) {
-      mount.appendChild(el('<p style="margin:12px 0 0;font:var(--gw-text-body-14-reg);' +
-        'color:var(--s-nav-label)">No groups yet.</p>'));
-    }
-    names.forEach(function (name) {
-      mount.appendChild(el(
-        '<div class="ac-row" style="grid-template-columns:minmax(120px,240px) minmax(0,1fr) 44px">' +
-          '<div class="ac-row__path">@' + esc(name) + '</div>' +
-          '<div><input class="ac-field" data-group="' + esc(name) + '" data-suggest="members" autocomplete="off" ' +
-            'value="' + esc(draft.groups[name].join(', ')) + '" ' +
-            'aria-label="Members of ' + esc(name) + '" ' +
-            'placeholder="name@' + esc(meta.domain) + ', name@' + esc(meta.domain) + '" ' +
-            'data-1p-ignore="true" data-lpignore="true" data-form-type="other"></div>' +
-          '<div><button class="ac-icbtn" type="button" data-dropgroup="' + esc(name) + '" ' +
-            'aria-label="Delete the ' + esc(name) + ' group">' + icon('trash') + '</button></div>' +
-        '</div>'
-      ));
-    });
+  /* Who works here, from Slack (api/access.js ?directory=1). Loaded once, after the rules, so the page is usable before it
+     arrives; until then (or without the Slack scope) a person is just their address. `by` indexes it for the avatars. */
+  var dir = { people: [], by: {}, source: null };
+  function setDirectory(d) {
+    dir.people = (d && d.people) || [];
+    dir.source = (d && d.source) || null;
+    dir.by = {};
+    dir.people.forEach(function (p) { dir.by[p.email] = p; });
+  }
+  function nameOf(email) { var p = dir.by[email]; return p && p.name ? p.name : email.split('@')[0]; }
+  function isOwnerEmail(e) { return (meta.owners || []).map(function (x) { return x.toLowerCase(); }).indexOf(e) > -1; }
+  function isInternalEmail(e) { return e.slice(e.lastIndexOf('@') + 1) === meta.domain; }
+  var EMAIL_RE = /^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/;
 
-    mount.addEventListener('change', function (ev) {
-      var name = ev.target.dataset.group; if (!name) return;
-      draft.groups[name] = ev.target.value.split(',').map(function (s) {
-        return s.trim().toLowerCase();
-      }).filter(Boolean);
-      paintBar();
+  function initials(email) {
+    var n = nameOf(email), w = n.replace(/[^A-Za-z0-9 .\-_]/g, ' ').split(/[ .\-_]+/).filter(Boolean);
+    return ((w[0] || '?').charAt(0) + (w.length > 1 ? w[w.length - 1].charAt(0) : '')).toUpperCase();
+  }
+  function avatarHTML(email, big) {
+    var p = dir.by[email];
+    return '<span class="ac-av' + (big ? ' ac-av--lg' : '') + '" aria-hidden="true">' +
+      (p && p.avatar ? '<img src="' + esc(p.avatar) + '" alt="" loading="lazy" referrerpolicy="no-referrer">' : esc(initials(email))) + '</span>';
+  }
+
+  /* Guests: people outside the company let in to named pages and tools. They live in draft.guests, keyed by address, each with
+     an expiry (30 days from when they were invited, renewable here). A guest only ever matches a rule that names them. */
+  var GUEST_DAYS = 30;
+  function canInviteGuests() { return !!(meta.you && meta.you.owner && meta.capabilities && meta.capabilities.guests); }
+  function ymd(ms) { return new Date(ms).toISOString().slice(0, 10); }
+  function guestFor(email) { return (draft.guests || {})[email] || null; }
+  function addGuest(email) {
+    draft.guests = draft.guests || {};
+    if (!draft.guests[email]) draft.guests[email] = { expires: ymd(Date.now() + GUEST_DAYS * 864e5), by: meta.you.email };
+  }
+  function daysLeft(g) { return Math.ceil((Date.parse(g.expires + 'T23:59:59Z') - Date.now()) / 864e5); }
+  function expiryText(g) {
+    var d = daysLeft(g);
+    var when = new Date(g.expires + 'T12:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    return d < 0 ? 'Expired ' + when : 'Until ' + when + ' · ' + (d === 0 ? 'today' : d + (d === 1 ? ' day' : ' days') + ' left');
+  }
+
+  /* One suggestion engine for both the picker (which holds pills) and the adder (which does not). `opts`:
+       onPick(item)   an item is {kind:'person'|'team'|'guest'|'internal', email|name}
+       skip(item)     true to leave it out (already chosen)
+       teams / guests whether to offer them
+     Typing filters; arrow keys and Enter pick; Escape closes; a pasted list is split and resolved in one go. */
+  var sg = null, sgOpts = null, sgInput = null, sgItems = [], sgActive = -1, sgQuiet = false, pplRefocus = false, pplNote = '';
+  function ensureSg() {
+    if (sg) return sg;
+    sg = document.createElement('div');
+    sg.className = 'ac-sg'; sg.hidden = true; sg.setAttribute('role', 'listbox');
+    sg.addEventListener('mousedown', function (ev) {                     // mousedown, so the input keeps focus
+      var b = ev.target.closest('[data-i]'); if (!b) return;
+      ev.preventDefault(); pickSg(+b.dataset.i);
     });
-    mount.addEventListener('click', function (ev) {
-      var btn = ev.target.closest('[data-dropgroup]'); if (!btn) return;
-      var name = btn.dataset.dropgroup;
-      delete draft.groups[name];
-      /* A page pointing at a group that no longer exists would silently stop
-         letting those people in, with nothing on screen saying why. */
-      draft.routes.forEach(function (r) {
-        r.groups = r.groups.filter(function (g) { return g !== name; });
+    document.body.appendChild(sg);
+    return sg;
+  }
+  function closeSg() { if (sg) sg.hidden = true; sgInput = null; sgOpts = null; sgItems = []; sgActive = -1; }
+  function placeSg() {
+    if (!sg || sg.hidden || !sgInput) return;
+    var host = sgInput.closest('[data-sghost]') || sgInput, r = host.getBoundingClientRect();
+    var below = window.innerHeight - r.bottom, up = below < 260 && r.top > below;
+    sg.style.left = Math.max(8, Math.min(r.left, window.innerWidth - sg.offsetWidth - 8)) + 'px';
+    sg.style.width = Math.max(320, Math.min(r.width, 420)) + 'px';
+    if (up) { sg.style.top = 'auto'; sg.style.bottom = (window.innerHeight - r.top + 6) + 'px'; }
+    else { sg.style.bottom = 'auto'; sg.style.top = (r.bottom + 6) + 'px'; }
+  }
+  function matches(q, p) { return !q || (p.name && p.name.toLowerCase().indexOf(q) > -1) || p.email.toLowerCase().indexOf(q) > -1; }
+  function buildItems(q, opts) {
+    var items = [], ql = q.trim().toLowerCase();
+    if (opts.teams) {
+      Object.keys(draft.groups || {}).sort().filter(function (n) { return !ql || n.indexOf(ql.replace(/^@/, '')) > -1; }).forEach(function (n) {
+        var it = { kind: 'team', name: n, n: (draft.groups[n] || []).length };
+        if (!opts.skip(it)) items.push(it);
       });
-      render();
+      items = items.slice(0, 4);
+    }
+    var ppl = dir.people.filter(function (p) { return matches(ql, p); });
+    ppl.sort(function (a, b) {
+      var as = ql && ((a.name || '').toLowerCase().indexOf(ql) === 0 || a.email.indexOf(ql) === 0) ? 0 : 1;
+      var bs = ql && ((b.name || '').toLowerCase().indexOf(ql) === 0 || b.email.indexOf(ql) === 0) ? 0 : 1;
+      return as - bs || (a.name || a.email).localeCompare(b.name || b.email);
+    });
+    var n = 0;
+    for (var i = 0; i < ppl.length && n < (ql ? 7 : 6); i++) {
+      var it2 = { kind: 'person', email: ppl[i].email };
+      if (!opts.skip(it2)) { items.push(it2); n++; }
+    }
+    if (EMAIL_RE.test(ql) && !dir.by[ql]) {
+      if (isInternalEmail(ql)) { var a = { kind: 'internal', email: ql }; if (!opts.skip(a)) items.push(a); }
+      else if (opts.guests && canInviteGuests()) { var g = { kind: 'guest', email: ql }; if (!opts.skip(g)) items.push(g); }
+      else if (opts.guests) items.push({ kind: 'blocked', email: ql });
+    }
+    return items;
+  }
+  function paintSg() {
+    var html = '', last = '';
+    sgItems.forEach(function (it, i) {
+      var sec = it.kind === 'team' ? 'Teams' : (it.kind === 'person' ? 'People' : 'Add by address');
+      if (sec !== last) { html += '<div class="ac-sg__h">' + sec + '</div>'; last = sec; }
+      if (it.kind === 'team') {
+        html += '<button type="button" class="ac-sg__o" role="option" data-i="' + i + '" aria-selected="' + (i === sgActive) + '"><span class="ac-av ac-av--team">' + icon('users') + '</span>' +
+          '<span class="ac-sg__t"><span class="ac-sg__n">' + esc(it.name) + '</span><span class="ac-sg__e">Team · ' + plural(it.n, 'person').replace('persons', 'people') + '</span></span></button>';
+      } else if (it.kind === 'person') {
+        var p = dir.by[it.email] || {};
+        html += '<button type="button" class="ac-sg__o" role="option" data-i="' + i + '" aria-selected="' + (i === sgActive) + '">' + avatarHTML(it.email) +
+          '<span class="ac-sg__t"><span class="ac-sg__n">' + esc(p.name || nameOf(it.email)) + '</span><span class="ac-sg__e">' + esc(it.email) + (p.title ? ' · ' + esc(p.title) : '') + '</span></span></button>';
+      } else if (it.kind === 'blocked') {
+        html += '<div class="ac-sg__x">' + icon('lock') + '<span><b>' + esc(it.email) + '</b> is outside ' + esc(meta.domain) + '. Only an owner can invite guests.</span></div>';
+      } else {
+        html += '<button type="button" class="ac-sg__o" role="option" data-i="' + i + '" aria-selected="' + (i === sgActive) + '"><span class="ac-av">' + esc(it.email.charAt(0).toUpperCase()) + '</span>' +
+          '<span class="ac-sg__t"><span class="ac-sg__n">' + (it.kind === 'guest' ? 'Invite ' : 'Add ') + esc(it.email) + '</span><span class="ac-sg__e">' +
+          (it.kind === 'guest' ? 'Outside ' + esc(meta.domain) + ' · a guest for ' + GUEST_DAYS + ' days' : 'Not found in the directory') + '</span></span></button>';
+      }
+    });
+    var foot = '';
+    if (dir.source && dir.source.slack !== 'ok' && meta.you && meta.you.owner) {
+      foot = '<div class="ac-sg__f">' + (dir.source.slack === 'missing_scope'
+        ? 'Suggestions are limited to people who have signed in. Give Bruce the <code>users:read.email</code> scope to search everyone.'
+        : 'Suggestions are limited to people who have signed in.') + '</div>';
+    }
+    sg.innerHTML = (html || '<div class="ac-sg__x"><span>No match. Type a full address to add someone.</span></div>') + foot;
+  }
+  function refreshSg() {
+    if (!sgInput || !sgOpts) return;
+    sgItems = buildItems(sgInput.value, sgOpts).filter(function (x) { return x.kind !== 'blocked' || true; });
+    sgActive = sgItems.findIndex(function (x) { return x.kind !== 'blocked'; });
+    ensureSg(); paintSg(); sg.hidden = false; placeSg();
+  }
+  function pickSg(i) {
+    var it = sgItems[i], o = sgOpts, inp = sgInput;
+    if (!it || it.kind === 'blocked') return;
+    o.onPick(it);
+    /* Picking may have redrawn the page (the People tab does), leaving this input detached: close the list, the new adder is focused for the next pick. */
+    if (inp && !document.body.contains(inp)) { closeSg(); return; }
+    if (inp) { inp.value = ''; inp.focus(); }
+    refreshSg();
+  }
+  function bindSuggest(input, opts) {
+    input.setAttribute('autocomplete', 'off');
+    input.setAttribute('data-1p-ignore', 'true'); input.setAttribute('data-lpignore', 'true'); input.setAttribute('data-form-type', 'other');
+    input.addEventListener('focus', function () { sgInput = input; sgOpts = opts; if (sgQuiet) { sgQuiet = false; return; } refreshSg(); });
+    input.addEventListener('input', function () { sgInput = input; sgOpts = opts; refreshSg(); });
+    input.addEventListener('blur', function () { setTimeout(function () { if (sgInput === input) closeSg(); }, 120); });
+    input.addEventListener('keydown', function (ev) {
+      var open = sg && !sg.hidden && sgInput === input, k = ev.key;
+      if (open && (k === 'ArrowDown' || k === 'ArrowUp')) {
+        ev.preventDefault();
+        var sel = sgItems.map(function (x, i) { return x.kind === 'blocked' ? -1 : i; }).filter(function (i) { return i > -1; });
+        if (!sel.length) return;
+        var at = sel.indexOf(sgActive), nx = k === 'ArrowDown' ? (at + 1) % sel.length : (at - 1 + sel.length) % sel.length;
+        sgActive = sel[nx]; paintSg();
+        var a = sg.querySelector('[aria-selected="true"]'); if (a && a.scrollIntoView) a.scrollIntoView({ block: 'nearest' });
+      } else if (open && (k === 'Enter' || k === 'Tab') && sgActive > -1 && input.value) {
+        ev.preventDefault(); pickSg(sgActive);
+      } else if (k === 'Enter' && input.value && EMAIL_RE.test(input.value.trim().toLowerCase())) {
+        ev.preventDefault();
+        var e = input.value.trim().toLowerCase();
+        var made = dir.by[e] ? { kind: 'person', email: e } : (isInternalEmail(e) ? { kind: 'internal', email: e } : (opts.guests && canInviteGuests() ? { kind: 'guest', email: e } : null));
+        if (made && !opts.skip(made)) { opts.onPick(made); input.value = ''; refreshSg(); }
+      } else if (k === 'Escape') { closeSg(); }
+      else if (k === 'Backspace' && !input.value && opts.onBackspace) { opts.onBackspace(); }
+    });
+    /* A pasted list: "a@x.com, b@x.com; Priya Nair\nsam@x.com". Split on commas, semicolons, new lines and tabs; match each piece to a
+       team, an address, or a unique name in the directory; add what resolves and say what did not. */
+    input.addEventListener('paste', function (ev) {
+      var text = (ev.clipboardData || window.clipboardData).getData('text') || '';
+      if (!/[,;\n\t]|\S+@\S+\s+\S+@/.test(text.trim())) return;          // a single value: let it paste into the box and suggest as normal
+      ev.preventDefault();
+      var parts = text.split(/[,;\n\t]+|\s+(?=\S+@)/).map(function (s) { return s.trim().replace(/^<|>$/g, ''); }).filter(Boolean);
+      var added = 0, miss = [], guests = 0;
+      parts.forEach(function (raw) {
+        var q = raw.toLowerCase(), item = null;
+        var m = q.match(/<([^>]+)>/); if (m) q = m[1];                    // "Name <a@x.com>"
+        if (opts.teams && draft.groups && draft.groups[q.replace(/^@/, '')]) item = { kind: 'team', name: q.replace(/^@/, '') };
+        else if (EMAIL_RE.test(q)) item = dir.by[q] ? { kind: 'person', email: q } : (isInternalEmail(q) ? { kind: 'internal', email: q } : (opts.guests && canInviteGuests() ? { kind: 'guest', email: q } : null));
+        else {
+          var hit = dir.people.filter(function (p) { return (p.name || '').toLowerCase() === q; });
+          if (!hit.length) hit = dir.people.filter(function (p) { return (p.name || '').toLowerCase().indexOf(q) > -1; });
+          if (hit.length === 1) item = { kind: 'person', email: hit[0].email };
+        }
+        if (!item) { miss.push(raw); return; }
+        if (opts.skip(item)) return;
+        opts.onPick(item); added++; if (item.kind === 'guest') guests++;
+      });
+      if (opts.onPasted) opts.onPasted({ added: added, guests: guests, missed: miss });
+      closeSg();
+    });
+  }
+  document.addEventListener('scroll', placeSg, true);
+  window.addEventListener('resize', placeSg);
+
+  /* The picker: the people and teams named on a rule, as removable pills, with a search box to add more. It writes to the
+     draft through onChange({ people, groups }). `locked` makes it read-only (an owner-only rule seen by an admin). */
+  function buildPicker(cfg) {
+    var value = { people: (cfg.people || []).slice(), groups: (cfg.groups || []).slice() };
+    var host = el('<div class="ac-pick" data-sghost><span class="ac-pick__pp"></span><input class="ac-pick__in" type="text" spellcheck="false"></div>');
+    var pills = host.querySelector('.ac-pick__pp'), input = host.querySelector('input');
+    input.placeholder = cfg.locked ? '' : (cfg.placeholder || 'Add people or a team');
+    input.setAttribute('aria-label', cfg.label || 'People and teams');
+    if (cfg.locked) input.disabled = true;
+    var note = el('<div class="ac-pick__note" hidden></div>');
+    function paint() {
+      pills.innerHTML = '';
+      value.groups.forEach(function (g) {
+        var ok = !!(draft.groups && draft.groups[g]);
+        pills.appendChild(el('<span class="ac-pp ac-pp--team' + (ok ? '' : ' is-gone') + '" data-g="' + esc(g) + '" title="' + (ok ? 'A team of ' + plural((draft.groups[g] || []).length, 'person').replace('persons', 'people') : 'This team no longer exists') + '">' + icon('users') +
+          '<span>' + esc(g) + '</span>' + (cfg.locked ? '' : '<button type="button" aria-label="Remove ' + esc(g) + '">' + icon('x') + '</button>') + '</span>'));
+      });
+      value.people.forEach(function (e) {
+        var g = guestFor(e), ext = !isInternalEmail(e);
+        pills.appendChild(el('<span class="ac-pp" data-e="' + esc(e) + '" title="' + esc(e) + '">' + avatarHTML(e) + '<span>' + esc(ext ? e : nameOf(e)) + '</span>' +
+          (ext ? '<em class="ac-pp__tag">Guest</em>' : '') + (cfg.locked ? '' : '<button type="button" aria-label="Remove ' + esc(e) + '">' + icon('x') + '</button>') + '</span>'));
+      });
+      if (cfg.locked && !value.groups.length && !value.people.length) pills.appendChild(el('<span class="ac-pick__none">Nobody named</span>'));
+    }
+    function changed() { cfg.onChange({ people: value.people.slice(), groups: value.groups.slice() }); paint(); }
+    pills.addEventListener('click', function (ev) {
+      var b = ev.target.closest('button'); if (!b) return;
+      var pp = b.closest('.ac-pp');
+      if (pp.dataset.g) value.groups = value.groups.filter(function (x) { return x !== pp.dataset.g; });
+      else value.people = value.people.filter(function (x) { return x !== pp.dataset.e; });
+      changed(); input.focus();
+    });
+    host.addEventListener('mousedown', function (ev) { if (ev.target === host && !cfg.locked) { ev.preventDefault(); input.focus(); } });
+    if (!cfg.locked) bindSuggest(input, {
+      teams: cfg.teams !== false, guests: cfg.guests === true,
+      skip: function (it) { return it.kind === 'team' ? value.groups.indexOf(it.name) > -1 : value.people.indexOf(it.email) > -1; },
+      onPick: function (it) {
+        if (it.kind === 'team') value.groups.push(it.name);
+        else { if (it.kind === 'guest') addGuest(it.email); value.people.push(it.email); }
+        changed();
+      },
+      onBackspace: function () { if (value.people.length) { value.people.pop(); changed(); } else if (value.groups.length) { value.groups.pop(); changed(); } },
+      onPasted: function (r) {
+        changed();
+        var msg = [];
+        if (r.added) msg.push('Added ' + r.added + (r.guests ? ' (' + r.guests + ' as guests)' : '') + '.');
+        if (r.missed.length) msg.push('Could not match: ' + r.missed.slice(0, 5).map(esc).join(', ') + (r.missed.length > 5 ? ' and ' + (r.missed.length - 5) + ' more' : '') + '.');
+        note.innerHTML = msg.join(' '); note.hidden = !msg.length;
+        setTimeout(function () { note.hidden = true; }, 8000);
+      }
+    });
+    paint();
+    var wrap = el('<div class="ac-pickwrap"></div>');
+    wrap.appendChild(host); wrap.appendChild(note);
+    return wrap;
+  }
+
+  /* -- the People tab -------------------------------------------------------------------------------------------------- */
+
+  var pplSel = 'admins';
+  function teamUsage(name) {
+    var pages = draft.routes.filter(function (r) { return (r.groups || []).indexOf(name) > -1; }).map(function (r) { return r.path; });
+    var lanes = Object.keys(draft.lanes || {}).filter(function (l) { return ((draft.lanes[l] || {}).groups || []).indexOf(name) > -1; });
+    return { pages: pages, lanes: lanes };
+  }
+  function listOf(sel) {
+    if (sel === 'owners') return (meta.owners || []).map(function (e) { return e.toLowerCase(); });
+    if (sel === 'admins') return (draft.admins || []).filter(function (e) { return !isOwnerEmail(e); });
+    if (sel === 'guests') return Object.keys(draft.guests || {}).sort();
+    return ((draft.groups || {})[sel.slice(5)] || []);
+  }
+  function memberRow(email, sel, canEdit) {
+    var g = guestFor(email), owner = isOwnerEmail(email), p = dir.by[email];
+    var tags = '';
+    if (owner && sel !== 'owners') tags += '<em class="ac-pp__tag">Owner</em>';
+    else if (!owner && sel !== 'admins' && (draft.admins || []).indexOf(email) > -1) tags += '<em class="ac-pp__tag">Admin</em>';
+    if (!isInternalEmail(email)) tags += '<em class="ac-pp__tag ac-pp__tag--guest">Guest</em>';
+    var right = '';
+    if (g && sel === 'guests') {
+      var gone = daysLeft(g) < 0;
+      right = '<span class="ac-mem__exp' + (gone ? ' is-gone' : '') + '">' + esc(expiryText(g)) + '</span>' +
+        (canInviteGuests() ? '<button class="ac-btn ac-btn--sm" type="button" data-act="renew" data-e="' + esc(email) + '">Renew</button>' : '');
+    }
+    var del = owner && sel === 'owners' ? '<span class="ac-mem__lock" title="Set in the environment">' + icon('lock') + '</span>'
+      : (canEdit ? '<button class="ac-icbtn" type="button" data-act="rm" data-e="' + esc(email) + '" aria-label="Remove ' + esc(email) + '">' + icon('x') + '</button>' : '<span></span>');
+    return '<div class="ac-mem">' + avatarHTML(email, true) +
+      '<div class="ac-mem__t"><span class="ac-mem__n">' + esc(p && p.name ? p.name : nameOf(email)) + '</span><span class="ac-mem__e">' + esc(email) + (p && p.title ? ' · ' + esc(p.title) : '') + '</span></div>' +
+      '<div class="ac-mem__r">' + tags + right + '</div>' + del + '</div>';
+  }
+
+  function peopleCard() {
+    var teams = Object.keys(draft.groups || {}).sort();
+    if (pplSel.indexOf('team:') === 0 && teams.indexOf(pplSel.slice(5)) < 0) pplSel = 'admins';
+    var isOwner = !!meta.you.owner, cap = !!(meta.capabilities && meta.capabilities.guests);
+    var guests = Object.keys(draft.guests || {});
+
+    function item(sel, ico, label, n) {
+      return '<button type="button" class="ac-ppl__it" data-sel="' + esc(sel) + '" aria-current="' + (pplSel === sel) + '">' + icon(ico) + '<span>' + esc(label) + '</span><small>' + n + '</small></button>';
+    }
+    var rail = '<div class="ac-ppl__sec">Company</div>' +
+      item('owners', 'lock', 'Owners', (meta.owners || []).length) + item('admins', 'shield', 'Admins', listOf('admins').length) +
+      '<div class="ac-ppl__sec">Teams</div>' +
+      (teams.length ? teams.map(function (t) { return item('team:' + t, 'users', t, listOf('team:' + t).length); }).join('') : '<p class="ac-ppl__empty">No teams yet.</p>') +
+      '<form class="ac-ppl__new" data-newteam><input class="ac-field" placeholder="New team, e.g. gtm" aria-label="New team name" data-1p-ignore="true" data-lpignore="true" data-form-type="other"><button class="ac-btn" type="submit" aria-label="Add team">' + icon('plus') + '</button></form>' +
+      (cap || guests.length ? '<div class="ac-ppl__sec">Outside the company</div>' + item('guests', 'globe', 'Guests', guests.length) : '');
+
+    var card = el('<section class="ac-card"><div class="ac-card__hd"><div><h3>People</h3><p>Owners, admins, teams and guests.</p></div></div>' +
+      '<div class="ac-card__body"><div class="ac-ppl"><nav class="ac-ppl__rail" aria-label="Groups of people">' + rail + '</nav><div class="ac-ppl__main" data-main></div></div></div></section>');
+    var main = card.querySelector('[data-main]');
+
+    /* what this group is, and who may change it */
+    var sel = pplSel, isTeam = sel.indexOf('team:') === 0, tname = isTeam ? sel.slice(5) : '';
+    var title = sel === 'owners' ? 'Owners' : sel === 'admins' ? 'Admins' : sel === 'guests' ? 'Guests' : tname;
+    var desc = sel === 'owners' ? 'Set in the environment, so they cannot be edited from here or locked out of it. Owners add and remove admins and guests, decide which pages are owners only, and say who may publish to a staging lane.'
+      : sel === 'admins' ? 'Change page access and teams here, and open every page an owner has not kept to themselves. Admins cannot change who is an admin.'
+      : sel === 'guests' ? 'People outside ' + meta.domain + ' who can open the pages and tools they are named on, and nothing else. Each guest signs in with their own Google account and lapses after ' + GUEST_DAYS + ' days unless renewed here.'
+      : 'A named list of people. Give a page, a tool or a staging lane to a team instead of to a list of addresses.';
+    var usage = isTeam ? teamUsage(tname) : null;
+    var onLane = !!(usage && usage.lanes.length);
+    var canEdit = sel === 'owners' ? false : sel === 'admins' ? isOwner : sel === 'guests' ? (isOwner && cap) : (isOwner || !onLane);
+    var why = sel === 'owners' ? '' : (!canEdit ? (sel === 'admins' ? 'Only an owner can change who is an admin.' : sel === 'guests' ? (cap ? 'Only an owner can invite guests.' : 'Guests are not switched on yet.') : 'This team can publish to a staging lane, so only an owner can change who is in it.') : '');
+
+    var members = listOf(sel);
+    var html = '<div class="ac-ppl__hd"><h3>' + (isTeam ? icon('users') : '') + esc(title) + '<span class="ac-ppl__n">' + members.length + '</span></h3><p>' + esc(desc) + '</p></div>';
+    if (canEdit) html += '<div class="ac-ppl__add"><div data-add></div></div>';
+    else if (why) html += '<div class="ac-note">' + icon('lock') + '<span>' + esc(why) + '</span></div>';
+    html += '<div class="ac-ppl__list">' + (members.length ? members.map(function (e) { return memberRow(e, sel, canEdit); }).join('') :
+      '<div class="ac-ppl__none">' + (sel === 'guests' ? 'No guests.' : 'Nobody here yet.') + (canEdit ? ' Search above to add someone.' : '') + '</div>') + '</div>';
+    if (isTeam) {
+      html += '<div class="ac-ppl__use"><h4>Used by</h4>' + ((usage.pages.length || usage.lanes.length) ?
+        '<ul>' + usage.lanes.map(function (l) { return '<li>' + icon('arrow-right') + '<span>Staging lane <b>' + esc(l) + '</b>, can publish</span></li>'; }).join('') +
+          usage.pages.slice(0, 6).map(function (p) { return '<li>' + icon('arrow-right') + '<span><code>' + esc(p) + '</code></span></li>'; }).join('') +
+          (usage.pages.length > 6 ? '<li><span>and ' + (usage.pages.length - 6) + ' more</span></li>' : '') + '</ul>'
+        : '<p class="ac-ppl__none">Nothing yet. Pick this team on a page, a tool or a staging lane.</p>') + '</div>';
+      html += '<div class="ac-ppl__acts"><button class="ac-btn" type="button" data-act="rename">Rename</button><button class="ac-btn ac-btn--danger" type="button" data-act="delteam">Delete team</button></div><div data-confirm></div>';
+    }
+    main.innerHTML = html;
+
+    /* adding people: the same search as everywhere, picking adds a row */
+    var add = main.querySelector('[data-add]');
+    if (add) {
+      var host = el('<div class="ac-pick" data-sghost><input class="ac-pick__in" type="text" spellcheck="false"></div>');
+      var inp = host.querySelector('input');
+      inp.placeholder = sel === 'guests' ? 'Invite by email address, outside ' + meta.domain : 'Search by name or email, or paste a list';
+      inp.setAttribute('aria-label', 'Add to ' + title);
+      var noteEl = el('<div class="ac-pick__note" hidden></div>');
+      add.appendChild(host); add.appendChild(noteEl);
+      var again = pplRefocus; pplRefocus = false;
+      if (pplNote) { noteEl.innerHTML = pplNote; noteEl.hidden = false; pplNote = ''; setTimeout(function () { noteEl.hidden = true; }, 8000); }
+      bindSuggest(inp, {
+        teams: false, guests: sel === 'guests' || isTeam,
+        skip: function (it) { return it.kind !== 'team' && listOf(sel).indexOf(it.email) > -1; },
+        onPick: function (it) {
+          pplRefocus = true;
+          if (it.kind === 'guest') addGuest(it.email);
+          if (sel === 'guests') { addGuest(it.email); }
+          else if (sel === 'admins') { draft.admins = draft.admins || []; if (draft.admins.indexOf(it.email) < 0) draft.admins.push(it.email); }
+          else { var l = draft.groups[tname]; if (l.indexOf(it.email) < 0) l.push(it.email); }
+          render();
+        },
+        onPasted: function (r) {
+          var msg = [];
+          if (r.added) msg.push('Added ' + r.added + (r.guests ? ' (' + r.guests + ' as guests)' : '') + '.');
+          if (r.missed.length) msg.push('Could not match: ' + r.missed.slice(0, 5).map(esc).join(', ') + (r.missed.length > 5 ? ' and ' + (r.missed.length - 5) + ' more' : '') + '.');
+          pplNote = msg.join(' '); pplRefocus = true; render();
+        }
+      });
+      if (again) { sgQuiet = true; inp.focus(); }
+    }
+
+    main.addEventListener('click', function (ev) {
+      var b = ev.target.closest('[data-act]'); if (!b) return;
+      var a = b.dataset.act, e = b.dataset.e;
+      if (a === 'rm') {
+        if (sel === 'admins') draft.admins = draft.admins.filter(function (x) { return x !== e; });
+        else if (sel === 'guests') { delete draft.guests[e]; scrubEmail(e); }
+        else draft.groups[tname] = draft.groups[tname].filter(function (x) { return x !== e; });
+        render();
+      } else if (a === 'renew') {
+        draft.guests[e].expires = ymd(Date.now() + GUEST_DAYS * 864e5); render();
+      } else if (a === 'delteam') {
+        var c = main.querySelector('[data-confirm]');
+        c.innerHTML = '<div class="ac-confirm"><p>Delete <b>' + esc(tname) + '</b>?' + ((usage.pages.length || usage.lanes.length) ? ' It is named on ' + usage.pages.length + ' page rule' + (usage.pages.length === 1 ? '' : 's') + (usage.lanes.length ? ' and ' + usage.lanes.length + ' staging lane' + (usage.lanes.length === 1 ? '' : 's') : '') + ', and will be taken off ' + (usage.pages.length + usage.lanes.length === 1 ? 'it' : 'them') + '. Nobody loses the Google account; they just lose what this team gave them.' : ' Nothing uses it.') + '</p>' +
+          '<div><button class="ac-btn ac-btn--danger" type="button" data-act="delyes">Delete</button><button class="ac-btn" type="button" data-act="delno">Cancel</button></div></div>';
+      } else if (a === 'delno') { main.querySelector('[data-confirm]').innerHTML = '';
+      } else if (a === 'delyes') {
+        delete draft.groups[tname];
+        draft.routes.forEach(function (r) { r.groups = (r.groups || []).filter(function (g) { return g !== tname; }); });
+        Object.keys(draft.lanes || {}).forEach(function (l) { draft.lanes[l].groups = (draft.lanes[l].groups || []).filter(function (g) { return g !== tname; }); });
+        pplSel = 'admins'; render();
+      } else if (a === 'rename') {
+        var c2 = main.querySelector('[data-confirm]');
+        c2.innerHTML = '<form class="ac-confirm" data-rename><input class="ac-field" value="' + esc(tname) + '" aria-label="New name" maxlength="40"><button class="ac-btn ac-btn--primary" type="submit">Save name</button><button class="ac-btn" type="button" data-act="delno">Cancel</button></form>';
+        var f = c2.querySelector('input'); f.focus(); f.select();
+        c2.querySelector('form').addEventListener('submit', function (e2) {
+          e2.preventDefault();
+          var n = f.value.trim().toLowerCase().replace(/^@/, '');
+          if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(n) || n.length > 40) { f.setCustomValidity('Lowercase words joined by hyphens'); f.reportValidity(); return; }
+          if (n === tname) { c2.innerHTML = ''; return; }
+          if (draft.groups[n]) { f.setCustomValidity('A team with that name exists'); f.reportValidity(); return; }
+          draft.groups[n] = draft.groups[tname]; delete draft.groups[tname];
+          draft.routes.forEach(function (r) { r.groups = (r.groups || []).map(function (g) { return g === tname ? n : g; }); });
+          Object.keys(draft.lanes || {}).forEach(function (l) { draft.lanes[l].groups = (draft.lanes[l].groups || []).map(function (g) { return g === tname ? n : g; }); });
+          pplSel = 'team:' + n; render();
+        });
+      }
     });
 
-    card.querySelector('[data-addgroup]').addEventListener('click', function () {
-      var input = card.querySelector('[data-newgroup]');
-      var name = input.value.trim().toLowerCase().replace(/^@/, '');
-      if (!name || draft.groups[name]) { input.value = ''; return; }
-      draft.groups[name] = [];
-      render();
+    card.querySelector('.ac-ppl__rail').addEventListener('click', function (ev) {
+      var b = ev.target.closest('[data-sel]'); if (!b) return;
+      pplSel = b.dataset.sel; render();
     });
-
+    card.querySelector('[data-newteam]').addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var f = ev.target.querySelector('input'), n = f.value.trim().toLowerCase().replace(/^@/, '');
+      if (!n) return;
+      if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(n) || n.length > 40) { f.setCustomValidity('Lowercase words joined by hyphens, like gtm or customer-success'); f.reportValidity(); f.setCustomValidity(''); return; }
+      if (!draft.groups[n]) draft.groups[n] = [];
+      pplSel = 'team:' + n; render();
+    });
     return card;
+  }
+
+  /* A guest removed from the list is taken off every rule and team that named them, so nothing keeps pointing at someone who can no longer sign in. */
+  function scrubEmail(e) {
+    draft.routes.forEach(function (r) { r.people = (r.people || []).filter(function (x) { return x !== e; }); });
+    Object.keys(draft.groups || {}).forEach(function (g) { draft.groups[g] = draft.groups[g].filter(function (x) { return x !== e; }); });
+    Object.keys(draft.lanes || {}).forEach(function (l) { draft.lanes[l].people = (draft.lanes[l].people || []).filter(function (x) { return x !== e; }); });
   }
 
   /* -- staging lanes ----------------------------------------------------------- */
@@ -875,30 +1336,21 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
     }
     names.forEach(function (name) {
       var l = lanes[name];
-      var who = [].concat((l.groups || []).map(function (g) { return '@' + g; }), l.people || []).join(', ');
-      mount.appendChild(el(
-        '<div class="ac-row" style="grid-template-columns:minmax(120px,240px) minmax(0,1fr) 44px">' +
+      var row = el(
+        '<div class="ac-row ac-row--lane">' +
           '<div class="ac-row__path">' + pathHTML('/internal/staging/' + name) + '</div>' +
-          '<div><input class="ac-field" data-lane="' + esc(name) + '" data-suggest="people" autocomplete="off" ' +
-            'value="' + esc(who) + '" ' + (canEdit ? '' : 'disabled ') +
-            'aria-label="Who can publish to the ' + esc(name) + ' lane" ' +
-            'placeholder="name@' + esc(meta.domain) + ', @group" ' +
-            'data-1p-ignore="true" data-lpignore="true" data-form-type="other"></div>' +
+          '<div data-pk></div>' +
           '<div>' + (canEdit ? '<button class="ac-icbtn" type="button" data-droplane="' + esc(name) + '" ' +
             'aria-label="Remove the ' + esc(name) + ' lane. Pages already published stay."' + '>' + icon('trash') + '</button>' : '') + '</div>' +
-        '</div>'
-      ));
+        '</div>');
+      row.querySelector('[data-pk]').appendChild(buildPicker({
+        people: l.people, groups: l.groups, guests: false, locked: !canEdit, placeholder: 'Add a team or people who can publish',
+        label: 'Who can publish to the ' + name + ' lane',
+        onChange: function (v) { lanes[name] = { groups: v.groups, people: v.people }; paintBar(); }
+      }));
+      mount.appendChild(row);
     });
 
-    mount.addEventListener('change', function (ev) {
-      var name = ev.target.dataset.lane; if (!name || !canEdit) return;
-      var parts = ev.target.value.split(',').map(function (x) { return x.trim(); }).filter(Boolean);
-      lanes[name] = {
-        groups: parts.filter(function (x) { return x.charAt(0) === '@'; }).map(function (x) { return x.slice(1).toLowerCase(); }),
-        people: parts.filter(function (x) { return x.charAt(0) !== '@'; }).map(function (x) { return x.toLowerCase(); })
-      };
-      paintBar();
-    });
     mount.addEventListener('click', function (ev) {
       var btn = ev.target.closest('[data-droplane]'); if (!btn || !canEdit) return;
       delete lanes[btn.dataset.droplane];
@@ -917,93 +1369,6 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
       lanes[name] = { groups: [], people: [] };
       render();
     });
-
-    return card;
-  }
-
-  function adminsCard() {
-    var owners = (meta.owners || []).map(function (e) { return e.toLowerCase(); });
-    var extra = (draft.admins || []).filter(function (e) { return owners.indexOf(e) === -1; });
-
-    var card = el(
-      '<section class="ac-card">' +
-        '<div class="ac-card__hd">' +
-          '<div><h3>Owners &amp; admins</h3><p>Two levels. Owners can open every page and ' +
-            'manage this one. Admins can open every page except those set to Owners only.</p></div>' +
-          '<span class="ac-card__n">' + (owners.length + extra.length === 1 ? '1 person' : (owners.length + extra.length) + ' people') + '</span>' +
-        '</div>' +
-        '<div class="ac-card__body ac-lvls">' +
-
-          '<div class="ac-lvl" data-lvl="owner">' +
-            '<div class="ac-lvl__hd">' +
-              '<div class="ac-lvl__t">Owners <span class="ac-lvl__n">' + owners.length + '</span></div>' +
-              '<p>Set in the environment, so they cannot be edited from here or locked out of ' +
-                'it. Owners add and remove admins, and decide which pages are Owners only.</p>' +
-            '</div>' +
-            '<div class="ac-people" data-owners></div>' +
-          '</div>' +
-
-          '<div class="ac-lvl" data-lvl="admin">' +
-            '<div class="ac-lvl__hd">' +
-              '<div class="ac-lvl__t">Admins <span class="ac-lvl__n">' + extra.length + '</span></div>' +
-              '<p>Change page access and groups here, and open every page an owner has not ' +
-                'kept to themselves. Admins cannot change who is an admin.</p>' +
-            '</div>' +
-            '<div class="ac-people" data-admins></div>' +
-            (meta.you.owner
-              ? '<div class="ac-lvl__add">' +
-                  '<input class="ac-field" data-newadmin data-suggest="admin" autocomplete="off" placeholder="name@' + esc(meta.domain) + '" ' +
-                    'type="email" aria-label="Email to make an admin" ' +
-                    'data-1p-ignore="true" data-lpignore="true" data-form-type="other">' +
-                  '<button class="ac-btn" type="button" data-addadmin>' + icon('plus') +
-                    '<span>Add an admin</span></button>' +
-                '</div>'
-              : '<div class="ac-note">' + icon('info') +
-                '<span>Only an owner can add or remove an admin, or change which pages are ' +
-                'Owners only. You can change everything else here.</span></div>') +
-          '</div>' +
-
-        '</div>' +
-      '</section>'
-    );
-
-    var ownersMount = card.querySelector('[data-owners]');
-    owners.forEach(function (e) {
-      ownersMount.appendChild(el('<span class="ac-chip ac-chip--owner">' + icon('lock') +
-        esc(e) + '</span>'));
-    });
-
-    var mount = card.querySelector('[data-admins]');
-    extra.forEach(function (e) {
-      mount.appendChild(el('<span class="ac-chip">' + esc(e) +
-        (meta.you.owner
-          ? '<button type="button" data-dropadmin="' + esc(e) + '" ' +
-            'aria-label="Remove ' + esc(e) + ' as an admin">' + icon('x') + '</button>'
-          : '<span style="width:8px"></span>') + '</span>'));
-    });
-    if (!extra.length) {
-      mount.appendChild(el('<span style="font:var(--gw-text-body-14-reg);' +
-        'color:var(--s-body)">No admins beyond the owners.</span>'));
-    }
-
-    mount.addEventListener('click', function (ev) {
-      var btn = ev.target.closest('[data-dropadmin]'); if (!btn) return;
-      var e = btn.dataset.dropadmin;
-      draft.admins = draft.admins.filter(function (a) { return a !== e; });
-      render();
-    });
-
-    var add = card.querySelector('[data-addadmin]');
-    if (add) {
-      add.addEventListener('click', function () {
-        var input = card.querySelector('[data-newadmin]');
-        var e = input.value.trim().toLowerCase();
-        if (!e || e.indexOf('@') === -1) return;
-        if (draft.admins.indexOf(e) === -1) draft.admins.push(e);
-        input.value = '';
-        render();
-      });
-    }
 
     return card;
   }
@@ -1155,228 +1520,6 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
     else if (k === 'End') { ev.preventDefault(); opts[opts.length - 1].focus(); }
   });
 
-  /* -- suggestions --------------------------------------------------------- */
-  /* There is no company directory to search, so the candidates are everyone already
-     named ANYWHERE in the rules — owners, admins, group members, people on a page —
-     plus a completion to name@domain for someone who is not there yet. That covers
-     the actual job: putting a person you have already granted something onto a second
-     thing, and typing a new address without typing the domain. */
-
-  var sug = null, sugInput = null, sugItems = [], sugActive = -1;
-
-  function knownPeople() {
-    var who = {};
-    function add(e, tag) {
-      e = String(e || '').trim().toLowerCase();
-      if (e.indexOf('@') < 1) return;
-      var t = who[e] = who[e] || [];
-      if (tag && t.indexOf(tag) === -1) t.push(tag);
-    }
-    (meta.owners || []).forEach(function (e) { add(e, 'Owner'); });
-    (draft.admins || []).forEach(function (e) { add(e, 'Admin'); });
-    Object.keys(draft.groups || {}).forEach(function (g) {
-      (draft.groups[g] || []).forEach(function (e) { add(e, '@' + g); });
-    });
-    draft.routes.forEach(function (r) { (r.people || []).forEach(function (e) { add(e, null); }); });
-    Object.keys(draft.lanes || {}).forEach(function (l) { ((draft.lanes[l] || {}).people || []).forEach(function (e) { add(e, null); }); });
-    if (meta.you) add(meta.you.email, 'You');
-    return who;
-  }
-
-  function tokensOf(input, atRest) {
-    var parts = input.value.split(',');
-    /* Focusing a field that already has addresses in it is not typing the last one.
-       Without this the last address was read as the half-typed token, so a filled
-       field suggested itself — or, being excluded as a duplicate, nothing at all. */
-    var typing = atRest ? '' : parts.pop();
-    return {
-      typing: typing.replace(/^\s+/, ''),
-      done: parts.map(function (x) { return x.trim().toLowerCase(); }).filter(Boolean)
-    };
-  }
-
-  function candidates(input, atRest) {
-    var kind = input.dataset.suggest, out = [];
-    var multi = kind !== 'admin';
-    var t = multi ? tokensOf(input, atRest) : { typing: input.value.trim(), done: [] };
-    var q = t.typing.toLowerCase(), taken = t.done.slice();
-    var who = knownPeople();
-    var owners = (meta.owners || []).map(function (e) { return e.toLowerCase(); });
-
-    function room() { return out.length < 6; }
-
-    /* @groups — only where a group is a valid thing to type. */
-    if (kind === 'people' && (q === '' || q.charAt(0) === '@')) {
-      var gq = q.replace(/^@/, '');
-      Object.keys(draft.groups || {}).sort().forEach(function (g) {
-        if (!room() || taken.indexOf('@' + g) !== -1) return;
-        if (gq && g.indexOf(gq) === -1) return;
-        out.push({ value: '@' + g, text: '@' + g, hint: ((draft.groups[g] || []).length === 1 ? '1 person' : (draft.groups[g] || []).length + ' people') });
-      });
-    }
-
-    if (q.charAt(0) !== '@') {
-      var list = Object.keys(who).filter(function (e) {
-        if (taken.indexOf(e) !== -1) return false;
-        if (kind === 'admin' && (owners.indexOf(e) !== -1 || (draft.admins || []).indexOf(e) !== -1)) return false;
-        return !q || e.indexOf(q) !== -1;
-      });
-      /* Starts-with before contains, then alphabetical: typing "sw" should put
-         swapnil@ above someone whose domain happens to contain it. */
-      list.sort(function (a, b) {
-        var as = a.indexOf(q) === 0 ? 0 : 1, bs = b.indexOf(q) === 0 ? 0 : 1;
-        return as - bs || a.localeCompare(b);
-      });
-      list.forEach(function (e) {
-        if (!room()) return;
-        out.push({ value: e, text: e, hint: who[e].slice(0, 2).join(' \u00b7 '), match: q });
-      });
-
-      /* Somebody new: complete the domain. Offered for "swap" and for "swap@gu",
-         not once the address is already whole. */
-      if (q && room()) {
-        var at = q.indexOf('@'), local = at === -1 ? q : q.slice(0, at);
-        var dom = at === -1 ? '' : q.slice(at + 1);
-        var full = local + '@' + meta.domain;
-        var okLocal = /^[a-z0-9._+-]+$/.test(local);
-        var partial = at === -1 || (dom !== meta.domain && meta.domain.indexOf(dom) === 0);
-        if (okLocal && partial && !who[full] && taken.indexOf(full) === -1) {
-          out.push({ value: full, text: full, hint: 'Add new', isNew: true, match: local });
-        }
-      }
-    }
-    return out;
-  }
-
-  function hi(text, m) {
-    if (!m) return esc(text);
-    var i = text.toLowerCase().indexOf(m);
-    if (i === -1) return esc(text);
-    return esc(text.slice(0, i)) + '<mark>' + esc(text.slice(i, i + m.length)) + '</mark>' +
-           esc(text.slice(i + m.length));
-  }
-
-  function ensureSug() {
-    if (sug) return sug;
-    sug = document.createElement('div');
-    sug.className = 'ac-sug'; sug.id = 'ac-sug'; sug.setAttribute('role', 'listbox');
-    sug.hidden = true;
-    document.body.appendChild(sug);
-    /* mousedown, not click: click fires after the input has blurred, and the blur
-       is what closes this. preventDefault keeps focus in the field. */
-    sug.addEventListener('mousedown', function (ev) {
-      var o = ev.target.closest('.ac-sug__o'); if (!o) return;
-      ev.preventDefault();
-      acceptSug(+o.dataset.i);
-    });
-    return sug;
-  }
-
-  function closeSug() {
-    if (!sug || sug.hidden) return;
-    sug.hidden = true;
-    if (sugInput) {
-      sugInput.setAttribute('aria-expanded', 'false');
-      sugInput.removeAttribute('aria-activedescendant');
-    }
-    sugActive = -1;
-  }
-
-  /* Under the field, or above it when there is no room below. Called on open AND on
-     every scroll: focusing a field near the bottom scrolls it into view, and closing
-     on that scroll — as this first did — meant the list vanished the instant it opened. */
-  function placeSug() {
-    if (!sug || sug.hidden || !sugInput) return;
-    var r = sugInput.getBoundingClientRect();
-    var port = document.querySelector('.gw-scroll');
-    var pr = port ? port.getBoundingClientRect() : { top: 0, bottom: window.innerHeight };
-    /* The field has scrolled out from under the bar, or off the bottom: stop. */
-    if (r.bottom < pr.top + 40 || r.top > pr.bottom - 8) { closeSug(); return; }
-    sug.style.left = r.left + 'px';
-    sug.style.width = Math.max(r.width, 260) + 'px';
-    sug.style.top = (r.bottom + 6) + 'px';
-    var h = sug.getBoundingClientRect().height;
-    if (r.bottom + 6 + h > window.innerHeight - 8) sug.style.top = Math.max(8, r.top - 6 - h) + 'px';
-  }
-
-  function paintSug() {
-    sug.innerHTML = sugItems.map(function (it, i) {
-      return '<button type="button" class="ac-sug__o' + (it.isNew ? ' ac-sug__o--new' : '') + '" role="option" ' +
-        'id="ac-sug-' + i + '" data-i="' + i + '" aria-selected="' + (i === sugActive) + '">' +
-        '<span class="ac-sug__t">' + hi(it.text, it.match) + '</span>' +
-        (it.hint ? '<span class="ac-sug__h">' + esc(it.hint) + '</span>' : '') + '</button>';
-    }).join('');
-    if (sugActive > -1) sugInput.setAttribute('aria-activedescendant', 'ac-sug-' + sugActive);
-    else sugInput.removeAttribute('aria-activedescendant');
-  }
-
-  function refreshSug(input, atRest) {
-    sugInput = input;
-    sugItems = candidates(input, atRest);
-    if (!sugItems.length) { closeSug(); return; }
-    ensureSug();
-    /* With something typed, the first match is already chosen so Enter/Tab takes it;
-       with nothing typed, nothing is, so Enter still means what it always did. */
-    var typing = input.dataset.suggest === 'admin' ? input.value.trim() : tokensOf(input, atRest).typing.trim();
-    sugActive = typing ? 0 : -1;
-    paintSug();
-    sug.hidden = false;
-    placeSug();
-    input.setAttribute('role', 'combobox');
-    input.setAttribute('aria-autocomplete', 'list');
-    input.setAttribute('aria-controls', 'ac-sug');
-    input.setAttribute('aria-expanded', 'true');
-  }
-
-  function acceptSug(i) {
-    var it = sugItems[i], inp = sugInput; if (!it || !inp) return;
-    if (inp.dataset.suggest === 'admin') {
-      inp.value = it.value;
-    } else {
-      var parts = inp.value.split(',');
-      parts.pop();
-      parts = parts.map(function (x) { return x.trim(); }).filter(Boolean);
-      parts.push(it.value);
-      inp.value = parts.join(', ') + ', ';
-    }
-    /* Both people fields commit on `change`, so fire it — the field's own handler then
-       updates the draft and the save bar exactly as if it had been typed and blurred. */
-    inp.dispatchEvent(new Event('change', { bubbles: true }));
-    closeSug();
-    inp.focus();
-  }
-
-  document.addEventListener('focusin', function (ev) {
-    if (ev.target.matches && ev.target.matches('[data-suggest]')) refreshSug(ev.target, true);
-  });
-  document.addEventListener('input', function (ev) {
-    if (ev.target.matches && ev.target.matches('[data-suggest]')) refreshSug(ev.target);
-  });
-  document.addEventListener('focusout', function (ev) {
-    if (ev.target.matches && ev.target.matches('[data-suggest]')) closeSug();
-  });
-  document.addEventListener('keydown', function (ev) {
-    if (!sug || sug.hidden || ev.target !== sugInput) return;
-    var k = ev.key;
-    if (k === 'ArrowDown' || k === 'ArrowUp') {
-      ev.preventDefault();
-      var n = sugItems.length;
-      sugActive = k === 'ArrowDown' ? (sugActive + 1) % n : (sugActive - 1 + n) % n;
-      paintSug();
-      var a = document.getElementById('ac-sug-' + sugActive);
-      if (a && a.scrollIntoView) a.scrollIntoView({ block: 'nearest' });
-    } else if ((k === 'Enter' || k === 'Tab') && sugActive > -1) {
-      ev.preventDefault();
-      acceptSug(sugActive);
-    } else if (k === 'Escape') {
-      ev.preventDefault();
-      closeSug();
-    }
-  });
-  /* A fixed popover does not follow the field by itself, so it is re-placed. */
-  document.addEventListener('scroll', placeSug, true);
-  window.addEventListener('resize', placeSug);
-
   /* -- boot --------------------------------------------------------------- */
 
   function render() {
@@ -1394,9 +1537,8 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
     mount.appendChild(toolsCard());
     mount.appendChild(templatesCard());
     mount.appendChild(pagesCard());
-    mount.appendChild(groupsCard());
+    mount.appendChild(peopleCard());
     mount.appendChild(lanesCard());
-    mount.appendChild(adminsCard());
     paintTabs();
     paintBar();
   }
@@ -1413,6 +1555,7 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
     });
     if (!items.length) { bar.innerHTML = ''; return; }
     var want = activeTab || location.hash.slice(1);
+    if (want === 'groups' || want === 'owners-admins') want = 'people';   // the two old tabs are one now
     if (!items.some(function (t) { return t.key === want; })) want = items[0].key;
     activeTab = want;
     bar.innerHTML = '';
@@ -1452,6 +1595,7 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
       r.admins = r.admins || [];
       r.groups = r.groups || {};
       r.lanes = r.lanes || {};
+      r.guests = r.guests || {};
       r.routes = (r.routes || []).map(function (x) {
         var row = { path: x.path, access: x.access,
                     groups: x.groups || [], people: x.people || [] };
@@ -1463,6 +1607,9 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
       document.getElementById('ac-state').innerHTML = '';
       document.getElementById('ac-app').hidden = false;
       render();
+      /* The directory arrives after the page is usable; until then people are just their addresses. */
+      fetch('/api/access?directory=1', { credentials: 'same-origin' }).then(function (d) { return d.json(); })
+        .then(function (d) { setDirectory(d); render(); }).catch(function () { setDirectory({ people: [] }); });
     })
     .catch(function (e) {
       document.getElementById('ac-state').innerHTML =

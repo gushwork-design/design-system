@@ -34,12 +34,13 @@
    nobody's saved work disappears without them deleting it.
    ========================================================================= */
 
-import { COOKIE, verify, readCookie, sessionSecret } from './_session.js';
+import { readAnySession } from './_session.js';
 import { loadRules, decide, isAdmin, allowedDomain } from './_access.js';
 
 const KEY = 'gw:certs';
 const NAMES = 'gw:cert-names';   // email -> the display name from that person's own Google sign-in
 const MAX_ITEMS = 1000;
+const GUEST_MAX_ITEMS = 20;
 const MAX_PEOPLE = 50;
 const MAX_TITLE = 120;
 const MAX_PAGES = 50;
@@ -123,6 +124,13 @@ function newId() {
 
 /* What this person may do with this certificate. */
 function perms(item, me) {
+  /* A GUEST (an outside person let in to this tool) sees and changes only what they made themselves. They are never on a share
+     list (those take company addresses only), and the 'everyone who can open the tool' default is about the company's people, so
+     it does not reach them: the company's certificates are not theirs to see. */
+  if (me.guest) {
+    const own = item.savedBy === me.email;
+    return { view: own, edit: own, share: false, manage: own };
+  }
   const access = item.access || DEFAULT_ACCESS;
   const manage = me.admin || item.savedBy === me.email;
   const person = (access.people || []).find((p) => p.email === me.email);
@@ -137,7 +145,7 @@ function present(item, me) {
 }
 
 export default async function handler(req, res) {
-  const session = await verify(readCookie(req.headers.cookie, COOKIE), sessionSecret());
+  const session = await readAnySession(req.headers.cookie);       // a guest is accepted here, and only here, and only if decide() below allows the tool
   if (!session) return json(res, 401, { error: 'Not signed in.' });
   const rules = await loadRules();
   if (!TOOL_PATHS.some((p) => decide(p, session, rules) === 'allow')) {
@@ -148,12 +156,13 @@ export default async function handler(req, res) {
   const email = session.email ? String(session.email).toLowerCase() : '';
   const me = {
     email: email || '(shared password)',
-    admin: !email || session.via === 'password' || isAdmin(email, rules),
+    admin: !session.guest && (!email || session.via === 'password' || isAdmin(email, rules)),
+    guest: !!session.guest,
   };
 
   // remember this visitor's own name, from the signed session only
   const myName = email && session.name && session.name !== email ? String(session.name).slice(0, 80) : '';
-  if (myName) { try { await pipe(cfg, [['HSET', NAMES, email, myName]]); } catch { /* a missing name falls back to the address */ } }
+  if (myName && !me.guest) { try { await pipe(cfg, [['HSET', NAMES, email, myName]]); } catch { /* a missing name falls back to the address */ } }
 
   const load = async (id) => {
     const r = await pipe(cfg, [['HGET', KEY, id]]);
@@ -170,7 +179,7 @@ export default async function handler(req, res) {
         .filter((it) => it.can.view)
         .sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
       const emails = new Set([me.email]);
-      for (const it of items) {
+      for (const it of me.guest ? [] : items) {
         emails.add(it.savedBy); emails.add(it.updatedBy);
         (it.access.people || []).forEach((p) => emails.add(p.email));
       }
@@ -238,7 +247,16 @@ export default async function handler(req, res) {
       const data = pages[0];
       const r = await pipe(cfg, [['HLEN', KEY]]);
       if ((r[0] && r[0].result) >= MAX_ITEMS) return json(res, 507, { error: 'The list is full. Delete some old certificates first.' });
-      const access = body.access ? cleanAccess(body.access, me.email) : DEFAULT_ACCESS;
+      /* A guest's file is private to them: never the 'everyone who can open the tool' default, which would let the company's staff
+         edit it, and never a share list. And a guest may keep only a handful, so one cannot fill the shared list for everyone. */
+      if (me.guest) {
+        const all = await pipe(cfg, [['HVALS', KEY]]);
+        let mine = 0;
+        for (const s of (all[0] && all[0].result) || []) { try { if (JSON.parse(s).savedBy === me.email) mine++; } catch { /* skip */ } }
+        if (mine >= GUEST_MAX_ITEMS) return json(res, 507, { error: 'Guests can keep ' + GUEST_MAX_ITEMS + ' certificates. Delete one first.' });
+      }
+      const access = me.guest ? { general: 'restricted', role: 'edit', people: [] }
+        : body.access ? cleanAccess(body.access, me.email) : DEFAULT_ACCESS;
       if (typeof access === 'string') return json(res, 400, { error: access });
       const item = { id: newId(), title: cleanTitle(body.title), data, pages, access, savedBy: me.email, savedAt: now, updatedBy: me.email, updatedAt: now };
       await pipe(cfg, [['HSET', KEY, item.id, JSON.stringify(item)]]);

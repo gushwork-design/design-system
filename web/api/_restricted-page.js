@@ -32,6 +32,7 @@ const CHECK = '<path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0
 export const COPY = {
   idle:     { title: 'Restricted page', text: 'This page isn’t open to everyone. Ask for access and the site owner will get a message to approve it.', glyph: 'lock' },
   owner:    { title: 'Restricted page', text: 'This page is for the site owners only.', glyph: 'lock' },
+  guest:    { title: 'Not open to your guest account', text: 'You are signed in as a guest, and this page is not one of the pages you were invited to. If you need it, ask the person who invited you.', glyph: 'lock' },
   sent:     { title: 'Request sent', text: 'The site owner has been asked. You’ll get a Slack message once it’s decided, and this page opens by itself when the answer is yes.', glyph: 'check' },
   declined: { title: 'Request not approved', text: 'The site owner didn’t approve access this time. If you still need this page, ask them directly.', glyph: 'lock' },
 };
@@ -54,8 +55,8 @@ const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&':
  *   canRequest is false for an owners-only page. Where an earlier request stands is asked of the API once the page
  *   loads, so a reload does not offer the button again and the edge needs no store of its own.
  */
-export function restrictedPage({ email, path, canRequest, lane }) {
-  const st = canRequest ? 'idle' : 'owner';
+export function restrictedPage({ email, path, canRequest, lane, guest }) {
+  const st = guest ? 'guest' : (canRequest ? 'idle' : 'owner');
   const COPYL = copyFor(lane);
   const c = COPYL[st];
   const title = titleFor(path);

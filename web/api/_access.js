@@ -337,8 +337,22 @@ export function normalise(raw) {
     }
   }
 
+  /* Guests: outside addresses with an expiry (YYYY-MM-DD). Anything that is not an outside address with a real date is dropped,
+     so a malformed entry can never be a way in. */
+  const guests = {};
+  if (raw.guests && typeof raw.guests === 'object') {
+    const dom = '@' + (process.env.ALLOWED_DOMAIN || 'gushwork.ai').toLowerCase();
+    for (const [e, v] of Object.entries(raw.guests)) {
+      const key = String(e).trim().toLowerCase();
+      if (!key.includes('@') || key.endsWith(dom)) continue;
+      const ex = String(v && v.expires || '');
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(ex) || Number.isNaN(Date.parse(ex + 'T00:00:00Z'))) continue;
+      guests[key] = { expires: ex, by: String((v && v.by) || '').toLowerCase().slice(0, 120) };
+    }
+  }
+
   if (!routes.length) return null;
-  return { version: 1, admins: emails(raw.admins), groups, routes, lanes };
+  return { version: 1, admins: emails(raw.admins), groups, routes, lanes, guests };
 }
 
 /* ── deciding ─────────────────────────────────────────────────────────────── */
@@ -349,10 +363,18 @@ export function isOwner(email) {
 
 /* Owners are admins whether or not the stored list says so, which is what
    makes the store un-lockable: emptying `admins` cannot shut the owner out. */
+/* A guest is someone OUTSIDE the company domain, let in by an owner to named pages and tools, for a while. They live in
+   rules.guests, keyed by address, each with an expiry date. An outside address that is not an active guest is nobody. */
+export function guestActive(email, rules, now = Date.now()) {
+  const g = rules && rules.guests && rules.guests[String(email || '').toLowerCase()];
+  return !!g && Date.parse(g.expires + 'T23:59:59Z') >= now;
+}
+
 export function isAdmin(email, rules) {
   if (!email) return false;
   const e = String(email).toLowerCase();
-  return isOwner(e) || (rules.admins || []).includes(e);
+  /* Owners and admins are company accounts. An outside address in the list (a typo, a hand-edited store) is not one. */
+  return isInternal(e) && (isOwner(e) || (rules.admins || []).includes(e));
 }
 
 export function isInternal(email) {
@@ -381,6 +403,7 @@ export function groupsFor(email, rules) {
 export function canPublish(email, lane, rules) {
   if (!email || !lane) return false;
   const e = String(email).toLowerCase();
+  if (!isInternal(e)) return false;                    // publishing is for the company's own people, never a guest
   if (isOwner(e)) return true;
   const l = (rules.lanes || {})[lane];
   if (!l) return false;
@@ -513,6 +536,11 @@ export function decide(pathname, session, rules) {
   if (!session.email) return 'signin';
 
   const email = String(session.email).toLowerCase();
+
+  /* An outside account is a guest or it is nobody: it must be on the guest list and not expired (read live, so removing a guest
+     or letting them lapse closes everything at once), and then it can open only a rule that NAMES it, one way or another. The
+     internal, admin and owner levels are already closed to it because isInternal, isAdmin and isOwner are all false for it. */
+  if (!isInternal(email) && !guestActive(email, rules)) return 'forbid';
 
   /* Owners-only is checked BEFORE the admin shortcut below, because that shortcut
      is exactly what it exists to override: an admin can open anything except a
