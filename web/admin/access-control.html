@@ -494,17 +494,25 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
 .ac-ppl__use li { display: flex; align-items: center; gap: var(--gw-space-8); font: var(--gw-text-body-14-reg); color: var(--s-body); }
 .ac-ppl__use li svg { width: 14px; height: 14px; flex: none; color: var(--s-nav-label); }
 .ac-ppl__acts { display: flex; gap: var(--gw-space-8); }
-.ac-ppl__it--txt { height: 36px; }
+.ac-ppl__it--txt { height: 44px; }
+.ac-ppl__rail .ac-ppl__new { padding: 0 0 var(--gw-space-8); }
+.ac-ppl__rail .ac-ppl__new .ac-field { min-height: 44px; width: 100%; }
+.ac-ppl__main--rule { gap: var(--gw-space-24); }
+.ac-ppl__main--rule .ac-ppl__hd p { margin-top: var(--gw-space-8); }
 .ac-ppl__it--txt small { white-space: nowrap; }
 .ac-ppl__it--txt > span { min-width: 0; }
 .ac-ppl__p { display: flex; min-width: 0; }
 .ac-ppl__p .ac-path__d { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .ac-ppl__p b { flex: none; font-weight: inherit; }
 .ac-ppl__it--txt .ac-path__d { color: var(--s-nav-label); }
-.ac-det__f { display: flex; flex-direction: column; gap: var(--gw-space-8); align-items: flex-start; }
-.ac-det__l { font: var(--gw-text-body-12-med); text-transform: uppercase; color: var(--s-nav-label); }
-.ac-det__f .ac-pick { width: 100%; max-width: 560px; }
-.ac-det__pv { width: 240px; max-width: 100%; border-radius: var(--gw-radius-12); border: 1px solid var(--s-card-border); }
+.ac-det__f { display: flex; flex-direction: column; gap: var(--gw-space-8); align-items: stretch; width: 100%; max-width: 560px; }
+.ac-det__l { font: var(--gw-text-body-14-med); color: var(--s-heading); }
+.ac-det__h { margin-top: calc(var(--gw-space-4) * -1); font: var(--gw-text-body-14-reg); color: var(--s-body); }
+.ac-det__f .ac-dd__btn, .ac-det__f .ac-pick { min-height: 44px; }
+.ac-det__f .ac-pick { width: 100%; padding: var(--gw-space-8) var(--gw-space-12); }
+.ac-det__acts { padding-top: var(--gw-space-20); border-top: 1px solid var(--s-chrome-border); max-width: 560px; }
+.ac-det__acts .ac-btn { min-height: 44px; }
+.ac-det__pv { width: 320px; max-width: 100%; border-radius: var(--gw-radius-12); border: 1px solid var(--s-card-border); }
 .ac-confirm { display: flex; flex-wrap: wrap; align-items: center; gap: var(--gw-space-12); padding: var(--gw-space-16); border: 1px solid var(--s-card-border);
   border-radius: var(--gw-radius-12); background: var(--s-lock-bg); }
 .ac-confirm p { margin: 0; flex: 1 1 100%; font: var(--gw-text-body-14-reg); color: var(--s-body); }
@@ -677,13 +685,14 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
     var h = '<div class="ac-ppl__hd"><h3>' + esc(it.name || it.path) + '</h3><p>' + (it.name ? '<code>' + esc(it.path) + '</code> · ' : '') +
       (own ? 'Has a rule of its own.' : 'Has no rule of its own, so it follows <code>' + esc(eff.path) + '</code>.') + '</p></div>';
     if (it.img) h += '<img class="ac-det__pv" src="' + esc(it.img) + '" alt="" loading="lazy">';
-    h += '<div class="ac-det__f"><div class="ac-det__l">Who can see it</div>' + (lane
+    var lvl = ACCESS.filter(function (a) { return a[0] === eff.access; })[0];
+    h += '<div class="ac-det__f"><div class="ac-det__l">Who can see it</div><div class="ac-det__h">' + esc(lane ? 'Its publisher kept it to their staging team. The rule follows that team, so there is no list to edit here.' : lvl ? lvl[2].replace('the row below', 'below') + '.' : '') + '</div>' + (lane
       ? '<span class="ac-tag" style="font:var(--gw-text-body-14-med)">Private to the ' + esc(own.lane) + ' team</span>' +
         ((own.people || []).length ? ' <small>+ ' + plural(own.people.length, 'approved person') + '</small>' : '')
       : ddHTML(it.path, eff.access, locked)) + '</div>';
-    if (own && own.access === 'people') h += '<div class="ac-det__f"><div class="ac-det__l">People &amp; groups</div><div data-pk></div></div>';
+    if (own && own.access === 'people') h += '<div class="ac-det__f"><div class="ac-det__l">People &amp; groups</div><div class="ac-det__h">Search the company directory, pick a team, or paste a list of addresses.</div><div data-pk></div></div>';
     var can = !!own && it.path !== '/admin' && !(!meta.you.owner && own.access === 'owner');
-    h += '<div class="ac-ppl__acts"><button class="ac-btn" type="button" data-act="drop"' + (can ? '' : ' disabled') + (it.path === '/admin' ? ' title="The admin area cannot be ungated here"' : '') + '>' +
+    h += '<div class="ac-ppl__acts ac-det__acts"><button class="ac-btn" type="button" data-act="drop"' + (can ? '' : ' disabled') + (it.path === '/admin' ? ' title="The admin area cannot be ungated here"' : '') + '>' +
       (lane ? 'Open it to everyone again' : it.follow ? 'Follow ' + esc(it.follow) + ' again' : 'Remove this rule') + '</button></div>';
     return h;
   }
@@ -723,7 +732,7 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
     var rail = '<div class="ac-ppl__sec">Whole section</div>' + railItem(all.path, esc(all.name), shortLevel(effOf(all.path)), tplSel === all.path) +
       '<div class="ac-ppl__sec">Templates</div>' + each.map(function (t) { return railItem(t.path, esc(t.name), shortLevel(effOf(t.path)), tplSel === t.path); }).join('');
     var card = el('<section class="ac-card"><div class="ac-card__hd"><div><h3>Templates</h3><p>Who can see the templates.</p></div></div>' +
-      '<div class="ac-card__body"><div class="ac-ppl"><nav class="ac-ppl__rail" aria-label="Templates">' + rail + '</nav><div class="ac-ppl__main" data-main></div></div></div></section>');
+      '<div class="ac-card__body"><div class="ac-ppl"><nav class="ac-ppl__rail" aria-label="Templates">' + rail + '</nav><div class="ac-ppl__main ac-ppl__main--rule" data-main></div></div></div></section>');
     var it = TEMPLATES.filter(function (t) { return t.path === tplSel; })[0];
     var item = { path: it.path, name: it.name, img: it.section ? '' : it.img, follow: it.section ? '' : 'the whole section' };
     mountDetail(card.querySelector('[data-main]'), item, function () { render(); });
@@ -746,7 +755,7 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
       }).join('') : '<p class="ac-ppl__empty">None yet.</p>') +
       (quiet ? '<p class="ac-ppl__empty">' + plural(quiet, 'other page rule') + ' open to everyone at ' + esc(meta.domain) + ' not listed. Search to change one.</p>' : '');
     var card = el('<section class="ac-card"><div class="ac-card__hd"><div><h3>Pages</h3><p>Pages that are not open to everyone.</p></div></div>' +
-      '<div class="ac-card__body"><div class="ac-ppl"><nav class="ac-ppl__rail" aria-label="Pages">' + rail + '</nav><div class="ac-ppl__main" data-main></div></div></div></section>');
+      '<div class="ac-card__body"><div class="ac-ppl"><nav class="ac-ppl__rail" aria-label="Pages">' + rail + '</nav><div class="ac-ppl__main ac-ppl__main--rule" data-main></div></div></div></section>');
     var main = card.querySelector('[data-main]');
     if (pageSel) {
       var parent = effectiveRuleAbove(pageSel);
