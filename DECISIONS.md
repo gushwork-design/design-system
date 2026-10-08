@@ -1471,3 +1471,12 @@ Ruled by Utsav, 8 Oct 2026: "bruce is my main guy, he will manage more agents so
 - **Prompts are not in git yet.** The repo is public, so an agent's prompt and guardrails stay in its routine in claude.ai until Utsav decides otherwise. Each record says so.
 - **Memory has three layers**: project memory (one writer), an agent's durable memory (a pull request), and private notes about people (the store).
 - **Next, not now**: the lead reads its routing from the registry, so adding an agent needs no code; one run log for every agent.
+
+## R70 — Bruce's analytics live on the Agents page only
+Asked by Utsav, 9 Oct 2026, looking at the Agents and Analytics pages: the layout was breaking, the agents should come before what needs him, Bruce's analytics should be on the Agents page only, Hide my activity should stay, and "No clear lane" needed to say what it means and what to do.
+
+- **Moved, not copied.** The Bruce tab is gone from `/admin/analytics` (a `#bruce` link redirects to `/admin/agents#bruce`). Its conversations, what people use him for, how they talk to him, what it costs and the asks worth a look are now in Bruce's tab on Agents, from `web/admin/bruce-panel.js` and `bruce-panel.css`, with the same drawer. Analytics keeps Insights, Usage and Visits, and both of its switches.
+- **Hide my activity** is on Bruce's tab and is the same preference Analytics keeps (`gw-analytics-hide-me`). It also leaves the owner's asks out of the counts on the overview, so a pile of the owner's own tests no longer makes Bruce look unhealthy.
+- **Order on All agents:** the team first, then Needs you.
+- **What "No clear lane" means.** Bruce's topics are plain keyword rules (`topicOf` in `api/_bruce-memory.js`); an ask that matches none is tagged No clear lane. It does not mean he failed, and he still answered. Worth a look now says so, with what to do for each tag: read it and add a lane if it is real work, leave it if it is chat or a test; Failed means the run did not start; Hit the daily cap needs nothing unless the cap is too low. The Needs you line splits the two: failed or capped asks, and asks that matched no topic.
+- **Layout.** Stat numbers wrap inside their card instead of spilling out (Doc's next report is the day, with the time as its label), and the period pills hide on Bruce's tab, which has its own.
