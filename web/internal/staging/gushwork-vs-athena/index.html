@@ -1005,7 +1005,7 @@ legend{padding:0;margin-bottom:var(--gw-space-8);font:var(--gw-text-body-14-med)
    2140:5993). The stops are a column with a 69px gap — Figma places them by hand and
    every gap measures 69 (one measures 71) — so they flow instead of being pinned, which is
    what lets phone reuse the same markup. */
-.diag{position:relative;overflow:hidden;min-height:0;padding:96px var(--gw-space-24) 70px;
+.diag{position:relative;overflow:hidden;min-height:0;padding:72px var(--gw-space-24) 70px;
   display:flex;flex-direction:column;align-items:center;gap:69px;
   background-image:radial-gradient(circle,var(--gw-color-neutral-100) 1.5px,transparent 1.6px);
   background-size:22px 22px;background-position:-2.5px 4.5px}
@@ -1023,6 +1023,9 @@ legend{padding:0;margin-bottom:var(--gw-space-8);font:var(--gw-text-body-14-med)
 .diag{justify-content:center}
 @media (min-width:768px){.diag--gw{padding-block:70px}}
 .diag > .stop--tag{position:absolute;top:var(--gw-space-24);left:var(--gw-space-24)}
+.diag > .stop--tag{padding:var(--gw-space-8) var(--gw-space-16);font:var(--gw-text-body-14-med);letter-spacing:var(--gw-text-body-14-med-tracking);line-height:20px}
+.diag > .stop--tag .mark{font:var(--gw-text-body-14-sem);letter-spacing:var(--gw-text-body-14-sem-tracking);line-height:20px;margin-left:var(--gw-space-4)}
+.diag > .stop--tag .gwlogo{height:16px;margin-left:var(--gw-space-4)}
 .stop--bad{background:var(--gw-color-red-25);--ring:var(--gw-color-red-100);color:var(--gw-color-red-500);
   font:var(--gw-text-body-16-med);letter-spacing:var(--gw-text-body-16-med-tracking);line-height:24px}
 .stop--good{background:var(--gw-color-primary-500);--ring:var(--gw-color-primary-600);color:var(--gw-color-white);
