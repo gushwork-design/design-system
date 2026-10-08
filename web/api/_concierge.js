@@ -51,6 +51,7 @@ const LOGOS = [
 const TEMPLATES = [
   ['ad-page', 'Ad landing page', 'Form-first landing page for paid ads.', ['ad', 'ads', 'landing', 'lander', 'page', 'paid', 'form']],
   ['ad-page-signup', 'Sign-up ad page', 'Illustrated-hero landing page with a one-click sign-up, for paid ads.', ['ad', 'ads', 'signup', 'landing', 'lander', 'page', 'illustrated']],
+  ['ad-page-comparison', 'Comparison ad page', 'Your product against one named competitor, fold by fold, for paid ads.', ['ad', 'ads', 'comparison', 'compare', 'competitor', 'versus', 'vs', 'alternative', 'landing', 'lander', 'page']],
   ['case-study', 'Case study page', 'One customer story, told as a page.', ['case', 'study', 'customer', 'story', 'page']],
   ['lead-magnet', 'Lead magnet', 'Print-ready PDF that sits behind an ad.', ['lead', 'magnet', 'pdf', 'guide', 'ebook', 'document']],
   ['growth-report', 'Growth report', 'A one-page report: a verdict, headline numbers, charts and tables, shared as a link or a PDF.', ['report', 'reports', 'growth', 'analytics', 'weekly', 'readout', 'summary']],

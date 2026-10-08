@@ -126,7 +126,7 @@ What changes is **which folds you reach for**. There is a measured ad-page set h
 the landers built over the last four to five months, and it beats composing the same shapes
 out of the general folds.
 
-**Before you reach for the fold set at all, check the two ad-page templates.** Each is a
+**Before you reach for the fold set at all, check the three ad-page templates.** Each is a
 whole page already assembled from measured folds — copy one and fill its tokens rather than
 rebuilding the composition. The fold set below is what you reach for when a lander genuinely
 needs a shape neither template carries.
@@ -135,6 +135,7 @@ needs a shape neither template carries.
 |---|---|---|
 | `templates/ad-page/` | Form-first: headline, proof ticks, demo form | The conversion is a form on the page |
 | `templates/ad-page-signup/` | Illustrated: headline, one-click Google sign-up, a picture card | The conversion is a sign-up, and there is a picture of the product to show |
+| `templates/ad-page-comparison/` | Form-first, the same hero as `ad-page`, then seven folds that set Gushwork against **one named competitor** | The page is about a competitor: two cards, a coverage diagram, reviews, a row-by-row table, pricing, a fit check |
 
 **The rule for every ad page, now and for any template added later (DECISIONS.md R27):**
 
@@ -216,7 +217,7 @@ values elsewhere — `700 18px` display and `700 16px` Inter are still not in th
 | Any marketing page | `page-build` | `page-shell.md` |
 | An empty page to compose freely | `page-build` with `Blank=yes` | `page-shell.md` |
 | A customer case study | **`templates/case-study/`** — a measured page, not a fold | `templates/case-study/README.md` |
-| A paid-ad landing page | **Ask for the hero first**, then **`templates/ad-page/`** (form-first hero) or **`templates/ad-page-signup/`** (illustrated hero, one-click sign-up) — a measured page, not a stack of folds; take folds from either | `templates/ad-page/README.md`, `templates/ad-page-signup/README.md` |
+| A paid-ad landing page | **Ask for the hero first**, then **`templates/ad-page/`** (form-first hero) or **`templates/ad-page-signup/`** (illustrated hero, one-click sign-up), or **`templates/ad-page-comparison/`** when the page sets Gushwork against one named competitor (form-first hero, like `ad-page`) — a measured page, not a stack of folds; take folds from any of them | `templates/ad-page/README.md`, `templates/ad-page-signup/README.md`, `templates/ad-page-comparison/README.md` |
 | Top nav | `navbar/navbar` — `Type` inherits from the page | `page-shell.md` |
 | Bottom of page | `footer/footer` — `Type` inherits | `page-shell.md` |
 | The opening fold | `fold/ Hero` — `Layout` = `Home` / `Centered` / `Split` / `Form` | `folds.md` |
@@ -265,11 +266,13 @@ is how a page ends up plausible but wrong.
 | `templates/case-study/` | One customer story as a page — hero with outcome numbers, prose column with a sticky rail CTA, closing CTA | Figma `case-study-with-image`, `2PbNu2kGHalHhMUfFyFoeG` / `495:3382`, with the navbar, rail card and footer from the live site |
 | `templates/ad-page/` | A paid-ad landing page — form-first hero, proof ticks, logo ticker, media fold, feature rows, agent marquee, timeline, comparison table, FAQs with an ask-anything row, closing CTA | Figma **GW Meta/Google Ads** `O6g05YAT980r85VaDQha4h` — desktop `1890:42045`, phone `1890:43786` |
 | `templates/ad-page-signup/` | A paid-ad landing page with an illustrated hero and a one-click Google sign-up — problem cards, three feature rows with picture slots, a black call to action with a phone, reassurance cards, a comparison table, FAQs, closing CTA. **Every string is a token**, so it carries no product's claims | Figma **GW Ads Library** `t9rRxJODIVZ4N6CnrGdMhC` — section `95:20276`, desktop `87:9662`; navbar, frame, ticker, FAQs and footer CTA from `templates/ad-page/` |
+| `templates/ad-page-comparison/` | A paid-ad landing page against **one named competitor** — form-first hero, logo ticker, then seven folds: two picture cards, a coverage diagram, a metrics-and-dashboard pair, Trustpilot review cards, a row-by-row table, pricing, a fit check; FAQs and a closing CTA whose card is a scaled comparison. **Every string is a token** (167) | Figma **GW Meta/Google Ads** `O6g05YAT980r85VaDQha4h` — section `2356:19338`, desktop `1971:61604`. **No phone frame exists**; phone is derived. Navbar, hero, ticker, FAQs and footer from `templates/ad-page/` |
 
 ```bash
 cp -r skills/gushwork-web/templates/case-study skills/gushwork-web/examples/<client-slug>
 cp -r skills/gushwork-web/templates/ad-page    skills/gushwork-web/examples/<campaign-slug>
 cp -r skills/gushwork-web/templates/ad-page-signup skills/gushwork-web/examples/<campaign-slug>
+cp -r skills/gushwork-web/templates/ad-page-comparison skills/gushwork-web/examples/<campaign-slug>
 ```
 
 Each template's README records what it was measured from, **where the live site disagrees with

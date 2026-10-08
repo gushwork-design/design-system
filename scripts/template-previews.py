@@ -3,7 +3,7 @@
 
     python3 scripts/template-previews.py <outdir>
 
-Writes <outdir>/<slug>/index.html for ad-page, ad-page-signup, support-ops-app, growth-report, case-study, slide-deck, lead-magnet and one-pager — the
+Writes <outdir>/<slug>/index.html for ad-page, ad-page-signup, ad-page-comparison, support-ops-app, growth-report, case-study, slide-deck, lead-magnet and one-pager — the
 templates' own HTML, not a screenshot of it. Two things are done to each copy, and nothing else:
 
   1. Paths. The templates reference ../../fonts and ../../../../assets from where they live in
@@ -87,6 +87,57 @@ def _signup_sample():
 SIGNUP = _signup_sample()
 SU_DIR = ROOT / 'skills/gushwork-web/templates/ad-page-signup'
 
+# ---- ad-page-comparison: neutral sample copy for every token. No competitor is named, no reviewer is named (R24), and the
+# numbers are placeholders, so the preview shows where each string goes without reading as a claim about anyone.
+def _comparison_sample():
+    d = {
+     'PAGE_TITLE': 'Comparison ad page template', 'META_DESCRIPTION': 'Sample campaign copy.',
+     'OG_TITLE': 'Comparison ad page template', 'OG_IMAGE_URL': '', 'PAGE_URL': '', 'COMPETITOR': 'Competitor',
+     'HERO_EYEBROW': 'Gushwork vs Competitor', 'HERO_H1_A': 'What the competitor gets you,', 'HERO_H1_B': 'what Gushwork gets you',
+     'HERO_SUB': 'One or two lines that set the competitor against Gushwork on the thing the buyer cares about.',
+     'PROOF_1': 'A proof point', 'PROOF_2': 'A second proof point', 'PROOF_3': 'A third proof point',
+     'FORM_HEADING': 'Book a demo', 'FORM_CTA': 'Pick a time', 'EXPERT_VIDEO': '',
+     'D_EYEBROW': 'Page depth', 'D_H': 'The headline for the first comparison', 'D_SUB': 'One or two lines that say what the two pictures show.',
+     'D_COMP_PILL': 'What they do', 'D_GW_PILL': 'What we do', 'BAR_TEXT': 'A line that leads to the call to action',
+     'C_EYEBROW': 'Coverage', 'C_H': 'The headline for the coverage diagram', 'C_SUB': 'One or two lines on how a buyer finds each of you.',
+     'C_QUERY': 'what the buyer searches for', 'C_TIP': 'Your buyer searches',
+     'C_L1': 'A first stop by', 'C_L2': 'A second stop by', 'C_L3': 'A third stop', 'C_L4': 'A dead end',
+     'C_R1': 'A first stop by', 'C_R2': 'A second stop', 'C_R3': 'A conversion', 'C_R4': 'A result',
+     'O_EYEBROW': 'Outcome', 'O_H': 'The headline for the outcome fold', 'O_COMP_PILL': 'Competitor dashboard | What it shows',
+     'O_GW_PILL': 'Gushwork dashboard | What it shows', 'O_NOT_REPORTED': 'The number they do not report',
+     'O_T1_TREND': '0%', 'R_EYEBROW': 'Reviews', 'R_H': 'The headline for the reviews fold',
+     'R_COMP_RATING': '3.5', 'R_GW_RATING': '4.8',
+     'T_EYEBROW': 'Head to head', 'T_H': 'The headline for the table',
+     'P_EYEBROW': 'Pricing', 'P_H': 'The headline for the pricing fold', 'P_SUB': 'One line that sets expectations.',
+     'P_COMP_HEAD': 'Not published', 'P_COMP_1': 'A competitor detail', 'P_COMP_2': 'Another competitor detail',
+     'P_GW_PILL': 'A short pill', 'P_GW_LABEL': 'Starts at', 'P_GW_PRICE': '$0', 'P_GW_UNIT': 'per month',
+     'P_GW_1': 'What is included', 'P_GW_2': 'What else is included', 'P_GW_3': 'And one more',
+     'F_EYEBROW': 'Fit check', 'F_H': 'The headline for the fit check', 'F_SUB': 'One line that sets expectations.',
+     'F_COMP_TITLE': 'may suit you if you', 'F_GW_TITLE_A': 'Choose', 'F_GW_TITLE_B': 'if you',
+     'FAQ_H': 'What people ask when they&rsquo;re comparing',
+     'CTA_HEADING': 'The closing call to action', 'CTA_SUB': 'One supporting line that says what happens next.', 'CTA_NOTE': 'A note under the button',
+     'CTA_CARD_TITLE': 'Why teams pick Gushwork',
+    }
+    for n in range(1, 7):
+        d['O_T%d_LABEL' % n] = 'Metric %d' % n; d['O_T%d_VALUE' % n] = '0'
+    for n in range(1, 5):
+        d['F_GW_%d' % n] = 'A reason to choose Gushwork'
+        d['FAQ_Q%d' % n] = 'A question buyers ask?'; d['FAQ_A%d' % n] = 'A short, plain answer.'
+        for side, stars in (('COMP', '2'), ('GW', '5')):
+            d['R_%s_%d_TOPIC' % (side, n)] = 'Topic'; d['R_%s_%d_STARS' % (side, n)] = stars
+            d['R_%s_%d_QUOTE' % (side, n)] = '&ldquo;A short customer review, quoted from the public page.&rdquo;'
+            d['R_%s_%d_META' % (side, n)] = 'A reviewer &middot; US &middot; Jan 1, 2026'
+    for n in range(1, 4):
+        d['F_COMP_%d' % n] = 'A reason to choose the competitor'
+    for n in range(1, 10):
+        d['T_%d_LABEL' % n] = 'Row %d' % n; d['T_%d_COMP' % n] = 'Their answer'; d['T_%d_GW' % n] = 'Our answer'
+    for n in range(1, 6):
+        d['CTA_ROW_%d_LABEL' % n] = 'Label'; d['CTA_ROW_%d_VALUE' % n] = 'Value'
+    return d
+
+COMPARISON = _comparison_sample()
+CP_DIR = ROOT / 'skills/gushwork-web/templates/ad-page-comparison'
+
 CS = {
  'CLIENT_NAME': 'Sample Co', 'CLIENT_SLUG': 'sample-co', 'INDUSTRY': 'B2B SaaS', 'COUNTRY': 'United States',
  'HERO_TITLE': 'How a sample company grew organic pipeline 6x in twelve months',
@@ -143,6 +194,16 @@ def main(out):
     write(out, 'ad-page-signup', fill(t, SIGNUP))
     for f in ('favicon.svg', 'favicon-32.png', 'apple-touch-icon.png'):
         shutil.copy(SU_DIR / f, out / 'ad-page-signup' / f)
+
+    t = sitepaths((CP_DIR / 'ad-page-comparison.html').read_text(encoding='utf-8'), 4)
+    for f in ('favicon.svg', 'favicon-32.png', 'apple-touch-icon.png'):
+        t = t.replace('href="%s"' % f, 'href="/internal/templates/ad-page-comparison/%s"' % f)
+    # The three pictures sit beside the page, and the route is served without its trailing slash.
+    t = t.replace('src="img/', 'src="/internal/templates/ad-page-comparison/img/')
+    write(out, 'ad-page-comparison', fill(t, COMPARISON))
+    for f in ('favicon.svg', 'favicon-32.png', 'apple-touch-icon.png'):
+        shutil.copy(CP_DIR / f, out / 'ad-page-comparison' / f)
+    shutil.copytree(CP_DIR / 'img', out / 'ad-page-comparison' / 'img', dirs_exist_ok=True)
 
     t = (ROOT / 'skills/gushwork-web/templates/case-study/case-study.html').read_text(encoding='utf-8')
     write(out, 'case-study', fill(sitepaths(t, 4), CS))
