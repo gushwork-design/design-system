@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Drop Studio | Gushwork</title>
+<title>Gushwork Agent Studio</title>
 <meta name="description" content="Meet the Drop family: every Gushwork agent's Drop picture, with a link and a download for each.">
 <meta name="robots" content="noindex, nofollow">
 <base href="/internal/staging/drop-studio/">
@@ -41,7 +41,7 @@ img{display:block;max-width:100%}
 .brand{display:flex;align-items:center;gap:var(--gw-space-12);min-width:0}
 .tile{width:32px;height:32px;border-radius:var(--gw-radius-8);background:var(--gw-color-primary-500);color:var(--gw-color-white);display:grid;place-items:center;flex:none}
 .tile svg{width:16px;height:16px}
-.brand b{font:var(--gw-text-h7-bold);white-space:nowrap}
+.brand b{font:var(--gw-text-h7-bold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bar .gd-input--search{--gd-input-w:100%;width:100%}
 .gd-input--search:has(input:not(:placeholder-shown)) .gd-search__key,.gd-input--search:focus-within .gd-search__key{display:none}
 @media (hover:none){.gd-search__key{display:none}}
@@ -168,7 +168,7 @@ h1{font:var(--gw-text-h3);letter-spacing:var(--gw-text-h3-tracking);margin:var(-
   .qv{width:100%;max-height:94vh;border-radius:var(--gw-radius-24) var(--gw-radius-24) 0 0;grid-template-columns:minmax(0,1fr);gap:var(--gw-space-16)}
   .qv .r{padding:0 var(--gw-space-8) var(--gw-space-8)}
 }
-@media (max-width:560px){.grid{gap:var(--gw-space-12)}.card .meta{padding:0 4px 4px}.card h2{font:var(--gw-text-body-14-sem)}.hov{opacity:1;transform:none}}
+@media (max-width:560px){.brand b{font:var(--gw-text-body-14-sem)}.brand{gap:var(--gw-space-8)}.grid{gap:var(--gw-space-12)}.card .meta{padding:0 4px 4px}.card h2{font:var(--gw-text-body-14-sem)}.hov{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -198,7 +198,7 @@ h1{font:var(--gw-text-h3);letter-spacing:var(--gw-text-h3-tracking);margin:var(-
 </defs></svg>
 
 <header class="bar">
-  <div class="brand"><span class="tile"><svg><use href="#gw-mark"/></svg></span><b>Drop Studio</b></div>
+  <div class="brand"><span class="tile"><svg><use href="#gw-mark"/></svg></span><b>Gushwork Agent Studio</b></div>
   <div class="gd-input gd-input--search"><svg class="i" aria-hidden="true"><use href="#i-search"/></svg><input class="gd-input__el" id="q" type="search" aria-label="Search the Drop family" aria-keyshortcuts="Meta+K Control+K" placeholder="Search the Drop family" autocomplete="off"><kbd class="gd-search__key" id="qkey" aria-hidden="true">⌘K</kbd><button type="button" class="gd-input__clear" aria-label="Clear search" data-gd-clear><svg class="i" aria-hidden="true"><use href="#i-x"/></svg></button></div>
   <div class="acts">
     <button class="gd-btn gd-btn--primary" id="create" type="button"><svg class="i" aria-hidden="true"><use href="#i-plus"/></svg><span class="lbl">Create new agent</span></button>
@@ -460,7 +460,7 @@ h1{font:var(--gw-text-h3);letter-spacing:var(--gw-text-h3-tracking);margin:var(-
   $('qcopy').addEventListener('click',function(){if(cur) copy(cur,this)});
   function act(btn){
     var a=byId(cur); if(!a) return; var x=btn.getAttribute('data-act');
-    if(btn.getAttribute('aria-disabled')==='true'){toast('Drop Studio is not connected to drop-reference yet.'); return}
+    if(btn.getAttribute('aria-disabled')==='true'){toast('Agent Studio is not connected to drop-reference yet.'); return}
     if(x==='dl') download(a.id);
     else{close(); if(x==='req') openBrief(a); else if(x==='review') showReview(a); else if(x==='ask') showAsk(a); else showWork(a)}
   }
@@ -554,7 +554,7 @@ h1{font:var(--gw-text-h3);letter-spacing:var(--gw-text-h3-tracking);margin:var(-
       if(!bundle) return err('Name the new bundle, or pick one from the list.');
       bundles.forEach(function(b){if(b.toLowerCase()===bundle.toLowerCase()) bundle=b});
     }
-    if(!remote.configured) return err('Drop Studio is not connected to drop-reference yet.');
+    if(!remote.configured) return err('Agent Studio is not connected to drop-reference yet.');
     busyBtn(true,'Sending…');
     api('create',{name:name,does:does,bundle:bundle,props:props,pose:poseNow(),notes:rev?$('f-notes').value.trim():'',agentId:rev?rev.id:undefined}).then(function(j){
       busy=false;
