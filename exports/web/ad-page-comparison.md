@@ -70,6 +70,14 @@ colour (primary-500, red-500 or neutral-500); the text stays `neutral-900` or `n
 
 A web page drawn in HTML inside the picture well, in place of a screenshot (`.pgmock`, `.pg-bar`, `.pg-body`, `.pg-blk`): a `neutral-50` browser bar with three dots and the address, a title in `h8-bold`, then 36-high blocks in `primary-25` with a `primary-100` ring and `primary-600` labels in `body-12-sem`, each with a 14px icon. One block may end in a small `primary-500` button. It is 84% of the well wide (92% on phone), starts 24 below the top and is clipped at the bottom by the well, as the pictures were. Every size is a ramp step; no value is off-token. New on the Gushwork vs Athena page, pending review.
 
+## `steps-card`
+
+Who does each step, as a card (`.steps-card`, `.steps`, `.steps-h`, `.eyebrow--green`): the `card--pad` shell with a header, a divider, a `body-14-med` caption and 64-high rows, each a `body-18-med` step and a pill naming who does it (grey pill for the competitor side, `primary-25` for Gushwork, `green-50` for the reader). Rows are split by a 2px `neutral-50` rule. New on the Gushwork vs Athena page, pending review.
+
+## `rating-breakdown`
+
+Five rows beside a review rating (`.dist`): the star level in `body-12-med`, a bar 8 high on `neutral-100` filled to the share in a ramp colour (`green-500`, `green-400`, `yellow-500`, `orange-500`, `red-500`), and the percentage right-aligned. 280 wide on desktop, full width on phone. The bar grows with a `scaleX` as the card arrives. New on the Gushwork vs Athena page, pending review.
+
 ## `cta-bar`
 
 Black (`--gw-color-black`), 1240 × 136, radius 20, padding 40 (`.bar`); the line is `h5-bold` in white, the
