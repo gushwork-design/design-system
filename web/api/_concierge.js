@@ -457,7 +457,8 @@ async function log(memory, token, event, extra) {
   if (!memory || !memory.logRun) return;
   try {
     const name = memory.slackName ? await memory.slackName(token, event.user) : event.user;
-    await memory.logRun({ user: event.user, name, thread: !!event.thread_ts, text: event.text || '', ...extra });
+    /* ch and ts: the DM and the thread's first message, so the owner's Conversation view opens exactly this thread. */
+    await memory.logRun({ user: event.user, name, thread: !!event.thread_ts, text: event.text || '', ch: event.channel, ts: event.thread_ts || event.ts, ...extra });
   } catch { /* the log is a nicety; the answer is not */ }
 }
 

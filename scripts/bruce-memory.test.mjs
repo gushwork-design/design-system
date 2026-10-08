@@ -39,4 +39,50 @@ await M.logRun({ user: 'U9', name: 'Priya', role: 'teammate', kind: 'run', threa
 await M.logRun({ user: 'U9', name: 'Priya', role: 'teammate', kind: 'capped', text: 'again', used: 3 }, f);
 const log = await M.readLog(f);
 ok('runs are logged newest first, text squashed, thread flagged', log.length === 2 && log[0].kind === 'capped' && log[0].used === 3 && log[1].text === 'make me a one-pager for sales' && log[1].thread === 1 && /^\d{4}-/.test(log[1].at), JSON.stringify(log));
+
+// the Conversation view: a thread of the DM read from Slack, owner only, nothing kept (R67)
+await M.logRun({ user: 'U0PRIYA01', name: 'Priya', kind: 'run', text: 'hi', ch: 'D0ABC1234', ts: '1800000000.000100' }, f);
+await M.logRun({ user: 'U0PRIYA01', name: 'Priya', kind: 'run', text: 'bad ids', ch: 'nope', ts: 'also nope' }, f);
+const rows = await M.readLog(f);
+ok('a log row keeps the DM channel and thread when they are real', rows[1].ch === 'D0ABC1234' && rows[1].ts === '1800000000.000100');
+ok('and drops them when they are not', rows[0].ch === undefined && rows[0].ts === undefined);
+ok('plain() makes Slack text readable', M.plain('see <https://x.test|the page> &amp; <@U1|sam> in <#C1234567|general> <https://y.test>') === 'see the page (https://x.test) & @sam in #general https://y.test');
+const calls = []; let mode = 'ok';
+const slackF = async (url, init) => {
+  const u = String(url); const body = Object.fromEntries(new URLSearchParams(init.body || ''));
+  if (!u.startsWith('https://slack.com/api/')) return f(url, init);
+  const method = u.split('/api/')[1].split('?')[0]; calls.push(method);
+  const J = (o) => ({ ok: true, json: async () => o });
+  if (method === 'users.info') return J({ ok: true, user: { profile: { display_name: 'Priya' } } });
+  if (method === 'conversations.open') return mode === 'scope' ? J({ ok: false, error: 'missing_scope', needed: 'im:write' }) : J({ ok: true, channel: { id: 'D0ABC1234' } });
+  if (method === 'conversations.history') return J({ ok: true, messages: mode === 'quiet' ? [{ user: 'UOTHER', ts: '1800000000.000100', text: 'x' }]
+    : [{ user: 'U0PRIYA01', ts: '1800000300.000100', text: 'later' }, { user: 'U0PRIYA01', ts: '1800000001.000100', text: 'near' }] });
+  if (method === 'conversations.replies') return J({ ok: true, messages: [
+    { user: 'U0PRIYA01', ts: body.ts, text: 'make me a one-pager &amp; send <@U1|sam>' },
+    { bot_id: 'B1', ts: '1800000020.000200', text: 'Here it is: <https://x.test|one-pager>', files: [{ name: 'one-pager.pdf' }] },
+    { subtype: 'channel_join', user: 'U0PRIYA01', ts: '1800000030.000300', text: '' }] });
+  return J({ ok: false, error: 'unknown' });
+};
+let c = await M.readConversation({ token: 'xoxb', user: 'U0PRIYA01', ch: 'D0ABC1234', ts: '1800000000.000100' }, slackF);
+ok('with the channel and thread it reads only the thread', c.ok && !calls.includes('conversations.open') && !calls.includes('conversations.history') && calls.includes('conversations.replies'), JSON.stringify(calls));
+ok('the person and Bruce are told apart and named', c.messages[0].from === 'person' && c.messages[0].name === 'Priya' && c.messages[1].from === 'bruce' && c.messages[1].name === 'Bruce');
+ok('text is readable and files are named', c.messages[0].text === 'make me a one-pager & send @sam' && c.messages[1].text === 'Here it is: one-pager (https://x.test)' && c.messages[1].files[0] === 'one-pager.pdf');
+ok('an empty system message is left out', c.messages.length === 2);
+calls.length = 0;
+c = await M.readConversation({ token: 'xoxb', user: 'U0PRIYA01', at: 1800000002000 }, slackF);
+ok('without them it opens the DM and finds the thread nearest the time', c.ok && c.ts === '1800000001.000100' && calls[0] === 'conversations.open' && calls[1] === 'conversations.history', JSON.stringify([c.ts, calls]));
+mode = 'scope';
+c = await M.readConversation({ token: 'xoxb', user: 'U0PRIYA01', at: 1800000002000 }, slackF);
+ok('a missing Slack permission is named, not hidden', !c.ok && c.reason === 'scope' && c.needed === 'im:write');
+mode = 'quiet';
+c = await M.readConversation({ token: 'xoxb', user: 'U0PRIYA01', at: 1800000002000 }, slackF);
+ok('nothing near that time is not found', !c.ok && c.reason === 'notfound');
+ok('a bad person is refused before Slack is asked', (await M.readConversation({ token: 'xoxb', user: 'x"; drop', at: 1 }, slackF)).reason === 'input');
+ok('no token says the app is not connected', (await M.readConversation({ token: '', user: 'U0PRIYA01', at: 1 }, slackF)).reason === 'slack');
+// the endpoint gate
+const gate = async (cookie) => { let status = 0; await M.default({ method: 'GET', query: { conversation: '1', user: 'U0PRIYA01' }, headers: { cookie } }, { status(s) { status = s; return this; }, json() {}, setHeader() {}, end() {} }); return status; };
+ok('signed out is 401', await gate('') === 401);
+const { sign, COOKIE } = await import('../web/api/_session.js');
+const ck = async (email) => `${COOKIE}=${encodeURIComponent(await sign({ email, exp: Math.floor(Date.now() / 1000) + 600 }, 'test-secret'))}`;
+ok('a teammate is 403', await gate(await ck('sam@gushwork.ai')) === 403);
 console.log(`${pass} passed, ${fail} failed`); process.exit(fail ? 1 : 0);

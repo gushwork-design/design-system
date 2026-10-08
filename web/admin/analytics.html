@@ -318,6 +318,18 @@ body[data-gw-page="analytics"] .sg__main > * { min-width: 0; }
   font-size: 20px; line-height: 1; color: var(--ul-sub); }
 .ul-dlg__x:hover { color: var(--ul-value); background: var(--ul-hdr-line); }
 .ul-dlg__b { padding: 0 var(--gw-space-24) var(--gw-space-24); overflow-y: auto; }
+/* Bruce's conversation (R67): what a person said and what Bruce answered, read from the Slack DM. The person's lines sit on
+   the right in the selected fill, Bruce's on the left in the quiet one. */
+.ul-dlg--conv { width: min(680px, calc(100vw - 32px)); }
+.br-msgs { display: flex; flex-direction: column; gap: var(--gw-space-16); padding-top: var(--gw-space-8); }
+.br-msg { display: flex; flex-direction: column; gap: var(--gw-space-4); max-width: 88%; }
+.br-msg--bruce { align-self: flex-start; }
+.br-msg--person { align-self: flex-end; align-items: flex-end; }
+.br-msg__who { font: var(--gw-text-body-12-med); color: var(--ul-sub); }
+.br-msg__t { margin: 0; padding: var(--gw-space-12) var(--gw-space-16); border-radius: var(--gw-radius-12); font: var(--gw-text-body-14-reg); white-space: pre-wrap; overflow-wrap: anywhere; }
+.br-msg--bruce .br-msg__t { background: var(--ul-tabs-bg); color: var(--ul-value); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }   /* the edge, because the fill equals the dialog in dark */
+.br-msg--person .br-msg__t { background: var(--ul-tab-on-bg); color: var(--ul-tab-on-fg); }
+.br-msg__f { font: var(--gw-text-body-12-med); color: var(--ul-sub); }
 .ul-old { display: flex; flex-direction: column; }
 .ul-old__r { display: grid; grid-template-columns: minmax(0, 1fr) 112px 148px; align-items: center; column-gap: var(--gw-space-16); padding: var(--gw-space-12) 0; }
 .ul-old__r + .ul-old__r { border-top: 1px solid var(--ul-hdr-line); }
@@ -793,6 +805,11 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
         <div class="ul-scroll vs-t" id="br-recent"></div>
         <div class="vs-more" id="br-more"></div>
       </section>
+      <dialog class="ul-dlg ul-dlg--conv" id="br-conv" aria-labelledby="br-conv-t">
+        <div class="ul-dlg__h"><h2 id="br-conv-t">Conversation</h2><span class="ul-sh__q" id="br-conv-q"></span>
+          <button type="button" class="ul-dlg__x" id="br-conv-x" aria-label="Close">&times;</button></div>
+        <div class="ul-dlg__b" id="br-conv-b"></div>
+      </dialog>
     </div>
 
   </section>
@@ -2355,7 +2372,7 @@ window.__anRefilter = {};
     raw.forEach(function (r) {
       var d = new Date(r.at); if (isNaN(d.getTime())) return;
       out.push({ at: d, user: String(r.user || ''), name: String(r.name || r.user || ''), role: r.role === 'owner' ? 'owner' : 'teammate',
-        kind: KIND[r.kind] ? r.kind : 'run', thread: !!r.thread, text: String(r.text || '') });
+        kind: KIND[r.kind] ? r.kind : 'run', thread: !!r.thread, text: String(r.text || ''), ch: String(r.ch || ''), ts: String(r.ts || '') });
     });
     return out;
   }
@@ -2403,10 +2420,13 @@ window.__anRefilter = {};
     var recent = rows.slice().sort(function (a, b) { return b.at - a.at; });
     var pages = Math.max(1, Math.ceil(recent.length / S.per)); S.page = Math.min(S.page, pages);
     $('br-q-recent').textContent = 'newest first, ' + plural(recent.length, 'turn');
-    $('br-recent').innerHTML = table('150px minmax(160px,1.2fr) 100px minmax(260px,3fr)', ['When', 'Person', 'Kind', 'What they asked'],
-      recent.slice((S.page - 1) * S.per, S.page * S.per).map(function (r) {
+    S.recent = recent;
+    var from = (S.page - 1) * S.per;
+    $('br-recent').innerHTML = table('150px minmax(160px,1.2fr) 100px minmax(240px,3fr) 110px', ['When', 'Person', 'Kind', 'What they asked', 'Conversation'],
+      recent.slice(from, S.page * S.per).map(function (r, i) {
         return '<div class="ul-row ul-row--d" role="row">' + cell(fmtWhen(r.at), '', r.at.toISOString()) + who(r) + kindCell(r.kind) +
-          cell((r.thread ? '\u21b3 ' : '') + (r.text || '\u2014'), '', r.text) + '</div>';
+          cell((r.thread ? '\u21b3 ' : '') + (r.text || '\u2014'), '', r.text) +
+          '<div class="ul-c" role="cell"><button type="button" class="ul-link" data-conv="' + (from + i) + '">View</button></div></div>';
       }), 'Nothing in this period');
     /* The same pager as the Usage log: page count and two arrow buttons, outside the table's scroller. */
     $('br-more').innerHTML = pages > 1 ? '<div class="ul-pg" style="width:100%"><div class="ul-pg__l"><span class="ul-pg__t">' + S.per + ' per page</span></div>' +
@@ -2448,6 +2468,37 @@ window.__anRefilter = {};
   $('br-refresh').innerHTML = icon('arrow-clockwise');
   ROOT.querySelectorAll('.ul-tab[data-period]').forEach(function (b) { b.addEventListener('click', function () { S.period = b.getAttribute('data-period'); S.page = 1; render(); }); });
   $('br-refresh').addEventListener('click', load);
+
+  /* The Conversation view: one thread of the DM, read from Slack when it is opened. Nothing is stored here. */
+  var dlg = $('br-conv'), convSeq = 0;
+  function bubble(m) {
+    return '<div class="br-msg br-msg--' + (m.from === 'bruce' ? 'bruce' : 'person') + '"><span class="br-msg__who">' + esc(m.name) + ' \u00b7 ' + esc(fmtWhen(new Date(m.at))) + '</span>' +
+      (m.text ? '<p class="br-msg__t">' + esc(m.text) + '</p>' : '') +
+      (m.files && m.files.length ? '<span class="br-msg__f">' + esc(m.files.join(', ')) + '</span>' : '') + '</div>';
+  }
+  function convEmpty(title, text) { return '<div class="ul-empty"><div class="ul-empty__copy"><h2>' + esc(title) + '</h2><p>' + esc(text) + '</p></div></div>'; }
+  function openConv(r) {
+    var seq = ++convSeq;
+    $('br-conv-t').textContent = 'Conversation with ' + r.name;
+    $('br-conv-q').textContent = fmtWhen(r.at);
+    $('br-conv-b').innerHTML = '<div class="ul-empty"><div class="ul-empty__copy"><h2>Reading the thread from Slack</h2></div></div>';
+    if (!dlg.open) dlg.showModal();
+    var q = 'conversation=1&user=' + encodeURIComponent(r.user) + '&at=' + r.at.getTime() + (r.ch && r.ts ? '&ch=' + encodeURIComponent(r.ch) + '&ts=' + encodeURIComponent(r.ts) : '');
+    fetch('/api/bruce-memory?' + q, { credentials: 'same-origin', cache: 'no-store' }).then(function (res) { return res.json().catch(function () { return { ok: false, reason: 'slack', detail: 'Unexpected answer.' }; }); })
+      .then(function (j) {
+        if (seq !== convSeq) return;                                  /* another row was opened meanwhile */
+        var b = $('br-conv-b');
+        if (j && j.ok) { b.innerHTML = j.messages.length ? '<div class="br-msgs">' + j.messages.map(bubble).join('') + '</div>' : convEmpty('Nothing in this thread', 'Slack returned no messages for it.'); return; }
+        if (j && j.reason === 'scope') b.innerHTML = convEmpty('Slack won\u2019t let the site read this yet', 'Bruce\u2019s Slack app is missing a permission' + (j.needed ? ' (' + j.needed + ')' : '') + '. Add it in the app\u2019s settings, reinstall the app, then open this again.');
+        else b.innerHTML = convEmpty('Could not read this conversation', (j && j.detail) || (j && j.error) || 'Try again in a moment.');
+      }).catch(function () { if (seq === convSeq) $('br-conv-b').innerHTML = convEmpty('Could not read this conversation', 'Try again in a moment.'); });
+  }
+  $('br-recent').addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('[data-conv]'); if (!b) return;
+    var r = (S.recent || [])[+b.getAttribute('data-conv')]; if (r) openConv(r);
+  });
+  $('br-conv-x').addEventListener('click', function () { dlg.close(); });
+  dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });   /* a click on the backdrop */
   setInterval(updated, 10000);
   window.__an = window.__an || {};
   window.__an.bruce = function () { render(); load(); };
