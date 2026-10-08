@@ -87,6 +87,7 @@ SOCIAL=(
   assets/og/crm-studio-deck.png
   assets/og/homepage-neo.png
   assets/og/social-creative.png
+  assets/og/agent-marketplace.jpg
 )
 
 # The changelog sheet is generated, so a publish must not ship a stale one.
