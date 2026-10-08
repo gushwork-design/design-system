@@ -25,6 +25,8 @@ replaced, and two elements first registered for this page (`drop-bundle-rail`, `
 | Bundle rail on desktop | follows `agent-filter-rail`'s category rows: a 240px sticky column, 36px rows in `--gw-text-body-14-med`, the count in `--gw-color-neutral-500`, the selected row white with a 1px stroke and `--gw-shadow-s2`, the others bare on the ground. Here the rows filter in place instead of scrolling to a section. |
 | Quick view | follows `agent-listing-panel`'s shell: a centered modal 820px at most, previous and next as 44px round buttons outside the edges (`--gw-shadow-s3`), a bottom sheet on a phone, a header with the bundle badge, the position (`2 of 33`) and close. It holds a large picture with Download and Copy link instead of the package controls. |
 
+The quick view's previous and next arrows are the marketplace's own: 44px round, 60px outside the modal's edges, the bold arrow glyphs, moving into the header below 1000px. The Premium tag (card and quick view) is the marketplace's `pill-prem` (24px, `--gw-color-primary-25` fill, a half-pixel `--gw-color-primary-100` edge, `--gw-text-body-12-med` in `--gw-color-primary-500`), shown on the three agents in its Generate more leads bundle.
+
 The rail and the quick view are page-local CSS, the same as their Agent Store originals. If the library later pulls
 either into a shared piece, this page should move to it.
 

@@ -4,21 +4,24 @@ window.DROP_STUDIO={bundles:["Generate more leads", "Lead to Quote", "Order Desk
 "name": "SEO Agent",
 "bundle": "Generate more leads",
 "line": "Writes pages that rank in search",
-"blurb": "Researches what buyers search for, writes and publishes pages on your site, and tracks rankings in Google and AI search."
+"blurb": "Researches what buyers search for, writes and publishes pages on your site, and tracks rankings in Google and AI search.",
+"premium": true
 },
 {
 "id": "paid-ad-agent",
 "name": "Paid Ad Agent",
 "bundle": "Generate more leads",
 "line": "Runs Meta, Google and ChatGPT ads",
-"blurb": "Runs Meta, Google & ChatGPT Ads"
+"blurb": "Runs Meta, Google & ChatGPT Ads",
+"premium": true
 },
 {
 "id": "email-marketing-agent",
 "name": "Email Marketing Agent",
 "bundle": "Generate more leads",
 "line": "Writes and sends email campaigns",
-"blurb": "Builds segments from your customer and lead lists, writes the campaigns and nurture sequences, and sends them."
+"blurb": "Builds segments from your customer and lead lists, writes the campaigns and nurture sequences, and sends them.",
+"premium": true
 },
 {
 "id": "front-desk",
