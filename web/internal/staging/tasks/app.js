@@ -204,6 +204,9 @@
     try {
       const d = await request('GET');
       S.tasks = d.tasks || []; S.me = d.me || S.me; S.names = d.names || {}; S.agents = d.agents || []; S.ask = d.ask || { used: 0, cap: 0 };
+      // the launcher's dot says when Bruce last finished scanning Slack, or that he has not yet
+      const dot = document.getElementById('tk-launch-status');
+      if (dot) { const tip = d.scan && d.scan.at ? 'Bruce last scanned Slack ' + ago(d.scan.at) + '. Open settings.' : 'Bruce has not scanned Slack yet. Open settings.'; dot.setAttribute('data-gd-tooltip', tip); dot.setAttribute('aria-label', tip); }
       S.status = 'ready'; S.err = null;
     } catch (e) { S.status = 'error'; S.err = e; }
     S.today = todayStr();
