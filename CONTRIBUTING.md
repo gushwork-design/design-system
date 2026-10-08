@@ -15,7 +15,7 @@ sign-in. You do not need the owner to review it, and you do not edit any shared 
    `web/internal/staging/<name>/` with an `index.html` and a `staging.json`. Build your page in that folder only.
    A `thumb.png` beside `index.html` becomes its picture on the Staging index.
 3. `bash scripts/check-staging-lane.sh` tells you whether it will merge. The PR runs the same check.
-4. Open a PR and merge it yourself once **Staging lane / check** is green. Merging publishes it,
+4. Open a PR and merge it yourself once **staging-lane** is green. Merging publishes it,
    and the Staging index lists it under "Team pages" with no edit to `staging.html`.
 
 Why this needs no review: `.github/CODEOWNERS` leaves `web/internal/staging/` unowned and owns

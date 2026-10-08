@@ -1,4 +1,4 @@
-# The check behind the staging lane. Make "Staging lane / check" a required status check on main.
+# The check behind the staging lane. Make "staging-lane" a required status check on main.
 #
 # WHY. .github/CODEOWNERS leaves web/internal/staging/ unowned, so a PR that touches only a
 # teammate's own page needs no review. This check is what makes that safe: it fails the PR when
@@ -18,7 +18,7 @@ permissions:
 
 jobs:
   check:
-    name: check
+    name: staging-lane
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
