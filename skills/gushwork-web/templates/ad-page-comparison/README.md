@@ -84,7 +84,7 @@ the bar and the footer button in lowercase `Book a demo`, and the brand string w
 
 ## Created here — new, pending library review
 
-None of these is in the library. Each is registered as new in `notices/2026-10-08-ad-page-comparison-template.md`.
+None of these is in the library. Nine are registered for review in `exports/web/component-registry.json`, specified in `exports/web/ad-page-comparison.md` and drawn at `web/previews/web/`; the notice is `notices/2026-10-08-ad-page-comparison-template.md`.
 
 | Element | Class | Note |
 |---|---|---|

@@ -23,9 +23,10 @@ footer come from `templates/ad-page/`; the seven comparison folds and the closin
 | Hero | Ad-page hero without the testimonial; second headline line takes the heading gradient |
 | FAQ heading | h4 on this page (Figma `1971:62319`) |
 
-All are pending library review. **Not yet done: the R43 registration** (registry entries, drawn
-`.frag` previews, `library-site.sh`, `check-previews.sh`) — the elements are declared here and in the
-README but will not show in Design System → Review until that is run.
+All are pending library review, and are registered for it (R43): nine entries in `exports/web/component-registry.json`
+(`comparison-card`, `coverage-diagram`, `metrics-grid`, `rating-stars`, `review-card`, `comparison-rows`, `plan-card`,
+`cta-bar`, `cta-comparison-card`), each drawn at `web/previews/web/<key>.frag` from the template's own markup, specified in
+`exports/web/ad-page-comparison.md`, and listed in Design System → Review. `library-site.sh` and `check-previews.sh` were run.
 
 ## Worth a decision
 

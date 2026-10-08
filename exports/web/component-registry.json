@@ -289,6 +289,60 @@
       "changed": "2026-10-08",
       "breaking": false,
       "doc": "drop-studio.md"
+    },
+    "comparison-card": {
+      "version": "2.0.6",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "ad-page-comparison.md"
+    },
+    "comparison-rows": {
+      "version": "2.0.6",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "ad-page-comparison.md"
+    },
+    "coverage-diagram": {
+      "version": "2.0.6",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "ad-page-comparison.md"
+    },
+    "cta-bar": {
+      "version": "2.0.6",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "ad-page-comparison.md"
+    },
+    "cta-comparison-card": {
+      "version": "2.0.6",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "ad-page-comparison.md"
+    },
+    "metrics-grid": {
+      "version": "2.0.6",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "ad-page-comparison.md"
+    },
+    "plan-card": {
+      "version": "2.0.6",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "ad-page-comparison.md"
+    },
+    "rating-stars": {
+      "version": "2.0.6",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "ad-page-comparison.md"
+    },
+    "review-card": {
+      "version": "2.0.6",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "ad-page-comparison.md"
     }
   },
   "review": {
