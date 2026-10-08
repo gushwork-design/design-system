@@ -520,13 +520,15 @@ export async function handleMessage(event, deps) {
       const isOwner = !!ownerId && event.user === ownerId;
       // Every run spends Utsav's account, so everyone but him has a daily cap. Past it, the concierge still answers.
       let quota = { allowed: true, used: 0, cap: 0 }, notes = [], memoryToken = '';
+      /* A run is work (a skill, a build, a check); a chat is a conversation (8 Oct 2026). Only runs spend the small cap. */
+      const weight = memory && memory.weightOf ? memory.weightOf(event.text) : 'run';
       if (memory) {
-        try { quota = await memory.takeRun(event.user, { uncapped: isOwner }); } catch { /* no count is better than no answer */ }
+        try { quota = await memory.takeRun(event.user, { uncapped: isOwner, bucket: weight === 'run' ? 'runs' : 'chats' }); } catch { /* no count is better than no answer */ }
         if (!quota.allowed) {
           await log(memory, token, event, { role: isOwner ? 'owner' : 'teammate', kind: 'capped', used: quota.used });
           const reply = compose(u, catalog, event.ts);
           await slack(token, 'chat.postMessage', { channel: event.channel, ...(replyTs !== event.ts ? { thread_ts: replyTs } : {}), unfurl_links: false,
-            text: `You’ve used today’s ${quota.cap} Bruce ${quota.cap === 1 ? 'run' : 'runs'}, so I can only do the quick things until tomorrow.\n\n` + reply.text });
+            text: (weight === 'run' ? `You’ve used today’s ${quota.cap} Bruce ${quota.cap === 1 ? 'run' : 'runs'}` : `That’s ${quota.cap} messages to Bruce today`) + `, so I can only do the quick things until tomorrow.\n\n` + reply.text });
           if (inPane) await setStatus(token, event, 'active');
           return { did: 'capped', used: quota.used };
         }
@@ -536,7 +538,7 @@ export async function handleMessage(event, deps) {
       // "Bruce is typing…" rather than the session's "Stop Bruce" spinner (Utsav, 6 Oct 2026). Slack clears it when Bruce posts.
       if (inPane && !(await setTyping(token, event))) await setStatus(token, event, 'processing');
       const run = await fire(event, undefined, undefined, { owner: isOwner, notes, memoryToken, agent: inPane });
-      if (memory) await log(memory, token, event, { role: isOwner ? 'owner' : 'teammate', kind: run.fired ? 'run' : 'failed', used: quota.used });
+      if (memory) await log(memory, token, event, { role: isOwner ? 'owner' : 'teammate', kind: run.fired ? (weight === 'run' ? 'run' : 'chat') : 'failed', used: quota.used });
       if (!run.fired) {
         await slack(token, 'chat.postMessage', { channel: event.channel, thread_ts: replyTs, text: `I couldn’t start on that (${run.why}). Check GW_BRUCE_TRIGGER_URL and GW_BRUCE_TRIGGER_TOKEN on the site.` });
         if (inPane) await setStatus(token, event, 'active');

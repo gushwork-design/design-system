@@ -2455,7 +2455,7 @@ window.__anRefilter = {};
   function fmtDay(d) { return d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }); }
   function fmtTime(d) { return d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }); }
   function clip(t, n) { t = String(t || ''); return t.length > n ? t.slice(0, n - 1) + '…' : t; }
-  var KIND = { run: 'Run', capped: 'Capped', 'to-alfred': 'To Alfred', failed: 'Failed', sent: 'Sent' };
+  var KIND = { run: 'Run', chat: 'Chat', capped: 'Capped', 'to-alfred': 'To Alfred', failed: 'Failed', sent: 'Sent' };
   var TOPIC = { 'pass-on': 'Pass on to Utsav', status: 'Status check', access: 'Access', brand: 'Brand files', build: 'Build a page', template: 'Templates and tools', hub: 'Hub and system', about: 'About Bruce', other: 'No clear lane' };
   var S = { status: 'loading', rows: [], rowsAll: [], period: '30', busy: false, fetchedAt: 0, owner: '', cap: 3, topic: '', convs: [], dm: {}, seq: 0, openUser: '', tab: 'chat' };
 
@@ -2498,7 +2498,7 @@ window.__anRefilter = {};
   function renderAll() {
     var rows = scoped(), asks = rows.filter(isAsk), convs = conversations(rows); S.convs = convs;
     var today = new Date().toISOString().slice(0, 10);
-    var runs = asks.filter(function (r) { return r.kind === 'run'; }).length;
+    var runs = asks.filter(function (r) { return r.kind === 'run'; }).length, chats = asks.filter(function (r) { return r.kind === 'chat'; }).length;
     var follow = asks.filter(function (r) { return r.thread; }).length;
     var tc = {}; asks.forEach(function (r) { tc[r.topic] = (tc[r.topic] || 0) + 1; });
     var tops = Object.keys(tc).sort(function (a, b) { return tc[b] - tc[a]; });
@@ -2506,7 +2506,7 @@ window.__anRefilter = {};
     var talkedToday = convs.filter(function (c) { return c.last.toISOString().slice(0, 10) === today; }).length;
     $('br-metrics').innerHTML =
       metric('Conversations', String(convs.length), talkedToday ? talkedToday + ' talked to him today' : (convs.length ? 'last one ' + ago(Date.now() - convs[0].last.getTime()) : 'nobody has asked yet')) +
-      metric('Asks', String(asks.length), runs + ' runs, each a cloud session on your account') +
+      metric('Runs', String(runs), 'real work: a build, a check, a rework or an edit' + (chats ? '. Plus ' + plural(chats, 'chat') + ', which cost little' : '')) +
       metric('Follow-ups', pct(follow, asks.length), 'asked inside an existing thread') +
       metric('Top use', lanes.length ? TOPIC[lanes[0]] : '—', lanes.length ? pct(tc[lanes[0]], asks.length) + ' of asks' : 'nothing yet');
 
@@ -2547,7 +2547,7 @@ window.__anRefilter = {};
     $('br-q-look').textContent = gaps.length ? plural(gaps.length, 'ask') + ', newest first' : '';
     $('br-look').innerHTML = gaps.length ? gaps.map(function (r) {
       return '<button type="button" class="br-lk" data-u="' + esc(r.user) + '"><span>' + esc(fmtWhen(r.at)) + '</span><span>' + esc(r.name) + '</span>' +
-        (r.kind === 'run' ? tag(r.topic, 0) : badge(r.kind)) + '<span>' + (r.thread ? '↳ ' : '') + esc(r.text || '—') + '</span></button>';
+        (r.kind === 'run' || r.kind === 'chat' ? tag(r.topic, 0) : badge(r.kind)) + '<span>' + (r.thread ? '↳ ' : '') + esc(r.text || '—') + '</span></button>';
     }).join('') : '<p class="br-empty">Nothing to fix. Every ask landed in a lane.</p>';
   }
 

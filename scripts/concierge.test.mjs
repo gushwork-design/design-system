@@ -215,6 +215,22 @@ t('end to end: a DM that is not a file ask starts Bruce, no reaction and is logg
   t('the owner is never capped, and his notes ride along', [fired.length, fired[0].owner, fired[0].notes], [4, true, ['2026-10-05: prefers the original logo colour']]);
   t('every turn is logged: runs, the capped ask, with names and roles', [logged.length, logged[0].kind, logged[0].name, logged[0].role, logged[2].kind, logged[3].role, logged[3].kind],
     [7, 'run', 'Name of UTEAM', 'teammate', 'capped', 'owner', 'run']);
+  // run or chat (8 Oct 2026): only work spends the run cap; a chat is logged as a chat
+  {
+    const { weightOf } = await import('../web/api/_bruce-memory.js');
+    const takes = []; const logged2 = [];
+    const mem2 = { ...mem, weightOf, logRun: async (r) => { logged2.push(r); return true; },
+      takeRun: async (u, { uncapped, bucket }) => { takes.push(bucket); return { allowed: true, used: 1, cap: 2, bucket }; } };
+    const d2 = { ...open, memory: mem2 };
+    fired.length = 0;
+    await handleMessage(ev('tell utsav i said hi', 'UTEAM2'), d2);
+    await handleMessage(ev('make me a one-pager for sales', 'UTEAM2'), d2);
+    t('a pass-on spends the chat bucket and is logged as a chat; a build spends the run cap and is a run', [takes, logged2.map((r) => r.kind), fired.length], [['chats', 'runs'], ['chat', 'run'], 2]);
+    const mem3 = { ...mem2, takeRun: async (u, { bucket }) => ({ allowed: bucket !== 'chats', used: 40, cap: 40, bucket }) };
+    calls.length = 0;
+    o = await handleMessage(ev('tell utsav i said hi again', 'UTEAM2'), { ...open, memory: mem3 });
+    t('past the chat guard it says so, in chat words, not "runs"', [o.did, calls[0].body.text.startsWith('That’s 40 messages to Bruce today'), /You’ve used today’s/.test(calls[0].body.text)], ['capped', true, false]);
+  }
   // A reply under an Alfred ping goes to Alfred; any other thread reply goes to Bruce.
   const sent = [];
   const pingDeps = { ...deps, findPing: async (tok, ch, ts) => (ts === '400.4' ? { issue: 7, scope: 'web', key: 'timeline' } : null), toAlfred: async (p, text) => { sent.push([p.issue, text]); return { ok: true, fired: true }; } };
