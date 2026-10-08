@@ -8,7 +8,7 @@
   "registryVersion": "2.0.0",
   "components": {
     "access-denied-screen": {
-      "version": "2.1.0",
+      "version": "2.0.6",
       "changed": "2026-10-08",
       "breaking": false,
       "doc": "auth.md"

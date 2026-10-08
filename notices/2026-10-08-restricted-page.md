@@ -10,7 +10,7 @@ The row that puts "Signed in as" next to "Page: {name}", and a one-line status u
 The lock badge takes the check glyph and the good tone once a request is sent. A glyph, not small text, so `--gd-good` is allowed.
 
 ## Modified
-### `access-denied-screen` 2.0.0 → 2.1.0
+### `access-denied-screen` 2.0.0 → 2.0.6
 Title "Admin access required" → "Restricted page"; the primary action "Ask the owner" (a link) → "Request access" (a button), with "Ask the owner" kept as the fallback; five states drawn instead of one. The spec text moved, so its review pass expires and it is waiting again.
 
 ### `web/api/access.js`: the write moved to `saveRules`
