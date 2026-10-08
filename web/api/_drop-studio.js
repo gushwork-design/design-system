@@ -16,9 +16,10 @@
    {configured:false} and every write is refused with 503, so the page works exactly as it did before phase 2.
 
    WHO. The same gate as the page: decide() on the tool's path, so adding marketing in Access Control carries over to
-   this API with no code change. Making a request and answering ChatGPT's question are open to everyone the gate lets
-   in; accepting, changing or discarding a picture is the owner's alone, because accepting writes into masters/ and
-   AGENTS.md says masters change only on explicit approval.
+   this API with no code change. From 9 Oct 2026 everyone the gate lets in can LOOK (state, pictures, notifications);
+   only the owner can make things happen: creating an agent, asking for a new picture, answering ChatGPT, and accepting,
+   changing or discarding a picture (accepting also writes into masters/, and AGENTS.md says masters change only on
+   explicit approval).
 
    THE PICTURES ARE PRIVATE. The repo is private, so the browser cannot load them. `op=image` streams one file, and only
    from two folders and only a .png (masters/agent-portrait-*, explorations/agents/<id>-v<N>), never the 7 MB material
@@ -286,6 +287,7 @@ export default async function handler(req, res) {
     if (!body) return json(res, 400, { error: 'Bad request.' });
 
     if (op === 'create') {
+      if (!owner) return json(res, 403, { error: 'Only the owner creates agents or asks for new pictures.' });
       const { issues } = await loadAll();
       const c = cleanBrief(body, issueIds(issues));
       if (c.error) return json(res, 400, { error: c.error });
@@ -294,6 +296,7 @@ export default async function handler(req, res) {
     }
 
     if (op === 'answer') {
+      if (!owner) return json(res, 403, { error: 'Only the owner answers ChatGPT.' });
       const n = Number(body.issue), text = String(body.text || '').trim().slice(0, MAX.answer);
       if (!n || !text) return json(res, 400, { error: 'Write an answer first.' });
       const { issues } = await loadAll();

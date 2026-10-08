@@ -211,7 +211,13 @@ t('a bad id is a 400', r.status, 400);
 
 g = pretend();
 r = await call('POST', 'create', { cookie: teammate, body: { ...ok, name: 'Rate Checker' } });
-t('a teammate can make a request', [r.status, r.body.agentId], [200, 'rate-checker']);
+t('a teammate cannot create an agent or ask for a picture', [r.status, g.issues.length], [403, 0]);
+r = await call('POST', 'create', { body: { ...ok, name: 'Rate Checker' } });
+t('the owner can', [r.status, r.body.agentId], [200, 'rate-checker']);
+g.issues[0].labels = [{ name: 'needs-input' }];
+r = await call('POST', 'answer', { cookie: teammate, body: { issue: g.issues[0].number, text: 'A clipboard' } });
+t('a teammate cannot answer ChatGPT', [r.status, g.comments[String(g.issues[0].number)]], [403, undefined]);
+g.issues[0].labels = [{ name: 'image-request' }];
 g.issues[0].labels = [{ name: 'image-ready' }]; g.issues[0].state = 'closed'; g.tree = files('explorations/agents/rate-checker-v1.png');
 r = await call('POST', 'decide', { cookie: teammate, body: { agentId: 'rate-checker', action: 'accept' } });
 t('a teammate cannot accept, change or discard a picture', [r.status, g.puts.length], [403, 0]);
