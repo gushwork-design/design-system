@@ -11,7 +11,7 @@
    (data-tool) and the TOOLS and TEMPLATES arrays in /admin/access-control. A tool missing here simply keeps no live badge.
    ========================================================================= */
 
-import { COOKIE, verify, readCookie, sessionSecret } from './_session.js';
+import { readAnySession } from './_session.js';
 import { loadRules, ruleFor, decide, describeAccess } from './_access.js';
 
 const TOOLS = [
@@ -29,13 +29,14 @@ function json(res, status, body) {
 }
 
 export default async function handler(req, res) {
-  const session = await verify(readCookie(req.headers.cookie, COOKIE), sessionSecret());
+  /* A guest is let in here only to learn which tools they may open (the badges and the logo menu draw from this). */
+  const session = await readAnySession(req.headers.cookie);
   if (!session) return json(res, 401, { error: 'Not signed in.' });
 
   const rules = await loadRules();
   const tools = {};
   for (const path of TOOLS) {
-    tools[path] = {
+    tools[path] = session.guest ? { level: 'guest', label: 'Guest access', restricted: true, canOpen: decide(path, session, rules) === 'allow' } : {
       ...describeAccess(ruleFor(path, rules)),
       /* Evaluated for THIS viewer by the same function the gate uses, so a locked card
          and a 403 can never disagree. */

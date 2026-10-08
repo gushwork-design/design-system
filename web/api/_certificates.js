@@ -34,7 +34,7 @@
    nobody's saved work disappears without them deleting it.
    ========================================================================= */
 
-import { COOKIE, verify, readCookie, sessionSecret } from './_session.js';
+import { readAnySession } from './_session.js';
 import { loadRules, decide, isAdmin, allowedDomain } from './_access.js';
 
 const KEY = 'gw:certs';
@@ -123,6 +123,13 @@ function newId() {
 
 /* What this person may do with this certificate. */
 function perms(item, me) {
+  /* A GUEST (an outside person let in to this tool) sees and changes only what they made themselves. They are never on a share
+     list (those take company addresses only), and the 'everyone who can open the tool' default is about the company's people, so
+     it does not reach them: the company's certificates are not theirs to see. */
+  if (me.guest) {
+    const own = item.savedBy === me.email;
+    return { view: own, edit: own, share: false, manage: own };
+  }
   const access = item.access || DEFAULT_ACCESS;
   const manage = me.admin || item.savedBy === me.email;
   const person = (access.people || []).find((p) => p.email === me.email);
@@ -137,7 +144,7 @@ function present(item, me) {
 }
 
 export default async function handler(req, res) {
-  const session = await verify(readCookie(req.headers.cookie, COOKIE), sessionSecret());
+  const session = await readAnySession(req.headers.cookie);       // a guest is accepted here, and only here, and only if decide() below allows the tool
   if (!session) return json(res, 401, { error: 'Not signed in.' });
   const rules = await loadRules();
   if (!TOOL_PATHS.some((p) => decide(p, session, rules) === 'allow')) {
@@ -148,12 +155,13 @@ export default async function handler(req, res) {
   const email = session.email ? String(session.email).toLowerCase() : '';
   const me = {
     email: email || '(shared password)',
-    admin: !email || session.via === 'password' || isAdmin(email, rules),
+    admin: !session.guest && (!email || session.via === 'password' || isAdmin(email, rules)),
+    guest: !!session.guest,
   };
 
   // remember this visitor's own name, from the signed session only
   const myName = email && session.name && session.name !== email ? String(session.name).slice(0, 80) : '';
-  if (myName) { try { await pipe(cfg, [['HSET', NAMES, email, myName]]); } catch { /* a missing name falls back to the address */ } }
+  if (myName && !me.guest) { try { await pipe(cfg, [['HSET', NAMES, email, myName]]); } catch { /* a missing name falls back to the address */ } }
 
   const load = async (id) => {
     const r = await pipe(cfg, [['HGET', KEY, id]]);
@@ -170,7 +178,7 @@ export default async function handler(req, res) {
         .filter((it) => it.can.view)
         .sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
       const emails = new Set([me.email]);
-      for (const it of items) {
+      for (const it of me.guest ? [] : items) {
         emails.add(it.savedBy); emails.add(it.updatedBy);
         (it.access.people || []).forEach((p) => emails.add(p.email));
       }
