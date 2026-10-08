@@ -639,6 +639,13 @@
       "reviewedOn": "2026-10-08",
       "fingerprint": "2f9bb8d63536c3b8",
       "previewFingerprint": "eb7fd39964ca4135"
+    },
+    "coverage-diagram": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-08",
+      "fingerprint": "1bfb7bfc30d199fa",
+      "previewFingerprint": "40fa7ce30826e610"
     }
   }
 }
