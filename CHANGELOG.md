@@ -24,6 +24,7 @@ reports its own stale date.**
 
 | Version | Date | What changed | Commit | Session |
 |---|---|---|---|---|
+| **v2.0.7** | 08 Oct 2026 15:01 | A restricted page you can request access from, approved from Slack through Bruce | [`6a7c897`](https://github.com/gushwork-design/design-system/commit/6a7c89733a2581dc81217729834598cce5cdffe2) | [Opens most page name and no new-chat greeting](claude://resume/16dfcbc4-fd1c-497a-bc67-d1c7fb2da3ac) |
 | **v2.0.6** | 08 Oct 2026 02:00 | Fix the dashboard's counting figures printing wrong in a PDF | [`ddccdf3`](https://github.com/gushwork-design/design-system/commit/ddccdf3880e90378ac947a23df387c55cd300bef) | [Opens most page name and no new-chat greeting](claude://resume/16dfcbc4-fd1c-497a-bc67-d1c7fb2da3ac) |
 | **v2.0.5** | 08 Oct 2026 01:55 | Dashboards and their templates move the way the hub does | [`361c5f2`](https://github.com/gushwork-design/design-system/commit/361c5f22f4bade828326e0d2b000ec7d50a409d3) | [Opens most page name and no new-chat greeting](claude://resume/16dfcbc4-fd1c-497a-bc67-d1c7fb2da3ac) |
 | **v2.0.4** | 08 Oct 2026 01:45 | Skills carry the hub's motion rules, and underlined tabs glide on every page | [`d60a33c`](https://github.com/gushwork-design/design-system/commit/d60a33c6383ecc61cf7071bbfe8f93398a015302) | [Opens most page name and no new-chat greeting](claude://resume/16dfcbc4-fd1c-497a-bc67-d1c7fb2da3ac) |
