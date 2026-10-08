@@ -23,7 +23,7 @@ Short, stable facts so a fresh session can pick up cold. Update as we go. No sec
 ## Existing routines (already running, created before this project)
 - **Nightly: reworks and missing drawings** — daily 15:30 UTC. Opens `nightly/*` PRs (max 3 reworks + 3 drawings), DMs Utsav a report via Slack app "bruce".
 - **Rework** — API-triggered when Utsav sends an item back on the Design System page. Opens one `rework/*` PR.
-- **System health: repo checks** — Mon and Thu 04:00 UTC. Read-only; posts a snapshot to the hub's System health page.
+- **System health: repo checks** — Mon and Thu 04:00 UTC. Read-only; posts a snapshot to Doc's page on Agents.
 - Those routines: open PRs only; never merge, publish or touch Vercel; may edit only `web/previews/**`, `web/admin/**`, `web/*.css/js`, `scripts/**`. Not allowed: `foundation/`, `exports/`, `skills/`, `DECISIONS.md`, `templates/`, any `component-registry.json`.
 
 ## Utsav's preferences

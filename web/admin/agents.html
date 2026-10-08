@@ -226,7 +226,7 @@ a.ag-row:hover { background: var(--s-nav-hover); }
   }
   function healthNeeds(h) {
     return h.rows.filter(function (c) { return c.status === 'fail' || c.status === 'warn'; }).map(function (c) {
-      return { key: 'check:' + c.id, health: true, text: c.name + (c.fix ? ': ' + c.fix : c.detail ? ': ' + c.detail : ''), cta: 'Open system health', href: '/admin/system-health' };
+      return { key: 'check:' + c.id, health: true, text: c.name + (c.fix ? ': ' + c.fix : c.detail ? ': ' + c.detail : ''), cta: 'See in Doc', href: '#doc' };
     });
   }
 
@@ -300,7 +300,7 @@ a.ag-row:hover { background: var(--s-nav-hover); }
   function needRow(item, withWho) {
     var n = item.n, a = item.a;
     return '<div class="ag-row">' + (withWho ? pic(a, 'ag-pic--sm') : '') + '<div class="ag-row__t ag-row__t--wrap">' + (withWho ? '<b>' + esc(a.name) + '</b>' : '') + '<span>' + esc(n.text) + '</span></div>' +
-      (n.href === '#bruce-look' ? '<button type="button" class="ag-btn" data-tab="bruce" data-scroll="br-h-look">' + esc(n.cta) + '</button>'
+      (n.href.charAt(0) === '#' ? '<button type="button" class="ag-btn" data-tab="' + (n.href === '#bruce-look' ? 'bruce' : esc(n.href.slice(1))) + '"' + (n.href === '#bruce-look' ? ' data-scroll="br-h-look"' : '') + '>' + esc(n.cta) + '</button>'
         : '<a class="ag-btn" href="' + esc(n.href) + '"' + ext(n.href) + '>' + esc(n.cta) + '</a>') + '</div>';
   }
   function renderAll() {
@@ -353,7 +353,7 @@ a.ag-row:hover { background: var(--s-nav-hover); }
     var body = bad.map(function (c) {
       return '<div class="ag-row"><i class="ag-dot ' + esc(c.status) + '" aria-hidden="true"></i><div class="ag-row__t ag-row__t--wrap"><b>' + esc(c.name) + '</b><span>' + esc(c.detail || '') + (c.fix ? ' To do: ' + esc(c.fix) : '') + '</span></div></div>';
     }).join('') + (good.length ? '<div class="ag-oks">' + good.map(function (c) { return '<span><i class="ag-dot ok" aria-hidden="true"></i>' + esc(c.name) + '</span>'; }).join('') + '</div>' : '');
-    return sec('Health', s.id === 'doc' ? '<a href="/admin/system-health">Open system health</a>' : '<span>' + (bad.length ? plural(bad.length, 'check') + ' to look at' : 'all ' + h.rows.length + ' checks pass') + '</span>', '<div class="ag-list">' + body + '</div>');
+    return sec('Health', '<span>' + (bad.length ? plural(bad.length, 'check') + ' to look at' : 'all ' + h.rows.length + ' checks pass') + '</span>', '<div class="ag-list">' + body + '</div>');
   }
   function about(a) {
     var d = S.data, route = (d.routing || []).filter(function (r) { return r.agent === a.id; })[0];

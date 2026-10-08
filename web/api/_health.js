@@ -299,7 +299,7 @@ export function failing(checks) { return checks.filter((x) => x.status === 'fail
 
 export function alertText(fails, base) {
   const lines = fails.map((x) => `• *${x.name}*: ${x.detail}`).join('\n');
-  return `System health: ${fails.length} thing${fails.length === 1 ? ' is' : 's are'} failing.\n${lines}\n<${base}/admin/system-health|Open System health>`;
+  return `System health: ${fails.length} thing${fails.length === 1 ? ' is' : 's are'} failing.\n${lines}\n<${base}/admin/agents#doc|Open Doc's page>`;
 }
 
 /* Decide whether to DM. Pure: takes the previous alert record, returns whether to send and what to keep. It sends when the set of

@@ -5,7 +5,7 @@
   "lead": false,
   "status": "live",
   "owner": "Utsav",
-  "summary": "Checks that everything keeping the hub alive is working: storage and data, hosting, integrations and upkeep. Checked live whenever the health page is opened, and by a routine twice a week. This is what used to be called System health.",
+  "summary": "Checks that everything keeping the hub alive is working: storage and data, hosting, integrations and upkeep. Checked live whenever Doc's page on Agents is opened, and by a routine twice a week. This is what used to be called System health.",
   "routine": {
     "id": "trig_01HQWcCHsTRA6jdzn45UC9vG",
     "url": "https://claude.ai/code/routines/trig_01HQWcCHsTRA6jdzn45UC9vG",
@@ -18,7 +18,7 @@
     ]
   },
   "reachedBy": [
-    "The health page, which runs the live checks when opened"
+    "Doc's page on Agents, which runs the live checks when opened"
   ],
   "schedule": [
     "Every Monday and Thursday at 04:00 UTC (09:30 IST)"
@@ -39,14 +39,9 @@
   "memory": {
     "durable": "agents/doc/memory.md",
     "perPerson": "None",
-    "log": "The last snapshot he reported, shown on the health page"
+    "log": "The last snapshot he reported, shown on Doc's page"
   },
-  "links": [
-    {
-      "label": "System health",
-      "href": "/admin/system-health"
-    }
-  ],
+  "links": [],
   "prompt": {
     "where": "The routine in claude.ai",
     "inGit": false,

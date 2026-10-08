@@ -158,7 +158,7 @@
       "lead": false,
       "status": "live",
       "owner": "Utsav",
-      "summary": "Checks that everything keeping the hub alive is working: storage and data, hosting, integrations and upkeep. Checked live whenever the health page is opened, and by a routine twice a week. This is what used to be called System health.",
+      "summary": "Checks that everything keeping the hub alive is working: storage and data, hosting, integrations and upkeep. Checked live whenever Doc's page on Agents is opened, and by a routine twice a week. This is what used to be called System health.",
       "routine": {
         "id": "trig_01HQWcCHsTRA6jdzn45UC9vG",
         "url": "https://claude.ai/code/routines/trig_01HQWcCHsTRA6jdzn45UC9vG",
@@ -171,7 +171,7 @@
         ]
       },
       "reachedBy": [
-        "The health page, which runs the live checks when opened"
+        "Doc's page on Agents, which runs the live checks when opened"
       ],
       "schedule": [
         "Every Monday and Thursday at 04:00 UTC (09:30 IST)"
@@ -192,14 +192,9 @@
       "memory": {
         "durable": "agents/doc/memory.md",
         "perPerson": "None",
-        "log": "The last snapshot he reported, shown on the health page"
+        "log": "The last snapshot he reported, shown on Doc's page"
       },
-      "links": [
-        {
-          "label": "System health",
-          "href": "/admin/system-health"
-        }
-      ],
+      "links": [],
       "prompt": {
         "where": "The routine in claude.ai",
         "inGit": false,
@@ -210,7 +205,7 @@
         "run": 40000,
         "measured": []
       },
-      "memoryText": "# Doc: durable memory\n\nRulings and facts that should outlive any one run. Changed by pull request.\n\n- **Where the checks run.** Live whenever `/admin/system-health` is opened, and on Monday and Thursday from a routine that can run what a repo checkout can.\n- **What he covers.** Storage and data, hosting, integrations, upkeep, and anything else the system depends on (Utsav, 5 Oct 2026).\n- **How he reports.** Each check is ok, warn or fail with the fix. The routine posts a snapshot to the hub, which the health page shows.\n- **Read-only.** He has no Write or Edit. He never fixes what he finds.\n- **Name.** Called System health until 8 Oct 2026, when Utsav made him an agent."
+      "memoryText": "# Doc: durable memory\n\nRulings and facts that should outlive any one run. Changed by pull request.\n\n- **Where the checks run.** Live whenever Doc's page on Agents (`/admin/agents#doc`) is opened, and on Monday and Thursday from a routine that can run what a repo checkout can.\n- **What he covers.** Storage and data, hosting, integrations, upkeep, and anything else the system depends on (Utsav, 5 Oct 2026).\n- **How he reports.** Each check is ok, warn or fail with the fix. The routine posts a snapshot to the hub, which Doc's page shows.\n- **Read-only.** He has no Write or Edit. He never fixes what he finds.\n- **Name.** Called System health until 8 Oct 2026, when Utsav made him an agent."
     }
   ],
   "routing": [

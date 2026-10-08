@@ -122,7 +122,7 @@ t('a new failure sends', alertDecision(F('kv'), null, NOW).send, true);
 t('the same failure the next day stays quiet', alertDecision(F('kv'), { sig: 'kv', at: NOW - DAY }, NOW).send, false);
 t('the same failure after 3 days reminds', alertDecision(F('kv'), { sig: 'kv', at: NOW - 4 * DAY }, NOW).send, true);
 t('a changed set sends', alertDecision(F('kv', 'slack'), { sig: 'kv', at: NOW - DAY }, NOW).send, true);
-t('the DM text names each failure and links the page', alertText(F('kv'), 'https://s.test').includes('<https://s.test/admin/system-health|'), true);
+t('the DM text names each failure and links the page', alertText(F('kv'), 'https://s.test').includes('<https://s.test/admin/agents#doc|'), true);
 
 /* the three ways in */
 const sent = [];
