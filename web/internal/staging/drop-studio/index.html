@@ -586,8 +586,7 @@ h1{font:var(--gw-text-h3);letter-spacing:var(--gw-text-h3-tracking);margin:var(-
     var w=a.work||{}; ctx={agent:a.id,name:a.name};
     $('cr-t').textContent=a.seed||a.revise?'New picture requested':'Create new agent';
     steps(2); view('work');
-    var ref=(w.issue?'#'+w.issue+' · ':'')+esc(a.name);
-    $('crtl').innerHTML=tl([['done','Request sent',ref+(remote.owner&&w.url?' · <a class="gd-table__link" href="'+esc(w.url)+'" target="_blank" rel="noopener">See it on GitHub</a>':'')],['now','Waiting for ChatGPT’s next check','You can close this. The card shows Requested until the picture is ready.'],['todo','Generating the picture','From the identity and material masters in drop-reference.'],['todo','Ready to review','The card changes to To review.']]);
+    $('crtl').innerHTML=tl([['done','Request sent',esc(a.name)],['now','Waiting for ChatGPT’s next check','You can close this. The card shows Requested until the picture is ready.'],['todo','Generating the picture','From the identity and material masters in drop-reference.'],['todo','Ready to review','The card changes to To review.']]);
     foot('','',btn('close','Close, I’ll come back','gd-btn--primary'));
     show();
   }
