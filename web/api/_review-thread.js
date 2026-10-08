@@ -39,7 +39,7 @@ export function ownerComment(text, refs, kind) {
   return `<!-- gw-hub:owner${kind ? ' ' + kind : ''} -->\n${String(text || '').trim()}${files ? `\n\nReference files:\n${files}` : ''}`;
 }
 
-async function gh(token, path, init = {}) {
+export async function gh(token, path, init = {}) {
   const r = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}${path}`, {
     ...init,
     headers: {

@@ -10,10 +10,11 @@ ok('the registry names a lead who is one of the agents', reg.agents.includes(reg
 ok('exactly one agent is the lead', data.agents.filter((a) => a.lead).length === 1);
 ok('ids are unique and match their folder', new Set(reg.agents).size === reg.agents.length && data.agents.every((a, i) => a.id === reg.agents[i]));
 ok('every folder under agents/ is in the registry', readdirSync(root + 'agents', { withFileTypes: true }).filter((d) => d.isDirectory()).every((d) => reg.agents.includes(d.name)));
-const need = ['id', 'name', 'role', 'status', 'owner', 'summary', 'routine', 'reachedBy', 'schedule', 'does', 'never', 'limits', 'memory', 'links', 'prompt'];
+const need = ['id', 'name', 'role', 'status', 'owner', 'summary', 'routine', 'reachedBy', 'schedule', 'does', 'never', 'limits', 'memory', 'links', 'prompt', 'cost'];
 for (const a of data.agents) {
   ok(`${a.id}: has every field the page reads`, need.every((k) => a[k] !== undefined && a[k] !== null), need.filter((k) => a[k] == null).join());
   ok(`${a.id}: a routine id and a claude.ai link that agree`, /^trig_[A-Za-z0-9]+$/.test(a.routine.id) && a.routine.url === `https://claude.ai/code/routines/${a.routine.id}`);
+  ok(`${a.id}: its token estimate is explained and its numbers are positive`, typeof a.cost.basis === 'string' && a.cost.basis.length > 30 && Object.entries(a.cost).filter(([k]) => ['start', 'chat', 'run'].includes(k)).every(([, v]) => v > 0) && a.cost.run > 0);
   ok(`${a.id}: says what it does and what it never does`, a.does.length > 0 && a.never.length > 0);
   ok(`${a.id}: has durable memory that is written down`, a.memoryText.length > 40 && existsSync(root + a.memory.durable));
   ok(`${a.id}: the prompt is not in git and says why`, a.prompt.inGit === false && /public/i.test(a.prompt.why));

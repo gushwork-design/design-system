@@ -71,5 +71,14 @@
     "where": "The routine in claude.ai",
     "inGit": false,
     "why": "The repo is public, so his prompt and guardrails are not committed yet."
+  },
+  "cost": {
+    "basis": "Every DM starts at about 29,000 tokens: his instructions and the files he must read first, measured from the repo at about 4 characters a token. A chat then adds about 4,000 and a run about 90,000, both assumed.",
+    "start": 29000,
+    "chat": 4000,
+    "run": 90000,
+    "measured": [
+      "start"
+    ]
   }
 }

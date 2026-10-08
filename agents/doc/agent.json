@@ -51,5 +51,10 @@
     "where": "The routine in claude.ai",
     "inGit": false,
     "why": "The repo is public, so his prompt and guardrails are not committed yet."
+  },
+  "cost": {
+    "basis": "About 40,000 tokens a run, assumed: the checks he runs and the report. A run is a scheduled Monday or Thursday.",
+    "run": 40000,
+    "measured": []
   }
 }
