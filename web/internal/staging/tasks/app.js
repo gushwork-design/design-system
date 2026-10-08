@@ -355,10 +355,11 @@
         let c = $('.gd-views__n', b);
         if (v === 'inbox' && n) { if (!c) { c = doc.createElement('span'); c.className = 'gd-views__n'; b.appendChild(c); } c.textContent = n; } else if (c) c.remove();
       });
-      $('#tk-search').hidden = !has;
-      $('#tk-filter-btn').closest('.gd-popover-wrap').hidden = !has || inbox;
-      $('#tk-display-btn').closest('.gd-popover-wrap').hidden = !has || inbox;
-      $('#tk-people-wrap').hidden = !has;
+      // every control stays on the bar when the board is empty, so an empty board is still the board and not a different page
+      $('#tk-search').hidden = false;
+      $('#tk-filter-btn').closest('.gd-popover-wrap').hidden = inbox;
+      $('#tk-display-btn').closest('.gd-popover-wrap').hidden = inbox;
+      $('#tk-people-wrap').hidden = false;
       const fn = $('#tk-filter-n'); fn.hidden = !S.filters.length; fn.textContent = S.filters.length || '';
       renderPeople();
       const sf = $('#tk-search-field'), open = !sf.hidden || !!S.search;
@@ -367,7 +368,7 @@
     $('#tk-new-btn').hidden = !ready;
     $('#tk-fab').hidden = !(ready && isPhone() && (S.view === 'board' || S.view === 'list'));
     const bn = $('#tk-bottomnav');
-    bn.hidden = !ready || !has;
+    bn.hidden = !ready;
     if (ready) {
       const n = inboxItems().length;
       bn.innerHTML = ['board', 'list', 'inbox'].map((v) => '<button type="button" class="gd-bottomnav__item" data-nav="' + v + '" data-fk="nav:' + v + '" aria-current="' + (S.view === v) + '">' + cap1(v) + (v === 'inbox' && n ? ' <span class="gd-num">' + n + '</span>' : '') + '</button>').join('') + '<button type="button" class="gd-bottomnav__item" data-nav="ask" aria-current="false">Ask Bruce</button>';
@@ -389,7 +390,7 @@
   }
   function renderStrip() {
     const el = $('#tk-strip');
-    const show = S.status === 'ready' && S.tasks.some((t) => t.status !== 'dismissed') && S.view !== 'inbox';
+    const show = S.status === 'ready' && S.view !== 'inbox';
     el.hidden = !show; if (!show) return;
     const cur = currentView();
     const tabs = viewsList().map((v) => '<button type="button" class="gd-views__tab" role="tab" aria-selected="' + (cur && cur.id === v.id) + '" tabindex="' + (cur && cur.id === v.id ? 0 : -1) + '" data-view-id="' + esc(v.id) + '" data-fk="view:' + esc(v.id) + '">' + esc(v.name) + ' <span class="gd-views__n gd-num">' + viewCount(v) + '</span></button>' +
@@ -404,7 +405,7 @@
   }
   function renderLaneChips() {
     const el = $('#tk-lanechips');
-    const show = S.status === 'ready' && S.view === 'board' && isPhone() && S.tasks.length > 0;
+    const show = S.status === 'ready' && S.view === 'board' && isPhone();
     el.hidden = !show; if (!show) return;
     const vis = visible(), lanes = boardLanes();
     if (!lanes.includes(S.lane)) S.lane = 'todo';
@@ -416,9 +417,14 @@
     const el = $('#tk-view');
     if (S.status === 'loading') { el.innerHTML = skeletonHtml(); return; }
     if (S.status === 'error') { el.innerHTML = errorHtml(); return; }
-    if (!S.tasks.length) { el.innerHTML = emptyHtml(); return; }
+    // an empty board still draws its four lanes (each says what belongs in it) under a one-line note; the list and the timeline have nothing to draw, so they get a page-level empty state
+    if (!S.tasks.length && (S.view === 'list' || S.view === 'timeline')) { el.innerHTML = emptyHtml(); return; }
+    const intro = !S.tasks.length && S.view === 'board' ? introHtml() : '';
     const html = S.view === 'board' ? boardHtml() : S.view === 'list' ? listHtml() : S.view === 'timeline' ? timelineHtml() : inboxHtml();
-    el.innerHTML = html;
+    el.innerHTML = intro + html;
+  }
+  function introHtml() {
+    return '<div class="gd-banner gd-banner--neutral tk-intro" role="status"><div class="gd-banner__body"><span>Nothing here yet. Bruce will suggest tasks as he finds them in Slack. You can also add one yourself, or DM Bruce.</span></div><button type="button" class="gd-btn gd-btn--outline gd-btn--sm" data-open-settings>Bruce settings</button></div>';
   }
   function skeletonHtml() {
     const lane = (w) => '<section class="gd-lane"><div class="gd-lane__head"><span class="gd-ghost gd-ghost--title" style="width:' + w + '"></span></div><div class="gd-lane__list">' + [0, 1, 2].map(() => '<div class="tk-sk__card"><span class="gd-ghost gd-ghost--title"></span><span class="gd-ghost gd-ghost--block"></span></div>').join('') + '</div></section>';
@@ -833,7 +839,7 @@
   const ask = () => $('#tk-ask');
   const askOpen = () => !ask().hidden;
   const CTX_NAME = { board: 'this board', list: 'this list', timeline: 'this timeline', inbox: 'this inbox' };
-  function syncLauncher() { $('#tk-launch').hidden = !(S.status === 'ready' && S.tasks.length > 0) || askOpen(); }
+  function syncLauncher() { $('#tk-launch').hidden = S.status !== 'ready' || askOpen(); }
   function askSub() { const a = S.ask || { used: 0, cap: 0 }; return 'Sees your tasks and Slack · ' + (a.cap > 0 ? Math.max(0, a.cap - a.used) + ' of ' + a.cap + ' messages left today' : a.used + (a.used === 1 ? ' message' : ' messages') + ' today'); }
   function openAsk(o) {
     o = o || {};
