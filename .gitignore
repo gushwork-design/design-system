@@ -22,3 +22,5 @@ templates/**/package-lock.json
 # whole snapshot, so the first CI publish served the lander with a 404 where the video was.
 # Re-render from videos/ai-crm-flow/ and commit the new file when it changes.
 .claude/hub/threads/
+
+web/node_modules/

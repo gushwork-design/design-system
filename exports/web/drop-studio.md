@@ -79,3 +79,22 @@ The library has no stepper, only the checklist's vertical list and `activity-tim
 ## Dark mode
 
 In dark the page's surfaces were one grey: card, modal, field and edge within a few points of each other. Page edges are now `--gw-color-neutral-800`, the secondary text `--gw-color-neutral-300`, and the dialog's fields are wells (`--gw-color-black`) on the raised modal with a `--gw-color-neutral-700` edge. Light mode is unchanged.
+
+## Notifications
+
+When a request is sent, the progress view offers **Notify me when it's ready**. The browser asks once for permission, then
+Studio keeps that device against the person's email. When ChatGPT finishes a picture, or asks a question, that person gets
+a push on each of their devices: "Your picture is ready" or "ChatGPT has a question", with the agent's name; tapping it opens
+the agent in Studio. Nothing about GitHub appears in it. The control is a library `action-button` in the dialog footer;
+once on, the footer says so in the 10px reference text, and where notifications are blocked or the device needs the page on
+its Home Screen (iPhone) it says that instead. No new element.
+
+How it works: GitHub calls `/api/drop-studio?op=hook` when an issue changes; the hub re-reads the issue itself (it never
+trusts the call), finds who requested it from the issue's `Requested by` line, and sends through the standard Web Push
+service with the hub's own keys. A repeat of the same event sends nothing. Keys and the store: `VAPID_PUBLIC_KEY`,
+`VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `DROP_WEBHOOK_KEY`, and the hub's Upstash store. The service worker is
+`drop-studio/sw.js`, scoped to the Studio folder only.
+
+Not verified in a real browser on a real device at the time of writing: the browser pane used for testing cannot register
+service workers. On iPhone, web push only works once the page is on the Home Screen.
+

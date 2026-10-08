@@ -2,6 +2,7 @@
 // Run: node scripts/drop-studio.test.mjs
 import { sign, COOKIE } from '../web/api/_session.js';
 import { slug, roleOf, approvedPath, cleanBrief, issueTitle, issueBody, parseBody, deriveState } from '../web/api/_drop-studio.js';
+import { cleanSubscription, message, _setSender } from '../web/api/_drop-push.js';
 
 process.env.SESSION_SECRET = 'test-secret';
 const { default: handler } = await import('../web/api/_drop-studio.js');
@@ -36,8 +37,9 @@ t('the title says revision', issueTitle(cleanBrief({ ...ok, revisionOf: 'credit-
 /* ---- the issue body is what the ChatGPT task parses ---- */
 const brief = cleanBrief({ ...ok, props: ['folder', 'stamp'], notes: 'No hard hat.' }, new Set()).brief;
 const body = issueBody(brief);
-t('the headings are the contract\'s, in order', body.match(/^### .+$/gm), ['### Agent id', '### Agent name', '### What it does', '### Props', '### Pose', '### Notes', '### Revision of', '### Bundle']);
-t('the body round-trips', parseBody(body), { agentId: 'credit-checker', name: 'Credit Checker', does: 'Checks a new customer’s credit.', props: ['folder', 'stamp'], pose: 'auto', notes: 'No hard hat.', revisionOf: '', bundle: 'Cash' });
+t('who asked is kept in the issue', parseBody(issueBody({ ...brief, requestedBy: 'sam@gushwork.ai' })).requestedBy, 'sam@gushwork.ai');
+t('the headings are the contract\'s, in order', body.match(/^### .+$/gm), ['### Agent id', '### Agent name', '### What it does', '### Props', '### Pose', '### Notes', '### Revision of', '### Bundle', '### Requested by']);
+t('the body round-trips', parseBody(body), { agentId: 'credit-checker', name: 'Credit Checker', does: 'Checks a new customer’s credit.', props: ['folder', 'stamp'], pose: 'auto', notes: 'No hard hat.', revisionOf: '', bundle: 'Cash', requestedBy: '' });
 t('no props reads none', issueBody(cleanBrief(ok, new Set()).brief).includes('### Props\n\nnone'), true);
 
 /* ---- state, from issues and files alone ---- */
@@ -73,9 +75,20 @@ t('a created agent with nothing left is dropped', s.created.length, 0);
 /* ---- the endpoint, against a pretend GitHub ---- */
 const PNG = Buffer.from([0x89, 0x50, 0x4e, 0x47, 1, 2, 3, 4]);
 function pretend() {
-  const g = { issues: [], tree: [], calls: [], puts: [], comments: {}, labelOps: [], nextIssue: 20, fail: 0 };
+  const g = { issues: [], tree: [], calls: [], puts: [], comments: {}, labelOps: [], nextIssue: 20, fail: 0, kv: { h: {}, s: {} } };
   globalThis.fetch = async (url, init = {}) => {
     const send = (code, bodyObj) => ({ ok: code < 300, status: code, json: async () => bodyObj });
+    if (String(url) === 'https://kv.test/pipeline') {
+      const out = JSON.parse(init.body).map((c) => {
+        const [cmd, key, ...a] = c;
+        if (cmd === 'HGETALL') return { result: Object.entries(g.kv.h[key] || {}).flat() };
+        if (cmd === 'HSET') { (g.kv.h[key] = g.kv.h[key] || {})[a[0]] = a[1]; return { result: 1 }; }
+        if (cmd === 'HDEL') { for (const f of a) delete (g.kv.h[key] || {})[f]; return { result: 1 }; }
+        if (cmd === 'SET') { if (a.includes('NX') && g.kv.s[key]) return { result: null }; g.kv.s[key] = a[0]; return { result: 'OK' }; }
+        return { result: null };
+      });
+      return send(200, out);
+    }
     const u = new URL(url), p = u.pathname.replace('/repos/o/r', ''), m = init.method || 'GET';
     g.calls.push(m + ' ' + p);
     if (g.fail) return send(g.fail, { message: 'nope' });
@@ -90,6 +103,7 @@ function pretend() {
     if (p.startsWith('/git/blobs/')) return send(200, { content: PNG.toString('base64').replace(/(.{4})/g, '$1\n'), encoding: 'base64' });
     if (p.startsWith('/contents/') && m === 'PUT') { g.puts.push({ path: p.slice(10), ...JSON.parse(init.body) }); return send(200, { commit: { sha: 'c1' } }); }
     let mm;
+    if (m === 'GET' && (mm = /^\/issues\/(\d+)$/.exec(p))) { const it = g.issues.find((i) => i.number === Number(mm[1])); return it ? send(200, it) : send(404, {}); }
     if ((mm = /^\/issues\/(\d+)\/comments$/.exec(p))) {
       if (m === 'POST') { (g.comments[mm[1]] = g.comments[mm[1]] || []).push({ body: JSON.parse(init.body).body }); return send(201, {}); }
       return send(200, g.comments[mm[1]] || []);
@@ -106,14 +120,14 @@ function pretend() {
 const owner = COOKIE + '=' + await sign({ email: 'utsav.singh@gushwork.ai', exp: Math.floor(Date.now() / 1000) + 600 }, 'test-secret');
 const teammate = COOKIE + '=' + await sign({ email: 'someone@gushwork.ai', exp: Math.floor(Date.now() / 1000) + 600 }, 'test-secret');
 const other = COOKIE + '=' + await sign({ email: 'someone@example.com', exp: Math.floor(Date.now() / 1000) + 600 }, 'test-secret');
-async function call(method, op, { cookie = owner, body, query = {} } = {}) {
+async function call(method, op, { cookie = owner, body, query = {}, headers = {} } = {}) {
   const out = { status: 0, headers: {}, body: null };
   const res = {
     setHeader: (k, v) => { out.headers[k.toLowerCase()] = v; },
     status(c) { out.status = c; return this; },
     end(b) { out.body = Buffer.isBuffer(b) ? b : (b ? JSON.parse(b) : null); },
   };
-  await handler({ method, query: { op, ...query }, headers: { cookie }, body }, res);
+  await handler({ method, query: { op, ...query }, headers: { cookie, ...headers }, body }, res);
   return out;
 }
 
@@ -201,6 +215,71 @@ t('a teammate can make a request', [r.status, r.body.agentId], [200, 'rate-check
 g.issues[0].labels = [{ name: 'image-ready' }]; g.issues[0].state = 'closed'; g.tree = files('explorations/agents/rate-checker-v1.png');
 r = await call('POST', 'decide', { cookie: teammate, body: { agentId: 'rate-checker', action: 'accept' } });
 t('a teammate cannot accept, change or discard a picture', [r.status, g.puts.length], [403, 0]);
+
+/* ---- push notifications ---- */
+const goodSub = { endpoint: 'https://push.example/abc123', keys: { p256dh: 'BPk', auth: 'au' } };
+t('a good subscription is kept', cleanSubscription({ ...goodSub, extra: 'x' }), goodSub);
+t('an http endpoint is refused', cleanSubscription({ ...goodSub, endpoint: 'http://push.example/abc' }), null);
+t('a subscription without keys is refused', cleanSubscription({ endpoint: goodSub.endpoint }), null);
+t('the message says nothing about GitHub', [message('ready', 'Sales Guy', 'sales-guy').title, message('ready', 'Sales Guy', 'sales-guy').body, message('needs-input', 'Sales Guy', 'sales-guy').title], ['Your picture is ready', 'Sales Guy is ready to review.', 'ChatGPT has a question']);
+t('the message opens the agent', message('ready', 'A', 'a-b').url, '/internal/staging/drop-studio/?agent=a-b');
+
+process.env.KV_REST_API_URL = 'https://kv.test'; process.env.KV_REST_API_TOKEN = 'kvtok';
+delete process.env.VAPID_PUBLIC_KEY; delete process.env.VAPID_PRIVATE_KEY; process.env.DROP_WEBHOOK_KEY = 'hookkey';
+g = pretend();
+r = await call('GET', 'pushkey');
+t('no keys: the page is told there is no push key', r.body.key, '');
+r = await call('POST', 'subscribe', { cookie: teammate, body: { subscription: goodSub } });
+t('no keys: subscribing says it is not switched on', r.status, 503);
+
+process.env.VAPID_PUBLIC_KEY = 'PUBKEY'; process.env.VAPID_PRIVATE_KEY = 'PRIVKEY';
+r = await call('GET', 'pushkey');
+t('with keys: the public key is handed out', r.body.key, 'PUBKEY');
+r = await call('GET', 'state');
+t('state says push is available', r.body.push, true);
+r = await call('POST', 'subscribe', { cookie: '', body: { subscription: goodSub } });
+t('signed out cannot subscribe', r.status, 401);
+r = await call('POST', 'subscribe', { cookie: teammate, body: { subscription: { endpoint: 'nope' } } });
+t('a bad subscription is a 400', r.status, 400);
+r = await call('POST', 'subscribe', { cookie: teammate, body: { subscription: goodSub } });
+t('a teammate subscribes', [r.status, Object.keys(g.kv.h['drop:push:someone@gushwork.ai'] || {})], [200, [goodSub.endpoint]]);
+await call('POST', 'subscribe', { cookie: teammate, body: { subscription: goodSub } });
+t('subscribing twice keeps one device', Object.keys(g.kv.h['drop:push:someone@gushwork.ai']).length, 1);
+for (let i = 0; i < 6; i++) await call('POST', 'subscribe', { cookie: teammate, body: { subscription: { ...goodSub, endpoint: 'https://push.example/dev' + i } } });
+t('at most 5 devices per person', Object.keys(g.kv.h['drop:push:someone@gushwork.ai']).length, 5);
+r = await call('POST', 'unsubscribe', { cookie: teammate, body: { endpoint: 'https://push.example/dev5' } });
+t('a device can be removed', [r.status, Object.keys(g.kv.h['drop:push:someone@gushwork.ai']).includes('https://push.example/dev5')], [200, false]);
+
+const sent = [];
+_setSender(async (sub, payload) => { if (sub.endpoint.endsWith('dev3')) { const e = new Error('gone'); e.statusCode = 410; throw e; } sent.push([sub.endpoint, payload.title]); });
+const reqBody = (extra = {}) => issueBody({ agentId: 'sales-guy', name: 'Sales Guy', does: 'x', props: [], pose: 'standing', notes: '', revisionOf: '', bundle: '', requestedBy: 'someone@gushwork.ai', ...extra });
+const ghIssue = (n, labels, state, extra = {}) => ({ number: n, state, html_url: 'u', comments: 1, labels: labels.map((name) => ({ name })), body: reqBody(extra) });
+const hookCall = (n, action, { key = 'hookkey', event = 'issues' } = {}) => call('POST', 'hook', { cookie: '', query: { key }, headers: { 'x-github-event': event }, body: { action, issue: { number: n } } });
+
+r = await hookCall(7, 'closed', { key: 'wrong' });
+t('the hook refuses a wrong key', r.status, 401);
+r = await hookCall(7, 'closed', { event: 'ping' });
+t('the hook answers a ping', [r.status, r.body.pong], [200, true]);
+g.issues = [ghIssue(7, ['image-ready'], 'closed')];
+globalThis.__issue = (n) => g.issues.find((i) => i.number === n);
+r = await hookCall(7, 'closed');
+t('a finished picture notifies the requester\'s devices (a gone one is dropped)', [r.status, r.body.kind, r.body.sent, sent.map((x) => x[1]).every((x) => x === 'Your picture is ready'), Object.keys(g.kv.h['drop:push:someone@gushwork.ai']).includes('https://push.example/dev3')], [200, 'ready', 3, true, false]);
+r = await hookCall(7, 'closed');
+t('the same event twice sends once', [r.body.duplicate, sent.length], [true, 3]);
+g.issues = [ghIssue(8, ['needs-input'], 'open')];
+r = await hookCall(8, 'labeled');
+t('a question notifies as a question', [r.body.kind, sent[sent.length - 1][1]], ['needs-input', 'ChatGPT has a question']);
+g.issues = [ghIssue(9, ['image-request'], 'open')];
+r = await hookCall(9, 'labeled');
+t('a plain new request tells nobody', [r.body.ignored, r.body.sent], ['nothing to tell', undefined]);
+g.issues = [ghIssue(10, ['image-ready'], 'closed', { requestedBy: '' })];
+r = await hookCall(10, 'closed');
+t('an issue with no requester tells nobody', r.body.ignored, 'no requester');
+g.issues = [ghIssue(11, ['image-ready', 'accepted'], 'closed')];
+r = await hookCall(11, 'closed');
+t('an accepted picture is not announced again', r.body.ignored, 'nothing to tell');
+r = await hookCall(7, 'edited');
+t('other issue actions are ignored', r.body.ignored, true);
 
 g = pretend(); g.fail = 403;
 r = await call('GET', 'state');
