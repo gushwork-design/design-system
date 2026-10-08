@@ -1997,6 +1997,7 @@
     /* Any tab row whose open tab draws a thin line along its bottom edge is an underlined row, whatever its class
        (.an-tabs, .tl-tabs, .ac-tabbar, a template's own). Filled-pill rows draw no such line and are left alone. */
     function underlined(row) {
+      if (row.closest('.gd')) return false;      /* a library tab row (exports/dashboard) slides its own line; two lines on one row fight */
       var tab = row.querySelector('[role="tab"][aria-selected="true"]');
       if (!tab) return false;
       var a = getComputedStyle(tab, '::after');

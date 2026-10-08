@@ -8,159 +8,26 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20x%3D%221%22%20y%3D%221%22%20width%3D%2278%22%20height%3D%2278%22%20rx%3D%2219%22%20fill%3D%22%230070ff%22%20stroke%3D%22%230061e0%22%20stroke-width%3D%222%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
 <link rel="stylesheet" href="/foundation/tokens.css">
 <link rel="stylesheet" href="/shell.css?v=ghost9">
-<link rel="stylesheet" href="/admin/bruce-panel.css?v=1">
-<script src="/shell.js?v=ghost9" defer></script>
-<script src="/admin/bruce-panel.js?v=1" defer></script>
+<link rel="stylesheet" href="/exports/dashboard/dashboard.css">
+<script src="/shell.js?v=ghost10" defer></script>
+<script src="/exports/dashboard/dashboard.js" defer></script>
 <style>
-/* /admin/agents — the design team's agents (8 Oct 2026). One underlined tab row: All agents, then one tab per agent, the lead first.
-   The point of the page is four answers: is it healthy, what is it doing, how is it doing, and what does it need from you. Everything else
-   (what it does and never does, memory, limits, the prompt) is folded away under "About". The definitions are agents/ in git, built into
-   agents-data.json; the activity comes from what the hub can already see: Bruce's log, the health checks and Alfred's GitHub threads.
-   Nothing here is a secret: the repo is public. Token figures are ESTIMATES, built from the numbers in each agent's `cost`. */
+/* /admin/agents: the design team's agents. Built from the dashboard library (exports/dashboard): underline tabs, the period control, the toggle,
+   status banner, cards, data tables, stat cards, badges, tags, avatars, key-value lists and the drawer. The only CSS here is the page's own layout:
+   the sticky tab row (as on Analytics) and the spacing between sections. Definitions are agents/ in git, built into agents-data.json; the activity
+   is what the hub can already see: Bruce's log, the health checks and Alfred's GitHub threads. Token figures are ESTIMATES. Nothing here is a secret. */
 body[data-gw-page="agents"] .sg__main { grid-column: 1 / -1; max-width: 1120px; gap: var(--gw-space-24); }
 body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw-space-8); }
-#ag-app[hidden] { display: none; }
-#ag-state:empty { display: none; }
-#ag-app, #ag-panel { display: grid; gap: var(--gw-space-32); }
+#ag-app[hidden], #ag-state:empty { display: none; }
+#ag-panel { display: grid; gap: var(--gw-space-24); }
 #ag-panel > * { min-width: 0; }
-
-/* the bar: underlined tabs only, like the other pages; the period and refresh sit in a row inside the content, as on Analytics */
 .ag-bar { position: sticky; top: 0; z-index: 6; background: var(--s-panel-bg); margin-top: calc(var(--gw-space-8) * -1); padding-top: var(--gw-space-8); align-self: stretch;
-  display: flex; align-items: center; gap: var(--gw-space-16); box-shadow: inset 0 -1px 0 var(--s-card-border); }
+  display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-16); }
+.ag-bar > .gd-tabs { flex: 1 1 auto; min-width: 0; }
+.ag-bar > .gd-toggle { flex: none; }
 @media (max-width: 767px) { .ag-bar { top: 76px; } }
-.ag-tabs { display: flex; gap: var(--gw-space-24); overflow-x: auto; scrollbar-width: none; max-width: 100%; }
-.ag-tabs::-webkit-scrollbar { display: none; }
-.ag-tab { all: unset; box-sizing: border-box; position: relative; height: 40px; padding: 0 2px; display: inline-flex; align-items: center; gap: var(--gw-space-8); cursor: pointer; white-space: nowrap;
-  font: var(--gw-text-body-14-med); color: var(--s-body); }
-.ag-tab:hover, .ag-tab[aria-selected="true"] { color: var(--s-heading); }
-.ag-tab[aria-selected="true"]::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; border-radius: 2px 2px 0 0; background: var(--s-heading); }
-.ag-tab:focus-visible { outline: 2px solid var(--gw-color-primary-500); outline-offset: 2px; border-radius: var(--gw-radius-4); }
-.ag-tab i { font-style: normal; width: 8px; height: 8px; border-radius: 2px; background: var(--s-nav-sel); flex: none; }
-.ag-tab i.ok, .ag-dot.ok { background: var(--gw-color-green-500, #10b981); } .ag-tab i.warn, .ag-dot.warn { background: var(--gw-color-yellow-500); } .ag-tab i.fail, .ag-dot.fail { background: var(--gw-color-red-500, #ef4444); }
-:root { --ag-tabs-bg: var(--gw-color-neutral-50); --ag-tabs-line: var(--gw-color-neutral-100); --ag-tab-fg: var(--gw-color-neutral-900); --ag-tab-hover: var(--gw-color-neutral-100); --ag-tab-on-bg: var(--gw-color-black); --ag-tab-on-fg: var(--gw-color-white); }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ag-tabs-bg: var(--gw-color-neutral-900); --ag-tabs-line: var(--gw-color-neutral-900); --ag-tab-fg: var(--gw-color-white); --ag-tab-hover: var(--gw-color-neutral-800); --ag-tab-on-bg: var(--gw-color-white); --ag-tab-on-fg: var(--gw-color-black); } }
-:root[data-theme="dark"] { --ag-tabs-bg: var(--gw-color-neutral-900); --ag-tabs-line: var(--gw-color-neutral-900); --ag-tab-fg: var(--gw-color-white); --ag-tab-hover: var(--gw-color-neutral-800); --ag-tab-on-bg: var(--gw-color-white); --ag-tab-on-fg: var(--gw-color-black); }
 .ag-ctrl { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-16); flex-wrap: wrap; }
-.ag-pills { display: inline-flex; height: 36px; padding: var(--gw-space-4); gap: var(--gw-space-4); border-radius: var(--gw-radius-12); background: var(--ag-tabs-bg); box-shadow: inset 0 0 0 1px var(--ag-tabs-line); }
-.ag-pill { height: 28px; padding: 0 var(--gw-space-12); border: 0; border-radius: var(--gw-radius-8); background: none; font: var(--gw-text-button-12); color: var(--ag-tab-fg); cursor: pointer; transition: background var(--gw-motion-fast); }
-.ag-pill:hover { background: var(--ag-tab-hover); }
-.ag-pill[aria-selected="true"] { background: var(--ag-tab-on-bg); color: var(--ag-tab-on-fg); }
-.ag-pill:focus-visible { outline: 2px solid var(--gw-color-primary-500); outline-offset: 2px; }
-.gw-iconbtn[aria-busy="true"] svg { animation: ag-spin 1s linear infinite; }
-@keyframes ag-spin { to { transform: rotate(360deg); } } @media (prefers-reduced-motion: reduce) { .gw-iconbtn[aria-busy="true"] svg { animation: none; } }
-
-.ag-note { padding: var(--gw-space-24); border-radius: var(--gw-radius-16); background: var(--s-card-bg); box-shadow: inset 0 0 0 1px var(--s-card-border); font: var(--gw-text-body-14-reg); color: var(--s-body); }
-.ag-note b { display: block; font: var(--gw-text-body-16-sem); color: var(--s-heading); margin-bottom: var(--gw-space-4); }
-.ag-empty { margin: 0; padding: var(--gw-space-8); font: var(--gw-text-body-14-reg); color: var(--s-body); }
-
-/* pictures, chips, buttons */
-.ag-pic { width: 40px; height: 40px; flex: none; border-radius: var(--gw-radius-10); display: grid; place-items: center; font: 700 16px/1 var(--gw-font-display); color: var(--s-heading); background: var(--s-nav-sel); }
-.ag-pic--bruce { background: var(--gw-color-primary-100) url(/assets/bruce-avatar.png) center / cover no-repeat; }
-.ag-pic--alfred { background: var(--gw-color-primary-500); color: var(--gw-color-white); }
-.ag-pic--lg { width: 56px; height: 56px; border-radius: var(--gw-radius-16); font-size: 22px; }
-.ag-pic--sm { width: 28px; height: 28px; border-radius: var(--gw-radius-8); font-size: 12px; }
-.ag-tag { display: inline-flex; align-items: center; height: 22px; padding: 0 var(--gw-space-8); border-radius: var(--gw-radius-4); font: var(--gw-text-body-12-med); background: var(--s-nav-sel); color: var(--s-heading); white-space: nowrap; }
-.ag-tag--gap { background: var(--gw-color-yellow-alpha-10); color: var(--gw-color-yellow-600); }
-:root[data-theme="dark"] .ag-tag--gap { color: var(--gw-color-yellow-300); }
-.ag-b { display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px; border-radius: var(--gw-radius-8); font: var(--gw-text-body-12-med); white-space: nowrap; flex: none; }
-.ag-b::before { content: ''; width: 6px; height: 6px; border-radius: 2px; background: currentColor; }
-.ag-b--ok { background: var(--gw-color-green-alpha-10, rgba(16,185,129,.12)); color: var(--gw-color-green-700, #047857); }
-.ag-b--warn { background: var(--gw-color-yellow-alpha-10); color: var(--gw-color-yellow-600); }
-.ag-b--fail { background: var(--gw-color-red-alpha-10); color: var(--gw-color-red-600); }
-.ag-b--unknown { background: var(--s-nav-sel); color: var(--s-body); }
-:root[data-theme="dark"] .ag-b--ok { color: var(--gw-color-green-300, #6ee7b7); } :root[data-theme="dark"] .ag-b--warn { color: var(--gw-color-yellow-300); } :root[data-theme="dark"] .ag-b--fail { color: var(--gw-color-red-300); }
-.ag-btn { height: 32px; padding: 0 var(--gw-space-12); border-radius: var(--gw-radius-8); border: 0; cursor: pointer; font: var(--gw-text-button-12, var(--gw-text-body-12-med)); display: inline-flex; align-items: center; justify-content: center; white-space: nowrap; flex: none;
-  background: none; color: var(--s-heading); box-shadow: inset 0 0 0 1px var(--s-card-border); transition: background var(--gw-motion-fast); text-decoration: none; }
-.ag-btn:hover { background: var(--s-nav-hover); }
-.ag-btn:focus-visible { outline: 2px solid var(--gw-color-primary-500); outline-offset: 2px; }
-
-/* the headline, then sections */
-.ag-lead h2 { margin: 0; font: 600 28px/1.2 var(--gw-font-display); color: var(--s-heading); }
-.ag-lead p { margin: var(--gw-space-8) 0 0; font: var(--gw-text-body-16-reg, var(--gw-text-body-14-reg)); color: var(--s-body); max-width: 70ch; }
-.ag-sec { display: grid; gap: var(--gw-space-12); min-width: 0; }
-.ag-sec__h { display: flex; align-items: baseline; justify-content: space-between; gap: var(--gw-space-12); flex-wrap: wrap; }
-.ag-sec__h h3 { margin: 0; font: 600 16px/1.3 var(--gw-font-display); color: var(--s-heading); }
-.ag-sec__h a, .ag-sec__h span { font: var(--gw-text-body-14-reg); color: var(--s-body); text-decoration: none; }
-.ag-sec__h a:hover { color: var(--s-heading); }
-.ag-list { border-radius: var(--gw-radius-16); background: var(--s-card-bg); box-shadow: inset 0 0 0 1px var(--s-card-border); overflow: hidden; }
-.ag-row { display: flex; align-items: center; gap: var(--gw-space-12); padding: var(--gw-space-12) var(--gw-space-16); border-top: 1px solid var(--s-card-border); min-width: 0; color: inherit; text-decoration: none; }
-.ag-row:first-child { border-top: 0; }
-a.ag-row:hover { background: var(--s-nav-hover); }
-.ag-row__t { flex: 1; min-width: 0; font: var(--gw-text-body-14-reg); color: var(--s-body); }
-.ag-row__t b { display: block; font: var(--gw-text-body-14-med); color: var(--s-heading); overflow-wrap: anywhere; }
-.ag-row__t span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ag-row__t--wrap span { white-space: normal; }
-.ag-row time, .ag-row small { font: var(--gw-text-body-12-reg); color: var(--s-body); white-space: nowrap; flex: none; }
-@media (max-width: 640px) { .ag-row { flex-wrap: wrap; } .ag-row__t { flex-basis: calc(100% - 44px); } }
-
-/* the agent cards on the overview */
-.ag-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gw-space-16); }
-@media (max-width: 960px) { .ag-cards { grid-template-columns: minmax(0, 1fr); } }
-.ag-card { all: unset; box-sizing: border-box; display: flex; flex-direction: column; gap: var(--gw-space-16); padding: var(--gw-space-20); min-width: 0; cursor: pointer; border-radius: var(--gw-radius-16); background: var(--s-card-bg); box-shadow: inset 0 0 0 1px var(--s-card-border); transition: background var(--gw-motion-fast); }
-.ag-card:hover { background: var(--s-nav-hover); }
-.ag-card:focus-visible { outline: 2px solid var(--gw-color-primary-500); outline-offset: 2px; }
-.ag-card__top { display: flex; align-items: center; gap: var(--gw-space-12); }
-.ag-card__top > div { flex: 1; min-width: 0; }
-.ag-card__top b, .ag-hero b { display: block; font: 600 18px/1.25 var(--gw-font-display); color: var(--s-heading); }
-.ag-card__top small, .ag-hero small { display: block; font: var(--gw-text-body-12-reg); color: var(--s-body); }
-.ag-card__now { margin: 0; font: var(--gw-text-body-14-reg); color: var(--s-body); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; min-height: 60px; }
-.ag-card__foot { margin-top: auto; padding-top: var(--gw-space-12); border-top: 1px solid var(--s-card-border); display: flex; align-items: center; gap: var(--gw-space-8); font: var(--gw-text-body-13-med, 500 13px/1.4 var(--gw-font-body)); color: var(--s-heading); }
-.ag-card__foot.is-quiet { color: var(--s-body); font-weight: 400; }
-.ag-card__foot .ag-dot { margin-top: 0; }
-.ag-dot { width: 8px; height: 8px; border-radius: 2px; background: var(--s-nav-sel); flex: none; }
-
-/* a few numbers, divided by straight lines */
-.ag-st { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; }
-.ag-st > div { padding: 0 var(--gw-space-12); border-left: 1px solid var(--s-card-border); min-width: 0; }
-.ag-st > div:first-child { padding-left: 0; border-left: 0; }
-.ag-st b { display: block; font: 500 20px/1.2 var(--gw-font-display); color: var(--s-heading); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
-.ag-st span { display: block; margin-top: 2px; font: var(--gw-text-body-12-reg); color: var(--s-body); overflow-wrap: anywhere; }
-.ag-card .ag-st { align-items: start; }
-.ag-st--big { padding: var(--gw-space-20); border-radius: var(--gw-radius-16); background: var(--s-card-bg); box-shadow: inset 0 0 0 1px var(--s-card-border); }
-.ag-st--big b { font-size: 28px; }
-.ag-st--big > div { padding: 0 var(--gw-space-20); }
-.ag-st--big > div:first-child { padding-left: 0; }
-@media (max-width: 640px) { .ag-st--big { grid-auto-flow: row; gap: var(--gw-space-16); } .ag-st--big > div, .ag-st--big > div:first-child { padding: 0; border-left: 0; } }
-.ag-foot { margin: 0; font: var(--gw-text-body-12-reg); color: var(--s-body); }
-
-/* one agent's page */
-.ag-hero { display: flex; align-items: flex-start; gap: var(--gw-space-16); flex-wrap: wrap; }
-.ag-hero > div { flex: 1; min-width: 220px; }
-.ag-hero p { margin: var(--gw-space-8) 0 0; font: var(--gw-text-body-14-reg); color: var(--s-body); max-width: 70ch; }
-.ag-oks { display: flex; flex-wrap: wrap; gap: var(--gw-space-8) var(--gw-space-16); padding: var(--gw-space-12) var(--gw-space-16); border-top: 1px solid var(--s-card-border); font: var(--gw-text-body-13-reg, 400 13px/1.4 var(--gw-font-body)); color: var(--s-body); }
-.ag-oks:first-child { border-top: 0; }
-.ag-oks span { display: inline-flex; align-items: center; gap: var(--gw-space-8); }
-
-/* Bruce's analytics sit in his tab, under the same page header. The panel brings its own sections and drawer. */
-#ag-bruce-slot { min-width: 0; }
 .ag-ctrl[hidden] { display: none; }
-.ag-ctrl__r { display: flex; align-items: center; gap: var(--gw-space-16); }
-.ag-bar__r { margin-left: auto; flex: none; }
-#ag-bruce-slot .ul-sec { margin-top: var(--gw-space-8); }
-#ag-bruce-slot .br-m4 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-@media (max-width: 900px) { #ag-bruce-slot .br-m4 { grid-template-columns: minmax(0, 1fr); } }
-.ag-btn[data-tab] { font: inherit; font: var(--gw-text-button-12, var(--gw-text-body-12-med)); }
-
-/* about, folded away */
-.ag-how { border-radius: var(--gw-radius-16); box-shadow: inset 0 0 0 1px var(--s-card-border); }
-.ag-how > summary { cursor: pointer; list-style: none; padding: var(--gw-space-16) var(--gw-space-20); font: var(--gw-text-body-14-med); color: var(--s-heading); display: flex; align-items: center; gap: var(--gw-space-8); }
-.ag-how > summary::-webkit-details-marker { display: none; }
-.ag-how > summary::before { content: "\203A"; transition: transform var(--gw-motion-fast); color: var(--s-body); }
-.ag-how[open] > summary::before { transform: rotate(90deg); }
-.ag-how > summary:focus-visible { outline: 2px solid var(--gw-color-primary-500); outline-offset: 2px; border-radius: var(--gw-radius-16); }
-.ag-about { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gw-space-24) var(--gw-space-32); padding: var(--gw-space-4) var(--gw-space-20) var(--gw-space-24); }
-@media (max-width: 800px) { .ag-about { grid-template-columns: minmax(0, 1fr); } }
-.ag-about h4 { margin: 0 0 var(--gw-space-8); font: 600 12px/1.3 var(--gw-font-body); letter-spacing: .04em; text-transform: uppercase; color: var(--s-group-label, var(--s-body)); }
-.ag-about p { margin: 0; font: var(--gw-text-body-14-reg); color: var(--s-body); }
-.ag-about p + p { margin-top: var(--gw-space-8); }
-.ag-about a { color: var(--s-heading); text-underline-offset: 2px; }
-.ag-ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--gw-space-8); }
-.ag-ul li { position: relative; padding-left: var(--gw-space-16); font: var(--gw-text-body-14-reg); color: var(--s-heading); }
-.ag-ul li::before { content: ""; position: absolute; left: 0; top: 8px; width: 6px; height: 6px; border-radius: var(--gw-radius-4); background: var(--gw-color-primary-500); }
-.ag-ul--never li::before { background: var(--s-body); }
-.ag-ul--mem li { font-size: 13px; color: var(--s-body); } .ag-ul--mem li strong { color: var(--s-heading); font-weight: 600; }
-.ag-links { display: flex; gap: var(--gw-space-8); flex-wrap: wrap; grid-column: 1 / -1; }
-.ag-add { margin: 0; font: var(--gw-text-body-14-reg); color: var(--s-body); } .ag-add a { color: var(--s-heading); text-underline-offset: 2px; }
 </style>
 </head>
 <body data-gw-page="agents">
@@ -173,19 +40,42 @@ a.ag-row:hover { background: var(--s-nav-hover); }
   </header>
 
   <main class="sg__main">
-    <div class="ag-bar">
-      <div class="ag-tabs" id="ag-tabs" role="tablist" aria-label="Agents"></div>
-      <div class="an-hide ag-bar__r"><label class="gd-toggle gd-toggle--xs" title="Leaves your own asks to Bruce out of the counts"><input type="checkbox" role="switch" id="ag-me-box"><span class="gd-toggle__track" aria-hidden="true"></span><span class="gd-toggle__t">Hide my activity</span></label></div>
-    </div>
-    <div id="ag-state"></div>
-    <div id="ag-app" hidden>
-      <div class="ag-ctrl" id="ag-ctrl">
-        <div class="ag-pills" role="tablist" aria-label="Period"><button type="button" class="ag-pill" role="tab" data-p="today" aria-selected="false">Today</button><button type="button" class="ag-pill" role="tab" data-p="7" aria-selected="true">7 days</button><button type="button" class="ag-pill" role="tab" data-p="30" aria-selected="false">30 days</button></div>
-        <div class="ag-ctrl__r">
-        <button class="gw-iconbtn" id="ag-refresh" type="button" aria-label="Refresh" data-tip="Refresh" data-tip-end><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z"/></svg></button></div>
+    <div class="gd" style="display: contents">
+      <div class="ag-bar">
+        <div class="gd-tabs gd-tabs--underline" id="ag-tabs" role="tablist" aria-label="Agents"></div>
+        <label class="gd-toggle gd-toggle--xs" title="Leaves your own asks to Bruce out of everything on this page"><input type="checkbox" role="switch" id="ag-me-box"><span class="gd-toggle__track" aria-hidden="true"></span><span class="gd-toggle__t">Hide my activity</span></label>
       </div>
-      <div id="ag-panel" role="tabpanel" tabindex="-1"></div>
-      <div id="ag-park" hidden><div id="ag-bruce" class="ul-scope"></div></div>
+      <div id="ag-state"></div>
+      <div id="ag-app" hidden>
+        <div class="ag-ctrl" id="ag-ctrl">
+          <div class="gd-period"><div class="gd-tabs gd-tabs--pill" id="ag-period" role="radiogroup" aria-label="Period">
+            <button type="button" role="radio" class="gd-tabs__tab" aria-checked="false" tabindex="-1" data-value="today">Today</button>
+            <button type="button" role="radio" class="gd-tabs__tab" aria-checked="true" tabindex="0" data-value="7">7 days</button>
+            <button type="button" role="radio" class="gd-tabs__tab" aria-checked="false" tabindex="-1" data-value="30">30 days</button></div></div>
+          <button type="button" class="gd-iconbtn" id="ag-refresh" aria-label="Refresh" data-tip="Refresh" data-tip-end><svg viewBox="0 0 256 256" fill="currentColor" width="16" height="16" aria-hidden="true"><path d="M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z"/></svg></button>
+        </div>
+        <div id="ag-panel" role="tabpanel" tabindex="-1" style="margin-top: var(--gw-space-24)"></div>
+      </div>
+
+      <dialog class="gd-drawer" id="ag-drawer" aria-labelledby="ag-d-title">
+        <div class="gd-drawer__head">
+          <div><div class="gd-drawer__sub" id="ag-d-sub">Conversation</div><h2 class="gd-drawer__title" id="ag-d-title">Conversation</h2></div>
+          <div class="gd-drawer__tools">
+            <button type="button" class="gd-iconbtn" id="ag-d-prev" aria-label="Previous conversation"><svg viewBox="0 0 256 256" fill="currentColor" width="16" height="16" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"/></svg></button>
+            <button type="button" class="gd-iconbtn" id="ag-d-next" aria-label="Next conversation"><svg viewBox="0 0 256 256" fill="currentColor" width="16" height="16" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></button>
+            <button type="button" class="gd-fb-close" data-gd-drawer-wide aria-pressed="false" aria-label="Open the drawer out"><svg viewBox="0 0 256 256" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M136,40V216a8,8,0,0,1-16,0V40a8,8,0,0,1,16,0ZM96,120H35.31l18.35-18.34A8,8,0,0,0,42.34,90.34l-32,32a8,8,0,0,0,0,11.32l32,32a8,8,0,0,0,11.32-11.32L35.31,136H96a8,8,0,0,0,0-16Zm149.66,2.34-32-32a8,8,0,0,0-11.32,11.32L220.69,120H160a8,8,0,0,0,0,16h60.69l-18.35,18.34a8,8,0,0,0,11.32,11.32l32-32A8,8,0,0,0,245.66,122.34Z"/></svg></button>
+            <button type="button" class="gd-fb-close" data-gd-close aria-label="Close"><svg viewBox="0 0 256 256" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button>
+          </div>
+        </div>
+        <div class="gd-drawer__body">
+          <div class="gd-tabs gd-tabs--pill" id="ag-d-tabs" role="tablist" aria-label="Conversation views">
+            <button type="button" role="tab" class="gd-tabs__tab" aria-selected="true" tabindex="0" data-dt="chat">Conversation</button>
+            <button type="button" role="tab" class="gd-tabs__tab" aria-selected="false" tabindex="-1" data-dt="shared" id="ag-d-shared">Shared</button>
+            <button type="button" role="tab" class="gd-tabs__tab" aria-selected="false" tabindex="-1" data-dt="log">Log</button>
+          </div>
+          <div id="ag-d-body" aria-live="polite" style="margin-top: var(--gw-space-16)"></div>
+        </div>
+      </dialog>
     </div>
   </main>
 </div>
@@ -195,27 +85,74 @@ a.ag-row:hover { background: var(--s-nav-hover); }
   'use strict';
   function $(id) { return document.getElementById(id); }
   function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
-  function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
+  function plural(n, w, many) { return n + ' ' + (n === 1 ? w : (many || w + 's')); }
   function clip(t, n) { t = String(t || '').replace(/\s+/g, ' ').trim(); return t.length > n ? t.slice(0, n - 1) + '…' : t; }
   var DAY = 86400000;
   function ago(ms) { var s = Math.max(0, Math.round(ms / 1000)); if (s < 60) return 'just now'; var m = Math.round(s / 60); if (m < 60) return m + ' min ago'; var h = Math.round(m / 60); if (h < 48) return h + ' h ago'; return Math.round(h / 24) + ' days ago'; }
   function agoShort(ms) { var m = Math.round(ms / 60000); if (m < 60) return m + ' min'; var h = Math.round(m / 60); if (h < 48) return h + ' h'; return Math.round(h / 24) + ' days'; }
   function tok(n) { return n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1e3 ? Math.round(n / 1e3) + 'k' : String(Math.round(n)); }
+  function fmtWhen(d) { return d.toLocaleString(undefined, { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }); }
+  function fmtTime(d) { return d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }); }
+  function fmtDay(d) { return d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }); }
+  var ICON = {
+    check: '<path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm45.66,85.66-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35a8,8,0,0,1,11.32,11.32Z"/>',
+    warn: '<path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM120,104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm8,88a12,12,0,1,1,12-12A12,12,0,0,1,128,192Z"/>',
+    info: '<path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm16-40a8,8,0,0,1-8,8,16,16,0,0,1-16-16V128a8,8,0,0,1,0-16,16,16,0,0,1,16,16v40A8,8,0,0,1,144,176ZM112,84a12,12,0,1,1,12,12A12,12,0,0,1,112,84Z"/>',
+    chat: '<path d="M216,48H40A16,16,0,0,0,24,64V224a15.85,15.85,0,0,0,9.24,14.5A16.13,16.13,0,0,0,40,240a15.89,15.89,0,0,0,10.25-3.78l.09-.07L83,208H216a16,16,0,0,0,16-16V64A16,16,0,0,0,216,48Z"/>',
+    caret: '<path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/>'
+  };
+  function svg(n, s) { return '<svg viewBox="0 0 256 256" fill="currentColor" width="' + (s || 16) + '" height="' + (s || 16) + '" aria-hidden="true">' + (ICON[n] || '') + '</svg>'; }
   var TOPIC = { 'pass-on': 'Pass on to Utsav', status: 'Status check', access: 'Access', brand: 'Brand files', build: 'Build a page', template: 'Templates and tools', hub: 'Hub and system', about: 'About Bruce', other: 'No clear lane' };
+  var KIND = { run: 'Run', chat: 'Chat', capped: 'Hit the daily cap', 'to-alfred': 'To Alfred', failed: 'Failed', sent: 'Sent' };
   var STATE_LABEL = { ok: 'Running well', warn: 'Worth a look', fail: 'Needs attention', unknown: 'Cannot tell yet' };
+  var TONE = { ok: 'good', warn: 'warn', fail: 'bad', unknown: 'neutral' };
   var REVIEW = '/internal/design-system#review';
-  var S = { data: null, health: null, healthErr: '', bruce: null, bruceErr: '', owner: '', alfred: null, alfredErr: '', period: '7', tab: 'all', at: 0, busy: false };
+  var S = { data: null, health: null, healthErr: '', bruce: null, bruceErr: '', owner: '', cap: 3, usage: null, alfred: null, alfredErr: '', period: '7', tab: 'all', at: 0, busy: false,
+            dm: {}, seq: 0, openUser: '', dtab: 'chat', order: [], convs: [] };
 
-  /* ---------- who ---------- */
-  function agent(id) { return S.data.agents.filter(function (a) { return a.id === id; })[0]; }
-  function pic(a, cls) { return '<span class="ag-pic ag-pic--' + esc(a.id) + (cls ? ' ' + cls : '') + '" aria-hidden="true">' + (a.id === 'bruce' ? '' : esc(a.name.charAt(0))) + '</span>'; }
+  /* ---------- small library pieces ---------- */
+  function badge(tone, label) { return '<span class="gd-badge gd-badge--' + tone + '">' + esc(label) + '</span>'; }
+  function tag(label, tone) { return '<span class="gd-tag' + (tone ? ' gd-tag--' + tone : '') + '"><span class="gd-tag__label">' + esc(label) + '</span></span>'; }
   function initial(n) { return esc(String(n || '?').trim().charAt(0).toUpperCase() || '?'); }
-  function badge(state, label) { return '<span class="ag-b ag-b--' + esc(state) + '">' + esc(label || STATE_LABEL[state] || state) + '</span>'; }
-  /* The period: Today (since midnight), 7 days or 30 days. */
+  function card(title, desc, body, o) {
+    o = o || {};
+    return '<section class="gd-card' + (o.flush ? ' gd-card--flush' : '') + '"><div class="gd-card__head"><div class="gd-card__titles"><h3 class="gd-card__title">' + esc(title) + '</h3>' + (desc ? '<p class="gd-card__desc">' + esc(desc) + '</p>' : '') + '</div>' +
+      (o.actions ? '<div class="gd-card__actions">' + o.actions + '</div>' : '') + '</div><div class="gd-card__body' + (o.flush ? ' gd-card__body--bleed' : '') + '">' + body + '</div>' + (o.foot ? '<div class="gd-card__foot">' + o.foot + '</div>' : '') + '</section>';
+  }
+  /* a collapsed card: the title is the button (the library's collapsible card) */
+  function foldCard(id, title, body) {
+    return '<section class="gd-card"><div class="gd-card__head"><div class="gd-card__titles"><button type="button" class="gd-card__toggle" data-gd-toggle aria-expanded="false" aria-controls="' + id + '"><h3 class="gd-card__title">' + esc(title) + '</h3></button></div></div><div class="gd-card__body" id="' + id + '" hidden>' + body + '</div></section>';
+  }
+  /* cols: [{h:'Person', w:'minmax(0,1fr)', num:true}]; rows: [{cells:[html], strong:0, attrs:''}] */
+  function table(label, cols, rows) {
+    var tpl = cols.map(function (c) { return c.w; }).join(' ');
+    var head = '<div class="gd-table__row gd-table__row--head" role="row">' + cols.map(function (c) { return '<div class="gd-table__th' + (c.num ? ' gd-table__th--num' : '') + '" role="columnheader">' + esc(c.h) + '</div>'; }).join('') + '</div>';
+    var body = rows.map(function (r) {
+      return '<div class="gd-table__row" role="row"' + (r.attrs || '') + '>' + r.cells.map(function (h, i) {
+        var c = cols[i], cls = 'gd-table__cell' + (c.num ? ' gd-table__cell--num' : '') + (c.flex ? ' gd-table__cell--flex' : '') + (c.strong ? ' gd-table__cell--strong' : '') + (c.muted ? ' gd-table__cell--muted' : '');
+        return '<div class="' + cls + '" role="cell"' + (c.title && r.t ? ' title="' + esc(r.t[i] || '') + '"' : '') + '>' + h + '</div>';
+      }).join('') + '</div>';
+    }).join('');
+    return '<div class="gd-tview gd-tview--flush"><div class="gd-table-wrap"><div class="gd-table gd-table--inset" role="table" aria-label="' + esc(label) + '" style="--gd-cols:' + tpl + ';--gd-table-min:640px">' + head + '<div class="gd-table__body" role="rowgroup">' + body + '</div></div></div></div>';
+  }
+  function who(name, sub) { return '<span class="gd-table__avatar" aria-hidden="true">' + initial(name) + '</span><span class="gd-table__who"><b class="gd-table__trunc">' + esc(name) + '</b>' + (sub ? '<small>' + esc(sub) + '</small>' : '') + '</span>'; }
+  function stat(name, value, compare) {
+    return '<div class="gd-stat-card"><div class="gd-stat-card__label"><span class="gd-stat-card__name">' + esc(name) + '</span></div><div class="gd-stat-card__body"><div class="gd-stat-card__row"><div class="gd-stat-card__value gd-num">' + esc(value) + '</div></div>' +
+      (compare ? '<div class="gd-stat-card__meta"><span class="gd-stat-card__compare">' + esc(compare) + '</span></div>' : '') + '</div></div>';
+  }
+  function stats(list) { return '<div class="gd-grid">' + list.map(function (s) { return '<div class="gd-span-4">' + stat(s.n, s.v, s.c) + '</div>'; }).join('') + '</div>'; }
+  function kv(rows, cls) { return '<dl class="gd-key-value-list ' + (cls || '') + '">' + rows.map(function (r) { return '<div class="gd-key-value-list__row"><dt class="gd-key-value-list__key">' + r[0] + '</dt><dd class="gd-key-value-list__value">' + r[1] + '</dd></div>'; }).join('') + '</dl>'; }
+  function empty(kind, title, text) { return '<div class="gd-empty gd-empty--' + kind + '"><div class="gd-empty__badge">' + svg('info') + '</div><div class="gd-empty__copy"><h3 class="gd-empty__title">' + esc(title) + '</h3><p class="gd-empty__text">' + esc(text) + '</p></div></div>'; }
+  function btn(label, attrs, href) { return href ? '<a class="gd-btn gd-btn--sm" href="' + esc(href) + '"' + (/^https?:/.test(href) ? ' target="_blank" rel="noopener noreferrer"' : '') + '>' + esc(label) + '</a>' : '<button type="button" class="gd-btn gd-btn--sm"' + (attrs || '') + '>' + esc(label) + '</button>'; }
+
+  /* ---------- the period, and who is hidden ---------- */
   function since() { if (S.period === 'today') { var d = new Date(); d.setHours(0, 0, 0, 0); return d.getTime(); } return Date.now() - (+S.period) * DAY; }
-  function inWindow(at) { return at.getTime() >= since(); }
   function periodText() { return S.period === 'today' ? 'today' : 'in ' + S.period + ' days'; }
-  function ext(href) { return /^https?:/.test(href) ? ' target="_blank" rel="noopener noreferrer"' : ''; }
+  function hideOn() { try { return localStorage.getItem('gw-analytics-hide-me') === '1'; } catch (e) { return false; } }
+  function mine(r) { return hideOn() && S.owner && r.user === S.owner; }
+  function inWindow(at) { return at.getTime() >= since(); }
+
+  function agent(id) { return S.data.agents.filter(function (a) { return a.id === id; })[0]; }
 
   /* ---------- when Doc and Alfred next run ---------- */
   function docNext() { var t = new Date(); t.setUTCHours(4, 0, 0, 0); for (var i = 0; i < 9; i++) { var w = t.getUTCDay(); if ((w === 1 || w === 4) && t.getTime() > Date.now()) return t.getTime(); t = new Date(t.getTime() + DAY); } return 0; }
@@ -237,27 +174,22 @@ a.ag-row:hover { background: var(--s-nav-hover); }
     });
   }
 
-  /* ---------- Bruce's log, read as the Bruce tab on Analytics does ---------- */
-  /* "Hide my activity" is one preference, shared with Analytics: it leaves the owner's own asks out of the counts too. */
-  function hideOn() { try { return localStorage.getItem('gw-analytics-hide-me') === '1'; } catch (e) { return false; } }
-  function bruceRows() { return (S.bruce || []).filter(function (r) { return r.kind !== 'sent' && inWindow(r.at) && !(hideOn() && S.owner && r.user === S.owner); }); }
+  /* ---------- Bruce's log ---------- */
+  function bruceAll() { return (S.bruce || []).filter(function (r) { return r.kind !== 'sent' && !mine(r); }); }
+  function bruceRows() { return bruceAll().filter(function (r) { return inWindow(r.at); }); }
   function isGap(r) { return r.topic === 'other' || r.kind === 'failed' || r.kind === 'capped'; }
   function bruceTokens(r, a) { var c = a.cost; return r.kind === 'run' ? c.start + c.run : r.kind === 'chat' ? c.start + c.chat : 0; }
 
-  /* ---------- one summary per agent, which the overview and the tabs both read ----------
-     state: ok / warn / fail / unknown.  doing: one sentence.  stats: three numbers that say how it is doing.
-     needs: what the agent wants from Utsav, each with where to go. */
+  /* one summary per agent: state, one sentence on what it is doing, and what it wants from Utsav */
   function summary(id) {
     var a = agent(id), h = healthOf(id), out = { a: a, id: id, known: true, state: h.status, doing: '', stats: [], needs: healthNeeds(h), tokens: 0, sessions: 0, last: 0 };
     var worse = function (s) { var rank = { ok: 0, unknown: 1, warn: 2, fail: 3 }; if ((rank[s] || 0) > (rank[out.state] || 0)) out.state = s; };
     if (id === 'bruce') {
       if (!S.bruce) { out.known = false; out.state = 'unknown'; out.doing = S.bruceErr || 'Reading his log'; return out; }
-      var rows = bruceRows(), all = (S.bruce || []).filter(function (r) { return r.kind !== 'sent' && !(hideOn() && S.owner && r.user === S.owner); }), gaps = rows.filter(isGap), people = {};
-      rows.forEach(function (r) { people[r.user] = 1; });
+      var rows = bruceRows(), all = bruceAll(), gaps = rows.filter(isGap);
       out.sessions = rows.filter(function (r) { return r.kind === 'run' || r.kind === 'chat'; }).length; out.tokens = rows.reduce(function (n, r) { return n + bruceTokens(r, a); }, 0);
       var latest = all.slice().sort(function (x, y) { return y.at - x.at; })[0]; out.last = latest ? latest.at.getTime() : 0;
       out.doing = latest ? 'Last asked ' + ago(Date.now() - out.last) + ' by ' + latest.name + ': “' + clip(latest.text, 80) + '”' : 'Nobody has asked him anything yet';
-      out.stats = [{ n: rows.length ? (rows.length - gaps.length) + ' of ' + rows.length : '0', l: 'asks handled' }, { n: String(Object.keys(people).length), l: 'people asked' }, { n: String(rows.filter(function (r) { return r.kind === 'run'; }).length), l: 'page builds and edits' }];
       if (gaps.length) {
         var broken = gaps.filter(function (r) { return r.kind === 'failed' || r.kind === 'capped'; }).length, unsorted = gaps.length - broken;
         worse('warn');
@@ -269,7 +201,7 @@ a.ag-row:hover { background: var(--s-nav-hover); }
       var c = al.counts, total = c.ready + c.stuck + c.queued, runs = alfredRunsIn(since());
       out.sessions = runs; out.tokens = runs * a.cost.run; out.last = al.lastRunAt ? Date.parse(al.lastRunAt) : 0;
       out.doing = (total ? 'Working through the items you sent back. ' : 'Nothing on his plate right now. ') + (out.last ? 'Last worked ' + ago(Date.now() - out.last) + '.' : 'No run seen yet.') + ' Sweeps every night at 9pm IST.';
-      out.stats = [{ n: total ? c.ready + ' of ' + total : '0', l: 'items finished' }, { n: String(c.stuck), l: 'waiting on your answer' }, { n: String(runs), l: 'runs ' + periodText() }];
+      out.stats = [{ n: 'Items finished', v: total ? c.ready + ' of ' + total : '0' }, { n: 'Waiting on your answer', v: String(c.stuck) }, { n: 'Runs ' + periodText(), v: String(runs) }];
       if (c.stuck) { worse('warn'); out.needs.unshift({ key: 'alfred:stuck', text: 'Waiting on your answer for ' + plural(c.stuck, 'item'), cta: 'Answer them', href: REVIEW }); }
       if (c.ready) out.needs.unshift({ key: 'alfred:ready', text: plural(c.ready, 'item') + ' finished, ready for you to check', cta: 'Check them', href: REVIEW });
     } else if (id === 'doc') {
@@ -277,7 +209,8 @@ a.ag-row:hover { background: var(--s-nav-hover); }
       var rows2 = S.health.checks, okn = rows2.filter(function (x) { return x.status === 'ok'; }).length, snap = S.health.snapshotAt ? Date.parse(S.health.snapshotAt) : 0, nx = docNext();
       var runsD = docRunCount(since()); out.sessions = runsD; out.tokens = runsD * a.cost.run; out.last = snap;
       out.doing = 'Checks the whole hub every Monday and Thursday and reports what he finds. ' + (snap ? 'Last report ' + ago(Date.now() - snap) + '.' : 'No report yet.');
-      out.stats = [{ n: okn + ' of ' + rows2.length, l: 'checks healthy' }, { n: snap ? agoShort(Date.now() - snap) : 'None', l: snap ? 'since the last report' : 'last report' }, { n: nx ? new Date(nx).toLocaleDateString(undefined, { weekday: 'short' }) : '—', l: nx ? 'next report, ' + new Date(nx).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }) : 'next report' }];
+      out.stats = [{ n: 'Checks healthy', v: okn + ' of ' + rows2.length }, { n: snap ? 'Since the last report' : 'Last report', v: snap ? agoShort(Date.now() - snap) : 'None' },
+        { n: nx ? 'Next report, ' + new Date(nx).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }) : 'Next report', v: nx ? new Date(nx).toLocaleDateString(undefined, { weekday: 'short' }) : '—' }];
     }
     return out;
   }
@@ -288,145 +221,264 @@ a.ag-row:hover { background: var(--s-nav-hover); }
     return STATE_LABEL[s.state];
   }
   function sums() { return S.data.agents.map(function (a) { return summary(a.id); }); }
-  function allNeeds(list) {
-    var seen = {}, out = [];
-    list.forEach(function (s) { s.needs.forEach(function (n) { if (seen[n.key]) return; seen[n.key] = 1; out.push({ n: n, a: s.a }); }); });
-    return out;
-  }
+  function allNeeds(list) { var seen = {}, out = []; list.forEach(function (s) { s.needs.forEach(function (n) { if (seen[n.key]) return; seen[n.key] = 1; out.push({ n: n, a: s.a }); }); }); return out; }
 
   /* ---------- the tab row ---------- */
   function tabs() {
     var items = [{ id: 'all', label: 'All agents' }].concat(S.data.agents.map(function (a) { return { id: a.id, label: a.name }; }));
     $('ag-tabs').innerHTML = items.map(function (t) {
-      var dot = t.id === 'all' ? '' : '<i class="' + (S.health ? summary(t.id).state : '') + '" aria-hidden="true"></i>';
-      return '<button type="button" class="ag-tab" role="tab" data-tab="' + esc(t.id) + '" aria-selected="' + (t.id === S.tab) + '">' + dot + esc(t.label) + '</button>';
+      return '<button type="button" class="gd-tabs__tab" role="tab" data-tab="' + esc(t.id) + '" aria-selected="' + (t.id === S.tab) + '" tabindex="' + (t.id === S.tab ? 0 : -1) + '">' + esc(t.label) + '</button>';
     }).join('');
   }
 
-  /* ---------- All agents ---------- */
-  function needRow(item, withWho) {
-    var n = item.n, a = item.a;
-    return '<div class="ag-row">' + (withWho ? pic(a, 'ag-pic--sm') : '') + '<div class="ag-row__t ag-row__t--wrap">' + (withWho ? '<b>' + esc(a.name) + '</b>' : '') + '<span>' + esc(n.text) + '</span></div>' +
-      (n.href.charAt(0) === '#' ? '<button type="button" class="ag-btn" data-tab="' + (n.href === '#bruce-look' ? 'bruce' : esc(n.href.slice(1))) + '"' + (n.href === '#bruce-look' ? ' data-scroll="br-h-look"' : '') + '>' + esc(n.cta) + '</button>'
-        : '<a class="ag-btn" href="' + esc(n.href) + '"' + ext(n.href) + '>' + esc(n.cta) + '</a>') + '</div>';
+  /* ---------- needs, as a table ---------- */
+  function needsCard(items, withWho, title) {
+    if (!items.length) return '';
+    var cols = withWho ? [{ h: 'Agent', w: '170px', flex: true }, { h: 'What needs you', w: 'minmax(0,1fr)', title: true }, { h: '', w: 'auto', flex: true }] : [{ h: 'What needs you', w: 'minmax(0,1fr)', title: true }, { h: '', w: 'auto', flex: true }];
+    var rows = items.slice(0, 8).map(function (x) {
+      var n = x.n, act = n.href.charAt(0) === '#' ? btn(n.cta, ' data-tab="' + (n.href === '#bruce-look' ? 'bruce' : esc(n.href.slice(1))) + '"' + (n.href === '#bruce-look' ? ' data-scroll="ag-look"' : '')) : btn(n.cta, '', n.href);
+      return withWho ? { cells: [who(x.a.name, x.a.role), esc(n.text), act], t: ['', n.text, ''] } : { cells: [esc(n.text), act], t: [n.text, ''] };
+    });
+    return card(title || 'Needs you', '', table('Needs you', cols, rows), { flush: true, foot: items.length > 8 ? '<span class="gd-card__desc">And ' + (items.length - 8) + ' more, in the agents’ own tabs.</span>' : '' });
   }
+
+  /* ---------- All agents ---------- */
   function renderAll() {
     var list = sums(), needs = allNeeds(list), loading = list.some(function (s) { return !s.known; }) && !needs.length;
     var names = needs.map(function (x) { return x.a.name; }).filter(function (v, i, arr) { return arr.indexOf(v) === i; });
-    var head = needs.length ? plural(needs.length, 'thing') + ' to look at' : loading ? 'Checking the agents' : 'Everything is running';
+    var title = needs.length ? plural(needs.length, 'thing') + ' to look at' : loading ? 'Checking the agents' : 'Everything is running';
     var sub = needs.length ? names.join(', ').replace(/, ([^,]*)$/, ' and $1') + (names.length === 1 ? ' has' : ' have') + ' something for you.' : loading ? 'Some of them have not answered yet.' : 'All ' + list.length + ' agents are healthy and nothing is waiting on you.';
-    var html = '<section class="ag-lead"><h2>' + esc(head) + '</h2><p>' + esc(sub) + '</p></section>';
-    html += '<section class="ag-sec"><div class="ag-sec__h"><h3>The team</h3><span>' + esc(list.length + ' agents, ' + (S.data.agents.filter(function (a) { return a.lead; })[0] || {}).name + ' leads') + '</span></div><div class="ag-cards">' +
+    var html = '<div class="gd-status-banner" data-status="' + (needs.length ? 'degraded' : 'operational') + '"><span class="gd-status-icon" data-status="' + (needs.length ? 'degraded' : 'operational') + '">' + svg(needs.length ? 'warn' : 'check', 28) + '</span>' +
+      '<div class="gd-status-banner__text"><h3 class="gd-status-banner__title">' + esc(title) + '</h3><p class="gd-status-banner__sub">' + esc(sub) + '</p></div></div>';
+    /* the team: the one new component on this page, the agent card (see the library's data-display doc) */
+    html += '<section class="ag-team" aria-label="The team"><div class="gd-card__titles" style="margin-bottom:var(--gd-gap)"><h3 class="gd-card__title">The team</h3><p class="gd-card__desc">' + esc(list.length + ' agents, ' + (S.data.agents.filter(function (a) { return a.lead; })[0] || {}).name + ' leads') + '</p></div><div class="gd-grid">' +
       list.map(function (s) {
-        var mine = s.needs.length;
-        return '<button type="button" class="ag-card" data-tab="' + esc(s.id) + '"><span class="ag-card__top">' + pic(s.a) + '<div><b>' + esc(s.a.name) + '</b><small>' + esc(s.a.role) + '</small></div>' + badge(s.state, stateLabel(s)) + '</span>' +
-          '<p class="ag-card__now">' + esc(s.doing) + '</p>' +
-          '<span class="ag-card__foot' + (mine ? '' : ' is-quiet') + '"><i class="ag-dot ' + (mine ? 'warn' : s.known ? 'ok' : '') + '" aria-hidden="true"></i>' + (mine ? esc(plural(mine, 'thing') + ' for you') : s.known ? 'Nothing needed from you' : 'Waiting for data') + '</span></button>';
+        var n = s.needs.length;
+        return '<div class="gd-span-4"><a class="gd-agent-card" href="#' + esc(s.id) + '" data-tab="' + esc(s.id) + '"><span class="gd-agent-card__top"><span class="gd-avatar gd-avatar--team gd-avatar--lg" data-gd-avatar="' + esc(s.a.name) + '" role="img" aria-label="' + esc(s.a.name) + '"></span>' +
+          '<span class="gd-agent-card__who"><b>' + esc(s.a.name) + '</b><small>' + esc(s.a.role) + '</small></span>' + badge(TONE[s.state], stateLabel(s)) + '</span>' +
+          '<span class="gd-agent-card__now">' + esc(s.doing) + '</span>' +
+          '<span class="gd-agent-card__foot">' + (n ? badge('warn', plural(n, 'thing') + ' for you') : '<span>' + (s.known ? 'Nothing needed from you' : 'Waiting for data') + '</span>') + '</span></a></div>';
       }).join('') + '</div></section>';
-    if (needs.length) {
-      var shown = needs.slice(0, 6);
-      html += '<section class="ag-sec"><div class="ag-sec__h"><h3>Needs you</h3></div><div class="ag-list">' + shown.map(function (x) { return needRow(x, true); }).join('') + '</div>' +
-        (needs.length > shown.length ? '<p class="ag-foot">And ' + (needs.length - shown.length) + ' more, in the agents’ own tabs.</p>' : '') + '</section>';
-    }
-    html += '<p class="ag-add">Each agent is recorded in git, with its memory. To add one, see <a href="https://github.com/gushwork-design/design-system/blob/main/agents/README.md" target="_blank" rel="noopener noreferrer">agents/README</a>.</p>';
+    html += needsCard(needs, true);
+    html += '<p class="gd-card__desc">Each agent is recorded in git, with its memory. To add one, see <a class="gd-table__link" href="https://github.com/gushwork-design/design-system/blob/main/agents/README.md" target="_blank" rel="noopener noreferrer">agents/README</a>.</p>';
     return html;
   }
 
   /* ---------- one agent ---------- */
-  function ulist(items, cls) { return '<ul class="ag-ul' + (cls ? ' ' + cls : '') + '">' + items.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>'; }
-  function mdList(t) {
-    var items = String(t || '').split('\n').filter(function (l) { return /^- /.test(l); }).map(function (l) { return '<li>' + esc(l.slice(2)).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/`([^`]+)`/g, '$1') + '</li>'; });
-    return items.length ? '<ul class="ag-ul ag-ul--mem">' + items.join('') + '</ul>' : '<p>Nothing written down yet.</p>';
-  }
-  function sec(title, right, body) { return '<section class="ag-sec"><div class="ag-sec__h"><h3>' + esc(title) + '</h3>' + (right || '') + '</div>' + body + '</section>'; }
-  function hero(s) {
-    return '<section class="ag-hero">' + pic(s.a, 'ag-pic--lg') + '<div><b>' + esc(s.a.name) + '</b><small>' + esc(s.a.role) + (s.a.lead ? ' · leads the team' : '') + '</small><p>' + esc(s.doing) + '</p></div>' + badge(s.state, stateLabel(s)) + '</section>';
-  }
-  function statsBlock(s) {
-    if (!s.known) return '';
-    return '<div class="ag-sec"><div class="ag-st ag-st--big">' + s.stats.map(function (t) { return '<div><b>' + esc(t.n) + '</b><span>' + esc(t.l) + '</span></div>'; }).join('') + '</div>' +
-      '<p class="ag-foot">' + (s.tokens ? 'Used about ' + tok(s.tokens) + ' tokens ' + periodText() + ' across ' + plural(s.sessions, 'session') + '. An estimate: nothing reports real token counts.' : 'No sessions in this period.') + '</p></div>';
-  }
-  function needsBlock(s) {
-    var mine = s.needs.filter(function (n) { return !n.health; });
-    return mine.length ? sec('Needs from you', '', '<div class="ag-list">' + mine.map(function (n) { return needRow({ n: n, a: s.a }, false); }).join('') + '</div>') : '';
-  }
-  function healthBlock(s) {
+  function healthCard(s, only) {
     var h = healthOf(s.id);
-    if (!S.health) return sec('Health', '', '<div class="ag-list"><p class="ag-empty">' + esc(S.healthErr || 'Reading the checks') + '</p></div>');
-    if (!h.rows.length) return sec('Health', '', '<div class="ag-list"><p class="ag-empty">No checks cover this agent yet.</p></div>');
-    var bad = h.rows.filter(function (c) { return c.status !== 'ok'; }), good = h.rows.filter(function (c) { return c.status === 'ok'; });
-    var body = bad.map(function (c) {
-      return '<div class="ag-row"><i class="ag-dot ' + esc(c.status) + '" aria-hidden="true"></i><div class="ag-row__t ag-row__t--wrap"><b>' + esc(c.name) + '</b><span>' + esc(c.detail || '') + (c.fix ? ' To do: ' + esc(c.fix) : '') + '</span></div></div>';
-    }).join('') + (good.length ? '<div class="ag-oks">' + good.map(function (c) { return '<span><i class="ag-dot ok" aria-hidden="true"></i>' + esc(c.name) + '</span>'; }).join('') + '</div>' : '');
-    return sec('Health', '<span>' + (bad.length ? plural(bad.length, 'check') + ' to look at' : 'all ' + h.rows.length + ' checks pass') + '</span>', '<div class="ag-list">' + body + '</div>');
+    if (!S.health) return card('Health', '', empty('error', 'Could not read the checks', S.healthErr || 'Try again in a moment.'));
+    if (!h.rows.length) return card('Health', '', empty('first-use', 'No checks cover this agent yet', 'Doc checks the hub; nothing checks this agent so far.'));
+    var rows = h.rows.slice().sort(function (a, b) { var r = { fail: 0, warn: 1, unknown: 2, ok: 3 }; return r[a.status] - r[b.status]; });
+    if (only) rows = rows.filter(function (c) { return c.status !== 'ok'; });
+    if (!rows.length) return '';
+    var bad = h.rows.filter(function (c) { return c.status !== 'ok'; }).length;
+    var tr = rows.map(function (c) {
+      var d = (c.detail || '') + (c.fix && c.status !== 'ok' ? ' To do: ' + c.fix : '');
+      return { cells: [esc(c.name), badge(TONE[c.status] || 'neutral', c.status === 'ok' ? 'Working' : c.status === 'fail' ? 'Failing' : c.status === 'warn' ? 'Needs improvement' : 'Could not check'), esc(d)], t: ['', '', d] };
+    });
+    return card('Health', bad ? plural(bad, 'check') + ' to look at' : 'All ' + h.rows.length + ' checks pass',
+      table('Health checks', [{ h: 'Check', w: '220px', strong: true }, { h: 'Status', w: '170px', flex: true }, { h: 'Detail', w: 'minmax(0,1fr)', title: true, muted: true }], tr), { flush: true });
   }
-  function about(a) {
+  function ul(items) { return '<ul style="margin:0;padding-left:16px">' + items.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>'; }
+  function aboutCard(a) {
     var d = S.data, route = (d.routing || []).filter(function (r) { return r.agent === a.id; })[0];
-    return '<details class="ag-how"><summary>About ' + esc(a.name) + ': what he does, what he never does, his memory</summary><div class="ag-about">' +
-      '<div class="ag-links">' + (a.links || []).concat([{ label: 'Routine in claude.ai', href: a.routine.url }]).map(function (l) { return '<a class="ag-btn" href="' + esc(l.href) + '"' + ext(l.href) + '>' + esc(l.label) + '</a>'; }).join('') + '</div>' +
-      '<div><h4>What he does</h4>' + ulist(a.does) + '</div><div><h4>What he never does</h4>' + ulist(a.never, 'ag-ul--never') + '</div>' +
-      '<div><h4>Reached by</h4>' + ulist(a.reachedBy) + '<h4 style="margin-top:16px">Runs</h4>' + ulist(a.schedule) + '</div>' +
-      '<div><h4>Limits</h4>' + ulist(a.limits) + (route ? '<h4 style="margin-top:16px">Handed work by the lead</h4><p>' + esc(route.when) + ' (' + esc(route.status) + ')</p>' : '') + '</div>' +
-      '<div><h4>Memory</h4><p>' + esc(a.memory.perPerson) + '</p><p><a href="https://github.com/gushwork-design/design-system/blob/main/' + esc(a.memory.durable) + '" target="_blank" rel="noopener noreferrer">' + esc(a.memory.durable) + '</a> in git</p>' + mdList(a.memoryText) + '</div>' +
-      '<div><h4>Model and prompt</h4><p>' + esc(a.routine.model) + ', with ' + esc(a.routine.tools.join(', ')) + '.</p><p>' + esc(a.prompt.where) + (a.prompt.inGit ? '' : '. Not in git: ' + esc(a.prompt.why)) + '</p><h4 style="margin-top:16px">How tokens are estimated</h4><p>' + esc(a.cost.basis) + '</p></div>' +
-      '</div></details>';
+    var mem = String(a.memoryText || '').split('\n').filter(function (l) { return /^- /.test(l); }).map(function (l) { return l.slice(2).replace(/\*\*/g, '').replace(/`/g, ''); });
+    var rows = [['What he does', ul(a.does)], ['What he never does', ul(a.never)], ['Reached by', ul(a.reachedBy)], ['Runs', ul(a.schedule)], ['Limits', ul(a.limits)]];
+    if (route) rows.push(['Handed work by the lead', esc(route.when) + ' (' + esc(route.status) + ')']);
+    rows.push(['Memory', esc(a.memory.perPerson) + '. <a class="gd-table__link" href="https://github.com/gushwork-design/design-system/blob/main/' + esc(a.memory.durable) + '" target="_blank" rel="noopener noreferrer">' + esc(a.memory.durable) + '</a> in git' + (mem.length ? ul(mem) : '')]);
+    rows.push(['Model and prompt', esc(a.routine.model) + ', with ' + esc(a.routine.tools.join(', ')) + '. ' + esc(a.prompt.where) + (a.prompt.inGit ? '' : '. Not in git: ' + esc(a.prompt.why))]);
+    rows.push(['How tokens are estimated', esc(a.cost.basis)]);
+    rows.push(['Links', (a.links || []).concat([{ label: 'Routine in claude.ai', href: a.routine.url }]).map(function (l) { return '<a class="gd-table__link" href="' + esc(l.href) + '" target="_blank" rel="noopener noreferrer">' + esc(l.label) + '</a>'; }).join(' · ')]);
+    return foldCard('ag-about', 'About ' + a.name, kv(rows, 'gd-key-value-list--stacked gd-key-value-list--ruled'));
   }
-
-  function renderBruce() {
-    var s = summary('bruce'), a = s.a, html = '';
-    /* No picture-and-sentence header on his tab: the tab already names him. It shows only when his log cannot be read, because it says why. */
-    if (!s.known) return hero(s) + healthBlock(s) + about(a);
-    /* His analytics (conversations, what people use him for, what it costs, the asks worth a look) live in bruce-panel.js and are moved into
-       this slot after the page is drawn; see mountBruce. */
-    /* Five things: conversations, who is new, usage and tokens, what he worked on, what he needs from you (the last is in the panel). Health only
-       appears when a check is failing, so a healthy Bruce is not a row of green. */
-    var bad = healthOf('bruce').rows.some(function (c) { return c.status !== 'ok'; });
-    return html + '<div id="ag-bruce-slot"></div>' + (bad ? healthBlock(s) : '') + about(a);
+  function statsCard(s) {
+    if (!s.known) return '';
+    return stats(s.stats.map(function (t) { return { n: t.n, v: t.v }; })) +
+      '<p class="gd-card__desc">' + (s.tokens ? 'Used about ' + tok(s.tokens) + ' tokens ' + periodText() + ' across ' + plural(s.sessions, 'session') + '. An estimate: nothing reports real token counts.' : 'No sessions in this period.') + '</p>';
   }
-  var brucePanel = null;
-  function parkBruce() { var h = $('ag-bruce'); if (h && h.parentNode !== $('ag-park')) $('ag-park').appendChild(h); }
-  function mountBruce() {
-    var slot = $('ag-bruce-slot'); if (!slot) return;
-    if (!brucePanel && window.mountBrucePanel) {
-      brucePanel = window.mountBrucePanel($('ag-bruce'));
-      brucePanel.onHide = function () { render(); };          /* the counts on the overview follow the switch too */
-      brucePanel.start();
-    }
-    slot.appendChild($('ag-bruce'));
-  }
-
   function renderAlfred() {
-    var s = summary('alfred'), a = s.a, al = S.alfred, html = hero(s);
-    if (!s.known) return html + healthBlock(s) + about(a);
-    var order = { stuck: 0, ready: 1, queued: 2 }, th = al.threads.slice().sort(function (x, y) { return (order[x.state] - order[y.state]) || (Date.parse(y.lastAt || 0) - Date.parse(x.lastAt || 0)); }), shown = th.slice(0, 6);
-    html += needsBlock(s) + statsBlock(s);
-    html += sec('His items', th.length ? '<a href="' + REVIEW + '">All ' + th.length + ' in review</a>' : '', shown.length ? '<div class="ag-list">' + shown.map(function (t) {
-      var tag = { ready: 'Ready for you', stuck: 'Waiting on you', queued: 'Queued' }[t.state];
-      return '<a class="ag-row" href="' + esc(t.url) + '" target="_blank" rel="noopener noreferrer"><div class="ag-row__t"><b>' + esc(t.scope + '/' + t.key) + '</b><span>' + esc(clip(t.note || 'No note yet', 120)) + '</span></div><span class="ag-tag' + (t.state === 'stuck' ? ' ag-tag--gap' : '') + '">' + esc(tag) + '</span><time>' + (t.lastAt ? esc(ago(Date.now() - Date.parse(t.lastAt))) : '') + '</time></a>';
-    }).join('') + '</div>' + (th.length > shown.length ? '<p class="ag-foot">And ' + (th.length - shown.length) + ' more.</p>' : '') : '<div class="ag-list"><p class="ag-empty">No rework items in the last ' + (al.days || 30) + ' days.</p></div>');
-    return html + healthBlock(s) + about(a);
+    var s = summary('alfred'), a = s.a, al = S.alfred;
+    if (!s.known) return card('Alfred', '', empty('error', 'Could not read his threads', s.doing)) + healthCard(s) + aboutCard(a);
+    var order = { stuck: 0, ready: 1, queued: 2 }, th = al.threads.slice().sort(function (x, y) { return (order[x.state] - order[y.state]) || (Date.parse(y.lastAt || 0) - Date.parse(x.lastAt || 0)); });
+    var html = needsCard(s.needs.filter(function (n) { return !n.health; }).map(function (n) { return { n: n, a: a }; }), false, 'Needs from you') + statsCard(s);
+    if (th.length) {
+      var rows = th.slice(0, 8).map(function (t) {
+        var tone = { ready: 'good', stuck: 'warn', queued: 'neutral' }[t.state], lbl = { ready: 'Ready for you', stuck: 'Waiting on you', queued: 'Queued' }[t.state];
+        return { cells: ['<a class="gd-table__link" href="' + esc(t.url) + '" target="_blank" rel="noopener noreferrer">' + esc(t.scope + '/' + t.key) + '</a>', esc(clip(t.note || 'No note yet', 140)), badge(tone, lbl), t.lastAt ? '<time datetime="' + esc(t.lastAt) + '">' + esc(ago(Date.now() - Date.parse(t.lastAt))) + '</time>' : ''], t: ['', t.note || '', '', ''] };
+      });
+      html += card('His items', th.length > 8 ? 'Latest 8 of ' + th.length + '. All of them are in review.' : '', table('His items', [{ h: 'Item', w: '220px', strong: true }, { h: 'Note', w: 'minmax(0,1fr)', title: true, muted: true }, { h: 'State', w: '150px', flex: true }, { h: 'When', w: '110px', muted: true }], rows), { flush: true,
+        actions: '<a class="gd-btn gd-btn--sm" href="' + REVIEW + '">Open review</a>' });
+    }
+    return html + healthCard(s, true) + aboutCard(a);
   }
-
   function renderDoc() {
-    var s = summary('doc'), a = s.a, html = hero(s);
-    if (!s.known) return html + healthBlock(s) + about(a);
-    return html + statsBlock(s) + healthBlock(s) + about(a);
+    var s = summary('doc'), a = s.a;
+    if (!s.known) return card('Doc', '', empty('error', 'Could not read the checks', s.doing)) + aboutCard(a);
+    return statsCard(s) + healthCard(s) + aboutCard(a);
   }
 
+  /* ---------- Bruce: five things ---------- */
+  function conversations(rows) {
+    var by = {};
+    rows.forEach(function (r) {
+      var c = by[r.user] || (by[r.user] = { user: r.user, name: r.name, role: r.role, asks: [], topics: {}, last: r.at, ask: null });
+      c.asks.push(r); c.topics[r.topic] = (c.topics[r.topic] || 0) + 1; if (!c.ask || r.at > c.ask.at) c.ask = r; if (r.at > c.last) c.last = r.at; if (r.role === 'owner') c.role = 'owner';
+    });
+    return Object.keys(by).map(function (k) { return by[k]; }).sort(function (a, b) { return b.last - a.last; });
+  }
+  function renderBruce() {
+    var s = summary('bruce'), a = s.a;
+    if (!s.known) return card('Bruce', '', empty('error', 'Could not read his log', s.doing)) + healthCard(s) + aboutCard(a);
+    var rows = bruceRows(), convs = conversations(rows); S.convs = convs; S.order = convs.map(function (c) { return c.user; });
+    if (!bruceAll().length) return card('Bruce', '', empty('first-use', 'Nobody has asked him anything yet', 'His conversations, usage and the asks that need you appear here once someone messages him in Slack.')) + healthCard(s, true) + aboutCard(a);
+    var firstBy = {};
+    bruceAll().forEach(function (r) { var f = firstBy[r.user]; if (!f || r.at < f.at) firstBy[r.user] = r; });
+    var isNew = function (u) { return firstBy[u] && firstBy[u].at.getTime() > Date.now() - DAY; };
+    var html = '';
+
+    /* 1. conversations; a New tag for anyone whose first ask came in the last day */
+    html += card('Conversations', convs.length ? plural(convs.length, 'conversation') + ', latest first' : '', convs.length ? table('Conversations', [
+      { h: 'Person', w: 'minmax(190px,1fr)', flex: true }, { h: 'Last ask', w: 'minmax(0,2fr)', title: true, muted: true }, { h: 'About', w: 'minmax(150px,1fr)', flex: true }, { h: 'Asks', w: '64px', num: true }, { h: 'When', w: '110px', muted: true }],
+      convs.map(function (c) {
+        var tags = Object.keys(c.topics).sort(function (x, y) { return c.topics[y] - c.topics[x]; }).slice(0, 2).map(function (t) { return tag(TOPIC[t] + (c.topics[t] > 1 ? ' ×' + c.topics[t] : ''), t === 'other' ? 'warn' : ''); }).join('');
+        return { attrs: ' data-u="' + esc(c.user) + '"', t: ['', c.ask.text, '', '', ''], cells: [
+          '<span class="gd-table__avatar" aria-hidden="true">' + initial(c.name) + '</span><span class="gd-table__who"><a class="gd-table__link" href="#" data-u="' + esc(c.user) + '">' + esc(c.name) + '</a>' + (c.role === 'owner' ? '<small>Owner</small>' : '') + '</span>' + (isNew(c.user) ? badge('info', 'New') : ''),
+          (c.ask.thread ? '↳ ' : '') + esc(clip(c.ask.text, 140)), tags, String(c.asks.length), '<time datetime="' + c.last.toISOString() + '">' + esc(ago(Date.now() - c.last.getTime())) + '</time>'] };
+      })) : empty('no-results', 'Nobody asked in this period', 'Try a longer period.'), { flush: !!convs.length });
+
+    /* 2. usage and tokens, estimated */
+    var cost = a.cost, u = S.usage, resetAt = u && u.weekly && Date.parse(u.weekly.resetsAt) ? Date.parse(u.weekly.resetsAt) : 0, weekFrom = resetAt ? resetAt - 7 * DAY : Date.now() - 7 * DAY;
+    var tk = function (r) { return bruceTokens(r, a); };
+    var periodTok = rows.reduce(function (n, r) { return n + tk(r); }, 0), weekTok = bruceAll().filter(function (r) { return r.at.getTime() >= weekFrom; }).reduce(function (n, r) { return n + tk(r); }, 0);
+    var started = rows.filter(function (r) { return tk(r) > 0; }).length, snapAge = u && Date.parse(u.at) ? Date.now() - Date.parse(u.at) : 0;
+    html += '<section aria-label="Usage and tokens"><div class="gd-card__titles" style="margin-bottom:var(--gd-gap)"><h3 class="gd-card__title">Usage and tokens</h3><p class="gd-card__desc">Estimated, not measured</p></div>' + stats([
+      { n: 'Tokens ' + (S.period === 'today' ? 'today' : 'in ' + S.period + ' days'), v: started ? '≈ ' + tok(periodTok) : '—', c: started ? 'about ' + tok(periodTok / started) + ' for each of ' + plural(started, 'session') + ' he started' : 'no sessions yet' },
+      { n: 'Tokens this week', v: '≈ ' + tok(weekTok), c: resetAt ? 'since the weekly limit reset on ' + new Date(weekFrom).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }) : 'the last 7 days' },
+      { n: 'Your weekly limit', v: u && u.weekly ? u.weekly.percentUsed + '% used' : '—', c: u && u.weekly ? 'everything on your account, as of ' + fmtWhen(new Date(u.at)) + (snapAge > 2 * DAY ? ' (' + Math.round(snapAge / DAY) + ' days old)' : '') : 'no snapshot found' }]) + '</section>';
+    html += foldCard('ag-how', 'How the estimate works', kv([
+      [tok(cost.start) + ' tokens to start', 'Before he does anything, every DM makes him read his instructions and the project’s rules. This is most of what a chat costs.'],
+      ['+' + tok(cost.chat) + ' for a chat', 'Assumed: reading the thread, one reply, a memory note.'],
+      ['+' + tok(cost.run) + ' for a run', 'Assumed: a skill, a template, the page itself, a screenshot. Builds vary a lot.'],
+      ['Nothing', 'For capped, failed and passed-to-Alfred asks: they start no Bruce session.'],
+      ['Not a bill', 'Re-reads of the same context are cached and weigh less on a plan. Use it to compare weeks, and chats against runs.'],
+      ['Your weekly limit', 'Comes from a dated snapshot of the plan’s usage card (admin/bruce-usage.json), because the hub cannot read it live.']], 'gd-key-value-list--stacked gd-key-value-list--ruled'));
+
+    /* 3. what he worked on: the runs; nothing to show, nothing drawn */
+    var work = rows.filter(function (r) { return r.kind === 'run'; }).sort(function (x, y) { return y.at - x.at; });
+    if (work.length) html += card('What he worked on', plural(work.length, 'run') + (work.length > 8 ? ', latest 8' : '') + ', newest first', table('Runs', [{ h: 'When', w: '150px', muted: true }, { h: 'Person', w: '150px', strong: true }, { h: 'About', w: '170px', flex: true }, { h: 'Ask', w: 'minmax(0,1fr)', title: true }],
+      work.slice(0, 8).map(function (r) { return { attrs: ' data-u="' + esc(r.user) + '"', t: ['', '', '', r.text], cells: ['<time datetime="' + r.at.toISOString() + '">' + esc(fmtWhen(r.at)) + '</time>', '<a class="gd-table__link" href="#" data-u="' + esc(r.user) + '">' + esc(r.name) + '</a>', tag(TOPIC[r.topic] || r.topic), esc(r.text)] }; })), { flush: true });
+
+    /* 4. what he needs from you; only when there is something */
+    var gaps = rows.filter(isGap).sort(function (x, y) { return y.at - x.at; });
+    if (gaps.length) {
+      var legend = kv([[badge('warn', 'No clear lane'), 'His keyword topics did not match the ask. That does not mean he failed, and he still answered. Read it: if it is real work he should own, ask for a lane to be added; if it is chat or a test, leave it.'],
+        [badge('bad', 'Failed'), 'His run did not start. Check Bruce on Doc’s tab, then ask again.'], [badge('warn', 'Hit the daily cap'), 'That person used up their runs for the day. Nothing to fix unless the cap is too low.']], 'gd-key-value-list--stacked');
+      html += '<div id="ag-look">' + card('Needs from you', plural(gaps.length, 'ask') + (gaps.length > 8 ? ', latest 8' : '') + ', newest first. If most are your own tests, turn on Hide my activity.', table('Asks that may not have gone well', [{ h: 'When', w: '150px', muted: true }, { h: 'Person', w: '150px', strong: true }, { h: 'What happened', w: '190px', flex: true }, { h: 'Ask', w: 'minmax(0,1fr)', title: true }],
+        gaps.slice(0, 8).map(function (r) { return { attrs: ' data-u="' + esc(r.user) + '"', t: ['', '', '', r.text], cells: ['<time datetime="' + r.at.toISOString() + '">' + esc(fmtWhen(r.at)) + '</time>', '<a class="gd-table__link" href="#" data-u="' + esc(r.user) + '">' + esc(r.name) + '</a>',
+          r.kind === 'failed' ? badge('bad', 'Failed') : r.kind === 'capped' ? badge('warn', 'Hit the daily cap') : badge('warn', 'No clear lane'), esc(r.text)] }; })), { flush: true, foot: legend }) + '</div>';
+    }
+    return html + healthCard(s, true) + aboutCard(a);
+  }
+
+  /* ---------- the conversation drawer ---------- */
+  function personRows(user) { return (S.bruce || []).filter(function (r) { return r.user === user; }).sort(function (a, b) { return b.at - a.at; }); }
+  function linkify(t) {
+    return String(t).split(/(https?:\/\/[^\s<]+)/g).map(function (p, i) {
+      if (i % 2) { var m = p.match(/^(.*?)([.,;:!?)\]'"]*)$/), u = m[1], tail = m[2]; return '<a class="gd-table__link" href="' + esc(u) + '" target="_blank" rel="noopener noreferrer">' + esc(u) + '</a>' + esc(tail); }
+      return esc(p).replace(/`([^`\n]+)`/g, '<code>$1</code>').replace(/\*([^*\n]+)\*/g, '<strong>$1</strong>');
+    }).join('');
+  }
+  function kb(n) { return n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB' : n >= 1024 ? Math.round(n / 1024) + ' KB' : n ? n + ' B' : ''; }
+  function host(u) { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (e) { return u; } }
+  function cur() { var u = S.openUser, c = S.convs.filter(function (x) { return x.user === u; })[0]; return { c: c || { user: u, name: (personRows(u)[0] || {}).name || u, role: 'teammate', last: new Date(), asks: [], topics: {} }, all: personRows(u) }; }
+  function drawerHead() {
+    var x = cur(), i = S.order.indexOf(S.openUser), n = S.order.length;
+    $('ag-d-sub').textContent = 'Conversation' + (i >= 0 && n > 1 ? ' · ' + (i + 1) + ' of ' + n : '');
+    $('ag-d-title').innerHTML = esc(x.c.name) + (x.c.role === 'owner' ? ' ' + badge('neutral', 'Owner') : '');
+    $('ag-d-prev').disabled = !(i > 0); $('ag-d-next').disabled = !(i >= 0 && i < n - 1);
+  }
+  function sharedOf(j) {
+    var files = [], links = [], seen = {};
+    j.messages.forEach(function (m) { (m.files || []).forEach(function (f) { files.push({ f: f, m: m }); }); (m.links || []).forEach(function (l) { if (!seen[l.url]) { seen[l.url] = 1; links.push({ l: l, m: m }); } }); });
+    return { files: files.reverse(), links: links.reverse() };
+  }
+  function setShared(j) { var n = j && j.ok ? (function (x) { return x.files.length + x.links.length; })(sharedOf(j)) : 0; $('ag-d-shared').textContent = 'Shared' + (n ? ' ' + n : ''); }
+  function detailsKv(c, all) {
+    var asks = all.filter(function (r) { return r.kind !== 'sent'; }), first = all.length ? all[all.length - 1].at : c.last, runs = asks.filter(function (r) { return r.kind === 'run'; }).length, chats = asks.filter(function (r) { return r.kind === 'chat'; }).length;
+    var a = agent('bruce'), t = asks.reduce(function (n, r) { return n + bruceTokens(r, a); }, 0), tc = {};
+    asks.forEach(function (r) { tc[r.topic] = (tc[r.topic] || 0) + 1; });
+    return kv([['First asked', esc(fmtWhen(first))], ['Last asked', esc(fmtWhen(c.last)) + ' (' + esc(ago(Date.now() - c.last.getTime())) + ')'], ['Asks', esc(plural(asks.length, 'ask')) + ' (' + runs + ' run' + (runs === 1 ? '' : 's') + ', ' + chats + ' chat' + (chats === 1 ? '' : 's') + ')'],
+      ['Tokens (est.)', '≈ ' + esc(tok(t))], ['Topics', Object.keys(tc).sort(function (x, y) { return tc[y] - tc[x]; }).map(function (k) { return tag(TOPIC[k] + (tc[k] > 1 ? ' ×' + tc[k] : ''), k === 'other' ? 'warn' : ''); }).join(' ') || '—']], 'gd-key-value-list--ruled');
+  }
+  function threadHTML(j) {
+    if (!j) return '<p class="gd-card__desc">Reading the DM from Slack…</p>';
+    if (!j.ok) return empty('error', j.reason === 'scope' ? 'Slack won’t let the site read this yet' : 'Could not read this conversation', j.reason === 'scope' ? 'Bruce’s Slack app is missing a permission' + (j.needed ? ' (' + j.needed + ')' : '') + '. Add it in the app’s settings, reinstall the app, then open this again. The Log tab still works.' : (j.detail || j.error || 'Try again in a moment. The Log tab still works.'));
+    if (!j.messages.length) return empty('first-use', 'Nothing in this DM', 'Slack returned no messages.');
+    var html = '<div class="gd-ask__thread" role="log" style="padding:0;overflow:visible">', day = '';
+    if (j.truncated) html += '<p class="gd-card__desc">Showing the newest ' + j.messages.length + ' messages. Older ones are in Slack.</p>';
+    j.messages.forEach(function (m) {
+      var d = new Date(m.at), dl = fmtDay(d), meta = esc(m.name) + ' · ' + (dl !== day ? esc(dl) + ', ' : '') + esc(fmtTime(d)) + (m.reply ? ' · in a thread' : ''); day = dl;
+      var files = (m.files || []).map(function (f) { var l = esc(f.name) + (f.type ? ' · ' + esc(f.type) : ''); return f.url && /^https:\/\//.test(f.url) ? '<a class="gd-tag" href="' + esc(f.url) + '" target="_blank" rel="noopener noreferrer"><span class="gd-tag__label">' + l + '</span></a>' : tag(f.name); }).join(' ');
+      var inner = (m.text ? '<span>' + linkify(m.text) + '</span>' : '') + (files ? '<span>' + files + '</span>' : '');
+      html += m.from === 'bruce' ? '<div class="gd-ask__msg gd-ask__msg--bruce"><div class="gd-ask__bubble"><small class="gd-card__desc">' + meta + '</small>' + inner + '</div></div>'
+        : '<div class="gd-ask__msg gd-ask__msg--me"><small class="gd-card__desc">' + meta + '</small><div class="gd-ask__bubble">' + inner + '</div></div>';
+    });
+    return html + '</div>';
+  }
+  function sharedHTML(j) {
+    if (!j) return '<p class="gd-card__desc">Reading the DM from Slack…</p>';
+    if (!j.ok) return threadHTML(j);
+    var sh = sharedOf(j);
+    if (!sh.files.length && !sh.links.length) return empty('first-use', 'No links or files yet', 'Nothing has been shared in this DM.');
+    var who = function (x) { return esc(x.m.name) + ' · ' + esc(fmtWhen(new Date(x.m.at))); };
+    var html = '';
+    if (sh.files.length) html += '<h4 class="gd-card__title">Files (' + sh.files.length + ')</h4>' + kv(sh.files.map(function (x) { return [esc(x.f.name), who(x) + (x.f.type ? ' · ' + esc(x.f.type) : '') + (x.f.size ? ' · ' + esc(kb(x.f.size)) : '') + (x.f.url && /^https:\/\//.test(x.f.url) ? ' · <a class="gd-table__link" href="' + esc(x.f.url) + '" target="_blank" rel="noopener noreferrer">Open in Slack</a>' : '')]; }), 'gd-key-value-list--stacked gd-key-value-list--ruled');
+    if (sh.links.length) html += '<h4 class="gd-card__title" style="margin-top:16px">Links (' + sh.links.length + ')</h4>' + kv(sh.links.map(function (x) { return [esc(x.l.label || host(x.l.url)), who(x) + ' · <a class="gd-table__link" href="' + esc(x.l.url) + '" target="_blank" rel="noopener noreferrer">' + esc(host(x.l.url)) + '</a>']; }), 'gd-key-value-list--stacked gd-key-value-list--ruled');
+    return html;
+  }
+  function logHTML() {
+    var x = cur();
+    if (!x.all.length) return empty('first-use', 'No logged turns', 'Nothing in the log for this person yet.');
+    return '<ol class="gd-timeline">' + x.all.map(function (r) {
+      var tone = r.kind === 'failed' ? 'bad' : r.kind === 'capped' ? 'warn' : r.kind === 'run' ? 'good' : 'info';
+      return '<li class="gd-timeline__item gd-timeline__item--' + tone + '"><span class="gd-timeline__node">' + svg('chat', 14) + '</span><div class="gd-timeline__body"><span>' +
+        (r.kind === 'sent' ? badge('neutral', 'Sent') + ' → ' + esc(r.to || 'someone') + ': ' : badge(tone === 'info' ? 'neutral' : tone, KIND[r.kind] || r.kind) + ' ' + tag(TOPIC[r.topic] || r.topic) + ' ' + (r.thread ? '↳ ' : '')) + esc(r.text || '—') + '</span></div><time class="gd-timeline__time" datetime="' + r.at.toISOString() + '">' + esc(fmtWhen(r.at)) + '</time></li>';
+    }).join('') + '</ol><p class="gd-card__desc" style="margin-top:12px">Everything the log holds for this person: the first 200 characters of each ask, and each message Bruce reported sending. What he answered is in Conversation, and what was shared is in Shared.</p>';
+  }
+  function showDTab(t) {
+    S.dtab = t;
+    document.querySelectorAll('#ag-d-tabs .gd-tabs__tab').forEach(function (b) { var on = b.getAttribute('data-dt') === t; b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1; });
+    var x = cur(), b = $('ag-d-body');
+    if (t === 'log') b.innerHTML = logHTML();
+    else if (t === 'shared') b.innerHTML = sharedHTML(S.dm[S.openUser] || null);
+    else b.innerHTML = '<h4 class="gd-card__title">Details</h4>' + detailsKv(x.c, x.all) + '<h4 class="gd-card__title" style="margin:20px 0 12px">Conversation</h4><div id="ag-thread">' + threadHTML(S.dm[S.openUser] || null) + '</div>';
+  }
+  function loadDM(user, all) {
+    if (S.dm[user]) { setShared(S.dm[user]); return; }
+    var seq = ++S.seq, ch = (all.filter(function (r) { return r.ch; })[0] || {}).ch || '';
+    fetch('/api/bruce-memory?dm=1&user=' + encodeURIComponent(user) + (ch ? '&ch=' + encodeURIComponent(ch) : ''), { credentials: 'same-origin', cache: 'no-store' })
+      .then(function (res) { return res.json().catch(function () { return { ok: false, reason: 'slack', detail: 'Unexpected answer.' }; }); })
+      .then(function (j) { if (j && j.ok) S.dm[user] = j; if (seq !== S.seq || S.openUser !== user) return; setShared(j); if (S.dtab === 'chat') { var t = $('ag-thread'); if (t) t.innerHTML = threadHTML(j); } else if (S.dtab === 'shared') $('ag-d-body').innerHTML = sharedHTML(j); })
+      .catch(function () { if (seq === S.seq && S.openUser === user && S.dtab === 'chat') { var t = $('ag-thread'); if (t) t.innerHTML = threadHTML({ ok: false, detail: 'Try again in a moment.' }); } });
+  }
+  function openConv(user) {
+    var d = $('ag-drawer');
+    S.openUser = user; drawerHead(); setShared(S.dm[user]); showDTab('chat');
+    if (!d.open && window.GD && GD.feedback) GD.feedback.open(d); else if (!d.open && d.showModal) d.showModal();
+    loadDM(user, personRows(user));
+  }
+  function step(dir) { var n = S.order[S.order.indexOf(S.openUser) + dir]; if (n) openConv(n); }
+
+  /* ---------- the page ---------- */
   function render() {
     tabs();
-    parkBruce();
-    var html = S.tab === 'bruce' ? renderBruce() : S.tab === 'alfred' ? renderAlfred() : S.tab === 'doc' ? renderDoc() : renderAll();
-    $('ag-panel').innerHTML = html;
     $('ag-me-box').checked = hideOn();
-    $('ag-ctrl').hidden = S.tab === 'bruce';                      /* his panel has its own periods and refresh */
-    if (S.tab === 'bruce') mountBruce();
-    document.querySelectorAll('.ag-pill').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-p') === S.period)); });
-    tip();
+    $('ag-ctrl').hidden = false;
+    $('ag-panel').innerHTML = S.tab === 'bruce' ? renderBruce() : S.tab === 'alfred' ? renderAlfred() : S.tab === 'doc' ? renderDoc() : renderAll();
+    document.querySelectorAll('#ag-period .gd-tabs__tab').forEach(function (b) { var on = b.getAttribute('data-value') === S.period; b.setAttribute('aria-checked', String(on)); b.tabIndex = on ? 0 : -1; });
+    $('ag-refresh').setAttribute('data-tip', S.at ? 'Updated ' + ago(Date.now() - S.at) + ' · click to refresh' : 'Refresh');
   }
-  /* "Updated 2 min ago" lives in the refresh button's tooltip, as on the other pages. */
-  function tip() { $('ag-refresh').setAttribute('data-tip', S.at ? 'Updated ' + ago(Date.now() - S.at) + ' · click to refresh' : 'Refresh'); }
   function setTab(id, push) {
     if (id !== 'all' && !agent(id)) id = 'all';
     S.tab = id; render();
@@ -439,9 +491,11 @@ a.ag-row:hover { background: var(--s-nav-hover); }
       if (r.status === 401 || r.status === 403) { S.bruceErr = 'Owners only'; return null; } if (!r.ok) throw new Error('http'); return r.json();
     }).then(function (j) {
       if (!j) return; if (!j.configured) { S.bruceErr = 'No store connected, so nothing is logged'; return; }
-      S.owner = String(j.owner || ''); S.bruce = (j.rows || []).map(function (r) { var d = new Date(r.at); return isNaN(d.getTime()) ? null : { at: d, user: String(r.user || ''), name: String(r.name || r.user || ''), kind: String(r.kind || 'run'), thread: !!r.thread, text: String(r.text || ''), topic: r.topic || (r.kind === 'sent' ? '' : 'other') }; }).filter(Boolean);
+      S.owner = String(j.owner || ''); S.cap = Number(j.cap) || 3; S.dm = {};
+      S.bruce = (j.rows || []).map(function (r) { var d = new Date(r.at); return isNaN(d.getTime()) ? null : { at: d, user: String(r.user || ''), name: String(r.name || r.user || ''), role: r.role === 'owner' ? 'owner' : 'teammate', kind: String(r.kind || 'run'), thread: !!r.thread, text: String(r.text || ''), topic: r.topic || (r.kind === 'sent' ? '' : 'other'), to: String(r.toName || ''), ch: String(r.ch || '') }; }).filter(Boolean);
     }).catch(function () { S.bruceErr = 'Could not read his log'; });
   }
+  function loadUsage() { return fetch('/admin/bruce-usage.json', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { S.usage = j && j.weekly ? j : null; }).catch(function () { S.usage = null; }); }
   function loadHealth() {
     return fetch('/api/health', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error('http'); return r.json(); }).then(function (j) { S.health = j && j.checks ? j : null; if (!S.health) S.healthErr = 'The checks returned nothing'; }).catch(function () { S.healthErr = 'Could not run the checks'; });
   }
@@ -454,36 +508,42 @@ a.ag-row:hover { background: var(--s-nav-hover); }
   function loadAll() {
     if (S.busy) return; S.busy = true; $('ag-refresh').setAttribute('aria-busy', 'true');
     var done = function () { S.at = Date.now(); S.busy = false; $('ag-refresh').removeAttribute('aria-busy'); render(); };
-    return Promise.all([loadBruce().then(render), loadHealth().then(render), loadAlfred().then(render)]).then(done, done);
+    return Promise.all([loadBruce().then(render), loadUsage().then(render), loadHealth().then(render), loadAlfred().then(render)]).then(done, done);
   }
 
   document.addEventListener('click', function (e) {
-    var t = e.target.closest && e.target.closest('[data-tab]');
+    var u = e.target.closest && e.target.closest('[data-u]');
+    if (u && $('ag-panel').contains(u)) { e.preventDefault(); openConv(u.getAttribute('data-u')); return; }
+    var t = e.target.closest && e.target.closest('#ag-panel [data-tab], #ag-tabs [data-tab]');
     if (t) {
-      setTab(t.getAttribute('data-tab'), true);
+      e.preventDefault(); setTab(t.getAttribute('data-tab'), true);
       var to = t.getAttribute('data-scroll'), target = to && $(to);
       if (target) target.scrollIntoView({ block: 'start' }); else window.scrollTo({ top: 0 });
       return;
     }
-    var p = e.target.closest && e.target.closest('.ag-pill'); if (p) { S.period = p.getAttribute('data-p'); render(); }
+    var p = e.target.closest && e.target.closest('#ag-period .gd-tabs__tab'); if (p) { S.period = p.getAttribute('data-value'); render(); return; }
+    var dt = e.target.closest && e.target.closest('#ag-d-tabs [data-dt]'); if (dt) { showDTab(dt.getAttribute('data-dt')); }
   });
   $('ag-tabs').addEventListener('keydown', function (ev) {
-    var ids = [].slice.call(document.querySelectorAll('.ag-tab')).map(function (b) { return b.getAttribute('data-tab'); }), i = ids.indexOf(S.tab);
-    if (ev.key === 'ArrowRight' || ev.key === 'ArrowLeft') { ev.preventDefault(); var n = ids[(i + (ev.key === 'ArrowRight' ? 1 : ids.length - 1)) % ids.length]; setTab(n, true); var b = document.querySelector('.ag-tab[data-tab="' + n + '"]'); if (b) b.focus(); }
+    var ids = [].slice.call(document.querySelectorAll('#ag-tabs .gd-tabs__tab')).map(function (b) { return b.getAttribute('data-tab'); }), i = ids.indexOf(S.tab);
+    if (ev.key === 'ArrowRight' || ev.key === 'ArrowLeft') { ev.preventDefault(); var n = ids[(i + (ev.key === 'ArrowRight' ? 1 : ids.length - 1)) % ids.length]; setTab(n, true); var b = document.querySelector('#ag-tabs [data-tab="' + n + '"]'); if (b) b.focus(); }
   });
   $('ag-refresh').addEventListener('click', loadAll);
-  $('ag-me-box').addEventListener('change', function () {
-    try { localStorage.setItem('gw-analytics-hide-me', this.checked ? '1' : '0'); } catch (e) { /* not remembered */ }
-    if (brucePanel) { brucePanel.setHide(this.checked); brucePanel.refilter(); }
-    render();
+  $('ag-me-box').addEventListener('change', function () { try { localStorage.setItem('gw-analytics-hide-me', this.checked ? '1' : '0'); } catch (e) { /* not remembered */ } render(); });
+  $('ag-d-prev').addEventListener('click', function () { step(-1); });
+  $('ag-d-next').addEventListener('click', function () { step(1); });
+  $('ag-drawer').addEventListener('close', function () { S.openUser = ''; S.seq++; });
+  document.addEventListener('keydown', function (ev) {
+    var d = $('ag-drawer'); if (!d.open || /^(TEXTAREA|INPUT)$/.test((ev.target || {}).tagName || '') || ev.metaKey || ev.ctrlKey || ev.altKey) return;
+    if (ev.key === 'ArrowLeft') { ev.preventDefault(); step(-1); } else if (ev.key === 'ArrowRight') { ev.preventDefault(); step(1); }
   });
   window.addEventListener('hashchange', function () { if (S.data) setTab(location.hash.slice(1) || 'all', false); });
-  setInterval(tip, 15000);
+  setInterval(function () { if (S.at) $('ag-refresh').setAttribute('data-tip', 'Updated ' + ago(Date.now() - S.at) + ' · click to refresh'); }, 15000);
 
   fetch('/admin/agents-data.json', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.json(); }).then(function (data) {
     S.data = data; var want = location.hash.slice(1); S.tab = want && (want === 'all' || agent(want)) ? want : 'all';
     $('ag-app').hidden = false; render(); loadAll();
-  }).catch(function () { $('ag-state').innerHTML = '<div class="ag-note"><b>Could not load the agents</b>Try again in a moment.</div>'; });
+  }).catch(function () { $('ag-state').innerHTML = empty('error', 'Could not load the agents', 'Try again in a moment.'); });
 })();
 </script>
 </body></html>
