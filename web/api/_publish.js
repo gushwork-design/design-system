@@ -25,6 +25,14 @@
    approved for that person, and the token is minted at the moment the waiting script collects it, then forgotten, so
    the store never holds a usable token (only hashes of them).
 
+   WHO CAN OPEN THE PAGE. The publisher says, in staging.json: "lane" (only their team) or "org" (everyone at the company,
+   which is what every page under /internal is by default). A "lane" page gets one rule for its exact path, access
+   'lane', that the gate reads live: the people who can publish to that lane, plus anyone an approved request added.
+   The publisher can only NARROW, only for their own page (setPageVisibility in _access.js); a rule the owner set is never
+   replaced. The rule is written BEFORE the commit, so there is no moment when the page is live and not yet private, and
+   if the rule cannot be written nothing is published. The page's title and line are kept in KV for the Staging index,
+   which shows them only to people who can open the page.
+
    WHAT IT NEVER DOES. Writes outside web/internal/staging/<lane>/<page>/, writes into a lane folder that already holds
    a page of its own (a legacy page, which stays the owner's), deletes anything, or takes staging.json from the caller.
 
@@ -34,7 +42,7 @@
    ========================================================================= */
 
 import { COOKIE, verify, readCookie, sessionSecret, isInternal } from './_session.js';
-import { loadRules, canPublish, lanesFor } from './_access.js';
+import { loadRules, canPublish, lanesFor, decide, setPageVisibility, saveRules, invalidate, storeId } from './_access.js';
 import { checkSubmission, STAGING_ROOT } from './_staging-rules.js';
 import { createHash, randomBytes, randomInt } from 'node:crypto';
 
@@ -186,6 +194,27 @@ async function approve(res, who, body, rules) {
   return json(res, 200, { ok: true, email: who.email, lanes: lanesFor(who.email, rules) });
 }
 
+/* Private pages this person may open, with the words the index shows. Filtered by the same decide() the gate uses, so the
+   index can never list a page its link would refuse (or the reverse). */
+async function privatePages(who, rules) {
+  const lanes = Object.keys(rules.lanes || {});
+  if (!lanes.length || !store()) return [];
+  const all = await kv(lanes.map((l) => ['HGETALL', `gw:pp:${l}`]));
+  const out = [];
+  lanes.forEach((lane, i) => {
+    const flat = all[i] || [];
+    for (let k = 0; k + 1 < flat.length; k += 2) {
+      const page = flat[k];
+      let m = null;
+      try { m = JSON.parse(flat[k + 1]); } catch { continue; }
+      const path = `/internal/staging/${lane}/${page}`;
+      if (decide(path, { email: who.email }, rules) !== 'allow') continue;
+      out.push({ lane, page, path, title: String(m.title || page), blurb: String(m.blurb || ''), owner: String(m.owner || '') });
+    }
+  });
+  return out.slice(0, 200);
+}
+
 /* ── GitHub ─────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 async function gh(path, init = {}) {
@@ -258,7 +287,7 @@ function decode(body) {
     if (!f || typeof f.path !== 'string' || typeof f.b64 !== 'string') { files.push({ path: f && f.path, bytes: null }); continue; }
     files.push({ path: f.path, bytes: Buffer.from(f.b64, 'base64') });
   }
-  return { lane: String(body.lane || ''), page: String(body.page || ''), title: body.title, blurb: body.blurb, owner: body.owner, files };
+  return { lane: String(body.lane || ''), page: String(body.page || ''), title: body.title, blurb: body.blurb, owner: body.owner, visibility: body.visibility, files };
 }
 
 export default async function handler(req, res) {
@@ -273,6 +302,15 @@ export default async function handler(req, res) {
     if (req.method !== 'POST') return json(res, 405, { error: 'POST only.' });
     try { return op === 'device-start' ? await deviceStart(req, res, host) : await devicePoll(req, res, body); }
     catch { return json(res, 502, { error: 'Could not do that. Try again.' }); }
+  }
+
+  /* The Staging index asks which private pages this person may see (a page private to a lane is not in the static index). */
+  if (op === 'private-index') {
+    const who = await whoByCookie(req).catch(() => null);
+    if (!who) return json(res, 401, { error: 'Not signed in.' });
+    if (req.method !== 'GET') return json(res, 405, { error: 'GET only.' });
+    try { return json(res, 200, { pages: await privatePages(who, await loadRules()) }); }
+    catch { return json(res, 200, { pages: [] }); }
   }
 
   /* The connect page, signed in to the hub as a person (me also answers to a token, so the script can ask who it is). */
@@ -315,11 +353,33 @@ export default async function handler(req, res) {
     return json(res, 429, { error: `That is more than ${PER_HOUR} publishes in an hour. Try again later.` });
   }
 
+  /* Who can open it comes FIRST. The rule is live at once and the page only after the deploy, so there is never a moment
+     when a private page is open to the organisation; and if the rule cannot be written nothing is published. */
+  const vis = checked.manifest.visibility;
+  let change;
+  try {
+    invalidate();                                              // read the rules as they are now, not as cached
+    change = setPageVisibility(await loadRules(), sub.lane, sub.page, vis);
+    if (change.changed) {
+      if (!storeId() || !process.env.VERCEL_API_TOKEN) {
+        return json(res, 503, { error: 'Private pages need the access rules store, which is not connected yet. Nothing was published.' });
+      }
+      const saved = await saveRules(change.rules);
+      if (!saved.ok) return json(res, 502, { error: 'Could not set who can open this page. Nothing was published. Try again in a minute.' });
+    }
+  } catch { return json(res, 502, { error: 'Could not set who can open this page. Nothing was published. Try again in a minute.' }); }
+
   try {
     const out = await writePage({ lane: sub.lane, page: sub.page, files: checked.files, manifest: checked.manifest, email: who.email });
-    return json(res, 200, { ok: true, ...out, path: `/internal/staging/${sub.lane}/${sub.page}`, note: out.mode === 'main'
+    /* The index's words for a private page, kept where only the people who can open it are told. */
+    try {
+      const pp = `gw:pp:${sub.lane}`;
+      await kv([vis === 'lane' ? ['HSET', pp, sub.page, JSON.stringify(checked.manifest)] : ['HDEL', pp, sub.page]]);
+    } catch { /* the page is still there at its link; only the index entry is missing */ }
+    const who_ = vis === 'lane' ? ` Private to the ${sub.lane} team.` : ' Open to everyone at Gushwork.';
+    return json(res, 200, { ok: true, ...out, visibility: vis, path: `/internal/staging/${sub.lane}/${sub.page}`, note: (out.mode === 'main'
       ? 'Committed. The page is live in a minute or two, after the deploy.'
-      : 'Queued for the owner: this publisher account could not write to main, so a pull request is waiting.' });
+      : 'Queued for the owner: this publisher account could not write to main, so a pull request is waiting.') + who_ + (change.note ? ' ' + change.note : '') });
   } catch (e) {
     if (e.code === 'lane-is-page') return json(res, 409, { error: `The ${sub.lane} folder already holds a page of its own, so it cannot be a lane. Ask the owner.` });
     return json(res, 502, { error: 'GitHub did not accept that. Nothing was published. Try again in a minute.' });

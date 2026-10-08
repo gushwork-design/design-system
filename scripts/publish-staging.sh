@@ -14,14 +14,17 @@
 #
 # WHO MAY PUBLISH WHERE is Access Control, Staging lanes, checked live on every call.
 #
-# The folder needs index.html and staging.json {"title","blurb","owner"}; new-staging-page.sh makes both. Up to 3 MB.
+# The folder needs index.html and staging.json {"title","blurb","owner","visibility"}; new-staging-page.sh makes both.
+# visibility is "lane" (only the people on your lane can open the page) or "org" (everyone at Gushwork). Up to 3 MB.
+# Someone who is refused a private page asks for access from its screen, and your lane's team gets a Slack message
+# from Bruce with Approve and Decline.
 # The page is live a minute or two after it says "Committed".
 set -euo pipefail
 
 HOST="${GW_HUB:-https://design.gushwork.ai}"
 TOKEN_FILE="${GW_PUBLISH_TOKEN_FILE:-$HOME/.config/gushwork/publish-token}"
 
-usage() { sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//' >&2; exit 2; }
+usage() { sed -n '2,24p' "$0" | sed 's/^# \{0,1\}//' >&2; exit 2; }
 
 CMD="publish"
 case "${1:-}" in
@@ -117,7 +120,7 @@ for dp, dn, fn in os.walk(root):
             continue
         full = os.path.join(dp, f)
         files.append({"path": os.path.relpath(full, root).replace(os.sep, "/"), "b64": base64.b64encode(open(full, "rb").read()).decode()})
-body = {"lane": lane, "page": page, "title": meta.get("title"), "blurb": meta.get("blurb"), "owner": meta.get("owner"), "files": files}
+body = {"lane": lane, "page": page, "title": meta.get("title"), "blurb": meta.get("blurb"), "owner": meta.get("owner"), "visibility": meta.get("visibility"), "files": files}
 if len(json.dumps(body)) > 4_300_000:
     sys.exit("That is too big once encoded. The limit is about 3 MB of files. Ask the owner for anything bigger.")
 

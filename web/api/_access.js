@@ -256,13 +256,14 @@ export function grantPage(rules, pathname, email) {
   const base = exact || rule;
   /* `admin` and `internal` carry no list of their own: the page becomes a people rule, and admins still pass
      because the admin check comes before the rule in decide(). */
-  const keep = base.access === 'people';
+  const keep = base.access === 'people' || base.access === 'lane';
   const next = {
     path,
-    access: 'people',
+    access: base.access === 'lane' ? 'lane' : 'people',
     groups: keep ? [...base.groups] : [],
     people: keep ? [...base.people] : []
   };
+  if (base.access === 'lane') next.lane = base.lane;      // still the team's page; the person is added beside the team
   if (next.people.includes(who)) return { rules, already: true };
   next.people.push(who);
   const routes = exact ? rules.routes.map(r => (r.path === path ? next : r)) : [...rules.routes, next];
@@ -297,15 +298,21 @@ export function normalise(raw) {
          which is why the level had to be added here before the page could offer it:
          a stored `owner` rule would otherwise be silently loosened to any verified
          @gushwork.ai account on the very next read. */
-      const access = ['public', 'internal', 'admin', 'owner', 'people'].includes(r.access)
+      let access = ['public', 'internal', 'admin', 'owner', 'people', 'lane'].includes(r.access)
         ? r.access : 'internal';
-      return {
+      /* `lane`: this page is private to a staging lane's team (see the lanes below). A lane rule that names no real lane
+         fails CLOSED, to admins only, rather than to anyone: a malformed rule must never open a private page. */
+      const lane = access === 'lane' ? String((r && r.lane) || '').trim().toLowerCase() : '';
+      if (access === 'lane' && !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(lane)) access = 'admin';
+      const out = {
         path: path.replace(/\/+$/, '') || '/',
         access,
         groups: (Array.isArray(r.groups) ? r.groups : [])
           .map(s => String(s).trim().toLowerCase()).filter(Boolean),
         people: emails(r.people)
       };
+      if (access === 'lane') out.lane = lane;
+      return out;
     })
     .filter(Boolean);
 
@@ -382,6 +389,42 @@ export function lanesFor(email, rules) {
   return Object.keys(rules.lanes || {}).sort().filter(l => canPublish(email, l, rules));
 }
 
+/* Everyone on a lane: its people and the members of its groups, one address each. Used to tell the team about a request. */
+export function laneMembers(rules, lane) {
+  const l = (rules.lanes || {})[lane];
+  if (!l) return [];
+  const out = new Set((l.people || []));
+  for (const g of l.groups || []) for (const e of (rules.groups || {})[g] || []) out.add(e);
+  return [...out];
+}
+
+/* A publisher chooses who can open their page: only their lane's team, or everyone in the organisation.
+
+   They can only NARROW, and only for their own page. A page is 'org' by default (the ordinary /internal rule), so
+   'lane' adds one rule for that page's exact path and 'org' removes that same rule; nothing else is ever written.
+   A rule the owner set (a people list, admins, owners, public) is never replaced, and a stricter rule on the lane itself
+   is never loosened by a page inside it: in both cases the page is left as the owner set it and the note says so.
+
+   Pure: returns { rules, changed, note }. */
+export function setPageVisibility(rules, lane, page, visibility) {
+  const path = `/internal/staging/${lane}/${page}`;
+  const exact = rules.routes.find(r => r.path === path);
+  const ours = exact && exact.access === 'lane' && exact.lane === lane;
+  if (visibility === 'lane') {
+    if (ours) return { rules, changed: false, note: '' };
+    if (exact) return { rules, changed: false, note: 'The owner has already set who can open this page, so it was left as is.' };
+    const above = ruleFor(path, rules);
+    if (above && above.access !== 'internal') {
+      return { rules, changed: false, note: above.access === 'public'
+        ? 'This page sits under a public rule the owner set, so it was left as is.'
+        : 'The owner has already set who can open this lane, so the page follows that.' };
+    }
+    return { rules: { ...rules, routes: [...rules.routes, { path, access: 'lane', lane, groups: [], people: [] }] }, changed: true, note: '' };
+  }
+  if (ours) return { rules: { ...rules, routes: rules.routes.filter(r => r !== exact) }, changed: true, note: '' };
+  return { rules, changed: false, note: '' };
+}
+
 /** The most specific rule covering a path — longest matching prefix. */
 export function ruleFor(pathname, rules) {
   const p = String(pathname || '/').replace(/\/+$/, '') || '/';
@@ -441,6 +484,16 @@ export function decide(pathname, session, rules) {
       return 'forbid';
     case 'internal':
       return isInternal(email) ? 'allow' : 'forbid';
+    case 'lane': {
+      /* A page private to a lane: the people who can publish to that lane (read live, so leaving the lane closes the
+         page at once), plus anyone named on the rule itself, which is what an approved request adds. */
+      if (canPublish(email, rule.lane, rules)) return 'allow';
+      if (rule.people.includes(email)) return 'allow';
+      for (const g of rule.groups) {
+        if ((rules.groups[g] || []).includes(email)) return 'allow';
+      }
+      return 'forbid';
+    }
     case 'people': {
       if (rule.people.includes(email)) return 'allow';
       for (const g of rule.groups) {
@@ -477,6 +530,7 @@ export function describeAccess(rule) {
     case 'internal': return { level, label: 'For everyone', restricted: false };
     case 'admin':    return { level, label: 'Admins only', restricted: true };
     case 'owner':    return { level, label: 'Owners only', restricted: true };
+    case 'lane':     return { level, label: `Only for the ${rule.lane} team`, restricted: true };
     case 'people': {
       const groups = (rule.groups || []).map(groupLabel).filter(Boolean);
       const n = (rule.people || []).length;

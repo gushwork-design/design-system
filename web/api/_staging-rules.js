@@ -121,6 +121,11 @@ export function checkSubmission(sub) {
 
   const str = (v, max) => (typeof v === 'string' ? v.replace(/[\u0000-\u001f]/g, ' ').trim() : '');
   const manifest = { title: str(sub && sub.title), blurb: str(sub && sub.blurb), owner: str(sub && sub.owner) };
+  /* Who can open the page. Asked for, never assumed: a page nobody chose a setting for would be public to the
+     organisation by accident, or hidden from it by accident. 'lane' is the lane's team only; 'org' is everyone at the
+     company, which is what every page under /internal is by default. */
+  if (sub && (sub.visibility === 'lane' || sub.visibility === 'org')) manifest.visibility = sub.visibility;
+  else P('Say who can open it: visibility must be "lane" (only your team) or "org" (everyone at Gushwork).');
   for (const [k, max] of [['title', LIMITS.title], ['blurb', LIMITS.blurb], ['owner', LIMITS.owner]]) {
     if (!manifest[k] || manifest[k].length > max) P(`The ${k} is needed (1 to ${max} characters).`);
   }

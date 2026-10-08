@@ -3,27 +3,31 @@
 # Start a page for a team's staging lane. Makes ./<page>/ with a starter index.html that already
 # passes the Publish checks, and a staging.json naming it.
 #
-#   bash new-staging-page.sh <lane> <page> "<Title>" "<one-line blurb>" "<your name>"
-#   bash new-staging-page.sh gtm agent-store "Agent store" "The new Agent Store mock-up." "Swapnil"
+#   bash new-staging-page.sh <lane> <page> "<Title>" "<one-line blurb>" "<your name>" <team|everyone>
+#   bash new-staging-page.sh gtm agent-store "Agent store" "The new Agent Store mock-up." "Swapnil" team
+#
+# The last word is who can open the page: `team` (only the people on your lane) or `everyone` (everyone at Gushwork).
+# Ask, do not guess. Publishing again with the other word changes it.
 #
 # Then build the page in that folder and publish it with publish-staging.sh, which sits beside this script.
 set -euo pipefail
 
-LANE="${1:-}"; PAGE="${2:-}"; TITLE="${3:-}"; BLURB="${4:-}"; OWNER="${5:-}"
-if [ -z "$LANE" ] || [ -z "$PAGE" ] || [ -z "$TITLE" ] || [ -z "$BLURB" ] || [ -z "$OWNER" ]; then
-  sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//' >&2; exit 2
+LANE="${1:-}"; PAGE="${2:-}"; TITLE="${3:-}"; BLURB="${4:-}"; OWNER="${5:-}"; WHO="${6:-}"
+if [ -z "$LANE" ] || [ -z "$PAGE" ] || [ -z "$TITLE" ] || [ -z "$BLURB" ] || [ -z "$OWNER" ] || [ -z "$WHO" ]; then
+  sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//' >&2; exit 2
 fi
 for v in "$LANE" "$PAGE"; do
   [[ "$v" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]] || { echo "'$v' must be lowercase words joined by hyphens, e.g. agent-store" >&2; exit 2; }
 done
 [ ! -e "$PAGE" ] || { echo "./$PAGE already exists" >&2; exit 1; }
+case "$WHO" in team) VIS=lane ;; everyone) VIS=org ;; *) echo "the last word must be team or everyone" >&2; exit 2 ;; esac
 mkdir -p "$PAGE"
 
-python3 - "$PAGE" "$LANE" "$TITLE" "$BLURB" "$OWNER" <<'PY'
+python3 - "$PAGE" "$LANE" "$TITLE" "$BLURB" "$OWNER" "$VIS" <<'PY'
 import json, sys, html
-d, lane, title, blurb, owner = sys.argv[1:]
+d, lane, title, blurb, owner, vis = sys.argv[1:]
 with open(f"{d}/staging.json", "w") as f:
-    json.dump({"title": title, "blurb": blurb, "owner": owner}, f, indent=2, ensure_ascii=False)
+    json.dump({"title": title, "blurb": blurb, "owner": owner, "visibility": vis}, f, indent=2, ensure_ascii=False)
     f.write("\n")
 open(f"{d}/index.html", "w").write(f'''<!doctype html>
 <html lang="en">

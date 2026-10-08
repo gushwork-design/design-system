@@ -172,6 +172,16 @@ The email signature creator and the employee ID card generator were redesigned i
     and presses Connect, and the script keeps a personal token for 90 days. The code is typed, not linked, so a link
     carrying someone else's code cannot be approved by accident. One gate: the lane list, read live on every call.
 
+49. **A staging page is open to the company or private to its lane's team, and the publisher chooses (Utsav, 8 Oct 2026).**
+    `staging.json` carries `visibility`: `lane` or `org`; publishing without it is refused, so nobody ends up public or hidden
+    by accident. `lane` writes one rule for that page, access `lane`, that the gate reads live (the people who can publish
+    to the lane, plus anyone an approved request added), so leaving the lane closes the page at once. A publisher can only
+    narrow, only their own page, and a rule the owner set is never replaced or loosened. The rule is written before the
+    commit, so a private page is never open to the company, even briefly. A private page is not in the static Staging
+    index; the hub tells the index which ones each person may see. Someone refused asks for access from the Restricted
+    screen, and Bruce DMs the owner and every lane member he can find in Slack, with Approve and Decline; any one answers,
+    and the rest of the messages change to say who did.
+
 ## Left open (the owner's call)
 
 - **A third typeface in the signature preview** (Plus Jakarta Sans). In the artefact, not the chrome.

@@ -512,8 +512,13 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
       '<div class="ac-row" data-i="' + i + '">' +
         '<div class="ac-row__path">' + pathHTML(r.path) +
           (r.path === '/admin' ? '<small>Includes this page</small>' : '') + '</div>' +
-        '<div class="ac-row__who">' + ddHTML(r.path, r.access, locked) + '</div>' +
-        '<div class="ac-row__people">' + peopleFieldHTML(r) + '</div>' +
+        /* A page its publisher made private to a staging lane (api/_publish.js): the rule follows the lane's team live, so there is
+           no list to edit here. Removing the row opens the page to the whole organisation again. */
+        '<div class="ac-row__who">' + (r.access === 'lane'
+          ? '<span class="ac-tag" style="font:var(--gw-text-body-14-med)">Private to the ' + esc(r.lane) + ' team</span>'
+          : ddHTML(r.path, r.access, locked)) + '</div>' +
+        '<div class="ac-row__people">' + (r.access === 'lane'
+          ? ((r.people || []).length ? '<small>+ ' + plural(r.people.length, 'approved person') + '</small>' : '') : peopleFieldHTML(r)) + '</div>' +
         '<div class="ac-row__del"><button class="ac-icbtn" type="button" data-act="drop" ' +
           (r.path === '/admin' ? 'disabled title="The admin area cannot be ungated here"' :
             'aria-label="Remove the rule for ' + esc(r.path) + '"') +
@@ -1448,8 +1453,10 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
       r.groups = r.groups || {};
       r.lanes = r.lanes || {};
       r.routes = (r.routes || []).map(function (x) {
-        return { path: x.path, access: x.access,
-                 groups: x.groups || [], people: x.people || [] };
+        var row = { path: x.path, access: x.access,
+                    groups: x.groups || [], people: x.people || [] };
+        if (x.access === 'lane') row.lane = x.lane;
+        return row;
       });
       state = clone(r);
       draft = clone(r);

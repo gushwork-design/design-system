@@ -18,12 +18,16 @@ process.env.GW_GITHUB_TOKEN = 'ghp_faketokenfaketokenfaketokenfaketoken1234';
 process.env.KV_REST_API_URL = 'https://kv.test';
 process.env.KV_REST_API_TOKEN = 'kv-token';
 process.env.VERCEL_API_TOKEN = 'vercel-token';
+process.env.SLACK_BOT_TOKEN = 'xoxb-test';
+process.env.OWNER_SLACK_ID = 'UOWNER';
 
 const { checkSubmission, fontProblems, isSlug, cleanPath } = await import('../web/api/_staging-rules.js');
-const { normalise, canPublish, lanesFor, invalidate: invalidateRules } = await import('../web/api/_access.js');
+const { normalise, canPublish, lanesFor, decide, setPageVisibility, laneMembers, grantPage, describeAccess, invalidate: invalidateRules } = await import('../web/api/_access.js');
 const { sign, COOKIE } = await import('../web/api/_session.js');
 const publish = (await import('../web/api/_publish.js')).default;
 const accessApi = (await import('../web/api/access.js')).default;
+const accessReq = (await import('../web/api/_access-request.js')).default;
+const { answerRequest } = await import('../web/api/_access-request.js');
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 let pass = 0, fail = 0;
@@ -39,7 +43,7 @@ const page = (extra = '') => `<!doctype html><html><head><meta charset="utf-8">
 <base href="/internal/staging/gtm/agent-store/"><meta name="robots" content="noindex, nofollow">
 <link rel="stylesheet" href="/foundation/tokens.css"><style>body{font:var(--gw-text-body-16-reg)}</style></head><body>hi${extra}</body></html>`;
 const sub = (over = {}) => ({
-  lane: 'gtm', page: 'agent-store', title: 'Agent store', blurb: 'The new mock-up.', owner: 'Swapnil',
+  lane: 'gtm', page: 'agent-store', title: 'Agent store', blurb: 'The new mock-up.', owner: 'Swapnil', visibility: 'org',
   files: [{ path: 'index.html', bytes: Buffer.from(page()) }], ...over,
 });
 
@@ -112,21 +116,36 @@ t('rules with no lanes key normalise to none', normalise({ routes: [{ path: '/in
 
 /* ── 4. the endpoint, against a faked GitHub and KV ─────────────────────────────────────────────────────── */
 
-const kvData = new Map(), kvSets = new Map(), vercelWrites = [];
+const kvData = new Map(), kvSets = new Map(), kvHashes = new Map(), vercelWrites = [];
 let gh = null, calls = [];
 const rulesJson = { access: { admins: [], groups: { gtm: ['sam@gushwork.ai'] }, routes: [{ path: '/internal', access: 'internal' }], lanes: { gtm: { groups: ['gtm'], people: ['swapnil@gushwork.ai'] } } } };
 process.env.GLOBAL_CONFIG = 'https://edge-config.test/ecfg_x?token=t';
 
+const order = [], slackLog = [];
+const SLACK_USERS = { 'swapnil@gushwork.ai': 'USWAP', 'sam@gushwork.ai': 'USAM', 'priya@gushwork.ai': 'UPRIYA', 'nobody@gushwork.ai': 'UNOBODY' };
 globalThis.fetch = async (url, init = {}) => {
-  const u = String(url), body = init.body ? JSON.parse(init.body) : null;
+  const u = String(url);
+  let body = null;
+  try { body = init.body ? JSON.parse(init.body) : null; } catch { body = init.body ? Object.fromEntries(new URLSearchParams(init.body)) : null; }
   const ok = (b, s = 200) => ({ ok: s < 400, status: s, text: async () => JSON.stringify(b), json: async () => b, headers: { get: () => '' } });
   if (u.startsWith('https://edge-config.test')) return ok(rulesJson);
-  if (u.startsWith('https://api.vercel.com/v1/edge-config/')) { vercelWrites.push(JSON.parse(init.body).items[0].value); return ok({ status: 'ok' }); }
+  if (u.startsWith('https://slack.com/api/')) {
+    const method = u.split('/api/')[1].split('?')[0];
+    slackLog.push({ method, body, url: u });
+    if (method === 'users.lookupByEmail') { const id = SLACK_USERS[body.email]; return ok(id ? { ok: true, user: { id } } : { ok: false, error: 'users_not_found' }); }
+    if (method === 'users.info') { const id = new URL(u).searchParams.get('user'); const email = Object.keys(SLACK_USERS).find((e) => SLACK_USERS[e] === id); return ok(email ? { ok: true, user: { id, profile: { email } } } : { ok: false, error: 'user_not_found' }); }
+    if (method === 'chat.postMessage') return ok({ ok: true, channel: 'D' + body.channel, ts: String(1000 + slackLog.length) });
+    return ok({ ok: true });
+  }
+  if (u.startsWith('https://api.vercel.com/v1/edge-config/')) { const v = JSON.parse(init.body).items[0].value; vercelWrites.push(v); rulesJson.access = v; order.push('rules'); return ok({ status: 'ok' }); }
   if (u === 'https://kv.test/pipeline') {
     return ok(body.map((c) => {
       const [op, k, ...r] = c;
       if (op === 'GET') return { result: kvData.get(k) ?? null };
-      if (op === 'SET') { kvData.set(k, r[0]); return { result: 'OK' }; }
+      if (op === 'SET') { if (r.includes('NX') && kvData.has(k)) return { result: null }; kvData.set(k, r[0]); return { result: 'OK' }; }
+      if (op === 'HSET') { (kvHashes.get(k) || kvHashes.set(k, new Map()).get(k)).set(r[0], r[1]); return { result: 1 }; }
+      if (op === 'HDEL') { (kvHashes.get(k) || new Map()).delete(r[0]); return { result: 1 }; }
+      if (op === 'HGETALL') return { result: [...(kvHashes.get(k) || new Map())].flat() };
       if (op === 'DEL') { kvData.delete(k); return { result: 1 }; }
       if (op === 'SADD') { (kvSets.get(k) || kvSets.set(k, new Set()).get(k)).add(r[0]); return { result: 1 }; }
       if (op === 'SREM') { (kvSets.get(k) || new Set()).delete(r[0]); return { result: 1 }; }
@@ -152,7 +171,7 @@ const call = async ({ method = 'POST', op, body, headers = {}, token, email, ip 
   return out;
 };
 const payload = (over = {}) => ({
-  lane: 'gtm', page: 'agent-store', title: 'Agent store', blurb: 'The new mock-up.', owner: 'Swapnil',
+  lane: 'gtm', page: 'agent-store', title: 'Agent store', blurb: 'The new mock-up.', owner: 'Swapnil', visibility: 'org',
   files: [{ path: 'index.html', b64: Buffer.from(page()).toString('base64') }], ...over,
 });
 const happyGh = (patch = () => null) => async (path, init, body, ok) => {
@@ -164,7 +183,7 @@ const happyGh = (patch = () => null) => async (path, init, body, ok) => {
   if (m === 'POST' && path === '/git/blobs') return ok({ sha: 'blob' + calls.length });
   if (m === 'POST' && path === '/git/trees') return ok({ sha: 'tree1', _sent: body });
   if (m === 'POST' && path === '/git/commits') return ok({ sha: 'commit1', _sent: body });
-  if (m === 'PATCH' && path === '/git/refs/heads/main') return ok({});
+  if (m === 'PATCH' && path === '/git/refs/heads/main') { order.push('commit'); return ok({}); }
   return ok({ message: 'unexpected ' + m + ' ' + path }, 500);
 };
 const H = { 'x-gw-publish': '1' };
@@ -318,6 +337,165 @@ t('but an admin can still edit a page rule, and the lanes ride along untouched',
 invalidateRules();
 w = await putRules('owner@gushwork.ai', (c) => { c.lanes.ops = { groups: [], people: ['x@gushwork.ai'] }; });
 t('an owner can add a lane', [w.status, Object.keys(vercelWrites.at(-1).lanes).sort()], [200, ['gtm', 'ops']]);
+
+
+// ── who can open the page ──
+const seedRules = () => {
+  rulesJson.access = { admins: ['boss@gushwork.ai'], groups: { gtm: ['sam@gushwork.ai'] }, routes: [{ path: '/internal', access: 'internal' }],
+    lanes: { gtm: { groups: ['gtm'], people: ['swapnil@gushwork.ai'] } } };
+  invalidateRules(); vercelWrites.length = 0; order.length = 0;
+};
+const connect = async (email, ip) => {
+  const d = (await call({ op: 'device-start', body: {}, ip })).body;
+  await call({ op: 'device-approve', email, headers: H, body: { code: d.userCode } });
+  return (await call({ op: 'device-poll', body: { deviceCode: d.deviceCode } })).body.token;
+};
+const PAGE_PATH = '/internal/staging/gtm/agent-store';
+const live = () => normalise(rulesJson.access);
+
+// the pure rule: only ever narrows, never overrides the owner
+{
+  const base = normalise({ routes: [{ path: '/internal', access: 'internal' }], lanes: { gtm: { people: ['a@gushwork.ai'] } } });
+  let c = setPageVisibility(base, 'gtm', 'p', 'lane');
+  t('private adds one rule for the exact page', [c.changed, c.rules.routes.at(-1)], [true, { path: '/internal/staging/gtm/p', access: 'lane', lane: 'gtm', groups: [], people: [] }]);
+  t('asking again changes nothing', setPageVisibility(c.rules, 'gtm', 'p', 'lane').changed, false);
+  c = setPageVisibility(c.rules, 'gtm', 'p', 'org');
+  t('org removes that same rule', [c.changed, c.rules.routes.some((r) => r.access === 'lane')], [true, false]);
+  t('org on a page with no rule changes nothing', setPageVisibility(base, 'gtm', 'p', 'org').changed, false);
+  const owned = normalise({ routes: [{ path: '/internal', access: 'internal' }, { path: '/internal/staging/gtm/p', access: 'people', people: ['x@gushwork.ai'] }] });
+  c = setPageVisibility(owned, 'gtm', 'p', 'lane');
+  t('a rule the owner set is never replaced', [c.changed, /owner/.test(c.note)], [false, true]);
+  c = setPageVisibility(owned, 'gtm', 'p', 'org');
+  t('and never removed', c.changed, false);
+  const laneOwned = normalise({ routes: [{ path: '/internal', access: 'internal' }, { path: '/internal/staging/gtm', access: 'people', people: ['x@gushwork.ai'] }] });
+  t('a stricter rule on the lane itself is not loosened by a page in it', setPageVisibility(laneOwned, 'gtm', 'p', 'lane').changed, false);
+  const pub = normalise({ routes: [{ path: '/internal', access: 'internal' }, { path: '/internal/staging/gtm', access: 'public' }] });
+  t('nor a public rule overridden', setPageVisibility(pub, 'gtm', 'p', 'lane').changed, false);
+  t('a lane rule with no real lane fails closed, to admins', normalise({ routes: [{ path: '/x', access: 'lane', lane: 'Bad Lane!' }] }).routes[0].access, 'admin');
+  t('its label', describeAccess({ access: 'lane', lane: 'gtm' }).label, 'Only for the gtm team');
+  t('lane members are the people plus the group members', laneMembers(normalise({ groups: { gtm: ['s@gushwork.ai'] }, routes: [{ path: '/internal', access: 'internal' }], lanes: { gtm: { groups: ['gtm'], people: ['a@gushwork.ai'] } } }), 'gtm').sort(), ['a@gushwork.ai', 's@gushwork.ai']);
+}
+
+seedRules();
+const samTok = await connect('sam@gushwork.ai', '5.5.5.5');
+t('publishing without saying who can open it is refused', [(await call({ op: 'publish', token: samTok, body: payload({ visibility: undefined }) })).status], [422]);
+
+gh = happyGh(); calls = [];
+let pv = await call({ op: 'publish', token: samTok, body: payload({ visibility: 'lane' }) });
+t('a private publish succeeds and says so', [pv.status, /Private to the gtm team/.test(pv.body.note), pv.body.visibility], [200, true, 'lane']);
+t('the rule is written BEFORE the commit', order, ['rules', 'commit']);
+{
+  const R = live();
+  const rule = R.routes.find((r) => r.path === PAGE_PATH);
+  t('one rule, for that page, for that lane', [rule && rule.access, rule && rule.lane], ['lane', 'gtm']);
+  t('the lane is kept in the rules', Object.keys(R.lanes), ['gtm']);
+  t('a person on the lane can open it', decide(PAGE_PATH, { email: 'swapnil@gushwork.ai' }, R), 'allow');
+  t('so can a member of a lane group', decide(PAGE_PATH, { email: 'sam@gushwork.ai' }, R), 'allow');
+  t('an admin can', decide(PAGE_PATH, { email: 'boss@gushwork.ai' }, R), 'allow');
+  t('someone else at the company cannot', decide(PAGE_PATH, { email: 'priya@gushwork.ai' }, R), 'forbid');
+  t('the lane\'s other pages stay open to the company', decide('/internal/staging/gtm/other', { email: 'priya@gushwork.ai' }, R), 'allow');
+}
+t('taking someone off the lane closes the page to them at once', (() => { const R = live(); R.lanes.gtm.people = []; R.groups.gtm = []; return decide(PAGE_PATH, { email: 'swapnil@gushwork.ai' }, R); })(), 'forbid');
+
+// the index shows a private page only to people who can open it
+{
+  const idx = async (email) => (await call({ method: 'GET', op: 'private-index', email })).body.pages.map((p) => p.path);
+  t('the index lists it for the team', await idx('swapnil@gushwork.ai'), [PAGE_PATH]);
+  t('and for an admin', await idx('boss@gushwork.ai'), [PAGE_PATH]);
+  t('but not for anyone else', await idx('priya@gushwork.ai'), []);
+  t('private-index needs a sign-in', (await call({ method: 'GET', op: 'private-index' })).status, 401);
+}
+
+// the owner's rules are never overridden by a publisher
+{
+  seedRules();
+  rulesJson.access.routes.push({ path: '/internal/staging/gtm/held', access: 'people', groups: [], people: ['x@gushwork.ai'] }); invalidateRules();
+  const r = await call({ op: 'publish', token: samTok, body: payload({ page: 'held', visibility: 'lane', files: [{ path: 'index.html', b64: Buffer.from(page().replace('agent-store', 'held')).toString('base64') }] }) });
+  t('a page the owner already restricted is left as the owner set it', [r.status, order.includes('rules'), /owner/.test(r.body.note)], [200, false, true]);
+}
+
+// no rules store: a private page is refused, and nothing is published
+{
+  seedRules(); calls = [];
+  const keep = process.env.VERCEL_API_TOKEN; delete process.env.VERCEL_API_TOKEN;
+  const r = await call({ op: 'publish', token: samTok, body: payload({ visibility: 'lane' }) });
+  process.env.VERCEL_API_TOKEN = keep;
+  t('no rules store: a private publish is refused and writes nothing', [r.status, calls.length], [503, 0]);
+  const r2 = await call({ op: 'publish', token: samTok, body: payload({ visibility: 'org' }) });
+  t('an open page needs no rule, so it still publishes', r2.status, 200);
+}
+
+// publishing again as open removes only that rule
+seedRules();
+await call({ op: 'publish', token: samTok, body: payload({ visibility: 'lane' }) });
+order.length = 0;
+{
+  const r = await call({ op: 'publish', token: samTok, body: payload({ visibility: 'org' }) });
+  t('switching to open removes the page rule, then commits', [r.status, order, live().routes.some((x) => x.access === 'lane')], [200, ['rules', 'commit'], false]);
+  t('and the company can open it again', decide(PAGE_PATH, { email: 'priya@gushwork.ai' }, live()), 'allow');
+}
+
+// ── a request for a private page goes to the team, and the team can answer ──
+seedRules();
+await call({ op: 'publish', token: samTok, body: payload({ visibility: 'lane' }) });
+const asReq = async (email, path = PAGE_PATH) => {
+  const out = { status: 0, body: null };
+  await accessReq({ method: 'POST', query: {}, headers: { cookie: await cookie(email) }, body: { path } }, { setHeader() {}, status(st) { out.status = st; return this; }, end(b) { out.body = JSON.parse(b); } });
+  return out;
+};
+const reqId = (email) => { for (const [k, v] of kvData) if (k.startsWith('gw:accreq:') && !k.includes(':by:') && !k.includes(':n:') && String(v).includes(email)) return k.split(':').pop(); return ''; };
+let q;
+{
+  slackLog.length = 0;
+  q = await asReq('priya@gushwork.ai');
+  const dms = slackLog.filter((c) => c.method === 'chat.postMessage');
+  t('the request is accepted', [q.status, q.body.state], [200, 'pending']);
+  t('Bruce tells the owner and the whole lane, and not the person asking', dms.map((d) => d.body.channel).sort(), ['UOWNER', 'USAM', 'USWAP']);
+  t('the message says it is the team\'s page', JSON.stringify(dms[0].body.blocks).includes('private to the *gtm* team'), true);
+  t('and every message carries Approve and Decline', dms.every((d) => JSON.stringify(d.body.blocks).includes('gw_access_approve')), true);
+  const id = reqId('priya@gushwork.ai');
+  t('the request remembers every message it went out in', JSON.parse(kvData.get(`gw:accreq:${id}`)).dms.length, 3);
+}
+const press = (id, who, approve) => ({
+  user: { id: who }, channel: { id: 'D' + who }, message: { ts: ((JSON.parse(kvData.get(`gw:accreq:${id}`)).dms || []).find((d) => d.channel === 'D' + who) || { ts: '1' }).ts, blocks: [{ block_id: `acc:${id}`, type: 'actions' }] },
+  actions: [{ action_id: approve ? 'gw_access_approve' : 'gw_access_decline', value: id }],
+});
+{
+  const id = reqId('priya@gushwork.ai');
+  slackLog.length = 0;
+  const w0 = vercelWrites.length;
+  await answerRequest(press(id, 'UNOBODY', true), true, 'xoxb-test', new Set(['UOWNER']));
+  t('someone not on the lane cannot answer', [slackLog.some((c) => c.method === 'chat.postEphemeral'), vercelWrites.length - w0, JSON.parse(kvData.get(`gw:accreq:${id}`)).status], [true, 0, 'open']);
+  slackLog.length = 0;
+  await answerRequest(press(id, 'USAM', true), true, 'xoxb-test', new Set(['UOWNER']));
+  const rule = live().routes.find((r) => r.path === PAGE_PATH);
+  t('a member of the lane can approve', [JSON.parse(kvData.get(`gw:accreq:${id}`)).status, rule.access, rule.people], ['approved', 'lane', ['priya@gushwork.ai']]);
+  t('the person can now open it, and nothing else widened', [decide(PAGE_PATH, { email: 'priya@gushwork.ai' }, live()), decide('/internal/staging/gtm/other', { email: 'priya@gushwork.ai' }, live())], ['allow', 'allow']);
+  t('everyone who was told sees it is answered, by whom', slackLog.filter((c) => c.method === 'chat.update').map((c) => c.body.channel).sort(), ['DUOWNER', 'DUSAM', 'DUSWAP']);
+  t('the line says who approved', slackLog.some((c) => c.method === 'chat.update' && /Approved by sam@gushwork.ai/.test(c.body.text)), true);
+  t('the person is told in Slack', slackLog.some((c) => c.method === 'chat.postMessage' && c.body.channel === 'UPRIYA'), true);
+  slackLog.length = 0;
+  const w1 = vercelWrites.length;
+  await answerRequest(press(id, 'USWAP', true), true, 'xoxb-test', new Set(['UOWNER']));
+  t('a second press changes nothing', [vercelWrites.length - w1, slackLog.filter((c) => c.method === 'chat.update').length > 0], [0, true]);
+}
+{
+  // a decline by the owner, on a request from someone else
+  slackLog.length = 0;
+  q = await asReq('nobody@gushwork.ai');
+  const id = reqId('nobody@gushwork.ai');
+  await answerRequest(press(id, 'UOWNER', false), false, 'xoxb-test', new Set(['UOWNER']));
+  t('the owner can always answer, and a decline grants nothing', [JSON.parse(kvData.get(`gw:accreq:${id}`)).status, decide(PAGE_PATH, { email: 'nobody@gushwork.ai' }, live())], ['declined', 'forbid']);
+  t('the decline tells them to ask the team', slackLog.some((c) => c.method === 'chat.postMessage' && c.body.channel === 'UNOBODY' && /ask the gtm team/.test(c.body.text)), true);
+}
+{
+  // an ordinary restricted page is unchanged: only the owner is told
+  seedRules();
+  rulesJson.access.routes.push({ path: '/admin/secret', access: 'admin', groups: [], people: [] }); invalidateRules();
+  slackLog.length = 0;
+  await asReq('priya@gushwork.ai', '/admin/secret');
+  t('a page with no lane tells only the owner, as before', slackLog.filter((c) => c.method === 'chat.postMessage').map((c) => c.body.channel), ['UOWNER']);
+}
 
 console.log(`${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

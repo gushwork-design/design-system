@@ -36,6 +36,18 @@ export const COPY = {
   declined: { title: 'Request not approved', text: 'The site owner didn’t approve access this time. If you still need this page, ask them directly.', glyph: 'lock' },
 };
 
+/* The same words for a page private to a staging lane: the team is who answers, so the page says so. */
+export function copyFor(lane) {
+  if (!lane) return COPY;
+  const team = `the ${lane} team`;
+  return {
+    ...COPY,
+    idle:     { ...COPY.idle, text: `This page is private to ${team}. Ask for access and they’ll get a message to approve it.` },
+    sent:     { ...COPY.sent, text: `${team.charAt(0).toUpperCase() + team.slice(1)} has been asked. You’ll get a Slack message once it’s decided, and this page opens by itself when the answer is yes.` },
+    declined: { ...COPY.declined, text: `${team.charAt(0).toUpperCase() + team.slice(1)} didn’t approve access this time. If you still need this page, ask them directly.` },
+  };
+}
+
 const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 /**
@@ -43,9 +55,10 @@ const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&':
  *   canRequest is false for an owners-only page. Where an earlier request stands is asked of the API once the page
  *   loads, so a reload does not offer the button again and the edge needs no store of its own.
  */
-export function restrictedPage({ email, path, canRequest }) {
+export function restrictedPage({ email, path, canRequest, lane }) {
   const st = canRequest ? 'idle' : 'owner';
-  const c = COPY[st];
+  const COPYL = copyFor(lane);
+  const c = COPYL[st];
   const title = titleFor(path);
   const asking = st === 'idle';
   const primary = asking
@@ -65,16 +78,16 @@ export function restrictedPage({ email, path, canRequest }) {
     `<div class="gd-auth__foot" id="foot">${primary}<button type="button" class="gd-btn gd-btn--outline" data-signout>Sign out</button></div>` +
     '<p class="gd-auth__note" id="note" hidden></p>' +
     '<a class="gd-btn gd-btn--link gd-btn--sm" href="/">Back to Gushwork Design</a>' +
-    '</div></div></div>' + script(path, st) + '</body></html>';
+    '</div></div></div>' + script(path, st, COPYL) + '</body></html>';
 }
 
 /* JSON that is safe inside an inline <script>: a path or a string containing </script> must not end the script. */
 const js = (x) => JSON.stringify(x).replace(/</g, '\\u003c').replace(/>/g, '\\u003e').replace(/&/g, '\\u0026');
 
 /* The page's behaviour. Request access posts, then polls for the answer; a yes reloads into the page itself. */
-function script(path, st) {
+function script(path, st, copy) {
   return '<script>(function(){' +
-    'var P=' + js(path) + ',C=' + js(COPY) + ',OWN=' + js(OWNER_LINK) + ',S=' + js(st) + ';' +
+    'var P=' + js(path) + ',C=' + js(copy) + ',OWN=' + js(OWNER_LINK) + ',S=' + js(st) + ';' +
     'var $=function(i){return document.getElementById(i)};' +
     'var btn=document.querySelector("[data-req]");' +
     'function show(k){var c=C[k];$("title").textContent=c.title;$("text").textContent=c.text;' +
