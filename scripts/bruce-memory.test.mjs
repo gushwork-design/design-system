@@ -166,4 +166,30 @@ ok('a missing permission to read it is named, and a known channel skips conversa
 ok('a bad person is refused before Slack is asked', (await M.readDM({ token: 'xoxb', user: 'x"; drop' }, dmF)).reason === 'input');
 const gateDm = async (cookie) => { let status = 0; await M.default({ method: 'GET', query: { dm: '1', user: 'U0PRIYA01' }, headers: { cookie } }, { status(s) { status = s; return this; }, json() {}, setHeader() {}, end() {} }); return status; };
 ok('the dm endpoint: signed out is 401, a teammate 403', await gateDm('') === 401 && await gateDm(await ck('sam@gushwork.ai')) === 403);
+// run or chat (8 Oct 2026): a pass-on is a conversation, a build is work
+const W = (text, want) => ok(`weight: "${text.slice(0, 40)}" is a ${want}`, M.weightOf(text) === want, M.weightOf(text));
+W('tell utsav i said hi', 'chat'); W('do you have a proof of sending him hi?', 'chat'); W('status of this?', 'chat'); W('and?', 'chat');
+W('what can you do', 'chat'); W('thanks', 'chat'); W('can I get access to the staging page', 'chat');
+W('Send me the brand colours and fonts', 'chat'); W('send me the logo, white, svg', 'chat'); W('which template should I use for a webinar', 'chat');
+W('purple elephants', 'chat');
+W('One-pager for sales, audience ops leads', 'run'); W('make me a landing page', 'run'); W('rework agent-card', 'run'); W('run the checks', 'run');
+W('the logo should be in original color, change the headline too', 'run'); W('can you make the logo purple and add a cat', 'run');
+W('x '.repeat(150), 'run');
+W('tell Utsav to change the date', 'chat');
+// the cap: runs and chats are counted apart, and chats have their own, bigger guard
+process.env.BRUCE_DAILY_CAP = '1'; process.env.BRUCE_DM_CHAT_CAP = '3';
+store = {}; const nowW = new Date('2026-10-08T10:00:00Z');
+let rr = await M.takeRun('U7', { f, now: nowW, bucket: 'runs' }); ok('a first run is allowed at a run cap of 1', rr.allowed && rr.bucket === 'runs' && rr.cap === 1);
+rr = await M.takeRun('U7', { f, now: nowW, bucket: 'runs' }); ok('a second run is refused', !rr.allowed && rr.cap === 1);
+for (let i = 0; i < 3; i++) rr = await M.takeRun('U7', { f, now: nowW, bucket: 'chats' });
+ok('three chats are fine after the run cap is spent', rr.allowed && rr.used === 3 && rr.bucket === 'chats' && rr.cap === 3);
+rr = await M.takeRun('U7', { f, now: nowW, bucket: 'chats' }); ok('a fourth chat hits the chat guard, not the run cap', !rr.allowed && rr.cap === 3 && rr.bucket === 'chats');
+ok('chats and runs live under different keys', Object.keys(store).some((k) => k.startsWith('gw:bruce:chats:')) && Object.keys(store).some((k) => k.startsWith('gw:bruce:runs:')));
+rr = await M.takeRun('UOWN', { f, now: nowW, uncapped: true, bucket: 'chats' }); ok('the owner is never refused, for chats either', rr.allowed);
+process.env.BRUCE_DAILY_CAP = '2';
+// old log rows: a "run" that was only a chat reads back as a chat
+store['gw:bruce:log'] = [JSON.stringify({ at: new Date().toISOString(), user: 'U1', name: 'A', role: 'teammate', kind: 'run', text: 'tell utsav i said hi', thread: 0, used: 1 }),
+  JSON.stringify({ at: new Date().toISOString(), user: 'U1', name: 'A', role: 'teammate', kind: 'run', text: 'make me a one-pager for sales', thread: 0, used: 1 })];
+const oldRows = (await M.readLog(f));
+ok('readLog returns old rows untouched (the mapping happens in the endpoint)', oldRows.length === 2 && oldRows.every((x) => x.kind === 'run'));
 console.log(`${pass} passed, ${fail} failed`); process.exit(fail ? 1 : 0);
