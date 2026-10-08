@@ -250,14 +250,14 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
     var sub = needs.length ? names.join(', ').replace(/, ([^,]*)$/, ' and $1') + (names.length === 1 ? ' has' : ' have') + ' something for you.' : loading ? 'Some of them have not answered yet.' : 'All ' + list.length + ' agents are healthy and nothing is waiting on you.';
     var html = '<div class="gd-status-banner" data-status="' + (needs.length ? 'degraded' : 'operational') + '"><span class="gd-status-icon" data-status="' + (needs.length ? 'degraded' : 'operational') + '">' + svg(needs.length ? 'warn' : 'check', 28) + '</span>' +
       '<div class="gd-status-banner__text"><h3 class="gd-status-banner__title">' + esc(title) + '</h3><p class="gd-status-banner__sub">' + esc(sub) + '</p></div></div>';
-    /* the team: the one new component on this page, the agent card (see the library's data-display doc) */
+    /* the team: the one new component on this page, the agent status card (see the library's data-display doc) */
     html += '<section class="ag-team" aria-label="The team"><div class="gd-card__titles" style="margin-bottom:var(--gd-gap)"><h3 class="gd-card__title">The team</h3><p class="gd-card__desc">' + esc(list.length + ' agents, ' + (S.data.agents.filter(function (a) { return a.lead; })[0] || {}).name + ' leads') + '</p></div><div class="gd-grid">' +
       list.map(function (s) {
         var n = s.needs.length;
-        return '<div class="gd-span-4"><a class="gd-agent-card" href="#' + esc(s.id) + '" data-tab="' + esc(s.id) + '"><span class="gd-agent-card__top"><span class="gd-avatar gd-avatar--team gd-avatar--lg" data-gd-avatar="' + esc(s.a.name) + '" role="img" aria-label="' + esc(s.a.name) + '"></span>' +
-          '<span class="gd-agent-card__who"><b>' + esc(s.a.name) + '</b><small>' + esc(s.a.role) + '</small></span>' + badge(TONE[s.state], stateLabel(s)) + '</span>' +
-          '<span class="gd-agent-card__now">' + esc(s.doing) + '</span>' +
-          '<span class="gd-agent-card__foot">' + (n ? badge('warn', plural(n, 'thing') + ' for you') : '<span>' + (s.known ? 'Nothing needed from you' : 'Waiting for data') + '</span>') + '</span></a></div>';
+        return '<div class="gd-span-4"><a class="gd-agent-status" href="#' + esc(s.id) + '" data-tab="' + esc(s.id) + '"><span class="gd-agent-status__top"><span class="gd-avatar gd-avatar--team gd-avatar--lg" data-gd-avatar="' + esc(s.a.name) + '" role="img" aria-label="' + esc(s.a.name) + '"></span>' +
+          '<span class="gd-agent-status__who"><b>' + esc(s.a.name) + '</b><small>' + esc(s.a.role) + '</small></span>' + badge(TONE[s.state], stateLabel(s)) + '</span>' +
+          '<span class="gd-agent-status__now">' + esc(s.doing) + '</span>' +
+          '<span class="gd-agent-status__foot">' + (n ? badge('warn', plural(n, 'thing') + ' for you') : '<span>' + (s.known ? 'Nothing needed from you' : 'Waiting for data') + '</span>') + '</span></a></div>';
       }).join('') + '</div></section>';
     html += needsCard(needs, true);
     html += '<p class="gd-card__desc">Each agent is recorded in git, with its memory. To add one, see <a class="gd-table__link" href="https://github.com/gushwork-design/design-system/blob/main/agents/README.md" target="_blank" rel="noopener noreferrer">agents/README</a>.</p>';
