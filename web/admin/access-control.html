@@ -735,8 +735,7 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
     var rail = '<div class="ac-ppl__sec">Whole section</div>' + railItem(all.path, esc(all.name), shortLevel(effOf(all.path)), tplSel === all.path) +
       '<div class="ac-ppl__sec">Find a template</div>' +
       '<div class="ac-ppl__new"><input class="ac-field" data-newtpl placeholder="Search templates" aria-label="Find a template to change"></div>' +
-      '<div class="ac-ppl__sec">Not open to everyone</div>' +
-      (shown.length ? shown.map(function (t) { return railItem(t.path, esc(t.name), shortLevel(effOf(t.path)), tplSel === t.path); }).join('') : '<p class="ac-ppl__empty">None yet.</p>') +
+      (shown.length ? '<div class="ac-ppl__sec">Not open to everyone</div>' + shown.map(function (t) { return railItem(t.path, esc(t.name), shortLevel(effOf(t.path)), tplSel === t.path); }).join('') : '') +
       (quiet ? '<p class="ac-ppl__empty">' + plural(quiet, 'template') + ' open to everyone at ' + esc(meta.domain) + ' not listed. Search to change one.</p>' : '');
     var card = el('<section class="ac-card"><div class="ac-card__hd"><div><h3>Templates</h3><p>Templates that are not open to everyone.</p></div></div>' +
       '<div class="ac-card__body"><div class="ac-ppl"><nav class="ac-ppl__rail" aria-label="Templates">' + rail + '</nav><div class="ac-ppl__main ac-ppl__main--rule" data-main></div></div></div></section>');
@@ -756,11 +755,10 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
     if (!rules.some(function (r) { return r.path === pageSel; })) pageSel = rules.length ? rules[0].path : '';
     var rail = '<div class="ac-ppl__sec">Find a page</div>' +
       '<div class="ac-ppl__new"><input class="ac-field" data-newpath placeholder="Search pages, or type a path" aria-label="Find a page to change"></div>' +
-      '<div class="ac-ppl__sec">Not open to everyone</div>' +
-      (rules.length ? rules.map(function (r) {
+      (rules.length ? '<div class="ac-ppl__sec">Not open to everyone</div>' + rules.map(function (r) {
         var i = r.path.lastIndexOf('/');
         return railItem(r.path, '<span class="ac-ppl__p"><span class="ac-path__d">' + esc(r.path.slice(0, i + 1)) + '</span><b>' + esc(r.path.slice(i + 1) || '/') + '</b></span>', shortLevel(r), pageSel === r.path);
-      }).join('') : '<p class="ac-ppl__empty">None yet.</p>') +
+      }).join('') : '') +
       (quiet ? '<p class="ac-ppl__empty">' + plural(quiet, 'other page rule') + ' open to everyone at ' + esc(meta.domain) + ' not listed. Search to change one.</p>' : '');
     var card = el('<section class="ac-card"><div class="ac-card__hd"><div><h3>Pages</h3><p>Pages that are not open to everyone.</p></div></div>' +
       '<div class="ac-card__body"><div class="ac-ppl"><nav class="ac-ppl__rail" aria-label="Pages">' + rail + '</nav><div class="ac-ppl__main ac-ppl__main--rule" data-main></div></div></div></section>');
