@@ -114,6 +114,15 @@
 .gd .gd-auth__who { display: inline-flex; max-width: 100%; align-items: center; padding: var(--gw-space-4) var(--gw-space-8); border-radius: var(--gw-radius-8); background: var(--gd-sunken-bg); color: var(--gd-text); font: var(--gw-text-body-12-med); overflow-wrap: anywhere; }
 .gd .gd-auth__foot { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: var(--gw-space-8); }
 
+/* --- access-denied-screen, request access (R66): the page they asked for next to who they are, an answer line, and the
+   states after pressing Request access. The badge is the same rounded square; it takes the check glyph once the
+   request is sent, in the good tone (a glyph, not small text). ----------------------------------------------------- */
+.gd .gd-auth__facts { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--gw-space-8); max-width: 100%; }
+.gd .gd-auth__card--denied .gd-empty--sent .gd-empty__badge { color: var(--gd-good); }
+.gd .gd-auth__note { margin: 0; min-height: 1lh; color: var(--gd-text-muted); font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); text-align: center; text-wrap: balance; }
+.gd .gd-auth__note--error { color: var(--gd-tone-bad-fg); }
+.gd .gd-auth__note[hidden] { display: none; }
+
 /* --- session-expired: a banner for a readable stale page, a modal when an action failed ---------- */
 .gd .gd-banner--session { align-items: center; }
 .gd .gd-modal--session .gd-modal__body { gap: var(--gw-space-8); }
