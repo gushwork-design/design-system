@@ -202,7 +202,7 @@ h1{font:var(--gw-text-h3);letter-spacing:var(--gw-text-h3-tracking);margin:var(-
 </header>
 
 <main class="page">
-  <h1>Meet the Drop family</h1>
+  <h1>Welcome to Drop’s place</h1>
   <div class="cols">
     <aside class="rail" id="rail" role="tablist" aria-orientation="vertical" aria-label="Bundles"></aside>
     <section class="main">
@@ -251,7 +251,8 @@ h1{font:var(--gw-text-h3);letter-spacing:var(--gw-text-h3-tracking);margin:var(-
       <div class="gd-field" id="fld-name"><label class="gd-field__label" for="f-name">Name</label><div class="gd-input"><input class="gd-input__el" id="f-name" maxlength="80" autocomplete="off" placeholder="Credit Checker"></div></div>
       <div class="gd-field" id="fld-does"><label class="gd-field__label" for="f-does">What it does</label><textarea class="gd-textarea" id="f-does" rows="3" maxlength="400" placeholder="Checks a new customer's credit before a quote is sent and flags risky accounts for the rep."></textarea></div>
       <div class="gd-field" id="fld-bundle"><span class="gd-field__label" id="f-bundle-l">Bundle</span>
-        <div class="gd-select" data-gd-select id="f-bundle"><button type="button" class="gd-input" aria-haspopup="listbox" aria-labelledby="f-bundle-l"><span class="gd-select__value">Not sure yet</span><svg class="gd-input__caret" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="gd-menu" role="listbox" hidden id="f-bundle-menu"></div><input type="hidden" id="f-bundle-v" value=""></div></div>
+        <div class="gd-select" data-gd-select id="f-bundle"><button type="button" class="gd-input" aria-haspopup="listbox" aria-labelledby="f-bundle-l"><span class="gd-select__value">Not sure yet</span><svg class="gd-input__caret" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="gd-menu" role="listbox" hidden id="f-bundle-menu"></div><input type="hidden" id="f-bundle-v" value=""></div>
+        <div class="gd-input" id="f-newbundle-w" hidden><input class="gd-input__el" id="f-newbundle" maxlength="60" autocomplete="off" placeholder="Name the new bundle" aria-label="New bundle name"></div></div>
       <div class="gd-field"><label class="gd-field__label" for="f-props">Props <span class="gd-field__opt">Optional</span></label><div class="gd-input"><input class="gd-input__el" id="f-props" maxlength="240" autocomplete="off" placeholder="Leave empty and ChatGPT chooses 2 to 4 that fit the role"></div><p class="gd-field__help">If you choose, give 2 to 4, separated by commas.</p></div>
       <div class="gd-field"><span class="gd-field__label" id="f-pose-l">Pose</span>
         <div class="gd-seg" role="radiogroup" aria-labelledby="f-pose-l" id="f-pose"><button type="button" class="gd-seg__item" role="radio" aria-checked="true" tabindex="0" data-value="standing">Standing</button><button type="button" class="gd-seg__item" role="radio" aria-checked="false" tabindex="-1" data-value="hovering">Hovering</button><button type="button" class="gd-seg__item" role="radio" aria-checked="false" tabindex="-1" data-value="seated">Seated</button><button type="button" class="gd-seg__item" role="radio" aria-checked="false" tabindex="-1" data-value="auto">Decide for me</button></div></div>
@@ -277,7 +278,7 @@ h1{font:var(--gw-text-h3);letter-spacing:var(--gw-text-h3-tracking);margin:var(-
 <script src="/exports/dashboard/dashboard.js"></script>
 <script>
 (function(){
-  var D=window.DROP_STUDIO, seed=D.agents, bundles=D.bundles;
+  var D=window.DROP_STUDIO, seed=D.agents, baseBundles=D.bundles, bundles=baseBundles.slice();
   var ALL='All bundles', API='/api/drop-studio';
   var BADGE={approved:['gd-badge--good','Approved'],review:['gd-badge--solid','To review'],requested:['gd-badge--warn','Requested']};
   var state={q:'',bundle:ALL,status:'all'};
@@ -315,6 +316,10 @@ h1{font:var(--gw-text-h3);letter-spacing:var(--gw-text-h3-tracking);margin:var(-
       out.push(a);
     });
     agents=out;
+    bundles=baseBundles.slice();
+    out.forEach(function(a){if(a.bundle&&bundles.indexOf(a.bundle)<0) bundles.push(a.bundle)});
+    if(state.bundle!==ALL&&bundles.indexOf(state.bundle)<0) state.bundle=ALL;
+    drawTabs();
   }
   var badge=function(a){
     if(a.quiet) return '';
@@ -330,9 +335,14 @@ h1{font:var(--gw-text-h3);letter-spacing:var(--gw-text-h3-tracking);margin:var(-
   function visible(){return agents.filter(function(a){return matches(a)})}
 
   /* the tab groups are drawn once; only counts and the disabled state change, so the library's selection stays intact */
-  var railItems=[ALL].concat(bundles);
-  $('rail').innerHTML=railItems.map(function(b,i){return '<button type="button" role="tab" aria-selected="'+(i===0)+'" tabindex="'+(i===0?0:-1)+'" data-value="'+esc(b)+'">'+esc(b)+'<em></em></button>'}).join('');
-  $('strip').innerHTML=railItems.map(function(b,i){return '<button type="button" role="tab" class="gd-tabs__tab" aria-selected="'+(i===0)+'" tabindex="'+(i===0?0:-1)+'" data-value="'+esc(b)+'">'+esc(b)+'<span class="gd-tabs__count"></span></button>'}).join('');
+  /* the tab groups are drawn from the bundle list; the list grows when a created agent names a bundle the page did not have */
+  var drawn='';
+  function drawTabs(){
+    var key=bundles.join('|'); if(key===drawn) return; drawn=key;
+    var items=[ALL].concat(bundles);
+    $('rail').innerHTML=items.map(function(b){var on=b===state.bundle; return '<button type="button" role="tab" aria-selected="'+on+'" tabindex="'+(on?0:-1)+'" data-value="'+esc(b)+'">'+esc(b)+'<em></em></button>'}).join('');
+    $('strip').innerHTML=items.map(function(b){var on=b===state.bundle; return '<button type="button" role="tab" class="gd-tabs__tab" aria-selected="'+on+'" tabindex="'+(on?0:-1)+'" data-value="'+esc(b)+'">'+esc(b)+'<span class="gd-tabs__count"></span></button>'}).join('');
+  }
 
   function counts(){
     var inBundle=agents.filter(function(a){return matches(a,true,false)});
@@ -481,14 +491,21 @@ h1{font:var(--gw-text-h3);letter-spacing:var(--gw-text-h3-tracking);margin:var(-
   cr.addEventListener('close',function(){busy=false; ctx={}});
 
   /* bundle select: options from the page's bundle list, plus "Not sure yet" */
-  var BSEL=[{v:'',t:'Not sure yet'}].concat(bundles.map(function(b){return{v:b,t:b}}));
-  $('f-bundle-menu').innerHTML=BSEL.map(function(o,i){return '<button type="button" class="gd-menu__item" role="option" data-value="'+esc(o.v)+'" aria-selected="'+(i===0)+'">'+esc(o.t)+'</button>'}).join('');
+  var NEW='__new__', BSEL=[];
+  function bundleMenu(){
+    BSEL=[{v:'',t:'Not sure yet'}].concat(bundles.map(function(b){return{v:b,t:b}}));
+    $('f-bundle-menu').innerHTML=BSEL.map(function(o){return '<button type="button" class="gd-menu__item" role="option" data-value="'+esc(o.v)+'" aria-selected="false">'+esc(o.t)+'</button>'}).join('')+
+      '<div class="gd-menu__sep" role="separator"></div><button type="button" class="gd-menu__item" role="option" data-value="'+NEW+'" aria-selected="false">Add a new bundle</button>';
+    $('f-bundle')._ready=false;      // the library adds its check mark to options once; let it see these
+  }
+  function showNewBundle(on){$('f-newbundle-w').hidden=!on; if(on) setTimeout(function(){$('f-newbundle').focus()},30); else $('f-newbundle').value=''}
   function setBundle(v){
     var o=BSEL.filter(function(x){return x.v===v})[0]||BSEL[0];
     $('f-bundle').querySelector('.gd-select__value').textContent=o.t; $('f-bundle-v').value=o.v;
-    [].forEach.call($('f-bundle-menu').children,function(m){m.setAttribute('aria-selected',m.getAttribute('data-value')===o.v)});
+    [].forEach.call($('f-bundle-menu').querySelectorAll('[role=option]'),function(m){m.setAttribute('aria-selected',m.getAttribute('data-value')===o.v)});
+    showNewBundle(false);
   }
-  $('f-bundle').addEventListener('gd:change',function(e){$('f-bundle-v').value=e.detail&&e.detail.value!=null?e.detail.value:$('f-bundle-v').value});
+  $('f-bundle').addEventListener('gd:change',function(e){var v=e.detail&&e.detail.value!=null?e.detail.value:$('f-bundle-v').value; $('f-bundle-v').value=v; showNewBundle(v===NEW)});
   function setPose(v){[].forEach.call($('f-pose').children,function(b){var on=b.getAttribute('data-value')===v; b.setAttribute('aria-checked',on); b.tabIndex=on?0:-1})}
   var poseNow=function(){var b=$('f-pose').querySelector('[aria-checked=true]'); return b?b.getAttribute('data-value'):'standing'};
 
@@ -497,7 +514,7 @@ h1{font:var(--gw-text-h3);letter-spacing:var(--gw-text-h3-tracking);margin:var(-
     $('cr-t').textContent=a?'New picture for '+a.name:'Create new agent';
     ['fld-name','fld-does','fld-bundle'].forEach(function(id){$(id).hidden=!!a});
     $('f-name').value=a?a.name:''; $('f-name').disabled=!!a;
-    $('f-does').value=a?a.blurb:''; setBundle(a?a.bundle:''); $('f-props').value=''; setPose('standing');
+    $('f-does').value=a?a.blurb:''; bundleMenu(); setBundle(a?a.bundle:''); $('f-props').value=''; setPose('standing');
     $('fld-notes').hidden=!a; $('f-notes').value='';
     steps(1); view('brief');
     foot(remote.configured?'Saved as a request in drop-reference. ChatGPT makes the picture on its next scheduled check.':'Not connected to drop-reference yet, so a request cannot be sent.','',btn('send',a?'Send request':'Start creating','gd-btn--primary'));
@@ -512,9 +529,15 @@ h1{font:var(--gw-text-h3);letter-spacing:var(--gw-text-h3-tracking);margin:var(-
     if(!does) return err('Say what the agent does.');
     if(props.length&&(props.length<2||props.length>4)) return err('Give 2 to 4 props, or none and ChatGPT will choose.');
     if(!rev){var id=slug(name); if(!id) return err('That name cannot make an agent id.'); if(byId(id)) return err('There is already an agent with that name.')}
+    var bundle=$('f-bundle-v').value;
+    if(bundle===NEW){
+      bundle=$('f-newbundle').value.trim().replace(/\s+/g,' ');
+      if(!bundle) return err('Name the new bundle, or pick one from the list.');
+      bundles.forEach(function(b){if(b.toLowerCase()===bundle.toLowerCase()) bundle=b});
+    }
     if(!remote.configured) return err('Drop Studio is not connected to drop-reference yet.');
     busyBtn(true,'Sending…');
-    api('create',{name:name,does:does,bundle:$('f-bundle-v').value,props:props,pose:poseNow(),notes:rev?$('f-notes').value.trim():'',agentId:rev?rev.id:undefined}).then(function(j){
+    api('create',{name:name,does:does,bundle:bundle,props:props,pose:poseNow(),notes:rev?$('f-notes').value.trim():'',agentId:rev?rev.id:undefined}).then(function(j){
       busy=false;
       showWork({id:rev?rev.id:slug(name),name:name,seed:!!rev,revise:!!rev,work:{issue:j.issue,url:j.url}});
       refresh();

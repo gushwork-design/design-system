@@ -67,3 +67,5 @@ exactly as in phase 1 and the create and request controls say it is not connecte
 The library's `select` does not open inside `gd-modal`: the modal's `scale` makes it the containing block of the
 select's fixed menu, which is then clipped and scrolls the dialog shut. The page overrides `scale` and `overflow` on its
 own dialog. This is worth fixing in the library.
+
+The Bundle select lists the page's bundles, `Not sure yet`, and below a separator `Add a new bundle`, which reveals a text field for the name. A name that matches an existing bundle (any case) uses that bundle. A created agent's bundle that the page did not have is added to the rail and the phone strip after the next refresh.
