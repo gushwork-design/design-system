@@ -653,6 +653,13 @@
       "reviewedOn": "2026-10-08",
       "fingerprint": "671fbdc256880e6d",
       "previewFingerprint": "bdc9275d09658927"
+    },
+    "cta-comparison-card": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-08",
+      "fingerprint": "4768d37234ee2111",
+      "previewFingerprint": "339c69a7173eb65d"
     }
   }
 }
