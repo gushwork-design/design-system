@@ -15,6 +15,7 @@
 
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { answerRequest } from './_access-request.js';
 
 const SITE = (process.env.SITE_BASE || 'https://design.gushwork.ai').replace(/\/$/, '');
 const VERB = { pass: 'Approved', rework: 'Sent back', reject: 'Rejected' };
@@ -112,6 +113,12 @@ export async function handleAction(payload, deps) {
   if (payload.type === 'block_actions') {
     const act = (payload.actions || [])[0] || {};
     if (act.action_id === 'gw_open') return undefined;
+    /* Request access (R66): Approve or Decline on a DM from the restricted page. The sender is already known to be the
+       owner (the allowlist above); the request itself is looked up by its id, never read from the button. */
+    if (act.action_id === 'gw_access_approve' || act.action_id === 'gw_access_decline') {
+      await answerRequest(payload, act.action_id === 'gw_access_approve', token);
+      return undefined;
+    }
     let v = {};
     try { v = JSON.parse(act.action_id === 'gw_menu' ? act.selected_option.value : act.value); } catch { return undefined; }
     if (!/^[a-z0-9-]{1,32}$/.test(v.s || '') || !/^[a-z0-9-]{1,80}$/.test(v.k || '') || !VERB[v.a]) return undefined;

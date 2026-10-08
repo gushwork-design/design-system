@@ -231,6 +231,10 @@
       "destination": "/api/gw?action=approvals"
     },
     {
+      "source": "/api/access-request",
+      "destination": "/api/gw?action=access-request"
+    },
+    {
       "source": "/api/tools",
       "destination": "/api/gw?action=tools"
     },

@@ -203,6 +203,72 @@ export async function loadRules() {
   return out;
 }
 
+/* ── writing ──────────────────────────────────────────────────────────
+   The one place that writes the rules. /api/access (an admin saving the Access Control page) and the
+   request-access approval in Slack both come through here, so the owners-are-admins rule and the cache
+   drop cannot be done in one path and forgotten in the other. Returns { ok: true, rules } or
+   { ok: false, status, error, detail? }; the caller decides how to say it. The token is in the request
+   and never in what comes back. */
+export async function saveRules(next) {
+  const id = storeId();
+  if (!id || !process.env.VERCEL_API_TOKEN) {
+    return { ok: false, status: 503, error: 'No Edge Config store is attached yet, so there is nowhere to save. ' +
+      'Attach a store to the project and set VERCEL_API_TOKEN.' };
+  }
+  /* An owner cannot be dropped from the admin list, because owners are admins by definition. */
+  const merged = { ...next, admins: [...new Set([...ownerEmails(), ...next.admins])] };
+  const team = process.env.VERCEL_TEAM_ID;
+  const url = 'https://api.vercel.com/v1/edge-config/' + id + '/items' + (team ? '?teamId=' + encodeURIComponent(team) : '');
+  let upstream;
+  try {
+    upstream = await fetch(url, {
+      method: 'PATCH',
+      headers: { Authorization: 'Bearer ' + process.env.VERCEL_API_TOKEN, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: [{ operation: 'upsert', key: 'access', value: merged }] })
+    });
+  } catch (e) {
+    return { ok: false, status: 502, error: 'Could not reach the Edge Config API.' };
+  }
+  if (!upstream.ok) {
+    const detail = await upstream.text().catch(() => '');
+    return { ok: false, status: 502, error: 'Edge Config refused the write (' + upstream.status + ').', detail: detail.slice(0, 400) };
+  }
+  /* The read-through cache would otherwise keep serving the old answer for up to its TTL. */
+  invalidate();
+  return { ok: true, rules: merged };
+}
+
+/* ── granting one person one page ─────────────────────────────────────
+   What Approve does on a request-access message. It opens THAT page for THAT person and nothing wider:
+   a rule is added for the exact path, copied from the rule the page falls under today, plus the person.
+   Editing the rule the page inherits would open every page under that prefix to them (a rule on /admin
+   covers every admin page), and replacing it with a bare list would drop the groups that can open the page
+   now. Owners-only pages cannot be granted this way (owners come from the environment, not the rules).
+   Pure: returns the next rules, { rules, already: true } when they can already open it, or null when it
+   cannot be granted. */
+export function grantPage(rules, pathname, email) {
+  const path = String(pathname || '').replace(/\/+$/, '') || '/';
+  const who = String(email || '').trim().toLowerCase();
+  if (!rules || !path.startsWith('/') || !who.includes('@')) return null;
+  const rule = ruleFor(path, rules);
+  if (!rule || rule.access === 'owner' || rule.access === 'public') return null;
+  const exact = rules.routes.find(r => r.path === path);
+  const base = exact || rule;
+  /* `admin` and `internal` carry no list of their own: the page becomes a people rule, and admins still pass
+     because the admin check comes before the rule in decide(). */
+  const keep = base.access === 'people';
+  const next = {
+    path,
+    access: 'people',
+    groups: keep ? [...base.groups] : [],
+    people: keep ? [...base.people] : []
+  };
+  if (next.people.includes(who)) return { rules, already: true };
+  next.people.push(who);
+  const routes = exact ? rules.routes.map(r => (r.path === path ? next : r)) : [...rules.routes, next];
+  return { rules: { ...rules, routes }, already: false };
+}
+
 /** Drop the cache so a write is visible on the very next read. */
 export function invalidate() { cache = { at: 0, rules: null }; }
 

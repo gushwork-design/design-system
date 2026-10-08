@@ -82,19 +82,25 @@ The mark is the real one: the paths of `assets/logo/gushwork-symbol-white.svg`, 
 
 ## Access denied screen
 
-**Purpose.** The visitor is signed in but this page is not for them. Use it instead of a blank page or a redirect loop. Do not use it for a signed-out visitor (that is Login screen) or for a record they cannot see inside an otherwise allowed page (that is the in-page no-access empty state, `.gd-empty--no-access`).
+**Purpose.** The visitor is signed in but this page is not for them. Use it instead of a blank page or a redirect loop, and let them ask for access from it. Do not use it for a signed-out visitor (that is Login screen) or for a record they cannot see inside an otherwise allowed page (that is the in-page no-access empty state, `.gd-empty--no-access`).
 
-**Anatomy.** The auth page and card with `.gd-auth__card--denied` holding a `.gd-empty.gd-empty--no-access`: a 48px badge that is a **rounded square** (radius 12, never a circle) with the lock glyph, an `h1` title (20 semibold, "Admin access required"), one line of text, a `.gd-auth__who` chip "Signed in as {email}", and the actions: primary link "Ask the owner" (a link to the owner's Slack profile or mail) and an outline "Sign out" button. The badge fill is `--gd-auth-field` with a 1px edge, because the empty state's usual fill equals the card in dark.
+**Anatomy.** The auth page and card with `.gd-auth__card--denied` holding a `.gd-empty.gd-empty--no-access`: a 48px badge that is a **rounded square** (radius 12, never a circle) with the lock glyph, an `h1` title ("Restricted page"), one line of text, a `.gd-auth__facts` row of two `.gd-auth__who` chips ("Signed in as {email}" and "Page: {name}"), and the actions: a primary "Request access" button and an outline "Sign out" button. A quiet `.gd-btn--link.gd-btn--sm` "Back to {app name}" sits under them, and an optional `.gd-auth__note` line (12 medium, muted; `--error` takes the bad tone) carries what went wrong. The badge fill is `--gd-auth-field` with a 1px edge, because the empty state's usual fill equals the card in dark.
 
-**Copy.** Name the requirement and the remedy: "Review is for admins. Ask the owner if you need access." Say which account is signed in so a wrong-account visitor can switch. No apology, no error code.
+**Copy.** Say it is restricted, never who it is restricted to ("Admins only" told a person nothing and was wrong for pages open to named people). The title is "Restricted page"; the line is "This page isn't open to everyone. Ask for access and the site owner will get a message to approve it." Name the page and the signed-in account so a wrong-account visitor can switch. No apology, no error code.
 
-**States.** Static. Buttons follow the shared states.
+**States.** Five, one card each; the copy is in `web/api/_restricted-page.js` so the page and its script cannot disagree.
+1. *Ask.* The default: lock badge, "Request access" primary.
+2. *Sent.* After pressing it: the badge takes the check glyph (`.gd-empty--sent`, the good tone), the title is "Request sent", the line says they will get a Slack message and the page opens by itself when the answer is yes. The button is gone. A reload shows the same state while the request is open.
+3. *Not approved.* Title "Request not approved", the line says to ask the owner directly, and the primary action becomes the "Ask the owner" link.
+4. *Unavailable.* If requests are not set up or fail, the note says "Requests aren't working right now." in the bad tone and the primary action becomes the "Ask the owner" link.
+5. *Owners only.* A page only the site owners can open (an owner cannot be granted through a page rule) offers no request: the line says "This page is for the site owners only." and there is no primary action.
+While the request is being sent the button is `aria-busy` (the shared busy state).
 
-**Accessibility.** The card is `role="alert"` so it is announced on load; focus starts on the primary action.
+**Accessibility.** The card is `role="alert"` so it is announced on load; focus starts on the primary action. The sent state is announced the same way because the title and line change inside the alert.
 
-**Behaviour.** `Sign out` is `data-gd-signout`; the app wires it (the set owns no auth endpoint).
+**Behaviour.** Request access posts to `/api/access-request`; the owner gets a Slack DM from Bruce with Approve and Decline, and Approve adds that person to a rule for that exact page only. The page polls for the answer every six seconds while it is visible and reloads on yes. One open request per person per page per day; ten requests an hour per person. `Sign out` is `data-gd-signout` in the set; the hub page wires it to its own sign-out. Pages inside an app without the endpoint leave the primary action as a link to the owner.
 
-**Provenance.** NEW: not in the hub as a page — reference Mobbin Linear / Notion / Vercel "no access" pages. Content mirrors the hub's admin-required empty state (web/internal/design-system.html:909). Pending library review.
+**Provenance.** NEW as a page, and CHANGED on 8 Oct 2026 (R66): the first version was reference Mobbin Linear / Notion / Vercel "no access" pages with an "Ask the owner" link and the title "Admin access required"; it now carries the request flow and five states. The hub serves it as its restricted page (the gate, `web/middleware.js`); it replaces a hand-written page that said "Admins only". Pending library review.
 
 ## Session expired
 

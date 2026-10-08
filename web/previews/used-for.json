@@ -10,7 +10,7 @@
  "ad-page/hero-primary": "Opens an ad landing page with the full-width headline, supporting text and main call to action",
  "ad-page/timeline": "Shows the steps from first call to going live on an ad landing page, four numbered steps in a row",
  "ad-page/video": "Presents a headline and short explanation beside a video on an ad landing page, to introduce the problem or product",
- "dashboard/access-denied-screen": "Fills the page when a signed-in person opens a page they are not allowed into, in place of a blank page or a redirect loop",
+ "dashboard/access-denied-screen": "Fills the page when a signed-in person opens a page they are not allowed into, in place of a blank page or a redirect loop, and lets them ask the owner for access from it",
  "dashboard/account-row": "Shows who is signed in at the foot of the side rail, with their role and one sign out action",
  "dashboard/action-button": "Triggers any action a person takes on a screen, such as save, export, add or apply, with an optional icon beside the label",
  "dashboard/activity-timeline": "Lists the events on a record in time order, grouped by date, on a detail page or drawer",

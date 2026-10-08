@@ -140,14 +140,7 @@ pending a ruling.
    `foundation/output-targets.md`).
 4. **Every interactive element has a keyboard ring; text fields show their edge instead.** Nothing that is
    not interactive gets a hover, a cursor or a ring (`foundation/states.md`).
-5. **Motion comes with `dashboard.css` and `dashboard.js`; add none of your own.** A dashboard built from them
-   already enters (the children of `.gd-page` rise in), presses (`.gd-btn`, icon buttons, tabs), opens its
-   menus, dialogs and drawers, slides its selected tab, pill and segment fills, and counts its stat-card and
-   metric-strip figures (`foundation/motion.md`, R61 and R65; `css/95-motion.css`, `js/90-motion.js`). Use the
-   component classes as documented; do not write `@keyframes`, a `transition: all`, or a global `:active`
-   scale. A control that should press in joins the named list in `95-motion.css`. (A page inside the hub
-   shell, such as Analytics or Access Control, gets the same from `web/shell.css` instead.)
-6. **A drawn affordance must work.** Every `data-gd-*` hook in your markup must have a handler in
+5. **A drawn affordance must work.** Every `data-gd-*` hook in your markup must have a handler in
    `dashboard.js`; every `<button>` must do something. Ship the affordance only if the function exists.
 6. **A quantity that cannot be read is removed, never zeroed.** A `0` that means "not loaded" reads as "we
    got no leads". Loading is a skeleton of the real layout; failure is per card, with a retry, never a
@@ -170,6 +163,14 @@ pending a ruling.
 12. **One underlined tab row per page (R59).** Never stack two. When a page's sections have sections of
     their own, the upper level is a rail submenu (the expandable `nav-group`) and only the lower level is
     `tabs-underline`. A single level of views stays tabs, in a flat rail.
+
+13. **Motion comes with `dashboard.css` and `dashboard.js`; add none of your own.** A dashboard built from them
+   already enters (the children of `.gd-page` rise in), presses (`.gd-btn`, icon buttons, tabs), opens its
+   menus, dialogs and drawers, slides its selected tab, pill and segment fills, and counts its stat-card and
+   metric-strip figures (`foundation/motion.md`, R61 and R65; `css/95-motion.css`, `js/90-motion.js`). Use the
+   component classes as documented; do not write `@keyframes`, a `transition: all`, or a global `:active`
+   scale. A control that should press in joins the named list in `95-motion.css`. (A page inside the hub
+   shell, such as Analytics or Access Control, gets the same from `web/shell.css` instead.)
 
 ## Heavy dashboards
 

@@ -12,8 +12,8 @@
    ========================================================================= */
 
 import { COOKIE, verify, readCookie, sessionSecret } from './_session.js';
-import { loadRules, normalise, ownerEmails, isOwner, isAdmin,
-         invalidate, allowedDomain, storeId, readStatus } from './_access.js';
+import { loadRules, normalise, ownerEmails, isOwner, isAdmin, saveRules,
+         allowedDomain, storeId, readStatus } from './_access.js';
 
 function json(res, status, body) {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -109,48 +109,10 @@ export default async function handler(req, res) {
     });
   }
 
-  /* An owner cannot be dropped from the admin list, because owners are admins
-     by definition — storing it otherwise would make the page disagree with
-     what the gate actually does. */
-  const merged = {
-    ...next,
-    admins: [...new Set([...ownerEmails(), ...next.admins])]
-  };
-
-  const id = storeId();
-  const team = process.env.VERCEL_TEAM_ID;
-  const url = 'https://api.vercel.com/v1/edge-config/' + id + '/items' +
-              (team ? '?teamId=' + encodeURIComponent(team) : '');
-
-  let upstream;
-  try {
-    upstream = await fetch(url, {
-      method: 'PATCH',
-      headers: {
-        Authorization: 'Bearer ' + process.env.VERCEL_API_TOKEN,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        items: [{ operation: 'upsert', key: 'access', value: merged }]
-      })
-    });
-  } catch (e) {
-    return json(res, 502, { error: 'Could not reach the Edge Config API.' });
+  const saved = await saveRules(next);
+  if (!saved.ok) {
+    return json(res, saved.status, saved.detail ? { error: saved.error, detail: saved.detail } : { error: saved.error });
   }
 
-  if (!upstream.ok) {
-    const detail = await upstream.text().catch(() => '');
-    /* The token is in the request, never in the response — surface the status
-       and the API's own message, nothing from the environment. */
-    return json(res, 502, {
-      error: 'Edge Config refused the write (' + upstream.status + ').',
-      detail: detail.slice(0, 400)
-    });
-  }
-
-  /* Read-through cache in _access.js would otherwise keep serving the old
-     answer for up to its TTL, including to the page that just saved. */
-  invalidate();
-
-  return json(res, 200, { ok: true, rules: merged });
+  return json(res, 200, { ok: true, rules: saved.rules });
 }

@@ -24,7 +24,8 @@
 
 import { COOKIE, verify, readCookie, sessionSecret, authModes, GATE_ENABLED }
   from './api/_session.js';
-import { loadRules, decide } from './api/_access.js';
+import { loadRules, decide, ruleFor } from './api/_access.js';
+import { restrictedPage } from './api/_restricted-page.js';
 import { recordVisit } from './api/_log-visit.js';
 
 export const config = {
@@ -59,22 +60,14 @@ export const config = {
    everywhere, and nothing reports it.
    ────────────────────────────────────────────────────────────────────────── */
 
-function forbidden(email) {
+/* Signed in, and this page is not theirs. The dashboard system's access-denied-screen, with Request access (R66): the
+   page is words, a button and a Slack DM to the owner, built in api/_restricted-page.js. An owners-only page offers no
+   request, because owners come from the environment and there is nothing an approval could grant. */
+function forbidden(session, url, rules) {
+  const rule = ruleFor(url.pathname, rules);
   return new Response(
-    '<!doctype html><meta charset="utf-8"><title>Not your tier</title>' +
-    '<link rel="stylesheet" href="/foundation/tokens.css">' +
-    '<body style="margin:0;min-height:100vh;display:grid;place-items:center;' +
-    'background:var(--gw-color-neutral-25);font-family:Inter,system-ui,sans-serif;' +
-    'color:var(--gw-color-neutral-900)">' +
-    '<div style="max-width:420px;padding:32px;background:#fff;border-radius:16px;' +
-    'border:1px solid var(--gw-color-neutral-100);text-align:center">' +
-    '<h1 style="margin:0 0 8px;font-size:22px">Admins only</h1>' +
-    '<p style="margin:0 0 24px;font-size:14px;color:var(--gw-color-neutral-600)">' +
-    'This page is limited to the design system admins. ' +
-    'You are signed in as ' + String(email || '').replace(/[<>&"]/g, '') + '.</p>' +
-    '<a href="/" style="font-size:14px;color:var(--gw-color-primary-500)">' +
-    'Back to Gushwork Design</a></div></body>',
-    { status: 403, headers: { 'Content-Type': 'text/html; charset=utf-8' } }
+    restrictedPage({ email: session.email, path: url.pathname, canRequest: !!rule && rule.access !== 'owner' }),
+    { status: 403, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store, private' } }
   );
 }
 
@@ -230,7 +223,7 @@ export default async function middleware(request, context) {
      old two-tier behaviour until someone changes something. */
   const rules = await loadRules();
   const verdict = decide(url.pathname, session, rules);
-  if (verdict === 'forbid') return forbidden(session.email);
+  if (verdict === 'forbid') return forbidden(session, url, rules);
   if (verdict === 'signin') return toSignIn(url);
 
   /* The owner's visit log (api/_log-visit.js): who opened which page. Pages only — not images,
