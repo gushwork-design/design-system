@@ -64,20 +64,6 @@
       "breaking": false,
       "doc": "components.md",
       "note": "The page strip under the sheet: numbered live thumbnails, add, duplicate, delete with a confirm, drag to reorder."
-    },
-    "tool-preview-frame": {
-      "version": "2.0.7",
-      "changed": "2026-10-08",
-      "breaking": false,
-      "doc": "components.md",
-      "note": "A page shown in a browser frame before it goes live: a bar with the address, then a sandboxed frame with the page's files written in."
-    },
-    "tool-checks-list": {
-      "version": "2.0.7",
-      "changed": "2026-10-08",
-      "breaking": false,
-      "doc": "components.md",
-      "note": "The checks a tool runs before it lets you go on: a state word, the problems as red rows, each rule as a ring that fills green."
     }
   },
   "review": {

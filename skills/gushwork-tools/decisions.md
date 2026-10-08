@@ -161,14 +161,16 @@ The email signature creator and the employee ID card generator were redesigned i
     people, change roles and general access; viewers open the same dialog read-only ("Who has
     access"); delete stays with the owner and hub admins (Utsav, 6 Oct 2026).
 
-48. **Publish: a team puts a page into its own staging lane, with no review (Utsav, 8 Oct 2026).** A lane
-    is a team's folder under `/internal/staging/<lane>/`; Access Control, Staging lanes, lists who may publish
-    into it (people and groups, owner-edited). The tool takes a folder or one HTML file, shows the page and the
-    server's checks before it goes live, and writes it to `main` through the hub's GitHub token; it falls back
-    to an open pull request when the token may not write to `main`. A second tab, From Claude, makes a personal
-    token (hashed in KV, 90 days, revocable) so a person's own Claude can post the same page with
-    `scripts/publish-staging.sh`. One gate for both doors: the lane list, read live on every call. Size:
-    light, one integration (GitHub). It lives at `/internal/staging/publish` until the owner moves it.
+48. **Staging lanes: a team publishes its own pages from the plugin, with no review and no page to open (Utsav, 8 Oct 2026).**
+    A lane is a team's folder under `/internal/staging/<lane>/`; Access Control, Staging lanes, lists who may publish
+    into it (people and groups, owner-edited). The person's own Claude does the work: `scripts/publish-staging.sh`
+    checks the page on the server and writes it to `main` through the hub's GitHub token, falling back to an open pull
+    request when the token may not write to `main`. A first version was a Publish tool with an upload panel, a live
+    preview and a token page; it was cut before it shipped, because the plugin already holds the files and `--check`
+    returns the same checks. What remains of it is one screen, `/internal/staging/connect`, the library's access-denied
+    screen with a code field: the first time, the script prints a code, the person signs in as themselves, types it
+    and presses Connect, and the script keeps a personal token for 90 days. The code is typed, not linked, so a link
+    carrying someone else's code cannot be approved by accident. One gate: the lane list, read live on every call.
 
 ## Left open (the owner's call)
 

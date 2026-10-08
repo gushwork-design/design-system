@@ -139,35 +139,3 @@ The **page strip** under the sheet when a file has pages, after Canva's (Mobbin)
 | Count | "2 / 4 · A4" in `body-12-med` `--t-label` |
 
 Source: `web/internal/certificate-creator/` (the page strip in app.jsx, "Page strip" in styles.css).
-
----
-
-## tool-preview-frame
-
-A page shown in a **browser frame** before it goes live, in the Publish tool. **New, pending review.**
-
-| Property | Value |
-|---|---|
-| Frame | the panel fill with the panel hairline, radius 16, shadow `s3`; no padding, so nothing inside has a radius to match |
-| Bar | 40 tall, 16 side padding, a hairline beneath; three 8 dots on `--t-field-hover`, then the address in `body-12-reg` `--t-label`, 8 after the dots, truncated |
-| Page | a sandboxed `<iframe>` (`allow-scripts`, no `allow-same-origin`) filling the rest, on white. The page's own look is never restyled. Its files are read in the browser and written into the frame (stylesheets and scripts inline, images and fonts as data), because a frame with no origin cannot load an address the tab made |
-| Empty | "Your page shows here before it goes live." in `body-16-med`, a hint beneath in `body-14-reg`, centred |
-
-Source: `web/internal/staging/publish/` (`buildPreview` in app.jsx, "Canvas" in styles.css).
-
----
-
-## tool-checks-list
-
-The **checks** a tool runs before it lets you go on. **New, pending review.**
-
-| Property | Value |
-|---|---|
-| Card | the panel fill and hairline, radius 16, 16 padding |
-| Head | "Checks" in Vert 14 semibold, and one state word in `body-12-med`: Waiting for files, Checking, All clear (`--t-ok`), Fix these (`--t-danger`) |
-| Problems | one row each, on `--t-danger-bg` with a `--t-danger` hairline, radius 8, 8 by 12 padding, an icon and the sentence in `body-12-med` `--t-danger` |
-| Rules | a 16 ring on `--t-field-hover`, then a 56 wide name in `body-12-med` `--t-heading`, then the rule in `body-12-reg` `--t-label`. When it holds the ring turns `--t-ok` with a tick |
-| Voice | sentence case; each problem says what to change |
-
-Source: `web/internal/staging/publish/` (`.pub-checks` in styles.css; the checks themselves are api/_staging-rules.js).
-

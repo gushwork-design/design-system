@@ -391,24 +391,30 @@ once the page moves, not before.
 A page built for the team to look at goes to `design.gushwork.ai/internal/staging/<lane>/<page>`, behind
 the sign-in, and the owner does not review it. A **lane** is a team's folder (`gtm`, `customer-success`);
 who may publish into which lane is set in Access Control, Staging lanes. Do not commit it to the repo and do
-not make a Vercel project for it.
+not make a Vercel project for it. When the person says "publish this to the gtm lane" (or "to staging"), this is the job.
 
-1. Start from the scaffold, which already passes the checks:
-   `bash scripts/new-staging-page.sh <lane> <page> "<Title>" "<one line>" "<their name>"`
+The scripts are in the plugin's `scripts/` folder: this skill's base directory (shown when it loads) is
+`.../skills/gushwork-web`, so they are at `../../scripts/`. Call them by that full path.
+
+1. **Start from the scaffold,** which already passes the checks:
+   `bash <scripts>/new-staging-page.sh <lane> <page> "<Title>" "<one line>" "<their name>"`
    makes `./<page>/` with an `index.html` and a `staging.json`. Build in that folder only, from the template
    (the fold set or the ad-page template), as for any page.
-2. `bash scripts/publish-staging.sh --check <lane> <page> ./<page>` runs the server's checks and publishes
-   nothing. Fix what it lists, then run it again without `--check`.
-3. It needs the person's personal token in `GW_PUBLISH_TOKEN` (or `~/.config/gushwork/publish-token`). If
-   there is none, say so and send them to `/internal/staging/publish`, tab From Claude, to make one. Never
-   write the token into a file in the page's folder, a commit or a message.
+2. **Check first:** `bash <scripts>/publish-staging.sh --check <lane> <page> ./<page>` runs the server's
+   checks and publishes nothing. Fix what it lists, then run it again without `--check`.
+3. **The first time on a computer, it connects itself.** There is no token to make or paste. The script prints a
+   code, opens `design.gushwork.ai/internal/staging/connect`, and waits. Tell the person plainly: "Approve in the
+   browser: sign in, type the code, press Connect." Run it with a long timeout (600000 ms) or in the background,
+   because it waits for them. After that it is remembered for 90 days and nothing is asked again. Never read,
+   print or copy the token file (`~/.config/gushwork/publish-token`) into a page, a commit or a message.
+   `bash <scripts>/publish-staging.sh logout` disconnects.
 4. The page is live a minute or two after it says Committed. Publishing the same name again replaces its files.
 
 What the checks refuse, so the page is built right the first time: a missing `index.html`, a `<base href>` that
 is not `/internal/staging/<lane>/<page>/`, no `noindex`, any file type that is not static, any file over 3 MB
 (3 MB in all), a key-shaped string, any reference to the hub's `/api/` or `/admin/` (the page runs on the hub's
-domain with the viewer's session), and anything that fails the type rule (link `/foundation/tokens.css`). A
-404 or 403 from the script means the person is not on that lane: ask the owner to add them, do not retry.
+domain with the viewer's session), and anything that fails the type rule (link `/foundation/tokens.css`). A 403
+"You cannot publish to the … lane" means the person is not on that lane: tell them to ask the owner, do not retry.
 
 ## Surface defaults
 

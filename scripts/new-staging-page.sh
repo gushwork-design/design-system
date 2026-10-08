@@ -3,11 +3,10 @@
 # Start a page for a team's staging lane. Makes ./<page>/ with a starter index.html that already
 # passes the Publish checks, and a staging.json naming it.
 #
-#   bash scripts/new-staging-page.sh <lane> <page> "<Title>" "<one-line blurb>" "<your name>"
-#   bash scripts/new-staging-page.sh gtm agent-store "Agent store" "The new Agent Store mock-up." "Swapnil"
+#   bash new-staging-page.sh <lane> <page> "<Title>" "<one-line blurb>" "<your name>"
+#   bash new-staging-page.sh gtm agent-store "Agent store" "The new Agent Store mock-up." "Swapnil"
 #
-# Then build the page in that folder and publish it with scripts/publish-staging.sh, or drop the
-# folder's files on the Publish tool at design.gushwork.ai/internal/staging/publish.
+# Then build the page in that folder and publish it with publish-staging.sh, which sits beside this script.
 set -euo pipefail
 
 LANE="${1:-}"; PAGE="${2:-}"; TITLE="${3:-}"; BLURB="${4:-}"; OWNER="${5:-}"
@@ -52,4 +51,4 @@ h1{{margin:0 0 var(--gw-space-12);font:var(--gw-text-h1);letter-spacing:var(--gw
 ''')
 PY
 echo "Created ./$PAGE/ (index.html, staging.json)."
-echo "Publish it:  bash scripts/publish-staging.sh $LANE $PAGE ./$PAGE"
+echo "Publish it:  bash \"$(dirname "$0")/publish-staging.sh\" $LANE $PAGE ./$PAGE"

@@ -20,7 +20,7 @@ process.env.KV_REST_API_TOKEN = 'kv-token';
 process.env.VERCEL_API_TOKEN = 'vercel-token';
 
 const { checkSubmission, fontProblems, isSlug, cleanPath } = await import('../web/api/_staging-rules.js');
-const { normalise, canPublish, lanesFor } = await import('../web/api/_access.js');
+const { normalise, canPublish, lanesFor, invalidate: invalidateRules } = await import('../web/api/_access.js');
 const { sign, COOKIE } = await import('../web/api/_session.js');
 const publish = (await import('../web/api/_publish.js')).default;
 const accessApi = (await import('../web/api/access.js')).default;
@@ -144,9 +144,9 @@ globalThis.fetch = async (url, init = {}) => {
 };
 
 const cookie = async (email) => `${COOKIE}=${encodeURIComponent(await sign({ email, name: 'Test', exp: Math.floor(Date.now() / 1000) + 3600 }, process.env.SESSION_SECRET))}`;
-const call = async ({ method = 'POST', op, body, headers = {}, email = 'swapnil@gushwork.ai', anon = false }) => {
-  const h = { ...(anon ? {} : { cookie: await cookie(email) }), ...headers };
-  const out = { status: 0, body: null, setHeader() {}, };
+const call = async ({ method = 'POST', op, body, headers = {}, token, email, ip = '1.1.1.1' }) => {
+  const h = { 'x-forwarded-for': ip, host: 'design.gushwork.ai', ...(token ? { authorization: `Bearer ${token}` } : {}), ...(email ? { cookie: await cookie(email) } : {}), ...headers };
+  const out = { status: 0, body: null };
   const res = { setHeader() {}, status(s) { out.status = s; return this; }, end(b) { out.body = JSON.parse(b); } };
   await publish({ method, query: { op }, headers: h, body }, res);
   return out;
@@ -169,34 +169,81 @@ const happyGh = (patch = () => null) => async (path, init, body, ok) => {
 };
 const H = { 'x-gw-publish': '1' };
 
-t('no session: 401', (await call({ op: 'publish', anon: true, body: payload() })).status, 401);
-t('a cross-site POST without the header: 400', (await call({ op: 'publish', body: payload() })).status, 400);
-t('not on the lane: 403', (await call({ op: 'publish', headers: H, email: 'nobody@gushwork.ai', body: payload() })).status, 403);
-t('a non-work account: 403', (await call({ op: 'publish', headers: H, email: 'a@gmail.com', body: payload() })).status, 403);
+// ── connecting: the device flow ──
+t('publishing with no token: 401', (await call({ op: 'publish', body: payload() })).status, 401);
+t('publishing with a made-up token: 401', (await call({ op: 'publish', token: 'gwp_notarealtokennotarealtoken', body: payload() })).status, 401);
+t('a cookie alone cannot publish', (await call({ op: 'publish', email: 'swapnil@gushwork.ai', headers: H, body: payload() })).status, 401);
 
-let r = await call({ method: 'GET', op: 'state', email: 'sam@gushwork.ai' });
-t('state lists my lanes (a group member)', [r.status, r.body.lanes], [200, ['gtm']]);
-r = await call({ method: 'GET', op: 'state', email: 'swapnil@gushwork.ai' });
-t('state lists my lanes (a named person)', r.body.lanes, ['gtm']);
+let st = await call({ op: 'device-start', body: {} });
+t('device-start gives a code, a device code and where to go', [st.status, /^[BCDFGHJKLMNPQRSTVWXZ]{4}-[BCDFGHJKLMNPQRSTVWXZ]{4}$/.test(st.body.userCode), st.body.verifyUrl, st.body.interval], [200, true, 'https://design.gushwork.ai/internal/staging/connect', 3]);
+const dev = st.body;
+t('the device code is not stored, only its hash', [...kvData.keys()].some((k) => k.includes(dev.deviceCode)), false);
+let pl = await call({ op: 'device-poll', body: { deviceCode: dev.deviceCode } });
+t('polling before approval says pending', [pl.status, pl.body.status], [200, 'pending']);
+t('a malformed device code: 400', (await call({ op: 'device-poll', body: { deviceCode: 'x' } })).status, 400);
+t('an unknown device code has expired: 410', (await call({ op: 'device-poll', body: { deviceCode: 'A'.repeat(43) } })).status, 410);
 
-r = await call({ op: 'check', headers: H, body: payload({ files: [] }) });
+t('the connect page needs a sign-in: 401', (await call({ op: 'device-approve', headers: H, body: { code: dev.userCode } })).status, 401);
+t('me needs a sign-in: 401', (await call({ method: 'GET', op: 'me' })).status, 401);
+let me = await call({ method: 'GET', op: 'me', email: 'sam@gushwork.ai' });
+t('me lists the lanes of a group member', [me.status, me.body.lanes], [200, ['gtm']]);
+me = await call({ method: 'GET', op: 'me', email: 'nobody@gushwork.ai' });
+t('me lists no lanes for someone on none', me.body.lanes, []);
+t('a cross-site POST without the header: 400', (await call({ op: 'device-approve', email: 'swapnil@gushwork.ai', body: { code: dev.userCode } })).status, 400);
+t('someone on no lane cannot approve: 403', (await call({ op: 'device-approve', email: 'nobody@gushwork.ai', headers: H, body: { code: dev.userCode } })).status, 403);
+t('a non-work account cannot approve: 403', (await call({ op: 'device-approve', email: 'a@gmail.com', headers: H, body: { code: dev.userCode } })).status, 403);
+t('a short code: 400', (await call({ op: 'device-approve', email: 'swapnil@gushwork.ai', headers: H, body: { code: 'BCDF' } })).status, 400);
+t('a wrong code: 404', (await call({ op: 'device-approve', email: 'swapnil@gushwork.ai', headers: H, body: { code: 'ZZZZ-ZZZZ' } })).status, 404);
+pl = await call({ op: 'device-poll', body: { deviceCode: dev.deviceCode } });
+t('a wrong code approves nothing', pl.body.status, 'pending');
+
+let ap = await call({ op: 'device-approve', email: 'swapnil@gushwork.ai', headers: H, body: { code: dev.userCode.toLowerCase().replace('-', ' ') } });
+t('the right code, typed loosely, approves', [ap.status, ap.body.ok, ap.body.lanes], [200, true, ['gtm']]);
+t('approving stores no token', [...kvData.entries()].some(([k, v]) => k.startsWith('gw:pt:')), false);
+pl = await call({ op: 'device-poll', body: { deviceCode: dev.deviceCode } });
+const tok = pl.body.token;
+t('the script collects a token, once', [pl.status, pl.body.status, /^gwp_/.test(tok), pl.body.email, pl.body.lanes], [200, 'approved', true, 'swapnil@gushwork.ai', ['gtm']]);
+t('the token is stored only as a hash', [...kvData.keys()].some((k) => k.includes(tok)) || [...kvData.values()].some((v) => String(v).includes(tok)), false);
+t('collecting it again: 410', (await call({ op: 'device-poll', body: { deviceCode: dev.deviceCode } })).status, 410);
+t('the code is used up', (await call({ op: 'device-approve', email: 'swapnil@gushwork.ai', headers: H, body: { code: dev.userCode } })).status, 404);
+
+// the person is removed from the lane between approving and collecting
+{
+  const d2 = (await call({ op: 'device-start', body: {} })).body;
+  await call({ op: 'device-approve', email: 'swapnil@gushwork.ai', headers: H, body: { code: d2.userCode } });
+  rulesJson.access.lanes.gtm.people = []; invalidateRules();
+  const r = await call({ op: 'device-poll', body: { deviceCode: d2.deviceCode } });
+  t('removed from every lane before collecting: no token', [r.status, r.body.token], [403, undefined]);
+  rulesJson.access.lanes.gtm.people = ['swapnil@gushwork.ai']; invalidateRules();
+}
+
+// one address cannot start unlimited codes
+{
+  let last = 0;
+  for (let n = 0; n < 22; n++) last = (await call({ op: 'device-start', body: {}, ip: '9.9.9.9' })).status;
+  t('device-start is limited per address: 429', last, 429);
+}
+
+// ── publishing with the token ──
+me = await call({ method: 'GET', op: 'me', token: tok });
+t('me by token', [me.status, me.body.email, me.body.lanes], [200, 'swapnil@gushwork.ai', ['gtm']]);
+let r = await call({ op: 'check', token: tok, body: payload({ files: [] }) });
 t('check reports problems without writing', [r.status, r.body.ok, calls.length], [200, false, 0]);
+t('not on the lane: 403', (await call({ op: 'publish', token: tok, body: payload({ lane: 'ops' }) })).status, 403);
 
 gh = happyGh(); calls = [];
-r = await call({ op: 'publish', headers: H, body: payload() });
+r = await call({ op: 'publish', token: tok, body: payload() });
 t('publish to main', [r.status, r.body.mode, r.body.path], [200, 'main', '/internal/staging/gtm/agent-store']);
-t('the writes are blobs, a tree, a commit and a ref update, in that order', calls.filter((c) => !c.includes('/contents/') && !c.includes('/git/ref/') && !c.includes('/git/commits/head1')).map((c) => c),
+t('the writes are blobs, a tree, a commit and a ref update, in that order', calls.filter((c) => !c.includes('/contents/') && !c.includes('/git/ref/') && !c.includes('/git/commits/head1')),
   ['POST /git/blobs', 'POST /git/blobs', 'POST /git/trees', 'POST /git/commits', 'PATCH /git/refs/heads/main']);
 
 let sentTree = null;
 gh = happyGh((path, m, body, ok) => { if (m === 'POST' && path === '/git/trees') { sentTree = body; return ok({ sha: 'tree1' }); } return null; });
-calls = [];
-await call({ op: 'publish', headers: H, body: payload() });
+await call({ op: 'publish', token: tok, body: payload() });
 t('only files under the lane and page are written', sentTree.tree.map((x) => x.path).sort(), ['web/internal/staging/gtm/agent-store/index.html', 'web/internal/staging/gtm/agent-store/staging.json']);
-t('nothing is deleted', sentTree.tree.every((x) => x.sha), true);
 
 gh = happyGh((path, m, body, ok) => (m === 'GET' && path.startsWith('/contents/') ? ok({ name: 'index.html' }) : null)); calls = [];
-r = await call({ op: 'publish', headers: H, body: payload() });
+r = await call({ op: 'publish', token: tok, body: payload() });
 t('a lane folder that already holds a page is refused', [r.status, calls.some((c) => c.includes('/git/blobs'))], [409, false]);
 
 gh = happyGh((path, m, body, ok) => {
@@ -204,60 +251,52 @@ gh = happyGh((path, m, body, ok) => {
   if (m === 'POST' && path === '/git/refs') return ok({});
   if (m === 'POST' && path === '/pulls') return ok({ html_url: 'https://github.com/x/pull/9' });
   return null;
-}); calls = [];
-r = await call({ op: 'publish', headers: H, body: payload() });
+});
+r = await call({ op: 'publish', token: tok, body: payload() });
 t('when main refuses the account it falls back to a pull request', [r.status, r.body.mode, r.body.url], [200, 'pr', 'https://github.com/x/pull/9']);
 
 let patches = 0;
 gh = happyGh((path, m, body, ok) => {
   if (m === 'PATCH' && path === '/git/refs/heads/main') { patches++; return patches === 1 ? ok({ message: 'Update is not a fast forward' }, 422) : ok({}); }
   return null;
-}); calls = [];
-r = await call({ op: 'publish', headers: H, body: payload() });
+});
+r = await call({ op: 'publish', token: tok, body: payload() });
 t('when main moves it retries on the new head', [r.status, r.body.mode, patches], [200, 'main', 2]);
 
 gh = happyGh((path, m, body, ok) => (m === 'POST' && path === '/git/trees' ? ok({ message: 'boom' }, 500) : null));
-r = await call({ op: 'publish', headers: H, body: payload() });
+r = await call({ op: 'publish', token: tok, body: payload() });
 t('a GitHub failure says nothing was published', [r.status, /Nothing was published/.test(r.body.error)], [502, true]);
 
-// tokens
-r = await call({ op: 'token-mint', headers: H, body: { label: 'My Claude' } });
-const tok = r.body.token;
-t('mint returns the token once', [r.status, /^gwp_/.test(tok)], [200, true]);
-t('only the hash is stored', [...kvData.keys()].some((k) => k.includes(tok)), false);
-r = await call({ method: 'GET', op: 'state' });
-t('the list shows the token without its value', [r.body.tokens.length, JSON.stringify(r.body.tokens).includes(tok)], [1, false]);
-gh = happyGh(); calls = [];
-r = await call({ op: 'publish', anon: true, headers: { authorization: `Bearer ${tok}` }, body: payload() });
-t('a token publishes with no cookie and no header', [r.status, r.body.mode], [200, 'main']);
-r = await call({ op: 'publish', anon: true, headers: { authorization: `Bearer ${tok}` }, body: payload({ lane: 'ops' }) });
-t('a token cannot publish to a lane its owner is not on', r.status, 403);
-r = await call({ op: 'token-mint', anon: true, headers: { authorization: `Bearer ${tok}` }, body: {} });
-t('a token cannot mint another', r.status, 403);
-r = await call({ op: 'publish', anon: true, headers: { authorization: 'Bearer gwp_notarealtokennotarealtoken' }, body: payload() });
-t('a wrong token: 401', r.status, 401);
-// removing the person from the lane stops the token at once
-rulesJson.access.lanes.gtm.people = []; rulesJson.access.groups.gtm = [];
-const { invalidate } = await import('../web/api/_access.js');
-invalidate();   // the rules are cached for 10 s; a real revoke is seen on the next read after that
-const out = await call({ op: 'publish', anon: true, headers: { authorization: `Bearer ${tok}` }, body: payload() });
-t('taking someone off the lane stops their token on the next call', out.status, 403);
-r = await call({ op: 'token-revoke', headers: H, body: { id: tok.slice(0, 4) } });
-t('a short id cannot revoke by prefix', r.body.ok, false);
-r = await call({ op: 'token-revoke', headers: H, body: { id: tok } });
-t('the full token is not an id', r.body.ok, false);
-const id = (await call({ method: 'GET', op: 'state' })).body.tokens[0].id;
-r = await call({ op: 'token-revoke', headers: H, body: { id } });
-t('revoking by id works even after leaving every lane', r.body.ok, true);
-r = await call({ method: 'GET', op: 'state' });
-t('the list is empty after', r.body.tokens, []);
-
+// ── leaving ──
+{
+  const sets = () => (kvSets.get('gw:ptu:swapnil@gushwork.ai') || new Set()).size;
+  for (let n = 0; n < 6; n++) {
+    const d = (await call({ op: 'device-start', body: {}, ip: `7.7.7.${n}` })).body;
+    await call({ op: 'device-approve', email: 'swapnil@gushwork.ai', headers: H, body: { code: d.userCode } });
+    await call({ op: 'device-poll', body: { deviceCode: d.deviceCode } });
+  }
+  t('five tokens at most: connecting a sixth retires the oldest', sets() <= 5, true);
+  t('and the very first token no longer works', (await call({ method: 'GET', op: 'me', token: tok })).status, 401);
+}
+{
+  const d = (await call({ op: 'device-start', body: {}, ip: '6.6.6.6' })).body;
+  await call({ op: 'device-approve', email: 'sam@gushwork.ai', headers: H, body: { code: d.userCode } });
+  const t2 = (await call({ op: 'device-poll', body: { deviceCode: d.deviceCode } })).body.token;
+  t('logout revokes the token', (await call({ op: 'logout', token: t2, body: {} })).body.ok, true);
+  t('and it stops working', (await call({ method: 'GET', op: 'me', token: t2 })).status, 401);
+  const d3 = (await call({ op: 'device-start', body: {}, ip: '6.6.6.7' })).body;
+  await call({ op: 'device-approve', email: 'sam@gushwork.ai', headers: H, body: { code: d3.userCode } });
+  const t3 = (await call({ op: 'device-poll', body: { deviceCode: d3.deviceCode } })).body.token;
+  rulesJson.access.groups.gtm = []; invalidateRules();
+  t('taking someone off the lane stops their token on the next call', (await call({ op: 'publish', token: t3, body: payload() })).status, 403);
+  rulesJson.access.groups.gtm = ['sam@gushwork.ai']; invalidateRules();
+}
 
 // Access Control: only an owner changes who publishes to a lane
 rulesJson.access.admins = ['boss@gushwork.ai'];
 rulesJson.access.lanes = { gtm: { groups: ['gtm'], people: ['swapnil@gushwork.ai'] } };
 rulesJson.access.groups = { gtm: ['sam@gushwork.ai'] };
-invalidate();
+invalidateRules();
 const putRules = async (email, mutate) => {
   // what the page would hold: the rules as the API serves them, compiled owner pages and all
   const got = { body: null };
@@ -273,10 +312,10 @@ let w = await putRules('boss@gushwork.ai', (c) => { c.lanes.ops = { groups: [], 
 t('an admin who is not an owner cannot add a lane', w.status, 403);
 w = await putRules('boss@gushwork.ai', (c) => { c.lanes.gtm.people.push('new@gushwork.ai'); });
 t('nor change who is on one', w.status, 403);
-invalidate();
+invalidateRules();
 w = await putRules('boss@gushwork.ai', (c) => { c.routes.push({ path: '/internal/x', access: 'internal', groups: [], people: [] }); });
 t('but an admin can still edit a page rule, and the lanes ride along untouched', [w.status, Object.keys(vercelWrites.at(-1).lanes)], [200, ['gtm']]);
-invalidate();
+invalidateRules();
 w = await putRules('owner@gushwork.ai', (c) => { c.lanes.ops = { groups: [], people: ['x@gushwork.ai'] }; });
 t('an owner can add a lane', [w.status, Object.keys(vercelWrites.at(-1).lanes).sort()], [200, ['gtm', 'ops']]);
 

@@ -20,7 +20,7 @@
 
 export const STAGING_ROOT = 'web/internal/staging';
 export const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
-export const RESERVED = new Set(['new', 'api', 'admin', 'assets', 'internal', 'template', 'templates', 'index', 'publish']);
+export const RESERVED = new Set(['new', 'api', 'admin', 'assets', 'internal', 'template', 'templates', 'index', 'publish', 'connect']);
 export const LIMITS = { file: 3 * 1024 * 1024, total: 3 * 1024 * 1024, files: 60, path: 120, title: 60, blurb: 220, owner: 40 };
 
 const OK_EXT = new Set(['.html', '.css', '.js', '.mjs', '.json', '.svg', '.png', '.jpg', '.jpeg', '.webp', '.gif',
