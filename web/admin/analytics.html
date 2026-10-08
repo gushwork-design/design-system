@@ -381,6 +381,15 @@ body[data-gw-page="analytics"] .sg__main > * { min-width: 0; }
 .br-lk > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--gw-text-body-14-reg); color: var(--ul-cell); }
 .br-lk > span:nth-child(2) { color: var(--ul-value); font-weight: 500; }
 @media (max-width: 760px) { .br-lk { grid-template-columns: minmax(0, 1fr) auto; } .br-lk > span:nth-child(1), .br-lk > span:nth-child(2) { grid-column: 1 / -1; } }
+.br-how { padding: 0 var(--gw-space-8) var(--gw-space-8); }
+.br-how summary { cursor: pointer; font: var(--gw-text-body-14-med); color: var(--ul-sub); list-style: none; display: inline-flex; align-items: center; gap: var(--gw-space-4); padding: var(--gw-space-4) 0; }
+.br-how summary::-webkit-details-marker { display: none; }
+.br-how summary::before { content: "\203A"; display: inline-block; transition: transform var(--gw-motion-fast); }
+.br-how[open] summary::before { transform: rotate(90deg); }
+.br-how summary:hover { color: var(--ul-value); }
+.br-how summary:focus-visible { outline: 2px solid var(--gw-color-primary-500); outline-offset: 2px; border-radius: var(--gw-radius-4); }
+.br-how ul { margin: var(--gw-space-8) 0 0; padding-left: var(--gw-space-20); display: flex; flex-direction: column; gap: var(--gw-space-8); font: var(--gw-text-body-14-reg); color: var(--ul-cell); }
+.br-how li b { color: var(--ul-value); font-weight: 500; }
 .br-note { padding: 0 var(--gw-space-8); font: var(--gw-text-body-14-reg); color: var(--ul-sub); }
 .br-empty { padding: var(--gw-space-24) var(--gw-space-8); font: var(--gw-text-body-14-reg); color: var(--ul-sub); }
 /* the drawer, in the shape of the Design System review drawer (8 Oct 2026): a scrim, a panel pinned right with a hairline and a soft
@@ -917,6 +926,12 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
       <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="br-h-talk">
         <div class="ul-sh"><div class="ul-sh__t"><h2 id="br-h-talk">How they talk to him</h2><span class="ul-sh__q" id="br-q-talk"></span></div></div>
         <div class="ul-metrics br-m4" id="br-talk"></div>
+      </section>
+
+      <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="br-h-cost">
+        <div class="ul-sh"><div class="ul-sh__t"><h2 id="br-h-cost">What it costs</h2><span class="ul-sh__q" id="br-q-cost">estimated, not measured</span></div></div>
+        <div class="ul-metrics br-m4" id="br-cost"></div>
+        <details class="br-how"><summary>How the estimate works</summary><div id="br-how"></div></details>
       </section>
 
       <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="br-h-look">
@@ -2499,7 +2514,12 @@ window.__anRefilter = {};
   function clip(t, n) { t = String(t || ''); return t.length > n ? t.slice(0, n - 1) + '…' : t; }
   var KIND = { run: 'Run', capped: 'Capped', 'to-alfred': 'To Alfred', failed: 'Failed', sent: 'Sent' };
   var TOPIC = { 'pass-on': 'Pass on to Utsav', status: 'Status check', access: 'Access', brand: 'Brand files', build: 'Build a page', template: 'Templates and tools', hub: 'Hub and system', about: 'About Bruce', other: 'No clear lane' };
-  var S = { status: 'loading', rows: [], rowsAll: [], period: '30', busy: false, fetchedAt: 0, owner: '', cap: 3, topic: '', convs: [], dm: {}, seq: 0, openUser: '', tab: 'chat', order: [], i: -1, wide: false };
+  /* What a Bruce session costs, ESTIMATED. Nothing here is measured: run records carry no token counts and the hub cannot read the plan's
+     usage card. The first figure is measured from the repo files (about 4 characters a token); the other two are assumptions to tune. */
+  var TOK = { start: 29000, chat: 4000, run: 90000 };
+  function tokensOf(r) { return r.kind === 'run' ? TOK.start + TOK.run : r.kind === 'chat' ? TOK.start + TOK.chat : 0; }   /* capped, failed and passed-to-Alfred start no Bruce session */
+  function tok(n) { return n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1e3 ? Math.round(n / 1e3) + 'k' : String(Math.round(n)); }
+  var S = { status: 'loading', rows: [], rowsAll: [], period: '30', busy: false, fetchedAt: 0, owner: '', cap: 3, topic: '', convs: [], dm: {}, seq: 0, openUser: '', tab: 'chat', order: [], i: -1, wide: false, usage: null };
 
   function parse(raw) {
     var out = [];
@@ -2585,6 +2605,27 @@ window.__anRefilter = {};
       metric('Asks per person', convs.length ? (asks.length / convs.length).toFixed(1) : '—', 'more than one means it is being reused') +
       metric('Came back', pct(back, convs.length), 'people who asked on more than one day');
 
+    /* what it costs: an estimate, per the TOK constants above */
+    var u = S.usage, resetAt = u && u.weekly && Date.parse(u.weekly.resetsAt) ? Date.parse(u.weekly.resetsAt) : 0;
+    var weekFrom = resetAt ? resetAt - 7 * DAY : Date.now() - 7 * DAY;
+    var periodTok = asks.reduce(function (n, r) { return n + tokensOf(r); }, 0);
+    var weekTok = S.rows.filter(function (r) { return isAsk(r) && r.at.getTime() >= weekFrom; }).reduce(function (n, r) { return n + tokensOf(r); }, 0);
+    var started = asks.filter(function (r) { return tokensOf(r) > 0; }).length;
+    var snapAge = u && Date.parse(u.at) ? Date.now() - Date.parse(u.at) : 0;
+    $('br-q-cost').textContent = 'estimated, not measured';
+    $('br-cost').innerHTML =
+      metric('Tokens, this period', started ? '≈ ' + tok(periodTok) : '—', started ? 'about ' + tok(periodTok / started) + ' for each of ' + plural(started, 'session') + ' he started' : 'no sessions yet') +
+      metric('Tokens, this week', '≈ ' + tok(weekTok), resetAt ? 'since the weekly limit reset on ' + new Date(weekFrom).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }) : 'the last 7 days') +
+      metric('Your weekly limit', u && u.weekly ? u.weekly.percentUsed + '% used' : '—', u && u.weekly ? 'everything on your account, as of ' + fmtWhen(new Date(u.at)) + (snapAge > 2 * DAY ? ' (' + Math.round(snapAge / DAY) + ' days old)' : '') + '. Resets in ' + Math.max(0, Math.round((resetAt - Date.now()) / DAY * 10) / 10) + ' days' : 'no snapshot found') +
+      metric('Bruce’s share of it', 'Not known', 'the plan reports a percentage of a limit it does not publish in tokens, so a share would be a guess');
+    $('br-how').innerHTML = '<ul>' +
+      '<li><b>' + tok(TOK.start) + ' tokens to start, measured.</b> Before he does anything, every DM makes him read his instructions (4.5k), CONTRIBUTING.md (5.1k), DECISIONS.md from R45 on (18.1k) and voice.md (1.3k). Sizes are taken from the repo files at about 4 characters a token. This is most of what a chat costs.</li>' +
+      '<li><b>+' + tok(TOK.chat) + ' for a chat, assumed.</b> Reading the thread, one reply, a memory note.</li>' +
+      '<li><b>+' + tok(TOK.run) + ' for a run, assumed.</b> A skill, a template, the page itself, a screenshot. Builds vary a lot; change TOK in this page to match what you see.</li>' +
+      '<li><b>Nothing</b> for capped, failed and passed-to-Alfred asks: they start no Bruce session.</li>' +
+      '<li><b>Not a bill.</b> Re-reads of the same context are cached and weigh less on a plan. Use it to compare weeks, and chats against runs.</li>' +
+      '<li><b>Your weekly limit</b> comes from a dated snapshot of the plan’s usage card (<code>admin/bruce-usage.json</code>), because the hub cannot read it live. Refresh the file to update it.</li></ul>';
+
     /* worth a look */
     var gaps = asks.filter(function (r) { return r.topic === 'other' || r.kind === 'failed' || r.kind === 'capped'; }).sort(function (a, b) { return b.at - a.at; }).slice(0, 8);
     $('br-q-look').textContent = gaps.length ? plural(gaps.length, 'ask') + ', newest first' : '';
@@ -2644,6 +2685,7 @@ window.__anRefilter = {};
     return '<section class="br-sec br-sec--det"><h3>Details</h3><div class="br-dl">' +
       dRow('First asked', esc(fmtWhen(first))) + dRow('Last asked', esc(fmtWhen(c.last)) + ' <span>(' + esc(ago(Date.now() - c.last.getTime())) + ')</span>') +
       dRow('Asks', esc(plural(asks.length, 'ask')) + ' <span>(' + runs + ' run' + (runs === 1 ? '' : 's') + ', ' + chats + ' chat' + (chats === 1 ? '' : 's') + ')</span>') +
+      dRow('Tokens (est.)', '\u2248 ' + esc(tok(asks.reduce(function (n, r) { return n + tokensOf(r); }, 0)))) +
       dRow('Role', c.role === 'owner' ? 'Owner' : 'Teammate') + '<div class="br-d br-d--text"><span>Topics</span><div class="br-tags">' + tags + '</div></div></div></section>';
   }
   function cur() { var u = S.openUser; return { c: S.convs.filter(function (x) { return x.user === u; })[0] || { user: u, name: (S.rowsAll.filter(function (r) { return r.user === u; })[0] || {}).name || u, role: 'teammate', last: new Date(), asks: [], topics: {} }, all: personRows(u) }; }
@@ -2765,6 +2807,7 @@ window.__anRefilter = {};
     updated();
   }
   function updated() { $('br-updated').textContent = S.fetchedAt ? 'Updated ' + ago(Date.now() - S.fetchedAt) : ''; }
+  function loadUsage() { return fetch('/admin/bruce-usage.json', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { S.usage = j && j.weekly ? j : null; }).catch(function () { S.usage = null; }); }
   function load() {
     if (S.busy) return; S.busy = true; S.dm = {}; $('br-refresh').setAttribute('aria-busy', 'true');
     fetch(API, { credentials: 'same-origin', cache: 'no-store' }).then(function (r) {
@@ -2778,7 +2821,7 @@ window.__anRefilter = {};
       S.owner = String(j.owner || ''); S.cap = Number(j.cap) || 3;
       S.rowsAll = parse(j.rows || []); S.rows = hideMe(S.rowsAll); S.fetchedAt = Date.now();
       S.status = S.rowsAll.length ? 'ready' : 'empty';
-    }).catch(function () { S.status = 'error'; }).then(function () { S.busy = false; $('br-refresh').removeAttribute('aria-busy'); render(); });
+    }).catch(function () { S.status = 'error'; }).then(loadUsage).then(function () { S.busy = false; $('br-refresh').removeAttribute('aria-busy'); render(); });
   }
   $('br-refresh').innerHTML = icon('arrow-clockwise');
   ROOT.querySelectorAll('.ul-tab[data-period]').forEach(function (b) { b.addEventListener('click', function () { S.period = b.getAttribute('data-period'); render(); }); });
