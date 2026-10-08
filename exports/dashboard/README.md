@@ -56,6 +56,7 @@ Fonts (Vert Grotesk Display, Inter) and icons come from the plugin, not from thi
 | [`templates.md`](templates.md) | analytics-overview-template: a whole verified page to copy |
 | [`reports.md`](reports.md) | report-frame, report-source-line, definition-tile, growth-report-template: a report is one scrolling page with no rail |
 | [`notice.md`](notice.md) | build-notice, and the build stamp every dashboard carries |
+| [`tasks.md`](tasks.md) | assignee-avatar, priority-bars, run-status-chip, board-lane, task-card, task-list, property-row, list-picker, date-picker, filter-popover, task-timeline, inbox-triage, quoted-message, assistant-launcher, bottom-bar, floating-add-button, assistant-panel, tag-chip, assistant-composer, tag-picker, assistant-plan-card, removable-view |
 | [`patterns.md`](patterns.md) | How the screens are put together: analytics overview, list with filters, explorer, log, monitoring, settings, detail, customisable home, and what each does while loading, empty, partly failed, stale or off limits |
 
 ## Rules that hold everywhere

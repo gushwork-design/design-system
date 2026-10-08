@@ -49,6 +49,36 @@
       "breaking": false,
       "doc": "charts.md"
     },
+    "assignee-avatar": {
+      "version": "2.0.8",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "tasks.md"
+    },
+    "assistant-composer": {
+      "version": "2.0.8",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "tasks.md"
+    },
+    "assistant-launcher": {
+      "version": "2.0.8",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "tasks.md"
+    },
+    "assistant-panel": {
+      "version": "2.0.8",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "tasks.md"
+    },
+    "assistant-plan-card": {
+      "version": "2.0.8",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "tasks.md"
+    },
     "avatar": {
       "version": "2.0.0",
       "changed": "2026-10-03",
@@ -78,6 +108,18 @@
       "changed": "2026-10-05",
       "breaking": false,
       "doc": "feedback.md"
+    },
+    "board-lane": {
+      "version": "2.0.8",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "tasks.md"
+    },
+    "bottom-bar": {
+      "version": "2.0.8",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "tasks.md"
     },
     "breadcrumbs": {
       "version": "2.0.0",
@@ -176,6 +218,12 @@
       "breaking": false,
       "doc": "tables.md"
     },
+    "date-picker": {
+      "version": "2.0.8",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "tasks.md"
+    },
     "date-range-picker": {
       "version": "2.0.0",
       "changed": "2026-10-03",
@@ -248,6 +296,18 @@
       "breaking": false,
       "doc": "filtering.md"
     },
+    "filter-popover": {
+      "version": "2.0.8",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "tasks.md"
+    },
+    "floating-add-button": {
+      "version": "2.0.8",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "tasks.md"
+    },
     "form-field": {
       "version": "2.0.0",
       "changed": "2026-10-03",
@@ -302,6 +362,12 @@
       "breaking": false,
       "doc": "actions.md"
     },
+    "inbox-triage": {
+      "version": "2.0.8",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "tasks.md"
+    },
     "incident-row": {
       "version": "2.0.1",
       "changed": "2026-10-05",
@@ -343,6 +409,12 @@
       "changed": "2026-10-03",
       "breaking": false,
       "doc": "charts.md"
+    },
+    "list-picker": {
+      "version": "2.0.8",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "tasks.md"
     },
     "log-viewer": {
       "version": "2.0.1",
@@ -422,11 +494,23 @@
       "breaking": false,
       "doc": "overlays.md"
     },
+    "priority-bars": {
+      "version": "2.0.8",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "tasks.md"
+    },
     "progress-bar": {
       "version": "2.0.0",
       "changed": "2026-10-03",
       "breaking": false,
       "doc": "data-display.md"
+    },
+    "property-row": {
+      "version": "2.0.8",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "tasks.md"
     },
     "query-builder": {
       "version": "2.0.1",
@@ -434,11 +518,23 @@
       "breaking": false,
       "doc": "inputs.md"
     },
+    "quoted-message": {
+      "version": "2.0.8",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "tasks.md"
+    },
     "radio": {
       "version": "2.0.0",
       "changed": "2026-10-03",
       "breaking": false,
       "doc": "inputs.md"
+    },
+    "removable-view": {
+      "version": "2.0.8",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "tasks.md"
     },
     "report-frame": {
       "version": "2.0.3",
@@ -469,6 +565,12 @@
       "changed": "2026-10-05",
       "breaking": false,
       "doc": "tables.md"
+    },
+    "run-status-chip": {
+      "version": "2.0.8",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "tasks.md"
     },
     "saved-views": {
       "version": "2.0.1",
@@ -625,6 +727,36 @@
       "changed": "2026-10-03",
       "breaking": false,
       "doc": "data-display.md"
+    },
+    "tag-chip": {
+      "version": "2.0.8",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "tasks.md"
+    },
+    "tag-picker": {
+      "version": "2.0.8",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "tasks.md"
+    },
+    "task-card": {
+      "version": "2.0.8",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "tasks.md"
+    },
+    "task-list": {
+      "version": "2.0.8",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "tasks.md"
+    },
+    "task-timeline": {
+      "version": "2.0.8",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "tasks.md"
     },
     "text-input": {
       "version": "2.0.0",

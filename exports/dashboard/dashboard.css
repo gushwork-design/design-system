@@ -2237,6 +2237,516 @@ a.gd-hbar__row:hover, a.gd-hbar__row.is-hover { background: var(--gd-hover-bg); 
   .gd .gd-report :is(.gd-card, .gd-chart, .gd-stat-card, .gd-banner) { break-inside: avoid; }
 }
 
+/* ==== 57-tasks.css ==== */
+/* ============================================================================
+   Gushwork dashboard — 57 tasks (the task board's pieces)
+
+   PROVENANCE. Every component here is NEW: not in the hub, built for the task board (web/internal/staging/tasks)
+   and pending library review. Reference: the approved task-board wireframes and the Mobbin screens listed in
+   exports/dashboard/tasks.md (Asana board, Linear board, Linear inbox, Linear task, Qatalog task, Todoist upcoming,
+   Attio grouped list). Docs: exports/dashboard/tasks.md. Previews: web/previews/dashboard/<key>.frag.
+
+   Tokens and --gd-* aliases only; no value is introduced. No @keyframes and no transition of its own beyond
+   --gw-motion-fast colour changes; the library's 95-motion.css press and rise rules apply to .gd-btn and friends.
+   Keyboard focus is the global :focus-visible ring. Markup shapes are written above each block.
+   ============================================================================ */
+
+/* ---- shared reset for the bare buttons these pieces use ------------------------------------------------------ */
+.gd :is(.gd-taskcard__open, .gd-tasklist__open, .gd-picker__row, .gd-prop, .gd-av--btn, .gd-launch__main, .gd-launch__status,
+        .gd-bottomnav__item, .gd-lane__add, .gd-gantt__bar, .gd-gantt__chip, .gd-datepick__day, .gd-datepick__field,
+        .gd-datepick__quick, .gd-filterpop__field, .gd-filterpop__value, .gd-mention__row, .gd-inbox__row, .gd-run--btn,
+        .gd-tagchip__x, .gd-ask__tag, .gd-composer__tool, .gd-tasklist__group-head, .gd-tasklist__check, .gd-gantt__name) {
+  font: inherit; color: inherit; text-align: left; background: none; border: 0; padding: 0; margin: 0; cursor: pointer;
+}
+
+/* ============================================================================
+   NEW: person and agent avatar for assignees. Pending library review.
+   Anatomy: span.gd-av[.gd-av--sm|--lg] with initials. People are circles; agents are rounded squares
+   (.gd-av--agent) in two weights: .gd-av--ink (Bruce, ink fill) and .gd-av--outline (Alfred, outlined).
+   .gd-av--ghost is an unassigned slot (dashed edge). A button form is .gd-av.gd-av--btn.
+   .gd-av-stack overlaps avatars with a ring in the surface colour; .gd-av-stack__item wraps a button.
+   States: rest, hover (button form), pressed (aria-pressed: ink edge), focus ring.
+   Reference: wireframe sections 1 and 10 (circles for people, rounded squares for agents).
+   ============================================================================ */
+.gd .gd-av {
+  --gd-av-size: 24px;
+  flex: none; display: inline-grid; place-items: center; box-sizing: border-box; width: var(--gd-av-size); height: var(--gd-av-size);
+  border-radius: var(--gw-radius-full); background: var(--gd-selected-bg); color: var(--gd-text);
+  font: var(--gw-text-body-10-sem); letter-spacing: var(--gw-text-body-10-sem-tracking); text-transform: uppercase; line-height: 1;
+  box-shadow: inset 0 0 0 1px var(--gd-border-strong);
+}
+.gd .gd-av--sm { --gd-av-size: 20px; }
+.gd .gd-av--lg { --gd-av-size: 32px; font: var(--gw-text-body-12-sem); letter-spacing: var(--gw-text-body-12-sem-tracking); }
+.gd .gd-av--agent { border-radius: var(--gw-radius-8); }
+.gd .gd-av--agent.gd-av--sm { border-radius: var(--gw-radius-4); }
+.gd .gd-av--ink { background: var(--gd-ink); color: var(--gd-ink-fg); box-shadow: none; }
+.gd .gd-av--outline { background: var(--gd-card-bg); color: var(--gd-text); box-shadow: inset 0 0 0 1px var(--gd-text); }
+.gd .gd-av--ghost { background: none; color: var(--gd-text-muted); box-shadow: none; border: 1px dashed var(--gd-border-strong); }
+.gd .gd-av--btn { cursor: pointer; transition: background var(--gw-motion-fast), box-shadow var(--gw-motion-fast); }
+.gd .gd-av--btn:hover { box-shadow: inset 0 0 0 1px var(--gd-text); }
+.gd .gd-av--btn[aria-pressed="true"] { box-shadow: inset 0 0 0 2px var(--gd-text); }
+.gd .gd-av--ink.gd-av--btn:hover, .gd .gd-av--ink.gd-av--btn[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--gd-panel-bg), 0 0 0 3px var(--gd-text); }
+.gd .gd-av-stack { display: inline-flex; align-items: center; }
+.gd .gd-av-stack > * + * { margin-left: calc(var(--gw-space-4) * -1); }
+.gd .gd-av-stack > * { box-shadow: 0 0 0 2px var(--gd-panel-bg); position: relative; }
+.gd .gd-av-stack > .gd-av:not(.gd-av--ink):not(.gd-av--outline) { box-shadow: 0 0 0 2px var(--gd-panel-bg), inset 0 0 0 1px var(--gd-border-strong); }
+
+/* ============================================================================
+   NEW: priority bars. Pending library review.
+   Anatomy: span.gd-prio[data-level="0|1|2|3"] > i i i, role="img" with an aria-label. Level 3 is High,
+   2 Medium, 1 Low, 0 none (all bars quiet). Urgent is not drawn here: it is a solid Badge.
+   Reference: wireframe sections 1, 6 and 7 (Linear priority bars).
+   ============================================================================ */
+.gd .gd-prio { flex: none; display: inline-flex; align-items: flex-end; gap: var(--gw-space-2); height: var(--gw-space-12); }
+.gd .gd-prio > i { display: block; width: calc(var(--gw-space-2) * 1.5); border-radius: var(--gw-radius-2); background: var(--gd-border-strong); }
+.gd .gd-prio > i:nth-child(1) { height: var(--gw-space-4); }
+.gd .gd-prio > i:nth-child(2) { height: var(--gw-space-8); }
+.gd .gd-prio > i:nth-child(3) { height: var(--gw-space-12); }
+.gd .gd-prio[data-level="1"] > i:nth-child(-n+1), .gd .gd-prio[data-level="2"] > i:nth-child(-n+2), .gd .gd-prio[data-level="3"] > i { background: var(--gd-ink); }
+
+/* ============================================================================
+   NEW: agent run-status chip. Pending library review.
+   Anatomy: .gd-run[data-state="queued|working|needs|review|failed"] > .gd-status-dot + label, drawn like a Badge
+   (20 tall, radius 4). The failed state is a button (.gd-run--btn) that reads "Failed, Retry".
+   States: rest, hover (button form), focus ring. Working carries the live dot, which stands still under reduced motion.
+   Reference: wireframe section 10 (five run states).
+   ============================================================================ */
+.gd .gd-run {
+  display: inline-flex; align-items: center; gap: var(--gw-space-4); height: 20px; padding: 0 var(--gw-space-8); box-sizing: border-box;
+  border-radius: var(--gw-radius-4); font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking);
+  background: var(--gd-tone-neutral-bg); color: var(--gd-tone-neutral-fg); white-space: nowrap;
+}
+.gd .gd-run[data-state="working"] { background: var(--gd-tone-info-bg); color: var(--gd-tone-info-fg); }
+.gd .gd-run[data-state="needs"] { background: var(--gd-tone-warn-bg); color: var(--gd-tone-warn-fg); }
+.gd .gd-run[data-state="review"] { background: var(--gd-tone-good-bg); color: var(--gd-tone-good-fg); }
+.gd .gd-run[data-state="failed"] { background: var(--gd-tone-bad-bg); color: var(--gd-tone-bad-fg); }
+.gd .gd-run--btn { transition: background var(--gw-motion-fast); }
+.gd .gd-run--btn:hover { background: color-mix(in srgb, var(--gd-tone-bad-bg) 70%, var(--gd-text) 8%); }
+
+/* ============================================================================
+   NEW: task card and board lane. Pending library review.
+   Anatomy: .gd-lanes > section.gd-lane[--suggested] > header.gd-lane__head (h2.gd-lane__name, .gd-lane__count,
+   optional .gd-lane__by) + .gd-lane__list > article.gd-taskcard (.gd-taskcard__open title button, .gd-taskcard__meta row,
+   optional .gd-taskcard__quote, .gd-taskcard__acts, .gd-taskcard__more menu trigger) + .gd-lane__add footer button.
+   The Suggested lane is dashed and tinted so it never reads as committed work.
+   States: card rest, hover, selected (data-selected), dragging (data-dragging), done (data-done, title struck),
+   lane drop target (data-over), empty lane (.gd-lane__empty, drawn only where a drop works).
+   Reference: wireframe section 1; Linear and Asana boards. Unlike the stock board, lanes share the width and the card is flat.
+   ============================================================================ */
+.gd .gd-lanes { display: grid; grid-template-columns: repeat(var(--gd-lanes, 4), minmax(0, 1fr)); gap: var(--gw-space-12); align-items: start; }
+.gd .gd-lane { min-width: 0; display: flex; flex-direction: column; gap: var(--gw-space-8); padding: var(--gw-space-8); border-radius: var(--gw-radius-12); border: 1px solid transparent; }
+.gd .gd-lane--suggested { background: var(--gd-sunken-bg); border: 1px dashed var(--gd-border-strong); }
+.gd .gd-lane[data-over="true"] { background: var(--gd-hover-bg); box-shadow: inset 0 0 0 1px var(--gd-border-focus); }
+.gd .gd-lane__head { display: flex; align-items: center; gap: var(--gw-space-8); min-height: var(--gw-space-24); padding: 0 var(--gw-space-4); }
+.gd .gd-lane__name { margin: 0; font: var(--gw-text-body-14-sem); letter-spacing: var(--gw-text-body-14-sem-tracking); color: var(--gd-text); }
+.gd .gd-lane__count { font: var(--gw-text-body-12-med); font-feature-settings: "tnum" 1; color: var(--gd-text-muted); }
+.gd .gd-lane__by { margin-left: var(--gw-space-4); display: inline-flex; align-items: center; gap: var(--gw-space-4); font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
+.gd .gd-lane__list { display: flex; flex-direction: column; gap: var(--gw-space-8); min-height: var(--gw-space-24); }
+.gd .gd-lane__empty { padding: var(--gw-space-12); border: 1px dashed var(--gd-border-strong); border-radius: var(--gw-radius-8); text-align: center; font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
+.gd .gd-lane__add { display: flex; align-items: center; gap: var(--gw-space-8); height: var(--gd-control-h); padding: 0 var(--gw-space-8); border-radius: var(--gw-radius-8); color: var(--gd-text-muted); font: var(--gw-text-body-14-med); letter-spacing: var(--gw-text-body-14-med-tracking); transition: background var(--gw-motion-fast), color var(--gw-motion-fast); }
+.gd .gd-lane__add svg { width: 14px; height: 14px; flex: none; }
+.gd .gd-lane__add:hover { background: var(--gd-hover-bg); color: var(--gd-text); }
+.gd .gd-lane__quick { display: block; width: 100%; box-sizing: border-box; height: var(--gd-control-h); padding: 0 var(--gw-space-12); border: 0; border-radius: var(--gw-radius-8); background: var(--gd-card-bg); color: var(--gd-text); box-shadow: inset 0 0 0 1px var(--gd-border-focus); font: var(--gw-text-body-14-med); outline: none; }
+.gd .gd-lane__quick::placeholder { color: var(--gd-placeholder); }
+
+.gd .gd-taskcard { position: relative; display: flex; flex-direction: column; gap: var(--gw-space-8); padding: var(--gw-space-12); border-radius: var(--gw-radius-8); background: var(--gd-card-bg); box-shadow: inset 0 0 0 1px var(--gd-border); color: var(--gd-text); transition: background var(--gw-motion-fast), box-shadow var(--gw-motion-fast); }
+.gd .gd-taskcard:hover { box-shadow: inset 0 0 0 1px var(--gd-border-strong); background: var(--gd-hover-bg); }
+.gd .gd-taskcard[data-selected="true"] { background: var(--gd-selected-bg); box-shadow: inset 0 0 0 1px var(--gd-text); }
+.gd .gd-taskcard[data-dragging] { opacity: .5; }
+.gd .gd-taskcard[draggable="true"] { cursor: grab; }
+.gd .gd-taskcard__open { display: block; width: 100%; padding-right: var(--gw-space-24); font: var(--gw-text-body-14-med); letter-spacing: var(--gw-text-body-14-med-tracking); color: var(--gd-text); overflow-wrap: anywhere; border-radius: var(--gw-radius-4); }
+.gd .gd-taskcard[data-done] .gd-taskcard__open { color: var(--gd-text-muted); text-decoration: line-through; }
+.gd .gd-taskcard__num { font: var(--gw-text-body-12-med); font-feature-settings: "tnum" 1; color: var(--gd-text-muted); }
+.gd .gd-taskcard__meta { display: flex; align-items: center; flex-wrap: wrap; gap: var(--gw-space-8); min-height: 20px; }
+.gd .gd-taskcard__meta > .gd-av:last-child { margin-left: auto; }
+.gd .gd-taskcard__spacer { flex: 1 1 auto; }
+.gd .gd-taskcard__quote { margin: 0; padding-left: var(--gw-space-8); border-left: 2px solid var(--gd-border-strong); font: var(--gw-text-body-12-reg); letter-spacing: var(--gw-text-body-12-reg-tracking); color: var(--gd-text-muted); overflow-wrap: anywhere; }
+.gd .gd-taskcard__acts { display: flex; gap: var(--gw-space-8); }
+.gd .gd-taskcard__more { position: absolute; top: var(--gw-space-8); right: var(--gw-space-8); opacity: 0; }
+.gd .gd-taskcard:hover .gd-taskcard__more, .gd .gd-taskcard:focus-within .gd-taskcard__more, .gd .gd-taskcard__more[aria-expanded="true"] { opacity: 1; }
+.gd .gd-taskcard--suggested { background: var(--gd-card-bg); }
+.gd .gd-taskcard--dismissed { opacity: .6; }
+@media (hover: none) { .gd .gd-taskcard__more { opacity: 1; } }
+
+/* ============================================================================
+   NEW: grouped task list. Pending library review.
+   Anatomy: .gd-tasklist > .gd-tasklist__head (column labels) + .gd-tasklist__group (button .gd-tasklist__group-head with
+   name, count, caret; rows) > .gd-tasklist__row (check button, .gd-tasklist__open title, priority, source, due, assignee).
+   States: row hover, selected, done (title struck), group collapsed (aria-expanded="false" hides its rows).
+   Reference: wireframe section 2; Attio grouped list, Todoist upcoming.
+   ============================================================================ */
+.gd .gd-tasklist { display: flex; flex-direction: column; --gd-list-cols: var(--gw-space-24) minmax(0, 1fr) 176px 140px 120px var(--gw-space-32); }
+.gd .gd-tasklist__head, .gd .gd-tasklist__row { display: grid; grid-template-columns: var(--gd-list-cols); align-items: center; column-gap: var(--gw-space-12); }
+.gd .gd-tasklist__head { height: var(--gw-space-32); border-bottom: 1px solid var(--gd-border); font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); color: var(--gd-text-muted); }
+.gd .gd-tasklist__group-head { display: flex; align-items: center; gap: var(--gw-space-8); height: var(--gw-space-40); margin-top: var(--gw-space-8); width: 100%; font: var(--gw-text-body-14-sem); letter-spacing: var(--gw-text-body-14-sem-tracking); color: var(--gd-text); border-radius: var(--gw-radius-4); }
+.gd .gd-tasklist__group-head svg { width: 12px; height: 12px; flex: none; color: var(--gd-text-muted); transition: transform var(--gw-motion-fast); }
+.gd .gd-tasklist__group-head[aria-expanded="true"] svg { transform: rotate(90deg); }
+.gd .gd-tasklist__n { font: var(--gw-text-body-12-med); font-feature-settings: "tnum" 1; color: var(--gd-text-muted); }
+.gd .gd-tasklist__group[data-collapsed="true"] > .gd-tasklist__row { display: none; }
+.gd .gd-tasklist__row { position: relative; min-height: var(--gd-row-h); border-bottom: 1px solid var(--gd-border); transition: background var(--gw-motion-fast); }
+.gd .gd-tasklist__row:hover { background: var(--gd-hover-bg); }
+.gd .gd-tasklist__row[data-selected="true"] { background: var(--gd-selected-bg); }
+.gd .gd-tasklist__open { display: block; min-width: 0; font: var(--gw-text-body-14-med); letter-spacing: var(--gw-text-body-14-med-tracking); color: var(--gd-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border-radius: var(--gw-radius-4); }
+.gd .gd-tasklist__row[data-done] .gd-tasklist__open { color: var(--gd-text-muted); text-decoration: line-through; }
+.gd .gd-tasklist__cell { min-width: 0; display: flex; align-items: center; gap: var(--gw-space-8); font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
+.gd .gd-tasklist__check { width: 20px; height: 20px; display: grid; place-items: center; border-radius: var(--gw-radius-4); box-shadow: inset 0 0 0 1.5px var(--gd-border-focus); color: var(--gd-ink-fg); background: none; cursor: pointer; transition: background var(--gw-motion-fast), box-shadow var(--gw-motion-fast); }
+.gd .gd-tasklist__check svg { width: 12px; height: 12px; visibility: hidden; }
+.gd .gd-tasklist__check:hover { box-shadow: inset 0 0 0 1.5px var(--gd-text); }
+.gd .gd-tasklist__check[aria-checked="true"] { background: var(--gd-ink); box-shadow: none; }
+.gd .gd-tasklist__check[aria-checked="true"] svg { visibility: visible; }
+
+/* ============================================================================
+   NEW: task property row. Pending library review.
+   Anatomy: dl.gd-props > div.gd-props__row > dt + dd > button.gd-prop (glyph, value) [aria-haspopup]. A quiet button: no edge until hover,
+   so a drawer of six properties stays calm. A .gd-prop--empty reads as a placeholder.
+   States: rest, hover, expanded (aria-expanded), focus ring.
+   Reference: wireframe section 5; Linear issue properties.
+   ============================================================================ */
+.gd .gd-props { margin: 0; display: flex; flex-direction: column; gap: var(--gw-space-2); }
+.gd .gd-props__row { display: grid; grid-template-columns: 96px minmax(0, 1fr); align-items: center; min-height: var(--gd-control-h); }
+.gd .gd-props dt { font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); color: var(--gd-text-muted); }
+.gd .gd-props dd { margin: 0; min-width: 0; display: flex; align-items: center; gap: var(--gw-space-8); flex-wrap: wrap; }
+.gd .gd-prop { display: inline-flex; align-items: center; gap: var(--gw-space-8); max-width: 100%; height: var(--gd-control-h); padding: 0 var(--gw-space-8); border-radius: var(--gw-radius-8); font: var(--gw-text-body-14-med); letter-spacing: var(--gw-text-body-14-med-tracking); color: var(--gd-text); transition: background var(--gw-motion-fast); }
+.gd .gd-prop:hover, .gd .gd-prop[aria-expanded="true"] { background: var(--gd-selected-bg); }
+.gd .gd-prop--empty { color: var(--gd-text-muted); }
+.gd .gd-prop__tag { font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
+.gd .gd-prop > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ============================================================================
+   NEW: list picker. Pending library review.
+   Anatomy: .gd-picker (inside a .gd-popover) > optional input.gd-picker__search, .gd-picker__label, button.gd-picker__row
+   [role=menuitemradio|menuitem][aria-checked] (glyph, .gd-picker__text > b + small description, .gd-picker__key hint,
+   .gd-picker__check), .gd-picker__sep, .gd-picker__note (a quiet line), and an optional .gd-picker__suggest block
+   (a suggestion with a reason and Apply and Ignore). Used for priority, status and assignee.
+   States: row hover and active (focus), checked (weight and tick), disabled (aria-disabled).
+   Reference: wireframe sections 7 and 10.
+   ============================================================================ */
+.gd .gd-popover:has(> .gd-picker) { padding: var(--gw-space-4); min-width: 260px; gap: 0; }
+.gd .gd-picker { display: flex; flex-direction: column; gap: var(--gw-space-2); min-width: 0; }
+.gd .gd-picker__label { padding: var(--gw-space-8) var(--gw-space-8) var(--gw-space-4); font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); color: var(--gd-text-muted); }
+.gd .gd-picker__row { display: flex; align-items: center; gap: var(--gw-space-8); min-height: var(--gd-control-h); padding: var(--gw-space-4) var(--gw-space-8); border-radius: var(--gw-radius-8); font: var(--gw-text-body-14-med); letter-spacing: var(--gw-text-body-14-med-tracking); color: var(--gd-text); transition: background var(--gw-motion-fast); }
+.gd .gd-picker__row:hover, .gd .gd-picker__row:focus-visible { background: var(--gd-menu-hover); outline: none; }
+.gd .gd-picker__row:focus-visible { box-shadow: inset 0 0 0 2px var(--gd-text); }
+.gd .gd-picker__row[aria-checked="true"] { font-weight: 600; }
+.gd .gd-picker__row[aria-disabled="true"] { color: var(--gd-disabled-ink); cursor: default; }
+.gd .gd-picker__row--quiet { color: var(--gd-text-muted); }
+.gd .gd-picker__text { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: var(--gw-space-2); }
+.gd .gd-picker__text small { font: var(--gw-text-body-12-reg); color: var(--gd-text-muted); font-weight: 400; }
+.gd .gd-picker__key { margin-left: auto; font: var(--gw-text-body-12-med); color: var(--gd-text-muted); font-feature-settings: "tnum" 1; }
+.gd .gd-picker__check { margin-left: auto; width: 14px; height: 14px; flex: none; color: var(--gd-ink); visibility: hidden; }
+.gd .gd-picker__row[aria-checked="true"] .gd-picker__check { visibility: visible; }
+.gd .gd-picker__row > svg { width: 16px; height: 16px; flex: none; color: var(--gd-text-muted); }
+.gd .gd-picker__sep { height: 1px; margin: var(--gw-space-4) 0; background: var(--gd-border); }
+.gd .gd-picker__note { margin: 0; padding: var(--gw-space-4) var(--gw-space-8) var(--gw-space-8); font: var(--gw-text-body-12-reg); letter-spacing: var(--gw-text-body-12-reg-tracking); color: var(--gd-text-muted); }
+.gd .gd-picker__suggest { margin: var(--gw-space-4); padding: var(--gw-space-12); border-radius: var(--gw-radius-8); background: var(--gd-sunken-bg); display: flex; flex-direction: column; gap: var(--gw-space-8); font: var(--gw-text-body-12-reg); color: var(--gd-text-muted); }
+.gd .gd-picker__suggest b { font: var(--gw-text-body-14-sem); color: var(--gd-text); display: flex; align-items: center; gap: var(--gw-space-8); }
+.gd .gd-picker__suggest > div { display: flex; gap: var(--gw-space-8); }
+
+/* ============================================================================
+   NEW: date picker with a range. Pending library review.
+   Anatomy: .gd-datepick (inside a .gd-popover) > .gd-datepick__fields (two button.gd-datepick__field[aria-pressed], each with
+   a small label and the value) + input.gd-datepick__type (types words: fri, next week, in 3 days, oct 12) +
+   .gd-datepick__quicks (buttons) + .gd-datepick__nav (prev, month name, next) + .gd-datepick__grid (7 columns:
+   .gd-datepick__dow labels, button.gd-datepick__day[data-today][data-range="start|mid|end|only"][data-out]).
+   States: day hover, today (underline mark), range band with ink endpoints, out-of-month muted, field active (ink edge).
+   Reference: wireframe section 7 (start and due fields, quick picks, month calendar with range highlight).
+   ============================================================================ */
+.gd .gd-popover:has(> .gd-datepick) { padding: var(--gw-space-8); width: 320px; max-width: min(320px, calc(100vw - 32px)); }
+.gd .gd-datepick { display: flex; flex-direction: column; gap: var(--gw-space-8); }
+.gd .gd-datepick__fields { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gw-space-8); }
+.gd .gd-datepick__field { display: flex; flex-direction: column; gap: var(--gw-space-2); padding: var(--gw-space-8) var(--gw-space-12); border-radius: var(--gw-radius-8); box-shadow: inset 0 0 0 1px var(--gd-border-strong); font: var(--gw-text-body-14-med); letter-spacing: var(--gw-text-body-14-med-tracking); color: var(--gd-text); }
+.gd .gd-datepick__field small { font: var(--gw-text-body-10-med); letter-spacing: var(--gw-text-body-10-med-tracking); color: var(--gd-text-muted); text-transform: uppercase; }
+.gd .gd-datepick__field[aria-pressed="true"] { box-shadow: inset 0 0 0 1px var(--gd-text); }
+.gd .gd-datepick__type { box-sizing: border-box; width: 100%; height: var(--gd-control-h); padding: 0 var(--gw-space-12); border: 0; border-radius: var(--gw-radius-8); background: var(--gd-card-bg); color: var(--gd-text); box-shadow: inset 0 0 0 1px var(--gd-border-strong); font: var(--gw-text-body-14-med); outline: none; }
+.gd .gd-datepick__type:focus { box-shadow: inset 0 0 0 1px var(--gd-border-focus); }
+.gd .gd-datepick__type::placeholder { color: var(--gd-placeholder); }
+.gd .gd-datepick__type[aria-invalid="true"] { box-shadow: inset 0 0 0 1px var(--gd-danger); }
+.gd .gd-datepick__hint { margin: 0; font: var(--gw-text-body-12-reg); color: var(--gd-text-muted); min-height: var(--gw-space-16); }
+.gd .gd-datepick__quicks { display: flex; flex-wrap: wrap; gap: var(--gw-space-4); }
+.gd .gd-datepick__quick { height: var(--gw-space-24); padding: 0 var(--gw-space-8); border-radius: var(--gw-radius-8); box-shadow: inset 0 0 0 1px var(--gd-border-strong); font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); color: var(--gd-text); transition: background var(--gw-motion-fast); }
+.gd .gd-datepick__quick:hover { background: var(--gd-selected-bg); }
+.gd .gd-datepick__nav { display: flex; align-items: center; justify-content: space-between; font: var(--gw-text-body-14-sem); color: var(--gd-text); }
+.gd .gd-datepick__grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); row-gap: var(--gw-space-2); }
+.gd .gd-datepick__dow { display: grid; place-items: center; height: var(--gw-space-24); font: var(--gw-text-body-10-med); color: var(--gd-text-muted); }
+.gd .gd-datepick__day { position: relative; display: grid; place-items: center; height: var(--gw-space-32); font: var(--gw-text-body-12-med); font-feature-settings: "tnum" 1; color: var(--gd-text); border-radius: var(--gw-radius-8); transition: background var(--gw-motion-fast); }
+.gd .gd-datepick__day:hover { background: var(--gd-selected-bg); }
+.gd .gd-datepick__day[data-out] { color: var(--gd-disabled-ink); }
+.gd .gd-datepick__day[data-today]::after { content: ""; position: absolute; bottom: var(--gw-space-4); width: var(--gw-space-4); height: var(--gw-space-4); border-radius: var(--gw-radius-full); background: currentColor; }
+.gd .gd-datepick__day[data-range] { background: var(--gd-selected-bg); border-radius: 0; }
+.gd .gd-datepick__day[data-range="start"], .gd .gd-datepick__day[data-range="end"], .gd .gd-datepick__day[data-range="only"] { background: var(--gd-ink); color: var(--gd-ink-fg); }
+.gd .gd-datepick__day[data-range="start"] { border-radius: var(--gw-radius-8) 0 0 var(--gw-radius-8); }
+.gd .gd-datepick__day[data-range="end"] { border-radius: 0 var(--gw-radius-8) var(--gw-radius-8) 0; }
+.gd .gd-datepick__day[data-range="only"] { border-radius: var(--gw-radius-8); }
+
+/* ============================================================================
+   NEW: filter popover. Pending library review.
+   Anatomy: .gd-filterpop (inside a .gd-popover) > .gd-filterpop__fields (buttons, aria-current on the open field, each with a
+   count of selected values) + .gd-filterpop__values (title, then rows: label.gd-filterpop__value with a library checkbox, the
+   value text and the number of tasks) + .gd-filterpop__foot (Clear, Save as view).
+   States: field hover and current, value hover, checked.
+   Reference: wireframe section 6 (field list left, any-of values right).
+   ============================================================================ */
+.gd .gd-popover:has(> .gd-filterpop) { padding: 0; width: 440px; max-width: min(440px, calc(100vw - 32px)); }
+.gd .gd-filterpop { display: grid; grid-template-columns: 160px minmax(0, 1fr); }
+.gd .gd-filterpop__fields { display: flex; flex-direction: column; gap: var(--gw-space-2); padding: var(--gw-space-8); border-right: 1px solid var(--gd-border); }
+.gd .gd-filterpop__field { display: flex; align-items: center; gap: var(--gw-space-8); min-height: var(--gd-control-h); padding: 0 var(--gw-space-8); border-radius: var(--gw-radius-8); font: var(--gw-text-body-14-med); letter-spacing: var(--gw-text-body-14-med-tracking); color: var(--gd-text); transition: background var(--gw-motion-fast); }
+.gd .gd-filterpop__field:hover { background: var(--gd-menu-hover); }
+.gd .gd-filterpop__field[aria-current="true"] { background: var(--gd-selected-bg); font-weight: 600; }
+.gd .gd-filterpop__field .gd-tbar__n { margin-left: auto; }
+.gd .gd-filterpop__values { display: flex; flex-direction: column; gap: var(--gw-space-2); padding: var(--gw-space-8); min-width: 0; }
+.gd .gd-filterpop__title { padding: var(--gw-space-4) var(--gw-space-8); font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
+.gd .gd-filterpop__value { display: flex; align-items: center; gap: var(--gw-space-8); min-height: var(--gd-control-h); padding: 0 var(--gw-space-8); border-radius: var(--gw-radius-8); font: var(--gw-text-body-14-med); color: var(--gd-text); }
+.gd .gd-filterpop__value:hover { background: var(--gd-menu-hover); }
+.gd .gd-filterpop__n { margin-left: auto; font: var(--gw-text-body-12-med); font-feature-settings: "tnum" 1; color: var(--gd-text-muted); }
+.gd .gd-filterpop__foot { grid-column: 1 / -1; display: flex; justify-content: space-between; gap: var(--gw-space-8); padding: var(--gw-space-8); border-top: 1px solid var(--gd-border); }
+
+/* ============================================================================
+   NEW: timeline. Pending library review.
+   Anatomy: .gd-gantt[style="--gd-tl-days:28; --gd-tl-today:3"] > .gd-gantt__head (corner label + .gd-gantt__scale of
+   .gd-gantt__day[data-we][data-today]) + .gd-gantt__body > (.gd-gantt__today line, .gd-gantt__group rows,
+   .gd-gantt__row > .gd-gantt__label + .gd-gantt__cells > button.gd-gantt__bar[data-level][data-suggested]
+   [data-kind="bar|diamond"] with --gd-tl-start and --gd-tl-len in days) + .gd-gantt__tray (button.gd-gantt__chip,
+   draggable). A bar has two .gd-gantt__grip edges that resize it.
+   Weekends are shaded, every day has a hairline, the today line is the accent colour (status), suggestions are dashed.
+   States: bar hover, dragging (data-dragging), drop target day (.gd-gantt__drop), focus ring.
+   Reference: wireframe section 3; Linear and Asana timelines.
+   ============================================================================ */
+.gd .gd-gantt { --gd-tl-label: 280px; display: flex; flex-direction: column; min-width: 0; border-radius: var(--gw-radius-12); box-shadow: inset 0 0 0 1px var(--gd-border); overflow: hidden; background: var(--gd-card-bg); }
+.gd .gd-gantt__head { display: grid; grid-template-columns: var(--gd-tl-label) minmax(0, 1fr); border-bottom: 1px solid var(--gd-border); background: var(--gd-card-bg); }
+.gd .gd-gantt__corner { display: flex; align-items: flex-end; padding: 0 var(--gw-space-16) var(--gw-space-8); border-right: 1px solid var(--gd-border); font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
+.gd .gd-gantt__scale { position: relative; display: grid; grid-template-columns: repeat(var(--gd-tl-days), minmax(0, 1fr)); height: var(--gw-space-48); }
+.gd .gd-gantt__week { position: absolute; top: var(--gw-space-8); font: var(--gw-text-body-12-sem); color: var(--gd-text); white-space: nowrap; padding-left: var(--gw-space-4); }
+.gd .gd-gantt__day { display: flex; align-items: flex-end; justify-content: center; padding-bottom: var(--gw-space-8); font: var(--gw-text-body-10-med); font-feature-settings: "tnum" 1; color: var(--gd-text-muted); border-left: 1px solid var(--gd-border); min-width: 0; }
+.gd .gd-gantt__day[data-today] { color: var(--gd-accent); font-weight: 600; }
+.gd .gd-gantt__body { position: relative; }
+.gd .gd-gantt__today { position: absolute; z-index: 3; top: 0; bottom: 0; left: calc(var(--gd-tl-label) + (100% - var(--gd-tl-label)) * (var(--gd-tl-today) + .5) / var(--gd-tl-days)); width: 0; border-left: 1.5px solid var(--gd-accent); pointer-events: none; }
+.gd .gd-gantt__row, .gd .gd-gantt__group { display: grid; grid-template-columns: var(--gd-tl-label) minmax(0, 1fr); border-bottom: 1px solid var(--gd-border); }
+.gd .gd-gantt__group { background: var(--gd-sunken-bg); min-height: var(--gw-space-32); align-items: center; }
+.gd .gd-gantt__group > div { padding: 0 var(--gw-space-16); font: var(--gw-text-body-12-sem); color: var(--gd-text); }
+.gd .gd-gantt__row { min-height: var(--gw-space-40); }
+.gd .gd-gantt__label { display: flex; align-items: center; gap: var(--gw-space-8); min-width: 0; padding: 0 var(--gw-space-16); border-right: 1px solid var(--gd-border); }
+.gd .gd-gantt__name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--gw-text-body-14-med); letter-spacing: var(--gw-text-body-14-med-tracking); color: var(--gd-text); text-align: left; background: none; border: 0; padding: 0; cursor: pointer; border-radius: var(--gw-radius-4); }
+.gd .gd-gantt__cells { position: relative; min-width: 0;
+  --_week: calc(100% * 7 / var(--gd-tl-days)); --_day: calc(100% / var(--gd-tl-days));
+  background-image:
+    linear-gradient(to right, transparent calc(100% * 5 / 7), var(--gd-sunken-bg) calc(100% * 5 / 7)),
+    linear-gradient(to right, var(--gd-border) 1px, transparent 1px);
+  background-size: var(--_week) 100%, var(--_day) 100%; background-repeat: repeat-x; }
+.gd .gd-gantt__group .gd-gantt__cells { background-image: linear-gradient(to right, var(--gd-border) 1px, transparent 1px); background-size: var(--_day) 100%; }
+.gd .gd-gantt__bar { position: absolute; z-index: 2; top: var(--gw-space-8); height: var(--gw-space-24); box-sizing: border-box;
+  left: calc(100% * var(--gd-tl-start) / var(--gd-tl-days) + 2px); width: calc(100% * var(--gd-tl-len) / var(--gd-tl-days) - 4px);
+  display: flex; align-items: center; padding: 0 var(--gw-space-8); border-radius: var(--gw-radius-8); overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  background: var(--gd-ink); color: var(--gd-ink-fg); font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); cursor: grab; touch-action: none; user-select: none; }
+.gd .gd-gantt__bar[data-level="high"] { background: color-mix(in srgb, var(--gd-ink) 78%, var(--gd-card-bg)); }
+.gd .gd-gantt__bar[data-level="med"] { background: color-mix(in srgb, var(--gd-ink) 36%, var(--gd-card-bg)); color: var(--gd-text); }   /* the label flips to the text colour: the ink-fg label on a mid grey measured 4.07 in dark at 56% */
+.gd .gd-gantt__bar[data-level="low"] { background: color-mix(in srgb, var(--gd-ink) 22%, var(--gd-card-bg)); color: var(--gd-text); }
+.gd .gd-gantt__bar[data-level="none"] { background: color-mix(in srgb, var(--gd-ink) 28%, var(--gd-card-bg)); color: var(--gd-text); }
+.gd .gd-gantt__bar[data-suggested] { background: var(--gd-card-bg); color: var(--gd-text-muted); box-shadow: inset 0 0 0 1.5px var(--gd-border-focus); outline: 0; border: 0; background-image: none; }
+.gd .gd-gantt__bar[data-suggested]::before { content: ""; position: absolute; inset: 0; border-radius: inherit; border: 1.5px dashed var(--gd-border-focus); pointer-events: none; }
+.gd .gd-gantt__bar[data-kind="diamond"] { left: calc(100% * (var(--gd-tl-start) + .5) / var(--gd-tl-days) - var(--gw-space-8)); width: var(--gw-space-16); height: var(--gw-space-16); top: var(--gw-space-12); padding: 0; transform: rotate(45deg); border-radius: var(--gw-radius-2); }
+.gd .gd-gantt__bar[data-dragging] { opacity: .7; cursor: grabbing; }
+.gd .gd-gantt__bar:focus-visible { outline-offset: 1px; }
+.gd .gd-gantt__grip { position: absolute; top: 0; bottom: 0; width: var(--gw-space-8); cursor: ew-resize; }
+.gd .gd-gantt__grip--start { left: 0; } .gd .gd-gantt__grip--end { right: 0; }
+.gd .gd-gantt__off { position: absolute; top: 50%; transform: translateY(-50%); padding: 0 var(--gw-space-8); font: var(--gw-text-body-12-reg); color: var(--gd-text-muted); }
+.gd .gd-gantt__drop { position: absolute; z-index: 1; top: 0; bottom: 0; left: calc(var(--gd-tl-label) + (100% - var(--gd-tl-label)) * var(--gd-tl-drop) / var(--gd-tl-days)); width: calc((100% - var(--gd-tl-label)) / var(--gd-tl-days)); background: var(--gd-selected-bg); pointer-events: none; }
+.gd .gd-gantt__tray { display: flex; align-items: center; flex-wrap: wrap; gap: var(--gw-space-8); padding: var(--gw-space-12) var(--gw-space-16); border-top: 1px solid var(--gd-border); background: var(--gd-sunken-bg); font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
+.gd .gd-gantt__tray b { font-weight: 600; color: var(--gd-text); }
+.gd .gd-gantt__chip { display: inline-flex; align-items: center; max-width: 280px; height: var(--gw-space-24); padding: 0 var(--gw-space-8); border-radius: var(--gw-radius-8); background: var(--gd-card-bg); box-shadow: inset 0 0 0 1px var(--gd-border-strong); color: var(--gd-text); font: var(--gw-text-body-12-med); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: grab; transition: box-shadow var(--gw-motion-fast); }
+.gd .gd-gantt__chip:hover { box-shadow: inset 0 0 0 1px var(--gd-text); }
+.gd .gd-gantt__tools { display: flex; align-items: center; gap: var(--gw-space-8); flex-wrap: wrap; }
+.gd .gd-gantt__legend { display: flex; align-items: center; gap: var(--gw-space-12); margin-left: auto; font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
+.gd .gd-gantt__legend i { display: inline-block; width: var(--gw-space-16); height: var(--gw-space-8); border-radius: var(--gw-radius-4); margin-right: var(--gw-space-4); vertical-align: middle; background: var(--gd-ink); }
+.gd .gd-gantt__legend i[data-level="high"] { background: color-mix(in srgb, var(--gd-ink) 78%, var(--gd-card-bg)); }
+.gd .gd-gantt__legend i[data-level="med"] { background: color-mix(in srgb, var(--gd-ink) 36%, var(--gd-card-bg)); }
+.gd .gd-gantt__legend i[data-level="low"] { background: color-mix(in srgb, var(--gd-ink) 22%, var(--gd-card-bg)); }
+.gd .gd-gantt__legend i[data-suggested] { background: none; border: 1px dashed var(--gd-border-focus); box-sizing: border-box; }
+
+/* ============================================================================
+   NEW: inbox triage. Pending library review.
+   Anatomy: .gd-inbox > .gd-inbox__list (button.gd-inbox__row[aria-current] with title and a meta line, plus .gd-inbox__foot with the
+   dismissed count and Undo) + .gd-inbox__pane (head with the key hints, .gd-quote, why note, props, .gd-inbox__acts).
+   States: row hover, current (ink bar on the left), empty (a library empty state in the pane).
+   Reference: wireframe section 4; Linear inbox.
+   ============================================================================ */
+.gd .gd-inbox { display: grid; grid-template-columns: 360px minmax(0, 1fr); min-height: 0; border-radius: var(--gw-radius-12); box-shadow: inset 0 0 0 1px var(--gd-border); overflow: hidden; background: var(--gd-card-bg); }
+.gd .gd-inbox__list { display: flex; flex-direction: column; border-right: 1px solid var(--gd-border); min-width: 0; }
+.gd .gd-inbox__row { display: flex; flex-direction: column; gap: var(--gw-space-4); padding: var(--gw-space-12) var(--gw-space-16); border-bottom: 1px solid var(--gd-border); font: var(--gw-text-body-14-med); letter-spacing: var(--gw-text-body-14-med-tracking); color: var(--gd-text); transition: background var(--gw-motion-fast); position: relative; }
+.gd .gd-inbox__row:hover { background: var(--gd-hover-bg); }
+.gd .gd-inbox__row[aria-current="true"] { background: var(--gd-selected-bg); box-shadow: inset 3px 0 0 var(--gd-ink); }
+.gd .gd-inbox__meta { display: flex; align-items: center; gap: var(--gw-space-8); font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
+.gd .gd-inbox__foot { padding: var(--gw-space-12) var(--gw-space-16); font: var(--gw-text-body-12-med); color: var(--gd-text-muted); display: flex; align-items: center; gap: var(--gw-space-8); }
+.gd .gd-inbox__pane { display: flex; flex-direction: column; gap: var(--gw-space-16); padding: var(--gw-space-24) var(--gw-space-32); min-width: 0; }
+.gd .gd-inbox__head { display: flex; align-items: center; gap: var(--gw-space-8); font: var(--gw-text-body-14-med); color: var(--gd-text); flex-wrap: wrap; }
+.gd .gd-inbox__head .gd-inbox__keys { margin-left: auto; display: inline-flex; align-items: center; gap: var(--gw-space-4); font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
+.gd .gd-inbox__acts { display: flex; align-items: center; gap: var(--gw-space-8); margin-top: auto; flex-wrap: wrap; }
+.gd .gd-inbox__title { box-sizing: border-box; width: 100%; padding: var(--gw-space-4) var(--gw-space-8); margin-left: calc(var(--gw-space-8) * -1); border: 0; border-radius: var(--gw-radius-8); background: none; color: var(--gd-text); font: var(--gw-text-h7-bold); letter-spacing: var(--gw-text-h7-bold-tracking); resize: none; field-sizing: content; outline: none; transition: background var(--gw-motion-fast); }
+.gd .gd-inbox__title:hover { background: var(--gd-hover-bg); }
+.gd .gd-inbox__title:focus { background: var(--gd-card-bg); box-shadow: inset 0 0 0 1px var(--gd-border-focus); }
+
+/* ============================================================================
+   NEW: quoted source message. Pending library review.
+   Anatomy: figure.gd-quote > .gd-quote__label (small caps line: From Slack, channel) + blockquote text + figcaption (who, link).
+   Used in the drawer, the inbox pane and the phone sheet. Reference: wireframe sections 4 and 5.
+   ============================================================================ */
+.gd .gd-quote { margin: 0; display: flex; flex-direction: column; gap: var(--gw-space-8); }
+.gd .gd-quote__label { font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); color: var(--gd-text-muted); }
+.gd .gd-quote blockquote { margin: 0; padding: var(--gw-space-4) 0 var(--gw-space-4) var(--gw-space-12); border-left: 2px solid var(--gd-border-strong); font: var(--gw-text-body-14-reg); letter-spacing: var(--gw-text-body-14-reg-tracking); color: var(--gd-text); overflow-wrap: anywhere; }
+.gd .gd-quote figcaption { display: flex; align-items: center; gap: var(--gw-space-8); font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
+.gd .gd-quote figcaption a { color: var(--gd-link); text-decoration: underline; text-underline-offset: 2px; }
+
+/* ============================================================================
+   NEW: assistant launcher. Pending library review.
+   Anatomy: .gd-launch (fixed bottom-right) > button.gd-launch__main (agent avatar, label, shortcut key cap) +
+   button.gd-launch__status (a status dot that opens the assistant's settings). Hidden under 768 wide, where the bottom bar carries it.
+   States: hover, focus ring, panel open (hidden). The status dot is neutral when the state cannot be read.
+   Reference: wireframe section 1 (Linear, Ferndesk, Fireflies park the assistant bottom-right).
+   ============================================================================ */
+.gd .gd-launch { position: fixed; z-index: 40; right: var(--gw-space-24); bottom: var(--gw-space-24); display: inline-flex; align-items: center; height: var(--gw-space-40); border-radius: var(--gw-radius-full); background: var(--gd-ink); color: var(--gd-ink-fg); box-shadow: var(--gw-shadow-s3); overflow: hidden; }
+.gd .gd-launch[hidden] { display: none; }
+.gd .gd-launch__main { display: inline-flex; align-items: center; gap: var(--gw-space-8); height: 100%; padding: 0 var(--gw-space-8) 0 var(--gw-space-8); font: var(--gw-text-button-14); letter-spacing: 0; white-space: nowrap; color: inherit; transition: background var(--gw-motion-fast); }
+.gd .gd-launch__main:hover, .gd .gd-launch__status:hover { background: var(--gd-ink-hover); }
+.gd .gd-launch__main .gd-av { background: var(--gd-ink-fg); color: var(--gd-ink); box-shadow: none; }
+.gd .gd-launch__key { display: inline-grid; place-items: center; height: 18px; padding: 0 var(--gw-space-4); border-radius: var(--gw-radius-4); background: color-mix(in srgb, currentColor 18%, transparent); color: color-mix(in srgb, currentColor 80%, transparent); font: var(--gw-text-body-10-med); }
+.gd .gd-launch__status { display: grid; place-items: center; width: var(--gw-space-40); height: 100%; color: inherit; transition: background var(--gw-motion-fast); }
+.gd .gd-launch__status .gd-status-dot { box-shadow: 0 0 0 2px color-mix(in srgb, currentColor 30%, transparent); }
+@media (max-width: 767px) { .gd .gd-launch { display: none; } }
+
+/* ============================================================================
+   NEW: mobile bottom bar. Pending library review.
+   Anatomy: nav.gd-bottomnav > button.gd-bottomnav__item[aria-current] (label and optional count). Fixed to the bottom of a phone page.
+   Reference: wireframe section 11.
+   ============================================================================ */
+.gd .gd-bottomnav { display: none; flex: none; align-items: stretch; justify-content: space-around; height: calc(var(--gd-control-h) + var(--gw-space-24)); border-top: 1px solid var(--gd-border); background: var(--gd-panel-bg); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.gd .gd-bottomnav__item { flex: 1 1 0; display: flex; align-items: center; justify-content: center; gap: var(--gw-space-4); font: var(--gw-text-body-12-med); color: var(--gd-text-muted); transition: color var(--gw-motion-fast); }
+.gd .gd-bottomnav__item[aria-current="true"] { color: var(--gd-text); font-weight: 600; }
+@media (max-width: 767px) { .gd .gd-bottomnav { display: flex; } }
+
+/* ============================================================================
+   NEW: chat panel (assistant). Pending library review.
+   Anatomy: aside.gd-ask[role=dialog] (right panel, over the page, not modal; a full-screen sheet under 768) > header.gd-ask__head
+   (agent avatar, h2.gd-ask__title, p.gd-ask__sub, close) + .gd-ask__thread[role=log] of .gd-ask__msg[--me|--bruce] (bubble, tag chips,
+   .gd-ask__mini task rows with an at-tag action, .gd-plan, .gd-donecard) + footer.gd-composer.
+   States: open (not hidden), message pending (.gd-ask__typing), error line (.gd-ask__bubble--error).
+   Reference: wireframes 8, 9 and 11.
+   ============================================================================ */
+.gd .gd-ask { position: fixed; z-index: 50; top: var(--gw-space-12); right: var(--gw-space-12); bottom: var(--gw-space-12); width: 480px; max-width: calc(100vw - var(--gw-space-24)); display: flex; flex-direction: column; border-radius: var(--gw-radius-16); background: var(--gd-raised-bg); box-shadow: var(--gw-shadow-s4), inset 0 0 0 1px var(--gd-border); color: var(--gd-text-body); overflow: hidden; }
+.gd .gd-ask[hidden] { display: none; }
+.gd .gd-ask__head { display: flex; align-items: center; gap: var(--gw-space-12); padding: var(--gw-space-16) var(--gd-card-pad); border-bottom: 1px solid var(--gd-border); }
+.gd .gd-ask__head > div { flex: 1 1 auto; min-width: 0; }
+.gd .gd-ask__title { margin: 0; font: var(--gw-text-body-16-sem); letter-spacing: var(--gw-text-body-16-sem-tracking); color: var(--gd-text); }
+.gd .gd-ask__sub { margin: 0; font: var(--gw-text-body-12-reg); letter-spacing: var(--gw-text-body-12-reg-tracking); color: var(--gd-text-muted); }
+.gd .gd-ask__thread { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: var(--gw-space-16); padding: var(--gd-card-pad); scrollbar-width: thin; scrollbar-color: var(--gd-border-strong) transparent; }
+.gd .gd-ask__msg { display: flex; gap: var(--gw-space-8); max-width: 94%; min-width: 0; }
+.gd .gd-ask__msg--me { align-self: flex-end; max-width: 86%; flex-direction: column; align-items: flex-end; gap: var(--gw-space-4); }
+.gd .gd-ask__bubble { display: flex; flex-direction: column; gap: var(--gw-space-8); min-width: 0; padding: var(--gw-space-8) var(--gw-space-12); border-radius: var(--gw-radius-12); background: var(--gd-sunken-bg); font: var(--gw-text-body-14-reg); letter-spacing: var(--gw-text-body-14-reg-tracking); color: var(--gd-text); overflow-wrap: anywhere; white-space: pre-wrap; }
+.gd .gd-ask__bubble > * { white-space: normal; }
+.gd .gd-ask__msg--me .gd-ask__bubble { background: var(--gd-ink); color: var(--gd-ink-fg); border-bottom-right-radius: var(--gw-radius-4); }
+.gd .gd-ask__msg--bruce .gd-ask__bubble { border-bottom-left-radius: var(--gw-radius-4); }
+.gd .gd-ask__bubble--error { color: var(--gd-text); box-shadow: inset 0 0 0 1px var(--gd-border-strong); background: var(--gd-card-bg); }
+.gd .gd-ask__typing { color: var(--gd-text-muted); font: var(--gw-text-body-14-reg); }
+.gd .gd-ask__mini { display: flex; align-items: center; gap: var(--gw-space-8); padding: var(--gw-space-4) var(--gw-space-8); border-radius: var(--gw-radius-8); background: var(--gd-card-bg); box-shadow: inset 0 0 0 1px var(--gd-border); font: var(--gw-text-body-12-med); }
+.gd .gd-ask__mini > b { flex: 1 1 auto; min-width: 0; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--gd-text); }
+.gd .gd-ask__tag { flex: none; padding: 0 var(--gw-space-4); height: var(--gw-space-20); border-radius: var(--gw-radius-4); box-shadow: inset 0 0 0 1px var(--gd-border-strong); font: var(--gw-text-body-10-med); color: var(--gd-text-muted); transition: background var(--gw-motion-fast), color var(--gw-motion-fast); }
+.gd .gd-ask__tag:hover { background: var(--gd-selected-bg); color: var(--gd-text); }
+.gd .gd-ask__tags { display: flex; flex-wrap: wrap; gap: var(--gw-space-4); justify-content: flex-end; }
+.gd .gd-ask__empty { margin: auto; max-width: 320px; text-align: center; font: var(--gw-text-body-14-reg); color: var(--gd-text-muted); display: flex; flex-direction: column; gap: var(--gw-space-8); align-items: center; }
+.gd .gd-ask__starters { display: flex; flex-wrap: wrap; gap: var(--gw-space-8); justify-content: center; }
+@media (max-width: 767px) { .gd .gd-ask { inset: 0; width: auto; max-width: none; border-radius: 0; } }
+
+/* NEW: tag chip. Pending library review.
+   Anatomy: span.gd-tagchip[data-kind="task|person|channel"] > b (TSK-14 or @Name or #channel) + span (title) + optional button.gd-tagchip__x. */
+.gd .gd-tagchip { display: inline-flex; align-items: center; gap: var(--gw-space-4); max-width: 100%; height: var(--gw-space-24); padding: 0 var(--gw-space-8); border-radius: var(--gw-radius-8); background: var(--gd-selected-bg); box-shadow: inset 0 0 0 1px var(--gd-border-strong); font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); color: var(--gd-text); white-space: nowrap; vertical-align: middle; }
+.gd .gd-tagchip b { font-weight: 600; }
+.gd .gd-tagchip span { min-width: 0; overflow: hidden; text-overflow: ellipsis; color: var(--gd-text-muted); }
+.gd .gd-tagchip__x { display: grid; place-items: center; width: var(--gw-space-16); height: var(--gw-space-16); margin-right: calc(var(--gw-space-4) * -1); border-radius: var(--gw-radius-4); color: var(--gd-text-muted); }
+.gd .gd-tagchip__x:hover { background: var(--gd-ctl-hover); color: var(--gd-text); }
+.gd .gd-tagchip__x svg { width: 10px; height: 10px; }
+.gd .gd-ask__msg--me .gd-tagchip { background: color-mix(in srgb, var(--gd-ink-fg) 16%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gd-ink-fg) 36%, transparent); color: var(--gd-ink-fg); }
+.gd .gd-ask__msg--me .gd-tagchip span { color: color-mix(in srgb, var(--gd-ink-fg) 70%, transparent); }
+
+/* NEW: assistant composer. Pending library review.
+   Anatomy: footer.gd-composer > .gd-composer__tags (tag chips) + textarea.gd-composer__input + .gd-composer__tools (buttons: tag, command,
+   context chip, send) + .gd-mention (the picker, above the box).
+   States: field focus (edge, never a ring, R41), send disabled while empty. */
+.gd .gd-composer { position: relative; display: flex; flex-direction: column; gap: var(--gw-space-8); padding: var(--gw-space-12) var(--gd-card-pad) var(--gd-card-pad); border-top: 1px solid var(--gd-border); }
+.gd .gd-composer__box { display: flex; flex-direction: column; gap: var(--gw-space-8); padding: var(--gw-space-8) var(--gw-space-12); border-radius: var(--gw-radius-12); background: var(--gd-card-bg); box-shadow: inset 0 0 0 1px var(--gd-border-strong); }
+.gd .gd-composer__box:focus-within { box-shadow: inset 0 0 0 1px var(--gd-border-focus); }
+.gd .gd-composer__tags { display: flex; flex-wrap: wrap; gap: var(--gw-space-4); }
+.gd .gd-composer__tags:empty { display: none; }
+.gd .gd-composer__input { box-sizing: border-box; width: 100%; min-height: var(--gw-space-40); max-height: 160px; padding: 0; border: 0; background: none; color: var(--gd-text); font: var(--gw-text-body-14-reg); letter-spacing: var(--gw-text-body-14-reg-tracking); resize: none; outline: none; field-sizing: content; }
+.gd .gd-composer__input::placeholder { color: var(--gd-placeholder); }
+.gd .gd-composer__tools { display: flex; align-items: center; gap: var(--gw-space-8); flex-wrap: wrap; }
+.gd .gd-composer__tool { display: inline-flex; align-items: center; gap: var(--gw-space-4); height: var(--gw-space-24); padding: 0 var(--gw-space-8); border-radius: var(--gw-radius-8); font: var(--gw-text-body-12-med); color: var(--gd-text-muted); transition: background var(--gw-motion-fast), color var(--gw-motion-fast); }
+.gd .gd-composer__tool:hover { background: var(--gd-selected-bg); color: var(--gd-text); }
+.gd .gd-composer__tool svg { width: 12px; height: 12px; }
+.gd .gd-composer__send { margin-left: auto; }
+
+/* NEW: tag picker for the composer. Pending library review.
+   Anatomy: .gd-mention (a popover above the composer) > .gd-mention__tabs (a segmented control) + .gd-mention__list of
+   button.gd-mention__row (a key such as TSK-14, the title, a hint) + .gd-mention__sep + shortcut rows. */
+.gd .gd-mention { position: absolute; z-index: 5; left: var(--gd-card-pad); right: var(--gd-card-pad); bottom: calc(100% - var(--gw-space-8)); display: flex; flex-direction: column; gap: var(--gw-space-4); padding: var(--gw-space-8); border-radius: var(--gw-radius-12); background: var(--gd-raised-bg); box-shadow: var(--gw-shadow-s3), inset 0 0 0 1px var(--gd-border); max-height: 320px; overflow-y: auto; }
+.gd .gd-mention[hidden] { display: none; }
+.gd .gd-mention__list { display: flex; flex-direction: column; gap: var(--gw-space-2); }
+.gd .gd-mention__row { display: flex; align-items: center; gap: var(--gw-space-8); min-height: var(--gd-control-h); padding: 0 var(--gw-space-8); border-radius: var(--gw-radius-8); font: var(--gw-text-body-14-med); color: var(--gd-text); }
+.gd .gd-mention__row b { font-weight: 600; flex: none; }
+.gd .gd-mention__row > span { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gd .gd-mention__row small { margin-left: auto; flex: none; font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
+.gd .gd-mention__row:hover, .gd .gd-mention__row[aria-selected="true"] { background: var(--gd-menu-hover); }
+.gd .gd-mention__row[aria-disabled="true"] { color: var(--gd-disabled-ink); cursor: default; }
+.gd .gd-mention__sep { height: 1px; background: var(--gd-border); margin: var(--gw-space-2) 0; }
+.gd .gd-mention__none { padding: var(--gw-space-8); font: var(--gw-text-body-12-reg); color: var(--gd-text-muted); }
+
+/* ============================================================================
+   NEW: plan card and result card. Pending library review.
+   Anatomy: .gd-plan > p.gd-plan__intro + .gd-plan__step (a library checkbox, label, a Badge saying whose tasks it touches, detail line of
+   tag chips) + .gd-plan__draft (a drafted outward message, dashed) + .gd-plan__note + .gd-plan__foot (buttons).
+   .gd-donecard is the result: a tick, text, an Undo button.
+   States: step unticked (dropped, label struck), approving (aria-busy), done, undone.
+   Reference: wireframe section 9 (a plan you approve; outward steps wait for a separate Send).
+   ============================================================================ */
+.gd .gd-plan { display: flex; flex-direction: column; gap: var(--gw-space-12); padding: var(--gw-space-12); border-radius: var(--gw-radius-12); background: var(--gd-card-bg); box-shadow: inset 0 0 0 1.5px var(--gd-text); }
+.gd .gd-plan__intro { margin: 0; font: var(--gw-text-body-14-reg); color: var(--gd-text); }
+.gd .gd-plan__step { display: flex; align-items: flex-start; gap: var(--gw-space-8); font: var(--gw-text-body-14-med); color: var(--gd-text); }
+.gd .gd-plan__step > div { min-width: 0; display: flex; flex-direction: column; gap: var(--gw-space-4); }
+.gd .gd-plan__label { display: flex; align-items: center; flex-wrap: wrap; gap: var(--gw-space-8); }
+.gd .gd-plan__step[data-off="true"] .gd-plan__label > span:first-child { color: var(--gd-text-muted); text-decoration: line-through; }
+.gd .gd-plan__detail { display: flex; flex-wrap: wrap; gap: var(--gw-space-4); font: var(--gw-text-body-12-reg); color: var(--gd-text-muted); }
+.gd .gd-plan__draft { margin-top: var(--gw-space-4); padding: var(--gw-space-8) var(--gw-space-12); border-radius: var(--gw-radius-8); border: 1px dashed var(--gd-border-focus); background: var(--gd-sunken-bg); font: var(--gw-text-body-12-reg); color: var(--gd-text); white-space: pre-wrap; overflow-wrap: anywhere; }
+.gd .gd-plan__note { margin: 0; font: var(--gw-text-body-12-reg); color: var(--gd-text-muted); }
+.gd .gd-plan__foot { display: flex; flex-wrap: wrap; gap: var(--gw-space-8); }
+.gd .gd-donecard { display: flex; align-items: center; gap: var(--gw-space-12); padding: var(--gw-space-8) var(--gw-space-12); border-radius: var(--gw-radius-12); background: var(--gd-card-bg); box-shadow: inset 0 0 0 1px var(--gd-border-strong); font: var(--gw-text-body-14-reg); color: var(--gd-text); }
+.gd .gd-donecard > span { flex: 1 1 auto; min-width: 0; }
+.gd .gd-donecard svg { width: 16px; height: 16px; flex: none; color: var(--gd-text); }
+
+/* NEW: removable saved view. Pending library review.
+   Anatomy: inside .gd-views, a button.gd-views__x (a small close mark) placed right after a user-made tab. A tab cannot hold a button, so it is a sibling. */
+.gd .gd-views__x { display: grid; place-items: center; width: var(--gw-space-20); height: var(--gw-space-20); margin-left: calc(var(--gw-space-4) * -1); border-radius: var(--gw-radius-4); color: var(--gd-text-muted); transition: background var(--gw-motion-fast), color var(--gw-motion-fast); font: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+.gd .gd-views__x:hover { background: var(--gd-ctl-hover); color: var(--gd-text); }
+.gd .gd-views__x svg { width: 10px; height: 10px; }
+
+/* NEW: task list second line, phone only. Pending library review.
+   Anatomy: span.gd-tasklist__sub under the title in a list row; shows the due date where the column is hidden. */
+.gd .gd-tasklist__sub { display: none; font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
+@media (max-width: 767px) { .gd .gd-tasklist__sub { display: block; } .gd .gd-tasklist__open { white-space: normal; } }
+.gd .gd-taskcard__quote { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* NEW: list row title cell. Pending library review.
+   Anatomy: .gd-tasklist__cell--main holds .gd-tasklist__line (title button and an optional badge) and the phone-only sub line. */
+.gd .gd-tasklist__cell--main { flex-direction: column; align-items: flex-start; gap: 0; }
+.gd .gd-tasklist__line { display: flex; align-items: center; gap: var(--gw-space-8); min-width: 0; max-width: 100%; }
+
+/* ============================================================================
+   NEW: floating add button. Pending library review.
+   Anatomy: button.gd-btn.gd-btn--primary.gd-fab (a glyph only, aria-label required) inside a positioned container; phone only,
+   it floats above the bottom bar. Reference: wireframe section 11.
+   ============================================================================ */
+.gd .gd-fab { display: none; }
+@media (max-width: 767px) {
+  .gd .gd-fab { display: inline-flex; position: absolute; z-index: 6; right: var(--gw-space-16); bottom: calc(var(--gd-control-h) + var(--gw-space-24) + var(--gw-space-16)); width: var(--gw-space-48); height: var(--gw-space-48); padding: 0; border-radius: var(--gw-radius-16); box-shadow: var(--gw-shadow-s3); justify-content: center; }
+  .gd .gd-fab[hidden] { display: none; }
+}
+
 /* ==== 60-feedback.css ==== */
 /* ============================================================================
    Gushwork dashboard — 60 feedback, overlays and views

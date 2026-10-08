@@ -1,0 +1,108 @@
+/* Task board: page glue only. Reusable pieces live in the library (exports/dashboard/css/57-tasks.css, documented in exports/dashboard/tasks.md); everything here is this page's own layout.
+   Tokens and --gd-* aliases only. Layout dimensions with no documented figure are marked "chosen". */
+
+html, body { margin: 0; overflow: hidden; }
+.tk-panel { position: relative; }   /* the phone add button positions against the panel */   /* the shell owns the viewport; the UA body margin otherwise overflows it by 8px */
+
+/* No rail on this page: a one-row rail would be chrome. The panel floats on the page ground with 12px clear on all four sides
+   (the shell clears three and leaves the left to the rail). Under 768 the shell removes its padding and so does this. */
+@container gd-app (min-width: 768px) { .tk-app .gd-app__main { padding-left: var(--gw-space-12); } }
+
+/* ---- the light top bar ----------------------------------------------------------------------------------------- */
+.tk-bar { flex: none; display: flex; align-items: center; gap: var(--gd-gap); height: calc(var(--gd-control-h) + var(--gw-space-24)); padding: 0 var(--gd-page-px); border-bottom: 1px solid var(--gd-border); }
+.tk-bar[hidden], .tk-bar [hidden] { display: none !important; }
+.tk-bar__brand { display: flex; align-items: center; gap: var(--gw-space-12); min-width: 0; }
+.tk-bar__title { margin: 0; font: 600 20px/1 var(--gw-font-display); letter-spacing: 0; color: var(--gd-text); }   /* 20 has no display token: the rail brand uses the same literal */
+.tk-bar__acts { margin-left: auto; display: flex; align-items: center; gap: var(--gw-space-8); min-width: 0; }
+.tk-bar__acts .gd-popover-wrap { align-items: center; gap: var(--gw-space-8); }
+.tk-bar .gd-seg__item .gd-views__n { margin-left: var(--gw-space-4); }
+.tk-search { display: flex; align-items: center; gap: var(--gw-space-8); }
+.tk-search__field { --gd-input-w: 240px; }
+
+/* ---- the strip under the bar: saved views and applied filters (sticky inside the one scroll region) ------------------- */
+.tk-page { padding-top: 0; gap: 0; }
+.tk-strip { position: sticky; z-index: 5; top: 0; display: flex; flex-direction: column; gap: var(--gw-space-8); padding: var(--gd-gap) 0 var(--gw-space-12); background: var(--gd-panel-bg); }
+.tk-strip[hidden] { display: none; }
+.tk-strip .gd-views { padding: 0; }
+.tk-strip .gd-chips { padding: 0; }
+.tk-strip .gd-views__tab { border-radius: var(--gw-radius-full); }
+.tk-strip .gd-chips__label { font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
+.tk-view { min-width: 0; padding-bottom: calc(var(--gd-page-px) + var(--gw-space-48)); }   /* room under the last row for the floating launcher */
+.tk-view > * { animation: none; }
+.tk-strip[hidden] ~ .tk-view { padding-top: var(--gd-gap); }
+.tk-lanechips { display: none; padding-bottom: var(--gw-space-8); }
+
+/* ---- board ---------------------------------------------------------------------------------------------------------- */
+.tk-view .gd-lanes { --gd-lanes: 4; }
+.tk-view .gd-lanes[data-lanes="3"] { --gd-lanes: 3; }
+.tk-sk .gd-lane { background: var(--gd-sunken-bg); }
+.tk-sk__card { display: flex; flex-direction: column; gap: var(--gw-space-8); padding: var(--gw-space-12); border-radius: var(--gw-radius-8); background: var(--gd-card-bg); box-shadow: inset 0 0 0 1px var(--gd-border); }
+
+/* ---- list and timeline and inbox wrappers ----------------------------------------------------------------------------- */
+.tk-tltools { display: flex; align-items: center; gap: var(--gw-space-8); flex-wrap: wrap; margin-bottom: var(--gw-space-12); }
+.tk-tltools__month { font: var(--gw-text-body-14-sem); color: var(--gd-text); margin-left: var(--gw-space-8); }
+.tk-view .gd-inbox { min-height: 480px; }   /* chosen: tall enough for the pane's properties and actions at 1440 */
+.tk-donefoot { margin-top: var(--gw-space-8); }
+
+/* ---- the drawer ----------------------------------------------------------------------------------------------------- */
+.tk-dr-titles { min-width: 0; flex: 1 1 auto; }
+.tk-dr-titles .gd-drawer__title { margin-top: var(--gw-space-4); display: block; }
+.tk-title-input { box-sizing: border-box; display: block; width: 100%; margin: 0 0 0 calc(var(--gw-space-8) * -1); padding: var(--gw-space-4) var(--gw-space-8); border: 0; border-radius: var(--gw-radius-8); background: none; color: var(--gd-text); font: inherit; resize: none; field-sizing: content; outline: none; transition: background var(--gw-motion-fast); }
+.tk-title-input:hover { background: var(--gd-hover-bg); }
+.tk-title-input:focus { background: var(--gd-card-bg); box-shadow: inset 0 0 0 1px var(--gd-border-focus); }
+.tk-dr-titles .gd-drawer__sub { display: flex; align-items: center; gap: var(--gw-space-8); flex-wrap: wrap; }
+.tk-sec { display: flex; flex-direction: column; gap: var(--gw-space-8); min-width: 0; }
+.tk-sec__label { font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); color: var(--gd-text-muted); }
+.tk-notes { box-sizing: border-box; width: 100%; min-height: 96px; padding: var(--gw-space-8) var(--gw-space-12); border: 0; border-radius: var(--gw-radius-12); background: var(--gd-card-bg); box-shadow: inset 0 0 0 1px var(--gd-border-strong); color: var(--gd-text); font: var(--gw-text-body-14-reg); letter-spacing: var(--gw-text-body-14-reg-tracking); resize: vertical; outline: none; }
+.tk-notes:focus { box-shadow: inset 0 0 0 1px var(--gd-border-focus); }
+.tk-notes::placeholder { color: var(--gd-placeholder); }
+.tk-saved { font: var(--gw-text-body-12-reg); color: var(--gd-text-muted); min-height: var(--gw-space-16); }
+.tk-agentnote { margin: 0; font: var(--gw-text-body-12-reg); color: var(--gd-text-muted); }
+.tk-result { display: flex; flex-direction: column; gap: var(--gw-space-8); padding: var(--gw-space-12); border-radius: var(--gw-radius-12); background: var(--gd-sunken-bg); font: var(--gw-text-body-14-reg); color: var(--gd-text); overflow-wrap: anywhere; }
+.tk-result b { font-weight: 600; }
+.tk-acts { display: flex; flex-wrap: wrap; gap: var(--gw-space-8); }
+.tk-rework { display: flex; flex-direction: column; gap: var(--gw-space-8); }
+.tk-dr-foot-note { margin-right: auto; font: var(--gw-text-body-12-reg); color: var(--gd-text-muted); }
+.tk-link { color: var(--gd-link); text-decoration: underline; text-underline-offset: 2px; font: var(--gw-text-body-12-med); }
+
+/* ---- Bruce settings (read only rows) -------------------------------------------------------------------------------- */
+.tk-readrows { margin: 0; display: flex; flex-direction: column; }
+.tk-readrows__group { padding: var(--gw-space-16) 0 var(--gw-space-4); font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
+.tk-readrows__row { display: flex; align-items: center; justify-content: space-between; gap: var(--gd-gap); padding: var(--gw-space-12) 0; border-bottom: 1px solid var(--gd-border); }
+.tk-readrows dt { display: flex; flex-direction: column; gap: var(--gw-space-2); font: var(--gw-text-body-14-med); color: var(--gd-text); }
+.tk-readrows dt small { font: var(--gw-text-body-12-reg); color: var(--gd-text-muted); }
+.tk-readrows dd { margin: 0; flex: none; font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
+
+/* ---- empty and unavailable states fill the view ---------------------------------------------------------------------- */
+.tk-state { min-height: 50vh; display: grid; place-items: center; }
+
+/* ---- display popover: small stacked sections ---------------------------------------------------------------------- */
+.gd .gd-popover[data-kind="display"] { width: 300px; padding: var(--gw-space-4); gap: 0; }
+.tk-disp__row { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-12); min-height: var(--gd-control-h); padding: 0 var(--gw-space-8); font: var(--gw-text-body-14-med); color: var(--gd-text); }
+.tk-disp__row .gd-seg { flex: none; }
+
+/* ---- phone: one lane at a time, a bottom bar, a floating add button ------------------------------------------------- */
+@media (max-width: 767px) {
+  .tk-bar { height: calc(var(--gd-control-h) + var(--gw-space-24)); }
+  .tk-bar__views, .tk-bar #tk-people-wrap, .tk-bar #tk-new-btn { display: none !important; }
+  .tk-bar__acts { gap: var(--gw-space-4); }
+  .tk-bar #tk-filter-btn > span:not(.gd-tbar__n), .tk-bar #tk-display-btn > span { display: none; }
+  .tk-bar .gd-btn { padding: 0 var(--gw-space-8); }
+  .tk-bar .tk-search[data-open="true"] { position: absolute; z-index: 6; left: var(--gd-page-px); right: var(--gd-page-px); top: 0; height: 100%; display: flex; align-items: center; background: var(--gd-panel-bg); }
+  .tk-bar .tk-search[data-open="true"] .tk-search__field { display: flex !important; flex: 1 1 auto; --gd-input-w: 100%; }
+  .tk-lanechips { display: block; }
+  .tk-view .gd-lanes { display: block; }
+  .tk-view .gd-lanes > .gd-lane:not([data-active="true"]) { display: none; }
+  .tk-view .gd-lanes > .gd-lane { padding: 0; background: none; border: 0; }
+  .tk-view .gd-lanes > .gd-lane .gd-lane__head { display: none; }
+  .tk-view .gd-lanes > .gd-lane--suggested { background: var(--gd-sunken-bg); border: 1px dashed var(--gd-border-strong); padding: var(--gw-space-8); }
+  .tk-view .gd-inbox { grid-template-columns: minmax(0, 1fr); }
+  .tk-view .gd-inbox__list { border-right: 0; border-bottom: 1px solid var(--gd-border); }
+  .tk-view .gd-inbox__pane { padding: var(--gw-space-16); }
+  .gd .gd-tasklist { --gd-list-cols: var(--gw-space-24) minmax(0, 1fr) var(--gw-space-32); }
+  .gd .gd-tasklist .gd-tasklist__hide-sm { display: none; }
+  .gd .gd-popover[data-kind="filter"] { position: fixed; left: var(--gw-space-8); right: var(--gw-space-8); top: auto; bottom: var(--gw-space-8); width: auto; max-width: none; }
+  .gd .gd-popover[data-kind="display"] { position: fixed; left: var(--gw-space-8); right: var(--gw-space-8); top: auto; bottom: var(--gw-space-8); width: auto; }
+  .gd .gd-filterpop { grid-template-columns: 120px minmax(0, 1fr); }
+  .tk-tltools .gd-gantt__legend { display: none; }
+}
