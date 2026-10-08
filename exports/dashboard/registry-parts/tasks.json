@@ -1,0 +1,134 @@
+{
+  "assignee-avatar": {
+    "version": "2.0.8",
+    "changed": "2026-10-08",
+    "breaking": false,
+    "doc": "tasks.md"
+  },
+  "priority-bars": {
+    "version": "2.0.8",
+    "changed": "2026-10-08",
+    "breaking": false,
+    "doc": "tasks.md"
+  },
+  "run-status-chip": {
+    "version": "2.0.8",
+    "changed": "2026-10-08",
+    "breaking": false,
+    "doc": "tasks.md"
+  },
+  "board-lane": {
+    "version": "2.0.8",
+    "changed": "2026-10-08",
+    "breaking": false,
+    "doc": "tasks.md"
+  },
+  "task-card": {
+    "version": "2.0.8",
+    "changed": "2026-10-08",
+    "breaking": false,
+    "doc": "tasks.md"
+  },
+  "task-list": {
+    "version": "2.0.8",
+    "changed": "2026-10-08",
+    "breaking": false,
+    "doc": "tasks.md"
+  },
+  "property-row": {
+    "version": "2.0.8",
+    "changed": "2026-10-08",
+    "breaking": false,
+    "doc": "tasks.md"
+  },
+  "list-picker": {
+    "version": "2.0.8",
+    "changed": "2026-10-08",
+    "breaking": false,
+    "doc": "tasks.md"
+  },
+  "date-picker": {
+    "version": "2.0.8",
+    "changed": "2026-10-08",
+    "breaking": false,
+    "doc": "tasks.md"
+  },
+  "filter-popover": {
+    "version": "2.0.8",
+    "changed": "2026-10-08",
+    "breaking": false,
+    "doc": "tasks.md"
+  },
+  "task-timeline": {
+    "version": "2.0.8",
+    "changed": "2026-10-08",
+    "breaking": false,
+    "doc": "tasks.md"
+  },
+  "inbox-triage": {
+    "version": "2.0.8",
+    "changed": "2026-10-08",
+    "breaking": false,
+    "doc": "tasks.md"
+  },
+  "quoted-message": {
+    "version": "2.0.8",
+    "changed": "2026-10-08",
+    "breaking": false,
+    "doc": "tasks.md"
+  },
+  "assistant-launcher": {
+    "version": "2.0.8",
+    "changed": "2026-10-08",
+    "breaking": false,
+    "doc": "tasks.md"
+  },
+  "bottom-bar": {
+    "version": "2.0.8",
+    "changed": "2026-10-08",
+    "breaking": false,
+    "doc": "tasks.md"
+  },
+  "floating-add-button": {
+    "version": "2.0.8",
+    "changed": "2026-10-08",
+    "breaking": false,
+    "doc": "tasks.md"
+  },
+  "assistant-panel": {
+    "version": "2.0.8",
+    "changed": "2026-10-08",
+    "breaking": false,
+    "doc": "tasks.md"
+  },
+  "tag-chip": {
+    "version": "2.0.8",
+    "changed": "2026-10-08",
+    "breaking": false,
+    "doc": "tasks.md"
+  },
+  "assistant-composer": {
+    "version": "2.0.8",
+    "changed": "2026-10-08",
+    "breaking": false,
+    "doc": "tasks.md"
+  },
+  "tag-picker": {
+    "version": "2.0.8",
+    "changed": "2026-10-08",
+    "breaking": false,
+    "doc": "tasks.md"
+  },
+  "assistant-plan-card": {
+    "version": "2.0.8",
+    "changed": "2026-10-08",
+    "breaking": false,
+    "doc": "tasks.md"
+  },
+  "removable-view": {
+    "version": "2.0.8",
+    "changed": "2026-10-08",
+    "breaking": false,
+    "doc": "tasks.md"
+  }
+}

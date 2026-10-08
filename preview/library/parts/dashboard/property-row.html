@@ -1,0 +1,725 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>property-row — Gushwork</title>
+<meta name="description" content="Dashboard · tasks.md">
+<meta name="robots" content="noindex">
+<script>try{var c=localStorage.getItem('gw-theme-choice'),t=c==='dark'||c==='light'?c:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20x%3D%221%22%20y%3D%221%22%20width%3D%2278%22%20height%3D%2278%22%20rx%3D%2219%22%20fill%3D%22%230070ff%22%20stroke%3D%22%230061e0%22%20stroke-width%3D%222%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="../../../foundation/tokens.css">
+<link rel="stylesheet" href="../../../shell.css">
+<style>
+.cl{--cl-gap:var(--gw-space-40)}
+.cl h2{font:var(--gw-text-h5);color:var(--s-heading);margin:0}
+.cl h3{font:var(--gw-text-h7);color:var(--s-heading);margin:0}
+.cl h4{font:var(--gw-text-body-16-sem);color:var(--s-heading);margin:0}
+.cl p{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+      color:var(--s-body);margin:0;max-width:78ch}
+.cl code,.cl .mono{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px}
+
+/* --- page head ------------------------------------------------------------ */
+.cl-head{display:flex;flex-direction:column;gap:var(--gw-space-16)}
+.cl-head h1{font:var(--gw-text-h4);color:var(--s-heading);margin:0}
+.cl-lede{font:var(--gw-text-body-18-reg);letter-spacing:var(--gw-text-body-18-reg-tracking);
+         color:var(--s-body);margin:0;max-width:72ch}
+
+/* --- the tally ------------------------------------------------------------ */
+.cl-tally{display:flex;flex-wrap:wrap;gap:var(--gw-space-12)}
+.cl-stat{flex:1 1 150px;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-16) var(--gw-space-20);
+         display:flex;flex-direction:column;gap:var(--gw-space-4)}
+.cl-stat b{font:var(--gw-text-h6);color:var(--s-heading);font-feature-settings:"tnum" 1}
+.cl-stat span{font:var(--gw-text-body-12-med);color:var(--gw-color-neutral-400);
+              text-transform:uppercase;letter-spacing:.06em}
+
+/* --- review queue --------------------------------------------------------- */
+.cl-queue{background:var(--s-card-bg);border:1px solid var(--gw-color-yellow-300);
+          border-left:3px solid var(--gw-color-yellow-400);border-radius:var(--gw-radius-12);
+          padding:var(--gw-space-20) var(--gw-space-24);display:flex;flex-direction:column;
+          gap:var(--gw-space-12)}
+.cl-queue h2{font:var(--gw-text-h7)}
+.cl-queue ul{margin:0;padding-left:var(--gw-space-20);display:flex;flex-direction:column;
+             gap:var(--gw-space-4)}
+.cl-queue li{font:var(--gw-text-body-14-reg);color:var(--s-body)}
+.cl-queue a{color:var(--gw-color-primary-600);text-decoration:none}
+.cl-queue a:hover{text-decoration:underline}
+.cl-pass{background:var(--s-card-bg);border:1px solid var(--gw-color-green-300);
+         border-left:3px solid var(--gw-color-green-400)}
+
+/* --- controls ------------------------------------------------------------- */
+.cl-bar{position:sticky;top:0;z-index:5;background:var(--s-page-bg);
+        padding:var(--gw-space-12) 0;display:flex;flex-wrap:wrap;gap:var(--gw-space-8);
+        align-items:center;border-bottom:1px solid var(--s-chrome-border)}
+.cl-find{flex:1 1 220px;min-width:180px;background:var(--s-field-bg);
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         padding:var(--gw-space-8) var(--gw-space-12);font:var(--gw-text-body-14-reg);
+         color:var(--s-heading)}
+.cl-find::placeholder{color:var(--s-placeholder)}
+.cl-find:focus{outline:none;border-color:var(--gw-color-neutral-400)}
+.cl-filter{display:flex;gap:var(--gw-space-4);flex-wrap:wrap}
+.cl-f{font:var(--gw-text-body-12-med);color:var(--s-body);background:transparent;
+      border:1px solid var(--s-field-border);border-radius:var(--gw-radius-full);
+      padding:6px var(--gw-space-12);cursor:pointer}
+.cl-f:hover{border-color:var(--gw-color-primary-500)}
+.cl-f[aria-pressed="true"]{background:var(--gw-color-black);color:var(--gw-color-white);
+                           border-color:var(--gw-color-black)}
+.cl-f:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+.cl-count{font:var(--gw-text-body-12-reg);color:var(--gw-color-neutral-400);margin-left:auto}
+
+/* --- sections ------------------------------------------------------------- */
+.cl-sec{display:flex;flex-direction:column;gap:var(--gw-space-20);
+        scroll-margin-top:var(--gw-space-80)}
+.cl-sec[hidden]{display:none}
+.cl-sechead{display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--gw-space-12)}
+.cl-note{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+         color:var(--s-body);background:var(--gw-color-neutral-25);
+         border:1px solid var(--s-card-border);border-left:3px solid var(--gw-color-neutral-300);
+         border-radius:var(--gw-radius-8);padding:var(--gw-space-12) var(--gw-space-16);
+         white-space:pre-wrap;max-width:88ch}
+:root[data-theme="dark"] .cl-note{background:var(--gw-color-neutral-900)}
+.cl-sub{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.cl-sub[hidden]{display:none}
+
+/* --- chips ---------------------------------------------------------------- */
+.cl-chip{display:inline-flex;align-items:center;gap:6px;font:var(--gw-text-body-12-med);
+         border-radius:var(--gw-radius-full);padding:3px var(--gw-space-8);white-space:nowrap}
+.cl-chip--measured{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.cl-chip--transcribed{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.cl-chip--ruled{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+.cl-chip--passed{background:var(--gw-color-green-500);color:var(--gw-color-white)}
+.cl-chip--pending{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+.cl-chip--rejected{background:var(--gw-color-red-500);color:var(--gw-color-white)}
+.cl-chip--gap{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+:root[data-theme="dark"] .cl-chip--measured{background:var(--gw-color-green-900);
+                                            color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .cl-chip--transcribed{background:var(--gw-color-yellow-900);
+                                               color:var(--gw-color-yellow-100)}
+:root[data-theme="dark"] .cl-chip--ruled{background:var(--gw-color-primary-900);
+                                         color:var(--gw-color-primary-200)}
+:root[data-theme="dark"] .cl-chip--pending{background:var(--gw-color-neutral-800);
+                                           color:var(--gw-color-neutral-300)}
+:root[data-theme="dark"] .cl-chip--gap{background:var(--gw-color-red-900);
+                                       color:var(--gw-color-red-200)}
+
+/* --- colour --------------------------------------------------------------- */
+.cl-ramp{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));
+         gap:var(--gw-space-8)}
+.cl-sw{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+       border-radius:var(--gw-radius-10);overflow:hidden;display:flex;flex-direction:column}
+.cl-sw[hidden]{display:none}
+.cl-sw__chip{height:64px;border-bottom:1px solid var(--s-card-border);
+             background-image:linear-gradient(45deg,var(--gw-color-neutral-100) 25%,transparent 25%),
+                              linear-gradient(-45deg,var(--gw-color-neutral-100) 25%,transparent 25%),
+                              linear-gradient(45deg,transparent 75%,var(--gw-color-neutral-100) 75%),
+                              linear-gradient(-45deg,transparent 75%,var(--gw-color-neutral-100) 75%);
+             background-size:12px 12px;
+             background-position:0 0,0 6px,6px -6px,-6px 0}
+.cl-sw__fill{width:100%;height:100%}
+.cl-sw__body{padding:var(--gw-space-8) var(--gw-space-12);display:flex;
+             flex-direction:column;gap:3px}
+.cl-sw__name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;
+             color:var(--s-heading);word-break:break-all;line-height:1.35}
+.cl-sw__hex{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;
+            color:var(--gw-color-neutral-400);text-transform:uppercase}
+.cl-sw__ac{display:flex;gap:4px;margin-top:2px}
+.cl-ac{font-size:9.5px;font-weight:600;letter-spacing:.04em;border-radius:var(--gw-radius-4);
+       padding:1px 4px;line-height:1.5}
+.cl-ac--ok{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.cl-ac--no{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+:root[data-theme="dark"] .cl-ac--ok{background:var(--gw-color-green-900);color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .cl-ac--no{background:var(--gw-color-red-900);color:var(--gw-color-red-200)}
+
+/* --- type ----------------------------------------------------------------- */
+.cl-types{display:flex;flex-direction:column;gap:2px}
+.cl-t{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:var(--gw-space-20);
+      align-items:start;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+      border-radius:var(--gw-radius-10);padding:var(--gw-space-16) var(--gw-space-20)}
+.cl-t[hidden]{display:none}
+.cl-t__spec{color:var(--s-heading);min-width:0;overflow-wrap:anywhere}
+.cl-t__meta{display:flex;flex-direction:column;gap:2px;text-align:right}
+.cl-t__name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+            color:var(--gw-color-primary-600)}
+.cl-t__val{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10.5px;
+           color:var(--gw-color-neutral-400);line-height:1.5}
+@media (max-width:860px){.cl-t{grid-template-columns:1fr}.cl-t__meta{text-align:left}}
+
+/* --- faces ---------------------------------------------------------------- */
+.cl-faces{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+          gap:var(--gw-space-16)}
+.cl-face{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-24);
+         display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.cl-face__aa{font-size:52px;line-height:1.05;color:var(--s-heading)}
+.cl-face__wt{display:flex;flex-direction:column;gap:2px}
+.cl-face__wt span{color:var(--s-heading);font-size:19px;line-height:1.45}
+
+/* --- space / radius / shadow ---------------------------------------------- */
+.cl-rows{display:flex;flex-direction:column;gap:6px}
+.cl-row{display:grid;grid-template-columns:132px minmax(0,1fr) 60px;gap:var(--gw-space-16);
+        align-items:center;background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-radius:var(--gw-radius-8);padding:var(--gw-space-8) var(--gw-space-16)}
+.cl-row[hidden]{display:none}
+.cl-row__n{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+           color:var(--gw-color-primary-600);word-break:break-all}
+.cl-row__v{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+           color:var(--gw-color-neutral-400);text-align:right}
+.cl-bararea{min-height:18px;display:flex;align-items:center}
+.cl-barfill{height:16px;background:var(--gw-color-primary-500);border-radius:var(--gw-radius-2);
+            max-width:100%}
+.cl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));
+         gap:var(--gw-space-12)}
+.cl-tile{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-10);padding:var(--gw-space-16);display:flex;
+         flex-direction:column;align-items:center;gap:var(--gw-space-8)}
+.cl-tile[hidden]{display:none}
+.cl-tile__demo{width:72px;height:72px;background:var(--gw-color-primary-100);
+               border:1.5px solid var(--gw-color-primary-500)}
+.cl-tile__sh{width:100%;height:64px;background:var(--gw-color-white);
+             border-radius:var(--gw-radius-8)}
+:root[data-theme="dark"] .cl-tile__sh{background:var(--gw-color-neutral-800)}
+/* The alpha checker is drawn in neutral-100, which is near-white and shouts on a
+   black ground. Same job, quieter, in dark. */
+:root[data-theme="dark"] .cl-sw__chip{
+  background-image:linear-gradient(45deg,var(--gw-color-neutral-800) 25%,transparent 25%),
+                   linear-gradient(-45deg,var(--gw-color-neutral-800) 25%,transparent 25%),
+                   linear-gradient(45deg,transparent 75%,var(--gw-color-neutral-800) 75%),
+                   linear-gradient(-45deg,transparent 75%,var(--gw-color-neutral-800) 75%)}
+
+/* --- tables --------------------------------------------------------------- */
+.cl-tbl{width:100%;border-collapse:collapse;background:var(--s-card-bg);
+        border:1px solid var(--s-card-border);border-radius:var(--gw-radius-10);
+        overflow:hidden;font:var(--gw-text-body-14-reg)}
+.cl-tblwrap{overflow-x:auto}
+.cl-tbl th{text-align:left;font:var(--gw-text-body-12-med);text-transform:uppercase;
+           letter-spacing:.06em;color:var(--gw-color-neutral-400);
+           padding:var(--gw-space-8) var(--gw-space-16);
+           border-bottom:1px solid var(--s-card-border);white-space:nowrap}
+.cl-tbl td{padding:var(--gw-space-8) var(--gw-space-16);color:var(--s-body);
+           border-bottom:1px solid var(--s-card-border);vertical-align:top}
+.cl-tbl tr:last-child td{border-bottom:none}
+.cl-tbl tr[hidden]{display:none}
+.cl-tbl .mono{color:var(--gw-color-primary-600)}
+.cl-tbl .num{font-feature-settings:"tnum" 1;white-space:nowrap}
+
+/* --- gaps ----------------------------------------------------------------- */
+.cl-gaps{display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.cl-gap{display:grid;grid-template-columns:28px minmax(0,1fr);gap:var(--gw-space-12);
+        background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-left:3px solid var(--gw-color-red-400);border-radius:var(--gw-radius-8);
+        padding:var(--gw-space-12) var(--gw-space-16)}
+.cl-gap__n{font:var(--gw-text-body-14-sem);color:var(--gw-color-red-500);
+           font-feature-settings:"tnum" 1}
+.cl-gap__t{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+           color:var(--s-body);white-space:pre-wrap;margin:0}
+
+/* --- use-case cards ------------------------------------------------------- */
+.cl-cases{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+          gap:var(--gw-space-12)}
+.cl-case{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+         border-radius:var(--gw-radius-12);padding:var(--gw-space-20);
+         display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.cl-case__n{display:flex;align-items:baseline;justify-content:space-between;gap:var(--gw-space-8)}
+.cl-case__list{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:4px}
+.cl-case__list li{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10.5px;
+                  color:var(--gw-color-neutral-600);background:var(--gw-color-neutral-25);
+                  border:1px solid var(--s-card-border);border-radius:var(--gw-radius-4);
+                  padding:1px 5px}
+:root[data-theme="dark"] .cl-case__list li{background:var(--gw-color-neutral-900)}
+
+/* --- misc ----------------------------------------------------------------- */
+.cl-src{display:flex;flex-wrap:wrap;gap:var(--gw-space-8)}
+.cl-src code{background:var(--s-code-bg);border:1px solid var(--s-code-border);
+             color:var(--s-code-fg);border-radius:var(--gw-radius-4);padding:2px 7px}
+.cl-empty{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-400);
+          border:1px dashed var(--s-field-border);border-radius:var(--gw-radius-10);
+          padding:var(--gw-space-24);text-align:center}
+.cl-jump{display:flex;flex-wrap:wrap;gap:6px}
+.cl-jump a{font:var(--gw-text-body-12-med);color:var(--s-body);text-decoration:none;
+           border:1px solid var(--s-field-border);border-radius:var(--gw-radius-full);
+           padding:5px var(--gw-space-12)}
+.cl-jump a:hover{border-color:var(--gw-color-primary-500);color:var(--gw-color-primary-600)}
+@media print{.cl-bar,.cl-jump{display:none}}
+
+*{box-sizing:border-box}
+/* Body/body-16-reg, the site-wide page default ruled 29 Sep 2026 (796:12917).
+   This sheet named the family but no size, so it fell to the browser's 16px at
+   `normal` leading — the right size by accident, the wrong line-height. */
+body{margin:0;background:var(--s-page-bg);
+     font:var(--gw-text-body-16-reg);
+     letter-spacing:var(--gw-text-body-16-reg-tracking);
+     color:var(--s-body);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+h1,h2,h3,h4,h5,h6{color:var(--s-heading)}
+
+/* ---- topbar ------------------------------------------------------------- */
+.lb-top{position:sticky;top:0;z-index:20;height:60px;display:flex;align-items:center;
+        gap:var(--gw-space-16);padding:0 var(--gw-space-24);
+        background:var(--s-chrome-bg);border-bottom:1px solid var(--s-chrome-border)}
+.lb-brand{display:flex;align-items:center;gap:var(--gw-space-12);text-decoration:none;
+          flex:none}
+.lb-brand__chip{width:32px;height:32px;border-radius:var(--gw-radius-8);
+                background:var(--gw-color-primary-500);color:var(--gw-color-white);
+                box-shadow:inset 0 0 0 1px var(--gw-color-primary-600);
+                display:grid;place-items:center;flex:none}
+.lb-brand__chip svg{width:16px;height:16px;display:block}
+.lb-brand__n{font:var(--gw-text-h7);color:var(--s-heading)}
+.lb-crumb{font:var(--gw-text-body-14-reg);color:var(--s-group-label);
+          white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-crumb a{color:var(--gw-color-primary-600);text-decoration:none}
+.lb-top__r{display:flex;align-items:center;gap:var(--gw-space-12);margin-left:auto}
+.lb-find{width:300px;height:36px;background:var(--s-field-bg);
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         padding:0 var(--gw-space-12);font:var(--gw-text-body-14-reg);color:var(--s-heading)}
+.lb-find::placeholder{color:var(--s-placeholder)}
+.lb-find:focus{outline:none;border-color:var(--gw-color-neutral-400)}
+.lb-tbtn{width:36px;height:36px;display:grid;place-items:center;background:transparent;
+         border:1px solid var(--s-field-border);border-radius:var(--gw-radius-10);
+         color:var(--s-body);cursor:pointer;flex:none}
+.lb-tbtn svg{width:18px;height:18px;display:block}
+.lb-tbtn:focus-visible{outline:var(--gw-focus-ring);outline-offset:var(--gw-focus-offset)}
+@media (max-width:820px){.lb-find{display:none}}
+
+/* ---- three columns ------------------------------------------------------- */
+.lb-3{display:grid;grid-template-columns:240px minmax(0,1fr) 212px;align-items:start;
+      max-width:1600px;margin:0 auto}
+.lb-rail{position:sticky;top:60px;max-height:calc(100vh - 60px);overflow-y:auto;
+         border-right:1px solid var(--s-chrome-border);padding:var(--gw-space-24) 0}
+.lb-rail__t{font:var(--gw-text-body-12-med);text-transform:uppercase;letter-spacing:.06em;
+            color:var(--s-group-label);padding:0 var(--gw-space-20) var(--gw-space-8)}
+.lb-rail a{display:flex;justify-content:space-between;gap:var(--gw-space-8);
+           font:var(--gw-text-body-14-reg);color:var(--s-body);text-decoration:none;
+           padding:6px var(--gw-space-20)}
+.lb-rail a:hover{background:var(--s-nav-hover);color:var(--s-heading)}
+.lb-rail a.on{background:var(--s-nav-sel);color:var(--s-heading);
+              font:var(--gw-text-body-14-sem)}
+.lb-rail a span{color:var(--gw-color-neutral-400);font:var(--gw-text-body-12-reg);flex:none}
+.lb-rail a.on span{color:var(--s-heading)}
+.lb-rail__sep{margin:var(--gw-space-12) var(--gw-space-20) var(--gw-space-8);
+              border-top:1px solid var(--s-chrome-border)}
+
+.lb-mid{grid-column:2;padding:var(--gw-space-32) var(--gw-space-40) var(--gw-space-80);
+        min-width:0;display:flex;flex-direction:column;gap:var(--gw-space-24)}
+.lb-toc{grid-column:3;position:sticky;top:60px;max-height:calc(100vh - 60px);overflow-y:auto;
+        padding:var(--gw-space-32) var(--gw-space-20);display:flex;flex-direction:column;
+        gap:5px}
+.lb-toc b{font:var(--gw-text-body-12-med);text-transform:uppercase;letter-spacing:.06em;
+          color:var(--gw-color-neutral-400);margin-bottom:3px}
+.lb-toc a{font:var(--gw-text-body-14-reg);color:var(--gw-color-neutral-600);
+          text-decoration:none;line-height:1.35}
+.lb-toc a:hover{color:var(--gw-color-primary-600)}
+.lb-toc a.l3{padding-left:var(--gw-space-12)}
+@media (max-width:1180px){.lb-3{grid-template-columns:220px minmax(0,1fr)}
+                          .lb-toc{display:none}}
+@media (max-width:820px){.lb-3{grid-template-columns:minmax(0,1fr)}
+                         /* `.lb-mid{grid-column:2}` above made the grid two columns even here, so the rail
+                            was squeezed to 0 wide and there was no way to move between sections. Both
+                            go back to column 1, and the rail becomes one scrolling row of chips instead
+                            of a 400px list in front of the content. */
+                         .lb-mid,.lb-rail{grid-column:1}
+                         .lb-rail{position:static;max-height:none;border-right:0;
+                                  border-bottom:1px solid var(--s-chrome-border);
+                                  display:flex;flex-direction:row;align-items:center;gap:var(--gw-space-8);
+                                  overflow-x:auto;padding:var(--gw-space-12) var(--gw-space-20);
+                                  scrollbar-width:none}
+                         .lb-rail::-webkit-scrollbar{display:none}
+                         .lb-rail__t,.lb-rail__sep{display:none}
+                         .lb-rail a{flex:none;white-space:nowrap;gap:var(--gw-space-4);
+                                    padding:6px var(--gw-space-12);border-radius:var(--gw-radius-full);
+                                    border:1px solid var(--s-chrome-border)}
+                         .lb-mid{padding:var(--gw-space-24) var(--gw-space-20)}}
+@media (max-width:640px){.lb-crumb{display:none}}
+
+/* ---- page head ----------------------------------------------------------- */
+.lb-h{display:flex;flex-direction:column;gap:var(--gw-space-8)}
+.lb-h h1{font:var(--gw-text-h4);margin:0}
+.lb-h .lede{font:var(--gw-text-body-16-reg);color:var(--s-body);margin:0;max-width:74ch}
+.lb-row{display:flex;flex-wrap:wrap;gap:var(--gw-space-8);align-items:center}
+.lb-rowfind{width:100%;max-width:360px;height:36px;padding:0 12px;margin:0 0 20px;border:0;border-radius:12px;background:var(--s-field-bg);
+  box-shadow:inset 0 0 0 1px var(--s-field-border);color:var(--s-heading);font:var(--gw-text-body-14-reg)}
+.lb-rowfind::placeholder{color:var(--s-placeholder)}
+.cat-name{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px;color:var(--s-heading);font-weight:600}
+a.cat-name{color:var(--gw-color-primary-600);text-decoration:none}
+:root[data-theme="dark"] a.cat-name{color:var(--gw-color-primary-400)}
+.cat-note{display:block;margin-top:2px;font:var(--gw-text-body-12-reg);color:var(--s-body)}
+@media (max-width:760px){.lb-mid td a,.lb-mid th a{display:inline-flex;align-items:center;min-height:24px}}
+.cat-link{font:var(--gw-text-body-14-med);color:var(--gw-color-primary-600);text-decoration:none}
+:root[data-theme="dark"] .cat-link{color:var(--gw-color-primary-400)}
+.cat-link:hover{text-decoration:underline}
+.sec>.lb-meta{margin:4px 0 14px}
+.cat-dim{color:var(--s-body)}
+.chip--annotated{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+:root[data-theme="dark"] .chip--annotated{background:var(--gw-color-neutral-800);color:var(--gw-color-neutral-300)}
+.lb-meta{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;
+         color:var(--gw-color-neutral-400)}
+
+.chip{display:inline-flex;align-items:center;gap:5px;font:var(--gw-text-body-12-med);
+      border-radius:var(--gw-radius-full);padding:3px var(--gw-space-8);white-space:nowrap}
+.chip--measured{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.chip--transcribed{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.chip--ruled,.chip--extracted{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+.chip--structure{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.chip--built-here{background:var(--gw-color-orange-50);color:var(--gw-color-orange-700)}
+.chip--passed{background:var(--gw-color-green-500);color:var(--gw-color-white)}
+.chip--pending{background:var(--gw-color-neutral-100);color:var(--gw-color-neutral-700)}
+.chip--rejected{background:var(--gw-color-red-500);color:var(--gw-color-white)}
+.chip--gap{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+.chip--web{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+:root[data-theme="dark"] .chip--measured{background:var(--gw-color-green-900);color:var(--gw-color-green-200)}
+:root[data-theme="dark"] .chip--transcribed,
+:root[data-theme="dark"] .chip--structure{background:var(--gw-color-yellow-900);color:var(--gw-color-yellow-100)}
+:root[data-theme="dark"] .chip--ruled,
+:root[data-theme="dark"] .chip--extracted,
+:root[data-theme="dark"] .chip--web{background:var(--gw-color-primary-900);color:var(--gw-color-primary-200)}
+:root[data-theme="dark"] .chip--pending{background:var(--gw-color-neutral-800);color:var(--gw-color-neutral-300)}
+:root[data-theme="dark"] .chip--built-here{background:var(--gw-color-orange-900);color:var(--gw-color-orange-100)}
+:root[data-theme="dark"] .chip--gap{background:var(--gw-color-red-900);color:var(--gw-color-red-200)}
+
+/* ---- markdown ------------------------------------------------------------ */
+.md{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.md h2{font:var(--gw-text-h6);margin:var(--gw-space-20) 0 0;scroll-margin-top:80px}
+.md h3{font:var(--gw-text-h7);margin:var(--gw-space-16) 0 0;scroll-margin-top:80px}
+.md h4,.md h5,.md h6{font:var(--gw-text-body-16-sem);margin:var(--gw-space-12) 0 0}
+.md p{font:var(--gw-text-body-14-reg);letter-spacing:var(--gw-text-body-14-reg-tracking);
+      color:var(--s-body);margin:0;max-width:80ch}
+.md ul,.md ol{margin:0;padding-left:var(--gw-space-20);display:flex;
+              flex-direction:column;gap:5px}
+.md li{font:var(--gw-text-body-14-reg);color:var(--s-body);max-width:78ch}
+.md code{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px;
+         background:var(--s-code-bg);border:1px solid var(--s-code-border);
+         color:var(--s-code-fg);border-radius:var(--gw-radius-4);padding:1px 5px}
+.md a{color:var(--gw-color-primary-600)}
+.md-pre{background:var(--s-card-bg);border:1px solid var(--s-card-border);
+        border-radius:var(--gw-radius-8);padding:var(--gw-space-16);overflow-x:auto;margin:0}
+.md-pre code{background:none;border:0;padding:0;color:var(--s-body);font-size:12px}
+.md-q{margin:0;border-left:3px solid var(--gw-color-neutral-300);
+      padding:var(--gw-space-8) var(--gw-space-16);font:var(--gw-text-body-14-reg);
+      color:var(--s-body)}
+.md-hr{border:0;border-top:1px solid var(--s-card-border);margin:var(--gw-space-12) 0}
+.md-tblwrap{overflow-x:auto}
+.md-tbl{width:100%;border-collapse:collapse;background:var(--s-card-bg);
+        border:1px solid var(--s-card-border);border-radius:var(--gw-radius-8);
+        overflow:hidden;font:var(--gw-text-body-14-reg)}
+.md-tbl th{text-align:left;font:var(--gw-text-body-12-med);text-transform:uppercase;
+           letter-spacing:.06em;color:var(--gw-color-neutral-400);
+           padding:var(--gw-space-8) var(--gw-space-12);
+           border-bottom:1px solid var(--s-card-border);white-space:nowrap}
+.md-tbl td{padding:var(--gw-space-8) var(--gw-space-12);color:var(--s-body);
+           border-bottom:1px solid var(--s-card-border);vertical-align:top}
+.md-tbl tr:last-child td{border-bottom:none}
+.md-tbl code{white-space:nowrap}
+
+.note{font:var(--gw-text-body-14-reg);color:var(--s-body);
+      background:var(--gw-color-neutral-25);border:1px solid var(--s-card-border);
+      border-left:3px solid var(--gw-color-neutral-300);border-radius:var(--gw-radius-8);
+      padding:var(--gw-space-12) var(--gw-space-16);white-space:pre-wrap;max-width:88ch}
+:root[data-theme="dark"] .note{background:var(--gw-color-neutral-900)}
+.note--find{border-left-color:var(--gw-color-yellow-400);white-space:normal}
+.empty{border:1px dashed var(--s-field-border);border-radius:var(--gw-radius-10);
+       padding:var(--gw-space-24);text-align:center;font:var(--gw-text-body-14-reg);
+       color:var(--gw-color-neutral-400)}
+.sec{display:flex;flex-direction:column;gap:var(--gw-space-12)}
+.sec h2{font:var(--gw-text-h6);margin:0;scroll-margin-top:80px}
+</style>
+</head>
+<body>
+<header class="lb-top">
+  <a class="lb-brand" href="/internal/design-system#library">
+    <span class="lb-brand__chip"><svg viewBox="0 0 80 80" fill="none" aria-hidden="true"><path d="M76.6088 4.56344C77.5025 2.36058 75.8495 0 73.4723 0H9.14286C4.0934 0 0 4.0934 0 9.14286V66.7778C0 72.018 5.17081 75.6829 9.9603 73.5568C40.8494 59.8449 64.3785 34.7075 76.6088 4.56344Z" fill="currentColor"/><path d="M32.5161 80C31.4022 80 30.9357 78.5531 31.8259 77.8835C54.9007 60.5265 71.4338 35.8047 78.7658 8.0522C78.9403 7.39154 80 7.51618 80 8.19951V70.8571C80 75.9066 75.9066 80 70.8571 80H32.5161Z" fill="currentColor"/></svg></span>
+    <span class="lb-brand__n">Component Library</span></a>
+  <span class="lb-crumb"><a href="../../index.html">Library</a> / <a href="index.html">Dashboard</a></span>
+  <div class="lb-top__r"><input class="lb-find" id="lb-find" type="search" placeholder="Filter this library" aria-label="Filter this library">
+    <button class="lb-tbtn" id="lb-theme" type="button" aria-label="Switch theme">
+      <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z"/></svg></button></div>
+</header>
+<div class="lb-3"><nav class="lb-rail"><div class="lb-rail__t">Dashboard · 140</div><a href="index.html" data-q="overview 139">Overview<span>139</span></a><div class="lb-rail__sep"></div><a href="access-denied-screen.html" data-q="access-denied-screen ">access-denied-screen</a><a href="account-row.html" data-q="account-row ">account-row</a><a href="action-button.html" data-q="action-button ">action-button</a><a href="activity-timeline.html" data-q="activity-timeline ">activity-timeline</a><a href="app-shell.html" data-q="app-shell ">app-shell</a><a href="area-chart.html" data-q="area-chart ">area-chart</a><a href="assignee-avatar.html" data-q="assignee-avatar ">assignee-avatar</a><a href="assistant-composer.html" data-q="assistant-composer ">assistant-composer</a><a href="assistant-launcher.html" data-q="assistant-launcher ">assistant-launcher</a><a href="assistant-panel.html" data-q="assistant-panel ">assistant-panel</a><a href="assistant-plan-card.html" data-q="assistant-plan-card ">assistant-plan-card</a><a href="avatar.html" data-q="avatar ">avatar</a><a href="avatar-group.html" data-q="avatar-group ">avatar-group</a><a href="banner.html" data-q="banner ">banner</a><a href="bar-chart.html" data-q="bar-chart ">bar-chart</a><a href="board.html" data-q="board ">board</a><a href="board-lane.html" data-q="board-lane ">board-lane</a><a href="bottom-bar.html" data-q="bottom-bar ">bottom-bar</a><a href="breadcrumbs.html" data-q="breadcrumbs ">breadcrumbs</a><a href="breakdown-bar.html" data-q="breakdown-bar ">breakdown-bar</a><a href="build-notice.html" data-q="build-notice ">build-notice</a><a href="bulk-action-bar.html" data-q="bulk-action-bar ">bulk-action-bar</a><a href="card.html" data-q="card ">card</a><a href="chart-frame.html" data-q="chart-frame ">chart-frame</a><a href="chart-tooltip.html" data-q="chart-tooltip ">chart-tooltip</a><a href="checkbox.html" data-q="checkbox ">checkbox</a><a href="checklist.html" data-q="checklist ">checklist</a><a href="coachmark.html" data-q="coachmark ">coachmark</a><a href="column-menu.html" data-q="column-menu ">column-menu</a><a href="combobox.html" data-q="combobox ">combobox</a><a href="command-palette.html" data-q="command-palette ">command-palette</a><a href="confirm-dialog.html" data-q="confirm-dialog ">confirm-dialog</a><a href="content-panel.html" data-q="content-panel ">content-panel</a><a href="data-table.html" data-q="data-table ">data-table</a><a href="date-picker.html" data-q="date-picker ">date-picker</a><a href="date-range-picker.html" data-q="date-range-picker ">date-range-picker</a><a href="datetime-field.html" data-q="datetime-field ">datetime-field</a><a href="definition-tile.html" data-q="definition-tile ">definition-tile</a><a href="delta-pill.html" data-q="delta-pill ">delta-pill</a><a href="detail-view.html" data-q="detail-view ">detail-view</a><a href="docked-panel.html" data-q="docked-panel ">docked-panel</a><a href="donut-chart.html" data-q="donut-chart ">donut-chart</a><a href="drawer.html" data-q="drawer ">drawer</a><a href="empty-state.html" data-q="empty-state ">empty-state</a><a href="explorer-layout.html" data-q="explorer-layout ">explorer-layout</a><a href="filter-builder.html" data-q="filter-builder ">filter-builder</a><a href="filter-chip.html" data-q="filter-chip ">filter-chip</a><a href="filter-popover.html" data-q="filter-popover ">filter-popover</a><a href="floating-add-button.html" data-q="floating-add-button ">floating-add-button</a><a href="form-field.html" data-q="form-field ">form-field</a><a href="form-section.html" data-q="form-section ">form-section</a><a href="funnel.html" data-q="funnel ">funnel</a><a href="google-button.html" data-q="google-button ">google-button</a><a href="growth-report-template.html" data-q="growth-report-template ">growth-report-template</a><a href="heatmap.html" data-q="heatmap ">heatmap</a><a href="histogram.html" data-q="histogram ">histogram</a><a href="horizontal-bar-chart.html" data-q="horizontal-bar-chart ">horizontal-bar-chart</a><a href="icon-button.html" data-q="icon-button ">icon-button</a><a href="inbox-triage.html" data-q="inbox-triage ">inbox-triage</a><a href="incident-row.html" data-q="incident-row ">incident-row</a><a href="info-hint.html" data-q="info-hint ">info-hint</a><a href="issue-summary.html" data-q="issue-summary ">issue-summary</a><a href="key-value-list.html" data-q="key-value-list ">key-value-list</a><a href="legend.html" data-q="legend ">legend</a><a href="legend-table.html" data-q="legend-table ">legend-table</a><a href="line-chart.html" data-q="line-chart ">line-chart</a><a href="list-picker.html" data-q="list-picker ">list-picker</a><a href="log-viewer.html" data-q="log-viewer ">log-viewer</a><a href="login-screen.html" data-q="login-screen ">login-screen</a><a href="menu.html" data-q="menu ">menu</a><a href="metric-strip.html" data-q="metric-strip ">metric-strip</a><a href="modal.html" data-q="modal ">modal</a><a href="multi-select.html" data-q="multi-select ">multi-select</a><a href="nav-group.html" data-q="nav-group ">nav-group</a><a href="nav-item.html" data-q="nav-item ">nav-item</a><a href="page-header.html" data-q="page-header ">page-header</a><a href="page-layout.html" data-q="page-layout ">page-layout</a><a href="pagination.html" data-q="pagination ">pagination</a><a href="period-select.html" data-q="period-select ">period-select</a><a href="popover.html" data-q="popover ">popover</a><a href="priority-bars.html" data-q="priority-bars ">priority-bars</a><a href="progress-bar.html" data-q="progress-bar ">progress-bar</a><a href="property-row.html" data-q="property-row " class="on">property-row</a><a href="query-builder.html" data-q="query-builder ">query-builder</a><a href="quoted-message.html" data-q="quoted-message ">quoted-message</a><a href="radio.html" data-q="radio ">radio</a><a href="removable-view.html" data-q="removable-view ">removable-view</a><a href="report-frame.html" data-q="report-frame ">report-frame</a><a href="report-source-line.html" data-q="report-source-line ">report-source-line</a><a href="ring.html" data-q="ring ">ring</a><a href="row-actions-menu.html" data-q="row-actions-menu ">row-actions-menu</a><a href="row-selection.html" data-q="row-selection ">row-selection</a><a href="run-status-chip.html" data-q="run-status-chip ">run-status-chip</a><a href="saved-views.html" data-q="saved-views ">saved-views</a><a href="search-field.html" data-q="search-field ">search-field</a><a href="search-trigger.html" data-q="search-trigger ">search-trigger</a><a href="segmented-control.html" data-q="segmented-control ">segmented-control</a><a href="select.html" data-q="select ">select</a><a href="session-expired.html" data-q="session-expired ">session-expired</a><a href="setting-row.html" data-q="setting-row ">setting-row</a><a href="shortcut-key.html" data-q="shortcut-key ">shortcut-key</a><a href="sidebar.html" data-q="sidebar ">sidebar</a><a href="sidebar-collapsed.html" data-q="sidebar-collapsed ">sidebar-collapsed</a><a href="sign-in-modal.html" data-q="sign-in-modal ">sign-in-modal</a><a href="skeleton.html" data-q="skeleton ">skeleton</a><a href="sparkline.html" data-q="sparkline ">sparkline</a><a href="split-button.html" data-q="split-button ">split-button</a><a href="stat-card.html" data-q="stat-card ">stat-card</a><a href="status-banner.html" data-q="status-banner ">status-banner</a><a href="status-dot.html" data-q="status-dot ">status-dot</a><a href="status-list.html" data-q="status-list ">status-list</a><a href="sub-nav.html" data-q="sub-nav ">sub-nav</a><a href="support-ops-app-template.html" data-q="support-ops-app-template ">support-ops-app-template</a><a href="table-cell-types.html" data-q="table-cell-types ">table-cell-types</a><a href="table-states.html" data-q="table-states ">table-states</a><a href="table-toolbar.html" data-q="table-toolbar ">table-toolbar</a><a href="tabs-pill.html" data-q="tabs-pill ">tabs-pill</a><a href="tabs-underline.html" data-q="tabs-underline ">tabs-underline</a><a href="tag.html" data-q="tag ">tag</a><a href="tag-chip.html" data-q="tag-chip ">tag-chip</a><a href="tag-picker.html" data-q="tag-picker ">tag-picker</a><a href="task-card.html" data-q="task-card ">task-card</a><a href="task-list.html" data-q="task-list ">task-list</a><a href="task-timeline.html" data-q="task-timeline ">task-timeline</a><a href="text-input.html" data-q="text-input ">text-input</a><a href="textarea.html" data-q="textarea ">textarea</a><a href="theme-and-density.html" data-q="theme-and-density ">theme-and-density</a><a href="theme-menu.html" data-q="theme-menu ">theme-menu</a><a href="time-range-bar.html" data-q="time-range-bar ">time-range-bar</a><a href="timezone-select.html" data-q="timezone-select ">timezone-select</a><a href="toast.html" data-q="toast ">toast</a><a href="toggle.html" data-q="toggle ">toggle</a><a href="tooltip.html" data-q="tooltip ">tooltip</a><a href="topbar.html" data-q="topbar ">topbar</a><a href="unavailable-state.html" data-q="unavailable-state ">unavailable-state</a><a href="unsaved-changes-bar.html" data-q="unsaved-changes-bar ">unsaved-changes-bar</a><a href="uptime-bar.html" data-q="uptime-bar ">uptime-bar</a><a href="widget-grid.html" data-q="widget-grid ">widget-grid</a><a href="workspace-switcher.html" data-q="workspace-switcher ">workspace-switcher</a></nav><main class="lb-mid"><div class="lb-h"><h1>property-row</h1><p class="lede">Dashboard · tasks.md</p><div class="lb-row"><span class="chip chip--extracted" title="Extracted from the design hub's shipped code and generalised, not measured off Figma. The hub is its source of truth. Elements marked NEW in the doc are not in the hub at all.">extracted</span><span class="chip chip--pending" title="Has not been through a review pass">not reviewed</span><span class="pill">v2.0.8</span></div><div class="lb-meta">review: bash scripts/review-pass.sh dashboard property-row</div></div><div class="md"><h2 id="assignee-avatar">Task board components</h2>
+<p>The pieces a task board is made of, drawn for the task board at <code>web/internal/staging/tasks</code>: board lanes and task cards, a grouped list, a timeline, an inbox for triage, property pickers (priority, status, assignee, dates), a filter popover, and an assistant panel with a composer, a tag picker and an approve-a-plan card. Wireframes: <code>task-board-wireframes/index.html</code> (sections 1 to 12). Mobbin references, from the wireframe notes: Asana board, Linear board, Linear inbox, Linear task, Qatalog task, Todoist upcoming, Attio grouped list. Source is NEW for every component here; none of it is in the hub. CSS is <code>css/57-tasks.css</code>. These components are CSS only: nothing was added to <code>js/</code>, because the behaviour (drag, pickers, the assistant's conversation) belongs to the page that uses them, and each section says what that behaviour is so a second page can repeat it.</p>
+<p>Everything is scoped by <code>class=&quot;gd&quot;</code> and themed by <code>color-scheme</code> (light and dark come from the <code>--gd-*</code> aliases in <code>base.md</code>). Heights and gaps follow the density tokens, so <code>data-density=&quot;compact&quot;</code> works; comfortable is what is built. Blue carries data and status only (a today line, a Working run chip); black carries interaction (ink fills, selected edges). Destructive is a red label on a neutral shape (the page uses the library's confirm dialog). No component here introduces a colour, type, radius, shadow or spacing value. Values with no token are named under each component's Tokens as gaps.</p>
+<h3 id="priority-bars">Assignee avatar</h3>
+<p><b>Purpose.</b> Shows who owns a task. People are circles; agents are rounded squares, so agent work reads at a glance. Use it in cards, list rows, pickers and feeds. Do not use it for an account or workspace mark (use <code>avatar</code>, the generated profile mark).</p>
+<p><b>Anatomy.</b> <code>span.gd-av</code> holding initials (two letters for a person, one for an agent). <code>.gd-av-stack</code> overlaps several with a ring in the surface colour. <code>button.gd-av.gd-av--btn</code> is the interactive form.</p>
+<pre class="md-pre"><code>&lt;span class=&quot;gd-av&quot; role=&quot;img&quot; aria-label=&quot;Utsav Singh&quot;&gt;US&lt;/span&gt;
+&lt;span class=&quot;gd-av gd-av--agent gd-av--ink&quot; role=&quot;img&quot; aria-label=&quot;Bruce&quot;&gt;B&lt;/span&gt;
+&lt;div class=&quot;gd-av-stack&quot;&gt;&lt;span class=&quot;gd-av&quot;&gt;US&lt;/span&gt;&lt;span class=&quot;gd-av gd-av--agent gd-av--ink&quot;&gt;B&lt;/span&gt;&lt;span class=&quot;gd-av gd-av--agent gd-av--outline&quot;&gt;A&lt;/span&gt;&lt;/div&gt;</code></pre>
+<p><b>Variants.</b> Size <code>--sm</code> (20), default (24), <code>--lg</code> (32). Shape: circle (person) or <code>--agent</code> (rounded square, radius 8, 4 at <code>--sm</code>). Agent fill: <code>--ink</code> (Bruce, ink fill) or <code>--outline</code> (Alfred, 1px ink edge). <code>--ghost</code>: an unassigned slot, dashed edge, no fill.</p>
+<p><b>States.</b> Rest. The button form has hover (ink edge), pressed (<code>aria-pressed=&quot;true&quot;</code>, 2px ink edge) and the keyboard ring.</p>
+<p><b>Behaviour.</b> None. The button form is used as a filter toggle: pressing it narrows the board to that assignee.</p>
+<p><b>Tokens.</b> <code>--gd-selected-bg</code>, <code>--gd-text</code>, <code>--gd-ink</code>, <code>--gd-ink-fg</code>, <code>--gd-card-bg</code>, <code>--gd-border-strong</code>, <code>--gd-panel-bg</code> (stack ring), <code>--gw-radius-full</code>, <code>--gw-radius-8</code>, <code>--gw-radius-4</code>, <code>--gw-text-body-10-sem</code>, <code>--gw-text-body-12-sem</code>, <code>--gw-motion-fast</code>. Gap: avatar sizes 20, 24 and 32 are literals.</p>
+<p><b>Accessibility.</b> <code>role=&quot;img&quot;</code> with the person's or agent's name, or a real button with the same <code>aria-label</code>. Initials are decorative beside the name.</p>
+<p><b>Provenance.</b> NEW, reference Mobbin Linear board and Asana board, wireframe sections 1 and 10, pending library review.</p>
+<h3 id="run-status-chip">Priority bars</h3>
+<p><b>Purpose.</b> A tiny glyph for a task's priority: three bars filled by level. Use it wherever priority is a property of a row. Urgent is not drawn here: it is a solid Badge, so the one level that needs attention is a filled shape.</p>
+<p><b>Anatomy.</b> <code>span.gd-prio[data-level=&quot;0|1|2|3&quot;] &gt; i i i</code>, with <code>role=&quot;img&quot;</code> and an <code>aria-label</code> such as &quot;High priority&quot;.</p>
+<pre class="md-pre"><code>&lt;span class=&quot;gd-prio&quot; data-level=&quot;3&quot; role=&quot;img&quot; aria-label=&quot;High priority&quot;&gt;&lt;i&gt;&lt;/i&gt;&lt;i&gt;&lt;/i&gt;&lt;i&gt;&lt;/i&gt;&lt;/span&gt;</code></pre>
+<p><b>Variants.</b> <code>data-level</code> 3 is High, 2 Medium, 1 Low, 0 none (every bar quiet).</p>
+<p><b>States.</b> Static.</p>
+<p><b>Behaviour.</b> None.</p>
+<p><b>Tokens.</b> <code>--gd-ink</code> (filled bar), <code>--gd-border-strong</code> (quiet bar), <code>--gw-space-2</code>, <code>--gw-space-4</code>, <code>--gw-space-8</code>, <code>--gw-space-12</code>, <code>--gw-radius-2</code>. The bar width is 1.5 times the 2px space token (3px), a gap with no token.</p>
+<p><b>Accessibility.</b> The level is carried by the label, never by the glyph alone.</p>
+<p><b>Provenance.</b> NEW, reference Mobbin Linear board and Linear task, wireframes 1, 6 and 7, pending library review.</p>
+<h3 id="board-lane">Run status chip</h3>
+<p><b>Purpose.</b> Where an agent has got to on a task: Queued, Working, Needs you, Ready for review, Failed. Use it beside an agent-assigned task only. An agent never marks a task done; Ready for review is where it stops.</p>
+<p><b>Anatomy.</b> <code>.gd-run[data-state=&quot;queued|working|needs|review|failed&quot;]</code> holding a <code>gd-status-dot</code> and the label, drawn like a Badge (20 tall, radius 4). Failed with a retry is a button, <code>button.gd-run.gd-run--btn</code>, reading &quot;Failed, Retry&quot;.</p>
+<pre class="md-pre"><code>&lt;span class=&quot;gd-run&quot; data-state=&quot;working&quot;&gt;&lt;span class=&quot;gd-status-dot gd-status-dot--info gd-status-dot--live&quot;&gt;&lt;/span&gt;Working&lt;/span&gt;
+&lt;button type=&quot;button&quot; class=&quot;gd-run gd-run--btn&quot; data-state=&quot;failed&quot;&gt;&lt;span class=&quot;gd-status-dot gd-status-dot--bad&quot;&gt;&lt;/span&gt;Failed · Retry&lt;/button&gt;</code></pre>
+<p><b>Variants.</b> The five states. Tone follows the state: neutral, info (blue, status), warn, good, bad.</p>
+<p><b>States.</b> Rest. The button form has hover and the keyboard ring. The Working dot pulses and stands still under reduced motion.</p>
+<p><b>Behaviour.</b> The page owns it: Retry sets the run back to queued.</p>
+<p><b>Tokens.</b> <code>--gd-tone-{neutral,info,warn,good,bad}-bg</code> and <code>-fg</code>, <code>--gw-radius-4</code>, <code>--gw-space-4</code>, <code>--gw-space-8</code>, <code>--gw-text-body-12-med</code>, <code>--gw-motion-fast</code>.</p>
+<p><b>Accessibility.</b> Colour is never the only carrier: the dot sits beside a word. The retry button's label names the task.</p>
+<p><b>Provenance.</b> NEW, reference Mobbin Asana board and Qatalog task, wireframe section 10, pending library review.</p>
+<h3 id="task-card">Board lane</h3>
+<p><b>Purpose.</b> One column of a board: a name, a count and the cards in it. Lanes share the width instead of scrolling sideways. Use it for work grouped by stage. Do not use it where the user compares many columns (a table is better).</p>
+<p><b>Anatomy.</b> <code>.gd-lanes &gt; section.gd-lane[.gd-lane--suggested] &gt; header.gd-lane__head (h2.gd-lane__name, .gd-lane__count, optional .gd-lane__by) + .gd-lane__list + .gd-lane__add</code>. <code>.gd-lane__empty</code> is the quiet line in an empty lane. <code>.gd-lane__quick</code> is the inline field the add button turns into.</p>
+<pre class="md-pre"><code>&lt;div class=&quot;gd-lanes&quot; style=&quot;--gd-lanes:4&quot;&gt;&lt;section class=&quot;gd-lane&quot; aria-label=&quot;To do, 2&quot;&gt;&lt;header class=&quot;gd-lane__head&quot;&gt;&lt;h2 class=&quot;gd-lane__name&quot;&gt;To do&lt;/h2&gt;&lt;span class=&quot;gd-lane__count gd-num&quot;&gt;2&lt;/span&gt;&lt;/header&gt;&lt;div class=&quot;gd-lane__list&quot;&gt;…cards…&lt;/div&gt;&lt;button type=&quot;button&quot; class=&quot;gd-lane__add&quot;&gt;Add task&lt;/button&gt;&lt;/section&gt;&lt;/div&gt;</code></pre>
+<p><b>Variants.</b> <code>--suggested</code>: dashed edge and a tinted ground, so work an assistant found never reads as committed. <code>--gd-lanes</code> sets how many lanes share the row (3 or 4 here).</p>
+<p><b>States.</b> Drop target (<code>data-over=&quot;true&quot;</code>: hover ground and a focus edge). Empty (dashed line of text). Add button hover.</p>
+<p><b>Behaviour.</b> The page owns it: cards move between lanes by native drag, or with Alt and the arrow keys on the card's title button; a drop changes the task's status. The Suggested lane accepts no drops.</p>
+<p><b>Tokens.</b> <code>--gd-sunken-bg</code>, <code>--gd-hover-bg</code>, <code>--gd-border-strong</code>, <code>--gd-border-focus</code>, <code>--gd-text</code>, <code>--gd-text-muted</code>, <code>--gd-card-bg</code>, <code>--gd-control-h</code>, <code>--gw-space-*</code>, <code>--gw-radius-8</code>, <code>--gw-radius-12</code>, <code>--gw-text-body-12-med</code>, <code>--gw-text-body-14-sem</code>, <code>--gw-text-body-14-med</code>, <code>--gw-motion-fast</code>.</p>
+<p><b>Accessibility.</b> Each lane is a labelled region; the heading is the lane name. Dragging has a keyboard path.</p>
+<p><b>Phone.</b> One lane shows at a time, chosen with the library's pill tabs; the lane heads are hidden and the Suggested lane keeps its dashed frame.</p>
+<p><b>Provenance.</b> NEW, reference Mobbin Linear board and Asana board, wireframe section 1, pending library review. Not the stock <code>board</code>: lanes share the width and the card is flat.</p>
+<h3 id="task-list">Task card</h3>
+<p><b>Purpose.</b> One task on a board: its title, what matters about it (priority, run state, due date, source) and who has it. Use it inside a board lane. Open the full record in a drawer.</p>
+<p><b>Anatomy.</b> <code>article.gd-taskcard &gt; button.gd-taskcard__open (the title) + .gd-pop.gd-taskcard__more (a menu trigger that shows on hover and focus) + .gd-taskcard__meta (chips, then </code>.gd-taskcard__spacer<code>, then the assignee avatar)</code>. A suggested card adds <code>.gd-taskcard__quote</code> and <code>.gd-taskcard__acts</code> (Accept, Dismiss).</p>
+<pre class="md-pre"><code>&lt;article class=&quot;gd-taskcard&quot; data-id=&quot;t1&quot;&gt;&lt;button type=&quot;button&quot; class=&quot;gd-taskcard__open&quot;&gt;Review the conversations tab PR&lt;/button&gt;
+&lt;div class=&quot;gd-taskcard__meta&quot;&gt;&lt;span class=&quot;gd-prio&quot; data-level=&quot;3&quot;&gt;…&lt;/span&gt;&lt;span class=&quot;gd-badge gd-badge--warn&quot;&gt;Today&lt;/span&gt;&lt;span class=&quot;gd-badge&quot;&gt;#design-hub&lt;/span&gt;&lt;span class=&quot;gd-taskcard__spacer&quot;&gt;&lt;/span&gt;&lt;span class=&quot;gd-av&quot;&gt;US&lt;/span&gt;&lt;/div&gt;&lt;/article&gt;</code></pre>
+<p><b>Variants.</b> <code>--suggested</code> (quote and Accept and Dismiss), <code>--dismissed</code> (muted, Restore). <code>draggable=&quot;true&quot;</code> on a card that can move.</p>
+<p><b>States.</b> Rest, hover, selected (<code>data-selected=&quot;true&quot;</code>: ink edge), dragging (<code>data-dragging</code>), done (<code>data-done</code>: title struck, muted), focus ring on the title.</p>
+<p><b>Behaviour.</b> The page owns it: the title button opens the record; clicking the card body does too; Cmd-click selects (for tagging in the assistant). The quote is clamped to three lines.</p>
+<p><b>Tokens.</b> <code>--gd-card-bg</code>, <code>--gd-hover-bg</code>, <code>--gd-selected-bg</code>, <code>--gd-border</code>, <code>--gd-border-strong</code>, <code>--gd-text</code>, <code>--gd-text-muted</code>, <code>--gw-radius-8</code>, <code>--gw-radius-4</code>, <code>--gw-space-*</code>, <code>--gw-text-body-12-reg</code>, <code>--gw-text-body-14-med</code>, <code>--gw-motion-fast</code>.</p>
+<p><b>Accessibility.</b> The title is a real button whose label includes the task number. The menu trigger has a label naming the task. The menu is the library <code>menu</code>.</p>
+<p><b>Provenance.</b> NEW, reference Mobbin Linear board and Asana board, wireframe section 1, pending library review.</p>
+<h3 id="property-row">Task list</h3>
+<p><b>Purpose.</b> The same tasks as a grouped list, for &quot;what is due today&quot; faster than a board answers it. Use it for 10 or more tasks grouped by a property. Do not use it for comparing numeric columns (use <code>data-table</code>).</p>
+<p><b>Anatomy.</b> <code>.gd-tasklist &gt; .gd-tasklist__head (column labels) + .gd-tasklist__group[data-collapsed] (button.gd-tasklist__group-head with a caret, name and count; rows) &gt; .gd-tasklist__row (cells: check, title cell, priority and run, source, due, assignee)</code>. The title cell is <code>.gd-tasklist__cell--main</code> holding <code>.gd-tasklist__line</code> (button.gd-tasklist__open and an optional badge) and a phone-only <code>.gd-tasklist__sub</code>.</p>
+<pre class="md-pre"><code>&lt;div class=&quot;gd-tasklist&quot; role=&quot;list&quot;&gt;&lt;div class=&quot;gd-tasklist__group&quot; role=&quot;group&quot; aria-label=&quot;Today&quot;&gt;&lt;button type=&quot;button&quot; class=&quot;gd-tasklist__group-head&quot; aria-expanded=&quot;true&quot;&gt;Today &lt;span class=&quot;gd-tasklist__n&quot;&gt;2&lt;/span&gt;&lt;/button&gt;
+&lt;div class=&quot;gd-tasklist__row&quot; role=&quot;listitem&quot;&gt;&lt;div class=&quot;gd-tasklist__cell&quot;&gt;&lt;button type=&quot;button&quot; class=&quot;gd-tasklist__check&quot; role=&quot;checkbox&quot; aria-checked=&quot;false&quot; aria-label=&quot;Mark done: TSK-2&quot;&gt;&lt;/button&gt;&lt;/div&gt;…&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;</code></pre>
+<p><b>Variants.</b> Group by due date, status, priority, assignee or nothing; the Done group collapses by default.</p>
+<p><b>States.</b> Row hover, selected, done (struck); check unchecked, hover, checked (ink fill); group expanded or collapsed (the caret turns).</p>
+<p><b>Behaviour.</b> The page owns it: the check toggles done; a group head toggles its rows.</p>
+<p><b>Tokens.</b> <code>--gd-hover-bg</code>, <code>--gd-selected-bg</code>, <code>--gd-border</code>, <code>--gd-border-focus</code>, <code>--gd-ink</code>, <code>--gd-ink-fg</code>, <code>--gd-text</code>, <code>--gd-text-muted</code>, <code>--gd-row-h</code>, <code>--gw-space-*</code>, <code>--gw-radius-4</code>, <code>--gw-text-body-12-med</code>, <code>--gw-text-body-14-med</code>, <code>--gw-text-body-14-sem</code>, <code>--gw-motion-fast</code>. Gap: the priority, source and due column widths (176, 140, 120) are chosen.</p>
+<p><b>Accessibility.</b> <code>role=&quot;list&quot;</code> with grouped <code>role=&quot;group&quot;</code> and <code>listitem</code> rows; the check is a real checkbox-role button with a label; the group head is a disclosure button with <code>aria-expanded</code>.</p>
+<p><b>Phone.</b> The priority, source and due columns are hidden and the due date moves under the title.</p>
+<p><b>Provenance.</b> NEW, reference Mobbin Attio grouped list and Todoist upcoming, wireframe section 2, pending library review.</p>
+<h3 id="list-picker">Property row</h3>
+<p><b>Purpose.</b> A label and a value you can change, one per row: status, priority, assignee, start, due. A quiet button for the value keeps a drawer with six properties calm. Use it in a record's drawer or pane. For read-only facts use <code>key-value-list</code>.</p>
+<p><b>Anatomy.</b> <code>dl.gd-props &gt; div.gd-props__row &gt; dt + dd &gt; button.gd-prop</code> (a glyph, the value, optionally <code>.gd-prop__tag</code> such as &quot;guessed&quot;). The button opens a popover (<code>gd-popover</code>) that holds a <code>list-picker</code> or a <code>date-picker</code>.</p>
+<pre class="md-pre"><code>&lt;dl class=&quot;gd-props&quot;&gt;&lt;div class=&quot;gd-props__row&quot;&gt;&lt;dt&gt;Priority&lt;/dt&gt;&lt;dd&gt;&lt;div class=&quot;gd-popover-wrap&quot;&gt;&lt;button type=&quot;button&quot; class=&quot;gd-prop&quot; aria-haspopup=&quot;dialog&quot; aria-expanded=&quot;false&quot;&gt;&lt;span class=&quot;gd-prio&quot; data-level=&quot;3&quot;&gt;…&lt;/span&gt;&lt;span&gt;High&lt;/span&gt;&lt;/button&gt;…&lt;/div&gt;&lt;/dd&gt;&lt;/div&gt;&lt;/dl&gt;</code></pre>
+<p><b>Variants.</b> <code>gd-prop--empty</code> reads as a placeholder (&quot;Set due date&quot;).</p>
+<p><b>States.</b> Rest (no edge), hover and expanded (selected ground), keyboard ring.</p>
+<p><b>Behaviour.</b> The page opens the popover on click or the down arrow.</p>
+<p><b>Tokens.</b> <code>--gd-selected-bg</code>, <code>--gd-text</code>, <code>--gd-text-muted</code>, <code>--gd-control-h</code>, <code>--gw-space-*</code>, <code>--gw-radius-8</code>, <code>--gw-text-body-12-med</code>, <code>--gw-text-body-14-med</code>, <code>--gw-motion-fast</code>. Gap: the 96px label column is chosen.</p>
+<p><b>Accessibility.</b> The value is a real button with <code>aria-haspopup</code> and <code>aria-expanded</code>; the <code>dt</code> names the property.</p>
+<p><b>Provenance.</b> NEW, reference Mobbin Linear task and Qatalog task, wireframe section 5, pending library review.</p>
+<h3 id="date-picker">List picker</h3>
+<p><b>Purpose.</b> Pick one value from a short list inside a popover, with room for a one-line description, a number key, a note and a suggestion with a reason. Use it for priority, status and assignee. For a long list use <code>combobox</code>.</p>
+<p><b>Anatomy.</b> <code>.gd-picker</code> (inside a <code>gd-popover</code>) &gt; <code>.gd-picker__label</code> (a group name), <code>button.gd-picker__row[role=menuitemradio][aria-checked]</code> (a glyph, <code>.gd-picker__text</code> with a bold name and a <code>small</code> description, <code>.gd-picker__key</code>, <code>.gd-picker__check</code>), <code>.gd-picker__sep</code>, <code>.gd-picker__note</code>, and <code>.gd-picker__suggest</code> (an assistant's suggestion: a heading, the reason, Apply and Ignore).</p>
+<pre class="md-pre"><code>&lt;div class=&quot;gd-popover&quot;&gt;&lt;div class=&quot;gd-picker&quot; role=&quot;menu&quot; aria-label=&quot;Priority&quot;&gt;&lt;button type=&quot;button&quot; class=&quot;gd-picker__row&quot; role=&quot;menuitemradio&quot; aria-checked=&quot;true&quot;&gt;&lt;span class=&quot;gd-prio&quot; data-level=&quot;3&quot;&gt;…&lt;/span&gt;&lt;span class=&quot;gd-picker__text&quot;&gt;&lt;b&gt;High&lt;/b&gt;&lt;/span&gt;&lt;span class=&quot;gd-picker__key&quot;&gt;2&lt;/span&gt;&lt;/button&gt;…&lt;/div&gt;&lt;/div&gt;</code></pre>
+<p><b>Variants.</b> <code>gd-picker__row--quiet</code> for rows that open something else (Invite someone, Add an agent).</p>
+<p><b>States.</b> Row hover and focus (menu hover ground; keyboard adds a 2px ink edge), checked (weight and a tick), disabled (<code>aria-disabled</code>).</p>
+<p><b>Behaviour.</b> The page owns it: the up and down arrows move between rows, number keys choose a priority, a pick closes the popover and returns focus to the trigger.</p>
+<p><b>Tokens.</b> <code>--gd-menu-hover</code>, <code>--gd-text</code>, <code>--gd-text-muted</code>, <code>--gd-ink</code>, <code>--gd-sunken-bg</code>, <code>--gd-border</code>, <code>--gd-disabled-ink</code>, <code>--gd-control-h</code>, <code>--gw-space-*</code>, <code>--gw-radius-8</code>, <code>--gw-text-body-12-med</code>, <code>--gw-text-body-12-reg</code>, <code>--gw-text-body-14-med</code>, <code>--gw-text-body-14-sem</code>, <code>--gw-motion-fast</code>.</p>
+<p><b>Accessibility.</b> <code>role=&quot;menu&quot;</code> with radio menu items; arrow keys move; the checked row carries <code>aria-checked</code>; Esc closes and returns focus.</p>
+<p><b>Provenance.</b> NEW, reference Mobbin Linear task and Qatalog task, wireframes 7 and 10, pending library review.</p>
+<h3 id="filter-popover">Date picker</h3>
+<p><b>Purpose.</b> Set a start and a due date in one place: two fields, a typed field that understands words, quick picks and a month calendar with the range drawn. Use it when a record has a start and an end. For an analytics range with presets and a compare use <code>date-range-picker</code>.</p>
+<p><b>Anatomy.</b> <code>.gd-datepick</code> (inside a <code>gd-popover</code>) &gt; <code>.gd-datepick__fields</code> (two <code>button.gd-datepick__field[aria-pressed]</code>, each a small label and the value), <code>input.gd-datepick__type</code>, <code>.gd-datepick__hint</code>, <code>.gd-datepick__quicks</code> (<code>button.gd-datepick__quick</code>), <code>.gd-datepick__nav</code> (previous, month, next) and <code>.gd-datepick__grid</code> (<code>.gd-datepick__dow</code> labels, <code>button.gd-datepick__day</code>).</p>
+<pre class="md-pre"><code>&lt;div class=&quot;gd-popover&quot;&gt;&lt;div class=&quot;gd-datepick&quot; role=&quot;group&quot; aria-label=&quot;Dates&quot;&gt;&lt;div class=&quot;gd-datepick__fields&quot;&gt;&lt;button type=&quot;button&quot; class=&quot;gd-datepick__field&quot; aria-pressed=&quot;false&quot;&gt;&lt;small&gt;Start&lt;/small&gt;Thu 8 Oct&lt;/button&gt;&lt;button type=&quot;button&quot; class=&quot;gd-datepick__field&quot; aria-pressed=&quot;true&quot;&gt;&lt;small&gt;Due&lt;/small&gt;Fri 9 Oct&lt;/button&gt;&lt;/div&gt;…&lt;/div&gt;&lt;/div&gt;</code></pre>
+<p><b>Variants.</b> Day <code>data-range</code>: <code>start</code>, <code>mid</code>, <code>end</code> or <code>only</code>. <code>data-today</code> marks today; <code>data-out</code> dims days of the next or previous month.</p>
+<p><b>States.</b> Day hover, today (a dot), range band with ink end caps, field active (ink edge), typed field focus (edge) and invalid (<code>aria-invalid</code>, red edge).</p>
+<p><b>Behaviour.</b> The page owns it: a click on a day sets the active field and moves on to Due after Start; the typed field parses &quot;fri&quot;, &quot;next week&quot;, &quot;in 3 days&quot;, &quot;oct 12&quot;; quick picks (Today, Tomorrow, This weekend, Next week, In 2 weeks, No date); the range never runs backwards, so setting one end clears the other if it would cross. No time of day.</p>
+<p><b>Tokens.</b> <code>--gd-selected-bg</code>, <code>--gd-ink</code>, <code>--gd-ink-fg</code>, <code>--gd-border-strong</code>, <code>--gd-border-focus</code>, <code>--gd-danger</code>, <code>--gd-text</code>, <code>--gd-text-muted</code>, <code>--gd-disabled-ink</code>, <code>--gd-placeholder</code>, <code>--gd-card-bg</code>, <code>--gd-control-h</code>, <code>--gw-space-*</code>, <code>--gw-radius-8</code>, <code>--gw-text-body-10-med</code>, <code>--gw-text-body-12-med</code>, <code>--gw-text-body-14-med</code>, <code>--gw-motion-fast</code>. Gap: the 320px width is chosen.</p>
+<p><b>Accessibility.</b> Each day is a button labelled with its full date; the fields are toggle buttons; the typed field has a label and a live hint.</p>
+<p><b>Provenance.</b> NEW, reference Mobbin Linear task and Todoist upcoming, wireframe section 7, pending library review.</p>
+<h3 id="task-timeline">Filter popover</h3>
+<p><b>Purpose.</b> Filter by several fields at once with &quot;any of&quot; values: pick a field on the left, tick its values on the right. Use it where a filter has few fields and fixed value lists. For free operators (&quot;greater than&quot;) use <code>filter-builder</code>.</p>
+<p><b>Anatomy.</b> <code>.gd-filterpop</code> (inside a <code>gd-popover</code>) &gt; <code>.gd-filterpop__fields</code> (buttons with <code>aria-current</code>, each with a count of ticked values) + <code>.gd-filterpop__values</code> (<code>.gd-filterpop__title</code>, then <code>label.gd-filterpop__value</code> rows holding a library checkbox, the text and <code>.gd-filterpop__n</code>, the number of tasks) + <code>.gd-filterpop__foot</code> (Clear, Save as view).</p>
+<pre class="md-pre"><code>&lt;div class=&quot;gd-popover&quot;&gt;&lt;div class=&quot;gd-filterpop&quot;&gt;&lt;div class=&quot;gd-filterpop__fields&quot;&gt;&lt;button type=&quot;button&quot; class=&quot;gd-filterpop__field&quot; aria-current=&quot;true&quot;&gt;Priority&lt;span class=&quot;gd-tbar__n&quot;&gt;2&lt;/span&gt;&lt;/button&gt;…&lt;/div&gt;&lt;div class=&quot;gd-filterpop__values&quot;&gt;&lt;div class=&quot;gd-filterpop__title&quot;&gt;Priority is any of&lt;/div&gt;…&lt;/div&gt;&lt;div class=&quot;gd-filterpop__foot&quot;&gt;…&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;</code></pre>
+<p><b>Variants.</b> None.</p>
+<p><b>States.</b> Field hover and current, value hover, checked.</p>
+<p><b>Behaviour.</b> The page owns it: each tick applies at once and adds a removable chip (<code>filter-chip</code>); the count beside a field is the ticked values; Save as view hands the filters to <code>saved-views</code>.</p>
+<p><b>Tokens.</b> <code>--gd-menu-hover</code>, <code>--gd-selected-bg</code>, <code>--gd-border</code>, <code>--gd-text</code>, <code>--gd-text-muted</code>, <code>--gd-control-h</code>, <code>--gw-space-*</code>, <code>--gw-radius-8</code>, <code>--gw-text-body-12-med</code>, <code>--gw-text-body-14-med</code>, <code>--gw-motion-fast</code>. Gap: the 440px width and the 160px field column are chosen.</p>
+<p><b>Accessibility.</b> The groups are labelled (&quot;Filter by&quot;, &quot;Priority is any of&quot;); checkboxes are real inputs; Esc closes and returns focus to the Filter button.</p>
+<p><b>Phone.</b> The popover docks to the bottom as a sheet and the field column narrows.</p>
+<p><b>Provenance.</b> NEW, reference Mobbin Linear board and Asana board, wireframe section 6, pending library review.</p>
+<h3 id="inbox-triage">Task timeline</h3>
+<p><b>Purpose.</b> Tasks as bars from start to due date on a day grid, so a week or a quarter reads at a glance. A task with only a due date is a diamond. Use it for work with dates; undated work waits in a tray so nothing is invisible. For a flat schedule of events use a table.</p>
+<p><b>Anatomy.</b> <code>.gd-gantt[style=&quot;--gd-tl-days:28;--gd-tl-today:3&quot;] &gt; .gd-gantt__head (.gd-gantt__corner + .gd-gantt__scale of .gd-gantt__day[data-we][data-today] and .gd-gantt__week labels) + .gd-gantt__body (.gd-gantt__today line, .gd-gantt__group rows, .gd-gantt__row &gt; .gd-gantt__label + .gd-gantt__cells &gt; button.gd-gantt__bar) + .gd-gantt__tray (button.gd-gantt__chip)</code>. A bar's place is two custom properties, <code>--gd-tl-start</code> and <code>--gd-tl-len</code>, in days. <code>.gd-gantt__grip</code> are the two edges that resize a bar. <code>.gd-gantt__tools</code> and <code>.gd-gantt__legend</code> sit above it.</p>
+<pre class="md-pre"><code>&lt;div class=&quot;gd-gantt&quot; style=&quot;--gd-tl-days:28;--gd-tl-today:3&quot;&gt;&lt;div class=&quot;gd-gantt__head&quot;&gt;…&lt;/div&gt;&lt;div class=&quot;gd-gantt__body&quot;&gt;&lt;div class=&quot;gd-gantt__today&quot;&gt;&lt;/div&gt;&lt;div class=&quot;gd-gantt__row&quot;&gt;&lt;div class=&quot;gd-gantt__label&quot;&gt;…&lt;/div&gt;&lt;div class=&quot;gd-gantt__cells&quot;&gt;&lt;button type=&quot;button&quot; class=&quot;gd-gantt__bar&quot; data-level=&quot;high&quot; style=&quot;--gd-tl-start:2;--gd-tl-len:3&quot;&gt;Review the PR&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;</code></pre>
+<p><b>Variants.</b> Bar shade by priority (<code>data-level</code> urgent, high, med, low, none), <code>data-suggested</code> (dashed, not committed), <code>data-kind=&quot;diamond&quot;</code> (due date only). Zoom is the day count: 28 (week) or 84 (month); the range always starts on a Monday, which the weekend shading relies on.</p>
+<p><b>States.</b> Bar hover and keyboard ring; dragging (<code>data-dragging</code>); a tray chip is draggable; the drop day is shaded (<code>.gd-gantt__drop</code>). Weekends are shaded, today is a blue line (status) and a blue day number.</p>
+<p><b>Behaviour.</b> The page owns it: drag a bar to move it, drag an edge to resize, drag a tray chip onto the grid to date it; Left and Right arrows move a focused bar by a day and Shift with an arrow resizes it. No time of day.</p>
+<p><b>Tokens.</b> <code>--gd-ink</code>, <code>--gd-ink-fg</code>, <code>--gd-card-bg</code>, <code>--gd-sunken-bg</code>, <code>--gd-border</code>, <code>--gd-border-focus</code>, <code>--gd-accent</code> (today, status), <code>--gd-text</code>, <code>--gd-text-muted</code>, <code>--gd-selected-bg</code>, <code>--gw-space-*</code>, <code>--gw-radius-2</code>, <code>--gw-radius-4</code>, <code>--gw-radius-8</code>, <code>--gw-radius-12</code>, <code>--gw-text-body-10-med</code>, <code>--gw-text-body-12-med</code>, <code>--gw-text-body-12-sem</code>, <code>--gw-text-body-14-med</code>. Bar shades are <code>color-mix</code> of <code>--gd-ink</code> and the card ground, which are tokens. Gap: the 280px label column is chosen.</p>
+<p><b>Accessibility.</b> Every bar is a button whose label gives the task, the dates and the arrow-key hint, so the whole timeline works without a pointer. Colour is paired with the legend and the label; the dashed edge marks a suggestion.</p>
+<p><b>Phone.</b> Not drawn: the task board's phone bar has no Timeline.</p>
+<p><b>Provenance.</b> NEW, reference Mobbin Linear board and Asana board, wireframe section 3, pending library review.</p>
+<h3 id="quoted-message">Inbox triage</h3>
+<p><b>Purpose.</b> Work through suggested items one at a time from the keyboard: a list on the left, the selected item on the right with its source message, why it was suggested, editable properties and Accept or Dismiss. Use it for a queue of things to accept or reject.</p>
+<p><b>Anatomy.</b> <code>.gd-inbox &gt; .gd-inbox__list (button.gd-inbox__row[aria-current] with a title and </code>.gd-inbox__meta<code>, then </code>.gd-inbox__foot<code>) + .gd-inbox__pane (</code>.gd-inbox__head<code>, a </code>quoted-message<code>, a library banner for the reason, </code>textarea.gd-inbox__title<code>, </code>property-row<code>s, </code>.gd-inbox__acts<code>)</code>.</p>
+<pre class="md-pre"><code>&lt;div class=&quot;gd-inbox&quot;&gt;&lt;div class=&quot;gd-inbox__list&quot;&gt;&lt;button type=&quot;button&quot; class=&quot;gd-inbox__row&quot; aria-current=&quot;true&quot;&gt;&lt;span&gt;Check the CTA copy&lt;/span&gt;&lt;span class=&quot;gd-inbox__meta&quot;&gt;…&lt;/span&gt;&lt;/button&gt;&lt;/div&gt;&lt;div class=&quot;gd-inbox__pane&quot;&gt;…&lt;/div&gt;&lt;/div&gt;</code></pre>
+<p><b>Variants.</b> None.</p>
+<p><b>States.</b> Row hover and current (selected ground and an ink bar on the left). Title field hover and focus (edge).</p>
+<p><b>Behaviour.</b> The page owns it: J and K move, A accepts, D dismisses, and Undo last restores the last dismissed item. The shortcut is shown on its button as a <code>shortcut-key</code>.</p>
+<p><b>Tokens.</b> <code>--gd-card-bg</code>, <code>--gd-hover-bg</code>, <code>--gd-selected-bg</code>, <code>--gd-ink</code>, <code>--gd-border</code>, <code>--gd-border-focus</code>, <code>--gd-text</code>, <code>--gd-text-muted</code>, <code>--gw-space-*</code>, <code>--gw-radius-8</code>, <code>--gw-radius-12</code>, <code>--gw-text-body-12-med</code>, <code>--gw-text-body-14-med</code>, <code>--gw-text-h7-bold</code>, <code>--gw-motion-fast</code>. Gap: the 360px list column is chosen.</p>
+<p><b>Accessibility.</b> The list is labelled; the current row has <code>aria-current</code>; every shortcut also has a button.</p>
+<p><b>Phone.</b> The two columns stack.</p>
+<p><b>Provenance.</b> NEW, reference Mobbin Linear inbox, wireframe section 4, pending library review.</p>
+<h3 id="assistant-launcher">Quoted message</h3>
+<p><b>Purpose.</b> The original message a record came from, quoted with its source, so you can see why the record exists. Use it where a record was created from a message.</p>
+<p><b>Anatomy.</b> <code>figure.gd-quote &gt; .gd-quote__label + blockquote + figcaption</code> (who it was from and a link to the source).</p>
+<pre class="md-pre"><code>&lt;figure class=&quot;gd-quote&quot;&gt;&lt;span class=&quot;gd-quote__label&quot;&gt;From Slack · #growth&lt;/span&gt;&lt;blockquote&gt;Can you check the CTA copy before it goes out?&lt;/blockquote&gt;&lt;figcaption&gt;Aarav · &lt;a href=&quot;#&quot;&gt;Open in Slack&lt;/a&gt;&lt;/figcaption&gt;&lt;/figure&gt;</code></pre>
+<p><b>Variants.</b> None.</p>
+<p><b>States.</b> Static.</p>
+<p><b>Behaviour.</b> None.</p>
+<p><b>Tokens.</b> <code>--gd-border-strong</code>, <code>--gd-text</code>, <code>--gd-text-muted</code>, <code>--gw-space-*</code>, <code>--gw-text-body-12-med</code>, <code>--gw-text-body-14-reg</code>.</p>
+<p><b>Accessibility.</b> A real <code>figure</code> with a caption; the link opens in a new tab with <code>rel=&quot;noopener noreferrer&quot;</code>.</p>
+<p><b>Provenance.</b> NEW, reference Mobbin Linear inbox and Linear task, wireframes 4 and 5, pending library review.</p>
+<h3 id="bottom-bar">Assistant launcher</h3>
+<p><b>Purpose.</b> A floating pill that opens the assistant from any screen, bottom right, with its shortcut. It has a second button, a status dot, that opens the assistant's settings. Use it for one assistant per product.</p>
+<p><b>Anatomy.</b> <code>.gd-launch &gt; button.gd-launch__main (an agent avatar, the label, a </code>.gd-launch__key<code> cap) + button.gd-launch__status (a </code>status-dot<code>)</code>.</p>
+<pre class="md-pre"><code>&lt;div class=&quot;gd-launch&quot;&gt;&lt;button type=&quot;button&quot; class=&quot;gd-launch__main&quot;&gt;&lt;span class=&quot;gd-av gd-av--agent gd-av--sm&quot;&gt;B&lt;/span&gt;Ask Bruce&lt;kbd class=&quot;gd-launch__key&quot;&gt;⌘K&lt;/kbd&gt;&lt;/button&gt;&lt;button type=&quot;button&quot; class=&quot;gd-launch__status&quot; aria-label=&quot;Bruce settings&quot;&gt;&lt;span class=&quot;gd-status-dot gd-status-dot--neutral&quot;&gt;&lt;/span&gt;&lt;/button&gt;&lt;/div&gt;</code></pre>
+<p><b>Variants.</b> None. The dot is neutral when its state cannot be read; a quantity that cannot be read is not drawn.</p>
+<p><b>States.</b> Hover (ink hover fill), keyboard ring, hidden while the panel is open.</p>
+<p><b>Behaviour.</b> The page owns it: click or the shortcut opens the panel; the dot opens settings. Hidden under 768 wide, where the bottom bar carries it.</p>
+<p><b>Tokens.</b> <code>--gd-ink</code>, <code>--gd-ink-fg</code>, <code>--gd-ink-hover</code>, <code>--gw-shadow-s3</code>, <code>--gw-radius-full</code>, <code>--gw-space-*</code>, <code>--gw-text-button-14</code>, <code>--gw-text-body-10-med</code>, <code>--gw-motion-fast</code>. Gap: it sits 24px from the corner and is 40px tall.</p>
+<p><b>Accessibility.</b> Both buttons are native with labels; the shortcut is on the main button as <code>aria-keyshortcuts</code>.</p>
+<p><b>Provenance.</b> NEW, reference Mobbin Linear, Ferndesk and Fireflies (assistant parked bottom right), wireframe section 1, pending library review.</p>
+<h3 id="floating-add-button">Bottom bar</h3>
+<p><b>Purpose.</b> The phone's view switcher: a row of text items fixed to the bottom of the screen. Use it where the desktop has a segmented control and a launcher.</p>
+<p><b>Anatomy.</b> <code>nav.gd-bottomnav &gt; button.gd-bottomnav__item[aria-current]</code> (label and an optional count).</p>
+<pre class="md-pre"><code>&lt;nav class=&quot;gd-bottomnav&quot; aria-label=&quot;Views&quot;&gt;&lt;button type=&quot;button&quot; class=&quot;gd-bottomnav__item&quot; aria-current=&quot;true&quot;&gt;Board&lt;/button&gt;&lt;button type=&quot;button&quot; class=&quot;gd-bottomnav__item&quot;&gt;List&lt;/button&gt;&lt;button type=&quot;button&quot; class=&quot;gd-bottomnav__item&quot;&gt;Ask Bruce&lt;/button&gt;&lt;/nav&gt;</code></pre>
+<p><b>Variants.</b> None.</p>
+<p><b>States.</b> Item rest, current (text colour and weight), keyboard ring.</p>
+<p><b>Behaviour.</b> Drawn only at 767 and narrower; the page switches views or opens the assistant.</p>
+<p><b>Tokens.</b> <code>--gd-panel-bg</code>, <code>--gd-border</code>, <code>--gd-text</code>, <code>--gd-text-muted</code>, <code>--gd-control-h</code>, <code>--gw-space-*</code>, <code>--gw-text-body-12-med</code>, <code>--gw-motion-fast</code>.</p>
+<p><b>Accessibility.</b> A labelled <code>nav</code>; the current item has <code>aria-current</code>.</p>
+<p><b>Provenance.</b> NEW, reference Mobbin Linear and Todoist (phone bottom bars), wireframe section 11, pending library review.</p>
+<h3 id="assistant-panel">Floating add button</h3>
+<p><b>Purpose.</b> The one primary action on a phone, always in reach: a square button with a glyph, above the bottom bar.</p>
+<p><b>Anatomy.</b> <code>button.gd-btn.gd-btn--primary.gd-fab</code> with one glyph and an <code>aria-label</code>, inside a positioned container.</p>
+<pre class="md-pre"><code>&lt;button type=&quot;button&quot; class=&quot;gd-btn gd-btn--primary gd-fab&quot; aria-label=&quot;New task&quot;&gt;&lt;svg width=&quot;16&quot; height=&quot;16&quot; aria-hidden=&quot;true&quot;&gt;…&lt;/svg&gt;&lt;/button&gt;</code></pre>
+<p><b>Variants.</b> None.</p>
+<p><b>States.</b> As a primary button (hover, press, keyboard ring).</p>
+<p><b>Behaviour.</b> Not drawn above 767 wide.</p>
+<p><b>Tokens.</b> <code>--gw-radius-16</code>, <code>--gw-shadow-s3</code>, <code>--gw-space-16</code>, <code>--gw-space-48</code>, <code>--gd-control-h</code>, plus the primary button's own.</p>
+<p><b>Accessibility.</b> Glyph only, so the label is mandatory.</p>
+<p><b>Provenance.</b> NEW, reference Mobbin Asana and Todoist (phone add button), wireframe section 11, pending library review.</p>
+<h3 id="tag-chip">Assistant panel</h3>
+<p><b>Purpose.</b> A chat with an assistant that can see the page: a thread of questions and answers, answers that list the tasks they mention, and plans to approve. It opens over the page from the right (a full-screen sheet on a phone) and does not block it, so cards can still be tagged. Use it for one assistant per product.</p>
+<p><b>Anatomy.</b> <code>aside.gd-ask[role=dialog][aria-modal=false] &gt; header.gd-ask__head (agent avatar, h2.gd-ask__title, p.gd-ask__sub, actions) + .gd-ask__thread[role=log] + footer.gd-composer</code>. In the thread: <code>.gd-ask__msg--me</code> and <code>.gd-ask__msg--bruce</code> holding <code>.gd-ask__bubble</code>, <code>.gd-ask__mini</code> (a mentioned task with an at-tag button <code>.gd-ask__tag</code>), <code>.gd-ask__tags</code>, an <code>assistant-plan-card</code>; <code>.gd-ask__empty</code> with <code>.gd-ask__starters</code> when the thread is empty.</p>
+<pre class="md-pre"><code>&lt;aside class=&quot;gd-ask&quot; role=&quot;dialog&quot; aria-label=&quot;Ask Bruce&quot;&gt;&lt;header class=&quot;gd-ask__head&quot;&gt;…&lt;/header&gt;&lt;div class=&quot;gd-ask__thread&quot; role=&quot;log&quot;&gt;&lt;div class=&quot;gd-ask__msg gd-ask__msg--me&quot;&gt;&lt;div class=&quot;gd-ask__bubble&quot;&gt;What is due this week?&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;gd-ask__msg gd-ask__msg--bruce&quot;&gt;&lt;div class=&quot;gd-ask__bubble&quot;&gt;Four tasks are due by Friday.&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;footer class=&quot;gd-composer&quot;&gt;…&lt;/footer&gt;&lt;/aside&gt;</code></pre>
+<p><b>Variants.</b> Your message is an ink bubble, the assistant's a quiet ground; <code>gd-ask__bubble--error</code> is a plain one-line error.</p>
+<p><b>States.</b> Open or hidden; empty thread; message pending (a quiet &quot;Looking&quot; line).</p>
+<p><b>Behaviour.</b> The page owns it: open with the launcher, the command key or a card's menu; Esc or the close button closes it and returns focus; the thread keeps itself scrolled to the newest message; errors read as one plain line.</p>
+<p><b>Tokens.</b> <code>--gd-raised-bg</code>, <code>--gd-sunken-bg</code>, <code>--gd-card-bg</code>, <code>--gd-ink</code>, <code>--gd-ink-fg</code>, <code>--gd-border</code>, <code>--gd-border-strong</code>, <code>--gd-text</code>, <code>--gd-text-body</code>, <code>--gd-text-muted</code>, <code>--gw-shadow-s4</code>, <code>--gw-radius-4</code>, <code>--gw-radius-8</code>, <code>--gw-radius-12</code>, <code>--gw-radius-16</code>, <code>--gw-space-*</code>, <code>--gw-text-body-10-med</code>, <code>--gw-text-body-12-reg</code>, <code>--gw-text-body-12-med</code>, <code>--gw-text-body-14-reg</code>, <code>--gw-text-body-16-sem</code>, <code>--gw-motion-fast</code>. Gap: the 480px width is chosen.</p>
+<p><b>Accessibility.</b> A named, non-modal dialog; the thread is a polite live region; Esc closes.</p>
+<p><b>Provenance.</b> NEW, reference Mobbin Linear and Ferndesk (assistant panels), wireframes 8, 9 and 11, pending library review.</p>
+<h3 id="assistant-composer">Tag chip</h3>
+<p><b>Purpose.</b> A reference to something the assistant should look at: a task, a person, a channel, or a group such as &quot;this view&quot;. Use it in the composer and in the message that was sent.</p>
+<p><b>Anatomy.</b> <code>span.gd-tagchip[data-kind=&quot;task|person|channel|group&quot;] &gt; b (TSK-14 or @Name) + span (a title) + optional button.gd-tagchip__x</code>.</p>
+<pre class="md-pre"><code>&lt;span class=&quot;gd-tagchip&quot; data-kind=&quot;task&quot;&gt;&lt;b&gt;TSK-14&lt;/b&gt;&lt;span&gt;Check the CTA copy&lt;/span&gt;&lt;button type=&quot;button&quot; class=&quot;gd-tagchip__x&quot; aria-label=&quot;Remove tag TSK-14&quot;&gt;&lt;svg width=&quot;10&quot; height=&quot;10&quot;&gt;…&lt;/svg&gt;&lt;/button&gt;&lt;/span&gt;</code></pre>
+<p><b>Variants.</b> Inside your own message bubble it recolours for the ink ground.</p>
+<p><b>States.</b> Rest; the remove mark has hover and the keyboard ring.</p>
+<p><b>Behaviour.</b> The page owns it: the remove mark takes the chip out of the composer.</p>
+<p><b>Tokens.</b> <code>--gd-selected-bg</code>, <code>--gd-border-strong</code>, <code>--gd-text</code>, <code>--gd-text-muted</code>, <code>--gd-ctl-hover</code>, <code>--gd-ink-fg</code>, <code>--gw-radius-4</code>, <code>--gw-radius-8</code>, <code>--gw-space-*</code>, <code>--gw-text-body-12-med</code>.</p>
+<p><b>Accessibility.</b> The remove button names the tag. The title truncates; the key stays whole.</p>
+<p><b>Provenance.</b> NEW, reference Mobbin Linear (mentions), wireframe section 8, pending library review.</p>
+<h3 id="tag-picker">Assistant composer</h3>
+<p><b>Purpose.</b> Where you write to the assistant: tag chips above a text box, with buttons for tagging, commands and the context, and a send button. Use it at the foot of the assistant panel.</p>
+<p><b>Anatomy.</b> <code>footer.gd-composer &gt; .gd-mention + .gd-composer__box (.gd-composer__tags, textarea.gd-composer__input, .gd-composer__tools with button.gd-composer__tool and a primary </code>.gd-composer__send<code>)</code>.</p>
+<pre class="md-pre"><code>&lt;footer class=&quot;gd-composer&quot;&gt;&lt;div class=&quot;gd-composer__box&quot;&gt;&lt;div class=&quot;gd-composer__tags&quot;&gt;&lt;/div&gt;&lt;textarea class=&quot;gd-composer__input&quot; rows=&quot;1&quot; aria-label=&quot;Message to Bruce&quot;&gt;&lt;/textarea&gt;&lt;div class=&quot;gd-composer__tools&quot;&gt;&lt;button type=&quot;button&quot; class=&quot;gd-composer__tool&quot;&gt;Tag&lt;/button&gt;&lt;button type=&quot;button&quot; class=&quot;gd-btn gd-btn--primary gd-btn--sm gd-composer__send&quot; aria-label=&quot;Send&quot;&gt;…&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;&lt;/footer&gt;</code></pre>
+<p><b>Variants.</b> None.</p>
+<p><b>States.</b> Box focus (the edge firms up, not a ring, R41), send disabled while empty, tool hover.</p>
+<p><b>Behaviour.</b> The page owns it: Enter sends, Shift and Enter adds a line, <code>@</code> opens the tag picker, <code>/</code> as the first character opens commands (which only insert text), Backspace in an empty box removes the last chip.</p>
+<p><b>Tokens.</b> <code>--gd-card-bg</code>, <code>--gd-border</code>, <code>--gd-border-strong</code>, <code>--gd-border-focus</code>, <code>--gd-text</code>, <code>--gd-text-muted</code>, <code>--gd-placeholder</code>, <code>--gd-selected-bg</code>, <code>--gd-card-pad</code>, <code>--gw-space-*</code>, <code>--gw-radius-8</code>, <code>--gw-radius-12</code>, <code>--gw-text-body-12-med</code>, <code>--gw-text-body-14-reg</code>, <code>--gw-motion-fast</code>.</p>
+<p><b>Accessibility.</b> The textarea has a label; the focused edge replaces the ring on a text field.</p>
+<p><b>Provenance.</b> NEW, reference Mobbin Linear and Ferndesk, wireframes 8 and 9, pending library review.</p>
+<h3 id="assistant-plan-card">Tag picker</h3>
+<p><b>Purpose.</b> Choose what to tag: tasks, people or channels, plus shortcuts to tag everything on the view or the selected cards. It also lists the assistant's commands. Use it above the composer.</p>
+<p><b>Anatomy.</b> <code>.gd-mention &gt; .gd-mention__tabs</code> (the library segmented control) <code>+ .gd-mention__list &gt; button.gd-mention__row[role=option][aria-selected] (a bold key, text, a small hint)</code>, <code>.gd-mention__sep</code>, <code>.gd-mention__none</code>.</p>
+<pre class="md-pre"><code>&lt;div class=&quot;gd-mention&quot;&gt;&lt;div class=&quot;gd-seg&quot;&gt;…&lt;/div&gt;&lt;div class=&quot;gd-mention__list&quot; role=&quot;listbox&quot;&gt;&lt;button type=&quot;button&quot; class=&quot;gd-mention__row&quot; role=&quot;option&quot; aria-selected=&quot;true&quot;&gt;&lt;b&gt;TSK-14&lt;/b&gt;&lt;span&gt;Check the CTA copy&lt;/span&gt;&lt;small&gt;To do · Fri&lt;/small&gt;&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;</code></pre>
+<p><b>Variants.</b> The command list has no tabs and its rows are a command and its description.</p>
+<p><b>States.</b> Row hover and selected, disabled row (<code>aria-disabled</code>, for an empty shortcut).</p>
+<p><b>Behaviour.</b> The page owns it: typing after <code>@</code> filters; the arrows move, Enter or Tab chooses, Esc closes the picker first and the panel second.</p>
+<p><b>Tokens.</b> <code>--gd-raised-bg</code>, <code>--gd-menu-hover</code>, <code>--gd-border</code>, <code>--gd-text</code>, <code>--gd-text-muted</code>, <code>--gd-disabled-ink</code>, <code>--gd-control-h</code>, <code>--gw-shadow-s3</code>, <code>--gw-radius-8</code>, <code>--gw-radius-12</code>, <code>--gw-space-*</code>, <code>--gw-text-body-12-reg</code>, <code>--gw-text-body-12-med</code>, <code>--gw-text-body-14-med</code>. Gap: the 320px height cap is chosen.</p>
+<p><b>Accessibility.</b> A listbox of options with <code>aria-selected</code>; the input keeps focus.</p>
+<p><b>Provenance.</b> NEW, reference Mobbin Linear (mentions and slash commands), wireframes 8 and 9, pending library review.</p>
+<h3 id="removable-view">Assistant plan card</h3>
+<p><b>Purpose.</b> What the assistant is about to do, for you to approve: ticked steps you can untick, a badge saying whose things each step touches, and anything that leaves the app drafted but never sent from here. After approval a result card says how much changed and offers Undo. Use it for any assistant action that changes data.</p>
+<p><b>Anatomy.</b> <code>.gd-plan &gt; .gd-plan__step (a library checkbox, </code>.gd-plan__label<code> with the step and a Badge, </code>.gd-plan__detail<code> of tag chips, or </code>.gd-plan__draft<code>) … + .gd-plan__note + .gd-plan__foot (Approve all, Tasks only, Cancel)</code>. <code>.gd-donecard</code> is the result: a tick, text and an Undo button.</p>
+<pre class="md-pre"><code>&lt;div class=&quot;gd-plan&quot;&gt;&lt;div class=&quot;gd-plan__step&quot;&gt;&lt;label class=&quot;gd-check&quot;&gt;&lt;input type=&quot;checkbox&quot; checked&gt;&lt;span class=&quot;gd-check__box&quot;&gt;&lt;/span&gt;&lt;/label&gt;&lt;div&gt;&lt;div class=&quot;gd-plan__label&quot;&gt;&lt;span&gt;Move 2 tasks to Doing&lt;/span&gt;&lt;span class=&quot;gd-badge&quot;&gt;your tasks&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;gd-plan__detail&quot;&gt;&lt;span class=&quot;gd-tagchip&quot;&gt;…&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;gd-plan__foot&quot;&gt;&lt;button type=&quot;button&quot; class=&quot;gd-btn gd-btn--primary gd-btn--sm&quot;&gt;Approve all&lt;/button&gt;…&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;gd-donecard&quot;&gt;&lt;svg&gt;…&lt;/svg&gt;&lt;span&gt;&lt;b&gt;Done.&lt;/b&gt; 2 tasks changed.&lt;/span&gt;&lt;button type=&quot;button&quot; class=&quot;gd-btn gd-btn--outline gd-btn--sm&quot;&gt;Undo&lt;/button&gt;&lt;/div&gt;</code></pre>
+<p><b>Variants.</b> Steps are &quot;your tasks&quot; (run on approval) or &quot;visible to others&quot; (a warn Badge; never run from here, shown as a draft beside a disabled send button and a line saying why).</p>
+<p><b>States.</b> Step ticked or unticked (the label strikes), approving (<code>aria-busy</code>), done, undone, cancelled.</p>
+<p><b>Behaviour.</b> The page owns it: only the ticked &quot;your tasks&quot; steps run, through the same operations as the board; the previous values are kept so Undo can put them back.</p>
+<p><b>Tokens.</b> <code>--gd-card-bg</code>, <code>--gd-sunken-bg</code>, <code>--gd-text</code>, <code>--gd-text-muted</code>, <code>--gd-border-focus</code>, <code>--gd-border-strong</code>, <code>--gw-radius-8</code>, <code>--gw-radius-12</code>, <code>--gw-space-*</code>, <code>--gw-text-body-12-reg</code>, <code>--gw-text-body-14-reg</code>, <code>--gw-text-body-14-med</code>.</p>
+<p><b>Accessibility.</b> Each checkbox has a screen-reader label naming its step; busy and result states are announced by the thread's live region.</p>
+<p><b>Provenance.</b> NEW, reference Mobbin Linear and Ferndesk (assistant actions), wireframe section 9, pending library review.</p>
+<h3>Removable view</h3>
+<p><b>Purpose.</b> A remove mark beside a saved view the person made, so it can be deleted. Built-in views have none. Use it inside <code>saved-views</code>.</p>
+<p><b>Anatomy.</b> <code>button.gd-views__x</code> placed right after the view's tab (a tab cannot hold a button).</p>
+<pre class="md-pre"><code>&lt;div class=&quot;gd-views&quot; role=&quot;tablist&quot;&gt;&lt;button type=&quot;button&quot; class=&quot;gd-views__tab&quot; role=&quot;tab&quot;&gt;Design hub&lt;/button&gt;&lt;button type=&quot;button&quot; class=&quot;gd-views__x&quot; aria-label=&quot;Delete view Design hub&quot;&gt;&lt;svg width=&quot;10&quot; height=&quot;10&quot;&gt;…&lt;/svg&gt;&lt;/button&gt;&lt;/div&gt;</code></pre>
+<p><b>Variants.</b> None.</p>
+<p><b>States.</b> Hover, keyboard ring.</p>
+<p><b>Behaviour.</b> The page deletes the view.</p>
+<p><b>Tokens.</b> <code>--gd-text-muted</code>, <code>--gd-text</code>, <code>--gd-ctl-hover</code>, <code>--gw-space-4</code>, <code>--gw-space-20</code>, <code>--gw-radius-4</code>, <code>--gw-motion-fast</code>.</p>
+<p><b>Accessibility.</b> The label names the view.</p>
+<p><b>Provenance.</b> NEW, reference Mobbin Aboard (saved views), pending library review. It extends <code>saved-views</code>.</p></div></main><div class="lb-toc"><b>On this page</b><a href="#assignee-avatar" class="l3">Assignee avatar</a><a href="#priority-bars" class="l3">Priority bars</a><a href="#run-status-chip" class="l3">Run status chip</a><a href="#board-lane" class="l3">Board lane</a><a href="#task-card" class="l3">Task card</a><a href="#task-list" class="l3">Task list</a><a href="#property-row" class="l3">Property row</a><a href="#list-picker" class="l3">List picker</a><a href="#date-picker" class="l3">Date picker</a><a href="#filter-popover" class="l3">Filter popover</a><a href="#task-timeline" class="l3">Task timeline</a><a href="#inbox-triage" class="l3">Inbox triage</a><a href="#quoted-message" class="l3">Quoted message</a><a href="#assistant-launcher" class="l3">Assistant launcher</a><a href="#bottom-bar" class="l3">Bottom bar</a><a href="#floating-add-button" class="l3">Floating add button</a><a href="#assistant-panel" class="l3">Assistant panel</a><a href="#tag-chip" class="l3">Tag chip</a><a href="#assistant-composer" class="l3">Assistant composer</a><a href="#tag-picker" class="l3">Tag picker</a><a href="#assistant-plan-card" class="l3">Assistant plan card</a><a href="#removable-view" class="l3">Removable view</a></div></div>
+<script>
+(function(){
+  /* Theme: the same keys as the main site. `gw-theme-choice` is what the person picked (light, dark or system) and is
+     written only when they pick; no choice means System, which follows the machine. `gw-theme` is the resolved
+     light or dark. This button toggles light and dark, so using it is a choice. */
+  var CH='gw-theme-choice', RES='gw-theme';
+  function pref(){try{var v=localStorage.getItem(CH);return (v==='light'||v==='dark'||v==='system')?v:'system'}catch(e){return 'system'}}
+  function res(p){return p==='dark'?'dark':p==='light'?'light':(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}
+  function apply(p,remember){var r=res(p);
+    document.documentElement.setAttribute('data-theme',r);
+    try{localStorage.setItem(RES,r);if(remember)localStorage.setItem(CH,p)}catch(e){}
+    var b=document.getElementById('lb-theme');
+    if(b)b.setAttribute('aria-label',r==='dark'?'Switch to light':'Switch to dark');}
+  var btn=document.getElementById('lb-theme');
+  if(btn)btn.addEventListener('click',function(){
+    apply(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark',true)});
+  apply(pref(),false);
+  try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){if(pref()==='system')apply('system',false)})}catch(e){}
+
+  /* Rail filter. Narrows the inventory in place — it does not navigate, because the
+     rail is a list of siblings and losing your place to search them is worse than
+     scrolling. */
+  var f=document.getElementById('lb-find');
+  if(f){
+    var rows=[].slice.call(document.querySelectorAll('.lb-rail a'));
+    f.addEventListener('input',function(){
+      var t=f.value.trim().toLowerCase();
+      rows.forEach(function(a){
+        a.hidden=!!t&&a.getAttribute('data-q').indexOf(t)===-1});
+    });
+  }
+
+  /* Component list filter: hides rows that do not match, and a surface whose rows all went. */
+  var rf=document.getElementById('lb-rows');
+  if(rf){
+    var trs=[].slice.call(document.querySelectorAll('tr[data-q]')), secs=[].slice.call(document.querySelectorAll('section[data-cat]'));
+    rf.addEventListener('input',function(){
+      var t=rf.value.trim().toLowerCase();
+      trs.forEach(function(r){r.hidden=!!t&&r.getAttribute('data-q').indexOf(t)===-1});
+      secs.forEach(function(sc){sc.hidden=!sc.querySelector('tr[data-q]:not([hidden])')});
+    });
+  }
+
+  /* Mark the on-this-page entry for whatever heading is currently at the top. */
+  var toc=[].slice.call(document.querySelectorAll('.lb-toc a'));
+  if(toc.length){
+    var heads=toc.map(function(a){return document.getElementById(a.hash.slice(1))})
+                 .filter(Boolean);
+    var tick=function(){
+      var best=0;
+      heads.forEach(function(h,i){if(h.getBoundingClientRect().top<=90)best=i});
+      toc.forEach(function(a,i){a.style.color=i===best?'var(--gw-color-primary-600)':''});
+    };
+    document.addEventListener('scroll',tick,{passive:true});tick();
+  }
+})();
+</script>
+</body></html>

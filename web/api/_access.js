@@ -83,6 +83,10 @@ export function defaultRules() {
          answer ChatGPT's question; accepting, changing or discarding a picture stays the owner's, checked in
          api/_drop-studio.js and not by this rule. */
       { path: '/internal/staging/drop-studio', access: 'internal', groups: [], people: [] },
+      /* Task board (staging): the owner alone to start (Utsav, 8 Oct 2026). It holds tasks Bruce lifted from his
+         Slack, so it opens to others one person at a time in Access Control, not by default. api/_tasks.js checks
+         this same path with decide() on every request, so the page and the list cannot disagree. */
+      { path: '/internal/staging/tasks', access: 'owner', groups: [], people: [] },
       /* Ad landers are public on purpose. An ad page's whole job is to be
          pasted into Slack, sent to a client and run as paid media, and a
          social card cannot render from behind the gate: the scraper fetching

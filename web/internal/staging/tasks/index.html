@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<base href="/internal/staging/tasks/">
+<title>Tasks - Gushwork</title>
+<script>try{var c=localStorage.getItem('gw-theme-choice');if(c==='light'||c==='dark')document.documentElement.setAttribute('data-theme',c)}catch(e){}</script>
+<link rel="stylesheet" href="/foundation/tokens.css">
+<link rel="stylesheet" href="/exports/dashboard/dashboard.css">
+<link rel="stylesheet" href="app.css">
+<!-- gushwork-build:{"pluginVersion":"2.0.8","createdBy":"utsav.singh@gushwork.ai","createdAt":"8 Oct 2026","surface":"dashboard",
+  "registry":"https://gushwork-design.vercel.app/exports/dashboard/component-registry.json",
+  "changelog":"https://gushwork-design.vercel.app/changelog-sheet","components":["app-shell","content-panel","segmented-control","saved-views","filter-chip","status-dot","action-button","icon-button","shortcut-key","menu","popover","modal","confirm-dialog","drawer","toast","activity-timeline","empty-state","skeleton","banner","checkbox","toggle","select","search-field","form-field","tabs-pill","tooltip","assignee-avatar","priority-bars","run-status-chip","board-lane","task-card","task-list","property-row","list-picker","date-picker","filter-popover","task-timeline","inbox-triage","quoted-message","assistant-launcher","bottom-bar","floating-add-button","assistant-panel","tag-chip","assistant-composer","tag-picker","assistant-plan-card","removable-view"]} -->
+</head>
+<body class="gd" data-density="comfortable" data-gd-palette-off>
+
+<div class="gd-app tk-app">
+  <div class="gd-app__main">
+    <section class="gd-panel tk-panel" aria-label="Tasks">
+
+      <header class="tk-bar" id="tk-bar">
+        <div class="tk-bar__brand">
+          <span class="gd-sidebar__chip" aria-hidden="true"><svg viewBox="0 0 80 80" fill="none" aria-hidden="true"><path d="M76.6088 4.56344C77.5025 2.36058 75.8495 0 73.4723 0H9.14286C4.0934 0 0 4.0934 0 9.14286V66.7778C0 72.018 5.17081 75.6829 9.9603 73.5568C40.8494 59.8449 64.3785 34.7075 76.6088 4.56344Z" fill="currentColor"/><path d="M32.5161 80C31.4022 80 30.9357 78.5531 31.8259 77.8835C54.9007 60.5265 71.4338 35.8047 78.7658 8.0522C78.9403 7.39154 80 7.51618 80 8.19951V70.8571C80 75.9066 75.9066 80 70.8571 80H32.5161Z" fill="currentColor"/></svg></span>
+          <h1 class="tk-bar__title">Tasks</h1>
+        </div>
+        <div class="gd-seg tk-bar__views" id="tk-viewseg" role="radiogroup" aria-label="View" hidden></div>
+        <div class="tk-bar__acts" id="tk-acts" hidden>
+          <div class="tk-search" id="tk-search">
+            <button type="button" class="gd-iconbtn" id="tk-search-btn" aria-label="Search tasks" aria-keyshortcuts="Control+/ Meta+/" aria-expanded="false" data-gd-tooltip="Search (&#8984;/)"><svg viewBox="0 0 256 256" width="16" height="16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"/></svg></button>
+            <div class="gd-input gd-input--search tk-search__field" id="tk-search-field" hidden>
+              <svg class="gd-input__icon" viewBox="0 0 256 256" width="16" height="16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"/></svg>
+              <input class="gd-input__el" id="tk-search-input" type="search" placeholder="Search tasks" aria-label="Search tasks" autocomplete="off">
+              <button type="button" class="gd-input__clear" data-gd-clear aria-label="Clear search"><svg viewBox="0 0 256 256" width="16" height="16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M208.49,191.51a12,12,0,0,1-17,17L128,145,64.49,208.49a12,12,0,0,1-17-17L111,128,47.51,64.49a12,12,0,0,1,17-17L128,111l63.51-63.52a12,12,0,0,1,17,17L145,128Z"/></svg></button>
+            </div>
+          </div>
+          <div class="gd-popover-wrap">
+            <button type="button" class="gd-btn" id="tk-filter-btn" data-gd-popover="#tk-filter-pop" aria-expanded="false" aria-controls="tk-filter-pop"><svg viewBox="0 0 256 256" width="16" height="16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M230.6,49.53A15.81,15.81,0,0,0,216,40H40A16,16,0,0,0,28.19,66.76l.08.09L96,139.17V216a16,16,0,0,0,24.87,13.32l32-21.34A16,16,0,0,0,160,194.66V139.17l67.74-72.32.08-.09A15.8,15.8,0,0,0,230.6,49.53ZM40,56h0Zm106.18,74.58A8,8,0,0,0,144,136v58.66L112,216V136a8,8,0,0,0-2.16-5.47L40,56H216Z"/></svg><span>Filter</span><span class="gd-tbar__n" id="tk-filter-n" hidden></span></button>
+            <div class="gd-popover" id="tk-filter-pop" data-placement="bottom-end" data-edge="end" data-kind="filter" hidden></div>
+          </div>
+          <div class="gd-popover-wrap">
+            <button type="button" class="gd-btn" id="tk-display-btn" data-gd-popover="#tk-display-pop" aria-expanded="false" aria-controls="tk-display-pop"><svg viewBox="0 0 256 256" width="16" height="16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M40,88H73a32,32,0,0,0,62,0h81a8,8,0,0,0,0-16H135a32,32,0,0,0-62,0H40a8,8,0,0,0,0,16Zm64-24A16,16,0,1,1,88,80,16,16,0,0,1,104,64ZM216,168H199a32,32,0,0,0-62,0H40a8,8,0,0,0,0,16h97a32,32,0,0,0,62,0h17a8,8,0,0,0,0-16Zm-48,24a16,16,0,1,1,16-16A16,16,0,0,1,168,192Z"/></svg><span>Display</span></button>
+            <div class="gd-popover" id="tk-display-pop" data-placement="bottom-end" data-edge="end" data-kind="display" hidden></div>
+          </div>
+          <div class="gd-popover-wrap" id="tk-people-wrap">
+            <div class="gd-av-stack" id="tk-people" role="group" aria-label="Filter by assignee"></div>
+            <button type="button" class="gd-av gd-av--ghost gd-av--btn" id="tk-add-person" data-gd-popover="#tk-add-pop" aria-expanded="false" aria-controls="tk-add-pop" aria-label="Add a person or an agent" data-gd-tooltip="Add a person or an agent"><svg viewBox="0 0 256 256" width="12" height="12" fill="currentColor" aria-hidden="true" focusable="false"><path d="M228,128a12,12,0,0,1-12,12H140v76a12,12,0,0,1-24,0V140H40a12,12,0,0,1,0-24h76V40a12,12,0,0,1,24,0v76h76A12,12,0,0,1,228,128Z"/></svg></button>
+            <div class="gd-popover" id="tk-add-pop" data-placement="bottom-end" data-edge="end" data-kind="add" hidden></div>
+          </div>
+          <button type="button" class="gd-btn gd-btn--primary" id="tk-new-btn" data-new-task><svg viewBox="0 0 256 256" width="16" height="16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M228,128a12,12,0,0,1-12,12H140v76a12,12,0,0,1-24,0V140H40a12,12,0,0,1,0-24h76V40a12,12,0,0,1,24,0v76h76A12,12,0,0,1,228,128Z"/></svg><span>New task</span></button>
+        </div>
+      </header>
+
+      <div class="gd-panel__body tk-body" id="tk-scroll">
+        <div class="gd-page tk-page">
+          <div class="tk-strip" id="tk-strip" hidden></div>
+          <div class="tk-lanechips" id="tk-lanechips" hidden></div>
+          <div class="tk-view" id="tk-view" aria-live="polite"></div>
+        </div>
+      </div>
+
+      <nav class="gd-bottomnav" id="tk-bottomnav" aria-label="Views" hidden></nav>
+      <button type="button" class="gd-btn gd-btn--primary gd-fab" id="tk-fab" data-new-task aria-label="New task" hidden><svg viewBox="0 0 256 256" width="16" height="16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M228,128a12,12,0,0,1-12,12H140v76a12,12,0,0,1-24,0V140H40a12,12,0,0,1,0-24h76V40a12,12,0,0,1,24,0v76h76A12,12,0,0,1,228,128Z"/></svg></button>
+    </section>
+  </div>
+</div>
+
+<!-- the floating Ask Bruce launcher -->
+<div class="gd-launch" id="tk-launch" hidden>
+  <button type="button" class="gd-launch__main" id="tk-launch-main" aria-keyshortcuts="Control+K Meta+K"><span class="gd-av gd-av--agent gd-av--sm" aria-hidden="true">B</span>Ask Bruce<kbd class="gd-launch__key" aria-hidden="true">&#8984;K</kbd></button>
+  <button type="button" class="gd-launch__status" id="tk-launch-status" aria-label="Bruce settings" data-gd-tooltip="Bruce settings"><span class="gd-status-dot gd-status-dot--neutral" aria-hidden="true"></span></button>
+</div>
+
+<!-- Ask Bruce panel -->
+<aside class="gd-ask" id="tk-ask" role="dialog" aria-label="Ask Bruce" aria-modal="false" hidden>
+  <header class="gd-ask__head">
+    <span class="gd-av gd-av--agent gd-av--ink gd-av--lg" aria-hidden="true">B</span>
+    <div><h2 class="gd-ask__title">Ask Bruce</h2><p class="gd-ask__sub" id="tk-ask-sub">Sees your tasks and Slack</p></div>
+    <button type="button" class="gd-btn gd-btn--ghost gd-btn--sm" id="tk-ask-newchat" hidden>New chat</button>
+    <button type="button" class="gd-iconbtn" id="tk-ask-close" aria-label="Close Ask Bruce"><svg viewBox="0 0 256 256" width="16" height="16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M208.49,191.51a12,12,0,0,1-17,17L128,145,64.49,208.49a12,12,0,0,1-17-17L111,128,47.51,64.49a12,12,0,0,1,17-17L128,111l63.51-63.52a12,12,0,0,1,17,17L145,128Z"/></svg></button>
+  </header>
+  <div class="gd-ask__thread" id="tk-ask-thread" role="log" aria-live="polite" aria-label="Conversation"></div>
+  <footer class="gd-composer" id="tk-composer">
+    <div class="gd-mention" id="tk-mention" hidden></div>
+    <div class="gd-composer__box">
+      <div class="gd-composer__tags" id="tk-ctags"></div>
+      <textarea class="gd-composer__input" id="tk-ask-input" rows="1" placeholder="Ask or tell Bruce" aria-label="Message to Bruce" autocomplete="off"></textarea>
+      <div class="gd-composer__tools">
+        <button type="button" class="gd-composer__tool" id="tk-tool-at"><svg viewBox="0 0 256 256" width="16" height="16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M128,24a104,104,0,0,0,0,208c21.51,0,44.1-6.48,60.43-17.33a8,8,0,0,0-8.86-13.33C166,210.38,146.21,216,128,216a88,88,0,1,1,88-88c0,26.45-10.88,32-20,32s-20-5.55-20-32V88a8,8,0,0,0-16,0v4.26a48,48,0,1,0,5.93,65.1c6,12,16.35,18.64,30.07,18.64,22.54,0,36-17.94,36-48A104.11,104.11,0,0,0,128,24Zm0,136a32,32,0,1,1,32-32A32,32,0,0,1,128,160Z"/></svg>Tag</button>
+        <button type="button" class="gd-composer__tool" id="tk-tool-slash"><span aria-hidden="true">/</span>Do something</button>
+        <button type="button" class="gd-composer__tool" id="tk-tool-ctx" hidden></button>
+        <button type="button" class="gd-btn gd-btn--primary gd-btn--sm gd-composer__send" id="tk-ask-send" aria-label="Send" disabled><svg viewBox="0 0 256 256" width="16" height="16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M208.49,120.49a12,12,0,0,1-17,0L140,69V216a12,12,0,0,1-24,0V69L64.49,120.49a12,12,0,0,1-17-17l72-72a12,12,0,0,1,17,0l72,72A12,12,0,0,1,208.49,120.49Z"/></svg></button>
+      </div>
+    </div>
+  </footer>
+</aside>
+
+<!-- task drawer -->
+<dialog class="gd-drawer" id="tk-drawer" aria-labelledby="tk-dr-title">
+  <div class="gd-drawer__head">
+    <div class="tk-dr-titles">
+      <div class="gd-drawer__sub" id="tk-dr-sub"></div>
+      <h2 class="gd-drawer__title" id="tk-dr-title-wrap"><textarea class="tk-title-input" id="tk-dr-title" rows="1" aria-label="Task title" maxlength="200"></textarea></h2>
+    </div>
+    <div class="gd-drawer__tools">
+      <button type="button" class="gd-btn gd-btn--sm" id="tk-dr-ask"><span class="gd-av gd-av--agent gd-av--ink gd-av--sm" aria-hidden="true">B</span>Ask about this</button>
+      <button type="button" class="gd-iconbtn" data-gd-close autofocus aria-label="Close task"><svg viewBox="0 0 256 256" width="16" height="16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M208.49,191.51a12,12,0,0,1-17,17L128,145,64.49,208.49a12,12,0,0,1-17-17L111,128,47.51,64.49a12,12,0,0,1,17-17L128,111l63.51-63.52a12,12,0,0,1,17,17L145,128Z"/></svg></button>
+    </div>
+  </div>
+  <div class="gd-drawer__body" id="tk-dr-body"></div>
+  <div class="gd-drawer__foot" id="tk-dr-foot"></div>
+</dialog>
+
+<!-- new task -->
+<dialog class="gd-modal gd-modal--sm" id="tk-new" aria-labelledby="tk-new-t">
+  <form id="tk-new-form" autocomplete="off">
+    <div class="gd-modal__head"><h2 class="gd-modal__title" id="tk-new-t">New task</h2><button type="button" class="gd-iconbtn" data-gd-close aria-label="Close"><svg viewBox="0 0 256 256" width="16" height="16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M208.49,191.51a12,12,0,0,1-17,17L128,145,64.49,208.49a12,12,0,0,1-17-17L111,128,47.51,64.49a12,12,0,0,1,17-17L128,111l63.51-63.52a12,12,0,0,1,17,17L145,128Z"/></svg></button></div>
+    <div class="gd-modal__body">
+      <div class="gd-field"><label class="gd-field__label" for="tk-new-title">Title</label><div class="gd-input"><input class="gd-input__el" id="tk-new-title" maxlength="200" required placeholder="What needs doing"></div><p class="gd-field__error" id="tk-new-err" role="alert" hidden>Add a title.</p></div>
+    </div>
+    <div class="gd-modal__foot"><button type="button" class="gd-btn gd-btn--outline" data-gd-close>Cancel</button><button type="submit" class="gd-btn gd-btn--primary">Create task</button></div>
+  </form>
+</dialog>
+
+<!-- adding people and agents is not switched on -->
+<dialog class="gd-modal gd-modal--sm" id="tk-notyet" aria-labelledby="tk-notyet-t">
+  <div class="gd-modal__head"><h2 class="gd-modal__title" id="tk-notyet-t">Adding people and agents is not switched on yet. Ask Utsav.</h2></div>
+  <div class="gd-modal__foot"><button type="button" class="gd-btn gd-btn--outline" data-gd-close autofocus>Close</button></div>
+</dialog>
+
+<!-- Bruce settings, read only -->
+<dialog class="gd-modal" id="tk-settings" aria-labelledby="tk-settings-t">
+  <div class="gd-modal__head"><h2 class="gd-modal__title" id="tk-settings-t">Bruce, task intake</h2><button type="button" class="gd-iconbtn" data-gd-close aria-label="Close"><svg viewBox="0 0 256 256" width="16" height="16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M208.49,191.51a12,12,0,0,1-17,17L128,145,64.49,208.49a12,12,0,0,1-17-17L111,128,47.51,64.49a12,12,0,0,1,17-17L128,111l63.51-63.52a12,12,0,0,1,17,17L145,128Z"/></svg></button></div>
+  <div class="gd-modal__body">
+    <div class="gd-banner gd-banner--neutral" role="status"><div class="gd-banner__body"><span>Settings are not switched on yet. Bruce reads the channels you are in, and DMs sent to you.</span></div></div>
+    <dl class="tk-readrows">
+      <div class="tk-readrows__group">Where Bruce looks</div>
+      <div class="tk-readrows__row"><dt>Direct messages to you<small>Only messages sent to you, not ones you send</small></dt><dd>On</dd></div>
+      <div class="tk-readrows__row"><dt>Channels you are in<small>Public channels Bruce has been added to</small></dt><dd>On</dd></div>
+      <div class="tk-readrows__row"><dt>Private channels<small>Bruce is never added to these without you</small></dt><dd>Off</dd></div>
+      <div class="tk-readrows__group">What counts as a task</div>
+      <div class="tk-readrows__row"><dt>Requests to you</dt><dd>Counts</dd></div>
+      <div class="tk-readrows__row"><dt>Things you promised<small>Such as &ldquo;I will send&hellip;&rdquo;</small></dt><dd>Counts</dd></div>
+      <div class="tk-readrows__row"><dt>Threads with a deadline</dt><dd>Counts</dd></div>
+      <div class="tk-readrows__group">What Bruce can do for you</div>
+      <div class="tk-readrows__row"><dt>Change my tasks when I ask<small>Move, date, prioritise, delete. Undo stays in the chat</small></dt><dd>On</dd></div>
+      <div class="tk-readrows__row"><dt>Send Slack replies after my Send<small>Posts as Bruce, never without a Send</small></dt><dd>Not switched on</dd></div>
+    </dl>
+  </div>
+  <div class="gd-modal__foot"><button type="button" class="gd-btn gd-btn--outline" data-gd-close>Close</button></div>
+</dialog>
+
+<script src="/exports/dashboard/dashboard.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
