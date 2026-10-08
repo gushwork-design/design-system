@@ -114,13 +114,13 @@ Rules that apply to the whole set: a figure that can change carries `gd-num` (ta
 
 **Behaviour.** The remove button deletes the tag and fires cancelable `gd:tag-remove {label}` first. **Provenance.** NEW: reference Mobbin Peec AI; pending library review.
 
-## Agent card
+## Agent status card
 
 **Purpose.** One agent on a team overview: who it is, how it is doing, what it is doing now and whether it wants something from you. Use it where each member of a small team (about three to eight) needs a glance and a way in. Not for people (avatar and name in a table), not for a metric (stat card), not for a list of records (data table).
 
-**Anatomy.** `a.gd-agent-card` (the whole card is the link to that agent's page; it has no variants) > `__top` (a large `gd-avatar`, `__who` with the name in `b` and the role in `small`, and a state `gd-badge`), `__now` (one or two sentences, clamped to three lines, never an empty box) and `__foot` (a warn badge saying how many things it wants from you, or a quiet "Nothing needed from you"). Lay the cards out in a `gd-grid`, `gd-span-4` each.
+**Anatomy.** `a.gd-agent-status` (the whole card is the link to that agent's page; it has no variants) > `__top` (a large `gd-avatar`, `__who` with the name in `b` and the role in `small`, and a state `gd-badge`), `__now` (one or two sentences, clamped to three lines, never an empty box) and `__foot` (a warn badge saying how many things it wants from you, or a quiet "Nothing needed from you"). Lay the cards out in a `gd-grid`, `gd-span-4` each.
 ```html
-<a class="gd-agent-card" href="#bruce"><span class="gd-agent-card__top"><span class="gd-avatar gd-avatar--team gd-avatar--lg" data-gd-avatar="Bruce" role="img" aria-label="Bruce"></span><span class="gd-agent-card__who"><b>Bruce</b><small>Lead, front door</small></span><span class="gd-badge gd-badge--warn">Worth a look</span></span><span class="gd-agent-card__now">Last asked 3 h ago by Punit.</span><span class="gd-agent-card__foot"><span class="gd-badge gd-badge--warn">1 thing for you</span></span></a>
+<a class="gd-agent-status" href="#bruce"><span class="gd-agent-status__top"><span class="gd-avatar gd-avatar--team gd-avatar--lg" data-gd-avatar="Bruce" role="img" aria-label="Bruce"></span><span class="gd-agent-status__who"><b>Bruce</b><small>Lead, front door</small></span><span class="gd-badge gd-badge--warn">Worth a look</span></span><span class="gd-agent-status__now">Last asked 3 h ago by Punit.</span><span class="gd-agent-status__foot"><span class="gd-badge gd-badge--warn">1 thing for you</span></span></a>
 ```
 **State.** The badge carries the state in words and tone (good "Running well", warn "Worth a look", bad "Needs attention", neutral "Cannot tell yet"); colour never stands alone. Hover darkens the edge and lifts the shadow, as an interactive card does; the keyboard ring is the library's.
 
