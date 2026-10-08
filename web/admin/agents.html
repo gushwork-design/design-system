@@ -8,7 +8,9 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20x%3D%221%22%20y%3D%221%22%20width%3D%2278%22%20height%3D%2278%22%20rx%3D%2219%22%20fill%3D%22%230070ff%22%20stroke%3D%22%230061e0%22%20stroke-width%3D%222%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
 <link rel="stylesheet" href="/foundation/tokens.css">
 <link rel="stylesheet" href="/shell.css?v=ghost9">
+<link rel="stylesheet" href="/admin/bruce-panel.css?v=1">
 <script src="/shell.js?v=ghost9" defer></script>
+<script src="/admin/bruce-panel.js?v=1" defer></script>
 <style>
 /* /admin/agents — the design team's agents (8 Oct 2026). One underlined tab row: All agents, then one tab per agent, the lead first.
    The point of the page is four answers: is it healthy, what is it doing, how is it doing, and what does it need from you. Everything else
@@ -111,8 +113,9 @@ a.ag-row:hover { background: var(--s-nav-hover); }
 .ag-st { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; }
 .ag-st > div { padding: 0 var(--gw-space-12); border-left: 1px solid var(--s-card-border); min-width: 0; }
 .ag-st > div:first-child { padding-left: 0; border-left: 0; }
-.ag-st b { display: block; font: 500 20px/1.2 var(--gw-font-display); color: var(--s-heading); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.ag-st span { display: block; margin-top: 2px; font: var(--gw-text-body-12-reg); color: var(--s-body); }
+.ag-st b { display: block; font: 500 20px/1.2 var(--gw-font-display); color: var(--s-heading); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.ag-st span { display: block; margin-top: 2px; font: var(--gw-text-body-12-reg); color: var(--s-body); overflow-wrap: anywhere; }
+.ag-card .ag-st { align-items: start; }
 .ag-st--big { padding: var(--gw-space-20); border-radius: var(--gw-radius-16); background: var(--s-card-bg); box-shadow: inset 0 0 0 1px var(--s-card-border); }
 .ag-st--big b { font-size: 28px; }
 .ag-st--big > div { padding: 0 var(--gw-space-20); }
@@ -127,6 +130,13 @@ a.ag-row:hover { background: var(--s-nav-hover); }
 .ag-oks { display: flex; flex-wrap: wrap; gap: var(--gw-space-8) var(--gw-space-16); padding: var(--gw-space-12) var(--gw-space-16); border-top: 1px solid var(--s-card-border); font: var(--gw-text-body-13-reg, 400 13px/1.4 var(--gw-font-body)); color: var(--s-body); }
 .ag-oks:first-child { border-top: 0; }
 .ag-oks span { display: inline-flex; align-items: center; gap: var(--gw-space-8); }
+
+/* Bruce's analytics sit in his tab, under the same page header. The panel brings its own sections and drawer. */
+#ag-bruce-slot { min-width: 0; }
+.ag-ctrl[hidden] { display: none; }
+#ag-bruce-slot .ul-sec { margin-top: var(--gw-space-8); }
+#ag-bruce-slot .br-m4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.ag-btn[data-tab] { font: inherit; font: var(--gw-text-button-12, var(--gw-text-body-12-med)); }
 
 /* about, folded away */
 .ag-how { border-radius: var(--gw-radius-16); box-shadow: inset 0 0 0 1px var(--s-card-border); }
@@ -165,11 +175,12 @@ a.ag-row:hover { background: var(--s-nav-hover); }
     </div>
     <div id="ag-state"></div>
     <div id="ag-app" hidden>
-      <div class="ag-ctrl">
+      <div class="ag-ctrl" id="ag-ctrl">
         <div class="ag-pills" role="tablist" aria-label="Period"><button type="button" class="ag-pill" role="tab" data-p="7" aria-selected="true">7 days</button><button type="button" class="ag-pill" role="tab" data-p="30" aria-selected="false">30 days</button></div>
         <button class="gw-iconbtn" id="ag-refresh" type="button" aria-label="Refresh" data-tip="Refresh" data-tip-end><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z"/></svg></button>
       </div>
       <div id="ag-panel" role="tabpanel" tabindex="-1"></div>
+      <div id="ag-park" hidden><div id="ag-bruce" class="ul-scope"></div></div>
     </div>
   </main>
 </div>
@@ -188,7 +199,7 @@ a.ag-row:hover { background: var(--s-nav-hover); }
   var TOPIC = { 'pass-on': 'Pass on to Utsav', status: 'Status check', access: 'Access', brand: 'Brand files', build: 'Build a page', template: 'Templates and tools', hub: 'Hub and system', about: 'About Bruce', other: 'No clear lane' };
   var STATE_LABEL = { ok: 'Running well', warn: 'Worth a look', fail: 'Needs attention', unknown: 'Cannot tell yet' };
   var REVIEW = '/internal/design-system#review';
-  var S = { data: null, health: null, healthErr: '', bruce: null, bruceErr: '', alfred: null, alfredErr: '', period: '7', tab: 'all', at: 0, busy: false };
+  var S = { data: null, health: null, healthErr: '', bruce: null, bruceErr: '', owner: '', alfred: null, alfredErr: '', period: '7', tab: 'all', at: 0, busy: false };
 
   /* ---------- who ---------- */
   function agent(id) { return S.data.agents.filter(function (a) { return a.id === id; })[0]; }
@@ -220,7 +231,9 @@ a.ag-row:hover { background: var(--s-nav-hover); }
   }
 
   /* ---------- Bruce's log, read as the Bruce tab on Analytics does ---------- */
-  function bruceRows() { return (S.bruce || []).filter(function (r) { return r.kind !== 'sent' && inWindow(r.at); }); }
+  /* "Hide my activity" is one preference, shared with Analytics: it leaves the owner's own asks out of the counts too. */
+  function hideOn() { try { return localStorage.getItem('gw-analytics-hide-me') === '1'; } catch (e) { return false; } }
+  function bruceRows() { return (S.bruce || []).filter(function (r) { return r.kind !== 'sent' && inWindow(r.at) && !(hideOn() && S.owner && r.user === S.owner); }); }
   function isGap(r) { return r.topic === 'other' || r.kind === 'failed' || r.kind === 'capped'; }
   function bruceTokens(r, a) { var c = a.cost; return r.kind === 'run' ? c.start + c.run : r.kind === 'chat' ? c.start + c.chat : 0; }
 
@@ -238,7 +251,11 @@ a.ag-row:hover { background: var(--s-nav-hover); }
       var latest = all.slice().sort(function (x, y) { return y.at - x.at; })[0]; out.last = latest ? latest.at.getTime() : 0;
       out.doing = latest ? 'Last asked ' + ago(Date.now() - out.last) + ' by ' + latest.name + ': “' + clip(latest.text, 80) + '”' : 'Nobody has asked him anything yet';
       out.stats = [{ n: rows.length ? (rows.length - gaps.length) + ' of ' + rows.length : '0', l: 'asks handled' }, { n: String(Object.keys(people).length), l: 'people asked' }, { n: String(rows.filter(function (r) { return r.kind === 'run'; }).length), l: 'page builds and edits' }];
-      if (gaps.length) { worse('warn'); out.needs.unshift({ key: 'bruce:gaps', text: plural(gaps.length, 'ask') + ' had no clear lane, failed or hit the daily cap', cta: 'Review', href: '/admin/analytics#bruce' }); }
+      if (gaps.length) {
+        var broken = gaps.filter(function (r) { return r.kind === 'failed' || r.kind === 'capped'; }).length, unsorted = gaps.length - broken;
+        worse('warn');
+        out.needs.unshift({ key: 'bruce:gaps', text: plural(gaps.length, 'ask') + ' to read: ' + [broken ? broken + ' failed or hit the daily cap' : '', unsorted ? unsorted + ' that matched none of his topics' : ''].filter(Boolean).join(', ') + '.', cta: 'Read them', href: '#bruce-look' });
+      }
     } else if (id === 'alfred') {
       var al = S.alfred;
       if (!al) { out.known = false; out.state = 'unknown'; out.doing = S.alfredErr || 'Reading his threads'; return out; }
@@ -253,7 +270,7 @@ a.ag-row:hover { background: var(--s-nav-hover); }
       var rows2 = S.health.checks, okn = rows2.filter(function (x) { return x.status === 'ok'; }).length, snap = S.health.snapshotAt ? Date.parse(S.health.snapshotAt) : 0, nx = docNext();
       var runsD = docRunCount(days()); out.sessions = runsD; out.tokens = runsD * a.cost.run; out.last = snap;
       out.doing = 'Checks the whole hub every Monday and Thursday and reports what he finds. ' + (snap ? 'Last report ' + ago(Date.now() - snap) + '.' : 'No report yet.');
-      out.stats = [{ n: okn + ' of ' + rows2.length, l: 'checks healthy' }, { n: snap ? agoShort(Date.now() - snap) : 'None', l: snap ? 'since the last report' : 'last report' }, { n: nx ? new Date(nx).toLocaleDateString(undefined, { weekday: 'short' }) + ' ' + new Date(nx).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }) : '—', l: 'next report' }];
+      out.stats = [{ n: okn + ' of ' + rows2.length, l: 'checks healthy' }, { n: snap ? agoShort(Date.now() - snap) : 'None', l: snap ? 'since the last report' : 'last report' }, { n: nx ? new Date(nx).toLocaleDateString(undefined, { weekday: 'short' }) : '—', l: nx ? 'next report, ' + new Date(nx).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }) : 'next report' }];
     }
     return out;
   }
@@ -283,7 +300,8 @@ a.ag-row:hover { background: var(--s-nav-hover); }
   function needRow(item, withWho) {
     var n = item.n, a = item.a;
     return '<div class="ag-row">' + (withWho ? pic(a, 'ag-pic--sm') : '') + '<div class="ag-row__t ag-row__t--wrap">' + (withWho ? '<b>' + esc(a.name) + '</b>' : '') + '<span>' + esc(n.text) + '</span></div>' +
-      '<a class="ag-btn" href="' + esc(n.href) + '"' + ext(n.href) + '>' + esc(n.cta) + '</a></div>';
+      (n.href === '#bruce-look' ? '<button type="button" class="ag-btn" data-tab="bruce" data-scroll="br-h-look">' + esc(n.cta) + '</button>'
+        : '<a class="ag-btn" href="' + esc(n.href) + '"' + ext(n.href) + '>' + esc(n.cta) + '</a>') + '</div>';
   }
   function renderAll() {
     var list = sums(), needs = allNeeds(list), loading = list.some(function (s) { return !s.known; }) && !needs.length;
@@ -291,11 +309,6 @@ a.ag-row:hover { background: var(--s-nav-hover); }
     var head = needs.length ? plural(needs.length, 'thing') + ' to look at' : loading ? 'Checking the agents' : 'Everything is running';
     var sub = needs.length ? names.join(', ').replace(/, ([^,]*)$/, ' and $1') + (names.length === 1 ? ' has' : ' have') + ' something for you.' : loading ? 'Some of them have not answered yet.' : 'All ' + list.length + ' agents are healthy and nothing is waiting on you.';
     var html = '<section class="ag-lead"><h2>' + esc(head) + '</h2><p>' + esc(sub) + '</p></section>';
-    if (needs.length) {
-      var shown = needs.slice(0, 6);
-      html += '<section class="ag-sec"><div class="ag-sec__h"><h3>Needs you</h3></div><div class="ag-list">' + shown.map(function (x) { return needRow(x, true); }).join('') + '</div>' +
-        (needs.length > shown.length ? '<p class="ag-foot">And ' + (needs.length - shown.length) + ' more, in the agents’ own tabs.</p>' : '') + '</section>';
-    }
     html += '<section class="ag-sec"><div class="ag-sec__h"><h3>The team</h3><span>' + esc(list.length + ' agents, ' + (S.data.agents.filter(function (a) { return a.lead; })[0] || {}).name + ' leads') + '</span></div><div class="ag-cards">' +
       list.map(function (s) {
         var mine = s.needs.length;
@@ -304,6 +317,11 @@ a.ag-row:hover { background: var(--s-nav-hover); }
           (s.known ? '<span class="ag-st">' + s.stats.map(function (t) { return '<div><b>' + esc(t.n) + '</b><span>' + esc(t.l) + '</span></div>'; }).join('') + '</span>' : '') +
           '<span class="ag-card__foot' + (mine ? '' : ' is-quiet') + '"><i class="ag-dot ' + (mine ? 'warn' : s.known ? 'ok' : '') + '" aria-hidden="true"></i>' + (mine ? esc(plural(mine, 'thing') + ' for you') : s.known ? 'Nothing needed from you' : 'Waiting for data') + '</span></button>';
       }).join('') + '</div></section>';
+    if (needs.length) {
+      var shown = needs.slice(0, 6);
+      html += '<section class="ag-sec"><div class="ag-sec__h"><h3>Needs you</h3></div><div class="ag-list">' + shown.map(function (x) { return needRow(x, true); }).join('') + '</div>' +
+        (needs.length > shown.length ? '<p class="ag-foot">And ' + (needs.length - shown.length) + ' more, in the agents’ own tabs.</p>' : '') + '</section>';
+    }
     html += '<p class="ag-add">Each agent is recorded in git, with its memory. To add one, see <a href="https://github.com/gushwork-design/design-system/blob/main/agents/README.md" target="_blank" rel="noopener noreferrer">agents/README</a>.</p>';
     return html;
   }
@@ -352,13 +370,20 @@ a.ag-row:hover { background: var(--s-nav-hover); }
   function renderBruce() {
     var s = summary('bruce'), a = s.a, html = hero(s);
     if (!s.known) return html + healthBlock(s) + about(a);
-    var rows = bruceRows().slice().sort(function (x, y) { return y.at - x.at; }).slice(0, 6);
-    html += needsBlock(s) + statsBlock(s);
-    html += sec('What people asked lately', '<a href="/admin/analytics#bruce">All conversations</a>', rows.length ? '<div class="ag-list">' + rows.map(function (r) {
-      var gap = isGap(r), tag = gap ? (r.kind === 'failed' ? 'Failed' : r.kind === 'capped' ? 'Hit the daily cap' : 'No clear lane') : (TOPIC[r.topic] || r.topic);
-      return '<div class="ag-row"><span class="ag-pic ag-pic--sm" aria-hidden="true">' + initial(r.name) + '</span><div class="ag-row__t"><b>' + esc(r.name) + '</b><span>' + esc(clip(r.text, 110)) + '</span></div><span class="ag-tag' + (gap ? ' ag-tag--gap' : '') + '">' + esc(tag) + '</span><time>' + esc(ago(Date.now() - r.at.getTime())) + '</time></div>';
-    }).join('') + '</div>' : '<div class="ag-list"><p class="ag-empty">Nobody has asked in this period.</p></div>');
-    return html + healthBlock(s) + about(a);
+    /* His analytics (conversations, what people use him for, what it costs, the asks worth a look) live in bruce-panel.js and are moved into
+       this slot after the page is drawn; see mountBruce. */
+    return html + needsBlock(s) + '<div id="ag-bruce-slot"></div>' + healthBlock(s) + about(a);
+  }
+  var brucePanel = null;
+  function parkBruce() { var h = $('ag-bruce'); if (h && h.parentNode !== $('ag-park')) $('ag-park').appendChild(h); }
+  function mountBruce() {
+    var slot = $('ag-bruce-slot'); if (!slot) return;
+    if (!brucePanel && window.mountBrucePanel) {
+      brucePanel = window.mountBrucePanel($('ag-bruce'));
+      brucePanel.onHide = function () { render(); };          /* the counts on the overview follow the switch too */
+      brucePanel.start();
+    }
+    slot.appendChild($('ag-bruce'));
   }
 
   function renderAlfred() {
@@ -381,8 +406,11 @@ a.ag-row:hover { background: var(--s-nav-hover); }
 
   function render() {
     tabs();
+    parkBruce();
     var html = S.tab === 'bruce' ? renderBruce() : S.tab === 'alfred' ? renderAlfred() : S.tab === 'doc' ? renderDoc() : renderAll();
     $('ag-panel').innerHTML = html;
+    $('ag-ctrl').hidden = S.tab === 'bruce';                      /* his panel has its own periods and refresh */
+    if (S.tab === 'bruce') mountBruce();
     document.querySelectorAll('.ag-pill').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-p') === S.period)); });
     tip();
   }
@@ -400,7 +428,7 @@ a.ag-row:hover { background: var(--s-nav-hover); }
       if (r.status === 401 || r.status === 403) { S.bruceErr = 'Owners only'; return null; } if (!r.ok) throw new Error('http'); return r.json();
     }).then(function (j) {
       if (!j) return; if (!j.configured) { S.bruceErr = 'No store connected, so nothing is logged'; return; }
-      S.bruce = (j.rows || []).map(function (r) { var d = new Date(r.at); return isNaN(d.getTime()) ? null : { at: d, user: String(r.user || ''), name: String(r.name || r.user || ''), kind: String(r.kind || 'run'), thread: !!r.thread, text: String(r.text || ''), topic: r.topic || (r.kind === 'sent' ? '' : 'other') }; }).filter(Boolean);
+      S.owner = String(j.owner || ''); S.bruce = (j.rows || []).map(function (r) { var d = new Date(r.at); return isNaN(d.getTime()) ? null : { at: d, user: String(r.user || ''), name: String(r.name || r.user || ''), kind: String(r.kind || 'run'), thread: !!r.thread, text: String(r.text || ''), topic: r.topic || (r.kind === 'sent' ? '' : 'other') }; }).filter(Boolean);
     }).catch(function () { S.bruceErr = 'Could not read his log'; });
   }
   function loadHealth() {
@@ -419,7 +447,13 @@ a.ag-row:hover { background: var(--s-nav-hover); }
   }
 
   document.addEventListener('click', function (e) {
-    var t = e.target.closest && e.target.closest('[data-tab]'); if (t) { setTab(t.getAttribute('data-tab'), true); window.scrollTo({ top: 0 }); return; }
+    var t = e.target.closest && e.target.closest('[data-tab]');
+    if (t) {
+      setTab(t.getAttribute('data-tab'), true);
+      var to = t.getAttribute('data-scroll'), target = to && $(to);
+      if (target) target.scrollIntoView({ block: 'start' }); else window.scrollTo({ top: 0 });
+      return;
+    }
     var p = e.target.closest && e.target.closest('.ag-pill'); if (p) { S.period = p.getAttribute('data-p'); render(); }
   });
   $('ag-tabs').addEventListener('keydown', function (ev) {
