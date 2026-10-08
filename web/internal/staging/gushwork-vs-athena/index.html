@@ -1227,6 +1227,7 @@ details p{margin-top:var(--gw-space-12);padding:0;font:var(--gw-text-body-16-med
 .footer .legal{font:var(--gw-text-body-12-med);line-height:12px;letter-spacing:var(--gw-text-body-12-med-tracking);color:var(--gw-color-neutral-600)}
 
 @media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
   *,*::before,*::after{animation:none!important;transition:none!important}
   .logos-track,.agents-row{transform:none}
 }
@@ -1300,8 +1301,6 @@ details p{margin-top:var(--gw-space-12);padding:0;font:var(--gw-text-body-16-med
      balances over three lines instead of orphaning its last word */
   .hero h1{font:var(--gw-text-h4);letter-spacing:var(--gw-text-h4-tracking)}
   .hero h1 br{display:none}
-  /* Utsav, 8 Oct: 243px between the proof ticks in the phone strip. Not on the spacing scale; asked for by value. */
-  .checks li{margin-right:243px}
   /* Utsav, 8 Oct: the ticker logos read too small at the ad-page template's 0.72 — full desktop size on phone */
   .logos img{height:var(--lh)}
 
@@ -1449,6 +1448,39 @@ details p{margin-top:var(--gw-space-12);padding:0;font:var(--gw-text-body-16-med
   .rise.in .pg-blk:nth-child(6),.rise.in .steps li:nth-child(5),.rise.in .dist > div:nth-child(5){animation-delay:160ms}
   .rise.in .pg-blk:nth-child(7){animation-delay:200ms}
   .rise.in .dist i::after{animation:bar-grow var(--hub-dur-enter) var(--hub-ease) backwards}
+  /* the drawn page: each blue block lands, its icon follows, then the button arrives and is pressed once */
+  @keyframes pg-icon{from{opacity:0;transform:scale(.6)}}
+  @keyframes pg-btn{from{opacity:0;transform:scale(.9)}}
+  @keyframes pg-press{0%,100%{transform:scale(1)}50%{transform:scale(.94)}}
+  .rise.in .pg-blk svg{animation:pg-icon var(--hub-dur-enter) var(--hub-ease) backwards}
+  .rise.in .pg-blk:nth-child(2) svg{animation-delay:120ms}.rise.in .pg-blk:nth-child(3) svg{animation-delay:160ms}
+  .rise.in .pg-blk:nth-child(4) svg{animation-delay:200ms}.rise.in .pg-blk:nth-child(5) svg{animation-delay:240ms}
+  .rise.in .pg-blk:nth-child(6) svg{animation-delay:280ms}.rise.in .pg-blk:nth-child(7) svg{animation-delay:320ms}
+  .rise.in .pg-blk em{animation:pg-btn var(--hub-dur-enter) var(--hub-ease) 360ms backwards,pg-press var(--hub-dur-enter) var(--hub-ease) 1000ms backwards}
+  .pg-blk{transition:transform var(--hub-dur) var(--hub-ease)}
+  .pg-blk:hover{transform:translateX(2px)}
+  /* the closing card slides up from beneath the call to action's frame, which clips it. Travel is
+     longer than R64's 8px and the run is 480ms, because the card has to cross its own clip: a
+     deliberate exception, once, and only opacity and transform move. */
+  @keyframes ccard-rise{from{opacity:0;transform:translateX(-50%) translateY(48px)}}
+  .ccard.rise.in{animation:ccard-rise 480ms var(--hub-ease) backwards}
+  /* smoothness: one curve everywhere, compositor properties only, every control eased */
+  .btn svg{transition:transform var(--hub-dur) var(--hub-ease)}
+  .btn:hover svg{transform:translateX(2px)}
+  .field{transition:border-color var(--gw-motion-fast),background-color var(--gw-motion-fast)}
+  .radio{transition:background-color var(--gw-motion-fast),border-color var(--gw-motion-fast),transform var(--hub-dur) var(--hub-ease)}
+  .radio:active{transform:scale(.97)}
+  details,.ask-row{transition:border-color var(--gw-motion-fast)}
+  summary{transition:transform var(--hub-dur) var(--hub-ease)}
+  summary:active{transform:scale(.99)}
+  .caret svg{transition:transform var(--hub-dur-enter) var(--hub-ease)}
+  details[open] > p{animation:hub-rise var(--hub-dur-enter) var(--hub-ease) backwards}
+  .ask-go{transition:transform var(--hub-dur) var(--hub-ease),color var(--gw-motion-fast)}
+  .ask-go:active{transform:scale(.92)}
+  .rise.in .ccard li{animation:hub-rise var(--hub-dur-enter) var(--hub-ease) backwards}
+  .rise.in .ccard li:nth-child(1){animation-delay:280ms}.rise.in .ccard li:nth-child(2){animation-delay:320ms}
+  .rise.in .ccard li:nth-child(3){animation-delay:360ms}.rise.in .ccard li:nth-child(4){animation-delay:400ms}
+  .rise.in .ccard li:nth-child(5){animation-delay:440ms}
   .btn{transition:background-color .15s ease,transform var(--hub-dur) var(--hub-ease)}
   .btn:active{transform:scale(.97)}
   .vs > .card,.rv-cards > .card{transition:transform var(--hub-dur) var(--hub-ease)}
@@ -1582,8 +1614,7 @@ details p{margin-top:var(--gw-space-12);padding:0;font:var(--gw-text-body-16-med
           <!-- NEW, pending library review: .pgmock, a drawn page the Gushwork card shows in place of a picture. Built from tokens only. -->
           <div class="shot"><div class="pgmock" aria-hidden="true"><div class="pg-bar"><i></i><i></i><i></i><span>yoursite.com/pallet-procurement-for-manufacturers</span></div><div class="pg-body"><div class="pg-title">Pallet procurement services for manufacturers</div><div class="pg-blk"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M176.49,95.51a12,12,0,0,1,0,17l-56,56a12,12,0,0,1-17,0l-24-24a12,12,0,1,1,17-17L112,143l47.51-47.52A12,12,0,0,1,176.49,95.51ZM236,128A108,108,0,1,1,128,20,108.12,108.12,0,0,1,236,128Zm-24,0a84,84,0,1,0-84,84A84.09,84.09,0,0,0,212,128Z"/></svg>The direct answer</div><div class="pg-blk"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M224,44H32A12,12,0,0,0,20,56V192a20,20,0,0,0,20,20H216a20,20,0,0,0,20-20V56A12,12,0,0,0,224,44ZM44,116H76v24H44Zm56,0H212v24H100ZM212,68V92H44V68ZM44,164H76v24H44Zm56,24V164H212v24Z"/></svg>Specs and pricing</div><div class="pg-blk"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M243.14,131.54l-32-80h0a12,12,0,0,0-13.73-7.25L140,57V40a12,12,0,0,0-24,0V62.37L53.4,76.29a12,12,0,0,0-8.54,7.25h0l0,0v0l-32,79.92A12,12,0,0,0,12,168c0,12.13,6.2,22.43,17.45,29A55,55,0,0,0,56,204a55,55,0,0,0,26.55-7C93.8,190.43,100,180.13,100,168a12,12,0,0,0-.86-4.46L72.38,96.65,116,87V204H104a12,12,0,0,0,0,24h48a12,12,0,0,0,0-24H140V81.63l40.42-9-23.56,58.9A12,12,0,0,0,156,136c0,12.13,6.2,22.43,17.45,29a53.78,53.78,0,0,0,53.1,0C237.8,158.43,244,148.13,244,136A12,12,0,0,0,243.14,131.54ZM56,180c-3.71,0-18-1.87-19.81-10.18L56,120.31l19.81,49.51C74,178.13,59.71,180,56,180Zm144-32c-3.71,0-18-1.87-19.81-10.18L200,88.31l19.81,49.51C218,146.13,203.71,148,200,148Z"/></svg>Comparison with alternatives</div><div class="pg-blk"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M228.75,100.05c-3.52-3.67-7.15-7.46-8.34-10.33-1.06-2.56-1.14-7.83-1.21-12.47-.15-10-.34-22.44-9.18-31.27s-21.27-9-31.27-9.18c-4.64-.07-9.91-.15-12.47-1.21-2.87-1.19-6.66-4.82-10.33-8.34C148.87,20.46,140.05,12,128,12s-20.87,8.46-27.95,15.25c-3.67,3.52-7.46,7.15-10.33,8.34-2.56,1.06-7.83,1.14-12.47,1.21C67.25,37,54.81,37.14,46,46S37,67.25,36.8,77.25c-.07,4.64-.15,9.91-1.21,12.47-1.19,2.87-4.82,6.66-8.34,10.33C20.46,107.13,12,116,12,128S20.46,148.87,27.25,156c3.52,3.67,7.15,7.46,8.34,10.33,1.06,2.56,1.14,7.83,1.21,12.47.15,10,.34,22.44,9.18,31.27s21.27,9,31.27,9.18c4.64.07,9.91.15,12.47,1.21,2.87,1.19,6.66,4.82,10.33,8.34C107.13,235.54,116,244,128,244s20.87-8.46,27.95-15.25c3.67-3.52,7.46-7.15,10.33-8.34,2.56-1.06,7.83-1.14,12.47-1.21,10-.15,22.44-.34,31.27-9.18s9-21.27,9.18-31.27c.07-4.64.15-9.91,1.21-12.47,1.19-2.87,4.82-6.66,8.34-10.33C235.54,148.87,244,140.05,244,128S235.54,107.13,228.75,100.05Zm-17.32,39.29c-4.82,5-10.28,10.72-13.19,17.76-2.82,6.8-2.93,14.16-3,21.29-.08,5.36-.19,12.71-2.15,14.66s-9.3,2.07-14.66,2.15c-7.13.11-14.49.22-21.29,3-7,2.91-12.73,8.37-17.76,13.19C135.78,214.84,130.4,220,128,220s-7.78-5.16-11.34-8.57c-5-4.82-10.72-10.28-17.76-13.19-6.8-2.82-14.16-2.93-21.29-3-5.36-.08-12.71-.19-14.66-2.15s-2.07-9.3-2.15-14.66c-.11-7.13-.22-14.49-3-21.29-2.91-7-8.37-12.73-13.19-17.76C41.16,135.78,36,130.4,36,128s5.16-7.78,8.57-11.34c4.82-5,10.28-10.72,13.19-17.76,2.82-6.8,2.93-14.16,3-21.29C60.88,72.25,61,64.9,63,63s9.3-2.07,14.66-2.15c7.13-.11,14.49-.22,21.29-3,7-2.91,12.73-8.37,17.76-13.19C120.22,41.16,125.6,36,128,36s7.78,5.16,11.34,8.57c5,4.82,10.72,10.28,17.76,13.19,6.8,2.82,14.16,2.93,21.29,3,5.36.08,12.71.19,14.66,2.15s2.07,9.3,2.15,14.66c.11,7.13.22,14.49,3,21.29,2.91,7,8.37,12.73,13.19,17.76,3.41,3.56,8.57,8.94,8.57,11.34S214.84,135.78,211.43,139.34ZM144,180a16,16,0,1,1-16-16A16,16,0,0,1,144,180Zm28-72c0,18.37-13.69,33.88-32.27,38.56A12,12,0,0,1,116,144v-8a12,12,0,0,1,12-12c11,0,20-7.18,20-16s-9-16-20-16-20,7.18-20,16v4a12,12,0,0,1-24,0v-4c0-22.06,19.74-40,44-40S172,85.94,172,108Z"/></svg>FAQs buyers actually ask</div><div class="pg-blk"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M228.75,100.05c-3.52-3.67-7.15-7.46-8.34-10.33-1.06-2.56-1.14-7.83-1.21-12.47-.15-10-.34-22.44-9.18-31.27s-21.27-9-31.27-9.18c-4.64-.07-9.91-.15-12.47-1.21-2.87-1.19-6.66-4.82-10.33-8.34C148.87,20.46,140.05,12,128,12s-20.87,8.46-27.95,15.25c-3.67,3.52-7.46,7.15-10.33,8.34-2.56,1.06-7.83,1.14-12.47,1.21C67.25,37,54.81,37.14,46,46S37,67.25,36.8,77.25c-.07,4.64-.15,9.91-1.21,12.47-1.19,2.87-4.82,6.66-8.34,10.33C20.46,107.13,12,116,12,128S20.46,148.87,27.25,156c3.52,3.67,7.15,7.46,8.34,10.33,1.06,2.56,1.14,7.83,1.21,12.47.15,10,.34,22.44,9.18,31.27s21.27,9,31.27,9.18c4.64.07,9.91.15,12.47,1.21,2.87,1.19,6.66,4.82,10.33,8.34C107.13,235.54,116,244,128,244s20.87-8.46,27.95-15.25c3.67-3.52,7.46-7.15,10.33-8.34,2.56-1.06,7.83-1.14,12.47-1.21,10-.15,22.44-.34,31.27-9.18s9-21.27,9.18-31.27c.07-4.64.15-9.91,1.21-12.47,1.19-2.87,4.82-6.66,8.34-10.33C235.54,148.87,244,140.05,244,128S235.54,107.13,228.75,100.05Zm-17.32,39.29c-4.82,5-10.28,10.72-13.19,17.76-2.82,6.8-2.93,14.16-3,21.29-.08,5.36-.19,12.71-2.15,14.66s-9.3,2.07-14.66,2.15c-7.13.11-14.49.22-21.29,3-7,2.91-12.73,8.37-17.76,13.19C135.78,214.84,130.4,220,128,220s-7.78-5.16-11.34-8.57c-5-4.82-10.72-10.28-17.76-13.19-6.8-2.82-14.16-2.93-21.29-3-5.36-.08-12.71-.19-14.66-2.15s-2.07-9.3-2.15-14.66c-.11-7.13-.22-14.49-3-21.29-2.91-7-8.37-12.73-13.19-17.76C41.16,135.78,36,130.4,36,128s5.16-7.78,8.57-11.34c4.82-5,10.28-10.72,13.19-17.76,2.82-6.8,2.93-14.16,3-21.29C60.88,72.25,61,64.9,63,63s9.3-2.07,14.66-2.15c7.13-.11,14.49-.22,21.29-3,7-2.91,12.73-8.37,17.76-13.19C120.22,41.16,125.6,36,128,36s7.78,5.16,11.34,8.57c5,4.82,10.72,10.28,17.76,13.19,6.8,2.82,14.16,2.93,21.29,3,5.36.08,12.71.19,14.66,2.15s2.07,9.3,2.15,14.66c.11,7.13.22,14.49,3,21.29,2.91,7,8.37,12.73,13.19,17.76,3.41,3.56,8.57,8.94,8.57,11.34S214.84,135.78,211.43,139.34ZM176.49,95.51a12,12,0,0,1,0,17l-56,56a12,12,0,0,1-17,0l-24-24a12,12,0,1,1,17-17L112,143l47.51-47.52A12,12,0,0,1,176.49,95.51Z"/></svg>Proof from your business</div><div class="pg-blk pg-blk--form"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M224,44H32A12,12,0,0,0,20,56V192a20,20,0,0,0,20,20H216a20,20,0,0,0,20-20V56A12,12,0,0,0,224,44ZM193.15,68,128,127.72,62.85,68ZM44,188V83.28l75.89,69.57a12,12,0,0,0,16.22,0L212,83.28V188Z"/></svg>Request a quote<em>Get a quote</em></div></div></div></div>
         </div>
-      </div>
-        <p class="sub fold-note">Illustrative report and page</p></div>
+      </div></div>
       <div class="bar"><p>We’ll show you the pages we’d build for your business</p><a class="btn btn--blue btn--lg" href="#demo" data-cta="bar">Book a Demo <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M204,64V168a12,12,0,0,1-24,0V93L72.49,200.49a12,12,0,0,1-17-17L163,76H88a12,12,0,0,1,0-24H192A12,12,0,0,1,204,64Z"/></svg></a></div>
     </div>
   </section>
@@ -1611,8 +1642,7 @@ details p{margin-top:var(--gw-space-12);padding:0;font:var(--gw-text-body-16-med
           <div class="stop stop--good"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></svg>Written and published by Gushwork</div>
           <div class="stop">Buyer requests a quote</div>
         </div>
-      </div>
-        <p class="sub fold-note">We build a page like this for every question your buyers ask.</p></div>
+      </div></div>
       <div class="cta-stack"><a class="btn btn--blue btn--lg" href="#demo" data-cta="fold">Book a Demo <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M204,64V168a12,12,0,0,1-24,0V93L72.49,200.49a12,12,0,0,1-17-17L163,76H88a12,12,0,0,1,0-24H192A12,12,0,0,1,204,64Z"/></svg></a><p class="cta-cap">We’ll show you the real questions buyers ask in your market</p></div>
     </div>
   </section>
@@ -1646,7 +1676,6 @@ details p{margin-top:var(--gw-space-12);padding:0;font:var(--gw-text-body-16-med
       <div class="heading">
         <span class="eyebrow"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M239.18,97.26A16.38,16.38,0,0,0,224.92,86l-59-4.76L143.14,26.15a16.36,16.36,0,0,0-30.27,0L90.11,81.23,31.08,86a16.46,16.46,0,0,0-9.37,28.86l45,38.83L53,211.75a16.38,16.38,0,0,0,24.5,17.82L128,198.49l50.53,31.08A16.4,16.4,0,0,0,203,211.75l-13.76-58.07,45-38.83A16.43,16.43,0,0,0,239.18,97.26Zm-15.34,5.47-48.7,42a8,8,0,0,0-2.56,7.91l14.88,62.8a.37.37,0,0,1-.17.48c-.18.14-.23.11-.38,0l-54.72-33.65a8,8,0,0,0-8.38,0L69.09,215.94c-.15.09-.19.12-.38,0a.37.37,0,0,1-.17-.48l14.88-62.8a8,8,0,0,0-2.56-7.91l-48.7-42c-.12-.1-.23-.19-.13-.5s.18-.27.33-.29l63.92-5.16A8,8,0,0,0,103,91.86l24.62-59.61c.08-.17.11-.25.35-.25s.27.08.35.25L153,91.86a8,8,0,0,0,6.75,4.92l63.92,5.16c.15,0,.24,0,.33.29S224,102.63,223.84,102.73Z"/></svg>Reviews</span>
         <h2 class="h3">Don’t take our word for it, read the reviews</h2>
-        <p class="sub">Here’s what Gushwork customers say on Trustpilot.</p>
       </div>
       <div class="stack"><!-- NEW, pending library review: .rv-layout, a rating rail beside a two by two grid of review cards. -->
         <div class="rv-layout">
@@ -1662,8 +1691,7 @@ details p{margin-top:var(--gw-space-12);padding:0;font:var(--gw-text-body-16-med
             <article class="card rv-card"><div class="rv-top"><span class="tp" data-r="5" style="--r:5" role="img" aria-label="5 out of 5 stars"><i></i><i></i><i></i><i></i><i></i></span><span>for Communication</span></div><q>Their response time has been excellent</q><small>Yana &middot; US &middot; Jul 31, 2026</small></article>
             <article class="card rv-card"><div class="rv-top"><span class="tp" data-r="5" style="--r:5" role="img" aria-label="5 out of 5 stars"><i></i><i></i><i></i><i></i><i></i></span><span>for Billing</span></div><q>accurate in their billing, focused and articulate with their communications</q><small>Bob H. &middot; US &middot; Aug 14, 2026</small></article>
           </div>
-        </div>
-        <p class="sub fold-note">Want to hear it firsthand? <a href="#demo">Ask us to connect you with a customer in your industry.</a></p></div>
+        </div></div>
       <div class="cta-stack"><a class="btn btn--blue btn--lg" href="#demo" data-cta="fold">Book a Demo <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M204,64V168a12,12,0,0,1-24,0V93L72.49,200.49a12,12,0,0,1-17-17L163,76H88a12,12,0,0,1,0-24H192A12,12,0,0,1,204,64Z"/></svg></a><p class="cta-cap">Starts at $900 per month</p></div>
     </div>
   </section>
@@ -1735,7 +1763,7 @@ details p{margin-top:var(--gw-space-12);padding:0;font:var(--gw-text-body-16-med
           <ul class="ticks ticks--roomy"><li class="ok"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></svg><span>Sell high-ticket B2B products or services</span></li><li class="ok"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></svg><span>Win deals through quotes and sales calls</span></li><li class="ok"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></svg><span>Don’t have a writer free to turn reports into pages</span></li><li class="ok"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></svg><span>Want to see every lead and where it came from</span></li></ul>
         </div>
       </div>
-      <div class="cta-stack"><a class="btn btn--blue btn--lg" href="#demo" data-cta="fold">Book a Demo <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M204,64V168a12,12,0,0,1-24,0V93L72.49,200.49a12,12,0,0,1-17-17L163,76H88a12,12,0,0,1,0-24H192A12,12,0,0,1,204,64Z"/></svg></a><p class="cta-cap">See if Gushwork is the right fit</p></div>
+      <div class="cta-stack"><a class="btn btn--blue btn--lg" href="#demo" data-cta="fold">Book a Demo <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M204,64V168a12,12,0,0,1-24,0V93L72.49,200.49a12,12,0,0,1-17-17L163,76H88a12,12,0,0,1,0-24H192A12,12,0,0,1,204,64Z"/></svg></a></div>
     </div>
   </section>
 
@@ -1772,8 +1800,8 @@ details p{margin-top:var(--gw-space-12);padding:0;font:var(--gw-text-body-16-med
   <div class="cta">
         <div class="cta-body">
           <div>
-            <h2>Let’s look at what your buyers are asking AI</h2>
-            <p>It’s a 30-minute call. We’ll show you real questions in your market and the pages we’d build for them.</p>
+            <h2>Let’s look at what your <br>buyers are asking AI</h2>
+            <p>It’s a 30-minute call. We’ll show you real questions <br>in your market and the pages we’d build for them.</p>
           </div>
           <div class="cta-actions">
             <a class="btn btn--white" href="#demo" data-cta="footer">Book a Demo <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M204,64V168a12,12,0,0,1-24,0V93L72.49,200.49a12,12,0,0,1-17-17L163,76H88a12,12,0,0,1,0-24H192A12,12,0,0,1,204,64Z"/></svg></a>
@@ -1785,8 +1813,6 @@ details p{margin-top:var(--gw-space-12);padding:0;font:var(--gw-text-body-16-med
           <div class="ccard"><h3>Why teams pick Gushwork over Athena</h3><hr><ul><li><span>What you get</span><b>Published pages</b></li><li><span>Who writes them</span><b>Gushwork</b></li><li><span>Measured on</span><b>Qualified leads</b></li><li><span>Your part</span><b>Approve the pages</b></li><li><span>Price</span><b>Starts at $900/mo</b></li></ul></div>
         </div>
       </div>
-  <small class="legal">Reviews quoted from Trustpilot as posted; rating and review count as of September 2026. Reports, dashboards, and pages shown are illustrative.</small>
-  <small class="legal">Athena details are based on athenahq.ai and its pricing page, October 2026. AthenaHQ is a trademark of its owner.</small>
   <small class="legal">&copy; 2026 Gushwork | All Rights Reserved</small>
 </footer>
 
