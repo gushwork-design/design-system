@@ -22,6 +22,13 @@
    A log row now also carries the DM channel and the thread's first message (`ch`, `ts`) so the thread opens directly;
    rows from before that find the thread by the person and the time.
 
+   WHAT HE SENT (Utsav, 8 Oct 2026: "always keep it honest and make sure you tell everything you did"). Bruce's bot token
+   cannot list conversations, so "whom did you message" had no answer. Now a run reports each message it sends to
+   someone other than the thread it was asked in (POST { sent: [{ to, text }] } with its per-run token), and the hub
+   keeps it as a `sent` row in the same log. The owner sees them on /admin/analytics#bruce, and Bruce reads them back for
+   the owner (GET ?sent=1, owner token only). It is the run's own report, not an interception of Slack: a send that is
+   not reported is not logged, so the prompt makes the report part of the send.
+
    THE CAP. Everyone may DM Bruce (Utsav: "let's open it for all people"), every run spends his account, so each person
    other than him gets BRUCE_DAILY_CAP runs a day (default 3, his call). The count is per person per day, kept here too.
    ========================================================================= */
@@ -120,14 +127,33 @@ export async function slackName(token, user, f = fetch) {
 }
 
 /* One row per turn Bruce was asked for. `kind`: run (a Bruce run started), capped (refused at the daily cap),
-   to-alfred (a reply passed to Alfred's thread), failed (the trigger did not fire). Never throws. */
+   to-alfred (a reply passed to Alfred's thread), failed (the trigger did not fire), sent (a message Bruce reported sending
+   to `to`; `user` is who the run was for). Never throws. */
 export async function logRun(row, f = fetch) {
   const cfg = store(); if (!cfg) return false;
   const r = { at: new Date().toISOString(), user: String(row.user || ''), name: String(row.name || row.user || ''), role: row.role === 'owner' ? 'owner' : 'teammate',
     kind: String(row.kind || 'run'), thread: row.thread ? 1 : 0, text: String(row.text || '').replace(/\s+/g, ' ').trim().slice(0, 200), used: Number(row.used) || 0 };
+  if (UID.test(String(row.to || '')) || CH.test(String(row.to || ''))) { r.to = String(row.to); r.toName = String(row.toName || row.to).replace(/\s+/g, ' ').trim().slice(0, 80); }
   if (CH.test(String(row.ch || ''))) r.ch = String(row.ch);
   if (TS.test(String(row.ts || ''))) r.ts = String(row.ts);
   try { await redis(cfg, [['LPUSH', LOG_KEY, JSON.stringify(r)], ['LTRIM', LOG_KEY, '0', String(MAX_LOG - 1)]], f); return true; } catch { return false; }
+}
+
+/* A run's report of what it sent: up to 5 { to, text } per call, `to` a Slack user or channel id. `user` is who the run was
+   for (the token's user). One `sent` row each; bad ids are skipped. Returns how many were kept. Never throws. */
+export async function logSent(user, items, { f = fetch, token = process.env.SLACK_BOT_TOKEN || '' } = {}) {
+  try {
+    const role = user && user === String(process.env.OWNER_SLACK_ID || '') ? 'owner' : 'teammate';
+    const name = await slackName(token, user, f);
+    let kept = 0;
+    for (const it of (Array.isArray(items) ? items : []).slice(0, 5)) {
+      const to = String((it && it.to) || '');
+      if (!UID.test(to) && !CH.test(to)) continue;
+      const toName = UID.test(to) ? await slackName(token, to, f) : to;
+      if (await logRun({ user, name, role, kind: 'sent', to, toName, text: it.text }, f)) kept++;
+    }
+    return kept;
+  } catch { return 0; }
 }
 
 export async function readLog(f = fetch) {
@@ -225,11 +251,17 @@ export default async function handler(req, res) {
   const user = readToken(token);
   if (!user) return res.status(401).json({ error: 'bad or expired token' });
   try {
+    if (req.method === 'GET' && req.query && req.query.sent) {
+      if (!user || user !== String(process.env.OWNER_SLACK_ID || '')) return res.status(403).json({ error: 'Owner token only.' });
+      const rows = (await readLog()) || [];
+      return res.status(200).json({ user, sent: rows.filter((r) => r.kind === 'sent').slice(0, 100) });
+    }
     if (req.method === 'GET') return res.status(200).json({ user, notes: await readNotes(user) });
     if (req.method === 'POST') {
       let body = req.body; if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
       const n = await addNotes(user, Array.isArray(body && body.notes) ? body.notes : []);
-      return res.status(200).json({ ok: true, added: n });
+      const sent = await logSent(user, body && body.sent);
+      return res.status(200).json({ ok: true, added: n, sent });
     }
     return res.status(405).json({ error: 'GET or POST' });
   } catch (e) { return res.status(502).json({ error: String(e.message || e).slice(0, 120) }); }

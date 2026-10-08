@@ -2341,7 +2341,7 @@ window.__anRefilter = {};
 <script>
 /* Bruce. Reads /api/bruce-memory?log=1 (owner only): one row per turn Bruce was asked for in Slack. A "run" spent one
    cloud session on Utsav's account; "capped" is an ask refused at the daily cap; "to Alfred" is a reply passed to an
-   item's thread; "failed" is a run that did not start. People are Slack display names, not emails, so the Hide-my-
+   item's thread; "failed" is a run that did not start; "sent" is a message Bruce reported sending to someone (the run's own report). People are Slack display names, not emails, so the Hide-my-
    activity switch hides the owner's Slack id instead. */
 (function () {
   'use strict';
@@ -2361,7 +2361,7 @@ window.__anRefilter = {};
     return Math.round(h / 24) + ' days ago';
   }
   function fmtWhen(d) { return d.toLocaleString(undefined, { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }); }
-  var KIND = { run: 'Run', capped: 'Capped', 'to-alfred': 'To Alfred', failed: 'Failed' };
+  var KIND = { run: 'Run', capped: 'Capped', 'to-alfred': 'To Alfred', failed: 'Failed', sent: 'Sent' };
   var S = { status: 'loading', rows: [], rowsAll: [], period: '30', page: 1, per: 25, busy: false, fetchedAt: 0, owner: '', cap: 3 };
   var ICON_NAV = { 'arrow-left': '<path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"/>',
     'arrow-right': '<path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/>' };
@@ -2372,7 +2372,7 @@ window.__anRefilter = {};
     raw.forEach(function (r) {
       var d = new Date(r.at); if (isNaN(d.getTime())) return;
       out.push({ at: d, user: String(r.user || ''), name: String(r.name || r.user || ''), role: r.role === 'owner' ? 'owner' : 'teammate',
-        kind: KIND[r.kind] ? r.kind : 'run', thread: !!r.thread, text: String(r.text || ''), ch: String(r.ch || ''), ts: String(r.ts || '') });
+        kind: KIND[r.kind] ? r.kind : 'run', thread: !!r.thread, text: String(r.text || ''), to: String(r.toName || ''), ch: String(r.ch || ''), ts: String(r.ts || '') });
     });
     return out;
   }
@@ -2422,11 +2422,11 @@ window.__anRefilter = {};
     $('br-q-recent').textContent = 'newest first, ' + plural(recent.length, 'turn');
     S.recent = recent;
     var from = (S.page - 1) * S.per;
-    $('br-recent').innerHTML = table('150px minmax(160px,1.2fr) 100px minmax(240px,3fr) 110px', ['When', 'Person', 'Kind', 'What they asked', 'Conversation'],
+    $('br-recent').innerHTML = table('150px minmax(160px,1.2fr) 100px minmax(240px,3fr) 110px', ['When', 'Person', 'Kind', 'What they asked, or what he sent', 'Conversation'],
       recent.slice(from, S.page * S.per).map(function (r, i) {
         return '<div class="ul-row ul-row--d" role="row">' + cell(fmtWhen(r.at), '', r.at.toISOString()) + who(r) + kindCell(r.kind) +
-          cell((r.thread ? '\u21b3 ' : '') + (r.text || '\u2014'), '', r.text) +
-          '<div class="ul-c" role="cell"><button type="button" class="ul-link" data-conv="' + (from + i) + '">View</button></div></div>';
+          cell(r.kind === 'sent' ? '\u2192 ' + (r.to || 'someone') + ': ' + (r.text || '\u2014') : (r.thread ? '\u21b3 ' : '') + (r.text || '\u2014'), '', r.text) +
+          (r.kind === 'sent' ? cell('\u2014') : '<div class="ul-c" role="cell"><button type="button" class="ul-link" data-conv="' + (from + i) + '">View</button></div>') + '</div>';
       }), 'Nothing in this period');
     /* The same pager as the Usage log: page count and two arrow buttons, outside the table's scroller. */
     $('br-more').innerHTML = pages > 1 ? '<div class="ul-pg" style="width:100%"><div class="ul-pg__l"><span class="ul-pg__t">' + S.per + ' per page</span></div>' +
