@@ -66,6 +66,10 @@ A 40-padding card (`.card--pad`, `.ticks`, `.price`), Pricing (`2071:3021`) and 
 strip or a title, a 2px divider, then a price (`h4`) or a list of 24px ticks at `body-18-med`. The icon carries the
 colour (primary-500, red-500 or neutral-500); the text stays `neutral-900` or `neutral-500`.
 
+## `page-mock`
+
+A web page drawn in HTML inside the picture well, in place of a screenshot (`.pgmock`, `.pg-bar`, `.pg-body`, `.pg-blk`): a `neutral-50` browser bar with three dots and the address, a title in `h8-bold`, then 36-high blocks in `primary-25` with a `primary-100` ring and `primary-600` labels in `body-12-sem`, each with a 14px icon. One block may end in a small `primary-500` button. It is 84% of the well wide (92% on phone), starts 24 below the top and is clipped at the bottom by the well, as the pictures were. Every size is a ramp step; no value is off-token. New on the Gushwork vs Athena page, pending review.
+
 ## `cta-bar`
 
 Black (`--gw-color-black`), 1240 × 136, radius 20, padding 40 (`.bar`); the line is `h5-bold` in white, the
