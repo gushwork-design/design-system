@@ -35,17 +35,20 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
 .ag-tab:focus-visible { outline: 2px solid var(--gw-color-primary-500); outline-offset: 2px; border-radius: var(--gw-radius-4); }
 .ag-tab i { font-style: normal; width: 8px; height: 8px; border-radius: 2px; background: var(--s-nav-sel); flex: none; }
 .ag-tab i.ok { background: var(--gw-color-green-500, #10b981); } .ag-tab i.warn { background: var(--gw-color-yellow-500); } .ag-tab i.fail { background: var(--gw-color-red-500, #ef4444); }
-.ag-ctl { display: flex; align-items: center; gap: var(--gw-space-12); padding-bottom: var(--gw-space-4); }
-.ag-seg { display: inline-flex; height: 32px; padding: 3px; gap: 2px; border-radius: var(--gw-radius-10); background: var(--s-nav-sel); }
-.ag-seg button { all: unset; box-sizing: border-box; cursor: pointer; padding: 0 var(--gw-space-12); border-radius: var(--gw-radius-8); font: var(--gw-text-body-12-med); color: var(--s-body); display: inline-flex; align-items: center; }
-.ag-seg button[aria-pressed="true"] { background: var(--s-heading); color: var(--s-panel-bg); }
-.ag-seg button:focus-visible, .ag-ib:focus-visible { outline: 2px solid var(--gw-color-primary-500); outline-offset: 2px; }
-.ag-upd { font: var(--gw-text-body-12-reg); color: var(--s-body); }
-.ag-ib { all: unset; box-sizing: border-box; cursor: pointer; width: 28px; height: 28px; display: grid; place-items: center; border-radius: var(--gw-radius-8); color: var(--s-body); }
-.ag-ib:hover { background: var(--s-nav-hover); color: var(--s-heading); }
-.ag-ib svg { width: 14px; height: 14px; }
-.ag-ib[aria-busy="true"] svg { animation: ag-spin 1s linear infinite; }
-@keyframes ag-spin { to { transform: rotate(360deg); } } @media (prefers-reduced-motion: reduce) { .ag-ib[aria-busy="true"] svg { animation: none; } }
+/* The period pills (left) and the refresh icon (right) sit in a row inside the content, as in Analytics; the sticky bar carries only the tabs.
+   The pill colours are Analytics' own, in both themes. The refresh button is the shell's icon button, with its tooltip. */
+:root { --ag-tabs-bg: var(--gw-color-neutral-50); --ag-tabs-line: var(--gw-color-neutral-100); --ag-tab-fg: var(--gw-color-neutral-900); --ag-tab-hover: var(--gw-color-neutral-100); --ag-tab-on-bg: var(--gw-color-black); --ag-tab-on-fg: var(--gw-color-white); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ag-tabs-bg: var(--gw-color-neutral-900); --ag-tabs-line: var(--gw-color-neutral-900); --ag-tab-fg: var(--gw-color-white); --ag-tab-hover: var(--gw-color-neutral-800); --ag-tab-on-bg: var(--gw-color-white); --ag-tab-on-fg: var(--gw-color-black); } }
+:root[data-theme="dark"] { --ag-tabs-bg: var(--gw-color-neutral-900); --ag-tabs-line: var(--gw-color-neutral-900); --ag-tab-fg: var(--gw-color-white); --ag-tab-hover: var(--gw-color-neutral-800); --ag-tab-on-bg: var(--gw-color-white); --ag-tab-on-fg: var(--gw-color-black); }
+.ag-ctrl { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-16); flex-wrap: wrap; }
+.ag-pills { display: inline-flex; height: 36px; padding: var(--gw-space-4); gap: var(--gw-space-4); border-radius: var(--gw-radius-12); background: var(--ag-tabs-bg); box-shadow: inset 0 0 0 1px var(--ag-tabs-line); }
+.ag-pill { height: 28px; padding: 0 var(--gw-space-12); border: 0; border-radius: var(--gw-radius-8); background: none; font: var(--gw-text-button-12); color: var(--ag-tab-fg); cursor: pointer; transition: background var(--gw-motion-fast); }
+.ag-pill:hover { background: var(--ag-tab-hover); }
+.ag-pill[aria-selected="true"] { background: var(--ag-tab-on-bg); color: var(--ag-tab-on-fg); }
+.ag-pill:focus-visible { outline: 2px solid var(--gw-color-primary-500); outline-offset: 2px; }
+.gw-iconbtn[aria-busy="true"] svg { animation: ag-spin 1s linear infinite; }
+@keyframes ag-spin { to { transform: rotate(360deg); } } @media (prefers-reduced-motion: reduce) { .gw-iconbtn[aria-busy="true"] svg { animation: none; } }
+#ag-app { display: grid; gap: var(--gw-space-24); }
 
 .ag-note { padding: var(--gw-space-24); border-radius: var(--gw-radius-16); background: var(--s-card-bg); box-shadow: inset 0 0 0 1px var(--s-card-border); font: var(--gw-text-body-14-reg); color: var(--s-body); }
 .ag-note b { display: block; font: var(--gw-text-body-16-sem); color: var(--s-heading); margin-bottom: var(--gw-space-4); }
@@ -170,14 +173,15 @@ button.ag-r:focus-visible, a.ag-r:focus-visible { outline: 2px solid var(--gw-co
   <main class="sg__main">
     <div class="ag-bar">
       <div class="ag-tabs" id="ag-tabs" role="tablist" aria-label="Agents"></div>
-      <div class="ag-ctl">
-        <div class="ag-seg" role="group" aria-label="Period"><button type="button" data-p="7" aria-pressed="true">7 days</button><button type="button" data-p="30" aria-pressed="false">30 days</button></div>
-        <span class="ag-upd" id="ag-upd" aria-live="polite"></span>
-        <button type="button" class="ag-ib" id="ag-refresh" aria-label="Refresh" title="Refresh"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z"/></svg></button>
-      </div>
     </div>
     <div id="ag-state"></div>
-    <div id="ag-app" hidden><div id="ag-panel" role="tabpanel" tabindex="-1"></div></div>
+    <div id="ag-app" hidden>
+      <div class="ag-ctrl">
+        <div class="ag-pills" role="tablist" aria-label="Period"><button type="button" class="ag-pill" role="tab" data-p="7" aria-selected="true">7 days</button><button type="button" class="ag-pill" role="tab" data-p="30" aria-selected="false">30 days</button></div>
+        <button class="gw-iconbtn" id="ag-refresh" type="button" aria-label="Refresh" data-tip="Refresh" data-tip-end><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z"/></svg></button>
+      </div>
+      <div id="ag-panel" role="tabpanel" tabindex="-1"></div>
+    </div>
   </main>
 </div>
 
@@ -393,9 +397,11 @@ button.ag-r:focus-visible, a.ag-r:focus-visible { outline: 2px solid var(--gw-co
     tabs();
     var html = S.tab === 'bruce' ? renderBruce() : S.tab === 'alfred' ? renderAlfred() : S.tab === 'doc' ? renderDoc() : renderAll();
     $('ag-panel').innerHTML = html;
-    document.querySelectorAll('.ag-seg button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-p') === S.period)); });
-    $('ag-upd').textContent = S.at ? 'Updated ' + ago(Date.now() - S.at) : '';
+    document.querySelectorAll('.ag-pill').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-p') === S.period)); });
+    tip();
   }
+  /* "Updated 2 min ago" lives in the refresh button's tooltip, as on the other pages. */
+  function tip() { $('ag-refresh').setAttribute('data-tip', S.at ? 'Updated ' + ago(Date.now() - S.at) + ' \u00b7 click to refresh' : 'Refresh'); }
   function setTab(id, push) {
     if (id !== 'all' && !agent(id)) id = 'all';
     S.tab = id; render();
@@ -431,7 +437,7 @@ button.ag-r:focus-visible, a.ag-r:focus-visible { outline: 2px solid var(--gw-co
 
   document.addEventListener('click', function (e) {
     var t = e.target.closest && e.target.closest('[data-tab]'); if (t) { setTab(t.getAttribute('data-tab'), true); window.scrollTo({ top: 0 }); return; }
-    var p = e.target.closest && e.target.closest('.ag-seg button'); if (p) { S.period = p.getAttribute('data-p'); render(); }
+    var p = e.target.closest && e.target.closest('.ag-pill'); if (p) { S.period = p.getAttribute('data-p'); render(); }
   });
   $('ag-tabs').addEventListener('keydown', function (ev) {
     var ids = [].slice.call(document.querySelectorAll('.ag-tab')).map(function (b) { return b.getAttribute('data-tab'); }), i = ids.indexOf(S.tab);
@@ -439,7 +445,7 @@ button.ag-r:focus-visible, a.ag-r:focus-visible { outline: 2px solid var(--gw-co
   });
   $('ag-refresh').addEventListener('click', loadAll);
   window.addEventListener('hashchange', function () { if (S.data) setTab(location.hash.slice(1) || 'all', false); });
-  setInterval(function () { if (S.at) $('ag-upd').textContent = 'Updated ' + ago(Date.now() - S.at); }, 15000);
+  setInterval(tip, 15000);
 
   fetch('/admin/agents-data.json', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.json(); }).then(function (data) {
     S.data = data; var want = location.hash.slice(1); S.tab = want && (want === 'all' || agent(want)) ? want : 'all';
