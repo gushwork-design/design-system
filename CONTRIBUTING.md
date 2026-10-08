@@ -5,27 +5,32 @@ not need Figma — everything measured is in `exports/`. Stop here.
 
 Read on only if you are adding a component, correcting a measurement, or re-pulling tokens.
 
-## Adding a staging page (anyone on the team)
+## Adding a staging page (anyone on a lane)
 
-A page you want to show the team goes at `design.gushwork.ai/internal/staging/<name>`, behind the
-sign-in. You do not need the owner to review it, and you do not edit any shared file.
+A page you want to show the team goes at `design.gushwork.ai/internal/staging/<lane>/<page>`, behind the
+sign-in. The owner does not review it and you do not need repo access.
 
-1. Get write access to this repo (ask the owner once), then clone it and branch: `git switch -c staging/<name> origin/main`
-2. `bash scripts/new-staging-page.sh <name> "<Title>" "<one-line blurb>" "<your name>"` makes
-   `web/internal/staging/<name>/` with an `index.html` and a `staging.json`. Build your page in that folder only.
-   A `thumb.png` beside `index.html` becomes its picture on the Staging index.
-3. `bash scripts/check-staging-lane.sh` tells you whether it will merge. The PR runs the same check.
-4. Open a PR and merge it yourself once **staging-lane** is green. Merging publishes it,
-   and the Staging index lists it under "Team pages" with no edit to `staging.html`.
+A **lane** is a team's folder (`gtm`, `customer-success`). The owner creates it, and lists who may publish into it, in
+Access Control, Staging lanes. Everyone in the organisation can open the pages.
 
-Why this needs no review: `.github/CODEOWNERS` leaves `web/internal/staging/` unowned and owns
-everything else, and main requires code-owner review, so a PR that touches only your folder has no
-owner to wait for. The check is what keeps that safe. It blocks a PR that deletes or moves files,
-adds a file type that is not static, calls the hub's `/api/` or `/admin/` (your page runs on the
-hub's domain with the viewer's session), carries a secret, breaks the font rule the publish
-enforces, or touches anything outside your folder, which then waits for the owner.
-The existing pages stay the owner's. Fixing a typo in someone else's page is a normal PR that
-the owner reviews.
+**From the browser.** Open `/internal/staging/publish`, choose your lane, name the page, drop a folder (or one HTML
+file) and press Publish. You see the page and the checks before it goes live.
+
+**From your own Claude.** On the same page, tab From Claude, make a personal token and set `GW_PUBLISH_TOKEN`. Then
+`bash scripts/new-staging-page.sh <lane> <page> "<Title>" "<one line>" "<your name>"` makes a starter,
+and `bash scripts/publish-staging.sh <lane> <page> ./<page>` publishes it (`--check` first runs the checks and
+publishes nothing).
+
+Either way the page is live a minute or two after it says Committed, and the Staging index lists it under Team
+pages by itself, from the `staging.json` Publish writes. Publishing the same name again replaces its files.
+
+What keeps it safe, all in `web/api/_staging-rules.js` and `_publish.js`: the person must be on the lane (read live
+from Access Control on every call, so removing them stops their token at once); it writes only under
+`web/internal/staging/<lane>/<page>/` and never into a folder that is already a page of its own; it deletes
+nothing; static files only, 3 MB in all; no key-shaped strings; no reference to the hub's `/api/` or `/admin/`
+(a page there runs on the hub's domain with the viewer's session; this is a scan, not a sandbox); the same font
+rule the deploy enforces. Anything beyond that (deleting a page, a bigger file, a new lane) is the owner's.
+`node scripts/staging-publish.test.mjs` runs the tests, including the font rule against `check-fonts.sh`.
 
 ## The one rule that has cost the most
 

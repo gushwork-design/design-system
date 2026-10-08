@@ -3,11 +3,11 @@
 
     python3 scripts/_staging_index.py <stage-dir>
 
-Every page added through the staging lane carries a staging.json (title, blurb, owner). Nobody
-edits web/internal/staging.html to list it: this reads the manifests at publish time and fills
-the two markers in the staged copy, so the committed file stays as authored and a teammate's PR
-never has to touch a file that is the owner's. Pages with no manifest (the legacy ones) are
-listed by hand in the file itself and are left alone.
+Every page published into a team's lane lives at web/internal/staging/<lane>/<page>/ and carries a
+staging.json (title, blurb, owner), which the Publish tool writes. Nobody edits
+web/internal/staging.html to list it: this reads the manifests at deploy time and fills the two
+markers in the staged copy, so the committed file stays as authored. Pages with no manifest (the
+legacy ones) are listed by hand in the file itself and are left alone.
 
 With no lane pages it removes the markers and adds nothing. With lane pages and no marker it
 fails, because a page that is live but missing from the index is the failure this exists to stop.
@@ -24,18 +24,26 @@ PLACEHOLDER = ('<span class="st-pv" style="display:grid;place-items:center"><svg
 SEC, TOC = "<!-- team-pages:section -->", "<!-- team-pages:toc -->"
 
 rows = []
-for mf in sorted(glob.glob(os.path.join(stage, "internal/staging/*/staging.json"))):
+for mf in sorted(glob.glob(os.path.join(stage, "internal/staging/*/*/staging.json"))):
     slug = os.path.basename(os.path.dirname(mf))
-    m = json.load(open(mf))
+    lane = os.path.basename(os.path.dirname(os.path.dirname(mf)))
+    path = f"{lane}/{slug}"
+    try:
+        m = json.load(open(mf))
+        for k in ("title", "blurb", "owner"):
+            assert isinstance(m.get(k), str) and m[k].strip()
+    except (ValueError, AssertionError):
+        print(f"  staging index: skipped {path}, its staging.json is not valid")
+        continue
     e = lambda k: html.escape(str(m[k]))
     thumb = os.path.exists(os.path.join(os.path.dirname(mf), "thumb.png"))
-    prev = (f'<img class="st-pv" src="/internal/staging/{slug}/thumb.png" alt="{e("title")}" loading="lazy">'
+    prev = (f'<img class="st-pv" src="/internal/staging/{path}/thumb.png" alt="{e("title")}" loading="lazy">'
             if thumb else PLACEHOLDER)
     rows.append(f'''            <tr>
               <td class="c-prev">{prev}</td>
-              <td class="c-name">{e("title")}</td>
+              <td class="c-name">{e("title")}<br><span style="color:var(--gw-color-neutral-500);font-weight:400">{html.escape(lane)}</span></td>
               <td class="u">{e("blurb")} <span style="color:var(--gw-color-neutral-500)">By {e("owner")}.</span></td>
-              <td class="c-act"><a class="st-open" href="/internal/staging/{slug}">Open {ARROW}</a></td>
+              <td class="c-act"><a class="st-open" href="/internal/staging/{path}">Open {ARROW}</a></td>
             </tr>''')
 
 h = open(page).read()
@@ -46,7 +54,7 @@ if SEC not in h or TOC not in h:
     sys.exit(f"{page} has no team-pages markers, so {len(rows)} lane page(s) would be live but unlisted")
 section = f'''<section class="st-sec" id="team-pages">
         <h2>Team pages</h2>
-        <p class="st-note">Added by the team through the staging lane, with no review from the owner. Each lists itself here.</p>
+        <p class="st-note">Published by each team into its own lane, with no review from the owner. Each lists itself here.</p>
           <table class="st-table">
             <thead>
               <tr>

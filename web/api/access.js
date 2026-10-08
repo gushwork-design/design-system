@@ -109,6 +109,16 @@ export default async function handler(req, res) {
     });
   }
 
+  /* Who may publish into a staging lane is an owner's call, for the same reason the admin list is: it decides
+     who can put code on the site. Compared as a whole, so adding, removing or editing a lane all count. */
+  const laneKey = r => JSON.stringify(Object.keys(r.lanes || {}).sort().map(k => [k,
+    [...(r.lanes[k].groups || [])].sort(), [...(r.lanes[k].people || [])].sort()]));
+  if (!owner && laneKey(next) !== laneKey(rules)) {
+    return json(res, 403, {
+      error: 'Only an owner can change who publishes to a staging lane. Your other changes were not saved.'
+    });
+  }
+
   const saved = await saveRules(next);
   if (!saved.ok) {
     return json(res, saved.status, saved.detail ? { error: saved.error, detail: saved.detail } : { error: saved.error });

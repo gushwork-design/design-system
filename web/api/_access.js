@@ -309,8 +309,24 @@ export function normalise(raw) {
     })
     .filter(Boolean);
 
+  /* Staging lanes: a team's folder under /internal/staging/<lane>/ and who may PUBLISH into it. Viewing is not
+     decided here, it is the ordinary /internal rule above. A lane is a slug, and its list is people and groups
+     in the same shape a page rule uses, so the page's one picker serves both. Only an owner may change this
+     (api/access.js): it decides who can put code on the site. */
+  const lanes = {};
+  if (raw.lanes && typeof raw.lanes === 'object') {
+    for (const [name, v] of Object.entries(raw.lanes)) {
+      const key = String(name).trim().toLowerCase();
+      if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(key) || key.length > 40) continue;
+      lanes[key] = {
+        groups: (Array.isArray(v && v.groups) ? v.groups : []).map(s => String(s).trim().toLowerCase()).filter(Boolean),
+        people: emails(v && v.people)
+      };
+    }
+  }
+
   if (!routes.length) return null;
-  return { version: 1, admins: emails(raw.admins), groups, routes };
+  return { version: 1, admins: emails(raw.admins), groups, routes, lanes };
 }
 
 /* ── deciding ─────────────────────────────────────────────────────────────── */
@@ -345,6 +361,25 @@ export function groupsFor(email, rules) {
     if ((members || []).includes(e)) out.push(name);
   }
   return out;
+}
+
+/* May this person publish into this lane? Owners always can (they are the ones who set lanes up). An admin is NOT
+   automatically a publisher: publishing is its own grant, listed per lane, so a person is added to the lanes they
+   work in and no wider. Read against the live rules on every call, never from the cookie. */
+export function canPublish(email, lane, rules) {
+  if (!email || !lane) return false;
+  const e = String(email).toLowerCase();
+  if (isOwner(e)) return true;
+  const l = (rules.lanes || {})[lane];
+  if (!l) return false;
+  if ((l.people || []).includes(e)) return true;
+  const mine = groupsFor(e, rules);
+  return (l.groups || []).some(g => mine.includes(g));
+}
+
+/* The lanes this person may publish into, in order. */
+export function lanesFor(email, rules) {
+  return Object.keys(rules.lanes || {}).sort().filter(l => canPublish(email, l, rules));
 }
 
 /** The most specific rule covering a path — longest matching prefix. */

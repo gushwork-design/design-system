@@ -1,37 +1,37 @@
 #!/usr/bin/env bash
 #
-# Start a staging page. Creates web/internal/staging/<name>/ with a page that already passes
-# the lane check, so you only have to replace the body.
+# Start a page for a team's staging lane. Makes ./<page>/ with a starter index.html that already
+# passes the Publish checks, and a staging.json naming it.
 #
-#   bash scripts/new-staging-page.sh <name> "<Title>" "<one-line blurb>" "<your name>"
-#   bash scripts/new-staging-page.sh gtm "GTM" "The new Agent Store mock-up." "Swapnil"
+#   bash scripts/new-staging-page.sh <lane> <page> "<Title>" "<one-line blurb>" "<your name>"
+#   bash scripts/new-staging-page.sh gtm agent-store "Agent store" "The new Agent Store mock-up." "Swapnil"
 #
-# The page lives at design.gushwork.ai/internal/staging/<name> behind the sign-in, and appears
-# on the Staging index by itself once it is merged (from staging.json). Drop a thumb.png next to
-# index.html to give it a preview picture. See CONTRIBUTING.md, "Adding a staging page".
+# Then build the page in that folder and publish it with scripts/publish-staging.sh, or drop the
+# folder's files on the Publish tool at design.gushwork.ai/internal/staging/publish.
 set -euo pipefail
-cd "$(dirname "$0")/.."
 
-NAME="${1:-}"; TITLE="${2:-}"; BLURB="${3:-}"; OWNER="${4:-}"
-if [ -z "$NAME" ] || [ -z "$TITLE" ] || [ -z "$BLURB" ] || [ -z "$OWNER" ]; then
+LANE="${1:-}"; PAGE="${2:-}"; TITLE="${3:-}"; BLURB="${4:-}"; OWNER="${5:-}"
+if [ -z "$LANE" ] || [ -z "$PAGE" ] || [ -z "$TITLE" ] || [ -z "$BLURB" ] || [ -z "$OWNER" ]; then
   sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//' >&2; exit 2
 fi
-[[ "$NAME" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]] || { echo "name must be lowercase-kebab-case, e.g. gtm" >&2; exit 2; }
-DIR="web/internal/staging/$NAME"
-[ ! -e "$DIR" ] || { echo "$DIR already exists — pick another name, or edit it in place" >&2; exit 1; }
-mkdir -p "$DIR"
+for v in "$LANE" "$PAGE"; do
+  [[ "$v" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]] || { echo "'$v' must be lowercase words joined by hyphens, e.g. agent-store" >&2; exit 2; }
+done
+[ ! -e "$PAGE" ] || { echo "./$PAGE already exists" >&2; exit 1; }
+mkdir -p "$PAGE"
 
-python3 - "$DIR" "$NAME" "$TITLE" "$BLURB" "$OWNER" <<'PY'
+python3 - "$PAGE" "$LANE" "$TITLE" "$BLURB" "$OWNER" <<'PY'
 import json, sys, html
-d, name, title, blurb, owner = sys.argv[1:]
-json.dump({"title": title, "blurb": blurb, "owner": owner}, open(f"{d}/staging.json", "w"), indent=2, ensure_ascii=False)
-open(f"{d}/staging.json", "a").write("\n")
+d, lane, title, blurb, owner = sys.argv[1:]
+with open(f"{d}/staging.json", "w") as f:
+    json.dump({"title": title, "blurb": blurb, "owner": owner}, f, indent=2, ensure_ascii=False)
+    f.write("\n")
 open(f"{d}/index.html", "w").write(f'''<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<base href="/internal/staging/{name}/">
+<base href="/internal/staging/{lane}/{d}/">
 <title>{html.escape(title)} | Gushwork</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="stylesheet" href="/foundation/tokens.css">
@@ -51,5 +51,5 @@ h1{{margin:0 0 var(--gw-space-12);font:var(--gw-text-h1);letter-spacing:var(--gw
 </html>
 ''')
 PY
-echo "Created $DIR/ (index.html, staging.json)."
-echo "Next: build the page in index.html, then run  bash scripts/check-staging-lane.sh"
+echo "Created ./$PAGE/ (index.html, staging.json)."
+echo "Publish it:  bash scripts/publish-staging.sh $LANE $PAGE ./$PAGE"
