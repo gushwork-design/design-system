@@ -470,8 +470,15 @@ h1{font:var(--gw-text-h3);letter-spacing:var(--gw-text-h3-tracking);margin:var(-
   $('qwrap').addEventListener('click',function(e){if(e.target===this) close()});
   dlg.addEventListener('keydown',function(e){if(e.key==='ArrowLeft') step(-1); else if(e.key==='ArrowRight') step(1)});
   $('qcopy').addEventListener('click',function(){if(cur) copy(cur,this)});
+  /* Only the owner creates, asks and answers. Everyone can look and download, so the buttons stay and say so. */
+  function deny(btn,text){
+    clearTimeout(btn._d); if(!btn._dHtml) btn._dHtml=btn.innerHTML;
+    btn.innerHTML=ic('x')+text;
+    btn._d=setTimeout(function(){btn.innerHTML=btn._dHtml; btn._dHtml=null},2800);
+  }
   function act(btn){
     var a=byId(cur); if(!a) return; var x=btn.getAttribute('data-act');
+    if(!remote.owner&&(x==='req'||x==='ask')){deny(btn,x==='req'?'You are not allowed':'You are not allowed to answer ChatGPT'); return}
     if(btn.getAttribute('aria-disabled')==='true'){toast('Agent Studio is not connected to drop-reference yet.'); return}
     if(x==='dl') download(a.id);
     else{close(); if(x==='req') openBrief(a); else if(x==='review') showReview(a); else if(x==='ask') showAsk(a); else showWork(a)}
@@ -687,7 +694,10 @@ h1{font:var(--gw-text-h3);letter-spacing:var(--gw-text-h3-tracking);margin:var(-
     else if(x==='changesAsk'||x==='discardAsk'){ctx.mode=x==='changesAsk'?'changes':'discard'; $('rv-notel').textContent=ctx.mode==='changes'?'What should change':'Why (optional)'; $('f-rvnote').placeholder=ctx.mode==='changes'?'For example: a bigger calculator, no hard hat':''; $('rv-notewrap').hidden=false; err(''); reviewFoot(); $('f-rvnote').focus()}
     else if(x==='back'){ctx.mode=''; $('rv-notewrap').hidden=true; err(''); reviewFoot()}
   });
-  $('create').addEventListener('click',function(){openBrief()});
+  $('create').addEventListener('click',function(){
+    if(!remote.owner){toast('You are not allowed to create a new agent. Only the owner can.','warning'); return}
+    openBrief();
+  });
 
   build(); render();
   var want=new URLSearchParams(location.search).get('agent');
