@@ -27,6 +27,8 @@
 
 import { COOKIE, verify, readCookie, sessionSecret } from './_session.js';
 import { loadRules, decide, isOwner } from './_access.js';
+import { timingSafeEqual } from 'node:crypto';
+import * as push from './_drop-push.js';
 
 /* One path, the one that has an Access Control rule. A second path with no rule of its own would inherit the broad
    /internal rule and let every internal account in. When the page goes live, move the rule and change this together. */
@@ -79,7 +81,7 @@ export function issueBody(b) {
     ['Agent id', b.agentId], ['Agent name', one(b.name)], ['What it does', one(b.does)],
     ['Props', b.props.length ? b.props.map((p) => `- ${one(p)}`).join('\n') : 'none'],
     ['Pose', b.pose], ['Notes', b.notes || 'none'], ['Revision of', b.revisionOf || 'none'],
-    ['Bundle', b.bundle || 'none'],
+    ['Bundle', b.bundle || 'none'], ['Requested by', b.requestedBy || 'none'],
   ].map(([h, v]) => `### ${h}\n\n${v}`).join('\n\n') + '\n';
 }
 
@@ -94,7 +96,7 @@ export function parseBody(body) {
   const none = (v) => (!v || v === 'none' ? '' : v);
   return {
     agentId: out['agent id'] || '', name: out['agent name'] || '', does: out['what it does'] || '',
-    props, pose: out.pose || 'standing', notes: none(out.notes), revisionOf: none(out['revision of']), bundle: none(out.bundle),
+    props, pose: out.pose || 'standing', notes: none(out.notes), revisionOf: none(out['revision of']), bundle: none(out.bundle), requestedBy: none(out['requested by']),
   };
 }
 
@@ -189,7 +191,38 @@ function json(res, status, body) {
   res.status(status).end(JSON.stringify(body));
 }
 
+const same = (a, b) => { const x = Buffer.from(String(a)), y = Buffer.from(String(b)); return x.length === y.length && timingSafeEqual(x, y); };
+
+/* GitHub calls this when an issue changes. It carries no session, so it is answered before the gate; what it may do is
+   narrow: it never trusts the payload, it re-reads the issue itself, and the worst a forged call can do is re-send a
+   notification the dedupe key then refuses. The key in the URL is DROP_WEBHOOK_KEY. */
+async function hook(req, res) {
+  const key = process.env.DROP_WEBHOOK_KEY || '';
+  if (!key || !same(key, (req.query && req.query.key) || '')) return json(res, 401, { error: 'No.' });
+  const ev = String((req.headers && req.headers['x-github-event']) || '');
+  if (ev === 'ping') return json(res, 200, { ok: true, pong: true });
+  const body = typeof req.body === 'string' ? (() => { try { return JSON.parse(req.body); } catch { return null; } })() : req.body;
+  const n = Number(body && body.issue && body.issue.number);
+  if (ev !== 'issues' || !n || !['labeled', 'closed'].includes(body.action)) return json(res, 200, { ok: true, ignored: true });
+  if (!token() || !push.configured()) return json(res, 200, { ok: true, ignored: 'not configured' });
+  try {
+    const it = await gh(`/issues/${n}`);
+    const ls = labelsOf(it), b = parseBody(it.body);
+    if (it.pull_request || !b.requestedBy || !b.agentId) return json(res, 200, { ok: true, ignored: 'no requester' });
+    let kind = '';
+    if (it.state === 'open' && ls.includes('needs-input')) kind = 'needs-input';
+    else if (it.state === 'closed' && ls.includes('image-ready') && !['accepted', 'discarded', 'revision'].some((l) => ls.includes(l))) kind = 'ready';
+    if (!kind) return json(res, 200, { ok: true, ignored: 'nothing to tell' });
+    if (!(await push.firstTime(`drop:notified:${n}:${kind}:${it.comments || 0}`))) return json(res, 200, { ok: true, duplicate: true });
+    const sent = await push.notifyUser(b.requestedBy, push.message(kind, b.name, b.agentId));
+    return json(res, 200, { ok: true, kind, sent });
+  } catch (e) {
+    return json(res, 502, { error: 'Could not read the request.' });
+  }
+}
+
 export default async function handler(req, res) {
+  if (String((req.query && req.query.op) || '') === 'hook') return hook(req, res);
   const session = await verify(readCookie(req.headers.cookie, COOKIE), sessionSecret());
   if (!session) return json(res, 401, { error: 'Not signed in.' });
   const rules = await loadRules();
@@ -199,8 +232,25 @@ export default async function handler(req, res) {
   const op = String((req.query && req.query.op) || '');
   const body = typeof req.body === 'string' ? (() => { try { return JSON.parse(req.body); } catch { return null; } })() : req.body;
 
+  if (op === 'pushkey') return json(res, 200, { key: push.configured() ? push.publicKey() : '' });
+  if (op === 'subscribe' || op === 'unsubscribe') {
+    if (req.method !== 'POST') return json(res, 405, { error: 'POST only.' });
+    if (!email) return json(res, 400, { error: 'Sign in with your work account first.' });
+    if (!push.configured()) return json(res, 503, { error: 'Notifications are not switched on yet.' });
+    try {
+      if (op === 'subscribe') {
+        const sub = push.cleanSubscription(body && body.subscription);
+        if (!sub) return json(res, 400, { error: 'That device cannot be notified.' });
+        await push.saveSubscription(email, sub);
+      } else {
+        await push.removeSubscription(email, body && body.endpoint);
+      }
+      return json(res, 200, { ok: true });
+    } catch (e) { return json(res, 502, { error: 'Could not save that. Try again.' }); }
+  }
+
   if (!token()) {
-    if (op === 'state' || !op) return json(res, 200, { configured: false, owner, work: {}, approved: {}, created: [] });
+    if (op === 'state' || !op) return json(res, 200, { configured: false, owner, push: push.configured(), work: {}, approved: {}, created: [] });
     return json(res, 503, { error: 'Drop Studio is not connected to drop-reference yet.' });
   }
 
@@ -214,7 +264,7 @@ export default async function handler(req, res) {
         const last = cs[cs.length - 1];
         w.question = last ? String(last.body || '').slice(0, MAX.answer) : '';
       }
-      return json(res, 200, { configured: true, owner, ...state });
+      return json(res, 200, { configured: true, owner, push: push.configured(), ...state });
     }
 
     if (req.method === 'GET' && op === 'image') {
@@ -238,7 +288,7 @@ export default async function handler(req, res) {
       const { issues } = await loadAll();
       const c = cleanBrief(body, issueIds(issues));
       if (c.error) return json(res, 400, { error: c.error });
-      const made = await createIssue(c.brief);
+      const made = await createIssue({ ...c.brief, requestedBy: email });
       return json(res, 200, { ok: true, agentId: c.brief.agentId, issue: made.number, url: made.html_url });
     }
 
@@ -286,7 +336,7 @@ export default async function handler(req, res) {
       const prev = parseBody(src && src.body);
       const c = cleanBrief({ ...prev, agentId: id, revisionOf: file, notes: note || prev.notes }, null);
       if (c.error) return json(res, 400, { error: c.error });
-      const made = await createIssue(c.brief);
+      const made = await createIssue({ ...c.brief, requestedBy: email });
       await comment(w.issue, `Changes requested by ${email} in Drop Studio, as #${made.number}.`);
       await addLabels(w.issue, ['revision']);
       return json(res, 200, { ok: true, issue: made.number, url: made.html_url });

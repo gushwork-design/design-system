@@ -494,7 +494,7 @@ h1{font:var(--gw-text-h3);letter-spacing:var(--gw-text-h3-tracking);margin:var(-
   }
   function refresh(){
     return api('state').then(function(j){
-      remote=j; build(); render();
+      remote=j; build(); render(); initPush();
       if(dlg.open&&cur){var a=byId(cur); if(a) fill(a); else close()}
     }).catch(function(){ /* offline or not connected: the page keeps what it has */ });
   }
@@ -503,8 +503,54 @@ h1{font:var(--gw-text-h3);letter-spacing:var(--gw-text-h3-tracking);margin:var(-
 
   /* ── the create / request / answer / review dialog ── */
   var cr=$('cr'), ctx={}, busy=false;
-  var VIEWS=['brief','work','ask','review'];
-  function view(v){VIEWS.forEach(function(x){$('v-'+x).hidden=x!==v}); err('')}
+  var VIEWS=['brief','work','ask','review'], curView='';
+  function view(v){curView=v; VIEWS.forEach(function(x){$('v-'+x).hidden=x!==v}); err('')}
+
+  /* ── push notifications: tell the person on their own device when the picture is ready ── */
+  var push={sub:false,busy:false};
+  var pushSupported=function(){return !!remote.push&&'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window};
+  var onIos=function(){return /iPhone|iPad|iPod/.test(navigator.userAgent)&&!(navigator.standalone||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches))};
+  function pushState(){
+    if(!remote.push) return 'none';
+    if(onIos()) return 'ios';
+    if(!pushSupported()) return 'none';
+    if(Notification.permission==='denied') return 'blocked';
+    return push.sub&&Notification.permission==='granted'?'on':'off';
+  }
+  function keyBytes(s){var p='='.repeat((4-s.length%4)%4),r=atob((s+p).replace(/-/g,'+').replace(/_/g,'/')),o=new Uint8Array(r.length);for(var i=0;i<r.length;i++)o[i]=r.charCodeAt(i);return o}
+  function initPush(){
+    if(!pushSupported()||onIos()) return;
+    navigator.serviceWorker.register('sw.js').then(function(reg){return reg.pushManager.getSubscription()}).then(function(s){push.sub=!!s; workFoot()}).catch(function(){});
+  }
+  function enablePush(){
+    if(push.busy||!pushSupported()) return; push.busy=true; workFoot(); err('');
+    Notification.requestPermission().then(function(p){
+      if(p!=='granted') throw new Error('');
+      return navigator.serviceWorker.register('sw.js');
+    }).then(function(){return navigator.serviceWorker.ready}).then(function(reg){
+      return api('pushkey').then(function(k){
+        if(!k.key) throw new Error('Notifications are not switched on yet.');
+        return reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:keyBytes(k.key)});
+      });
+    }).then(function(sub){return api('subscribe',{subscription:sub.toJSON()})}).then(function(){
+      push.sub=true; push.busy=false; workFoot();
+    }).catch(function(e){
+      push.busy=false; workFoot();
+      if(Notification.permission==='denied') return;           // the footer now says they are blocked
+      err(e&&e.name==='Error'&&e.message?e.message:'Could not turn on notifications on this device.');
+    });
+  }
+  /* the footer of the progress view: the Notify me control sits with the note, Close stays the main button */
+  function workFoot(){
+    if(curView!=='work') return;
+    var st=pushState(), note='', left='';
+    if(st==='off') left=btn('notify',push.busy?'Asking…':ic('check').replace('class="i"','class="i" style="display:none"')+'Notify me when it’s ready');
+    else if(st==='on') note=ic('check')+' We’ll notify you on this device when it’s ready.';
+    else if(st==='blocked') note='Notifications are blocked in this browser. Allow them in the site settings to be told.';
+    else if(st==='ios') note='On iPhone, add this page to your Home Screen to get a notification when it’s ready.';
+    foot(note,left,btn('close','Close, I’ll come back','gd-btn--primary'));
+    var n=$('crfoot').querySelector('.gref'); if(n&&st==='on') n.style.display='flex', n.style.alignItems='center', n.style.gap='4px';
+  }
   function err(m){var e=$('crerr'); e.hidden=!m; e.firstChild.textContent=m||''}
   function steps(n){
     var L=['Brief','ChatGPT','Review'];
@@ -588,7 +634,7 @@ h1{font:var(--gw-text-h3);letter-spacing:var(--gw-text-h3-tracking);margin:var(-
     steps(2); view('work');
     var ref=(w.issue?'#'+w.issue+' · ':'')+esc(a.name);
     $('crtl').innerHTML=tl([['done','Request sent',ref+(remote.owner&&w.url?' · <a class="gd-table__link" href="'+esc(w.url)+'" target="_blank" rel="noopener">See it on GitHub</a>':'')],['now','Waiting for ChatGPT’s next check','You can close this. The card shows Requested until the picture is ready.'],['todo','Generating the picture','From the identity and material masters in drop-reference.'],['todo','Ready to review','The card changes to To review.']]);
-    foot('','',btn('close','Close, I’ll come back','gd-btn--primary'));
+    workFoot();
     show();
   }
   function showAsk(a){
@@ -632,6 +678,7 @@ h1{font:var(--gw-text-h3);letter-spacing:var(--gw-text-h3-tracking);margin:var(-
     var x=b.getAttribute('data-cr');
     if(x==='send') submitBrief();
     else if(x==='close') cr.close();
+    else if(x==='notify') enablePush();
     else if(x==='answer') submitAnswer();
     else if(x==='accept') decide('accept');
     else if(x==='changes') decide('changes');
