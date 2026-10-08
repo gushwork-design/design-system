@@ -958,6 +958,10 @@ legend{padding:0;margin-bottom:var(--gw-space-8);font:var(--gw-text-body-14-med)
    (a placeholder named "mega-made-up-logo"), so the template sets the NAME in the
    display face and leaves a real logo to be dropped over it. */
 .mark{display:inline-block;font:var(--gw-text-h6-bold);letter-spacing:var(--gw-text-h6-bold-tracking);color:var(--gw-color-neutral-800);line-height:1}
+/* OFF-SYSTEM, asked for by Utsav: the Athena name is set in Space Grotesk Light, a third typeface, so it reads as
+   Athena's own wordmark the way the competitor's name did on the earlier page. Self-hosted, latin subset, one
+   file (Space Grotesk, SIL Open Font License 1.1). Every .mark on this page is the competitor's name. */
+@font-face{font-family:"Athena Mark";src:url("SpaceGrotesk-Light.woff2") format("woff2");font-weight:300;font-style:normal;font-display:swap}
 .mark img{height:24px;width:auto}
 .gwlogo{height:24px;width:auto;flex:none}
 
@@ -1438,6 +1442,9 @@ details p{margin-top:var(--gw-space-12);padding:0;font:var(--gw-text-body-16-med
   .rv-cards{grid-template-columns:minmax(0,1fr);gap:var(--gw-space-12)}
 }
 
+/* the Athena wordmark: after every size rule above, so each keeps its size and only the face changes */
+.mark,.stop .mark,.diag > .stop--tag .mark,.prof-tile .mark,.cmp3-head .mark,.card-top .mark,.steps-card .mark{font-family:"Athena Mark",var(--gw-font-display);font-weight:300}
+
 /* ---------- motion (R64): arrive, never leave; opacity and transform only; 8px, 320ms ---------- */
 @media (prefers-reduced-motion: no-preference){
   :root{--hub-ease:cubic-bezier(.2,.7,.2,1);--hub-dur:200ms;--hub-dur-enter:320ms}
@@ -1673,7 +1680,7 @@ details p{margin-top:var(--gw-space-12);padding:0;font:var(--gw-text-body-16-med
       </div>
       <div class="vs">
         <div class="card card--pad steps-card">
-          <div class="card-top"><span class="mark">With Athena</span><span class="eyebrow">Software</span></div>
+          <div class="card-top"><span class="steps-with">With <span class="mark">Athena</span></span><span class="eyebrow">Software</span></div>
           <hr>
           <p class="steps-h">Who does each step</p>
           <ul class="steps"><li><span>Find the questions buyers ask</span><em class="eyebrow">Your team</em></li><li><span>Write each page</span><em class="eyebrow">Your team</em></li><li><span>Publish it on your site</span><em class="eyebrow">Your team</em></li><li><span>Track what it brings in</span><em class="eyebrow">Athena</em></li></ul>
@@ -1746,7 +1753,7 @@ details p{margin-top:var(--gw-space-12);padding:0;font:var(--gw-text-body-16-med
       </div>
       <div class="vs">
         <div class="card card--pad">
-          <div class="card-top"><span class="mark">Athena Starter</span><span class="eyebrow">Software</span></div>
+          <div class="card-top"><span class="steps-with"><span class="mark">Athena</span> Starter</span><span class="eyebrow">Software</span></div>
           <hr>
           <div class="big-no"><span>From $295 per month</span></div>
           <ul class="ticks ticks--soft"><li class="na"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M176,128a8,8,0,0,1-8,8H88a8,8,0,0,1,0-16h80A8,8,0,0,1,176,128Zm56,0A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></svg><span>3,600 credits, 1 credit per AI response</span></li><li class="na"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M176,128a8,8,0,0,1-8,8H88a8,8,0,0,1,0-16h80A8,8,0,0,1,176,128Zm56,0A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></svg><span>API access and extra credits cost extra</span></li><li class="na"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M176,128a8,8,0,0,1-8,8H88a8,8,0,0,1,0-16h80A8,8,0,0,1,176,128Zm56,0A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></svg><span>Writing and publishing: your team</span></li></ul>
