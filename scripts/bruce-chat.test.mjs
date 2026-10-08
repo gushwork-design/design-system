@@ -39,6 +39,7 @@ const sent = upstream[0];
 ok('it calls the Messages API with the key from the environment', sent.url === 'https://api.anthropic.com/v1/messages' && sent.headers['x-api-key'] === 'sk-test-never-printed');
 ok('the model is a small fast one by default', sent.body.model === 'claude-haiku-5-5');
 ok('Bruce is the system prompt, and it says what the window cannot do', /You are Bruce/.test(sent.body.system) && /cannot build anything/.test(sent.body.system) && /Never claim you have done/.test(sent.body.system));
+ok('it knows it reports to its creator every day', /report to Utsav, your creator, every day/.test(sent.body.system));
 ok('the reply is capped in length', sent.body.max_tokens <= 500);
 ok('the key is never in the response', !JSON.stringify(r.out).includes('sk-test'));
 
