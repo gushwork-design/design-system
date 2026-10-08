@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agents — Gushwork Design</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="The agents that run the design hub: what each is up to, how much it uses, how healthy it is and what is on its plate.">
+<script>try{var c=localStorage.getItem('gw-theme-choice'),t=c==='dark'||c==='light'?c:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20x%3D%221%22%20y%3D%221%22%20width%3D%2278%22%20height%3D%2278%22%20rx%3D%2219%22%20fill%3D%22%230070ff%22%20stroke%3D%22%230061e0%22%20stroke-width%3D%222%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="/foundation/tokens.css">
+<link rel="stylesheet" href="/shell.css?v=ghost9">
+<script src="/shell.js?v=ghost9" defer></script>
+<style>
+/* /admin/agents — the agents that run the design hub (8 Oct 2026). Same chrome as the other admin pages; the content is an underlined
+   tab row (All agents, then one tab per agent, the lead first) like Analytics. Each agent tab says what it is up to, its usage and
+   estimated tokens, its health, its tasks and what it is. The definitions are agents/ in git, built into agents-data.json; the
+   activity comes from what the hub can already see: Bruce's log, the health checks, and Alfred's GitHub threads (/api/agents).
+   Nothing here is a secret: the repo is public. Token figures are ESTIMATES, built from the numbers in each agent's `cost`. */
+body[data-gw-page="agents"] .sg__main { grid-column: 1 / -1; max-width: 1120px; gap: var(--gw-space-24); }
+body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw-space-8); }
+#ag-app[hidden] { display: none; }
+#ag-state:empty { display: none; }
+#ag-panel { display: grid; gap: var(--gw-space-24); }
+
+/* the bar: underlined tabs on the left, period and refresh on the right */
+.ag-bar { position: sticky; top: 0; z-index: 6; background: var(--s-panel-bg); margin-top: calc(var(--gw-space-8) * -1); padding-top: var(--gw-space-8); align-self: stretch;
+  display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-16); flex-wrap: wrap; box-shadow: inset 0 -1px 0 var(--s-card-border); }
+@media (max-width: 767px) { .ag-bar { top: 76px; } }
+.ag-tabs { display: flex; gap: var(--gw-space-24); overflow-x: auto; scrollbar-width: none; max-width: 100%; }
+.ag-tabs::-webkit-scrollbar { display: none; }
+.ag-tab { all: unset; box-sizing: border-box; position: relative; height: 40px; padding: 0 2px; display: inline-flex; align-items: center; gap: var(--gw-space-8); cursor: pointer; white-space: nowrap;
+  font: var(--gw-text-body-14-med); color: var(--s-body); }
+.ag-tab:hover { color: var(--s-heading); }
+.ag-tab[aria-selected="true"] { color: var(--s-heading); }
+.ag-tab[aria-selected="true"]::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; border-radius: 2px 2px 0 0; background: var(--s-heading); }
+.ag-tab:focus-visible { outline: 2px solid var(--gw-color-primary-500); outline-offset: 2px; border-radius: var(--gw-radius-4); }
+.ag-tab i { font-style: normal; width: 8px; height: 8px; border-radius: 2px; background: var(--s-nav-sel); flex: none; }
+.ag-tab i.ok { background: var(--gw-color-green-500, #10b981); } .ag-tab i.warn { background: var(--gw-color-yellow-500); } .ag-tab i.fail { background: var(--gw-color-red-500, #ef4444); }
+/* The period pills (left) and the refresh icon (right) sit in a row inside the content, as in Analytics; the sticky bar carries only the tabs.
+   The pill colours are Analytics' own, in both themes. The refresh button is the shell's icon button, with its tooltip. */
+:root { --ag-tabs-bg: var(--gw-color-neutral-50); --ag-tabs-line: var(--gw-color-neutral-100); --ag-tab-fg: var(--gw-color-neutral-900); --ag-tab-hover: var(--gw-color-neutral-100); --ag-tab-on-bg: var(--gw-color-black); --ag-tab-on-fg: var(--gw-color-white); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ag-tabs-bg: var(--gw-color-neutral-900); --ag-tabs-line: var(--gw-color-neutral-900); --ag-tab-fg: var(--gw-color-white); --ag-tab-hover: var(--gw-color-neutral-800); --ag-tab-on-bg: var(--gw-color-white); --ag-tab-on-fg: var(--gw-color-black); } }
+:root[data-theme="dark"] { --ag-tabs-bg: var(--gw-color-neutral-900); --ag-tabs-line: var(--gw-color-neutral-900); --ag-tab-fg: var(--gw-color-white); --ag-tab-hover: var(--gw-color-neutral-800); --ag-tab-on-bg: var(--gw-color-white); --ag-tab-on-fg: var(--gw-color-black); }
+.ag-ctrl { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-16); flex-wrap: wrap; }
+.ag-pills { display: inline-flex; height: 36px; padding: var(--gw-space-4); gap: var(--gw-space-4); border-radius: var(--gw-radius-12); background: var(--ag-tabs-bg); box-shadow: inset 0 0 0 1px var(--ag-tabs-line); }
+.ag-pill { height: 28px; padding: 0 var(--gw-space-12); border: 0; border-radius: var(--gw-radius-8); background: none; font: var(--gw-text-button-12); color: var(--ag-tab-fg); cursor: pointer; transition: background var(--gw-motion-fast); }
+.ag-pill:hover { background: var(--ag-tab-hover); }
+.ag-pill[aria-selected="true"] { background: var(--ag-tab-on-bg); color: var(--ag-tab-on-fg); }
+.ag-pill:focus-visible { outline: 2px solid var(--gw-color-primary-500); outline-offset: 2px; }
+.gw-iconbtn[aria-busy="true"] svg { animation: ag-spin 1s linear infinite; }
+@keyframes ag-spin { to { transform: rotate(360deg); } } @media (prefers-reduced-motion: reduce) { .gw-iconbtn[aria-busy="true"] svg { animation: none; } }
+#ag-app { display: grid; gap: var(--gw-space-24); }
+
+.ag-note { padding: var(--gw-space-24); border-radius: var(--gw-radius-16); background: var(--s-card-bg); box-shadow: inset 0 0 0 1px var(--s-card-border); font: var(--gw-text-body-14-reg); color: var(--s-body); }
+.ag-note b { display: block; font: var(--gw-text-body-16-sem); color: var(--s-heading); margin-bottom: var(--gw-space-4); }
+.ag-empty { padding: var(--gw-space-16) var(--gw-space-8); font: var(--gw-text-body-14-reg); color: var(--s-body); }
+
+/* pictures, tags, badges, buttons */
+.ag-pic { width: 40px; height: 40px; flex: none; border-radius: var(--gw-radius-10); display: grid; place-items: center; font: 700 16px/1 var(--gw-font-display); color: var(--s-heading); background: var(--s-nav-sel); }
+.ag-pic--bruce { background: var(--gw-color-primary-100) url(/assets/bruce-avatar.png) center / cover no-repeat; }
+.ag-pic--alfred { background: var(--gw-color-primary-500); color: var(--gw-color-white); }
+.ag-pic--lg { width: 64px; height: 64px; border-radius: var(--gw-radius-16); font-size: 24px; }
+.ag-pic--sm { width: 28px; height: 28px; border-radius: var(--gw-radius-8); font-size: 12px; }
+.ag-tag { display: inline-flex; align-items: center; height: 22px; padding: 0 var(--gw-space-8); border-radius: var(--gw-radius-4); font: var(--gw-text-body-12-med); background: var(--s-nav-sel); color: var(--s-heading); white-space: nowrap; }
+.ag-tag--lead { background: var(--gw-color-primary-alpha-10); color: var(--gw-color-primary-600); }
+.ag-tag--gap { background: var(--gw-color-yellow-alpha-10); color: var(--gw-color-yellow-600); }
+:root[data-theme="dark"] .ag-tag--lead { color: var(--gw-color-primary-300, var(--gw-color-primary-500)); }
+.ag-b { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 10px; border-radius: var(--gw-radius-8); font: var(--gw-text-body-12-med); white-space: nowrap; }
+.ag-b::before { content: ''; width: 6px; height: 6px; border-radius: 2px; background: currentColor; }
+.ag-b--ok { background: var(--gw-color-green-alpha-10, rgba(16,185,129,.12)); color: var(--gw-color-green-700, #047857); }
+.ag-b--warn { background: var(--gw-color-yellow-alpha-10); color: var(--gw-color-yellow-600); }
+.ag-b--fail { background: var(--gw-color-red-alpha-10); color: var(--gw-color-red-600); }
+.ag-b--unknown { background: var(--s-nav-sel); color: var(--s-body); }
+:root[data-theme="dark"] .ag-b--ok { color: var(--gw-color-green-300, #6ee7b7); } :root[data-theme="dark"] .ag-b--warn { color: var(--gw-color-yellow-300); } :root[data-theme="dark"] .ag-b--fail { color: var(--gw-color-red-300); }
+.ag-btn { height: 32px; padding: 0 var(--gw-space-12); border-radius: var(--gw-radius-8); border: 0; cursor: pointer; font: var(--gw-text-button-12, var(--gw-text-body-12-med)); display: inline-flex; align-items: center; justify-content: center; white-space: nowrap;
+  background: none; color: var(--s-heading); box-shadow: inset 0 0 0 1px var(--s-card-border); transition: background var(--gw-motion-fast); text-decoration: none; }
+.ag-btn:hover { background: var(--s-nav-hover); }
+.ag-btn:focus-visible { outline: 2px solid var(--gw-color-primary-500); outline-offset: 2px; }
+
+/* metrics */
+.ag-ms { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gw-space-8); }
+@media (max-width: 900px) { .ag-ms { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .ag-ms { grid-template-columns: minmax(0, 1fr); } }
+.ag-m { padding: var(--gw-space-16); border-radius: var(--gw-radius-12); background: var(--s-card-bg); box-shadow: inset 0 0 0 1px var(--s-card-border); display: flex; flex-direction: column; gap: var(--gw-space-12); min-height: 108px; min-width: 0; }
+.ag-m span { font: var(--gw-text-body-12-med); color: var(--s-body); }
+.ag-m b { font: 500 26px/1.2 var(--gw-font-display); color: var(--s-heading); font-variant-numeric: tabular-nums; margin-top: auto; }
+.ag-m small { font: var(--gw-text-body-12-med); color: var(--s-body); }
+
+/* boxes and rows */
+.ag-box { padding: var(--gw-space-12); border-radius: var(--gw-radius-16); background: var(--s-card-bg); box-shadow: inset 0 0 0 1px var(--s-card-border); display: flex; flex-direction: column; gap: var(--gw-space-12); min-width: 0; }
+.ag-box__h { display: flex; align-items: baseline; justify-content: space-between; gap: var(--gw-space-8); padding: 0 var(--gw-space-8); flex-wrap: wrap; }
+.ag-box__h h2 { margin: 0; font: var(--gw-text-body-16-sem); color: var(--s-heading); }
+.ag-box__h small { font: var(--gw-text-body-14-reg); color: var(--s-body); }
+.ag-box__h a { font: var(--gw-text-body-14-med); color: var(--s-body); text-decoration: none; }
+.ag-box__h a:hover { color: var(--s-heading); }
+.ag-foot { padding: 0 var(--gw-space-8); font: var(--gw-text-body-12-reg); color: var(--s-body); }
+.ag-r { display: grid; gap: var(--gw-space-12); align-items: center; padding: var(--gw-space-12) var(--gw-space-8); border: 0; border-top: 1px solid var(--s-card-border); border-radius: 0; background: none; text-align: left; width: 100%; color: inherit; text-decoration: none; min-width: 0; }
+.ag-r:first-of-type { border-top: 0; }
+.ag-r > * { min-width: 0; }
+button.ag-r, a.ag-r { cursor: pointer; transition: background var(--gw-motion-fast); }
+button.ag-r:hover, a.ag-r:hover { background: var(--s-nav-hover); }
+button.ag-r:focus-visible, a.ag-r:focus-visible { outline: 2px solid var(--gw-color-primary-500); outline-offset: -2px; }
+.ag-r--h { font: var(--gw-text-body-12-med); color: var(--s-body); padding-top: 0; padding-bottom: var(--gw-space-8); }
+.ag-who { display: flex; align-items: center; gap: var(--gw-space-12); }
+.ag-who b { display: block; font: var(--gw-text-body-14-med); color: var(--s-heading); }
+.ag-who small { display: block; font: var(--gw-text-body-12-reg); color: var(--s-body); }
+.ag-c { font: var(--gw-text-body-14-reg); color: var(--s-body); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ag-c--wrap { white-space: normal; overflow-wrap: anywhere; }
+.ag-c strong { color: var(--s-heading); font-weight: 500; }
+.ag-c--num { text-align: right; font-variant-numeric: tabular-nums; }
+.ag-share { height: 6px; border-radius: 3px; background: var(--s-nav-sel); overflow: hidden; min-width: 40px; }
+.ag-share i { display: block; height: 100%; border-radius: 3px; background: var(--gw-color-primary-500); }
+.r-all { grid-template-columns: minmax(150px, 1.1fr) minmax(0, 1.8fr) 100px 90px 130px 100px; }
+.r-person { grid-template-columns: minmax(130px, 1.3fr) 60px 60px 60px 90px minmax(70px, 1fr); }
+.r-work { grid-template-columns: 110px 130px 220px minmax(0, 1fr) 80px; }
+.r-thread { grid-template-columns: minmax(140px, 1.1fr) 140px minmax(0, 1.6fr) 110px 60px; }
+.r-check { grid-template-columns: minmax(150px, 1fr) 110px minmax(0, 2fr); }
+.r-need { grid-template-columns: 64px minmax(0, 1fr) auto; }
+.r-run { grid-template-columns: 170px minmax(0, 1fr) 110px; }
+@media (max-width: 900px) {
+  .r-all, .r-person, .r-work, .r-thread, .r-check, .r-run { grid-template-columns: minmax(0, 1fr) auto; }
+  .r-all > :nth-child(n+3), .r-person > :nth-child(n+3), .r-work > :nth-child(n+3), .r-thread > :nth-child(n+3), .r-check > :nth-child(n+3), .r-run > :nth-child(n+3) { grid-column: 1 / -1; text-align: left; }
+  .ag-r--h { display: none; }
+}
+
+/* the agent header */
+.ag-head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--gw-space-16); align-items: start; padding: var(--gw-space-20); border-radius: var(--gw-radius-16); background: var(--s-card-bg); box-shadow: inset 0 0 0 1px var(--s-card-border); }
+.ag-head__t { display: flex; align-items: center; gap: var(--gw-space-8); flex-wrap: wrap; }
+.ag-head h2 { margin: 0; font: 600 24px/1.2 var(--gw-font-display); color: var(--s-heading); }
+.ag-head p { margin: var(--gw-space-8) 0 0; font: var(--gw-text-body-14-reg); color: var(--s-body); max-width: 72ch; }
+.ag-head__r { display: flex; gap: var(--gw-space-8); flex-wrap: wrap; justify-content: flex-end; }
+@media (max-width: 760px) { .ag-head { grid-template-columns: auto minmax(0, 1fr); } .ag-head__r { grid-column: 1 / -1; justify-content: flex-start; } }
+.ag-bars { display: flex; align-items: flex-end; gap: 3px; height: 72px; padding: var(--gw-space-8) var(--gw-space-8) 0; }
+.ag-bars i { flex: 1; min-width: 3px; border-radius: 2px 2px 0 0; background: var(--gw-color-primary-500); min-height: 2px; }
+.ag-bars i.zero { background: var(--s-nav-sel); }
+.ag-axis { display: flex; justify-content: space-between; padding: 0 var(--gw-space-8); font: var(--gw-text-body-12-reg); color: var(--s-body); }
+
+/* about */
+.ag-about { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gw-space-24) var(--gw-space-32); padding: var(--gw-space-8); }
+@media (max-width: 800px) { .ag-about { grid-template-columns: minmax(0, 1fr); } }
+.ag-about h3 { margin: 0 0 var(--gw-space-8); font: 600 12px/1.3 var(--gw-font-body); letter-spacing: .04em; text-transform: uppercase; color: var(--s-group-label, var(--s-body)); }
+.ag-ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--gw-space-8); }
+.ag-ul li { position: relative; padding-left: var(--gw-space-16); font: var(--gw-text-body-14-reg); color: var(--s-heading); }
+.ag-ul li::before { content: ""; position: absolute; left: 0; top: 8px; width: 6px; height: 6px; border-radius: var(--gw-radius-4); background: var(--gw-color-primary-500); }
+.ag-ul--never li::before { background: var(--s-body); }
+.ag-dl { display: flex; flex-direction: column; }
+.ag-d { display: flex; justify-content: space-between; gap: var(--gw-space-16); padding: var(--gw-space-8) 0; box-shadow: inset 0 -1px 0 var(--s-card-border); font: var(--gw-text-body-13-reg, 400 13px/1.5 var(--gw-font-body)); }
+.ag-d:last-child { box-shadow: none; }
+.ag-d span { color: var(--s-body); flex: none; }
+.ag-d b { font-weight: 500; color: var(--s-heading); text-align: right; overflow-wrap: anywhere; }
+.ag-d b a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.ag-mem { padding: var(--gw-space-12) var(--gw-space-16); border-radius: var(--gw-radius-12); background: var(--s-nav-sel); margin-top: var(--gw-space-12); }
+.ag-mem .ag-ul li { font-size: 13px; color: var(--s-body); } .ag-mem .ag-ul li strong { color: var(--s-heading); font-weight: 600; }
+.ag-warn { margin: var(--gw-space-8) 0 0; padding: var(--gw-space-12) var(--gw-space-16); border-radius: var(--gw-radius-12); background: var(--gw-color-yellow-alpha-10); font: 400 13px/1.5 var(--gw-font-body); color: var(--s-heading); }
+.ag-how { padding: 0 var(--gw-space-8); }
+.ag-how summary { cursor: pointer; font: var(--gw-text-body-14-med); color: var(--s-body); list-style: none; padding: var(--gw-space-4) 0; }
+.ag-how summary::-webkit-details-marker { display: none; }
+.ag-how summary::before { content: "\203A"; display: inline-block; margin-right: var(--gw-space-8); transition: transform var(--gw-motion-fast); }
+.ag-how[open] summary::before { transform: rotate(90deg); }
+.ag-how ul, .ag-how ol { margin: var(--gw-space-8) 0 0; padding-left: var(--gw-space-20); display: grid; gap: var(--gw-space-8); font: var(--gw-text-body-14-reg); color: var(--s-body); }
+.ag-how code { font: inherit; background: var(--s-nav-sel); padding: 0 var(--gw-space-4); border-radius: var(--gw-radius-4); }
+.ag-how b { color: var(--s-heading); font-weight: 500; }
+</style>
+</head>
+<body data-gw-page="agents">
+
+<div class="sg">
+
+  <header class="sg__hd">
+    <h1>Agents</h1>
+    <p>The agents that run the design hub: what each is up to, how much it uses, how healthy it is and what is on its plate. Recorded in git, so a change is a pull request</p>
+  </header>
+
+  <main class="sg__main">
+    <div class="ag-bar">
+      <div class="ag-tabs" id="ag-tabs" role="tablist" aria-label="Agents"></div>
+    </div>
+    <div id="ag-state"></div>
+    <div id="ag-app" hidden>
+      <div class="ag-ctrl">
+        <div class="ag-pills" role="tablist" aria-label="Period"><button type="button" class="ag-pill" role="tab" data-p="7" aria-selected="true">7 days</button><button type="button" class="ag-pill" role="tab" data-p="30" aria-selected="false">30 days</button></div>
+        <button class="gw-iconbtn" id="ag-refresh" type="button" aria-label="Refresh" data-tip="Refresh" data-tip-end><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z"/></svg></button>
+      </div>
+      <div id="ag-panel" role="tabpanel" tabindex="-1"></div>
+    </div>
+  </main>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+  function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
+  function clip(t, n) { t = String(t || ''); return t.length > n ? t.slice(0, n - 1) + '…' : t; }
+  var DAY = 86400000;
+  function ago(ms) { var s = Math.max(0, Math.round(ms / 1000)); if (s < 60) return s + 's ago'; var m = Math.round(s / 60); if (m < 60) return m + ' min ago'; var h = Math.round(m / 60); if (h < 48) return h + ' h ago'; return Math.round(h / 24) + ' days ago'; }
+  function when(d) { return d.toLocaleString(undefined, { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }); }
+  function tok(n) { return n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1e3 ? Math.round(n / 1e3) + 'k' : String(Math.round(n)); }
+  function pct(n, d) { return d ? Math.round(n / d * 100) + '%' : '—'; }
+  var TOPIC = { 'pass-on': 'Pass on to Utsav', status: 'Status check', access: 'Access', brand: 'Brand files', build: 'Build a page', template: 'Templates and tools', hub: 'Hub and system', about: 'About Bruce', other: 'No clear lane' };
+  var S = { data: null, health: null, healthErr: '', bruce: null, bruceErr: '', alfred: null, alfredErr: '', period: '7', tab: 'all', at: 0, busy: false };
+
+  /* ---------- who and what ---------- */
+  function agent(id) { return S.data.agents.filter(function (a) { return a.id === id; })[0]; }
+  function pic(a, cls) { return '<span class="ag-pic ag-pic--' + esc(a.id) + (cls ? ' ' + cls : '') + '" aria-hidden="true">' + (a.id === 'bruce' ? '' : esc(a.name.charAt(0))) + '</span>'; }
+  function initial(n) { return esc(String(n || '?').trim().charAt(0).toUpperCase() || '?'); }
+  function badge(status, label) { return '<span class="ag-b ag-b--' + esc(status) + '">' + esc(label || ({ ok: 'Healthy', warn: 'Warning', fail: 'Failing', unknown: 'Not checked' }[status] || status)) + '</span>'; }
+  function days() { return +S.period; }
+  function inWindow(at) { return at.getTime() >= Date.now() - days() * DAY; }
+
+  /* ---------- Bruce: his log, read as the Bruce tab does ---------- */
+  function bruceRows() {
+    return (S.bruce || []).filter(function (r) { return r.kind !== 'sent' && inWindow(r.at); });
+  }
+  function bruceTokens(r, a) { var c = a.cost; return r.kind === 'run' ? c.start + c.run : r.kind === 'chat' ? c.start + c.chat : 0; }
+
+  /* ---------- Doc: scheduled runs, Monday and Thursday at 04:00 UTC ---------- */
+  function docRuns(from, to) {
+    var out = [], d = new Date(from); d.setUTCHours(4, 0, 0, 0);
+    for (var t = d.getTime(); t <= to; t += DAY) { var w = new Date(t).getUTCDay(); if ((w === 1 || w === 4) && t >= from && t <= to) out.push(t); }
+    return out;
+  }
+  function docNext() { var t = new Date(); t.setUTCHours(4, 0, 0, 0); for (var i = 0; i < 9; i++) { var w = t.getUTCDay(); if ((w === 1 || w === 4) && t.getTime() > Date.now()) return t.getTime(); t = new Date(t.getTime() + DAY); } return 0; }
+  function alfredNext() { var t = new Date(); t.setUTCHours(15, 30, 0, 0); if (t.getTime() <= Date.now()) t = new Date(t.getTime() + DAY); return t.getTime(); }
+
+  /* ---------- health: the checks that matter to each agent ---------- */
+  var HEALTH_IDS = { bruce: ['bruce', 'slack', 'anthropic'], alfred: ['trigger', 'github', 'bypass'], doc: null };
+  function healthOf(id) {
+    var checks = S.health && S.health.checks; if (!checks) return { status: 'unknown', rows: [] };
+    var ids = HEALTH_IDS[id], rows = ids ? checks.filter(function (c) { return ids.indexOf(c.id) !== -1; }) : checks;
+    var rank = { ok: 0, unknown: 1, warn: 2, fail: 3 }, worst = 'ok';
+    rows.forEach(function (c) { if ((rank[c.status] || 0) > rank[worst]) worst = c.status; });
+    return { status: rows.length ? worst : 'unknown', rows: rows };
+  }
+
+  /* ---------- one summary per agent, which both the overview and the tabs read ---------- */
+  function summary(id) {
+    var a = agent(id), h = healthOf(id), out = { a: a, health: h, sessions: 0, tokens: 0, last: 0, doing: '', needs: [], known: true };
+    if (id === 'bruce') {
+      var rows = bruceRows();
+      if (!S.bruce) { out.known = false; out.doing = S.bruceErr || 'Reading his log'; return out; }
+      out.sessions = rows.filter(function (r) { return r.kind === 'run' || r.kind === 'chat'; }).length;
+      out.tokens = rows.reduce(function (n, r) { return n + bruceTokens(r, a); }, 0);
+      var all = (S.bruce || []).filter(function (r) { return r.kind !== 'sent'; }); out.last = all.length ? Math.max.apply(null, all.map(function (r) { return r.at.getTime(); })) : 0;
+      var latest = all.slice().sort(function (x, y) { return y.at - x.at; })[0];
+      out.doing = latest ? esc(latest.name) + ' asked ' + ago(Date.now() - latest.at.getTime()) + ': “' + esc(clip(latest.text, 70)) + '”' : 'Nobody has asked yet';
+      var gaps = rows.filter(function (r) { return r.topic === 'other' || r.kind === 'failed' || r.kind === 'capped'; });
+      if (gaps.length) out.needs.push({ icon: 'gap', text: plural(gaps.length, 'ask') + ' Bruce had no lane for, or that failed or hit a cap', href: '/admin/analytics#bruce', tab: 'bruce' });
+    } else if (id === 'alfred') {
+      var al = S.alfred;
+      if (!al) { out.known = false; out.doing = S.alfredErr || 'Reading his threads'; return out; }
+      var ar = alfredRunsIn(days()); out.sessions = ar; out.tokens = ar * a.cost.run; out.last = al.lastRunAt ? Date.parse(al.lastRunAt) : 0;
+      var c = al.counts; out.doing = (c.ready + c.stuck + c.queued) ? c.ready + ' ready to look at, ' + c.stuck + ' stuck, ' + c.queued + ' queued' : 'Nothing on his plate';
+      al.threads.filter(function (t) { return t.state === 'stuck'; }).forEach(function (t) { out.needs.push({ icon: 'stuck', text: t.scope + '/' + t.key + ' is stuck and needs an answer', href: t.url, tab: 'alfred' }); });
+      if (c.ready) out.needs.push({ icon: 'ready', text: plural(c.ready, 'item') + ' he has finished, ready to look at', href: '/internal/design-system#review', tab: 'alfred' });
+    } else if (id === 'doc') {
+      var runs = docRuns(Date.now() - days() * DAY, Date.now()), snap = S.health && S.health.snapshotAt ? Date.parse(S.health.snapshotAt) : 0;
+      out.sessions = runs.length; out.tokens = runs.length * a.cost.run; out.last = snap;
+      var cc = S.health && S.health.counts; out.doing = !S.health ? (S.healthErr || 'Reading the checks') : (cc.fail || cc.warn ? (cc.fail || 0) + ' failing, ' + (cc.warn || 0) + ' warnings' : 'Every check is healthy') + (snap ? '; last report ' + ago(Date.now() - snap) : '');
+      h.rows.filter(function (x) { return x.status === 'fail' || x.status === 'warn'; }).forEach(function (x) { out.needs.push({ icon: x.status, text: x.name + (x.fix ? ': ' + x.fix : ''), href: '/admin/system-health', tab: 'doc' }); });
+    }
+    return out;
+  }
+
+  /* ---------- the tab row ---------- */
+  function tabs() {
+    var items = [{ id: 'all', label: 'All agents' }].concat(S.data.agents.map(function (a) { return { id: a.id, label: a.name }; }));
+    $('ag-tabs').innerHTML = items.map(function (t) {
+      var dot = t.id === 'all' ? '' : '<i class="' + (S.health ? healthOf(t.id).status : '') + '" aria-hidden="true"></i>';
+      return '<button type="button" class="ag-tab" role="tab" data-tab="' + esc(t.id) + '" aria-selected="' + (t.id === S.tab) + '">' + dot + esc(t.label) + '</button>';
+    }).join('');
+  }
+
+  /* ---------- All agents ---------- */
+  function metric(l, v, n) { return '<div class="ag-m"><span>' + esc(l) + '</span><b>' + esc(v) + '</b><small>' + esc(n) + '</small></div>'; }
+  function renderAll() {
+    var ids = S.data.agents.map(function (a) { return a.id; }), sums = ids.map(summary);
+    var sessions = sums.reduce(function (n, s) { return n + s.sessions; }, 0), tokens = sums.reduce(function (n, s) { return n + s.tokens; }, 0);
+    var needs = sums.reduce(function (l, s) { return l.concat(s.needs); }, []);
+    var live = S.data.agents.filter(function (a) { return a.status === 'live'; }).length;
+    var html = '<div class="ag-ms">' +
+      metric('Agents', live + ' live', S.data.agents.length + ' in the registry, ' + (S.data.agents.filter(function (a) { return a.lead; })[0] || {}).name + ' leads') +
+      metric('Sessions, ' + S.period + ' days', String(sessions), 'Bruce runs and chats, Alfred runs, Doc scheduled runs') +
+      metric('Tokens, ' + S.period + ' days', '≈ ' + tok(tokens), 'estimated, see how below') +
+      metric('Needs you', String(needs.length), needs.length ? 'open items across the agents' : 'nothing is waiting on you') + '</div>';
+    html += '<section class="ag-box" aria-labelledby="ag-h-all"><div class="ag-box__h"><h2 id="ag-h-all">Agents</h2><small>what each is up to, newest activity first</small></div>' +
+      '<div class="ag-r ag-r--h r-all"><span>Agent</span><span>Up to now</span><span>Health</span><span class="ag-c--num">Sessions</span><span>Tokens (est.)</span><span>Last active</span></div>' +
+      sums.slice().sort(function (x, y) { return y.last - x.last; }).map(function (s) {
+        return '<button type="button" class="ag-r r-all" data-tab="' + esc(s.a.id) + '"><span class="ag-who">' + pic(s.a) + '<span><b>' + esc(s.a.name) + '</b><small>' + esc(s.a.role) + '</small></span></span>' +
+          '<span class="ag-c ag-c--wrap">' + (s.known ? s.doing : esc(s.doing)) + '</span><span>' + badge(s.health.status) + '</span><span class="ag-c ag-c--num">' + (s.known ? s.sessions : '—') + '</span>' +
+          '<span class="ag-c">' + (s.known ? '≈ ' + tok(s.tokens) + ' <span class="ag-share" style="display:block;margin-top:4px"><i style="width:' + (tokens ? Math.round(s.tokens / tokens * 100) : 0) + '%"></i></span>' : '—') + '</span>' +
+          '<span class="ag-c">' + (s.last ? esc(ago(Date.now() - s.last)) : '—') + '</span></button>';
+      }).join('') + '</section>';
+    html += '<section class="ag-box" aria-labelledby="ag-h-need"><div class="ag-box__h"><h2 id="ag-h-need">Needs you</h2><small>' + (needs.length ? plural(needs.length, 'thing') : 'all clear') + '</small></div>' +
+      (needs.length ? needs.map(function (n) {
+        return '<a class="ag-r r-need" href="' + esc(n.href) + '"' + (/^https?:/.test(n.href) ? ' target="_blank" rel="noopener noreferrer"' : '') + '><span class="ag-tag' + (n.icon === 'stuck' || n.icon === 'fail' ? ' ag-tag--gap' : '') + '">' + esc({ gap: 'Gap', stuck: 'Stuck', ready: 'Ready', fail: 'Fail', warn: 'Warn' }[n.icon] || '') + '</span><span class="ag-c ag-c--wrap">' + esc(n.text) + '</span><span class="ag-c">' + esc((agent(n.tab) || {}).name || '') + '</span></a>';
+      }).join('') : '<p class="ag-empty">Nothing is waiting on you.</p>') + '</section>';
+    html += '<details class="ag-how"><summary>How the token figures are estimated</summary><ul>' +
+      S.data.agents.map(function (a) { return '<li><b>' + esc(a.name) + '.</b> ' + esc(a.cost.basis) + '</li>'; }).join('') +
+      '<li><b>Not a bill.</b> Nothing reports real token counts to the hub, and your plan shows a percentage of a limit it does not publish in tokens, so a share of the weekly limit cannot be worked out. Use these to compare agents and weeks. The numbers behind them are in each agent’s <code>agent.json</code>.</li></ul></details>' +
+      '<details class="ag-how"><summary>Adding an agent</summary><ol>' +
+      '<li>Create the routine in claude.ai, with its trigger and the fewest tools it needs.</li>' +
+      '<li>Add <code>agents/&lt;id&gt;/agent.json</code> (who it is, how it is reached, what it does and never does, its <code>cost</code>) and <code>memory.md</code>.</li>' +
+      '<li>List it in <code>agents/registry.json</code>, with a routing line if the lead should hand work to it.</li>' +
+      '<li>Run <code>node scripts/agents-build.mjs</code> and <code>node scripts/agents.test.mjs</code>, then open the pull request.</li>' +
+      '<li>Keep secrets out: the repo is public. A trigger’s address and token stay in the site’s environment.</li></ol></details>';
+    return html;
+  }
+
+  /* ---------- one agent ---------- */
+  function row(k, v) { return '<div class="ag-d"><span>' + esc(k) + '</span><b>' + v + '</b></div>'; }
+  function list(items, cls) { return '<ul class="ag-ul' + (cls ? ' ' + cls : '') + '">' + items.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>'; }
+  function mdList(t) {
+    var items = String(t || '').split('\n').filter(function (l) { return /^- /.test(l); }).map(function (l) { return '<li>' + esc(l.slice(2)).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/`([^`]+)`/g, '$1') + '</li>'; });
+    return items.length ? '<ul class="ag-ul">' + items.join('') + '</ul>' : '<p class="ag-empty">Nothing written down yet.</p>';
+  }
+  function box(title, small, body, link) { return '<section class="ag-box"><div class="ag-box__h"><h2>' + esc(title) + '</h2>' + (link ? link : '<small>' + esc(small || '') + '</small>') + '</div>' + body + '</section>'; }
+  function healthBox(id) {
+    var h = healthOf(id);
+    if (!S.health) return box('Health', '', '<p class="ag-empty">' + esc(S.healthErr || 'Reading the checks') + '</p>');
+    var counts = { ok: 0, warn: 0, fail: 0, unknown: 0 }; h.rows.forEach(function (c) { counts[c.status] = (counts[c.status] || 0) + 1; });
+    return box('Health', counts.ok + ' ok, ' + counts.warn + ' warn, ' + counts.fail + ' fail' + (id === 'doc' && S.health.snapshotAt ? ' · last report ' + ago(Date.now() - Date.parse(S.health.snapshotAt)) : ''),
+      h.rows.length ? '<div class="ag-r ag-r--h r-check"><span>Check</span><span>Status</span><span>Detail</span></div>' + h.rows.map(function (c) {
+        return '<div class="ag-r r-check"><span class="ag-c"><strong>' + esc(c.name) + '</strong></span><span>' + badge(c.status, { ok: 'ok', warn: 'warn', fail: 'fail', unknown: 'unknown' }[c.status]) + '</span><span class="ag-c ag-c--wrap">' + esc(c.detail || '') + (c.fix ? ' <strong>To do: ' + esc(c.fix) + '</strong>' : '') + '</span></div>';
+      }).join('') : '<p class="ag-empty">No checks cover this agent yet.</p>',
+      id === 'doc' ? '<a href="/admin/system-health">Open system health</a>' : '');
+  }
+  function about(a) {
+    var d = S.data, route = (d.routing || []).filter(function (r) { return r.agent === a.id; })[0];
+    return '<section class="ag-box"><div class="ag-box__h"><h2>About ' + esc(a.name) + '</h2><small>recorded in git, in agents/' + esc(a.id) + '</small></div><div class="ag-about">' +
+      '<div><h3>Details</h3><div class="ag-dl">' + row('Role', esc(a.role)) + row('Owner', esc(a.owner)) + row('Model', esc(a.routine.model)) + row('Tools', esc(a.routine.tools.join(', '))) +
+        row('Routine', '<a href="' + esc(a.routine.url) + '" target="_blank" rel="noopener noreferrer">Open in claude.ai</a>') + '</div></div>' +
+      '<div><h3>Reached by</h3>' + list(a.reachedBy) + '<h3 style="margin-top:16px">Runs</h3>' + list(a.schedule) + '</div>' +
+      '<div><h3>Does</h3>' + list(a.does) + '</div><div><h3>Never</h3>' + list(a.never, 'ag-ul--never') + '</div>' +
+      '<div><h3>Limits</h3>' + list(a.limits) + (route ? '<h3 style="margin-top:16px">Handed work by the lead</h3><div class="ag-dl">' + row('Status', esc(route.status)) + row('When', esc(route.when)) + '</div>' : '') + '</div>' +
+      '<div><h3>Memory</h3><div class="ag-dl">' + row('Durable', '<a href="https://github.com/gushwork-design/design-system/blob/main/' + esc(a.memory.durable) + '" target="_blank" rel="noopener noreferrer">' + esc(a.memory.durable) + '</a>') + row('Per person', esc(a.memory.perPerson)) + row('Log', esc(a.memory.log)) + '</div><div class="ag-mem">' + mdList(a.memoryText) + '</div>' +
+        '<h3 style="margin-top:16px">Prompt</h3><div class="ag-dl">' + row('Lives in', esc(a.prompt.where)) + row('In git', a.prompt.inGit ? 'Yes' : 'Not yet') + '</div><p class="ag-warn">' + esc(a.prompt.why) + '</p></div>' +
+      '</div></section>';
+  }
+  function head(a, s) {
+    return '<section class="ag-head">' + pic(a, 'ag-pic--lg') + '<div><div class="ag-head__t"><h2>' + esc(a.name) + '</h2>' + (a.lead ? '<span class="ag-tag ag-tag--lead">Lead</span>' : '') + '<span class="ag-tag">' + esc(a.role) + '</span>' + badge(s.health.status) + '</div><p>' + esc(a.summary) + '</p></div>' +
+      '<div class="ag-head__r">' + (a.links || []).map(function (l) { return '<a class="ag-btn" href="' + esc(l.href) + '"' + (/^https?:/.test(l.href) ? ' target="_blank" rel="noopener noreferrer"' : '') + '>' + esc(l.label) + '</a>'; }).join('') + '</div></section>';
+  }
+
+  function renderBruce() {
+    var a = agent('bruce'), s = summary('bruce'), rows = bruceRows(), html = head(a, s);
+    if (!S.bruce) return html + box('Usage', '', '<p class="ag-empty">' + esc(S.bruceErr || 'Reading his log') + '</p>') + healthBox('bruce') + about(a);
+    var users = {}; rows.forEach(function (r) { var u = users[r.user] || (users[r.user] = { name: r.name, asks: 0, runs: 0, chats: 0, tokens: 0, last: 0 }); u.asks++; if (r.kind === 'run') u.runs++; if (r.kind === 'chat') u.chats++; u.tokens += bruceTokens(r, a); u.last = Math.max(u.last, r.at.getTime()); });
+    var people = Object.keys(users).map(function (k) { return users[k]; }).sort(function (x, y) { return y.tokens - x.tokens; });
+    var today = rows.filter(function (r) { return r.at.toISOString().slice(0, 10) === new Date().toISOString().slice(0, 10); }).length;
+    html += '<div class="ag-ms">' + metric('Last asked', s.last ? ago(Date.now() - s.last) : '—', 'asks today: ' + today) + metric('Sessions, ' + S.period + ' days', String(s.sessions), rows.filter(function (r) { return r.kind === 'run'; }).length + ' runs, ' + rows.filter(function (r) { return r.kind === 'chat'; }).length + ' chats') +
+      metric('Tokens, ' + S.period + ' days', '≈ ' + tok(s.tokens), 'estimated; about ' + tok(a.cost.start) + ' to start every DM') + metric('People', String(people.length), 'talked to him in ' + S.period + ' days') + '</div>';
+    var total = people.reduce(function (n, p) { return n + p.tokens; }, 0);
+    html += box('Usage by person', 'tokens are estimates', people.length ? '<div class="ag-r ag-r--h r-person"><span>Person</span><span class="ag-c--num">Asks</span><span class="ag-c--num">Runs</span><span class="ag-c--num">Chats</span><span>Tokens (est.)</span><span>Share</span></div>' + people.map(function (p) {
+      return '<div class="ag-r r-person"><span class="ag-who"><span class="ag-pic ag-pic--sm" aria-hidden="true">' + initial(p.name) + '</span><span><b>' + esc(p.name) + '</b><small>' + esc(ago(Date.now() - p.last)) + '</small></span></span><span class="ag-c ag-c--num">' + p.asks + '</span><span class="ag-c ag-c--num">' + p.runs + '</span><span class="ag-c ag-c--num">' + p.chats + '</span><span class="ag-c">≈ ' + tok(p.tokens) + '</span><span class="ag-share"><i style="width:' + (total ? Math.round(p.tokens / total * 100) : 0) + '%"></i></span></div>';
+    }).join('') + '<p class="ag-foot">' + esc(a.limits.join('. ')) + '. ' + esc(a.cost.basis) + '</p>' : '<p class="ag-empty">Nobody has asked in this period.</p>');
+    html += healthBox('bruce');
+    var recent = rows.slice().sort(function (x, y) { return y.at - x.at; }).slice(0, 8);
+    html += box('Recent work', 'newest first', recent.length ? '<div class="ag-r ag-r--h r-work"><span>When</span><span>Person</span><span>Kind</span><span>Ask</span><span class="ag-c--num">Tokens (est.)</span></div>' + recent.map(function (r) {
+      return '<div class="ag-r r-work"><span class="ag-c">' + esc(when(r.at)) + '</span><span class="ag-c"><strong>' + esc(r.name) + '</strong></span><span><span class="ag-tag' + (r.topic === 'other' || r.kind === 'failed' || r.kind === 'capped' ? ' ag-tag--gap' : '') + '">' + esc(r.kind === 'run' || r.kind === 'chat' ? (r.kind === 'run' ? 'Run' : 'Chat') + ' · ' + (TOPIC[r.topic] || r.topic) : r.kind) + '</span></span><span class="ag-c">' + (r.thread ? '↳ ' : '') + esc(clip(r.text, 120)) + '</span><span class="ag-c ag-c--num">' + (bruceTokens(r, a) ? '≈ ' + tok(bruceTokens(r, a)) : '—') + '</span></div>';
+    }).join('') : '<p class="ag-empty">Nothing in this period.</p>', '<a href="/admin/analytics#bruce">Open all conversations</a>');
+    return html + about(a);
+  }
+
+  function renderAlfred() {
+    var a = agent('alfred'), s = summary('alfred'), al = S.alfred, html = head(a, s);
+    if (!al) return html + box('Usage', '', '<p class="ag-empty">' + esc(S.alfredErr || 'Reading his threads') + '</p>') + healthBox('alfred') + about(a);
+    var c = al.counts, bars = [], d0 = new Date(); d0.setUTCHours(0, 0, 0, 0); var n = days(), mx = 1;
+    for (var i = n - 1; i >= 0; i--) { var k = new Date(d0.getTime() - i * DAY).toISOString().slice(0, 10), v = (al.byDay && al.byDay[k]) || 0; bars.push({ k: k, v: v }); mx = Math.max(mx, v); }
+    html += '<div class="ag-ms">' + metric('Ready to look at', String(c.ready), 'finished, waiting for you') + metric('Stuck', String(c.stuck), 'needs an answer from you') + metric('Queued', String(c.queued), 'sent back, not answered yet') +
+      metric('Next sweep', new Date(alfredNext()).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }), 'every day at 9pm IST; last run ' + (al.lastRunAt ? ago(Date.now() - Date.parse(al.lastRunAt)) : 'not seen')) + '</div>';
+    var ar = alfredRunsIn(n);
+    html += box('Usage', plural(ar, 'run') + ' in ' + S.period + ' days · ≈ ' + tok(ar * a.cost.run) + ' tokens (estimated)',
+      '<div class="ag-bars" role="img" aria-label="Alfred runs per day">' + bars.map(function (b) { return '<i class="' + (b.v ? '' : 'zero') + '" style="height:' + Math.max(3, Math.round(b.v / mx * 100)) + '%" title="' + esc(b.k + ': ' + plural(b.v, 'run')) + '"></i>'; }).join('') + '</div><div class="ag-axis"><span>' + esc(bars[0].k.slice(5)) + '</span><span>today</span></div><p class="ag-foot">' + esc(a.cost.basis) + '</p>');
+    html += healthBox('alfred');
+    html += box('Tasks', plural(al.threads.length, 'item') + ' in the last ' + (al.days || 30) + ' days', al.threads.length ? '<div class="ag-r ag-r--h r-thread"><span>Item</span><span>State</span><span>Last note</span><span>Last activity</span><span class="ag-c--num">Runs</span></div>' + al.threads.map(function (t) {
+      return '<a class="ag-r r-thread" href="' + esc(t.url) + '" target="_blank" rel="noopener noreferrer"><span class="ag-c"><strong>' + esc(t.scope + '/' + t.key) + '</strong></span><span>' + badge(t.state === 'ready' ? 'ok' : t.state === 'stuck' ? 'fail' : 'unknown', { ready: 'Ready to look at', stuck: 'Stuck', queued: 'Queued' }[t.state]) + '</span><span class="ag-c">' + esc(t.note || '—') + '</span><span class="ag-c">' + (t.lastAt ? esc(ago(Date.now() - Date.parse(t.lastAt))) : '—') + '</span><span class="ag-c ag-c--num">' + t.runs + '</span></a>';
+    }).join('') : '<p class="ag-empty">No rework threads in this period.</p>', '<a href="/internal/design-system#review">Open Design System review</a>');
+    return html + about(a);
+  }
+
+  function renderDoc() {
+    var a = agent('doc'), s = summary('doc'), html = head(a, s), snap = S.health && S.health.snapshotAt ? Date.parse(S.health.snapshotAt) : 0, c = (S.health && S.health.counts) || null;
+    var runs = docRuns(Date.now() - days() * DAY, Date.now()).reverse(), next = docNext();
+    html += '<div class="ag-ms">' + metric('Checks', c ? (c.ok || 0) + ' ok' : '—', c ? (c.warn || 0) + ' warn, ' + (c.fail || 0) + ' fail' : (S.healthErr || 'reading')) + metric('Last report', snap ? ago(Date.now() - snap) : 'none yet', snap ? when(new Date(snap)) : 'the routine has not reported') +
+      metric('Next run', next ? new Date(next).toLocaleDateString(undefined, { weekday: 'short' }) + ' ' + new Date(next).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }) : '—', 'Monday and Thursday, 09:30 IST') + metric('Tokens, ' + S.period + ' days', '≈ ' + tok(s.tokens), plural(runs.length, 'scheduled run') + ', estimated') + '</div>';
+    html += box('Usage', plural(runs.length, 'scheduled run') + ' in ' + S.period + ' days · ≈ ' + tok(s.tokens) + ' tokens (estimated)',
+      (runs.length ? runs.map(function (t) { var past = t <= Date.now(); return '<div class="ag-r r-run"><span class="ag-c"><strong>' + esc(new Date(t).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' })) + '</strong> 09:30 IST</span><span class="ag-c">Scheduled run</span><span class="ag-c ag-c--num">≈ ' + tok(a.cost.run) + '</span></div>'; }).join('') : '<p class="ag-empty">No scheduled runs in this period.</p>') +
+      '<p class="ag-foot">These are the scheduled times, not confirmed runs: the hub only sees his latest report. ' + esc(a.cost.basis) + '</p>');
+    html += healthBox('doc');
+    var todo = s.needs;
+    html += box('Tasks', todo.length ? plural(todo.length, 'finding') + ' to do' : 'nothing to do', todo.length ? todo.map(function (n) { return '<a class="ag-r r-need" href="' + esc(n.href) + '"><span class="ag-tag ag-tag--gap">' + esc(n.icon === 'fail' ? 'Fail' : 'Warn') + '</span><span class="ag-c ag-c--wrap">' + esc(n.text) + '</span><span></span></a>'; }).join('') : '<p class="ag-empty">' + (S.health ? 'Every check is healthy. He reads and reports; he never fixes what he finds.' : esc(S.healthErr || 'Reading the checks')) + '</p>', '<a href="/admin/system-health">Open system health</a>');
+    return html + about(a);
+  }
+
+  function render() {
+    tabs();
+    var html = S.tab === 'bruce' ? renderBruce() : S.tab === 'alfred' ? renderAlfred() : S.tab === 'doc' ? renderDoc() : renderAll();
+    $('ag-panel').innerHTML = html;
+    document.querySelectorAll('.ag-pill').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-p') === S.period)); });
+    tip();
+  }
+  /* "Updated 2 min ago" lives in the refresh button's tooltip, as on the other pages. */
+  function tip() { $('ag-refresh').setAttribute('data-tip', S.at ? 'Updated ' + ago(Date.now() - S.at) + ' \u00b7 click to refresh' : 'Refresh'); }
+  function setTab(id, push) {
+    if (id !== 'all' && !agent(id)) id = 'all';
+    S.tab = id; render();
+    if (push) { try { history.replaceState(null, '', '#' + id); } catch (e) { location.hash = id; } }
+  }
+
+  /* ---------- loading: each source on its own, so one failing leaves the rest ---------- */
+  function loadBruce() {
+    return fetch('/api/bruce-memory?log=1', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) {
+      if (r.status === 401 || r.status === 403) { S.bruceErr = 'Owners only'; return null; } if (!r.ok) throw new Error('http'); return r.json();
+    }).then(function (j) {
+      if (!j) return; if (!j.configured) { S.bruceErr = 'No store connected, so nothing is logged'; return; }
+      S.bruce = (j.rows || []).map(function (r) { var d = new Date(r.at); return isNaN(d.getTime()) ? null : { at: d, user: String(r.user || ''), name: String(r.name || r.user || ''), kind: String(r.kind || 'run'), thread: !!r.thread, text: String(r.text || ''), topic: r.topic || (r.kind === 'sent' ? '' : 'other') }; }).filter(Boolean);
+    }).catch(function () { S.bruceErr = 'Could not read his log'; });
+  }
+  function loadHealth() {
+    return fetch('/api/health', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error('http'); return r.json(); }).then(function (j) { S.health = j && j.checks ? j : null; if (!S.health) S.healthErr = 'The checks returned nothing'; }).catch(function () { S.healthErr = 'Could not run the checks'; });
+  }
+  function loadAlfred() {
+    return fetch('/api/agents?days=30', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.json(); }).then(function (j) {
+      if (!j || !j.configured) { S.alfredErr = 'The site has no GitHub token, so his threads cannot be read'; return; }
+      S.alfred = j.alfred; S.alfred.days = j.days;
+    }).catch(function () { S.alfredErr = 'Could not read his threads'; });
+  }
+  function loadAll() {
+    if (S.busy) return; S.busy = true; $('ag-refresh').setAttribute('aria-busy', 'true');
+    var done = function () { S.at = Date.now(); S.busy = false; $('ag-refresh').removeAttribute('aria-busy'); render(); };
+    return Promise.all([loadBruce().then(render), loadHealth().then(render), loadAlfred().then(render)]).then(done, done);
+  }
+
+  /* Alfred's byDay always covers 30 days; the period only decides how many of them are drawn and counted. */
+  function alfredRunsIn(n) { if (!S.alfred) return 0; var from = Date.now() - n * DAY, t = 0; Object.keys(S.alfred.byDay || {}).forEach(function (k) { if (Date.parse(k + 'T12:00:00Z') >= from) t += S.alfred.byDay[k]; }); return t; }
+
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest && e.target.closest('[data-tab]'); if (t) { setTab(t.getAttribute('data-tab'), true); window.scrollTo({ top: 0 }); return; }
+    var p = e.target.closest && e.target.closest('.ag-pill'); if (p) { S.period = p.getAttribute('data-p'); render(); }
+  });
+  $('ag-tabs').addEventListener('keydown', function (ev) {
+    var ids = [].slice.call(document.querySelectorAll('.ag-tab')).map(function (b) { return b.getAttribute('data-tab'); }), i = ids.indexOf(S.tab);
+    if (ev.key === 'ArrowRight' || ev.key === 'ArrowLeft') { ev.preventDefault(); var n = ids[(i + (ev.key === 'ArrowRight' ? 1 : ids.length - 1)) % ids.length]; setTab(n, true); var b = document.querySelector('.ag-tab[data-tab="' + n + '"]'); if (b) b.focus(); }
+  });
+  $('ag-refresh').addEventListener('click', loadAll);
+  window.addEventListener('hashchange', function () { if (S.data) setTab(location.hash.slice(1) || 'all', false); });
+  setInterval(tip, 15000);
+
+  fetch('/admin/agents-data.json', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.json(); }).then(function (data) {
+    S.data = data; var want = location.hash.slice(1); S.tab = want && (want === 'all' || agent(want)) ? want : 'all';
+    $('ag-app').hidden = false; render(); loadAll();
+  }).catch(function () { $('ag-state').innerHTML = '<div class="ag-note"><b>Could not load the agents</b>Try again in a moment.</div>'; });
+})();
+</script>
+</body></html>

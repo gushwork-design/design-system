@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "lead": "bruce",
+  "agents": [
+    "bruce",
+    "alfred",
+    "doc"
+  ],
+  "routing": [
+    {
+      "agent": "alfred",
+      "status": "live",
+      "when": "A reply in the thread of one of his pings, or an item sent back for rework in Design System review",
+      "via": "web/api/_concierge.js (replyToAlfred) and web/api/_review.js (fireRework)"
+    },
+    {
+      "agent": "doc",
+      "status": "planned",
+      "when": "Someone asks whether the hub is healthy",
+      "via": "Not wired yet. Today Doc runs on a schedule and when the health page is opened."
+    }
+  ],
+  "paused": [
+    {
+      "name": "Design hub nightly: missing drawings and report",
+      "routine": "trig_01LHtRu44ofgr3DQTiMuV9bB",
+      "note": "Switched off. Not an agent."
+    }
+  ]
+}

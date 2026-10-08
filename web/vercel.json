@@ -231,6 +231,10 @@
       "destination": "/api/gw?action=bruce-chat"
     },
     {
+      "source": "/api/agents",
+      "destination": "/api/gw?action=agents"
+    },
+    {
       "source": "/api/approvals",
       "destination": "/api/gw?action=approvals"
     },

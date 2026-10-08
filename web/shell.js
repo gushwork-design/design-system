@@ -162,14 +162,15 @@
 
   /* NEW in 796:11251 — the owner tier gets its own section under Admin.
      "Review Gate" is the existing /admin/review-sheet renamed, ruled 29 Sep 2026.
-     "Usage Logs" is /admin/usage-log — added now that the page exists. The drawing's
+     "Usage Logs" is /admin/usage-log — added now that the page exists. "Agents" (8 Oct 2026) replaces
+     "System health", which is now Doc's page, reached from Agents. The drawing's
      glyph was not read; `list` is a stand-in from the icons this rail already carries. */
   var OWNER_GROUP = {
     label: 'Owner',
     tier: 'admin',
     items: [
       { label: 'Analytics',    href: '/admin/analytics',    icon: 'chart-line-up' },
-      { label: 'System health', href: '/admin/system-health', icon: 'heartbeat' }
+      { label: 'Agents',       href: '/admin/agents',       icon: 'users' }
     ]
   };
 
@@ -258,11 +259,13 @@
     if (p.length > 1) p = p.replace(/\/+$/, '');
     return p || '/';
   }
-  function isCurrent(href) { return normalise(location.pathname) === normalise(href); }
+  /* System health is Doc's page (8 Oct 2026), so it is reached from Agents and lights Agents in the rail. */
+  var CURRENT_ALIAS = { '/admin/system-health': '/admin/agents' };
+  function isCurrent(href) { var p = normalise(location.pathname); return (CURRENT_ALIAS[p] || p) === normalise(href); }
 
   /* The logo chip is brand blue everywhere except the two owner pages (Review Gate, Analytics),
      where it goes black so the bar says you are somewhere only the owner is. Ruled by Utsav, 1 Oct 2026. */
-  var OWNER_PAGE = /^\/admin\/(analytics|system-health)$/.test(normalise(location.pathname));
+  var OWNER_PAGE = /^\/admin\/(analytics|agents|system-health)$/.test(normalise(location.pathname));
 
   /* -- markup ------------------------------------------------------------ */
   function topbarHTML() {

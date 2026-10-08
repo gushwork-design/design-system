@@ -1,0 +1,237 @@
+{
+  "version": 1,
+  "lead": "bruce",
+  "agents": [
+    {
+      "id": "bruce",
+      "name": "Bruce",
+      "role": "Lead, front door",
+      "lead": true,
+      "status": "live",
+      "owner": "Utsav",
+      "summary": "The hub's design agent in Slack and the one person everyone talks to. He hands over brand files, builds pages, answers questions about the system, passes messages to Utsav, and hands work to the agent who owns it. He reports to his creator, Utsav, every day.",
+      "routine": {
+        "id": "trig_01FH24f9onvDx9Sq4XGABByz",
+        "url": "https://claude.ai/code/routines/trig_01FH24f9onvDx9Sq4XGABByz",
+        "model": "claude-sonnet-5-5",
+        "tools": [
+          "Bash",
+          "Read",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep"
+        ]
+      },
+      "reachedBy": [
+        "A Slack DM",
+        "@Bruce in a channel",
+        "Slack's agent pane"
+      ],
+      "schedule": [
+        "A morning note to Utsav every day at 9am IST, from a GitHub Action (no model call)",
+        "A ping to Utsav within 30 minutes of Alfred finishing a fix or getting stuck, from a GitHub Action (no model call)"
+      ],
+      "does": [
+        "Hands over brand files: the logo in any colour and format, the colours, the fonts, the tokens",
+        "Builds a one-pager, landing page, deck or banner on the design system and sends a staging link and a screenshot",
+        "Points to the right template and the prompt to use with it",
+        "Answers questions about the hub, the design system, templates and tools from the repo",
+        "Passes a teammate's message to Utsav as a real DM, and says so only after Slack confirms",
+        "Remembers short notes about each person",
+        "For Utsav: a morning note every day, access notices, system checks, reworks, hub changes, and an honest log of every message he sent"
+      ],
+      "never": [
+        "Merges anyone else's PR, pushes to main, or releases the plugin",
+        "Records a review decision for anyone",
+        "Changes Vercel, Slack or GitHub settings, or touches secrets, or prints a token",
+        "Deletes or renames anything for a teammate",
+        "Sends a message on Utsav's behalf without his explicit send"
+      ],
+      "limits": [
+        "Teammates: 3 runs a day and 40 chats a day",
+        "Utsav: no cap"
+      ],
+      "memory": {
+        "durable": "agents/bruce/memory.md",
+        "perPerson": "Short notes about each person, in the hub's private store, read and written through /api/bruce-memory",
+        "log": "Every turn he is asked for, in the hub's store: Analytics, Bruce"
+      },
+      "links": [
+        {
+          "label": "Conversations and usage",
+          "href": "/admin/analytics#bruce"
+        },
+        {
+          "label": "His page",
+          "href": "/internal/staging/bruce/"
+        },
+        {
+          "label": "Slack app manifest",
+          "href": "https://github.com/gushwork-design/design-system/blob/main/slack/bruce-app-manifest.yml"
+        }
+      ],
+      "prompt": {
+        "where": "The routine in claude.ai",
+        "inGit": false,
+        "why": "The repo is public, so his prompt and guardrails are not committed yet."
+      },
+      "cost": {
+        "basis": "Every DM starts at about 29,000 tokens: his instructions and the files he must read first, measured from the repo at about 4 characters a token. A chat then adds about 4,000 and a run about 90,000, both assumed.",
+        "start": 29000,
+        "chat": 4000,
+        "run": 90000,
+        "measured": [
+          "start"
+        ]
+      },
+      "memoryText": "# Bruce: durable memory\n\nRulings and facts that should outlive any one chat. Changed by pull request, so each one has a date and a reviewer. Notes about individual people are not here: they are private and live in the hub's store.\n\n- **5 Oct 2026, voice.** Crisp, a little dry, never cliche. Answer first, at most one line of wit, after the answer.\n- **5 Oct 2026, teammates.** Nothing destructive for a teammate. Only Utsav deletes a template or changes the library.\n- **5 Oct 2026, screens.** Every design is for screen, not print, unless someone asks for a PDF.\n- **6 Oct 2026, every DM gets a reply.** Even \"status of this?\" gets an answer in its thread.\n- **8 Oct 2026, passed on means passed on.** A pass-on is a real DM to Utsav. He says \"passed on\" only after Slack returns ok:true, and says so if it did not go through.\n- **8 Oct 2026, honest.** He reports every message he sends. When Utsav asks what he did, he tells him everything, including what he got wrong and what he cannot see.\n- **8 Oct 2026, run or chat.** A run is real work: a build, a hub change or check, an edit to something he made. A chat is a conversation. Runs spend the small daily cap, chats a separate larger one.\n- **8 Oct 2026, three levels of freedom when he acts for Utsav.** He does it and tells him; he asks first, with the exact text and recipient, for anything sent on Utsav's behalf; and some things he never does.\n- **8 Oct 2026, creator.** He reports to his creator, Utsav, every day."
+    },
+    {
+      "id": "alfred",
+      "name": "Alfred",
+      "role": "Rework",
+      "lead": false,
+      "status": "live",
+      "owner": "Utsav",
+      "summary": "Takes the design-system items Utsav sends back and fixes them, then tells Utsav when each is ready to look at again. Works in the item's own thread.",
+      "routine": {
+        "id": "trig_01SD4LLhLYMQtdF1QhNndj5u",
+        "url": "https://claude.ai/code/routines/trig_01SD4LLhLYMQtdF1QhNndj5u",
+        "model": "claude-sonnet-5-5",
+        "tools": [
+          "Bash",
+          "Read",
+          "Write",
+          "Edit",
+          "Glob",
+          "Grep"
+        ]
+      },
+      "reachedBy": [
+        "An item sent back for rework in Design System review",
+        "A reply in the thread of one of his pings, which Bruce passes on"
+      ],
+      "schedule": [
+        "A sweep every day at 9pm IST (15:30 UTC)"
+      ],
+      "does": [
+        "Fixes a sent-back item as its note says, on a branch of his own",
+        "Merges and publishes his own rework through scripts/merge-rework.sh, which allows hub paths only",
+        "Answers in the item's thread, and says when it is ready to look at again"
+      ],
+      "never": [
+        "Touches anything outside the hub's own pages",
+        "Decides a review: approve, rework and reject are Utsav's",
+        "Merges anything that is not his own rework"
+      ],
+      "limits": [
+        "Hub paths only, enforced by the merge script"
+      ],
+      "memory": {
+        "durable": "agents/alfred/memory.md",
+        "perPerson": "None",
+        "log": "The item's own GitHub issue thread, one per item"
+      },
+      "links": [
+        {
+          "label": "Design System review",
+          "href": "/internal/design-system#review"
+        }
+      ],
+      "prompt": {
+        "where": "The routine in claude.ai",
+        "inGit": false,
+        "why": "The repo is public, so his prompt and guardrails are not committed yet."
+      },
+      "cost": {
+        "basis": "About 60,000 tokens a run, assumed: his instructions, the item, the files he changes, the check and his comment. A run is one comment he posts.",
+        "run": 60000,
+        "measured": []
+      },
+      "memoryText": "# Alfred: durable memory\n\nRulings and facts that should outlive any one run. Changed by pull request.\n\n- **Where he works.** One GitHub issue thread per review item. A reply in that thread, from the drawer or passed on by Bruce, starts him in reply mode.\n- **What he may merge.** His own rework, through `scripts/merge-rework.sh`, which allows hub paths only. Verified from the cloud on 5 Oct 2026.\n- **What he may not do.** Decide a review. Approve, rework and reject are Utsav's.\n- **The sweep.** A daily run at 9pm IST looks for items waiting on him.\n- **The nightly routine.** The old \"missing drawings and report\" routine is switched off and is not an agent."
+    },
+    {
+      "id": "doc",
+      "name": "Doc",
+      "role": "Health",
+      "lead": false,
+      "status": "live",
+      "owner": "Utsav",
+      "summary": "Checks that everything keeping the hub alive is working: storage and data, hosting, integrations and upkeep. Checked live whenever the health page is opened, and by a routine twice a week. This is what used to be called System health.",
+      "routine": {
+        "id": "trig_01HQWcCHsTRA6jdzn45UC9vG",
+        "url": "https://claude.ai/code/routines/trig_01HQWcCHsTRA6jdzn45UC9vG",
+        "model": "claude-sonnet-5-5",
+        "tools": [
+          "Bash",
+          "Read",
+          "Glob",
+          "Grep"
+        ]
+      },
+      "reachedBy": [
+        "The health page, which runs the live checks when opened"
+      ],
+      "schedule": [
+        "Every Monday and Thursday at 04:00 UTC (09:30 IST)"
+      ],
+      "does": [
+        "Runs the live checks: the store, the log sizes, the review queue, hosting, the integrations",
+        "Runs what only a repo checkout can: skill drift, placeholders, previews, tests",
+        "Reports each check as ok, warn or fail, with the fix",
+        "Reports to the hub, which keeps the last snapshot"
+      ],
+      "never": [
+        "Edits files, merges, or changes any setting: he reads and reports",
+        "Fixes what he finds; he tells Utsav, or Bruce, what needs doing"
+      ],
+      "limits": [
+        "Read-only tools: no Write or Edit"
+      ],
+      "memory": {
+        "durable": "agents/doc/memory.md",
+        "perPerson": "None",
+        "log": "The last snapshot he reported, shown on the health page"
+      },
+      "links": [
+        {
+          "label": "System health",
+          "href": "/admin/system-health"
+        }
+      ],
+      "prompt": {
+        "where": "The routine in claude.ai",
+        "inGit": false,
+        "why": "The repo is public, so his prompt and guardrails are not committed yet."
+      },
+      "cost": {
+        "basis": "About 40,000 tokens a run, assumed: the checks he runs and the report. A run is a scheduled Monday or Thursday.",
+        "run": 40000,
+        "measured": []
+      },
+      "memoryText": "# Doc: durable memory\n\nRulings and facts that should outlive any one run. Changed by pull request.\n\n- **Where the checks run.** Live whenever `/admin/system-health` is opened, and on Monday and Thursday from a routine that can run what a repo checkout can.\n- **What he covers.** Storage and data, hosting, integrations, upkeep, and anything else the system depends on (Utsav, 5 Oct 2026).\n- **How he reports.** Each check is ok, warn or fail with the fix. The routine posts a snapshot to the hub, which the health page shows.\n- **Read-only.** He has no Write or Edit. He never fixes what he finds.\n- **Name.** Called System health until 8 Oct 2026, when Utsav made him an agent."
+    }
+  ],
+  "routing": [
+    {
+      "agent": "alfred",
+      "status": "live",
+      "when": "A reply in the thread of one of his pings, or an item sent back for rework in Design System review",
+      "via": "web/api/_concierge.js (replyToAlfred) and web/api/_review.js (fireRework)"
+    },
+    {
+      "agent": "doc",
+      "status": "planned",
+      "when": "Someone asks whether the hub is healthy",
+      "via": "Not wired yet. Today Doc runs on a schedule and when the health page is opened."
+    }
+  ],
+  "paused": [
+    {
+      "name": "Design hub nightly: missing drawings and report",
+      "routine": "trig_01LHtRu44ofgr3DQTiMuV9bB",
+      "note": "Switched off. Not an agent."
+    }
+  ]
+}

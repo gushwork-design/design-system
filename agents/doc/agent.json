@@ -1,0 +1,60 @@
+{
+  "id": "doc",
+  "name": "Doc",
+  "role": "Health",
+  "lead": false,
+  "status": "live",
+  "owner": "Utsav",
+  "summary": "Checks that everything keeping the hub alive is working: storage and data, hosting, integrations and upkeep. Checked live whenever the health page is opened, and by a routine twice a week. This is what used to be called System health.",
+  "routine": {
+    "id": "trig_01HQWcCHsTRA6jdzn45UC9vG",
+    "url": "https://claude.ai/code/routines/trig_01HQWcCHsTRA6jdzn45UC9vG",
+    "model": "claude-sonnet-5-5",
+    "tools": [
+      "Bash",
+      "Read",
+      "Glob",
+      "Grep"
+    ]
+  },
+  "reachedBy": [
+    "The health page, which runs the live checks when opened"
+  ],
+  "schedule": [
+    "Every Monday and Thursday at 04:00 UTC (09:30 IST)"
+  ],
+  "does": [
+    "Runs the live checks: the store, the log sizes, the review queue, hosting, the integrations",
+    "Runs what only a repo checkout can: skill drift, placeholders, previews, tests",
+    "Reports each check as ok, warn or fail, with the fix",
+    "Reports to the hub, which keeps the last snapshot"
+  ],
+  "never": [
+    "Edits files, merges, or changes any setting: he reads and reports",
+    "Fixes what he finds; he tells Utsav, or Bruce, what needs doing"
+  ],
+  "limits": [
+    "Read-only tools: no Write or Edit"
+  ],
+  "memory": {
+    "durable": "agents/doc/memory.md",
+    "perPerson": "None",
+    "log": "The last snapshot he reported, shown on the health page"
+  },
+  "links": [
+    {
+      "label": "System health",
+      "href": "/admin/system-health"
+    }
+  ],
+  "prompt": {
+    "where": "The routine in claude.ai",
+    "inGit": false,
+    "why": "The repo is public, so his prompt and guardrails are not committed yet."
+  },
+  "cost": {
+    "basis": "About 40,000 tokens a run, assumed: the checks he runs and the report. A run is a scheduled Monday or Thursday.",
+    "run": 40000,
+    "measured": []
+  }
+}
