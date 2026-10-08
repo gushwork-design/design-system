@@ -1,9 +1,9 @@
 # Drop Studio elements
 
-**Status: pending review.** One new element, `drop-agent-card`, for Drop Studio at `web/internal/staging/drop-studio/`. Phase 2 (creating agents and reviewing pictures) added no new element: it is built from library pieces, listed below.
+**Status: pending review.** Two new elements, `drop-agent-card` and `drop-stepper`, for Drop Studio at `web/internal/staging/drop-studio/`. The create / review dialog is built from library pieces, and the rest is built from library pieces, listed below.
 The page was drawn first as wireframes (Version C chosen by Utsav on 8 Oct 2026, placements taken from Blush,
 Unsplash and unDraw). Nothing here is measured from a Figma file; sizes are tokens and the builder's choice. Until
-`drop-agent-card` passes in Design System → Review, any page that uses it must say it is unreviewed.
+`drop-agent-card` or `drop-stepper` passes in Design System → Review, any page that uses it must say it is unreviewed.
 
 The page has no template. It is owner-only while it is staged.
 
@@ -23,10 +23,10 @@ replaced, and two elements first registered for this page (`drop-bundle-rail`, `
 | Appearance (System, Light, Dark) | dashboard `theme-menu` |
 | Help | the hub's own Help: the question-mark button with a two-row menu, `Send an email` (design@gushwork.ai) and `Message on Slack`, as `shell.js` and `tool-chrome.js` draw it, built here from the library's `gd-pop` and `menu` |
 | Bundle rail on desktop | follows `agent-filter-rail`'s category rows: a 240px sticky column, 36px rows in `--gw-text-body-14-med`, the count in `--gw-color-neutral-500`, the selected row white with a 1px stroke and `--gw-shadow-s2`, the others bare on the ground. Here the rows filter in place instead of scrolling to a section. |
-| Create new agent, New picture for an agent, ChatGPT has a question, Review the new picture | dashboard `modal` (`gd-modal--lg`) with `form-field`, `text-input`, `textarea`, `select` and `segmented-control` for the brief, and `activity-timeline` for the ChatGPT progress steps. The small grey lines ("Saved as a request in drop-reference…") are 10px `--gw-text-body-10-reg` in `--gw-color-neutral-500`, the same reference text the wireframes use. |
+| Create new agent, New picture for an agent, ChatGPT has a question, Review the new picture | dashboard `modal` (`gd-modal--lg`) with `form-field`, `text-input`, `textarea`, `select` and `segmented-control` for the brief, and `activity-timeline` for the ChatGPT progress, and `drop-stepper` for the three-step header. The small grey lines ("Saved as a request in drop-reference…") are 10px `--gw-text-body-10-reg` in `--gw-color-neutral-500`, the same reference text the wireframes use. |
 | Quick view | follows `agent-listing-panel`'s shell: a centered modal 820px at most, previous and next as 44px round buttons outside the edges (`--gw-shadow-s3`), a bottom sheet on a phone, a header with the bundle badge, the position (`2 of 33`) and close. It holds a large picture with Download and Copy link instead of the package controls. |
 
-The quick view's previous and next arrows are the marketplace's own: 44px round, 60px outside the modal's edges, the bold arrow glyphs, moving into the header below 1000px. The Premium tag (card and quick view) is the marketplace's `pill-prem` (24px, `--gw-color-primary-25` fill, a half-pixel `--gw-color-primary-100` edge, `--gw-text-body-12-med` in `--gw-color-primary-500`), shown on the three agents in its Generate more leads bundle.
+The quick view's previous and next arrows are the marketplace's own: 44px round, 60px outside the modal's edges, the bold arrow glyphs, moving into the header below 1000px. The Premium tag (card and quick view) is the marketplace's `pill-prem` (24px, `--gw-color-primary-25` fill, a half-pixel `--gw-color-primary-100` edge, `--gw-text-body-12-med` in `--gw-color-primary-500`), shown on the three agents in its Generate more leads bundle. It is the same pill in light and dark; the marketplace does not draw a dark variant.
 
 The rail and the quick view are page-local CSS, the same as their Agent Store originals. If the library later pulls
 either into a shared piece, this page should move to it.
@@ -69,3 +69,13 @@ select's fixed menu, which is then clipped and scrolls the dialog shut. The page
 own dialog. This is worth fixing in the library.
 
 The Bundle select lists the page's bundles, `Not sure yet`, and below a separator `Add a new bundle`, which reveals a text field for the name. A name that matches an existing bundle (any case) uses that bundle. A created agent's bundle that the page did not have is added to the rail and the phone strip after the next refresh.
+
+## `drop-stepper`
+
+A row of three steps for a short flow (here Brief, ChatGPT, Review), under a modal's title. Each step is a 20px round mark and a label in `--gw-text-body-12-med`, joined by a 32px hairline (16px on a phone). The marks are the setup checklist's: **done** is a filled ink circle with a check, **now** is an ink ring with the step's number and an ink label, **next** is a grey ring (`--gw-color-neutral-200`, `--gw-color-neutral-700` in dark) with the number and a muted label. The hairline is ink up to the current step and grey after it. The current step carries `aria-current="step"`; the list is labelled `Steps`. It shows where you are, not a control: steps are not clickable.
+
+The library has no stepper, only the checklist's vertical list and `activity-timeline`. The spacing, marks and states are the checklist's; if the library adds a stepper this should move to it.
+
+## Dark mode
+
+In dark the page's surfaces were one grey: card, modal, field and edge within a few points of each other. Page edges are now `--gw-color-neutral-800`, the secondary text `--gw-color-neutral-300`, and the dialog's fields are wells (`--gw-color-black`) on the raised modal with a `--gw-color-neutral-700` edge. Light mode is unchanged.

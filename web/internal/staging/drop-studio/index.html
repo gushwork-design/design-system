@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Drop Studio | Gushwork</title>
+<title>Gushwork Agent Studio</title>
 <meta name="description" content="Meet the Drop family: every Gushwork agent's Drop picture, with a link and a download for each.">
 <meta name="robots" content="noindex, nofollow">
 <base href="/internal/staging/drop-studio/">
@@ -19,10 +19,12 @@ body.gd{
   --s-bg:light-dark(var(--gw-color-neutral-50),var(--gw-color-black));
   --s-bar:light-dark(var(--gw-color-white),var(--gw-color-black));
   --s-card:light-dark(var(--gw-color-white),var(--gw-color-neutral-900));
-  --s-line:light-dark(var(--gw-color-neutral-100),var(--gw-color-neutral-850));
+  --s-line:light-dark(var(--gw-color-neutral-100),var(--gw-color-neutral-800));
+  --s-edge:light-dark(var(--gw-color-neutral-200),var(--gw-color-neutral-700));
+  --s-ink-fg:light-dark(var(--gw-color-white),var(--gw-color-black));
   --s-text:light-dark(var(--gw-color-black),var(--gw-color-white));
-  --s-body:light-dark(var(--gw-color-neutral-700),var(--gw-color-neutral-400));
-  --s-muted:var(--gw-color-neutral-500);
+  --s-body:light-dark(var(--gw-color-neutral-700),var(--gw-color-neutral-300));
+  --s-muted:light-dark(var(--gw-color-neutral-500),var(--gw-color-neutral-400));
   --s-pic:light-dark(var(--gw-color-neutral-50),var(--gw-color-neutral-850));
   --s-hover:light-dark(var(--gw-color-neutral-50),var(--gw-color-neutral-850));
   --s-scrim:light-dark(rgba(13,13,13,.5),rgba(0,0,0,.65));
@@ -39,7 +41,7 @@ img{display:block;max-width:100%}
 .brand{display:flex;align-items:center;gap:var(--gw-space-12);min-width:0}
 .tile{width:32px;height:32px;border-radius:var(--gw-radius-8);background:var(--gw-color-primary-500);color:var(--gw-color-white);display:grid;place-items:center;flex:none}
 .tile svg{width:16px;height:16px}
-.brand b{font:var(--gw-text-h7-bold);white-space:nowrap}
+.brand b{font:var(--gw-text-h7-bold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bar .gd-input--search{--gd-input-w:100%;width:100%}
 .gd-input--search:has(input:not(:placeholder-shown)) .gd-search__key,.gd-input--search:focus-within .gd-search__key{display:none}
 @media (hover:none){.gd-search__key{display:none}}
@@ -107,19 +109,30 @@ h1{font:var(--gw-text-h3);letter-spacing:var(--gw-text-h3-tracking);margin:var(-
 .edge.l{left:-60px}.edge.r{right:-60px}
 .qv .top .nv{display:flex;align-items:center;gap:var(--gw-space-4)}
 .qv .gd-iconbtn.step{display:none}
-.prem{display:inline-flex;align-items:center;justify-content:center;height:24px;padding:4px var(--gw-space-8);border-radius:var(--gw-radius-full);background:light-dark(var(--gw-color-primary-25),color-mix(in srgb,var(--gw-color-primary-500) 18%,var(--gw-color-neutral-900)));border:.5px solid light-dark(var(--gw-color-primary-100),color-mix(in srgb,var(--gw-color-primary-500) 45%,var(--gw-color-neutral-900)));font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking);color:light-dark(var(--gw-color-primary-500),var(--gw-color-primary-300));white-space:nowrap}
+.prem{display:inline-flex;align-items:center;justify-content:center;height:24px;padding:4px var(--gw-space-8);border-radius:var(--gw-radius-full);background:var(--gw-color-primary-25);border:.5px solid var(--gw-color-primary-100);font:var(--gw-text-body-12-med);letter-spacing:var(--gw-text-body-12-med-tracking);color:var(--gw-color-primary-500);white-space:nowrap}
 .card .prem{position:absolute;left:var(--gw-space-16);top:var(--gw-space-16);z-index:1}
 
 /* phase 2: a picture that does not exist yet, the small ChatGPT reference text, and the create / review dialog (the library modal) */
 .noimg{width:100%;height:100%;border:1px dashed var(--s-line);border-radius:var(--gw-radius-8);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--gw-space-8);padding:var(--gw-space-16);text-align:center;font:var(--gw-text-body-12-med);color:var(--s-muted)}
 .noimg .i{font-size:20px}
 .gref{font:var(--gw-text-body-10-reg);color:var(--s-muted)}
+/* in dark the modal, its fields and its edge were all one grey; fields become wells darker than the modal, with a visible edge */
+.gd #cr{--gd-field-bg:light-dark(var(--gw-color-white),var(--gw-color-black));--gd-border:light-dark(var(--gw-color-neutral-100),var(--gw-color-neutral-800));--gd-border-strong:light-dark(var(--gw-color-neutral-200),var(--gw-color-neutral-700))}
 .qv .btns .two.one{grid-template-columns:1fr}
 /* the library modal's scale makes it the containing block of a fixed menu, which clips the Bundle select and scrolls the dialog; with no scale and no clip the menu opens over the page */
-.gd #cr.gd-modal{scale:none;overflow:visible}
+.gd #cr.gd-modal{scale:none;overflow:visible;max-height:calc(100dvh - 32px)}   /* the library caps a modal at 640px; this one grows when the new-bundle field opens and scrolls only on a short screen */
 #cr .gd-modal__head{align-items:flex-start}
-#cr .steps{display:flex;gap:var(--gw-space-8);margin-top:var(--gw-space-8);font:var(--gw-text-body-12-med);color:var(--s-muted)}
-#cr .steps b{font-weight:inherit;color:var(--s-text)}
+/* steps (NEW, pending review): the checklist's round marks in a row, done = ink with a check, now = ink ring, next = grey ring */
+.stp{list-style:none;margin:var(--gw-space-16) 0 0;padding:0;display:flex;align-items:center;gap:var(--gw-space-8)}
+.stp li{display:flex;align-items:center;gap:var(--gw-space-8);font:var(--gw-text-body-12-med);color:var(--s-muted);white-space:nowrap}
+.stp li+li::before{content:"";width:32px;height:1px;margin-right:var(--gw-space-4);background:var(--s-edge)}
+.stp li[data-s=done]+li::before,.stp li[data-s=now]::before{background:var(--s-text)}
+.stp .mk{width:20px;height:20px;flex:none;display:grid;place-items:center;border-radius:var(--gw-radius-full);box-shadow:inset 0 0 0 1.5px var(--s-edge);font:var(--gw-text-body-12-med)}
+.stp .mk .i{font-size:12px}
+.stp li[data-s=done]{color:var(--s-body)}
+.stp li[data-s=done] .mk{background:var(--s-text);color:var(--s-ink-fg);box-shadow:none}
+.stp li[data-s=now]{color:var(--s-text)}
+.stp li[data-s=now] .mk{box-shadow:inset 0 0 0 1.5px var(--s-text);color:var(--s-text)}
 #cr section{display:flex;flex-direction:column;gap:var(--gw-space-16)}
 #cr #fld-notes{order:-1}
 #cr .gd-modal__foot{align-items:center;justify-content:space-between;gap:var(--gw-space-16)}
@@ -133,7 +146,7 @@ h1{font:var(--gw-text-h3);letter-spacing:var(--gw-text-h3-tracking);margin:var(-
 #cr .rvw figcaption{font:var(--gw-text-body-12-med);color:var(--s-muted)}
 .q{padding:var(--gw-space-12) var(--gw-space-16);border-radius:var(--gw-radius-12);background:var(--s-pic);border:1px solid var(--s-line);font:var(--gw-text-body-14-reg);color:var(--s-text);white-space:pre-wrap;overflow-wrap:anywhere}
 .q small{display:block;font:var(--gw-text-body-12-reg);color:var(--s-muted);margin-bottom:var(--gw-space-4)}
-@media (max-width:700px){#cr .rvw{gap:var(--gw-space-8)}#cr .gd-modal__foot{flex-direction:column;align-items:stretch;gap:var(--gw-space-12)}#cr .gd-modal__foot .acts2{margin-left:0;display:grid;grid-auto-flow:column;grid-auto-columns:1fr}#cr .gd-modal__foot>.gd-btn{width:100%}#cr .gd-modal__foot .gd-btn{justify-content:center}}
+@media (max-width:700px){.stp li+li::before{width:16px}#cr .rvw{gap:var(--gw-space-8)}#cr .gd-modal__foot{flex-direction:column;align-items:stretch;gap:var(--gw-space-12)}#cr .gd-modal__foot .acts2{margin-left:0;display:grid;grid-auto-flow:column;grid-auto-columns:1fr}#cr .gd-modal__foot>.gd-btn{width:100%}#cr .gd-modal__foot .gd-btn{justify-content:center}}
 
 @media (max-width:1280px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:1000px){
@@ -155,7 +168,7 @@ h1{font:var(--gw-text-h3);letter-spacing:var(--gw-text-h3-tracking);margin:var(-
   .qv{width:100%;max-height:94vh;border-radius:var(--gw-radius-24) var(--gw-radius-24) 0 0;grid-template-columns:minmax(0,1fr);gap:var(--gw-space-16)}
   .qv .r{padding:0 var(--gw-space-8) var(--gw-space-8)}
 }
-@media (max-width:560px){.grid{gap:var(--gw-space-12)}.card .meta{padding:0 4px 4px}.card h2{font:var(--gw-text-body-14-sem)}.hov{opacity:1;transform:none}}
+@media (max-width:560px){.brand b{font:var(--gw-text-body-14-sem)}.brand{gap:var(--gw-space-8)}.grid{gap:var(--gw-space-12)}.card .meta{padding:0 4px 4px}.card h2{font:var(--gw-text-body-14-sem)}.hov{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -185,7 +198,7 @@ h1{font:var(--gw-text-h3);letter-spacing:var(--gw-text-h3-tracking);margin:var(-
 </defs></svg>
 
 <header class="bar">
-  <div class="brand"><span class="tile"><svg><use href="#gw-mark"/></svg></span><b>Drop Studio</b></div>
+  <div class="brand"><span class="tile"><svg><use href="#gw-mark"/></svg></span><b>Gushwork Agent Studio</b></div>
   <div class="gd-input gd-input--search"><svg class="i" aria-hidden="true"><use href="#i-search"/></svg><input class="gd-input__el" id="q" type="search" aria-label="Search the Drop family" aria-keyshortcuts="Meta+K Control+K" placeholder="Search the Drop family" autocomplete="off"><kbd class="gd-search__key" id="qkey" aria-hidden="true">⌘K</kbd><button type="button" class="gd-input__clear" aria-label="Clear search" data-gd-clear><svg class="i" aria-hidden="true"><use href="#i-x"/></svg></button></div>
   <div class="acts">
     <button class="gd-btn gd-btn--primary" id="create" type="button"><svg class="i" aria-hidden="true"><use href="#i-plus"/></svg><span class="lbl">Create new agent</span></button>
@@ -447,7 +460,7 @@ h1{font:var(--gw-text-h3);letter-spacing:var(--gw-text-h3-tracking);margin:var(-
   $('qcopy').addEventListener('click',function(){if(cur) copy(cur,this)});
   function act(btn){
     var a=byId(cur); if(!a) return; var x=btn.getAttribute('data-act');
-    if(btn.getAttribute('aria-disabled')==='true'){toast('Drop Studio is not connected to drop-reference yet.'); return}
+    if(btn.getAttribute('aria-disabled')==='true'){toast('Agent Studio is not connected to drop-reference yet.'); return}
     if(x==='dl') download(a.id);
     else{close(); if(x==='req') openBrief(a); else if(x==='review') showReview(a); else if(x==='ask') showAsk(a); else showWork(a)}
   }
@@ -481,7 +494,13 @@ h1{font:var(--gw-text-h3);letter-spacing:var(--gw-text-h3-tracking);margin:var(-
   var VIEWS=['brief','work','ask','review'];
   function view(v){VIEWS.forEach(function(x){$('v-'+x).hidden=x!==v}); err('')}
   function err(m){var e=$('crerr'); e.hidden=!m; e.firstChild.textContent=m||''}
-  function steps(n){$('crsteps').innerHTML=['Brief','ChatGPT','Review'].map(function(s,i){return i+1===n?'<b>'+(i+1)+' '+s+'</b>':'<span>'+(i+1)+' '+s+'</span>'}).join('<span>·</span>')}
+  function steps(n){
+    var L=['Brief','ChatGPT','Review'];
+    $('crsteps').innerHTML='<ol class="stp" aria-label="Steps">'+L.map(function(t,i){
+      var st=i+1<n?'done':i+1===n?'now':'next';
+      return '<li data-s="'+st+'"'+(st==='now'?' aria-current="step"':'')+'><span class="mk">'+(st==='done'?ic('check'):i+1)+'</span>'+t+'</li>';
+    }).join('')+'</ol>';
+  }
   function foot(note,left,right){
     $('crfoot').innerHTML=(note?'<span class="gref">'+note+'</span>':'')+(left||'')+(right?'<span class="acts2">'+right+'</span>':'');
   }
@@ -495,7 +514,7 @@ h1{font:var(--gw-text-h3);letter-spacing:var(--gw-text-h3-tracking);margin:var(-
   function bundleMenu(){
     BSEL=[{v:'',t:'Not sure yet'}].concat(bundles.map(function(b){return{v:b,t:b}}));
     $('f-bundle-menu').innerHTML=BSEL.map(function(o){return '<button type="button" class="gd-menu__item" role="option" data-value="'+esc(o.v)+'" aria-selected="false">'+esc(o.t)+'</button>'}).join('')+
-      '<div class="gd-menu__sep" role="separator"></div><button type="button" class="gd-menu__item" role="option" data-value="'+NEW+'" aria-selected="false">Add a new bundle</button>';
+      '<div class="gd-menu__sep" role="separator"></div><button type="button" class="gd-menu__item" role="option" data-value="'+NEW+'" aria-selected="false"><svg width="16" height="16" aria-hidden="true"><use href="#i-plus"/></svg><span style="width:8px"></span><span>Add a new bundle</span></button>';
     $('f-bundle')._ready=false;      // the library adds its check mark to options once; let it see these
   }
   function showNewBundle(on){$('f-newbundle-w').hidden=!on; if(on) setTimeout(function(){$('f-newbundle').focus()},30); else $('f-newbundle').value=''}
@@ -535,7 +554,7 @@ h1{font:var(--gw-text-h3);letter-spacing:var(--gw-text-h3-tracking);margin:var(-
       if(!bundle) return err('Name the new bundle, or pick one from the list.');
       bundles.forEach(function(b){if(b.toLowerCase()===bundle.toLowerCase()) bundle=b});
     }
-    if(!remote.configured) return err('Drop Studio is not connected to drop-reference yet.');
+    if(!remote.configured) return err('Agent Studio is not connected to drop-reference yet.');
     busyBtn(true,'Sending…');
     api('create',{name:name,does:does,bundle:bundle,props:props,pose:poseNow(),notes:rev?$('f-notes').value.trim():'',agentId:rev?rev.id:undefined}).then(function(j){
       busy=false;

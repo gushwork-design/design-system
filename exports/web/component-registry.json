@@ -283,6 +283,12 @@
       "changed": "2026-10-08",
       "breaking": false,
       "doc": "drop-studio.md"
+    },
+    "drop-stepper": {
+      "version": "2.0.3",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "drop-studio.md"
     }
   },
   "review": {
