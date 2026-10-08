@@ -5,6 +5,28 @@ not need Figma — everything measured is in `exports/`. Stop here.
 
 Read on only if you are adding a component, correcting a measurement, or re-pulling tokens.
 
+## Adding a staging page (anyone on the team)
+
+A page you want to show the team goes at `design.gushwork.ai/internal/staging/<name>`, behind the
+sign-in. You do not need the owner to review it, and you do not edit any shared file.
+
+1. Get write access to this repo (ask the owner once), then clone it and branch: `git switch -c staging/<name> origin/main`
+2. `bash scripts/new-staging-page.sh <name> "<Title>" "<one-line blurb>" "<your name>"` makes
+   `web/internal/staging/<name>/` with an `index.html` and a `staging.json`. Build your page in that folder only.
+   A `thumb.png` beside `index.html` becomes its picture on the Staging index.
+3. `bash scripts/check-staging-lane.sh` tells you whether it will merge. The PR runs the same check.
+4. Open a PR and merge it yourself once **Staging lane / check** is green. Merging publishes it,
+   and the Staging index lists it under "Team pages" with no edit to `staging.html`.
+
+Why this needs no review: `.github/CODEOWNERS` leaves `web/internal/staging/` unowned and owns
+everything else, and main requires code-owner review, so a PR that touches only your folder has no
+owner to wait for. The check is what keeps that safe. It blocks a PR that deletes or moves files,
+adds a file type that is not static, calls the hub's `/api/` or `/admin/` (your page runs on the
+hub's domain with the viewer's session), carries a secret, breaks the font rule the publish
+enforces, or touches anything outside your folder, which then waits for the owner.
+The existing pages stay the owner's. Fixing a typo in someone else's page is a normal PR that
+the owner reviews.
+
 ## The one rule that has cost the most
 
 **Read the component *set*, or a variant `<symbol>` inside it. Never an instance.**

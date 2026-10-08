@@ -1,0 +1,29 @@
+# The check behind the staging lane. Make "Staging lane / check" a required status check on main.
+#
+# WHY. .github/CODEOWNERS leaves web/internal/staging/ unowned, so a PR that touches only a
+# teammate's own page needs no review. This check is what makes that safe: it fails the PR when
+# the page breaks a rule (see scripts/_staging_lane.py). It runs on every PR so it can be
+# required; on a PR that has no staging pages it passes at once.
+#
+# It runs on the PR's own code but is not trusted to guard itself: .github/ is owned, so a PR
+# that edits this file needs the owner anyway.
+name: Staging lane
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check the staging pages in this PR
+        run: python3 scripts/_staging_lane.py --base "origin/${{ github.base_ref }}"
