@@ -625,6 +625,13 @@
       "fingerprint": "798a5a1a11331609",
       "previewFingerprint": "09c7d46e66cf8b43",
       "note": "i've updated this, check and fix"
+    },
+    "comparison-card": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-08",
+      "fingerprint": "393a7685251e578b",
+      "previewFingerprint": "044ffa8480b97a6d"
     }
   }
 }
