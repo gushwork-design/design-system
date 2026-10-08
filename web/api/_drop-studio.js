@@ -41,7 +41,8 @@ const CAND_RE = /^explorations\/agents\/([a-z0-9]+(?:-[a-z0-9]+)*)-v(\d+)\.png$/
 const MASTER_RE = /^masters\/agent-portrait-([a-z0-9]+(?:-[a-z0-9]+)*)\.png$/;
 const MAX = { name: 80, does: 400, bundle: 60, prop: 60, notes: 600, answer: 800 };
 
-const repo = () => process.env.DROP_REFERENCE_REPO || 'gushwork-design-id/drop-reference';
+/* The repo moved from gushwork-design-id/drop-reference to the org on or before 9 Oct 2026; a token scoped to the old owner gets 404 from the new address. */
+const repo = () => process.env.DROP_REFERENCE_REPO || 'gushwork-design/drop-reference';
 const token = () => process.env.DROP_REFERENCE_TOKEN || '';
 
 /* ── pure pieces (tested in scripts/drop-studio.test.mjs) ─────────────────────────────────────────────────────────── */
