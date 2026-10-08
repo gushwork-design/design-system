@@ -33,6 +33,8 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
 #ag-panel .gd-table__cell { overflow: visible; white-space: normal; text-overflow: clip; overflow-wrap: break-word; }
 #ag-panel .gd-table__cell--flex { flex-wrap: wrap; row-gap: var(--gw-space-4); }
 #ag-panel .gd-table__avatar { font-size: 11px; }
+/* the table's last row must not sit on the card's bottom edge, or its background covers the border between the rounded corners */
+#ag-panel .gd-card--flush > .gd-card__body--bleed { padding-bottom: var(--gw-space-8); }
 /* a collapsed card shows a chevron at its right edge: down while closed, up while open */
 #ag-panel .gd-card__titles:has(> .gd-card__toggle) { flex: 1 1 auto; }
 #ag-panel .gd-card__toggle { width: 100%; justify-content: space-between; }
@@ -252,7 +254,13 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
   /* ---------- the tab row ---------- */
   function tabs() {
     var items = [{ id: 'all', label: 'All agents' }].concat(S.data.agents.map(function (a) { return { id: a.id, label: a.name }; }));
-    $('ag-tabs').innerHTML = items.map(function (t) {
+    var host = $('ag-tabs'), btns = [].slice.call(host.querySelectorAll('.gd-tabs__tab'));
+    /* the same four tabs: change the selected one in place. The library moves the underline when an aria-selected attribute changes; rebuilding the buttons would leave it where it was */
+    if (btns.length === items.length && btns.every(function (b, i) { return b.getAttribute('data-tab') === items[i].id; })) {
+      btns.forEach(function (b) { var on = b.getAttribute('data-tab') === S.tab; b.setAttribute('aria-selected', String(on)); b.setAttribute('tabindex', on ? '0' : '-1'); });
+      return;
+    }
+    host.innerHTML = items.map(function (t) {
       return '<button type="button" class="gd-tabs__tab" role="tab" data-tab="' + esc(t.id) + '" aria-selected="' + (t.id === S.tab) + '" tabindex="' + (t.id === S.tab ? 0 : -1) + '">' + esc(t.label) + '</button>';
     }).join('');
   }
@@ -270,14 +278,9 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
 
   /* ---------- All agents ---------- */
   function renderAll() {
-    var list = sums(), needs = allNeeds(list), loading = list.some(function (s) { return !s.known; }) && !needs.length;
-    var names = needs.map(function (x) { return x.a.name; }).filter(function (v, i, arr) { return arr.indexOf(v) === i; });
-    var title = needs.length ? plural(needs.length, 'thing') + ' to look at' : loading ? 'Checking the agents' : 'Everything is running';
-    var sub = needs.length ? names.join(', ').replace(/, ([^,]*)$/, ' and $1') + (names.length === 1 ? ' has' : ' have') + ' something for you.' : loading ? 'Some of them have not answered yet.' : 'All ' + list.length + ' agents are healthy and nothing is waiting on you.';
-    var html = '<div class="gd-status-banner" data-status="' + (needs.length ? 'degraded' : 'operational') + '"><span class="gd-status-icon" data-status="' + (needs.length ? 'degraded' : 'operational') + '">' + svg(needs.length ? 'warn' : 'check', 28) + '</span>' +
-      '<div class="gd-status-banner__text"><h3 class="gd-status-banner__title">' + esc(title) + '</h3><p class="gd-status-banner__sub">' + esc(sub) + '</p></div></div>';
+    var list = sums(), needs = allNeeds(list);
     /* the team: the one new component on this page, the agent status card (see the library's data-display doc) */
-    html += '<section class="ag-team" aria-label="The team"><div class="gd-card__titles" style="margin-bottom:var(--gd-gap)"><h3 class="gd-card__title">The team</h3><p class="gd-card__desc">' + esc(list.length + ' agents, ' + (S.data.agents.filter(function (a) { return a.lead; })[0] || {}).name + ' leads') + '</p></div><div class="gd-grid">' +
+    var html = '<section class="ag-team" aria-label="The team"><div class="gd-card__titles" style="margin-bottom:var(--gd-gap)"><h3 class="gd-card__title">The team</h3></div><div class="gd-grid">' +
       list.map(function (s) {
         var n = s.needs.length;
         return '<div class="gd-span-4"><a class="gd-agent-status" href="#' + esc(s.id) + '" data-tab="' + esc(s.id) + '"><span class="gd-agent-status__top"><span class="gd-avatar gd-avatar--team gd-avatar--lg" data-gd-avatar="' + esc(s.a.name) + '" role="img" aria-label="' + esc(s.a.name) + '"></span>' +
@@ -331,7 +334,7 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
     if (th.length) {
       var rows = th.slice(0, 8).map(function (t) {
         var tone = { ready: 'good', stuck: 'warn', queued: 'neutral' }[t.state], lbl = { ready: 'Ready for you', stuck: 'Waiting on you', queued: 'Queued' }[t.state];
-        return { cells: ['<a class="gd-table__link" href="' + esc(t.url) + '" target="_blank" rel="noopener noreferrer">' + esc(t.scope + '/' + t.key) + '</a>', esc(clip(t.note || 'No note yet', 140)), badge(tone, lbl), t.lastAt ? '<time datetime="' + esc(t.lastAt) + '">' + esc(ago(Date.now() - Date.parse(t.lastAt))) + '</time>' : ''], t: ['', t.note || '', '', ''] };
+        return { cells: ['<a class="gd-table__link" href="' + esc(REVIEW + '/' + encodeURIComponent(t.scope) + '/' + encodeURIComponent(t.key)) + '">' + esc(t.scope + '/' + t.key) + '</a>', esc(clip(t.note || 'No note yet', 140)), badge(tone, lbl), t.lastAt ? '<time datetime="' + esc(t.lastAt) + '">' + esc(ago(Date.now() - Date.parse(t.lastAt))) + '</time>' : ''], t: ['', t.note || '', '', ''] };
       });
       html += card('His items', th.length > 8 ? 'Latest 8 of ' + th.length + '. All of them are in review.' : '', table('His items', [{ h: 'Item', w: '220px', strong: true }, { h: 'Note', w: 'minmax(0,1fr)', title: true, muted: true }, { h: 'State', w: '150px', flex: true }, { h: 'When', w: '110px', muted: true }], rows), { flush: true,
         actions: '<a class="gd-btn gd-btn--sm" href="' + REVIEW + '">Open review</a>' });
