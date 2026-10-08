@@ -95,6 +95,9 @@ html, body { margin: 0; overflow: hidden; }
   .tk-view .gd-lanes > .gd-lane:not([data-active="true"]) { display: none; }
   .tk-view .gd-lanes > .gd-lane { padding: 0; background: none; border: 0; }
   .tk-view .gd-lanes > .gd-lane .gd-lane__head { display: none; }
+  /* the Suggested lane keeps one thing in its head on a phone: the button that accepts the whole lane */
+  .tk-view .gd-lanes > .gd-lane--suggested .gd-lane__head { display: flex; }
+  .tk-view .gd-lanes > .gd-lane--suggested .gd-lane__head > :not(.tk-accept-all) { display: none; }
   .tk-view .gd-lanes > .gd-lane--suggested { background: var(--gd-sunken-bg); border: 1px dashed var(--gd-border-strong); padding: var(--gw-space-8); }
   .tk-view .gd-inbox { grid-template-columns: minmax(0, 1fr); }
   .tk-view .gd-inbox__list { border-right: 0; border-bottom: 1px solid var(--gd-border); }
@@ -110,3 +113,6 @@ html, body { margin: 0; overflow: hidden; }
 /* the one-line note above an empty board: text on the left, the settings button on the right */
 .tk-intro { display: flex; align-items: center; justify-content: space-between; gap: var(--gd-gap); margin-bottom: var(--gd-gap); }
 .tk-intro .gd-banner__body { flex: 1; min-width: 0; }
+
+/* Accept all sits at the right end of the Suggested lane's head */
+.tk-accept-all { margin-left: auto; }

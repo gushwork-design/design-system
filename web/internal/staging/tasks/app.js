@@ -242,6 +242,13 @@
     const before = JSON.parse(JSON.stringify(t)); t.status = 'todo'; if (!t.assignee) t.assignee = meAssignee(); refresh();
     try { const r = await request('POST', { op: 'accept', id }); put(r.task); refresh(); return r.task; } catch (e) { put(before); refresh(); failToast(e); return null; }
   }
+  // one click for a lane of suggestions you already agree with (the design-hub review notes arrive this way)
+  async function acceptAll() {
+    const ids = visible().filter((t) => t.status === 'suggested').map((t) => t.id);
+    if (!ids.length) return;
+    const r = await bulk(ids, { status: 'todo' });
+    if (r) toast('Accepted ' + r.length + (r.length === 1 ? ' suggestion' : ' suggestions'), { type: 'success', action: { label: 'Undo', onClick: () => bulk(ids, { status: 'suggested' }) } });
+  }
   async function dismissTask(id) {
     const t = byId(id); if (!t) return null;
     const before = JSON.parse(JSON.stringify(t)); t.status = 'dismissed'; refresh();
@@ -459,7 +466,7 @@
       if (l === 'suggested' && S.display.showDismissed) list = list.concat(sorted(vis.filter((t) => t.status === 'dismissed')));
       const by = l === 'suggested' ? '<span class="gd-lane__by"><span class="gd-av gd-av--agent gd-av--ink gd-av--sm" aria-hidden="true">B</span>Bruce</span>' : '';
       return '<section class="gd-lane' + (l === 'suggested' ? ' gd-lane--suggested' : '') + '" data-lane="' + l + '"' + (S.lane === l ? ' data-active="true"' : '') + ' aria-label="' + STATUS_NAME[l] + ', ' + list.length + '">' +
-        '<header class="gd-lane__head"><h2 class="gd-lane__name">' + STATUS_NAME[l] + '</h2><span class="gd-lane__count gd-num">' + list.length + '</span>' + by + '</header>' +
+        '<header class="gd-lane__head"><h2 class="gd-lane__name">' + STATUS_NAME[l] + '</h2><span class="gd-lane__count gd-num">' + list.length + '</span>' + by + (l === 'suggested' && list.length > 1 ? '<button type="button" class="gd-btn gd-btn--ghost gd-btn--sm tk-accept-all" data-accept-all>Accept all</button>' : '') + '</header>' +
         '<div class="gd-lane__list" data-lane-list="' + l + '">' + (list.length ? list.map(cardHtml).join('') : '<div class="gd-lane__empty">' + empties[l] + '</div>') + '</div>' +
         (l === 'todo' || l === 'doing' ? '<button type="button" class="gd-lane__add" data-add-lane="' + l + '">' + ico('plus', 14) + 'Add task</button>' : '') + '</section>';
     });
@@ -1093,6 +1100,7 @@
     if (q('#tk-search-btn')) { openSearch(); return; }
     if (q('[data-retry-load]')) { load(); return; }
     if (q('[data-new-task]')) { openNew(); return; }
+    if (q('[data-accept-all]')) { acceptAll(); return; }
     if ((b = q('[data-add-lane]'))) { quickAdd(b); return; }
     if ((b = q('[data-group]'))) { const k = b.dataset.group; if (S.collapsed.has(k)) S.collapsed.delete(k); else S.collapsed.add(k); render(); const n = $('[data-group="' + k + '"]'); if (n) n.focus(); return; }
     if ((b = q('[data-tl-nav]'))) { const dir = +b.dataset.tlNav; S.tl.start = dir === 0 ? mondayOf(S.today) : addDays(tlStart(), dir * (S.tl.zoom === 'week' ? 14 : 28)); render(); const n = $('[data-tl-nav="' + dir + '"]'); if (n) n.focus(); return; }
