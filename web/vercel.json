@@ -94,6 +94,11 @@
       "permanent": false
     },
     {
+      "source": "/admin/system-health",
+      "destination": "/admin/agents#doc",
+      "permanent": false
+    },
+    {
       "source": "/admin/usage-log",
       "destination": "/admin/analytics#usage",
       "permanent": false

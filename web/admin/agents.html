@@ -134,8 +134,11 @@ a.ag-row:hover { background: var(--s-nav-hover); }
 /* Bruce's analytics sit in his tab, under the same page header. The panel brings its own sections and drawer. */
 #ag-bruce-slot { min-width: 0; }
 .ag-ctrl[hidden] { display: none; }
+.ag-ctrl__r { display: flex; align-items: center; gap: var(--gw-space-16); }
+.ag-bar__r { margin-left: auto; flex: none; }
 #ag-bruce-slot .ul-sec { margin-top: var(--gw-space-8); }
-#ag-bruce-slot .br-m4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+#ag-bruce-slot .br-m4 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 900px) { #ag-bruce-slot .br-m4 { grid-template-columns: minmax(0, 1fr); } }
 .ag-btn[data-tab] { font: inherit; font: var(--gw-text-button-12, var(--gw-text-body-12-med)); }
 
 /* about, folded away */
@@ -172,12 +175,14 @@ a.ag-row:hover { background: var(--s-nav-hover); }
   <main class="sg__main">
     <div class="ag-bar">
       <div class="ag-tabs" id="ag-tabs" role="tablist" aria-label="Agents"></div>
+      <div class="an-hide ag-bar__r"><label class="gd-toggle gd-toggle--xs" title="Leaves your own asks to Bruce out of the counts"><input type="checkbox" role="switch" id="ag-me-box"><span class="gd-toggle__track" aria-hidden="true"></span><span class="gd-toggle__t">Hide my activity</span></label></div>
     </div>
     <div id="ag-state"></div>
     <div id="ag-app" hidden>
       <div class="ag-ctrl" id="ag-ctrl">
-        <div class="ag-pills" role="tablist" aria-label="Period"><button type="button" class="ag-pill" role="tab" data-p="7" aria-selected="true">7 days</button><button type="button" class="ag-pill" role="tab" data-p="30" aria-selected="false">30 days</button></div>
-        <button class="gw-iconbtn" id="ag-refresh" type="button" aria-label="Refresh" data-tip="Refresh" data-tip-end><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z"/></svg></button>
+        <div class="ag-pills" role="tablist" aria-label="Period"><button type="button" class="ag-pill" role="tab" data-p="today" aria-selected="false">Today</button><button type="button" class="ag-pill" role="tab" data-p="7" aria-selected="true">7 days</button><button type="button" class="ag-pill" role="tab" data-p="30" aria-selected="false">30 days</button></div>
+        <div class="ag-ctrl__r">
+        <button class="gw-iconbtn" id="ag-refresh" type="button" aria-label="Refresh" data-tip="Refresh" data-tip-end><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z"/></svg></button></div>
       </div>
       <div id="ag-panel" role="tabpanel" tabindex="-1"></div>
       <div id="ag-park" hidden><div id="ag-bruce" class="ul-scope"></div></div>
@@ -206,14 +211,16 @@ a.ag-row:hover { background: var(--s-nav-hover); }
   function pic(a, cls) { return '<span class="ag-pic ag-pic--' + esc(a.id) + (cls ? ' ' + cls : '') + '" aria-hidden="true">' + (a.id === 'bruce' ? '' : esc(a.name.charAt(0))) + '</span>'; }
   function initial(n) { return esc(String(n || '?').trim().charAt(0).toUpperCase() || '?'); }
   function badge(state, label) { return '<span class="ag-b ag-b--' + esc(state) + '">' + esc(label || STATE_LABEL[state] || state) + '</span>'; }
-  function days() { return +S.period; }
-  function inWindow(at) { return at.getTime() >= Date.now() - days() * DAY; }
+  /* The period: Today (since midnight), 7 days or 30 days. */
+  function since() { if (S.period === 'today') { var d = new Date(); d.setHours(0, 0, 0, 0); return d.getTime(); } return Date.now() - (+S.period) * DAY; }
+  function inWindow(at) { return at.getTime() >= since(); }
+  function periodText() { return S.period === 'today' ? 'today' : 'in ' + S.period + ' days'; }
   function ext(href) { return /^https?:/.test(href) ? ' target="_blank" rel="noopener noreferrer"' : ''; }
 
   /* ---------- when Doc and Alfred next run ---------- */
   function docNext() { var t = new Date(); t.setUTCHours(4, 0, 0, 0); for (var i = 0; i < 9; i++) { var w = t.getUTCDay(); if ((w === 1 || w === 4) && t.getTime() > Date.now()) return t.getTime(); t = new Date(t.getTime() + DAY); } return 0; }
-  function docRunCount(n) { var c = 0, from = Date.now() - n * DAY, d = new Date(from); d.setUTCHours(4, 0, 0, 0); for (var t = d.getTime(); t <= Date.now(); t += DAY) { var w = new Date(t).getUTCDay(); if ((w === 1 || w === 4) && t >= from) c++; } return c; }
-  function alfredRunsIn(n) { if (!S.alfred) return 0; var from = Date.now() - n * DAY, t = 0; Object.keys(S.alfred.byDay || {}).forEach(function (k) { if (Date.parse(k + 'T12:00:00Z') >= from) t += S.alfred.byDay[k]; }); return t; }
+  function docRunCount(from) { var c = 0, d = new Date(from); d.setUTCHours(4, 0, 0, 0); for (var t = d.getTime(); t <= Date.now(); t += DAY) { var w = new Date(t).getUTCDay(); if ((w === 1 || w === 4) && t >= from) c++; } return c; }
+  function alfredRunsIn(from) { if (!S.alfred) return 0; var t = 0; Object.keys(S.alfred.byDay || {}).forEach(function (k) { if (Date.parse(k + 'T12:00:00Z') >= from) t += S.alfred.byDay[k]; }); return t; }
 
   /* ---------- health: the checks that matter to each agent ---------- */
   var HEALTH_IDS = { bruce: ['bruce', 'slack', 'anthropic'], alfred: ['trigger', 'github', 'bypass'], doc: null };
@@ -226,7 +233,7 @@ a.ag-row:hover { background: var(--s-nav-hover); }
   }
   function healthNeeds(h) {
     return h.rows.filter(function (c) { return c.status === 'fail' || c.status === 'warn'; }).map(function (c) {
-      return { key: 'check:' + c.id, health: true, text: c.name + (c.fix ? ': ' + c.fix : c.detail ? ': ' + c.detail : ''), cta: 'Open system health', href: '/admin/system-health' };
+      return { key: 'check:' + c.id, health: true, text: c.name + (c.fix ? ': ' + c.fix : c.detail ? ': ' + c.detail : ''), cta: 'See in Doc', href: '#doc' };
     });
   }
 
@@ -245,7 +252,7 @@ a.ag-row:hover { background: var(--s-nav-hover); }
     var worse = function (s) { var rank = { ok: 0, unknown: 1, warn: 2, fail: 3 }; if ((rank[s] || 0) > (rank[out.state] || 0)) out.state = s; };
     if (id === 'bruce') {
       if (!S.bruce) { out.known = false; out.state = 'unknown'; out.doing = S.bruceErr || 'Reading his log'; return out; }
-      var rows = bruceRows(), all = (S.bruce || []).filter(function (r) { return r.kind !== 'sent'; }), gaps = rows.filter(isGap), people = {};
+      var rows = bruceRows(), all = (S.bruce || []).filter(function (r) { return r.kind !== 'sent' && !(hideOn() && S.owner && r.user === S.owner); }), gaps = rows.filter(isGap), people = {};
       rows.forEach(function (r) { people[r.user] = 1; });
       out.sessions = rows.filter(function (r) { return r.kind === 'run' || r.kind === 'chat'; }).length; out.tokens = rows.reduce(function (n, r) { return n + bruceTokens(r, a); }, 0);
       var latest = all.slice().sort(function (x, y) { return y.at - x.at; })[0]; out.last = latest ? latest.at.getTime() : 0;
@@ -259,16 +266,16 @@ a.ag-row:hover { background: var(--s-nav-hover); }
     } else if (id === 'alfred') {
       var al = S.alfred;
       if (!al) { out.known = false; out.state = 'unknown'; out.doing = S.alfredErr || 'Reading his threads'; return out; }
-      var c = al.counts, total = c.ready + c.stuck + c.queued, runs = alfredRunsIn(days());
+      var c = al.counts, total = c.ready + c.stuck + c.queued, runs = alfredRunsIn(since());
       out.sessions = runs; out.tokens = runs * a.cost.run; out.last = al.lastRunAt ? Date.parse(al.lastRunAt) : 0;
       out.doing = (total ? 'Working through the items you sent back. ' : 'Nothing on his plate right now. ') + (out.last ? 'Last worked ' + ago(Date.now() - out.last) + '.' : 'No run seen yet.') + ' Sweeps every night at 9pm IST.';
-      out.stats = [{ n: total ? c.ready + ' of ' + total : '0', l: 'items finished' }, { n: String(c.stuck), l: 'waiting on your answer' }, { n: String(runs), l: 'runs in ' + S.period + ' days' }];
+      out.stats = [{ n: total ? c.ready + ' of ' + total : '0', l: 'items finished' }, { n: String(c.stuck), l: 'waiting on your answer' }, { n: String(runs), l: 'runs ' + periodText() }];
       if (c.stuck) { worse('warn'); out.needs.unshift({ key: 'alfred:stuck', text: 'Waiting on your answer for ' + plural(c.stuck, 'item'), cta: 'Answer them', href: REVIEW }); }
       if (c.ready) out.needs.unshift({ key: 'alfred:ready', text: plural(c.ready, 'item') + ' finished, ready for you to check', cta: 'Check them', href: REVIEW });
     } else if (id === 'doc') {
       if (!S.health) { out.known = false; out.state = 'unknown'; out.doing = S.healthErr || 'Reading the checks'; return out; }
       var rows2 = S.health.checks, okn = rows2.filter(function (x) { return x.status === 'ok'; }).length, snap = S.health.snapshotAt ? Date.parse(S.health.snapshotAt) : 0, nx = docNext();
-      var runsD = docRunCount(days()); out.sessions = runsD; out.tokens = runsD * a.cost.run; out.last = snap;
+      var runsD = docRunCount(since()); out.sessions = runsD; out.tokens = runsD * a.cost.run; out.last = snap;
       out.doing = 'Checks the whole hub every Monday and Thursday and reports what he finds. ' + (snap ? 'Last report ' + ago(Date.now() - snap) + '.' : 'No report yet.');
       out.stats = [{ n: okn + ' of ' + rows2.length, l: 'checks healthy' }, { n: snap ? agoShort(Date.now() - snap) : 'None', l: snap ? 'since the last report' : 'last report' }, { n: nx ? new Date(nx).toLocaleDateString(undefined, { weekday: 'short' }) : '—', l: nx ? 'next report, ' + new Date(nx).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }) : 'next report' }];
     }
@@ -300,7 +307,7 @@ a.ag-row:hover { background: var(--s-nav-hover); }
   function needRow(item, withWho) {
     var n = item.n, a = item.a;
     return '<div class="ag-row">' + (withWho ? pic(a, 'ag-pic--sm') : '') + '<div class="ag-row__t ag-row__t--wrap">' + (withWho ? '<b>' + esc(a.name) + '</b>' : '') + '<span>' + esc(n.text) + '</span></div>' +
-      (n.href === '#bruce-look' ? '<button type="button" class="ag-btn" data-tab="bruce" data-scroll="br-h-look">' + esc(n.cta) + '</button>'
+      (n.href.charAt(0) === '#' ? '<button type="button" class="ag-btn" data-tab="' + (n.href === '#bruce-look' ? 'bruce' : esc(n.href.slice(1))) + '"' + (n.href === '#bruce-look' ? ' data-scroll="br-h-look"' : '') + '>' + esc(n.cta) + '</button>'
         : '<a class="ag-btn" href="' + esc(n.href) + '"' + ext(n.href) + '>' + esc(n.cta) + '</a>') + '</div>';
   }
   function renderAll() {
@@ -314,7 +321,6 @@ a.ag-row:hover { background: var(--s-nav-hover); }
         var mine = s.needs.length;
         return '<button type="button" class="ag-card" data-tab="' + esc(s.id) + '"><span class="ag-card__top">' + pic(s.a) + '<div><b>' + esc(s.a.name) + '</b><small>' + esc(s.a.role) + '</small></div>' + badge(s.state, stateLabel(s)) + '</span>' +
           '<p class="ag-card__now">' + esc(s.doing) + '</p>' +
-          (s.known ? '<span class="ag-st">' + s.stats.map(function (t) { return '<div><b>' + esc(t.n) + '</b><span>' + esc(t.l) + '</span></div>'; }).join('') + '</span>' : '') +
           '<span class="ag-card__foot' + (mine ? '' : ' is-quiet') + '"><i class="ag-dot ' + (mine ? 'warn' : s.known ? 'ok' : '') + '" aria-hidden="true"></i>' + (mine ? esc(plural(mine, 'thing') + ' for you') : s.known ? 'Nothing needed from you' : 'Waiting for data') + '</span></button>';
       }).join('') + '</div></section>';
     if (needs.length) {
@@ -339,7 +345,7 @@ a.ag-row:hover { background: var(--s-nav-hover); }
   function statsBlock(s) {
     if (!s.known) return '';
     return '<div class="ag-sec"><div class="ag-st ag-st--big">' + s.stats.map(function (t) { return '<div><b>' + esc(t.n) + '</b><span>' + esc(t.l) + '</span></div>'; }).join('') + '</div>' +
-      '<p class="ag-foot">' + (s.tokens ? 'Used about ' + tok(s.tokens) + ' tokens in ' + S.period + ' days across ' + plural(s.sessions, 'session') + '. An estimate: nothing reports real token counts.' : 'No sessions in this period.') + '</p></div>';
+      '<p class="ag-foot">' + (s.tokens ? 'Used about ' + tok(s.tokens) + ' tokens ' + periodText() + ' across ' + plural(s.sessions, 'session') + '. An estimate: nothing reports real token counts.' : 'No sessions in this period.') + '</p></div>';
   }
   function needsBlock(s) {
     var mine = s.needs.filter(function (n) { return !n.health; });
@@ -353,7 +359,7 @@ a.ag-row:hover { background: var(--s-nav-hover); }
     var body = bad.map(function (c) {
       return '<div class="ag-row"><i class="ag-dot ' + esc(c.status) + '" aria-hidden="true"></i><div class="ag-row__t ag-row__t--wrap"><b>' + esc(c.name) + '</b><span>' + esc(c.detail || '') + (c.fix ? ' To do: ' + esc(c.fix) : '') + '</span></div></div>';
     }).join('') + (good.length ? '<div class="ag-oks">' + good.map(function (c) { return '<span><i class="ag-dot ok" aria-hidden="true"></i>' + esc(c.name) + '</span>'; }).join('') + '</div>' : '');
-    return sec('Health', s.id === 'doc' ? '<a href="/admin/system-health">Open system health</a>' : '<span>' + (bad.length ? plural(bad.length, 'check') + ' to look at' : 'all ' + h.rows.length + ' checks pass') + '</span>', '<div class="ag-list">' + body + '</div>');
+    return sec('Health', '<span>' + (bad.length ? plural(bad.length, 'check') + ' to look at' : 'all ' + h.rows.length + ' checks pass') + '</span>', '<div class="ag-list">' + body + '</div>');
   }
   function about(a) {
     var d = S.data, route = (d.routing || []).filter(function (r) { return r.agent === a.id; })[0];
@@ -368,11 +374,15 @@ a.ag-row:hover { background: var(--s-nav-hover); }
   }
 
   function renderBruce() {
-    var s = summary('bruce'), a = s.a, html = hero(s);
-    if (!s.known) return html + healthBlock(s) + about(a);
+    var s = summary('bruce'), a = s.a, html = '';
+    /* No picture-and-sentence header on his tab: the tab already names him. It shows only when his log cannot be read, because it says why. */
+    if (!s.known) return hero(s) + healthBlock(s) + about(a);
     /* His analytics (conversations, what people use him for, what it costs, the asks worth a look) live in bruce-panel.js and are moved into
        this slot after the page is drawn; see mountBruce. */
-    return html + needsBlock(s) + '<div id="ag-bruce-slot"></div>' + healthBlock(s) + about(a);
+    /* Five things: conversations, who is new, usage and tokens, what he worked on, what he needs from you (the last is in the panel). Health only
+       appears when a check is failing, so a healthy Bruce is not a row of green. */
+    var bad = healthOf('bruce').rows.some(function (c) { return c.status !== 'ok'; });
+    return html + '<div id="ag-bruce-slot"></div>' + (bad ? healthBlock(s) : '') + about(a);
   }
   var brucePanel = null;
   function parkBruce() { var h = $('ag-bruce'); if (h && h.parentNode !== $('ag-park')) $('ag-park').appendChild(h); }
@@ -409,6 +419,7 @@ a.ag-row:hover { background: var(--s-nav-hover); }
     parkBruce();
     var html = S.tab === 'bruce' ? renderBruce() : S.tab === 'alfred' ? renderAlfred() : S.tab === 'doc' ? renderDoc() : renderAll();
     $('ag-panel').innerHTML = html;
+    $('ag-me-box').checked = hideOn();
     $('ag-ctrl').hidden = S.tab === 'bruce';                      /* his panel has its own periods and refresh */
     if (S.tab === 'bruce') mountBruce();
     document.querySelectorAll('.ag-pill').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-p') === S.period)); });
@@ -461,6 +472,11 @@ a.ag-row:hover { background: var(--s-nav-hover); }
     if (ev.key === 'ArrowRight' || ev.key === 'ArrowLeft') { ev.preventDefault(); var n = ids[(i + (ev.key === 'ArrowRight' ? 1 : ids.length - 1)) % ids.length]; setTab(n, true); var b = document.querySelector('.ag-tab[data-tab="' + n + '"]'); if (b) b.focus(); }
   });
   $('ag-refresh').addEventListener('click', loadAll);
+  $('ag-me-box').addEventListener('change', function () {
+    try { localStorage.setItem('gw-analytics-hide-me', this.checked ? '1' : '0'); } catch (e) { /* not remembered */ }
+    if (brucePanel) { brucePanel.setHide(this.checked); brucePanel.refilter(); }
+    render();
+  });
   window.addEventListener('hashchange', function () { if (S.data) setTab(location.hash.slice(1) || 'all', false); });
   setInterval(tip, 15000);
 
