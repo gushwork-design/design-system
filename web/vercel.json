@@ -241,6 +241,10 @@
     {
       "source": "/api/certificates",
       "destination": "/api/gw?action=certificates"
+    },
+    {
+      "source": "/api/drop-studio",
+      "destination": "/api/gw?action=drop-studio"
     }
   ],
   "functions": {

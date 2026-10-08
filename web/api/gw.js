@@ -32,6 +32,7 @@ import review from './_review.js';
 import health from './_health.js';
 import certificates from './_certificates.js';
 import bruceMemory from './_bruce-memory.js';
+import dropStudio from './_drop-studio.js';
 
 const ROUTES = {
   'log-usage': logUsage,
@@ -46,6 +47,7 @@ const ROUTES = {
   'health': health,
   'certificates': certificates,
   'bruce-memory': bruceMemory,
+  'drop-studio': dropStudio,
 };
 
 export default async function handler(req, res) {
