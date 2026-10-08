@@ -227,6 +227,10 @@
       "destination": "/api/gw?action=bruce-memory"
     },
     {
+      "source": "/api/bruce-chat",
+      "destination": "/api/gw?action=bruce-chat"
+    },
+    {
       "source": "/api/approvals",
       "destination": "/api/gw?action=approvals"
     },

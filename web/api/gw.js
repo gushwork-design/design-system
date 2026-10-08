@@ -32,6 +32,7 @@ import review from './_review.js';
 import health from './_health.js';
 import certificates from './_certificates.js';
 import bruceMemory from './_bruce-memory.js';
+import bruceChat from './_bruce-chat.js';
 import dropStudio from './_drop-studio.js';
 import accessRequest from './_access-request.js';
 
@@ -48,6 +49,7 @@ const ROUTES = {
   'health': health,
   'certificates': certificates,
   'bruce-memory': bruceMemory,
+  'bruce-chat': bruceChat,
   'drop-studio': dropStudio,
   'access-request': accessRequest,
 };
