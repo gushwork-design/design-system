@@ -332,6 +332,12 @@
       "breaking": false,
       "doc": "ad-page-comparison.md"
     },
+    "page-mock": {
+      "version": "2.0.6",
+      "changed": "2026-10-08",
+      "breaking": false,
+      "doc": "ad-page-comparison.md"
+    },
     "rating-stars": {
       "version": "2.0.6",
       "changed": "2026-10-08",

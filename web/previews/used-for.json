@@ -193,5 +193,6 @@
  "web/comparison-rows": "Compares two companies row by row in three columns, with the Gushwork answer highlighted",
  "web/plan-card": "Sets out what a company offers or who it suits, under a divider, as a price or a list of ticks",
  "web/cta-bar": "Closes a section with a black bar that carries one line and a Book a Demo button",
- "web/cta-comparison-card": "Shows a small comparison inside the closing call to action, clipped by the frame"
+ "web/cta-comparison-card": "Shows a small comparison inside the closing call to action, clipped by the frame",
+ "web/page-mock": "Draws a web page as a browser bar, a title and a stack of blocks inside a picture well, in place of a screenshot"
 }
