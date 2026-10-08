@@ -4,7 +4,7 @@
 # the lane check, so you only have to replace the body.
 #
 #   bash scripts/new-staging-page.sh <name> "<Title>" "<one-line blurb>" "<your name>"
-#   bash scripts/new-staging-page.sh ai-team "AI team" "The new Agent Store mock-up." "Swapnil"
+#   bash scripts/new-staging-page.sh gtm "GTM" "The new Agent Store mock-up." "Swapnil"
 #
 # The page lives at design.gushwork.ai/internal/staging/<name> behind the sign-in, and appears
 # on the Staging index by itself once it is merged (from staging.json). Drop a thumb.png next to
@@ -16,7 +16,7 @@ NAME="${1:-}"; TITLE="${2:-}"; BLURB="${3:-}"; OWNER="${4:-}"
 if [ -z "$NAME" ] || [ -z "$TITLE" ] || [ -z "$BLURB" ] || [ -z "$OWNER" ]; then
   sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//' >&2; exit 2
 fi
-[[ "$NAME" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]] || { echo "name must be lowercase-kebab-case, e.g. ai-team" >&2; exit 2; }
+[[ "$NAME" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]] || { echo "name must be lowercase-kebab-case, e.g. gtm" >&2; exit 2; }
 DIR="web/internal/staging/$NAME"
 [ ! -e "$DIR" ] || { echo "$DIR already exists — pick another name, or edit it in place" >&2; exit 1; }
 mkdir -p "$DIR"
