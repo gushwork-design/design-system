@@ -91,6 +91,22 @@ button that should press in joins the named list in `shell.css` (both the `trans
 | **Slides, lead-magnet PDFs, reports** | None. They are static output. |
 | **Games, posters, one-offs (`gushwork-brand`)** | Yours to choose. If it reuses product UI (a button, a tab row), the product rules above apply to that UI. |
 
+## Comparison landers
+
+The rules above, applied to a comparison ad page (`templates/ad-page-comparison/`). The Gushwork vs Athena page is the worked example, in `web/internal/staging/gushwork-vs-athena/`. The page copies the three tokens and keeps rule 3: its CSS sits inside `no-preference` and its script stands down under `reduce`.
+
+| Moment | What it does | Values |
+|---|---|---|
+| **Hero on load** | The hero text and the form rise as the page opens. | `hub-rise`, children stagger 40ms apart up to 160ms, the form at 80ms. |
+| **Scroll-in** | Each fold's heading, cards, table, call to action and the footer's closing card rise once as they come into view. | A script marks the parts `.rise` and adds `.in` at 12% visible; `.rise:not(.in)` is `opacity: 0`, `.rise.in` plays `hub-rise` with `backwards` fill. Parts of one row stagger 40ms apart, up to 160ms. Not applied without the script, so a page with no script is whole. |
+| **Drawn page** (`comparison-card`, `Picture=Drawn page`) | The blocks rise in turn, each icon scales in behind its block, the button arrives and is pressed once. | Blocks 40ms apart; icon `scale(.6)` to 1 at 120ms plus the block's delay; button `scale(.9)` at 360ms, then one press (`scale(.94)`) at 1000ms. A block leans `translateX(2px)` on hover. |
+| **Drawn report** (`Picture=Drawn report`) | Tiles rise in turn, the whole numbers count up, then the bar and the chips follow. | Count-up 600ms ease-out cubic after a 140ms delay: this is the one use of the count-up on a lander, allowed because the tiles are a stats block. Under `reduce` the numbers show as final. |
+| **Rating bars** (`rating-breakdown`) | Each bar grows from its left edge. | `scaleX(0)` to 1 on a fixed-width bar, 320ms. |
+| **Closing card** (`cta-comparison-card`, `Entrance=Slides up`) | The card slides up from beneath its frame. | `translateY(48px)` to 0 over 480ms, once, with its own `translateX(-50%)` kept in the keyframes. **An exception** to rule 2: the card has to cross its own clip, and a card that moves 8px reads as a fade. |
+| **Smoothness** | Every control uses the one curve. | The arrow inside a button nudges `translateX(2px)` on hover; radio cards, FAQ rows and the ask button press in (`scale(.97)`, `.99`, `.92`); an FAQ answer rises as it opens and the caret turns on `--hub-dur-enter`; field and card borders ease with `--gw-motion-fast`. Smooth scrolling is turned off under `reduce`. |
+
+Never loop on a lander. The earlier Athena page replayed its mocks on a timer; that is gone, and the drawn page, the report and the bars play once.
+
 ## Checking it works
 
 A screenshot cannot show motion, and a hidden browser tab stops animation frames, so verify with
