@@ -278,6 +278,10 @@ python3 scripts/_add_og.py "$STAGE"
 
 python3 scripts/_search_index.py "$STAGE" > "$STAGE/search-index.json"
 
+# admin/pages.json — every page on this deploy, for the page search in Access Control. Under /admin, so only admins can read it.
+mkdir -p "$STAGE/admin"
+python3 scripts/_pages_index.py "$STAGE" > "$STAGE/admin/pages.json"
+
 cp foundation/tokens.css "$STAGE/foundation/"
 
 # Live previews of the page templates — what the Preview links on /internal/templates open.
