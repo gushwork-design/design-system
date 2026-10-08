@@ -85,4 +85,29 @@ ok('signed out is 401', await gate('') === 401);
 const { sign, COOKIE } = await import('../web/api/_session.js');
 const ck = async (email) => `${COOKIE}=${encodeURIComponent(await sign({ email, exp: Math.floor(Date.now() / 1000) + 600 }, 'test-secret'))}`;
 ok('a teammate is 403', await gate(await ck('sam@gushwork.ai')) === 403);
+// what Bruce reports sending (R55 addendum, 8 Oct 2026)
+store['gw:bruce:log'] = [];
+process.env.OWNER_SLACK_ID = 'U0OWNER01'; process.env.SLACK_BOT_TOKEN = 'xoxb';
+ok('a report looks at the first five items and keeps the real recipients', await M.logSent('U0OWNER01', [
+  { to: 'U0PRIYA01', text: 'the staging link\nfor the AI team' }, { to: 'nope', text: 'bad id' }, { to: 'D0ABC1234', text: 'a DM id' },
+  { to: 'U0PRIYA01', text: '3' }, { to: 'U0PRIYA01', text: '4' }, { to: 'U0PRIYA01', text: '5' }, { to: 'U0PRIYA01', text: '6 is past five' }], { f: slackF }) === 4);
+let sent = (await M.readLog(f)).filter((x) => x.kind === 'sent');
+ok('each is a sent row for the person the run was for, to whoever got it', sent.length === 4 && sent.every((x) => x.user === 'U0OWNER01' && x.role === 'owner' && /^[UD]/.test(x.to)), JSON.stringify(sent[0]));
+const link = sent.find((x) => x.text.startsWith('the staging link'));
+ok('the recipient is named, the text squashed, and no thread is attached', link.toName === 'Priya' && link.text === 'the staging link for the AI team' && link.ch === undefined && link.ts === undefined, JSON.stringify(link));
+ok('nothing is sent for a report that is not a list', await M.logSent('U0OWNER01', 'x', { f: slackF }) === 0);
+// the endpoint: POST reports, GET ?sent=1 reads back, owner token only
+const call = async (method, tokenUser, extra) => { let status = 0, out = null; await M.default({ method, query: extra.query || {}, body: extra.body, headers: { authorization: `Bearer ${M.mintToken(tokenUser)}` } },
+  { status(s) { status = s; return this; }, json(o) { out = o; return this; }, setHeader() {}, end() {} }); return { status, out }; };
+const realFetch = globalThis.fetch; globalThis.fetch = slackF;
+store['gw:bruce:log'] = [];
+let h = await call('POST', 'U0OWNER01', { body: { notes: [], sent: [{ to: 'U0PRIYA01', text: 'the logo files' }] } });
+ok('POST reports sends alongside notes', h.status === 200 && h.out.sent === 1 && h.out.added === 0, JSON.stringify(h));
+h = await call('GET', 'U0OWNER01', { query: { sent: '1' } });
+ok('the owner reads them back', h.status === 200 && h.out.sent.length === 1 && h.out.sent[0].text === 'the logo files' && h.out.sent[0].toName === 'Priya', JSON.stringify(h));
+h = await call('GET', 'U0PRIYA01', { query: { sent: '1' } });
+ok('a teammate token cannot read what Bruce sent', h.status === 403 && !h.out.sent, JSON.stringify(h));
+h = await call('GET', 'U0PRIYA01', { query: {} });
+ok('and plain GET still returns only their notes', h.status === 200 && Array.isArray(h.out.notes) && !h.out.sent);
+globalThis.fetch = realFetch;
 console.log(`${pass} passed, ${fail} failed`); process.exit(fail ? 1 : 0);
