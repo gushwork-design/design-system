@@ -10,6 +10,7 @@ process.env.ADMIN_EMAILS = 'utsav.singh@gushwork.ai';
 process.env.OWNER_SLACK_ID = 'U0OWNER';
 process.env.ANTHROPIC_API_KEY = 'test-key';
 process.env.BRUCE_CHAT_DAILY_CAP = '2';
+process.env.TASKS_INTAKE_TOKEN = 'k'.repeat(40);
 
 let anthropicReply = { answer: 'ok', plan: null };
 let anthropicCalls = [];
@@ -113,9 +114,9 @@ t('a token cannot read the list', (await call('GET', null, { headers: { authoriz
 t('a token cannot create or delete', [(await bruceCall({ op: 'create', task: { title: 'x' } })).status, (await bruceCall({ op: 'delete', id: a.id })).status], [403, 403]);
 const sug = { title: 'Send Darshil the template', quote: 'Can you send me the template?', channel: '#growth', from: 'Darshil', url: 'https://gushwork.slack.com/archives/C1/p1', ts: '1791470000.123456', due: '2026-10-09', priority: 'high', why: 'A direct request.' };
 r = await bruceCall({ op: 'suggest', tasks: [sug, { title: '' }] });
-t('suggest files and skips the empty one', r.body, { added: 1, skipped: 1 });
+t('suggest files and skips the empty one', [r.body.added, r.body.skipped], [1, 1]);
 r = await bruceCall({ op: 'suggest', tasks: [sug] });
-t('the same Slack message is filed once', r.body, { added: 0, skipped: 1 });
+t('the same Slack message is filed once', [r.body.added, r.body.skipped], [0, 1]);
 let list = (await call('GET', null, { cookie: me })).body;
 const s = list.tasks.find((x) => x.status === 'suggested');
 t('a suggestion is Bruce\'s, in the Suggested lane, guessed, for the owner', [s.createdBy, s.assignee, s.guessed, s.source.channel, s.activity[0].text], ['bruce', 'u:' + owner, { due: true, priority: true }, '#growth', 'suggested this from #growth']);
@@ -130,6 +131,24 @@ r = await bruceCall({ op: 'run', id: b.id, run: 'working', text: 'Read the #grow
 t('an agent can report a run and add a line', [r.body.task.run, r.body.task.activity.at(-1)], ['working', { at: r.body.task.activity.at(-1).at, by: 'bruce', text: 'Read the #growth thread.' }]);
 t('an agent cannot set done through run', (await bruceCall({ op: 'run', id: b.id, run: 'done' })).status, 400);
 t('a run on a person task is refused', (await bruceCall({ op: 'run', id: a.id, run: 'working' })).status, 400);
+
+/* the scan routine's standing key */
+const KEY = 'k'.repeat(40);
+const keyCall = (body, token = KEY) => bruceCall(body, token);
+t('the standing key is refused when wrong', (await keyCall({ op: 'cursor' }, 'k'.repeat(39) + 'x')).status, 401);
+t('a short key is never accepted even if it matches', await (async () => { process.env.TASKS_INTAKE_TOKEN = 'short'; const r = await keyCall({ op: 'cursor' }, 'short'); process.env.TASKS_INTAKE_TOKEN = KEY; return r.status; })(), 401);
+t('the standing key does nothing while the env var is unset', await (async () => { delete process.env.TASKS_INTAKE_TOKEN; const r = await keyCall({ op: 'cursor' }, ''); process.env.TASKS_INTAKE_TOKEN = KEY; return r.status; })(), 401);
+t('the standing key cannot read, create or delete', [(await call('GET', null, { headers: { authorization: `Bearer ${KEY}` } })).status, (await keyCall({ op: 'create', task: { title: 'x' } })).status, (await keyCall({ op: 'delete', id: a.id })).status], [403, 403, 403]);
+r = await keyCall({ op: 'cursor' });
+t('with no scan yet the cursor is about a day ago', Math.round((Date.now() - Date.parse(r.body.since)) / 3600e3), 24);
+const doneAt = new Date(Date.now() - 20 * 60e3).toISOString();
+r = await keyCall({ op: 'suggest', tasks: [{ title: 'From the scan', channel: 'DM', ts: '1791470099.000100', from: 'Sam' }], scanned: doneAt });
+t('a scan files and moves the cursor', [r.body.added, r.body.since], [1, doneAt]);
+r = await keyCall({ op: 'suggest', tasks: [], scanned: new Date(Date.now() - 3600e3).toISOString() });
+t('the cursor never goes backwards', r.body.since, doneAt);
+r = await keyCall({ op: 'suggest', tasks: [], scanned: new Date(Date.now() + 3600e3 * 5).toISOString() });
+t('the cursor never goes into the future', r.body.since, doneAt);
+t('the cursor shows on the board for the page', (await call('GET', null, { cookie: me })).body.scan.at, doneAt);
 
 /* Ask Bruce */
 const board = (await call('GET', null, { cookie: me })).body.tasks;

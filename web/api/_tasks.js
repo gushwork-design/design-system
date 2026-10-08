@@ -9,10 +9,13 @@
    1. A person. Anyone the gate lets open the tool, checked with decide() on the tool's path so the page and the list
       can never disagree (middleware gates /internal/* pages, not /api/*, so it is checked here on every request).
       Guests are refused: this is the company's own list.
-   2. Bruce, with his per-run token (the one _bruce-memory.js mints for a run, an HMAC over his Slack user id). It is
-      accepted only for the OWNER's Slack id, and only for two ops: `suggest` (file what looks like a task into the
-      Suggested lane) and `run` (report an agent's run state). He cannot read the list, edit a task or delete one.
-      The cloud run holds no secret for the store.
+   2. Bruce, by one of two keys: his per-run token (the one _bruce-memory.js mints for a run, an HMAC over his Slack
+      user id, accepted only for the OWNER's Slack id), or the scan routine's standing key TASKS_INTAKE_TOKEN (Utsav,
+      8 Oct 2026: "set up Bruce to scan my Slack"; a scheduled routine is not started by the hub, so it has no per-run
+      token). Either key allows exactly three ops: `cursor` (when the last scan finished), `suggest` (file what looks
+      like a task into the Suggested lane, and move the cursor) and `run` (report an agent's run state). He cannot read
+      the list, edit a task or delete one. The standing key is compared in constant time, must be 32 characters or
+      more, and does nothing at all while the env var is unset. The cloud run holds no secret for the store.
 
    WHAT IT STORES. One hash, `gw:tasks`: id -> task. A counter `gw:tasks:seq` gives each task its display number
    (TSK-14), never reused. A second hash `gw:tasks:src` remembers which Slack message a suggestion came from, so
@@ -32,7 +35,7 @@
    HOW MUCH. Capped at MAX_TASKS; a create past the cap is refused, not trimmed.
    ========================================================================= */
 
-import { readAnySession, ownerEmails } from './_session.js';
+import { readAnySession, ownerEmails, constantTimeEqual } from './_session.js';
 import { loadRules, decide, isAdmin } from './_access.js';
 import { readToken } from './_bruce-memory.js';
 import { dailyCap as chatCap } from './_bruce-chat.js';
@@ -40,6 +43,8 @@ import { dailyCap as chatCap } from './_bruce-chat.js';
 const KEY = 'gw:tasks';
 const SEQ = 'gw:tasks:seq';
 const SRC = 'gw:tasks:src';
+const SCAN = 'gw:tasks:scan';             // when Bruce last finished a scan of Slack (ISO), so the next one looks back only that far
+const MAX_LOOKBACK_DAYS = 7;
 const NAMES = 'gw:cert-names';             // email -> display name, shared with Certificate Creator
 /* The page's own path and nothing else. When the board is promoted out of staging this becomes its live path, in the same
    commit that moves the page: listing the live path now would let anyone the general /internal rule admits read the list. */
@@ -305,12 +310,14 @@ export default async function handler(req, res) {
   const body = await readBody(req);
   const bearer = /^Bearer\s+(\S+)/i.exec(String(req.headers.authorization || ''));
 
-  /* Bruce, with his run token: two ops, nothing else. */
+  /* Bruce, with a key: three ops, nothing else. */
   if (bearer) {
-    const user = readToken(bearer[1]);
+    const intake = String(process.env.TASKS_INTAKE_TOKEN || '');
+    const standing = intake.length >= 32 && constantTimeEqual(bearer[1], intake);
+    const user = standing ? '' : readToken(bearer[1]);
     const ownerSlack = String(process.env.OWNER_SLACK_ID || '').split(',')[0].trim();
-    if (!user || !ownerSlack || user !== ownerSlack) return json(res, 401, { error: 'That token is not valid.' });
-    if (req.method !== 'POST' || !body || !['suggest', 'run'].includes(body.op)) return json(res, 403, { error: 'A run token may suggest tasks and report a run, nothing else.' });
+    if (!standing && (!user || !ownerSlack || user !== ownerSlack)) return json(res, 401, { error: 'That token is not valid.' });
+    if (req.method !== 'POST' || !body || !['suggest', 'run', 'cursor'].includes(body.op)) return json(res, 403, { error: 'A Bruce key may check the scan cursor, suggest tasks and report a run, nothing else.' });
     if (!cfg) return json(res, 503, { error: 'The store is not connected.' });
     const owner = (ownerEmails()[0] || '').toLowerCase();
     try { return await bruceOp(cfg, body, owner, res); } catch { return json(res, 502, { error: 'The store did not answer. Try again.' }); }
@@ -354,7 +361,8 @@ export default async function handler(req, res) {
         list.forEach((e, i) => { if (vals[i]) names[e] = vals[i]; });
       }
       const used = await chatUsed(cfg, me);
-      return json(res, 200, { tasks, me: { email: me, name: myName || names[me] || '' }, names, agents: AGENTS, ask: { used, cap: owner ? 0 : chatCap() } });
+      const scanAt = (await pipe(cfg, [['GET', SCAN]]))[0].result || '';
+      return json(res, 200, { tasks, me: { email: me, name: myName || names[me] || '' }, names, agents: AGENTS, ask: { used, cap: owner ? 0 : chatCap() }, scan: { at: scanAt } });
     }
 
     if (req.method === 'DELETE') {
@@ -443,6 +451,14 @@ export default async function handler(req, res) {
 /* What Bruce may do with a run token. */
 async function bruceOp(cfg, body, ownerEmail, res) {
   const now = new Date().toISOString();
+  const floor = new Date(Date.now() - MAX_LOOKBACK_DAYS * 86400e3).toISOString();
+  /* Where the last scan finished. A first scan, or one after a long gap, looks back a day (or at most a week). */
+  const since = async () => {
+    const last = (await pipe(cfg, [['GET', SCAN]]))[0].result || '';
+    const dayAgo = new Date(Date.now() - 86400e3).toISOString();
+    return last && last > floor ? last : dayAgo;
+  };
+  if (body.op === 'cursor') return json(res, 200, { since: await since(), now });
   if (body.op === 'run') {
     if (!isId(body.id)) return json(res, 400, { error: 'Bad id.' });
     const r = await pipe(cfg, [['HGET', KEY, body.id]]);
@@ -487,7 +503,13 @@ async function bruceOp(cfg, body, ownerEmail, res) {
     await pipe(cfg, [['HSET', KEY, t.id, JSON.stringify(t)], ...(ts ? [['HSET', SRC, `${channel}:${ts}`, t.id]] : [])]);
     added++;
   }
-  return json(res, 200, { added, skipped });
+  /* The scan reports where it got to, so the next one starts there. Never into the future, never backwards. */
+  const scanned = typeof body.scanned === 'string' && !Number.isNaN(Date.parse(body.scanned)) ? new Date(body.scanned).toISOString() : '';
+  if (scanned && scanned <= new Date(Date.now() + 5 * 60e3).toISOString()) {
+    const last = (await pipe(cfg, [['GET', SCAN]]))[0].result || '';
+    if (scanned > last) await pipe(cfg, [['SET', SCAN, scanned]]);
+  }
+  return json(res, 200, { added, skipped, since: await since() });
 }
 
 async function readBody(req) {
