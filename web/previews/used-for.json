@@ -184,5 +184,14 @@
  "web/testimonial": "Shows client proof in a full-width section, as a video testimonial or a single quote with the client's photo and signature",
  "web/timeline": "Walks through week-based steps of a process in a dark section, laid out horizontally on desktop and stacked on phones",
  "web/video": "Shows a video with a play control in a full-width section of a marketing page",
- "web/with-image": "Splits a section into text on one side and an image or media on the other, with an optional call to action"
+ "web/with-image": "Splits a section into text on one side and an image or media on the other, with an optional call to action",
+ "web/comparison-card": "Sets two things side by side in matching cards, a header strip over a picture or a screen, with the Gushwork side lifted",
+ "web/coverage-diagram": "Shows how a buyer reaches each of two companies, as a column of steps on a dot grid with a dashed line to a dead end and a blue line to a lead",
+ "web/metrics-grid": "Draws the numbers a competitor reports as a grid of tiles, with a dashed bar for the number it leaves out",
+ "web/rating-stars": "Shows a review rating as five squares, filled and coloured by the number",
+ "web/review-card": "Quotes public reviews of a company under its rating, four to a card",
+ "web/comparison-rows": "Compares two companies row by row in three columns, with the Gushwork answer highlighted",
+ "web/plan-card": "Sets out what a company offers or who it suits, under a divider, as a price or a list of ticks",
+ "web/cta-bar": "Closes a section with a black bar that carries one line and a Book a Demo button",
+ "web/cta-comparison-card": "Shows a small comparison inside the closing call to action, clipped by the frame"
 }
