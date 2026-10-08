@@ -33,6 +33,12 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
 #ag-panel .gd-table__cell { overflow: visible; white-space: normal; text-overflow: clip; overflow-wrap: break-word; }
 #ag-panel .gd-table__cell--flex { flex-wrap: wrap; row-gap: var(--gw-space-4); }
 #ag-panel .gd-table__avatar { font-size: 11px; }
+/* a collapsed card shows a chevron at its right edge: down while closed, up while open */
+#ag-panel .gd-card__titles:has(> .gd-card__toggle) { flex: 1 1 auto; }
+#ag-panel .gd-card__toggle { width: 100%; justify-content: space-between; }
+#ag-panel .gd-card__toggle > svg { width: 16px; height: 16px; }
+#ag-panel .gd-card__toggle[aria-expanded="false"] > svg { transform: none; }
+#ag-panel .gd-card__toggle[aria-expanded="true"] > svg { transform: rotate(180deg); }
 /* the header rule ends where the row dividers end (the library draws it edge to edge of the inset row, the dividers a cell's padding in) */
 #ag-panel .gd-table--inset .gd-table__row--head { box-shadow: none; }
 #ag-panel .gd-table--inset .gd-table__row--head::after { content: ""; position: absolute; left: var(--gd-cell-px); right: var(--gd-cell-px); bottom: 0; height: 1px; background: var(--gd-border-strong); }
@@ -141,7 +147,7 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
   }
   /* a collapsed card: the title is the button (the library's collapsible card) */
   function foldCard(id, title, body) {
-    return '<section class="gd-card"><div class="gd-card__head"><div class="gd-card__titles"><button type="button" class="gd-card__toggle" data-gd-toggle aria-expanded="false" aria-controls="' + id + '"><h3 class="gd-card__title">' + esc(title) + '</h3></button></div></div><div class="gd-card__body" id="' + id + '" hidden>' + body + '</div></section>';
+    return '<section class="gd-card"><div class="gd-card__head"><div class="gd-card__titles"><button type="button" class="gd-card__toggle" data-gd-toggle aria-expanded="false" aria-controls="' + id + '"><h3 class="gd-card__title">' + esc(title) + '</h3>' + svg('caret', 16) + '</button></div></div><div class="gd-card__body" id="' + id + '" hidden>' + body + '</div></section>';
   }
   /* cols: [{h:'Person', w:'minmax(0,1fr)', num:true}]; rows: [{cells:[html], strong:0, attrs:''}] */
   function table(label, cols, rows) {
