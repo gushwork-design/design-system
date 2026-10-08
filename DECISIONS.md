@@ -1450,3 +1450,12 @@ Asked by Utsav, 9 Oct 2026, looking at Analytics, Bruce: "I can't see what Bruce
 - **Needs from the Slack app.** `im:history` to read the DM (the app already has it to receive DMs) and `im:write` to open the DM for rows from before this change. If Slack refuses, the view says which permission is missing instead of an empty box; new rows need only the first.
 - **Left alone.** The cap, the memory, the one-line log and who can DM Bruce. This is the owner reading his own tool's conversations; nothing is shown to anyone else.
 - **Checked.** `scripts/bruce-memory.test.mjs` (27 checks, a fake Slack): the thread opens directly or by time, the person and Bruce are told apart, Slack text is made readable, an empty system message is dropped, a missing permission is named, a bad id is refused before Slack is asked, signed-out is 401 and a teammate is 403. The view was driven in a browser against stubbed data in light and dark, including the permission error. The real Slack read is not exercised here.
+
+## R68 — the hub has agents, they are recorded in git, and they have a page
+Ruled by Utsav, 8 Oct 2026: "bruce is my main guy, he will manage more agents soon, make sure we have the infrastructure ready". Bruce is the lead; Alfred (rework) works with him; the system health checker becomes an agent called Doc.
+- **A page, in the Owner section.** `/admin/agents`, next to Analytics: a roster with Bruce as lead and a drawer in the shape of the Design System review drawer for each agent (role, how it is reached, what it does and never does, limits, memory). It is not `/agents`, which is the customer-facing marketplace.
+- **System health is Doc's page.** The sidebar no longer lists System health; Agents does, and `/admin/system-health` is reached from Doc's card and lights Agents in the rail.
+- **Recorded in git.** `agents/registry.json`, and per agent `agent.json` and `memory.md`, built into `web/admin/agents-data.json` by `scripts/agents-build.mjs`. `scripts/agents.test.mjs` checks the structure, that nothing looks like a secret, and that the built file is current.
+- **Prompts are not in git yet.** The repo is public, so an agent's prompt and guardrails stay in its routine in claude.ai until Utsav decides otherwise. Each record says so.
+- **Memory has three layers**: project memory (one writer), an agent's durable memory (a pull request), and private notes about people (the store).
+- **Next, not now**: the lead reads its routing from the registry, so adding an agent needs no code; one run log for every agent.

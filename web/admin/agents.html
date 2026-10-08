@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agents — Gushwork Design</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="The agents that run the design hub: who leads, what each can do, and where each keeps its memory.">
+<script>try{var c=localStorage.getItem('gw-theme-choice'),t=c==='dark'||c==='light'?c:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20x%3D%221%22%20y%3D%221%22%20width%3D%2278%22%20height%3D%2278%22%20rx%3D%2219%22%20fill%3D%22%230070ff%22%20stroke%3D%22%230061e0%22%20stroke-width%3D%222%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="/foundation/tokens.css">
+<link rel="stylesheet" href="/shell.css?v=ghost9">
+<script src="/shell.js?v=ghost9" defer></script>
+<style>
+/* /admin/agents — the agents that run the design hub (8 Oct 2026). Same chrome as the other admin pages (shell.css and shell.js); the
+   content is a roster with Bruce as lead and a drawer in the shape of the Design System review drawer. The data is agents/ in git,
+   built into agents-data.json by scripts/agents-build.mjs. Nothing here is a secret: the repo is public. */
+body[data-gw-page="agents"] .sg__main { grid-column: 1 / -1; max-width: 1120px; gap: var(--gw-space-32); }
+body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw-space-8); }
+html.ag-open { overflow: hidden; }
+#ag-app { display: grid; gap: var(--gw-space-32); }
+#ag-app[hidden] { display: none; }
+#ag-state:empty { display: none; }
+.ag-note { padding: var(--gw-space-24); border-radius: var(--gw-radius-16); background: var(--s-card-bg); box-shadow: inset 0 0 0 1px var(--s-card-border); font: var(--gw-text-body-14-reg); color: var(--s-body); }
+.ag-note b { display: block; font: var(--gw-text-body-16-sem); color: var(--s-heading); margin-bottom: var(--gw-space-4); }
+.ag-h { margin: 0 0 var(--gw-space-12); font: 600 12px/1.3 var(--gw-font-body); letter-spacing: .04em; text-transform: uppercase; color: var(--s-group-label, var(--s-body)); }
+
+/* the pictures: Bruce's face, and an initial for the others */
+.ag-pic { width: 56px; height: 56px; flex: none; border-radius: var(--gw-radius-12); display: grid; place-items: center; font: 700 22px/1 var(--gw-font-display); color: var(--s-heading); background: var(--s-nav-sel); }
+.ag-pic--bruce { background: var(--gw-color-primary-100) url(/assets/bruce-avatar.png) center / cover no-repeat; }
+.ag-pic--alfred { background: var(--gw-color-primary-500); color: var(--gw-color-white); }
+.ag-pic--sm { width: 28px; height: 28px; border-radius: var(--gw-radius-8); font-size: 12px; }
+.ag-tag { display: inline-flex; align-items: center; height: 22px; padding: 0 var(--gw-space-8); border-radius: var(--gw-radius-4); font: var(--gw-text-body-12-med); background: var(--s-nav-sel); color: var(--s-heading); }
+.ag-tag--lead { background: var(--gw-color-primary-alpha-10); color: var(--gw-color-primary-600); }
+:root[data-theme="dark"] .ag-tag--lead { color: var(--gw-color-primary-300, var(--gw-color-primary-500)); }
+.ag-b { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 10px; border-radius: var(--gw-radius-8); font: var(--gw-text-body-12-med); white-space: nowrap; }
+.ag-b::before { content: ''; width: 6px; height: 6px; border-radius: 2px; background: currentColor; }
+.ag-b--ok { background: var(--gw-color-green-alpha-10, rgba(16,185,129,.12)); color: var(--gw-color-green-700, #047857); }
+.ag-b--plan { background: var(--s-nav-sel); color: var(--s-body); }
+:root[data-theme="dark"] .ag-b--ok { color: var(--gw-color-green-300, #6ee7b7); }
+.ag-btn { height: 36px; padding: 0 var(--gw-space-16); border-radius: var(--gw-radius-12); border: 0; cursor: pointer; font: var(--gw-text-button-14); display: inline-flex; align-items: center; justify-content: center; white-space: nowrap;
+  background: none; color: var(--s-heading); box-shadow: inset 0 0 0 1px var(--s-card-border); transition: background var(--gw-motion-fast); text-decoration: none; }
+.ag-btn:hover { background: var(--s-nav-hover); }
+.ag-btn:focus-visible, .ag-card:focus-visible { outline: 2px solid var(--gw-color-primary-500); outline-offset: 2px; }
+
+/* the lead */
+.ag-lead { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--gw-space-20); align-items: start; padding: var(--gw-space-24); border-radius: var(--gw-radius-16); background: var(--s-card-bg); box-shadow: inset 0 0 0 1px var(--s-card-border); }
+.ag-lead .ag-pic { width: 88px; height: 88px; border-radius: var(--gw-radius-16); }
+.ag-lead__t { display: flex; align-items: center; gap: var(--gw-space-8); flex-wrap: wrap; }
+.ag-lead h2 { margin: 0; font: 600 28px/1.2 var(--gw-font-display); color: var(--s-heading); }
+.ag-lead p { margin: var(--gw-space-8) 0 0; font: var(--gw-text-body-14-reg); color: var(--s-body); max-width: 70ch; }
+.ag-lead__r { display: flex; flex-direction: column; gap: var(--gw-space-8); align-items: stretch; }
+.ag-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gw-space-16); margin-top: var(--gw-space-16); }
+.ag-facts span { display: block; font: var(--gw-text-body-12-reg); color: var(--s-body); }
+.ag-facts b { display: block; margin-top: 2px; font: var(--gw-text-body-14-med); color: var(--s-heading); }
+.ag-live { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gw-space-8); margin-top: var(--gw-space-16); }
+.ag-live > div { padding: var(--gw-space-12) var(--gw-space-16); border-radius: var(--gw-radius-12); box-shadow: inset 0 0 0 1px var(--s-card-border); }
+.ag-live span { display: block; font: var(--gw-text-body-12-reg); color: var(--s-body); }
+.ag-live b { display: block; margin-top: 2px; font: 600 20px/1.2 var(--gw-font-display); color: var(--s-heading); font-variant-numeric: tabular-nums; }
+.ag-live:empty { display: none; }
+@media (max-width: 860px) { .ag-lead { grid-template-columns: auto minmax(0, 1fr); } .ag-lead__r { grid-column: 1 / -1; flex-direction: row; } .ag-facts, .ag-live { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* the others */
+.ag-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gw-space-16); }
+@media (max-width: 760px) { .ag-grid { grid-template-columns: minmax(0, 1fr); } }
+.ag-card { display: grid; gap: var(--gw-space-12); align-content: start; padding: var(--gw-space-20); border-radius: var(--gw-radius-16); background: var(--s-card-bg); box-shadow: inset 0 0 0 1px var(--s-card-border); }
+.ag-card__h { display: flex; align-items: center; gap: var(--gw-space-12); }
+.ag-card__h h3 { margin: 0; font: 600 18px/1.3 var(--gw-font-display); color: var(--s-heading); }
+.ag-card__h small { display: block; font: var(--gw-text-body-12-reg); color: var(--s-body); }
+.ag-card__h .ag-b { margin-left: auto; }
+.ag-card p { margin: 0; font: var(--gw-text-body-14-reg); color: var(--s-body); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.ag-card dl { margin: 0; display: grid; gap: var(--gw-space-4); }
+.ag-card dl div { display: flex; justify-content: space-between; gap: var(--gw-space-12); font: var(--gw-text-body-12-reg); }
+.ag-card dt { color: var(--s-body); } .ag-card dd { margin: 0; color: var(--s-heading); text-align: right; font-weight: 500; }
+.ag-card__f { display: flex; gap: var(--gw-space-8); flex-wrap: wrap; margin-top: var(--gw-space-4); }
+.ag-how { padding: var(--gw-space-4) var(--gw-space-4); }
+.ag-how summary { cursor: pointer; font: var(--gw-text-body-14-med); color: var(--s-body); list-style: none; padding: var(--gw-space-4) 0; }
+.ag-how summary::-webkit-details-marker { display: none; }
+.ag-how summary::before { content: "\203A"; display: inline-block; margin-right: var(--gw-space-8); transition: transform var(--gw-motion-fast); }
+.ag-how[open] summary::before { transform: rotate(90deg); }
+.ag-how ol { margin: var(--gw-space-8) 0 0; padding-left: var(--gw-space-20); display: grid; gap: var(--gw-space-8); font: var(--gw-text-body-14-reg); color: var(--s-body); }
+.ag-how code { font: inherit; background: var(--s-nav-sel); padding: 0 var(--gw-space-4); border-radius: var(--gw-radius-4); }
+
+/* the drawer, in the shape of the Design System review drawer */
+.ag-scrim { position: fixed; inset: 0; z-index: 80; background: rgba(13, 13, 13, .38); }
+.ag-rv { position: fixed; top: 0; right: 0; bottom: 0; z-index: 81; width: min(560px, 100vw); display: flex; flex-direction: column; background: var(--s-panel-bg); outline: 0;
+  box-shadow: inset 1px 0 0 var(--s-card-border), -28px 0 56px -28px rgba(0, 0, 0, .4); }
+.ag-rv[hidden], .ag-scrim[hidden] { display: none; }
+.ag-h2 { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--gw-space-12); padding: var(--gw-space-20) var(--gw-space-24) var(--gw-space-16); box-shadow: inset 0 -1px 0 var(--s-card-border); }
+.ag-h2__s { font: var(--gw-text-body-12-reg); color: var(--s-body); }
+.ag-h2 h2 { margin: 4px 0 0; font: 600 22px/1.2 var(--gw-font-display); color: var(--s-heading); display: flex; gap: var(--gw-space-8); align-items: center; flex-wrap: wrap; }
+.ag-h2__r { display: flex; gap: var(--gw-space-8); flex: none; }
+.ag-x { all: unset; box-sizing: border-box; cursor: pointer; width: 28px; height: 28px; display: grid; place-items: center; border-radius: var(--gw-radius-8); color: var(--s-body); font: 500 16px/1 var(--gw-font-body); }
+.ag-x:hover { background: var(--s-nav-hover); color: var(--s-heading); }
+.ag-x:disabled { opacity: .3; cursor: default; background: none; }
+.ag-x:focus-visible { outline: 2px solid var(--gw-color-primary-500); outline-offset: 2px; }
+.ag-body { flex: 1; min-height: 0; overflow-y: auto; padding: var(--gw-space-20) var(--gw-space-24); display: flex; flex-direction: column; gap: var(--gw-space-32); }
+.ag-sec { display: flex; flex-direction: column; gap: var(--gw-space-12); }
+.ag-sec > h3 { margin: 0; font: 600 12px/1.3 var(--gw-font-body); letter-spacing: .04em; text-transform: uppercase; color: var(--s-group-label, var(--s-body)); }
+.ag-sum { margin: 0; font: var(--gw-text-body-14-reg); color: var(--s-heading); }
+.ag-dl { display: flex; flex-direction: column; }
+.ag-d { display: flex; justify-content: space-between; gap: var(--gw-space-16); padding: var(--gw-space-8) 0; box-shadow: inset 0 -1px 0 var(--s-card-border); font: var(--gw-text-body-13-reg, 400 13px/1.5 var(--gw-font-body)); }
+.ag-d:last-child { box-shadow: none; }
+.ag-d span { color: var(--s-body); flex: none; }
+.ag-d b { font-weight: 500; color: var(--s-heading); text-align: right; overflow-wrap: anywhere; }
+.ag-d b a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.ag-ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--gw-space-8); }
+.ag-ul li { position: relative; padding-left: var(--gw-space-16); font: var(--gw-text-body-14-reg); color: var(--s-heading); }
+.ag-ul li::before { content: ""; position: absolute; left: 0; top: 8px; width: 6px; height: 6px; border-radius: var(--gw-radius-4); background: var(--gw-color-primary-500); }
+.ag-ul--never li::before { background: var(--s-body); }
+.ag-mem { padding: var(--gw-space-12) var(--gw-space-16); border-radius: var(--gw-radius-12); background: var(--s-nav-sel); }
+.ag-mem .ag-ul li { font-size: 13px; color: var(--s-body); }
+.ag-mem .ag-ul li strong { color: var(--s-heading); font-weight: 600; }
+.ag-warn { padding: var(--gw-space-12) var(--gw-space-16); border-radius: var(--gw-radius-12); background: var(--gw-color-yellow-alpha-10); font: 400 13px/1.5 var(--gw-font-body); color: var(--s-heading); }
+.ag-links { display: flex; flex-wrap: wrap; gap: var(--gw-space-8); }
+</style>
+</head>
+<body data-gw-page="agents">
+
+<div class="sg">
+
+  <header class="sg__hd">
+    <h1>Agents</h1>
+    <p>The agents that run the design hub: who leads, what each can do and never does, and where each keeps its memory. Recorded in git, so a change is a pull request</p>
+  </header>
+
+  <main class="sg__main">
+    <div id="ag-state"></div>
+    <div id="ag-app" hidden>
+      <section aria-label="Lead"><div id="ag-lead"></div></section>
+      <section aria-labelledby="ag-t-team"><h2 class="ag-h" id="ag-t-team">Works with the lead</h2><div class="ag-grid" id="ag-team"></div></section>
+      <details class="ag-how"><summary>Adding an agent</summary>
+        <ol>
+          <li>Create the routine in claude.ai, with its trigger, and give it the smallest set of tools it needs.</li>
+          <li>Add a folder <code>agents/&lt;id&gt;/</code> with <code>agent.json</code> (who it is, how it is reached, what it does and never does) and <code>memory.md</code> (rulings that should outlive a chat).</li>
+          <li>List it in <code>agents/registry.json</code>, with a routing line if the lead should hand work to it.</li>
+          <li>Run <code>node scripts/agents-build.mjs</code> and <code>node scripts/agents.test.mjs</code>, then open the pull request.</li>
+          <li>Keep secrets out: the repo is public. A trigger's address and token stay in the site's environment, never in these files.</li>
+        </ol>
+      </details>
+    </div>
+  </main>
+</div>
+
+<div class="ag-scrim" id="ag-scrim" hidden></div>
+<aside class="ag-rv" id="ag-drawer" role="dialog" aria-modal="true" aria-labelledby="ag-d-t" tabindex="-1" hidden>
+  <div class="ag-h2">
+    <div><div class="ag-h2__s" id="ag-d-s">Agent</div><h2 id="ag-d-t">Agent</h2></div>
+    <div class="ag-h2__r">
+      <button type="button" class="ag-x" id="ag-prev" aria-label="Previous agent" title="Previous (←)">‹</button>
+      <button type="button" class="ag-x" id="ag-next" aria-label="Next agent" title="Next (→)">›</button>
+      <button type="button" class="ag-x" id="ag-close" aria-label="Close" title="Close (Esc)">&times;</button>
+    </div>
+  </div>
+  <div class="ag-body" id="ag-d-b"></div>
+</aside>
+
+<script>
+(function () {
+  'use strict';
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+  function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
+  var DAY = 86400000;
+  function ago(ms) { var s = Math.max(0, Math.round(ms / 1000)); if (s < 60) return s + 's ago'; var m = Math.round(s / 60); if (m < 60) return m + ' min ago'; var h = Math.round(m / 60); if (h < 48) return h + ' h ago'; return Math.round(h / 24) + ' days ago'; }
+  var S = { data: null, i: -1, live: {}, last: null };
+
+  /* the memory file, read as a list: "- **bold** text" lines, nothing else is drawn */
+  function mdList(t) {
+    var items = String(t || '').split('\n').filter(function (l) { return /^- /.test(l); }).map(function (l) {
+      return '<li>' + esc(l.slice(2)).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/`([^`]+)`/g, '$1') + '</li>';
+    });
+    return items.length ? '<ul class="ag-ul">' + items.join('') + '</ul>' : '<p class="ag-sum">Nothing written down yet.</p>';
+  }
+  function pic(a, sm) { return '<span class="ag-pic ag-pic--' + esc(a.id) + (sm ? ' ag-pic--sm' : '') + '" aria-hidden="true">' + (a.id === 'bruce' ? '' : esc(a.name.charAt(0))) + '</span>'; }
+  function status(a) { return a.status === 'live' ? '<span class="ag-b ag-b--ok">Live</span>' : '<span class="ag-b ag-b--plan">' + esc(a.status) + '</span>'; }
+  function first(list) { return list && list.length ? list[0] : 'None'; }
+
+  function render() {
+    var d = S.data, lead = d.agents.filter(function (a) { return a.id === d.lead; })[0], rest = d.agents.filter(function (a) { return a.id !== d.lead; });
+    var l = S.live.bruce;
+    $('ag-lead').innerHTML = '<article class="ag-lead">' + pic(lead) +
+      '<div><div class="ag-lead__t"><h2>' + esc(lead.name) + '</h2><span class="ag-tag ag-tag--lead">Lead</span>' + status(lead) + '</div><p>' + esc(lead.summary) + '</p>' +
+      '<div class="ag-facts"><div><span>Reached by</span><b>' + esc(lead.reachedBy.join(', ')) + '</b></div><div><span>Model</span><b>' + esc(lead.routine.model) + '</b></div><div><span>Limits</span><b>' + esc(first(lead.limits)) + '</b></div></div>' +
+      '<div class="ag-live" id="ag-bruce-live">' + (l ? '<div><span>Conversations, 30 days</span><b>' + l.convs + '</b></div><div><span>Runs</span><b>' + l.runs + '</b></div><div><span>Chats</span><b>' + l.chats + '</b></div><div><span>Last asked</span><b>' + esc(l.last) + '</b></div>' : '') + '</div></div>' +
+      '<div class="ag-lead__r"><button type="button" class="ag-btn" data-open="' + esc(lead.id) + '">Open</button><a class="ag-btn" href="/admin/analytics#bruce">Conversations</a></div></article>';
+    $('ag-team').innerHTML = rest.map(function (a) {
+      var live = S.live[a.id];
+      return '<article class="ag-card" aria-label="' + esc(a.name) + '"><div class="ag-card__h">' + pic(a) + '<div><h3>' + esc(a.name) + '</h3><small>' + esc(a.role) + '</small></div>' + status(a) + '</div>' +
+        '<p>' + esc(a.summary) + '</p><dl><div><dt>Reached by</dt><dd>' + esc(first(a.reachedBy)) + '</dd></div><div><dt>Runs</dt><dd>' + esc(first(a.schedule)) + '</dd></div>' +
+        (live ? '<div><dt>' + esc(live.label) + '</dt><dd>' + esc(live.value) + '</dd></div>' : '') + '</dl>' +
+        '<div class="ag-card__f"><button type="button" class="ag-btn" data-open="' + esc(a.id) + '">Open</button>' + (a.id === 'doc' ? '<a class="ag-btn" href="/admin/system-health">System health</a>' : '') + '</div></article>';
+    }).join('');
+  }
+
+  /* ---------- the drawer ---------- */
+  var drawer = $('ag-drawer'), scrim = $('ag-scrim'), lastFocus = null;
+  function row(k, v) { return '<div class="ag-d"><span>' + esc(k) + '</span><b>' + v + '</b></div>'; }
+  function list(items, cls) { return '<ul class="ag-ul' + (cls ? ' ' + cls : '') + '">' + items.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>'; }
+  function drawerFor(i) {
+    var d = S.data, a = d.agents[i]; S.i = i;
+    $('ag-d-s').textContent = 'Agent · ' + (i + 1) + ' of ' + d.agents.length;
+    $('ag-d-t').innerHTML = esc(a.name) + (a.lead ? ' <span class="ag-tag ag-tag--lead">Lead</span>' : '') + ' ' + status(a);
+    $('ag-prev').disabled = i === 0; $('ag-next').disabled = i === d.agents.length - 1;
+    var route = (d.routing || []).filter(function (r) { return r.agent === a.id; })[0];
+    var html = '<section class="ag-sec"><p class="ag-sum">' + esc(a.summary) + '</p></section>' +
+      '<section class="ag-sec"><h3>Details</h3><div class="ag-dl">' + row('Role', esc(a.role)) + row('Owner', esc(a.owner)) + row('Model', esc(a.routine.model)) +
+        row('Tools', esc(a.routine.tools.join(', '))) + row('Routine', '<a href="' + esc(a.routine.url) + '" target="_blank" rel="noopener noreferrer">Open in claude.ai</a>') + '</div></section>' +
+      '<section class="ag-sec"><h3>Reached by</h3>' + list(a.reachedBy) + '</section>' +
+      '<section class="ag-sec"><h3>Runs</h3>' + list(a.schedule) + '</section>' +
+      (route ? '<section class="ag-sec"><h3>How ' + esc(S.data.agents.filter(function (x) { return x.id === S.data.lead; })[0].name) + ' hands work to ' + esc(a.name) + '</h3><div class="ag-dl">' + row('Status', esc(route.status)) + row('When', esc(route.when)) + row('Where in the code', esc(route.via)) + '</div></section>' : '') +
+      '<section class="ag-sec"><h3>Does</h3>' + list(a.does) + '</section>' +
+      '<section class="ag-sec"><h3>Never</h3>' + list(a.never, 'ag-ul--never') + '</section>' +
+      '<section class="ag-sec"><h3>Limits</h3>' + list(a.limits) + '</section>' +
+      '<section class="ag-sec"><h3>Memory</h3><div class="ag-dl">' + row('Durable', '<a href="https://github.com/gushwork-design/design-system/blob/main/' + esc(a.memory.durable) + '" target="_blank" rel="noopener noreferrer">' + esc(a.memory.durable) + '</a>') +
+        row('Per person', esc(a.memory.perPerson)) + row('Log', esc(a.memory.log)) + '</div><div class="ag-mem">' + mdList(a.memoryText) + '</div></section>' +
+      '<section class="ag-sec"><h3>Prompt</h3><div class="ag-dl">' + row('Lives in', esc(a.prompt.where)) + row('In git', a.prompt.inGit ? 'Yes' : 'Not yet') + '</div><p class="ag-warn">' + esc(a.prompt.why) + '</p></section>' +
+      (a.links && a.links.length ? '<section class="ag-sec"><h3>Links</h3><div class="ag-links">' + a.links.map(function (l) { return '<a class="ag-btn" href="' + esc(l.href) + '"' + (/^https?:/.test(l.href) ? ' target="_blank" rel="noopener noreferrer"' : '') + '>' + esc(l.label) + '</a>'; }).join('') + '</div></section>' : '');
+    $('ag-d-b').innerHTML = html; $('ag-d-b').scrollTop = 0;
+  }
+  function openDrawer(id) {
+    var i = S.data.agents.map(function (a) { return a.id; }).indexOf(id); if (i < 0) return;
+    if (drawer.hidden) { lastFocus = document.activeElement; drawer.hidden = false; scrim.hidden = false; document.documentElement.classList.add('ag-open'); }
+    drawerFor(i); drawer.focus();
+    try { history.replaceState(null, '', '#' + id); } catch (e) {}
+  }
+  function closeDrawer() {
+    drawer.hidden = true; scrim.hidden = true; document.documentElement.classList.remove('ag-open');
+    try { history.replaceState(null, '', location.pathname); } catch (e) {}
+    if (lastFocus && lastFocus.focus) { try { lastFocus.focus(); } catch (e) {} }
+  }
+  function step(d) { var n = S.data.agents[S.i + d]; if (n) openDrawer(n.id); }
+  $('ag-close').addEventListener('click', closeDrawer); scrim.addEventListener('click', closeDrawer);
+  $('ag-prev').addEventListener('click', function () { step(-1); }); $('ag-next').addEventListener('click', function () { step(1); });
+  document.addEventListener('keydown', function (ev) {
+    if (drawer.hidden) return;
+    if (ev.key === 'Escape') closeDrawer();
+    else if (ev.key === 'ArrowLeft' && !(ev.metaKey || ev.ctrlKey || ev.altKey)) { ev.preventDefault(); step(-1); }
+    else if (ev.key === 'ArrowRight' && !(ev.metaKey || ev.ctrlKey || ev.altKey)) { ev.preventDefault(); step(1); }
+  });
+  document.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-open]'); if (b) openDrawer(b.getAttribute('data-open')); });
+
+  /* ---------- what is live: only what the hub can see for itself ---------- */
+  function liveBruce() {
+    return fetch('/api/bruce-memory?log=1', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+      if (!j || !j.configured) return;
+      var cut = Date.now() - 30 * DAY, rows = (j.rows || []).filter(function (r) { return r.kind !== 'sent' && new Date(r.at).getTime() >= cut; });
+      var users = {}; rows.forEach(function (r) { users[r.user] = 1; });
+      var last = rows.length ? Math.max.apply(null, rows.map(function (r) { return new Date(r.at).getTime(); })) : 0;
+      S.live.bruce = { convs: Object.keys(users).length, runs: rows.filter(function (r) { return r.kind === 'run'; }).length, chats: rows.filter(function (r) { return r.kind === 'chat'; }).length, last: last ? ago(Date.now() - last) : '—' };
+    }).catch(function () {});
+  }
+  function liveDoc() {
+    return fetch('/api/health', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+      var c = j && j.counts; if (!c || typeof c.ok !== 'number') return;
+      S.live.doc = { label: 'Last check', value: c.ok + ' ok, ' + (c.warn || 0) + ' warn, ' + (c.fail || 0) + ' fail' };
+    }).catch(function () {});
+  }
+
+  fetch('/admin/agents-data.json', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.json(); }).then(function (data) {
+    S.data = data; $('ag-app').hidden = false; render();
+    var deepLink = location.hash.slice(1); if (deepLink) openDrawer(deepLink);
+    return Promise.all([liveBruce(), liveDoc()]).then(function () { render(); });
+  }).catch(function () {
+    $('ag-state').innerHTML = '<div class="ag-note"><b>Could not load the agents</b>Try again in a moment.</div>';
+  });
+})();
+</script>
+</body></html>
