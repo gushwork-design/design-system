@@ -71,7 +71,7 @@ t('non-addresses are filtered out of the admin list', normalise({ routes: [{ pat
    usage log, analytics and system health, and the one public ad lander. This used to assert just the first two and went stale
    as routes were added; it now names them all so adding one is a deliberate edit here. */
 t('the compiled fallback routes and their tiers', defaultRules().routes.map(r => r.access),
-  ['admin', 'internal', 'internal', 'internal', 'admin', 'owner', 'owner', 'owner', 'public']);   // /library and /previews became internal on 3 Oct 2026; /admin/system-health is the third owner page
+  ['admin', 'internal', 'internal', 'internal', 'admin', 'internal', 'owner', 'owner', 'owner', 'internal', 'public']);   // /library and /previews became internal on 3 Oct 2026; /agents on 7 Oct; /admin/system-health is the third owner page; Drop Studio opened to the org on 9 Oct
 t('previews: an ordinary teammate is let in (internal tier since 3 Oct 2026)', decide('/previews/web/button.html', S('sam@gushwork.ai'), normalise(defaultRules())), 'allow');
 
 /* The usage log lists who ran a session. It is the owner tier, so an admin who is not an
@@ -91,6 +91,9 @@ t('system health: an admin who is not an owner is forbidden',
   decide('/admin/system-health', S('priya@gushwork.ai'), { ...compiled, admins: ['priya@gushwork.ai'] }), 'forbid');
 t('system health: an owner is let in', decide('/admin/system-health', S('utsav.singh@gushwork.ai'), compiled), 'allow');
 t('analytics: an owner is let in', decide('/admin/analytics', S('utsav.singh@gushwork.ai'), compiled), 'allow');
+t('drop studio: an ordinary teammate is let in (the org, since 9 Oct 2026)', decide('/internal/staging/drop-studio', S('sam@gushwork.ai'), compiled), 'allow');
+t('drop studio: someone outside the organisation is kept out', decide('/internal/staging/drop-studio', S('sam@example.com'), compiled), 'forbid');
+t('drop studio: signed out is sent to sign in', decide('/internal/staging/drop-studio', null, compiled), 'signin');
 
 /* The unconfigured path — no Edge Config store — is what every deployment
    serves until a store is attached, and it is the one the page crashed on:

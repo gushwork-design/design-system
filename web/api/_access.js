@@ -77,9 +77,12 @@ export function defaultRules() {
          api/_usage-log.js, which the data cannot be read without. */
       { path: '/admin/analytics', access: 'owner', groups: [], people: [] },
       { path: '/admin/system-health', access: 'owner', groups: [], people: [] },
-      /* Drop Studio (staging): the owner only for now. Marketing joins through Access Control (a named
-         group or people) once the accounts are known. Decided 8 Oct 2026: "start phase 1 with the owner gate". */
-      { path: '/internal/staging/drop-studio', access: 'owner', groups: [], people: [] },
+      /* Drop Studio (staging): everyone in the organisation. It was the owner alone from 8 Oct 2026 ("start
+         phase 1 with the owner gate") and opened to the org on 9 Oct 2026 ("keep permission for everyone in the
+         org") so the team can react to it. Anyone in the org can browse, download, make a picture request and
+         answer ChatGPT's question; accepting, changing or discarding a picture stays the owner's, checked in
+         api/_drop-studio.js and not by this rule. */
+      { path: '/internal/staging/drop-studio', access: 'internal', groups: [], people: [] },
       /* Ad landers are public on purpose. An ad page's whole job is to be
          pasted into Slack, sent to a client and run as paid media, and a
          social card cannot render from behind the gate: the scraper fetching
