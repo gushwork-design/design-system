@@ -98,14 +98,13 @@ export default async function handler(req, res) {
   }
   const company = isInternal(email) && !(claims.hd && String(claims.hd).toLowerCase() !== allowedDomain());
   if (!company) {
-    let guest = false;
-    try { guest = !isInternal(email) && guestActive(email, await loadRules()); } catch { guest = false; }
+    let guest = false, rules = null;
+    try { rules = await loadRules(); guest = !isInternal(email) && guestActive(email, rules); } catch { guest = false; }
     if (!guest) {
       return deny(res, 'Not on the list',
         'This part of the design system is for @' + allowedDomain() + ' accounts and invited guests. ' +
         email.replace(/[<>&]/g, '') + ' is neither. Sign in with your Gushwork account, or ask whoever shared the page to invite you.');
     }
-    const rules = await loadRules();
     const end = Date.parse(rules.guests[email].expires + 'T23:59:59Z') / 1000;
     const gp = { typ: 'guest', email, name: claims.name || email, picture: claims.picture || null,
                  exp: Math.min(Math.floor(Date.now() / 1000) + MAX_AGE, Math.floor(end)) };

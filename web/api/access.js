@@ -168,6 +168,8 @@ export default async function handler(req, res) {
   if (!next) {
     return json(res, 400, { error: 'Those rules did not validate. Nothing was saved.' });
   }
+  /* A page loaded before guests existed does not send them; that is not a request to remove them all. */
+  if (!(body && body.rules && typeof body.rules === 'object' && 'guests' in body.rules)) next.guests = { ...(rules.guests || {}) };
 
   if (!owner && !sameEmails(next.admins, rules.admins)) {
     return json(res, 403, {
@@ -204,7 +206,7 @@ export default async function handler(req, res) {
   for (const [ln, l] of Object.entries(next.lanes || {})) {
     if ((l.people || []).some(outside)) return json(res, 400, { error: 'Only ' + dom + ' accounts can publish to a lane (' + ln + '). Nothing was saved.' });
   }
-  const guestKey = r => JSON.stringify(Object.keys(r.guests || {}).sort().map(k => [k, r.guests[k].expires]));
+  const guestKey = r => JSON.stringify(Object.keys(r.guests || {}).sort().map(k => [k, r.guests[k].expires, r.guests[k].by]));
   if (!owner && guestKey(next) !== guestKey(rules)) {
     return json(res, 403, { error: 'Only an owner can invite, renew or remove guests. Your other changes were not saved.' });
   }
@@ -217,6 +219,19 @@ export default async function handler(req, res) {
   const before = new Set();
   for (const r of rules.routes || []) (r.people || []).forEach(e => before.add(e));
   for (const members of Object.values(rules.groups || {})) (members || []).forEach(e => before.add(e));
+  /* An admin may not put ANY outside address onto a rule or team it was not on before, guest already or not: letting someone outside
+     into more of the site is the owner's call, the same as inviting them. (Removing one, or leaving it where it is, is fine.) */
+  if (!owner) {
+    const wasOn = new Map();
+    const note = (k, list) => (list || []).forEach(e => { const s = wasOn.get(e) || new Set(); s.add(k); wasOn.set(e, s); });
+    for (const r of rules.routes || []) note('r:' + r.path, r.people);
+    for (const [g, m] of Object.entries(rules.groups || {})) note('g:' + g, m);
+    const wider = [];
+    const check = (k, list) => (list || []).forEach(e => { if (outside(e) && !(wasOn.get(e) || new Set()).has(k)) wider.push(e); });
+    for (const r of next.routes) check('r:' + r.path, r.people);
+    for (const [g, m] of Object.entries(next.groups || {})) check('g:' + g, m);
+    if (wider.length) return json(res, 403, { error: 'Only an owner can give someone outside the company access (' + [...new Set(wider)].slice(0, 3).join(', ') + '). Your other changes were not saved.' });
+  }
   const strays = [...named].filter(e => outside(e) && !(next.guests || {})[e] && !before.has(e));
   if (strays.length) {
     if (!owner) return json(res, 403, { error: 'Only an owner can invite guests (' + strays.slice(0, 3).join(', ') + '). Your other changes were not saved.' });

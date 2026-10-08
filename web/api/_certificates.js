@@ -40,6 +40,7 @@ import { loadRules, decide, isAdmin, allowedDomain } from './_access.js';
 const KEY = 'gw:certs';
 const NAMES = 'gw:cert-names';   // email -> the display name from that person's own Google sign-in
 const MAX_ITEMS = 1000;
+const GUEST_MAX_ITEMS = 20;
 const MAX_PEOPLE = 50;
 const MAX_TITLE = 120;
 const MAX_PAGES = 50;
@@ -246,7 +247,16 @@ export default async function handler(req, res) {
       const data = pages[0];
       const r = await pipe(cfg, [['HLEN', KEY]]);
       if ((r[0] && r[0].result) >= MAX_ITEMS) return json(res, 507, { error: 'The list is full. Delete some old certificates first.' });
-      const access = body.access ? cleanAccess(body.access, me.email) : DEFAULT_ACCESS;
+      /* A guest's file is private to them: never the 'everyone who can open the tool' default, which would let the company's staff
+         edit it, and never a share list. And a guest may keep only a handful, so one cannot fill the shared list for everyone. */
+      if (me.guest) {
+        const all = await pipe(cfg, [['HVALS', KEY]]);
+        let mine = 0;
+        for (const s of (all[0] && all[0].result) || []) { try { if (JSON.parse(s).savedBy === me.email) mine++; } catch { /* skip */ } }
+        if (mine >= GUEST_MAX_ITEMS) return json(res, 507, { error: 'Guests can keep ' + GUEST_MAX_ITEMS + ' certificates. Delete one first.' });
+      }
+      const access = me.guest ? { general: 'restricted', role: 'edit', people: [] }
+        : body.access ? cleanAccess(body.access, me.email) : DEFAULT_ACCESS;
       if (typeof access === 'string') return json(res, 400, { error: access });
       const item = { id: newId(), title: cleanTitle(body.title), data, pages, access, savedBy: me.email, savedAt: now, updatedBy: me.email, updatedAt: now };
       await pipe(cfg, [['HSET', KEY, item.id, JSON.stringify(item)]]);

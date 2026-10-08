@@ -209,6 +209,8 @@ const cookieVal = (r, name) => decodeURIComponent((([].concat(r.headers['set-coo
 {
   const r = await call(me, { headers: asGuest.cookie ? asGuest : {} });
   t('me: a guest is signed in, a guest, not admin, no teams', [r.body.signedIn, r.body.guest, r.body.admin, r.body.owner, r.body.groups], [true, true, false, false, []]);
+  const lapsedC = cookies([GUEST_COOKIE, await sign({ typ: 'guest', email: 'lapsed@partner.test', exp: Math.floor(Date.now() / 1000) + 3600 }, guestSecret())]);
+  t('me: a guest whose invite has lapsed reads as signed out, not as a guest', (await call(me, { headers: lapsedC })).body.signedIn, false);
   const s = await call(me, { headers: asStaff });
   t('me: staff unchanged', [s.body.signedIn, s.body.guest, s.body.groups], [true, undefined, ['gtm']]);
   const tl = await call(tools, { headers: asGuest });
@@ -243,6 +245,14 @@ const cookieVal = (r, name) => decodeURIComponent((([].concat(r.headers['set-coo
   const ally = await call(certs, { headers: stranger });
   t('certificates: a guest on the tool through a team still sees only their own (none)', (ally.body.items || []).length, 0);
   t('a name is not stored for a guest', [...(hashes.get('gw:cert-names') || new Map()).keys()].includes('guest@partner.test'), false);
+  /* a guest's new file is private to them, cannot be shared out to staff by the body, and they may keep only a few */
+  const made = await call(certs, { method: 'POST', headers: asGuest, body: { title: 'fresh', data: { name: 'x' }, access: { general: 'tool', role: 'edit', people: [{ email: 'sam@gushwork.ai', role: 'edit' }] } } });
+  t('a guest\'s new certificate is restricted, whatever the body asks', [made.status, made.body.item && made.body.item.access], [200, { general: 'restricted', role: 'edit', people: [] }]);
+  const staffSees = await call(certs, { headers: asStaff });
+  t('and staff do not see it', (staffSees.body.items || []).some((i) => i.title === 'fresh'), false);
+  let last = 200;
+  for (let i = 0; i < 25 && last === 200; i++) last = (await call(certs, { method: 'POST', headers: asGuest, body: { title: 'n' + i, data: { name: 'x' } } })).status;
+  t('a guest cannot fill the shared list', last, 507);
   const noTool = cookies([GUEST_COOKIE, await sign({ typ: 'guest', email: 'lapsed@partner.test', exp }, guestSecret())]);
   t('a guest who is not named on the tool is refused', (await call(certs, { headers: noTool })).status, 403);
 }
@@ -275,6 +285,15 @@ const owner = cookies([COOKIE, ownerCookie]), boss = cookies([COOKIE, bossCookie
   rules2();
   r = await save(boss, (x) => { delete x.guests['guest@partner.test']; });
   t('nor remove one', r.status, 403);
+  rules2();
+  r = await save(boss, (x) => { x.routes.push({ path: '/internal/staging/other', access: 'people', groups: [], people: ['ally@partner.test'] }); });
+  t('nor widen an existing guest onto a page they were not on', r.status, 403);
+  rules2();
+  r = await save(boss, (x) => { x.guests['guest@partner.test'].by = 'someone@gushwork.ai'; });
+  t('nor rewrite who invited a guest', r.status, 403);
+  rules2();
+  r = await call(accessApi, { method: 'POST', headers: owner, body: { rules: (() => { const c = A.normalise(rulesJson.access); delete c.guests; return c; })() } });
+  t('a page that does not send guests does not wipe them', [r.status, Object.keys((vercelWrites.at(-1) || {}).guests || {}).length > 0], [200, true]);
   rules2();
   r = await save(boss, (x) => { x.routes.push({ path: '/internal/staging/other', access: 'people', groups: [], people: ['sam@gushwork.ai'] }); });
   t('an admin can still edit ordinary rules, and the guests ride along', [r.status, Object.keys((vercelWrites.at(-1) || {}).guests || {}).sort()], [200, ['ally@partner.test', 'guest@partner.test', 'lapsed@partner.test']]);
