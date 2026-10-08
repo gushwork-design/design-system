@@ -726,12 +726,19 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
   }
   function effOf(path) { return ownRule(path) || effectiveRule(path) || { path: path, access: 'internal', groups: [], people: [] }; }
 
+  /* Like Pages, the Templates tab lists only the exceptions: a template whose level is not "everyone at the company", whether it has a
+     rule of its own or follows a stricter section rule. One stays listed for the rest of this visit once it has been picked or edited. */
+  function tplListed(t) { return effOf(t.path).access !== 'internal' || !!revealed[t.path]; }
   function templatesCard() {
-    var all = TEMPLATES[0], each = TEMPLATES.slice(1);
-    if (!TEMPLATES.some(function (t) { return t.path === tplSel; })) tplSel = all.path;
+    var all = TEMPLATES[0], each = TEMPLATES.slice(1), shown = each.filter(tplListed), quiet = each.length - shown.length;
+    if (tplSel !== all.path && !shown.some(function (t) { return t.path === tplSel; })) tplSel = all.path;
     var rail = '<div class="ac-ppl__sec">Whole section</div>' + railItem(all.path, esc(all.name), shortLevel(effOf(all.path)), tplSel === all.path) +
-      '<div class="ac-ppl__sec">Templates</div>' + each.map(function (t) { return railItem(t.path, esc(t.name), shortLevel(effOf(t.path)), tplSel === t.path); }).join('');
-    var card = el('<section class="ac-card"><div class="ac-card__hd"><div><h3>Templates</h3><p>Who can see the templates.</p></div></div>' +
+      '<div class="ac-ppl__sec">Find a template</div>' +
+      '<div class="ac-ppl__new"><input class="ac-field" data-newtpl placeholder="Search templates" aria-label="Find a template to change"></div>' +
+      '<div class="ac-ppl__sec">Not open to everyone</div>' +
+      (shown.length ? shown.map(function (t) { return railItem(t.path, esc(t.name), shortLevel(effOf(t.path)), tplSel === t.path); }).join('') : '<p class="ac-ppl__empty">None yet.</p>') +
+      (quiet ? '<p class="ac-ppl__empty">' + plural(quiet, 'template') + ' open to everyone at ' + esc(meta.domain) + ' not listed. Search to change one.</p>' : '');
+    var card = el('<section class="ac-card"><div class="ac-card__hd"><div><h3>Templates</h3><p>Templates that are not open to everyone.</p></div></div>' +
       '<div class="ac-card__body"><div class="ac-ppl"><nav class="ac-ppl__rail" aria-label="Templates">' + rail + '</nav><div class="ac-ppl__main ac-ppl__main--rule" data-main></div></div></div></section>');
     var it = TEMPLATES.filter(function (t) { return t.path === tplSel; })[0];
     var item = { path: it.path, name: it.name, img: it.section ? '' : it.img, follow: it.section ? '' : 'the whole section' };
@@ -740,6 +747,7 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
       var b = ev.target.closest('[data-sel]'); if (!b) return;
       tplSel = b.dataset.sel; render();
     });
+    bindSuggest(card.querySelector('[data-newtpl]'), { templates: true, skip: function () { return false; }, onPick: function (it) { revealed[it.path] = true; tplSel = it.path; render(); } });
     return card;
   }
 
@@ -1012,7 +1020,14 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
     });
     return f.slice(0, 8);
   }
+  function templateItems(q) {
+    var ql = q.trim().toLowerCase().replace(/^\//, '');
+    return TEMPLATES.slice(1).filter(function (t) { return !ql || t.name.toLowerCase().indexOf(ql) > -1 || t.path.toLowerCase().indexOf(ql) > -1; }).map(function (t) {
+      return { kind: 'page', group: 'Templates', path: t.path, title: t.name, rule: effOf(t.path).access };
+    });
+  }
   function buildItems(q, opts) {
+    if (opts.templates) return templateItems(q);
     if (opts.pages) return pageItems(q);
     var items = [], ql = q.trim().toLowerCase();
     if (opts.teams) {
@@ -1044,7 +1059,7 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
     var html = '', last = '';
     sgItems.forEach(function (it, i) {
       if (it.kind === 'page') {
-        if (!last) { html += '<div class="ac-sg__h">Pages</div>'; last = 'Pages'; }
+        if (!last) { html += '<div class="ac-sg__h">' + (it.group || 'Pages') + '</div>'; last = it.group || 'Pages'; }
         var tag = it.rule === null ? 'No rule of its own' : (it.rule === 'internal' ? 'Open to everyone' : levelLabel(it.rule));
         html += '<button type="button" class="ac-sg__o" role="option" data-i="' + i + '" aria-selected="' + (i === sgActive) + '"><span class="ac-av ac-av--team">' + icon('globe') + '</span>' +
           '<span class="ac-sg__t"><span class="ac-sg__n">' + esc(it.path) + '</span><span class="ac-sg__e">' + (it.title ? esc(it.title) + ' · ' : '') + esc(tag) + '</span></span></button>';
