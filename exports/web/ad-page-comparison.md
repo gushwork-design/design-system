@@ -68,7 +68,7 @@ colour (primary-500, red-500 or neutral-500); the text stays `neutral-900` or `n
 
 ## `page-mock`
 
-A web page drawn in HTML inside the picture well, in place of a screenshot (`.pgmock`, `.pg-bar`, `.pg-body`, `.pg-blk`): a `neutral-50` browser bar with three dots and the address, a title in `h8-bold`, then 36-high blocks in `primary-25` with a `primary-100` ring and `primary-600` labels in `body-12-sem`, each with a 14px icon. One block may end in a small `primary-500` button. It is 84% of the well wide (92% on phone), starts 24 below the top and is clipped at the bottom by the well, as the pictures were. Every size is a ramp step; no value is off-token. New on the Gushwork vs Athena page, pending review.
+A web page drawn in HTML inside the picture well, in place of a screenshot (`.pgmock`, `.pg-bar`, `.pg-body`, `.pg-blk`): a `neutral-50` browser bar with three dots and the address, a title in `h8-bold`, then 36-high blocks in `primary-25` with a `primary-100` ring and `primary-600` labels in `body-12-sem`, each with a 14px icon. One block may end in a small `primary-500` button. It is 84% of the well wide (92% on phone), starts 24 below the top and is clipped at the bottom by the well, as the pictures were. Every size is a ramp step; no value is off-token. Motion (R64, once, never looped): the blocks rise in turn, each icon scales in behind its block, and the button arrives and is pressed once; a block leans 2px on hover. New on the Gushwork vs Athena page, pending review.
 
 ## `steps-card`
 
