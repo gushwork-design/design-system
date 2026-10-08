@@ -361,6 +361,9 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
 .ac-head { background: none; border-radius: 0; box-shadow: none; border-bottom: 1px solid var(--s-chrome-border); }
 .ac-card__ft { background: none; border-radius: 0; border-top: 1px solid var(--s-chrome-border); padding: var(--gw-space-16) var(--gw-space-12) 0; margin-top: var(--gw-space-8); }
 .ac-card__ft .ac-field { background: var(--s-field-bg); }
+.ac-card__ft--pages .ac-field { max-width: 360px; width: 100%; }
+.ac-empty { padding: var(--gw-space-24) var(--gw-space-12); color: var(--s-nav-label); font: var(--gw-text-body-14-reg); }
+.ac-card__note { padding: var(--gw-space-12) var(--gw-space-12) 0; color: var(--s-nav-label); font: var(--gw-text-body-12-reg); }
 /* No description under the tab (it only repeated what the tab and the columns say), and rows with room to
    breathe: more padding, and looser lines in the name / path / follows stack. */
 .ac-card__hd { display: none; }
@@ -659,40 +662,53 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
 
   /* Ten rules to a page; the pager shows only when there is more than a page. */
   var ROUTES_PER = 10, routesPage = 1;
+  /* The Pages tab lists only the pages with a rule that is not "everyone at the company": the exceptions. Tools and templates have
+     their own tabs. A page stays listed for the rest of this visit once it has been added or edited, so choosing "Anyone at
+     gushwork.ai" on a row does not make the row vanish under the cursor. */
+  var revealed = {};
+  function ownTab(path) {
+    return TOOLS.some(function (t) { return t.path === path; }) || path === '/internal/templates' || path.indexOf('/internal/templates/') === 0;
+  }
+  function listed(r) { return !ownTab(r.path) && (r.access !== 'internal' || revealed[r.path]); }
   function pagesCard() {
+    var shown = [], quiet = 0;
+    draft.routes.forEach(function (r, i) { if (listed(r)) shown.push(i); else if (!ownTab(r.path)) quiet++; });
     var card = el(
       '<section class="ac-card">' +
         '<div class="ac-card__hd">' +
-          '<div><h3>Pages</h3><p>The most specific matching path wins, so a rule on ' +
-            '<code>/internal/staging</code> overrides the one on <code>/internal</code>.</p></div>' +
-          '<span class="ac-card__n">' + plural(draft.routes.length, 'rule') + '</span>' +
+          '<div><h3>Pages</h3><p>Pages that are not open to everyone at ' + esc(meta.domain) + '. The most specific matching path wins, so a rule on ' +
+            '<code>/internal/staging</code> overrides the one on <code>/internal</code>. Tools and templates are on their own tabs.</p></div>' +
+          '<span class="ac-card__n">' + plural(shown.length, 'page') + '</span>' +
         '</div>' +
         '<div class="ac-card__body">' +
           '<div class="ac-head"><span>Path</span><span>Who can see it</span>' +
             '<span>People &amp; groups</span><span></span></div>' +
           '<div data-rows></div>' +
+          (shown.length ? '' : '<div class="ac-empty">Every page is open to everyone at ' + esc(meta.domain) + ', apart from the tools and templates. ' +
+            'Search below to restrict one.</div>') +
           '<div class="ac-pg" data-pg hidden></div>' +
         '</div>' +
-        '<div class="ac-card__ft">' +
-          '<input class="ac-field" data-newpath placeholder="/internal/new-page" ' +
-            'aria-label="Path to add" ' +
+        '<div class="ac-card__ft ac-card__ft--pages">' +
+          '<input class="ac-field" data-newpath placeholder="Search pages, or type a path" ' +
+            'aria-label="Find a page to change" ' +
             'data-1p-ignore="true" data-lpignore="true" data-form-type="other">' +
           '<button class="ac-btn" type="button" data-addpath>' + icon('plus') +
             '<span>Add a page</span></button>' +
         '</div>' +
+        (quiet ? '<div class="ac-card__note">' + plural(quiet, 'other page rule') + ' open to everyone at ' + esc(meta.domain) + ' not listed. Search above to change one.</div>' : '') +
       '</section>'
     );
 
     var rows = card.querySelector('[data-rows]');
     /* Rows keep their ABSOLUTE index in draft.routes (data-i), so every handler below still edits the right rule. */
-    var pgCount = Math.max(1, Math.ceil(draft.routes.length / ROUTES_PER));
+    var pgCount = Math.max(1, Math.ceil(shown.length / ROUTES_PER));
     routesPage = Math.min(Math.max(1, routesPage), pgCount);
     var from = (routesPage - 1) * ROUTES_PER;
-    draft.routes.slice(from, from + ROUTES_PER).forEach(function (r, k) { rows.appendChild(routeRow(r, from + k)); });
+    shown.slice(from, from + ROUTES_PER).forEach(function (ri) { rows.appendChild(routeRow(draft.routes[ri], ri)); });
     var pg = card.querySelector('[data-pg]');
-    if (draft.routes.length > ROUTES_PER) {
+    if (shown.length > ROUTES_PER) {
       pg.hidden = false;
-      pg.innerHTML = '<span class="ac-pg__t">' + (from + 1) + '–' + Math.min(from + ROUTES_PER, draft.routes.length) + ' of ' + draft.routes.length + '</span>' +
+      pg.innerHTML = '<span class="ac-pg__t">' + (from + 1) + '–' + Math.min(from + ROUTES_PER, shown.length) + ' of ' + shown.length + '</span>' +
         '<div class="ac-pg__r"><span class="ac-pg__t">Page ' + routesPage + ' of ' + pgCount + '</span>' +
         '<button class="ac-pg__b" type="button" data-pgnav="prev" aria-label="Previous page"' + (routesPage <= 1 ? ' disabled' : '') + '>' + icon('arrow-left') + '</button>' +
         '<button class="ac-pg__b" type="button" data-pgnav="next" aria-label="Next page"' + (routesPage >= pgCount ? ' disabled' : '') + '>' + icon('arrow-right') + '</button></div>';
@@ -708,7 +724,8 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
       if (trig && !trig.disabled) { toggleDD(trig.closest('[data-dd]')); return; }
       var opt = ev.target.closest('.ac-dd__opt');
       if (opt && !opt.disabled) {
-        draft.routes[+opt.closest('.ac-row').dataset.i].access = opt.dataset.v;
+        var changed = draft.routes[+opt.closest('.ac-row').dataset.i];
+        changed.access = opt.dataset.v; revealed[changed.path] = true;
         render();
         return;
       }
@@ -717,18 +734,29 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
       render();
     });
 
-    card.querySelector('[data-addpath]').addEventListener('click', function () {
-      var input = card.querySelector('[data-newpath]');
-      var path = input.value.trim().replace(/\/+$/, '');
+    /* Pick or type a page: an existing rule is shown (and its row opened), a page with none gets one at "everyone", ready to change. */
+    var input = card.querySelector('[data-newpath]'), note = card.querySelector('.ac-card__note');
+    function addPage(path) {
+      path = String(path || '').trim().replace(/\/+$/, '');
       if (!path) return;
-      if (path.charAt(0) !== '/') { input.value = '/' + path; return; }
-      if (draft.routes.some(function (r) { return r.path === path; })) { input.value = ''; return; }
-      draft.routes.push({ path: path, access: 'internal', groups: [], people: [] });
-      draft.routes.sort(function (a, b) { return a.path.localeCompare(b.path); });
-      /* show the new rule: jump to the page it landed on */
-      routesPage = Math.floor(draft.routes.findIndex(function (r) { return r.path === path; }) / ROUTES_PER) + 1;
+      if (path.charAt(0) !== '/') path = '/' + path;
+      if (ownTab(path)) { flash('That one is on the ' + (path.indexOf('/internal/templates') === 0 ? 'Templates' : 'Tools') + ' tab.'); return; }
+      revealed[path] = true;
+      if (!draft.routes.some(function (r) { return r.path === path; })) {
+        draft.routes.push({ path: path, access: 'internal', groups: [], people: [] });
+        draft.routes.sort(function (a, b) { return a.path.localeCompare(b.path); });
+      }
+      /* show the rule: jump to the page it is on */
+      var idx = draft.routes.findIndex(function (r) { return r.path === path; }), at = 0;
+      for (var k = 0; k < idx; k++) if (listed(draft.routes[k])) at++;
+      routesPage = Math.floor(at / ROUTES_PER) + 1;
       render();
-    });
+    }
+    function flash(msg) {
+      input.setCustomValidity(msg); input.reportValidity(); setTimeout(function () { input.setCustomValidity(''); }, 2500);
+    }
+    bindSuggest(input, { pages: true, skip: function () { return false; }, onPick: function (it) { addPage(it.path); } });
+    card.querySelector('[data-addpath]').addEventListener('click', function () { addPage(input.value); });
 
     return card;
   }
@@ -938,7 +966,27 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
     else { sg.style.bottom = 'auto'; sg.style.top = (r.bottom + 6) + 'px'; }
   }
   function matches(q, p) { return !q || (p.name && p.name.toLowerCase().indexOf(q) > -1) || p.email.toLowerCase().indexOf(q) > -1; }
+  /* The pages to suggest: every page the deploy serves (admin/pages.json) plus every path with a rule, minus the tools and templates,
+     which have their own tabs. A page already listed is still offered (picking it just jumps to it); one open to everyone is marked. */
+  var sitePages = [];
+  function pageItems(q) {
+    var ql = q.trim().toLowerCase().replace(/^\//, ''), seen = {}, out = [];
+    function add(path, title) {
+      if (seen[path] || ownTab(path)) return; seen[path] = 1;
+      var rule = draft.routes.filter(function (r) { return r.path === path; })[0];
+      out.push({ kind: 'page', path: path, title: title || '', rule: rule ? rule.access : null, listed: rule ? listed(rule) : false });
+    }
+    sitePages.forEach(function (p) { add(p.u, p.t); });
+    draft.routes.forEach(function (r) { add(r.path, ''); });
+    var f = out.filter(function (x) { return !ql || x.path.toLowerCase().indexOf(ql) > -1 || x.title.toLowerCase().indexOf(ql) > -1; });
+    f.sort(function (a, b) {
+      var as = ql && a.path.toLowerCase().replace(/^\//, '').indexOf(ql) === 0 ? 0 : 1, bs = ql && b.path.toLowerCase().replace(/^\//, '').indexOf(ql) === 0 ? 0 : 1;
+      return as - bs || a.path.localeCompare(b.path);
+    });
+    return f.slice(0, 8);
+  }
   function buildItems(q, opts) {
+    if (opts.pages) return pageItems(q);
     var items = [], ql = q.trim().toLowerCase();
     if (opts.teams) {
       Object.keys(draft.groups || {}).sort().filter(function (n) { return !ql || n.indexOf(ql.replace(/^@/, '')) > -1; }).forEach(function (n) {
@@ -968,6 +1016,13 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
   function paintSg() {
     var html = '', last = '';
     sgItems.forEach(function (it, i) {
+      if (it.kind === 'page') {
+        if (!last) { html += '<div class="ac-sg__h">Pages</div>'; last = 'Pages'; }
+        var tag = it.rule === null ? 'No rule of its own' : (it.rule === 'internal' ? 'Open to everyone' : levelLabel(it.rule));
+        html += '<button type="button" class="ac-sg__o" role="option" data-i="' + i + '" aria-selected="' + (i === sgActive) + '"><span class="ac-av ac-av--team">' + icon('globe') + '</span>' +
+          '<span class="ac-sg__t"><span class="ac-sg__n">' + esc(it.path) + '</span><span class="ac-sg__e">' + (it.title ? esc(it.title) + ' · ' : '') + esc(tag) + '</span></span></button>';
+        return;
+      }
       var sec = it.kind === 'team' ? 'Teams' : (it.kind === 'person' ? 'People' : 'Add by address');
       if (sec !== last) { html += '<div class="ac-sg__h">' + sec + '</div>'; last = sec; }
       if (it.kind === 'team') {
@@ -991,7 +1046,7 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
         ? 'Suggestions are limited to people who have signed in. Give Bruce the <code>users:read.email</code> scope to search everyone.'
         : 'Suggestions are limited to people who have signed in.') + '</div>';
     }
-    sg.innerHTML = (html || '<div class="ac-sg__x"><span>No match. Type a full address to add someone.</span></div>') + foot;
+    sg.innerHTML = (html || '<div class="ac-sg__x"><span>' + (sgOpts && sgOpts.pages ? 'No page matches. Press Enter to add the path you typed.' : 'No match. Type a full address to add someone.') + '</span></div>') + foot;
   }
   function refreshSg() {
     if (!sgInput || !sgOpts) return;
@@ -1025,6 +1080,9 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
         var a = sg.querySelector('[aria-selected="true"]'); if (a && a.scrollIntoView) a.scrollIntoView({ block: 'nearest' });
       } else if (open && (k === 'Enter' || k === 'Tab') && sgActive > -1 && input.value) {
         ev.preventDefault(); pickSg(sgActive);
+      } else if (k === 'Enter' && opts.pages) {
+        ev.preventDefault();
+        if (input.value.trim()) opts.onPick({ kind: 'page', path: input.value.trim() });
       } else if (k === 'Enter' && input.value && EMAIL_RE.test(input.value.trim().toLowerCase())) {
         ev.preventDefault();
         var e = input.value.trim().toLowerCase();
@@ -1036,6 +1094,7 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
     /* A pasted list: "a@x.com, b@x.com; Priya Nair\nsam@x.com". Split on commas, semicolons, new lines and tabs; match each piece to a
        team, an address, or a unique name in the directory; add what resolves and say what did not. */
     input.addEventListener('paste', function (ev) {
+      if (opts.pages) return;
       var text = (ev.clipboardData || window.clipboardData).getData('text') || '';
       if (!/[,;\n\t]|\S+@\S+\s+\S+@/.test(text.trim())) return;          // a single value: let it paste into the box and suggest as normal
       ev.preventDefault();
@@ -1610,6 +1669,9 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
       /* The directory arrives after the page is usable; until then people are just their addresses. */
       fetch('/api/access?directory=1', { credentials: 'same-origin' }).then(function (d) { return d.json(); })
         .then(function (d) { setDirectory(d); render(); }).catch(function () { setDirectory({ people: [] }); });
+      /* Every page on the deploy, for the page search (built at publish time, under /admin). Without it, search still finds every path with a rule. */
+      fetch('/admin/pages.json', { credentials: 'same-origin' }).then(function (d) { return d.ok ? d.json() : []; })
+        .then(function (d) { sitePages = Array.isArray(d) ? d : []; }).catch(function () { sitePages = []; });
     })
     .catch(function (e) {
       document.getElementById('ac-state').innerHTML =
