@@ -14,9 +14,9 @@ review and Needs answer, plus a dashed waiting square); its spec in `exports/web
 `_name.js` file dispatched by `gw.js`.
 
 ## To switch on (nothing works until this is done)
-1. In GitHub, create a fine-grained token for `gushwork-design-id/drop-reference` only, with Contents and Issues set to
+1. In GitHub, create a fine-grained token for `gushwork-design/drop-reference` only, with Contents and Issues set to
    read and write. Add it in Vercel as `DROP_REFERENCE_TOKEN`. `DROP_REFERENCE_REPO` is optional (default
-   `gushwork-design-id/drop-reference`).
+   `gushwork-design/drop-reference`).
 2. Add the labels `image-request`, `image-ready`, `needs-input`, `accepted`, `discarded` and `revision` to the repo.
 3. The scheduled ChatGPT task must be the one in `image-request-contract.md`, which now also reads an optional
    `### Bundle` heading.
