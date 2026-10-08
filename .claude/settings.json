@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s -X POST https://slack.com/api/conversations.open *)",
+      "Bash(curl -s -X POST https://slack.com/api/chat.postMessage *)"
+    ]
+  }
+}
