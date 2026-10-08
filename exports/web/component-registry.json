@@ -367,14 +367,16 @@
     "card-case-study": {
       "reviewed": "passed",
       "reviewedBy": "utsav-gushwork",
-      "reviewedOn": "2026-10-02",
-      "fingerprint": "b079e9e4b1f933f3"
+      "reviewedOn": "2026-10-08",
+      "fingerprint": "b079e9e4b1f933f3",
+      "previewFingerprint": "944ebdf6b6bbec8e"
     },
     "card-information": {
       "reviewed": "passed",
       "reviewedBy": "utsav-gushwork",
-      "reviewedOn": "2026-10-02",
-      "fingerprint": "167ff79e4a942f32"
+      "reviewedOn": "2026-10-08",
+      "fingerprint": "167ff79e4a942f32",
+      "previewFingerprint": "3092538c12d0c2b4"
     },
     "card-testimonial": {
       "reviewed": "rework",
