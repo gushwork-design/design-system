@@ -17,6 +17,13 @@
 export const COOKIE = 'gw_session';
 export const MAX_AGE = 60 * 60 * 24 * 30; // 30 days, then sign in again
 
+/* GUESTS (people outside the company let in to named pages and tools) hold a DIFFERENT cookie, signed with a DIFFERENT key.
+   That is the whole separation: every API module that reads only `gw_session` is closed to a guest by default, whatever the
+   module assumes about "a session", and a guest cannot move their cookie value across (the key is wrong, so it fails to
+   verify). A module opts a guest in explicitly, for one tool path, with readAnySession and a decide() on that path. */
+export const GUEST_COOKIE = 'gw_guest';
+export function guestSecret() { return sessionSecret() + '|guest'; }
+
 /* One cookie, Path=/, on the design site's host: the hub, /internal/staging/* and every /internal
    tool are the same host, so a single sign-in already covers all of them. Set SESSION_COOKIE_DOMAIN
    (for example `gushwork.ai`) to ALSO share the sign-in with other subdomains. Unset keeps the
@@ -95,6 +102,15 @@ export function readCookie(header, name) {
     }
   }
   return null;
+}
+
+/* The caller's session, from the staff cookie or else the guest cookie. A guest comes back marked `guest: true`, with no admin
+   flag, whatever the payload says. Only code that has decided a guest may be served should call this. */
+export async function readAnySession(header) {
+  const s = await verify(readCookie(header, COOKIE), sessionSecret());
+  if (s) return s;
+  const g = await verify(readCookie(header, GUEST_COOKIE), guestSecret());
+  return g && g.typ === 'guest' && g.email ? { ...g, guest: true, admin: false } : null;
 }
 
 export function serializeCookie(name, value, opts = {}) {

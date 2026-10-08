@@ -22,7 +22,7 @@
    function and stays public.
    ========================================================================= */
 
-import { COOKIE, verify, readCookie, sessionSecret, authModes, GATE_ENABLED }
+import { readAnySession, authModes, GATE_ENABLED }
   from './api/_session.js';
 import { loadRules, decide, ruleFor } from './api/_access.js';
 import { restrictedPage } from './api/_restricted-page.js';
@@ -66,7 +66,7 @@ export const config = {
 function forbidden(session, url, rules) {
   const rule = ruleFor(url.pathname, rules);
   return new Response(
-    restrictedPage({ email: session.email, path: url.pathname, canRequest: !!rule && rule.access !== 'owner', lane: rule && rule.access === 'lane' ? rule.lane : '' }),
+    restrictedPage({ email: session.email, path: url.pathname, canRequest: !session.guest && !!rule && rule.access !== 'owner', lane: rule && rule.access === 'lane' ? rule.lane : '', guest: !!session.guest }),
     { status: 403, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store, private' } }
   );
 }
@@ -112,7 +112,9 @@ function toSignIn(url) {
    Consequence worth knowing: this bypasses decide(), so /admin/access-control
    cannot re-gate these paths. Removing a page from public means removing it
    from this list. Ruled by Utsav 22 Sep 2026. */
-const PUBLIC_PATHS = ['/internal/staging/ai-crm-lander'];
+/* The tools' shared stylesheet and chrome script (the same files for every tool). They hold no data, and a tool opened by a guest
+   needs them to draw at all, while a guest's rule names the TOOL, not these. Same reasoning as the ad lander: say it here. */
+const PUBLIC_PATHS = ['/internal/staging/ai-crm-lander', '/internal/tool-shell.css', '/internal/tool-chrome.js'];
 
 function isPublic(pathname) {
   return PUBLIC_PATHS.some(p => pathname === p || pathname.startsWith(p + '/'));
@@ -209,9 +211,7 @@ export default async function middleware(request, context) {
 
   /* One cookie, either door — the password route signs the same payload the
      Google callback does, so nothing here needs to know which was used. */
-  const session = await verify(
-    readCookie(request.headers.get('cookie'), COOKIE), sessionSecret()
-  );
+  const session = await readAnySession(request.headers.get('cookie'));
   if (!session) return toSignIn(url);
 
   /* Evaluated against the rules AS THEY ARE NOW, not against session.admin.

@@ -59,6 +59,7 @@ oauth_config:
       - mpim:read
       - incoming-webhook
       - users:read
+      - users:read.email
       - assistant:write
   pkce_enabled: false
 settings:

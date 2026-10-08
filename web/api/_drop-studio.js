@@ -26,7 +26,7 @@
    master or anything else in the repo.
    ========================================================================= */
 
-import { COOKIE, verify, readCookie, sessionSecret } from './_session.js';
+import { readAnySession } from './_session.js';
 import { loadRules, decide, isOwner } from './_access.js';
 import { timingSafeEqual } from 'node:crypto';
 import * as push from './_drop-push.js';
@@ -225,13 +225,16 @@ async function hook(req, res) {
 
 export default async function handler(req, res) {
   if (String((req.query && req.query.op) || '') === 'hook') return hook(req, res);
-  const session = await verify(readCookie(req.headers.cookie, COOKIE), sessionSecret());
+  const session = await readAnySession(req.headers.cookie);       // a guest may LOOK (below), never act
   if (!session) return json(res, 401, { error: 'Not signed in.' });
   const rules = await loadRules();
   if (decide(TOOL_PATH, session, rules) !== 'allow') return json(res, 403, { error: 'This is limited to the people who can open Drop Studio.' });
   const email = session.email ? String(session.email).toLowerCase() : '';
   const owner = isOwner(email);
   const op = String((req.query && req.query.op) || '');
+  /* A guest the gate lets in may see the pictures and the state, like everyone the gate admits, and nothing else: no push
+     subscription (it would store their address), and no write of any kind. */
+  if (session.guest && !['state', 'image', ''].includes(op)) return json(res, 403, { error: 'Guests can look, not change.' });
   const body = typeof req.body === 'string' ? (() => { try { return JSON.parse(req.body); } catch { return null; } })() : req.body;
 
   if (op === 'pushkey') return json(res, 200, { key: push.configured() ? push.publicKey() : '' });

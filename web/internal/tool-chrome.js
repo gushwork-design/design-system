@@ -233,9 +233,10 @@
   var LEVELS = {
     owner: { fill: 'var(--gw-color-black)', label: 'Owner' },
     admin: { fill: 'var(--gw-color-black)', label: 'Admin' },
-    team:  { fill: 'var(--gw-color-primary-300)', label: 'Gushwork team' }
+    team:  { fill: 'var(--gw-color-primary-300)', label: 'Gushwork team' },
+    guest: { fill: 'var(--gw-color-neutral-600)', label: 'Guest' }
   };
-  function level() { return !session ? 'team' : session.owner ? 'owner' : session.admin ? 'admin' : 'team'; }
+  function level() { return !session ? 'team' : session.guest ? 'guest' : session.owner ? 'owner' : session.admin ? 'admin' : 'team'; }
   function avatarIndex(seed) {
     var h = 2166136261, str = String(seed || '').toLowerCase();
     for (var i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = (h + (h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24)) >>> 0; }

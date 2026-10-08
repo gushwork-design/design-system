@@ -34,10 +34,10 @@ export default function handler(req, res) {
   authorize.searchParams.set('scope', 'openid email profile');
   authorize.searchParams.set('state', state);
   authorize.searchParams.set('prompt', 'select_account');
-  /* `hd` asks Google to show only Workspace accounts on this domain. It is a
-     hint to the picker, NOT a security control — the callback re-checks the
-     verified claim, because a determined user can strip this parameter. */
-  authorize.searchParams.set('hd', process.env.ALLOWED_DOMAIN || 'gushwork.ai');
+  /* No `hd` hint any more. It used to narrow Google's picker to this Workspace domain, which also hid the accounts of guests (people
+     outside the company let in to named pages). It never was a security control; the callback decides who gets a session, from
+     the verified claim: a company account gets a staff session, an outside account gets a guest session only if an owner has
+     invited it, and anyone else is refused. */
 
   res.setHeader('Set-Cookie', serializeCookie(STATE_COOKIE, nonce, { maxAge: 600 }));
   res.writeHead(302, { Location: authorize.toString() });

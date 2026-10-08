@@ -456,10 +456,12 @@
        mark stops implying a hierarchy of colour it was never asked to carry. */
     owner: { fill: 'var(--gw-color-black)',        label: 'Owner' },
     admin: { fill: 'var(--gw-color-black)',        label: 'Admin' },
-    team:  { fill: 'var(--gw-color-primary-300)',  label: 'Gushwork team' }
+    team:  { fill: 'var(--gw-color-primary-300)',  label: 'Gushwork team' },
+    guest: { fill: 'var(--gw-color-neutral-600)',  label: 'Guest' }
   };
 
   function avatarLevel() {
+    if (session.guest) return 'guest';
     if (session.owner) return 'owner';
     if (session.admin) return 'admin';
     return 'team';

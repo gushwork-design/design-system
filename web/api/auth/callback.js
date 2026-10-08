@@ -3,9 +3,10 @@
    check who it is, and set the session cookie. */
 
 import {
-  COOKIE, MAX_AGE, sign, readCookie, serializeCookie, cookieDomain,
+  COOKIE, GUEST_COOKIE, guestSecret, MAX_AGE, sign, readCookie, serializeCookie, cookieDomain,
   safeNext, redirectUri, missingConfig, isInternal, isAdmin, allowedDomain
 } from '../_session.js';
+import { loadRules, guestActive } from '../_access.js';
 import { recordVisit } from '../_log-visit.js';
 
 const STATE_COOKIE = 'gw_oauth_state';
@@ -90,15 +91,31 @@ export default async function handler(req, res) {
 
   const email = String(claims.email || '').toLowerCase();
 
-  /* Three things must hold: Google verified the address, and it is on the
-     Workspace domain — checked on the claim, not on the `hd` hint we sent. */
+  /* Google must have verified the address. Then it is one of two kinds of person: a company account, or a GUEST (an outside address
+     an owner has invited, not expired), checked against the rules as they are now. Anyone else is refused. */
   if (!claims.email_verified) {
     return deny(res, 'Account not verified', 'Google has not verified this email address.');
   }
-  if (!isInternal(email) || (claims.hd && String(claims.hd).toLowerCase() !== allowedDomain())) {
-    return deny(res, 'Not a Gushwork account',
-      'This part of the design system is for @' + allowedDomain() +
-      ' accounts. You signed in as ' + email.replace(/[<>&]/g, '') + '.');
+  const company = isInternal(email) && !(claims.hd && String(claims.hd).toLowerCase() !== allowedDomain());
+  if (!company) {
+    let guest = false, rules = null;
+    try { rules = await loadRules(); guest = !isInternal(email) && guestActive(email, rules); } catch { guest = false; }
+    if (!guest) {
+      return deny(res, 'Not on the list',
+        'This part of the design system is for @' + allowedDomain() + ' accounts and invited guests. ' +
+        email.replace(/[<>&]/g, '') + ' is neither. Sign in with your Gushwork account, or ask whoever shared the page to invite you.');
+    }
+    const end = Date.parse(rules.guests[email].expires + 'T23:59:59Z') / 1000;
+    const gp = { typ: 'guest', email, name: claims.name || email, picture: claims.picture || null,
+                 exp: Math.min(Math.floor(Date.now() / 1000) + MAX_AGE, Math.floor(end)) };
+    await recordVisit({ email, path: '/', kind: 'signin', via: 'guest' });
+    res.setHeader('Set-Cookie', [
+      serializeCookie(GUEST_COOKIE, await sign(gp, guestSecret()), { maxAge: Math.max(60, gp.exp - Math.floor(Date.now() / 1000)) }),
+      serializeCookie(COOKIE, '', { maxAge: 0, domain: cookieDomain() || undefined }),
+      serializeCookie(STATE_COOKIE, '', { maxAge: 0 })
+    ]);
+    res.writeHead(302, { Location: safeNext(state.next) });
+    return res.end();
   }
 
   const payload = {
@@ -112,6 +129,7 @@ export default async function handler(req, res) {
   await recordVisit({ email, path: '/', kind: 'signin', via: 'google' });
   res.setHeader('Set-Cookie', [
     serializeCookie(COOKIE, await sign(payload, process.env.SESSION_SECRET), { maxAge: MAX_AGE, domain: cookieDomain() }),
+    serializeCookie(GUEST_COOKIE, '', { maxAge: 0 }),            // a company account is not also a guest
     serializeCookie(STATE_COOKIE, '', { maxAge: 0 })
   ]);
   res.writeHead(302, { Location: safeNext(state.next) });

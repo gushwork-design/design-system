@@ -4,9 +4,9 @@
 
    Always 200 — "nobody" is a valid answer, not an error. */
 
-import { COOKIE, verify, readCookie, sessionSecret, authModes, GATE_ENABLED, isOwner }
+import { readAnySession, authModes, GATE_ENABLED, isOwner }
   from '../_session.js';
-import { loadRules, isAdmin, groupsFor } from '../_access.js';
+import { loadRules, isAdmin, groupsFor, guestActive } from '../_access.js';
 
 export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -14,7 +14,7 @@ export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store, private');
 
   const modes = authModes();
-  const payload = await verify(readCookie(req.headers.cookie, COOKIE), sessionSecret());
+  const payload = await readAnySession(req.headers.cookie);
 
   if (!payload) {
     return res.status(200).end(JSON.stringify({ signedIn: false, admin: false, modes,
@@ -26,6 +26,16 @@ export default async function handler(req, res) {
      drawing nothing, and that is exactly what a stale claim produces the
      moment access-control is used to grant or revoke someone. */
   const rules = await loadRules();
+
+  /* A guest is signed in, but is not a member of anything: no admin, no owner, no team (a team's name would draw that team's
+     navigation, and tells a guest who works here). `guest` lets the page say so. */
+  if (payload.guest) {
+    if (!guestActive(payload.email, rules)) return res.status(200).end(JSON.stringify({ signedIn: false, admin: false, modes, gate: GATE_ENABLED }));
+    return res.status(200).end(JSON.stringify({
+      signedIn: true, guest: true, email: payload.email, name: payload.name || payload.email, picture: payload.picture || null,
+      admin: false, owner: false, groups: [], via: 'guest', modes, gate: GATE_ENABLED
+    }));
+  }
 
   res.status(200).end(JSON.stringify({
     signedIn: true,
