@@ -180,7 +180,7 @@ The email signature creator and the employee ID card generator were redesigned i
     commit, so a private page is never open to the company, even briefly. A private page is not in the static Staging
     index; the hub tells the index which ones each person may see. Someone refused asks for access from the Restricted
     screen, and Bruce DMs the owner and the person who published the page, and no one else, with Approve and Decline; either
-    answers and the other message changes to say who did. Asked first, before every publish: the staging lane, or somewhere else
+    answers and the other message changes to say who did. Private hides the page on the hub only: the repo is public, so its files are readable on GitHub, which Claude says before publishing a private page. A publish never deletes a file; removing one is the owner's. Asked first, before every publish: the staging lane, or somewhere else
     (which this does not do).
 
 ## Left open (the owner's call)

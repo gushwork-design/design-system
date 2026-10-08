@@ -42,7 +42,7 @@
    ========================================================================= */
 
 import { COOKIE, verify, readCookie, sessionSecret, isInternal } from './_session.js';
-import { loadRules, canPublish, lanesFor, decide, setPageVisibility, saveRules, invalidate, storeId } from './_access.js';
+import { loadRules, loadRulesForWrite, updateRules, canPublish, lanesFor, decide, ruleFor, setPageVisibility, isOwner } from './_access.js';
 import { checkSubmission, STAGING_ROOT } from './_staging-rules.js';
 import { createHash, randomBytes, randomInt } from 'node:crypto';
 
@@ -82,12 +82,12 @@ async function kv(cmds) {
   return (await r.json()).map((x) => x.result);
 }
 
-/* A counter that expires: true once n goes past max within the window. */
+/* A counter that expires: true once n goes past max within the window. INCR and EXPIRE go in ONE call, so a failure cannot
+   leave a counter that never expires (and a person locked out for good). */
 async function over(key, max, seconds) {
   try {
-    const [n] = await kv([['INCR', key]]);
-    if (n === 1) await kv([['EXPIRE', key, String(seconds)]]);
-    return n > max;
+    const [n] = await kv([['INCR', key], ['EXPIRE', key, String(seconds), 'NX']]);
+    return Number(n) > max;
   } catch { return false; }       // a counter outage is not a reason to refuse
 }
 
@@ -232,6 +232,11 @@ async function gh(path, init = {}) {
   return body;
 }
 
+/* A lane folder that already holds an index.html is a page, not a lane: it stays the owner's. */
+async function laneIsPage(lane) {
+  return gh(`/contents/${STAGING_ROOT}/${lane}/index.html?ref=${BASE}`).then(() => true).catch((e) => { if (e.status === 404) return false; throw e; });
+}
+
 /* Write the page to main in one commit. Returns { mode: 'main', commit } or, when the token's account may not push to
    main, { mode: 'pr', url } with the same files on a branch. Retries when main moves under it. */
 async function writePage({ lane, page, files, manifest, email }) {
@@ -353,33 +358,57 @@ export default async function handler(req, res) {
     return json(res, 429, { error: `That is more than ${PER_HOUR} publishes in an hour. Try again later.` });
   }
 
-  /* Who can open it comes FIRST. The rule is live at once and the page only after the deploy, so there is never a moment
-     when a private page is open to the organisation; and if the rule cannot be written nothing is published. */
-  const vis = checked.manifest.visibility;
-  let change;
+  /* A lane folder that already holds a page of its own is refused BEFORE anything is written, so it leaves no stray rule behind. */
   try {
-    invalidate();                                              // read the rules as they are now, not as cached
-    change = setPageVisibility(await loadRules(), sub.lane, sub.page, vis, who.email);
-    if (change.changed) {
-      if (!storeId() || !process.env.VERCEL_API_TOKEN) {
-        return json(res, 503, { error: 'Private pages need the access rules store, which is not connected yet. Nothing was published.' });
-      }
-      const saved = await saveRules(change.rules);
-      if (!saved.ok) return json(res, 502, { error: 'Could not set who can open this page. Nothing was published. Try again in a minute.' });
+    if (await laneIsPage(sub.lane)) return json(res, 409, { error: `The ${sub.lane} folder already holds a page of its own, so it cannot be a lane. Ask the owner.` });
+  } catch { return json(res, 502, { error: 'GitHub did not answer. Nothing was published. Try again in a minute.' }); }
+
+  /* Who can open it. NARROWING (private) is written BEFORE the commit: the rule is live at once and the page only after the
+     deploy, so there is never a moment when a private page is open to the company, and if the rule cannot be written nothing is
+     published. WIDENING (back to everyone) is written AFTER the commit, so a publish that fails cannot leave the old private
+     content open. The rules are read through loadRulesForWrite, which refuses when the store did not really answer: saving
+     "defaults plus my change" over a store that merely failed to reply would erase every lane and private page rule. */
+  const vis = checked.manifest.visibility;
+  const path = `/internal/staging/${sub.lane}/${sub.page}`;
+  const mine = (r) => setPageVisibility(r, sub.lane, sub.page, vis, who.email, isOwner(who.email));
+  const hasRule = (r) => r.routes.some((x) => x.path === path && x.access === 'lane' && x.lane === sub.lane);
+  let plan;
+  try { plan = mine(await loadRulesForWrite()); }
+  catch { return json(res, 503, { error: 'The access rules could not be read just now, so nothing was published. Try again in a minute.' }); }
+  /* What the page really is once this is applied: a page the owner has restricted is not open to the company whatever was asked,
+     and the Staging index must treat it as private too (its title is for people who can open it). */
+  const eff = ruleFor(path, plan.rules);
+  const stays = !!eff && eff.access !== 'internal' && eff.access !== 'public';
+  /* What is written into staging.json (and so the static index). A page waiting to be opened up is stamped private until that
+     succeeds, so a failed widening can never leave its title listed for everyone; its entry then shows through the per-viewer
+     index, which lists it to everyone who can open it, and that is the whole company once it is open. */
+  checked.manifest.visibility = (vis === 'lane' || stays || (vis === 'org' && plan.changed)) ? 'lane' : 'org';
+
+  if (vis === 'lane' && plan.changed) {
+    const r1 = await updateRules(mine, hasRule);
+    if (!r1.ok) {
+      const noStore = /No Edge Config store/.test(r1.error || '');
+      return json(res, r1.status || 502, { error: (noStore ? 'Private pages need the access rules store, which is not connected yet.' : 'Could not set who can open this page.') + ' Nothing was published.' });
     }
-  } catch { return json(res, 502, { error: 'Could not set who can open this page. Nothing was published. Try again in a minute.' }); }
+  }
 
   try {
     const out = await writePage({ lane: sub.lane, page: sub.page, files: checked.files, manifest: checked.manifest, email: who.email });
+    let widenNote = '';
+    if (vis === 'org' && plan.changed) {
+      const r2 = await updateRules(mine, (r) => !hasRule(r));
+      if (!r2.ok) widenNote = ' It could not be opened to everyone just now, so it stays private; publish again to retry.';
+    }
     /* The index's words for a private page, kept where only the people who can open it are told. */
     try {
       const pp = `gw:pp:${sub.lane}`;
-      await kv([vis === 'lane' ? ['HSET', pp, sub.page, JSON.stringify(checked.manifest)] : ['HDEL', pp, sub.page]]);
+      await kv([checked.manifest.visibility === 'lane' ? ['HSET', pp, sub.page, JSON.stringify(checked.manifest)] : ['HDEL', pp, sub.page]]);
     } catch { /* the page is still there at its link; only the index entry is missing */ }
-    const who_ = vis === 'lane' ? ` Private to the ${sub.lane} team.` : ' Open to everyone at Gushwork.';
-    return json(res, 200, { ok: true, ...out, visibility: vis, path: `/internal/staging/${sub.lane}/${sub.page}`, note: (out.mode === 'main'
+    const priv = vis === 'lane' || stays || !!widenNote;
+    return json(res, 200, { ok: true, ...out, visibility: priv ? 'lane' : 'org', path, note: (out.mode === 'main'
       ? 'Committed. The page is live in a minute or two, after the deploy.'
-      : 'Queued for the owner: this publisher account could not write to main, so a pull request is waiting.') + who_ + (change.note ? ' ' + change.note : '') });
+      : 'Queued for the owner: this publisher account could not write to main, so a pull request is waiting.')
+      + (priv ? ` Private to the ${sub.lane} team on the hub. The files themselves are in the public design-system repo, so keep anything confidential out of the page.` : ' Open to everyone at Gushwork.') + (plan.note ? ' ' + plan.note : '') + widenNote });
   } catch (e) {
     if (e.code === 'lane-is-page') return json(res, 409, { error: `The ${sub.lane} folder already holds a page of its own, so it cannot be a lane. Ask the owner.` });
     return json(res, 502, { error: 'GitHub did not accept that. Nothing was published. Try again in a minute.' });

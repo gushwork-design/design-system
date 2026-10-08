@@ -33,7 +33,7 @@
 
 import crypto from 'node:crypto';
 import { COOKIE, verify, readCookie, sessionSecret } from './_session.js';
-import { loadRules, decide, ruleFor, describeAccess, grantPage, saveRules, invalidate } from './_access.js';
+import { loadRules, decide, ruleFor, describeAccess, grantPage, updateRules, canPublish, invalidate } from './_access.js';
 import { titleFor } from './_restricted-page.js';
 
 export { titleFor };
@@ -252,7 +252,9 @@ export async function answerRequest(payload, approve, token, owners = null) {
   let who = '';
   if (owners && !owners.has(clicker)) {
     const mail = rec.lane && rec.creator ? await emailOfSlackUser(token, clicker) : '';
-    if (!mail || mail !== rec.creator) {
+    invalidate();
+    /* The creator, and only while they are still on the lane: someone the owner has taken off it can no longer let people in. */
+    if (!mail || mail !== rec.creator || !canPublish(mail, rec.lane, await loadRules())) {
       return slack(token, 'chat.postEphemeral', { channel, user: clicker, text: rec.lane ? 'Only the person who published this page, or the owner, can answer this.' : 'Only the owner can answer this.' }).catch(() => {});
     }
     who = mail;
@@ -263,25 +265,43 @@ export async function answerRequest(payload, approve, token, owners = null) {
   const set = (status) => redis(cfg, [['SET', `gw:accreq:${id}`, JSON.stringify({ ...rec, status, by: clicker, answeredBy: who || 'the owner', answered: Date.now() }), 'EX', REQUEST_TTL]]);
   const askWho = rec.lane ? 'the person who published it' : 'Utsav';
 
-  if (!approve) {
-    await set('declined');
-    await updateAll(`Declined${byWhom} · ${rec.email} was not given ${rec.title}.`);
-    await tell(token, rec.email, `Your request to open ${rec.title} on the Gushwork design hub wasn’t approved this time. If you still need it, ask ${askWho}.`);
-    return;
-  }
+  /* One answer wins. Two presses at the same moment (the owner and the creator, or one person twice) would otherwise both read
+     "open" and both act, leaving access granted while the record says declined. The first to claim it goes on; the other is told. */
+  const claim = `gw:accreq:claim:${id}`;
+  const [got] = await redis(cfg, [['SET', claim, '1', 'EX', 120, 'NX']]);
+  if (!got || got.result !== 'OK') return slack(token, 'chat.postEphemeral', { channel, user: clicker, text: 'Someone is answering this right now.' }).catch(() => {});
+  const release = () => redis(cfg, [['DEL', claim]]).catch(() => {});
 
-  invalidate();
-  const rules = await loadRules();
-  const grant = grantPage(rules, rec.path, rec.email);
-  if (!grant) {
-    await set('declined');
-    return updateAll(`Not granted · ${rec.title} can’t be opened up this way (it is owners-only or already public).`);
+  try {
+    if (!approve) {
+      await set('declined');
+      await updateAll(`Declined${byWhom} · ${rec.email} was not given ${rec.title}.`);
+      await tell(token, rec.email, `Your request to open ${rec.title} on the Gushwork design hub wasn’t approved this time. If you still need it, ask ${askWho}.`);
+      return;
+    }
+
+    /* The rules are read and written through updateRules: it refuses when the store did not really answer (writing defaults back
+       would erase every rule), and checks the change took. Whether the person can ALREADY open the page is asked first, so an old
+       Approve on a page that has since been opened to everyone cannot narrow it to one person. */
+    let open = false, notGrantable = false;
+    const r = await updateRules((rs) => {
+      if (decide(rec.path, { email: rec.email }, rs) !== 'forbid') { open = true; return { changed: false }; }
+      const g = grantPage(rs, rec.path, rec.email);
+      if (!g) { notGrantable = true; return { changed: false }; }
+      return { rules: g.rules, changed: !g.already };
+    }, (after) => decide(rec.path, { email: rec.email }, after) === 'allow');
+    if (!r.ok) { await release(); return complain(`That didn’t save: ${r.error} Nothing changed; you can press Approve again, or add them in <${SITE}/admin/access-control|Access Control>.`); }
+    if (notGrantable) {
+      await set('declined');
+      return updateAll(`Not granted · ${rec.title} can’t be opened up this way (it is owners-only or already public).`);
+    }
+    await set('approved');
+    await updateAll(open
+      ? `Already open · ${rec.email} can open ${rec.title} (it was opened to everyone since they asked).`
+      : `Approved${byWhom} · ${rec.email} can open ${rec.title}. They can be removed any time in Access Control.`);
+    await tell(token, rec.email, `You can open ${rec.title} on the Gushwork design hub now: ${SITE}${rec.path}`);
+  } catch (e) {
+    await release();                      // something threw part-way: the buttons must still work
+    throw e;
   }
-  if (!grant.already) {
-    const saved = await saveRules(grant.rules);
-    if (!saved.ok) return complain(`That didn’t save: ${saved.error} Nothing changed; you can press Approve again, or add them in <${SITE}/admin/access-control|Access Control>.`);
-  }
-  await set('approved');
-  await updateAll(`Approved${byWhom} · ${rec.email} can open ${rec.title}. They can be removed any time in Access Control.`);
-  await tell(token, rec.email, `You can open ${rec.title} on the Gushwork design hub now: ${SITE}${rec.path}`);
 }

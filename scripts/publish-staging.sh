@@ -84,6 +84,7 @@ def login():
             fd = os.open(token_file, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
             with os.fdopen(fd, "w") as f:
                 f.write(p["token"] + "\n")
+            os.chmod(token_file, 0o600)                 # the mode above only applies to a new file; an old one may be wider
             lanes = ", ".join(p.get("lanes", [])) or "none yet"
             print(f"\n✔ Connected as {p['email']}. You can publish to: {lanes}.")
             return p["token"]

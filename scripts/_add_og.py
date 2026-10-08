@@ -91,6 +91,13 @@ def remember(cards, stage, path, s):
     r = route(stage, path)
     if not (r.startswith("/internal") or r.startswith("/library")):
         return
+    # A page its team made private (staging.json beside it says visibility "lane") must not appear in og-map.json: that file
+    # is public, and the gate hands it to link-preview bots before it checks who is asking.
+    try:
+        if json.load(open(os.path.join(os.path.dirname(path), "staging.json"))).get("visibility") == "lane":
+            return
+    except (OSError, ValueError):
+        pass
     t = re.search(r'<meta property="og:title" content="([^"]*)"', s)
     i = re.search(r'<meta property="og:image" content="([^"]*)"', s)
     if not (t and i):

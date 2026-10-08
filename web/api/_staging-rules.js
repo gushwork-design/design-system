@@ -41,7 +41,7 @@ export function cleanPath(p) {
   if (typeof p !== 'string' || !p || p.length > LIMITS.path) return null;
   if (p.startsWith('/') || p.includes('\\') || p.includes('\0')) return null;
   const parts = p.split('/');
-  if (parts.some((s) => !s || s === '.' || s === '..')) return null;
+  if (parts.some((s) => !s || s === '.' || s === '..' || s.startsWith('.'))) return null;      // no dot folders either (.git, .well-known)
   if (!/^[A-Za-z0-9._\-\/ ]+$/.test(p)) return null;
   return p;
 }
@@ -152,6 +152,14 @@ export function checkSubmission(sub) {
     files.push({ path, bytes });
   }
   if (total > LIMITS.total) P(`The page is ${(total / 1048576).toFixed(1)} MB in all. The limit is ${LIMITS.total / 1048576} MB.`);
+
+  /* A file and a folder cannot share a name (a.txt and a.txt/b.png): git refuses the tree, and a refused tree used to be a 502
+     after the rules were already written. */
+  const names = new Set(files.map((f) => f.path.toLowerCase()));
+  for (const f of files) {
+    const bits = f.path.toLowerCase().split('/');
+    for (let i = 1; i < bits.length; i++) if (names.has(bits.slice(0, i).join('/'))) P(`${f.path} sits inside ${bits.slice(0, i).join('/')}, which is also a file.`);
+  }
 
   const index = files.find((f) => f.path === 'index.html');
   if (!index) P('index.html is missing.');

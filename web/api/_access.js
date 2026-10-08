@@ -407,14 +407,17 @@ export function laneMembers(rules, lane) {
 
    They can only NARROW, and only for their own page. A page is 'org' by default (the ordinary /internal rule), so
    'lane' adds one rule for that page's exact path and 'org' removes that same rule; nothing else is ever written.
-   A rule the owner set (a people list, admins, owners, public) is never replaced, and a stricter rule on the lane itself
-   is never loosened by a page inside it: in both cases the page is left as the owner set it and the note says so.
+   Opening a private page back up is the page's creator's to do (or the owner's), so another member of the lane cannot widen
+   it or wipe the people an approved request added. A rule the owner set (a people list, admins, owners, public) is never
+   replaced, and a stricter rule on the lane itself is never loosened by a page inside it: in both cases the page is left
+   as the owner set it and the note says so.
 
    Pure: returns { rules, changed, note }. */
-export function setPageVisibility(rules, lane, page, visibility, creator = '') {
+export function setPageVisibility(rules, lane, page, visibility, actor = '', actorIsOwner = false) {
   const path = `/internal/staging/${lane}/${page}`;
   const exact = rules.routes.find(r => r.path === path);
   const ours = exact && exact.access === 'lane' && exact.lane === lane;
+  const creator = String(actor || '').toLowerCase();
   if (visibility === 'lane') {
     if (ours) return { rules, changed: false, note: '' };
     if (exact) return { rules, changed: false, note: 'The owner has already set who can open this page, so it was left as is.' };
@@ -424,10 +427,51 @@ export function setPageVisibility(rules, lane, page, visibility, creator = '') {
         ? 'This page sits under a public rule the owner set, so it was left as is.'
         : 'The owner has already set who can open this lane, so the page follows that.' };
     }
-    return { rules: { ...rules, routes: [...rules.routes, { path, access: 'lane', lane, ...(creator ? { creator: String(creator).toLowerCase() } : {}), groups: [], people: [] }] }, changed: true, note: '' };
+    return { rules: { ...rules, routes: [...rules.routes, { path, access: 'lane', lane, ...(creator ? { creator } : {}), groups: [], people: [] }] }, changed: true, note: '' };
   }
-  if (ours) return { rules: { ...rules, routes: rules.routes.filter(r => r !== exact) }, changed: true, note: '' };
+  if (ours) {
+    if (exact.creator && creator !== exact.creator && !actorIsOwner) {
+      return { rules, changed: false, note: 'Only the person who published it, or the owner, can open it to everyone, so it stays private to the team.' };
+    }
+    return { rules: { ...rules, routes: rules.routes.filter(r => r !== exact) }, changed: true, note: '' };
+  }
   return { rules, changed: false, note: '' };
+}
+
+/* Read the rules to CHANGE them, or refuse. loadRules() falls back to the compiled defaults when the store cannot be read, which is
+   right for serving a page and wrong for saving: writing back "the defaults plus my change" over a store that merely failed to
+   answer would erase every lane, group and private page rule. So a writer reads through this, which says no unless the store
+   really answered (`ok`, or `empty` for a store that has never been saved). */
+export async function loadRulesForWrite() {
+  invalidate();
+  const rules = await loadRules();
+  const st = readStatus().state;
+  if (st !== 'ok' && st !== 'empty') {
+    const e = new Error('rules unreadable'); e.code = 'rules-unreadable'; throw e;
+  }
+  return rules;
+}
+
+/* Change the rules and check the change took. `mutate(rules)` returns { rules, changed, ... } (pure); `holds(rules)` says whether
+   the saved rules show the change. Two writers (a publish and an Approve, or two publishes) can each read, change and save the
+   whole ruleset in the same moment, and the second save would silently drop the first's rule; so after saving it reads again,
+   and if its change is missing it starts over from what is there now. Returns { ok, changed, out, rules } or { ok: false, status, error }. */
+export async function updateRules(mutate, holds) {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    let cur;
+    try { cur = await loadRulesForWrite(); }
+    catch { return { ok: false, status: 503, error: 'The access rules could not be read just now, so nothing was changed. Try again in a minute.' }; }
+    const out = mutate(cur);
+    if (!out || !out.changed) return { ok: true, changed: false, out, rules: cur };
+    const saved = await saveRules(out.rules);
+    if (!saved.ok) return { ok: false, status: saved.status || 502, error: saved.error };
+    const settle = Number(process.env.RULES_SETTLE_MS ?? 250);
+    if (settle > 0) await new Promise((r) => setTimeout(r, settle));
+    invalidate();
+    const after = await loadRules();
+    if (holds(after)) return { ok: true, changed: true, out, rules: after };
+  }
+  return { ok: false, status: 502, error: 'The access rules did not settle after saving. Try again.' };
 }
 
 /** The most specific rule covering a path — longest matching prefix. */

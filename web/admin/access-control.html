@@ -1455,7 +1455,7 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
       r.routes = (r.routes || []).map(function (x) {
         var row = { path: x.path, access: x.access,
                     groups: x.groups || [], people: x.people || [] };
-        if (x.access === 'lane') row.lane = x.lane;
+        if (x.access === 'lane') { row.lane = x.lane; if (x.creator) row.creator = x.creator; }
         return row;
       });
       state = clone(r);

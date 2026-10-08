@@ -22,6 +22,9 @@ it is remembered for 90 days (`publish-staging.sh logout` disconnects).
 
 **Where it goes.** When you say "publish this", Claude first asks whether you mean your lane's staging (it lists your lanes) or somewhere else. It only publishes to a staging lane you are on; anywhere else, including the live site, is the owner's call.
 
+**Private is private on the hub, not in git.** The repo is public, so a private page's files (and its `staging.json`, with the title,
+the line about it and who published it) can be read on GitHub by anyone. Keep anything confidential out of lane pages.
+
 **Who can open it.** Your Claude asks, and the answer is saved in `staging.json` (`visibility`): *only your team* (the people
 on the lane) or *everyone at Gushwork*. A private page gets one rule that follows the lane's team live, so leaving the
 lane closes it at once; you can only narrow your own page, and a rule the owner set is never overridden. Someone outside

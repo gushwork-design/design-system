@@ -12,7 +12,7 @@
    ========================================================================= */
 
 import { COOKIE, verify, readCookie, sessionSecret } from './_session.js';
-import { loadRules, normalise, ownerEmails, isOwner, isAdmin, saveRules,
+import { loadRules, normalise, ownerEmails, isOwner, isAdmin, saveRules, laneMembers,
          allowedDomain, storeId, readStatus } from './_access.js';
 
 function json(res, status, body) {
@@ -111,12 +111,23 @@ export default async function handler(req, res) {
 
   /* Who may publish into a staging lane is an owner's call, for the same reason the admin list is: it decides
      who can put code on the site. Compared as a whole, so adding, removing or editing a lane all count. */
+  /* Compared by what each lane really lets in: its people, its groups AND who is in those groups. Comparing only the group names
+     let an admin add themselves to a group already on a lane and so gain the right to publish there. */
   const laneKey = r => JSON.stringify(Object.keys(r.lanes || {}).sort().map(k => [k,
-    [...(r.lanes[k].groups || [])].sort(), [...(r.lanes[k].people || [])].sort()]));
+    [...(r.lanes[k].groups || [])].sort(), [...(r.lanes[k].people || [])].sort(), laneMembers(r, k).sort()]));
   if (!owner && laneKey(next) !== laneKey(rules)) {
     return json(res, 403, {
       error: 'Only an owner can change who publishes to a staging lane. Your other changes were not saved.'
     });
+  }
+
+  /* Who published a private page is not on the page's row in Access Control, so a save from the page could not carry it; keep what the
+     stored rule already says. */
+  for (const r of next.routes) {
+    if (r.access === 'lane' && !r.creator) {
+      const was = (rules.routes || []).find(x => x.path === r.path && x.creator);
+      if (was) r.creator = was.creator;
+    }
   }
 
   const saved = await saveRules(next);

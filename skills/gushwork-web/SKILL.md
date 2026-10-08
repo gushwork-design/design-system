@@ -409,6 +409,8 @@ The scripts are in the plugin's `scripts/` folder: this skill's base directory (
    `bash <scripts>/new-staging-page.sh <lane> <page> "<Title>" "<one line>" "<their name>" <team|everyone>`
    makes `./<page>/` with an `index.html` and a `staging.json` (`team` = only the lane's team, `everyone` = the whole
    company). Build in that folder only, from the template (the fold set or the ad-page template), as for any page.
+   **Say this when they choose `team`:** "Only the <lane> team can open it on the hub. The page's files are still stored in the
+   company's public GitHub repo, so don't put anything confidential in it." Private hides the page on the hub, not in git.
    Publishing again with the other word changes who can open it; a page can be made narrower or opened back up, and
    a setting the owner has put on the page or the lane is never overridden (the publish says so).
 2. **Check first:** `bash <scripts>/publish-staging.sh --check <lane> <page> ./<page>` runs the server's
