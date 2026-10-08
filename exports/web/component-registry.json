@@ -646,6 +646,13 @@
       "reviewedOn": "2026-10-08",
       "fingerprint": "1bfb7bfc30d199fa",
       "previewFingerprint": "40fa7ce30826e610"
+    },
+    "cta-bar": {
+      "reviewed": "passed",
+      "reviewedBy": "utsav.singh@gushwork.ai",
+      "reviewedOn": "2026-10-08",
+      "fingerprint": "671fbdc256880e6d",
+      "previewFingerprint": "bdc9275d09658927"
     }
   }
 }
