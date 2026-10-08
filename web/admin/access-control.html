@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20x%3D%221%22%20y%3D%221%22%20width%3D%2278%22%20height%3D%2278%22%20rx%3D%2219%22%20fill%3D%22%230070ff%22%20stroke%3D%22%230061e0%22%20stroke-width%3D%222%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
 <link rel="stylesheet" href="/foundation/tokens.css">
 <link rel="stylesheet" href="/shell.css?v=ghost9">
-<script src="/shell.js?v=ghost8" defer></script>
+<script src="/shell.js?v=ghost9" defer></script>
 <style>
 /* Frame. `.sg` / `.sg__hd` / `.sg__main` are shell.css's shared page layout, so the
    title, the meta line and the rule match every other page. There is no "On this
@@ -361,9 +361,6 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
 .ac-head { background: none; border-radius: 0; box-shadow: none; border-bottom: 1px solid var(--s-chrome-border); }
 .ac-card__ft { background: none; border-radius: 0; border-top: 1px solid var(--s-chrome-border); padding: var(--gw-space-16) var(--gw-space-12) 0; margin-top: var(--gw-space-8); }
 .ac-card__ft .ac-field { background: var(--s-field-bg); }
-.ac-card__ft--pages .ac-field { max-width: 360px; width: 100%; }
-.ac-empty { padding: var(--gw-space-24) var(--gw-space-12); color: var(--s-nav-label); font: var(--gw-text-body-14-reg); }
-.ac-card__note { padding: var(--gw-space-12) var(--gw-space-12) 0; color: var(--s-nav-label); font: var(--gw-text-body-12-reg); }
 /* No description under the tab (it only repeated what the tab and the columns say), and rows with room to
    breathe: more padding, and looser lines in the name / path / follows stack. */
 .ac-card__hd { display: none; }
@@ -497,6 +494,25 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
 .ac-ppl__use li { display: flex; align-items: center; gap: var(--gw-space-8); font: var(--gw-text-body-14-reg); color: var(--s-body); }
 .ac-ppl__use li svg { width: 14px; height: 14px; flex: none; color: var(--s-nav-label); }
 .ac-ppl__acts { display: flex; gap: var(--gw-space-8); }
+.ac-ppl__it--txt { height: 44px; }
+.ac-ppl__rail .ac-ppl__new { padding: 0 0 var(--gw-space-8); }
+.ac-ppl__rail .ac-ppl__new .ac-field { min-height: 44px; width: 100%; }
+.ac-ppl__main--rule { gap: var(--gw-space-24); }
+.ac-ppl__main--rule .ac-ppl__hd p { margin-top: var(--gw-space-8); }
+.ac-ppl__it--txt small { white-space: nowrap; }
+.ac-ppl__it--txt > span { min-width: 0; }
+.ac-ppl__p { display: flex; min-width: 0; }
+.ac-ppl__p .ac-path__d { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.ac-ppl__p b { flex: none; font-weight: inherit; }
+.ac-ppl__it--txt .ac-path__d { color: var(--s-nav-label); }
+.ac-det__f { display: flex; flex-direction: column; gap: var(--gw-space-8); align-items: stretch; width: 100%; max-width: 560px; }
+.ac-det__l { font: var(--gw-text-body-14-med); color: var(--s-heading); }
+.ac-det__h { margin-top: calc(var(--gw-space-4) * -1); font: var(--gw-text-body-14-reg); color: var(--s-body); }
+.ac-det__f .ac-dd__btn, .ac-det__f .ac-pick { min-height: 44px; }
+.ac-det__f .ac-pick { width: 100%; padding: var(--gw-space-8) var(--gw-space-12); }
+.ac-det__acts { padding-top: var(--gw-space-20); border-top: 1px solid var(--s-chrome-border); max-width: 560px; }
+.ac-det__acts .ac-btn { min-height: 44px; }
+.ac-det__pv { width: 320px; max-width: 100%; border-radius: var(--gw-radius-12); border: 1px solid var(--s-card-border); }
 .ac-confirm { display: flex; flex-wrap: wrap; align-items: center; gap: var(--gw-space-12); padding: var(--gw-space-16); border: 1px solid var(--s-card-border);
   border-radius: var(--gw-radius-12); background: var(--s-lock-bg); }
 .ac-confirm p { margin: 0; flex: 1 1 100%; font: var(--gw-text-body-14-reg); color: var(--s-body); }
@@ -634,131 +650,157 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
     }));
   }
 
-  function routeRow(r, i) {
-    /* Only an owner may put a page in, take a page out of, or move a page at the
-       owners tier — the server enforces it; this just says so before the click. */
-    var locked = !meta.you.owner && r.access === 'owner';
-
-    var row = el(
-      '<div class="ac-row" data-i="' + i + '">' +
-        '<div class="ac-row__path">' + pathHTML(r.path) +
-          (r.path === '/admin' ? '<small>Includes this page</small>' : '') + '</div>' +
-        /* A page its publisher made private to a staging lane (api/_publish.js): the rule follows the lane's team live, so there is
-           no list to edit here. Removing the row opens the page to the whole organisation again. */
-        '<div class="ac-row__who">' + (r.access === 'lane'
-          ? '<span class="ac-tag" style="font:var(--gw-text-body-14-med)">Private to the ' + esc(r.lane) + ' team</span>'
-          : ddHTML(r.path, r.access, locked)) + '</div>' +
-        '<div class="ac-row__people">' + (r.access === 'lane'
-          ? ((r.people || []).length ? '<small>+ ' + plural(r.people.length, 'approved person') + '</small>' : '') : peopleFieldHTML(r)) + '</div>' +
-        '<div class="ac-row__del"><button class="ac-icbtn" type="button" data-act="drop" ' +
-          (r.path === '/admin' ? 'disabled title="The admin area cannot be ungated here"' :
-            'aria-label="Remove the rule for ' + esc(r.path) + '"') +
-          '>' + icon('trash') + '</button></div>' +
-      '</div>'
-    );
-    mountPeople(row, r, r.path);
-    return row;
-  }
-
-  /* Ten rules to a page; the pager shows only when there is more than a page. */
-  var ROUTES_PER = 10, routesPage = 1;
-  /* The Pages tab lists only the pages with a rule that is not "everyone at the company": the exceptions. Tools and templates have
-     their own tabs. A page stays listed for the rest of this visit once it has been added or edited, so choosing "Anyone at
-     gushwork.ai" on a row does not make the row vanish under the cursor. */
+  /* Pages and Templates share the People tab's layout: a rail of what there is on the left, the one you picked on the right. Tools
+     stay a table (there are three). A template or a page keeps a rule of its own; "follows" means it has none and inherits one. */
   var revealed = {};
+  var tplSel = '/internal/templates', pageSel = '';
+  function ownRule(path) { return draft.routes.filter(function (r) { return r.path === path; })[0] || null; }
   function ownTab(path) {
     return TOOLS.some(function (t) { return t.path === path; }) || path === '/internal/templates' || path.indexOf('/internal/templates/') === 0;
   }
+  /* The Pages tab lists only the exceptions: a rule that is not "everyone at the company". A page stays listed for the rest of this
+     visit once it has been added or edited, so choosing that level on it does not make it vanish from under the cursor. */
   function listed(r) { return !ownTab(r.path) && (r.access !== 'internal' || revealed[r.path]); }
-  function pagesCard() {
-    var shown = [], quiet = 0;
-    draft.routes.forEach(function (r, i) { if (listed(r)) shown.push(i); else if (!ownTab(r.path)) quiet++; });
-    var card = el(
-      '<section class="ac-card">' +
-        '<div class="ac-card__hd">' +
-          '<div><h3>Pages</h3><p>Pages that are not open to everyone at ' + esc(meta.domain) + '. The most specific matching path wins, so a rule on ' +
-            '<code>/internal/staging</code> overrides the one on <code>/internal</code>. Tools and templates are on their own tabs.</p></div>' +
-          '<span class="ac-card__n">' + plural(shown.length, 'page') + '</span>' +
-        '</div>' +
-        '<div class="ac-card__body">' +
-          '<div class="ac-head"><span>Path</span><span>Who can see it</span>' +
-            '<span>People &amp; groups</span><span></span></div>' +
-          '<div data-rows></div>' +
-          (shown.length ? '' : '<div class="ac-empty">Every page is open to everyone at ' + esc(meta.domain) + ', apart from the tools and templates. ' +
-            'Search below to restrict one.</div>') +
-          '<div class="ac-pg" data-pg hidden></div>' +
-        '</div>' +
-        '<div class="ac-card__ft ac-card__ft--pages">' +
-          '<input class="ac-field" data-newpath placeholder="Search pages, or type a path" ' +
-            'aria-label="Find a page to change" ' +
-            'data-1p-ignore="true" data-lpignore="true" data-form-type="other">' +
-          '<button class="ac-btn" type="button" data-addpath>' + icon('plus') +
-            '<span>Add a page</span></button>' +
-        '</div>' +
-        (quiet ? '<div class="ac-card__note">' + plural(quiet, 'other page rule') + ' open to everyone at ' + esc(meta.domain) + ' not listed. Search above to change one.</div>' : '') +
-      '</section>'
-    );
-
-    var rows = card.querySelector('[data-rows]');
-    /* Rows keep their ABSOLUTE index in draft.routes (data-i), so every handler below still edits the right rule. */
-    var pgCount = Math.max(1, Math.ceil(shown.length / ROUTES_PER));
-    routesPage = Math.min(Math.max(1, routesPage), pgCount);
-    var from = (routesPage - 1) * ROUTES_PER;
-    shown.slice(from, from + ROUTES_PER).forEach(function (ri) { rows.appendChild(routeRow(draft.routes[ri], ri)); });
-    var pg = card.querySelector('[data-pg]');
-    if (shown.length > ROUTES_PER) {
-      pg.hidden = false;
-      pg.innerHTML = '<span class="ac-pg__t">' + (from + 1) + '–' + Math.min(from + ROUTES_PER, shown.length) + ' of ' + shown.length + '</span>' +
-        '<div class="ac-pg__r"><span class="ac-pg__t">Page ' + routesPage + ' of ' + pgCount + '</span>' +
-        '<button class="ac-pg__b" type="button" data-pgnav="prev" aria-label="Previous page"' + (routesPage <= 1 ? ' disabled' : '') + '>' + icon('arrow-left') + '</button>' +
-        '<button class="ac-pg__b" type="button" data-pgnav="next" aria-label="Next page"' + (routesPage >= pgCount ? ' disabled' : '') + '>' + icon('arrow-right') + '</button></div>';
-      pg.addEventListener('click', function (ev) {
-        var b = ev.target.closest('[data-pgnav]'); if (!b || b.disabled) return;
-        routesPage += b.dataset.pgnav === 'next' ? 1 : -1;
-        render();
-      });
+  function shortLevel(e) {
+    return e.access === 'people' ? ((e.people || []).length + (e.groups || []).length) + ' named' : e.access === 'internal' ? 'Everyone'
+      : e.access === 'admin' ? 'Admins' : e.access === 'owner' ? 'Owners' : e.access === 'lane' ? 'Team' : e.access === 'public' ? 'Public' : e.access;
+  }
+  function setLevel(path, v) {
+    var own = ownRule(path);
+    if (own) own.access = v;
+    else {
+      /* First choice on something that was following its parent: it needs a rule of its own now. Nothing is carried over, since a
+         parent's named people are the parent's. */
+      draft.routes.push({ path: path, access: v, groups: [], people: [] });
+      draft.routes.sort(function (a, b) { return a.path.localeCompare(b.path); });
     }
+    revealed[path] = true;
+  }
 
-    rows.addEventListener('click', function (ev) {
+  /* The right-hand side for one page or template: its level, who is named, and the way back to following its parent. */
+  function detailHTML(it) {
+    var own = ownRule(it.path), eff = own || effectiveRule(it.path) || { path: it.path, access: 'internal', groups: [], people: [] };
+    var locked = !meta.you.owner && eff.access === 'owner';
+    var lane = own && own.access === 'lane';
+    var h = '<div class="ac-ppl__hd"><h3>' + esc(it.name || it.path) + '</h3><p>' + (it.name ? '<code>' + esc(it.path) + '</code> · ' : '') +
+      (own ? 'Has a rule of its own.' : 'Has no rule of its own, so it follows <code>' + esc(eff.path) + '</code>.') + '</p></div>';
+    if (it.img) h += '<img class="ac-det__pv" src="' + esc(it.img) + '" alt="" loading="lazy">';
+    var lvl = ACCESS.filter(function (a) { return a[0] === eff.access; })[0];
+    h += '<div class="ac-det__f"><div class="ac-det__l">Who can see it</div><div class="ac-det__h">' + esc(lane ? 'Its publisher kept it to their staging team. The rule follows that team, so there is no list to edit here.' : lvl ? lvl[2].replace('the row below', 'below') + '.' : '') + '</div>' + (lane
+      ? '<span class="ac-tag" style="font:var(--gw-text-body-14-med)">Private to the ' + esc(own.lane) + ' team</span>' +
+        ((own.people || []).length ? ' <small>+ ' + plural(own.people.length, 'approved person') + '</small>' : '')
+      : ddHTML(it.path, eff.access, locked)) + '</div>';
+    if (own && own.access === 'people') h += '<div class="ac-det__f"><div class="ac-det__l">People &amp; groups</div><div class="ac-det__h">Search the company directory, pick a team, or paste a list of addresses.</div><div data-pk></div></div>';
+    var can = !!own && it.path !== '/admin' && !(!meta.you.owner && own.access === 'owner');
+    h += '<div class="ac-ppl__acts ac-det__acts"><button class="ac-btn" type="button" data-act="drop"' + (can ? '' : ' disabled') + (it.path === '/admin' ? ' title="The admin area cannot be ungated here"' : '') + '>' +
+      (lane ? 'Open it to everyone again' : it.follow ? 'Follow ' + esc(it.follow) + ' again' : 'Remove this rule') + '</button></div>';
+    return h;
+  }
+  /* Draws the detail and wires it; `after` runs when a change should redraw the page. */
+  function mountDetail(main, it, after) {
+    main.innerHTML = detailHTML(it);
+    var own = ownRule(it.path);
+    if (own && own.access === 'people') {
+      var host = main.querySelector('[data-pk]');
+      host.appendChild(buildPicker({
+        people: own.people, groups: own.groups, guests: true, label: 'People and teams for ' + it.path,
+        locked: !meta.you.owner && own.access === 'owner',
+        onChange: function (v) { own.people = v.people; own.groups = v.groups; paintBar(); }
+      }));
+    }
+    main.onclick = function (ev) {
       var trig = ev.target.closest('[data-act="ddbtn"]');
       if (trig && !trig.disabled) { toggleDD(trig.closest('[data-dd]')); return; }
       var opt = ev.target.closest('.ac-dd__opt');
-      if (opt && !opt.disabled) {
-        var changed = draft.routes[+opt.closest('.ac-row').dataset.i];
-        changed.access = opt.dataset.v; revealed[changed.path] = true;
-        render();
-        return;
+      if (opt && !opt.disabled) { setLevel(it.path, opt.dataset.v); after(); return; }
+      var drop = ev.target.closest('[data-act="drop"]');
+      if (drop && !drop.disabled) {
+        draft.routes = draft.routes.filter(function (r) { return r.path !== it.path; });
+        delete revealed[it.path];
+        after(true);
       }
-      var btn = ev.target.closest('[data-act="drop"]'); if (!btn || btn.disabled) return;
-      draft.routes.splice(+btn.closest('.ac-row').dataset.i, 1);
-      render();
+    };
+  }
+  function railItem(path, label, small, on, key) {
+    return '<button type="button" class="ac-ppl__it ac-ppl__it--txt" data-sel="' + esc(key || path) + '" aria-current="' + on + '"><span>' + label + '</span><small>' + esc(small) + '</small></button>';
+  }
+  function effOf(path) { return ownRule(path) || effectiveRule(path) || { path: path, access: 'internal', groups: [], people: [] }; }
+
+  /* Like Pages, the Templates tab lists only the exceptions: a template whose level is not "everyone at the company", whether it has a
+     rule of its own or follows a stricter section rule. One stays listed for the rest of this visit once it has been picked or edited. */
+  function tplListed(t) { return effOf(t.path).access !== 'internal' || !!revealed[t.path]; }
+  function templatesCard() {
+    var all = TEMPLATES[0], each = TEMPLATES.slice(1), shown = each.filter(tplListed), quiet = each.length - shown.length;
+    if (tplSel !== all.path && !shown.some(function (t) { return t.path === tplSel; })) tplSel = all.path;
+    var rail = '<div class="ac-ppl__sec">Whole section</div>' + railItem(all.path, esc(all.name), shortLevel(effOf(all.path)), tplSel === all.path) +
+      '<div class="ac-ppl__sec">Find a template</div>' +
+      '<div class="ac-ppl__new"><input class="ac-field" data-newtpl placeholder="Search templates" aria-label="Find a template to change"></div>' +
+      (shown.length ? '<div class="ac-ppl__sec">Not open to everyone</div>' + shown.map(function (t) { return railItem(t.path, esc(t.name), shortLevel(effOf(t.path)), tplSel === t.path); }).join('') : '') +
+      (quiet ? '<p class="ac-ppl__empty">' + plural(quiet, 'template') + ' open to everyone at ' + esc(meta.domain) + ' not listed. Search to change one.</p>' : '');
+    var card = el('<section class="ac-card"><div class="ac-card__hd"><div><h3>Templates</h3><p>Templates that are not open to everyone.</p></div></div>' +
+      '<div class="ac-card__body"><div class="ac-ppl"><nav class="ac-ppl__rail" aria-label="Templates">' + rail + '</nav><div class="ac-ppl__main ac-ppl__main--rule" data-main></div></div></div></section>');
+    var it = TEMPLATES.filter(function (t) { return t.path === tplSel; })[0];
+    var item = { path: it.path, name: it.name, img: it.section ? '' : it.img, follow: it.section ? '' : 'the whole section' };
+    mountDetail(card.querySelector('[data-main]'), item, function () { render(); });
+    card.querySelector('.ac-ppl__rail').addEventListener('click', function (ev) {
+      var b = ev.target.closest('[data-sel]'); if (!b) return;
+      tplSel = b.dataset.sel; render();
+    });
+    bindSuggest(card.querySelector('[data-newtpl]'), { templates: true, skip: function () { return false; }, onPick: function (it) { revealed[it.path] = true; tplSel = it.path; render(); } });
+    return card;
+  }
+
+  function pagesCard() {
+    var rules = draft.routes.filter(listed), quiet = draft.routes.filter(function (r) { return !ownTab(r.path) && !listed(r); }).length;
+    if (!rules.some(function (r) { return r.path === pageSel; })) pageSel = rules.length ? rules[0].path : '';
+    var rail = '<div class="ac-ppl__sec">Find a page</div>' +
+      '<div class="ac-ppl__new"><input class="ac-field" data-newpath placeholder="Search pages, or type a path" aria-label="Find a page to change"></div>' +
+      (rules.length ? '<div class="ac-ppl__sec">Not open to everyone</div>' + rules.map(function (r) {
+        var i = r.path.lastIndexOf('/');
+        return railItem(r.path, '<span class="ac-ppl__p"><span class="ac-path__d">' + esc(r.path.slice(0, i + 1)) + '</span><b>' + esc(r.path.slice(i + 1) || '/') + '</b></span>', shortLevel(r), pageSel === r.path);
+      }).join('') : '') +
+      (quiet ? '<p class="ac-ppl__empty">' + plural(quiet, 'other page rule') + ' open to everyone at ' + esc(meta.domain) + ' not listed. Search to change one.</p>' : '');
+    var card = el('<section class="ac-card"><div class="ac-card__hd"><div><h3>Pages</h3><p>Pages that are not open to everyone.</p></div></div>' +
+      '<div class="ac-card__body"><div class="ac-ppl"><nav class="ac-ppl__rail" aria-label="Pages">' + rail + '</nav><div class="ac-ppl__main ac-ppl__main--rule" data-main></div></div></div></section>');
+    var main = card.querySelector('[data-main]');
+    if (pageSel) {
+      var parent = effectiveRuleAbove(pageSel);
+      mountDetail(main, { path: pageSel, name: '', follow: parent ? parent.path : '' }, function (removed) { render(); });
+    } else {
+      main.innerHTML = '<div class="ac-ppl__hd"><h3>Every page is open</h3><p>Every page is open to everyone at ' + esc(meta.domain) + ', apart from the tools and templates. Search to restrict one.</p></div>';
+    }
+    card.querySelector('.ac-ppl__rail').addEventListener('click', function (ev) {
+      var b = ev.target.closest('[data-sel]'); if (!b) return;
+      pageSel = b.dataset.sel; render();
     });
 
-    /* Pick or type a page: an existing rule is shown (and its row opened), a page with none gets one at "everyone", ready to change. */
-    var input = card.querySelector('[data-newpath]'), note = card.querySelector('.ac-card__note');
+    /* Pick or type a page: an existing rule is shown, a page with none gets one at "everyone", ready to change. */
+    var input = card.querySelector('[data-newpath]');
     function addPage(path) {
       path = String(path || '').trim().replace(/\/+$/, '');
       if (!path) return;
       if (path.charAt(0) !== '/') path = '/' + path;
-      if (ownTab(path)) { flash('That one is on the ' + (path.indexOf('/internal/templates') === 0 ? 'Templates' : 'Tools') + ' tab.'); return; }
+      if (ownTab(path)) {
+        input.setCustomValidity('That one is on the ' + (path.indexOf('/internal/templates') === 0 ? 'Templates' : 'Tools') + ' tab.'); input.reportValidity();
+        setTimeout(function () { input.setCustomValidity(''); }, 2500); return;
+      }
       revealed[path] = true;
-      if (!draft.routes.some(function (r) { return r.path === path; })) {
+      if (!ownRule(path)) {
         draft.routes.push({ path: path, access: 'internal', groups: [], people: [] });
         draft.routes.sort(function (a, b) { return a.path.localeCompare(b.path); });
       }
-      /* show the rule: jump to the page it is on */
-      var idx = draft.routes.findIndex(function (r) { return r.path === path; }), at = 0;
-      for (var k = 0; k < idx; k++) if (listed(draft.routes[k])) at++;
-      routesPage = Math.floor(at / ROUTES_PER) + 1;
-      render();
-    }
-    function flash(msg) {
-      input.setCustomValidity(msg); input.reportValidity(); setTimeout(function () { input.setCustomValidity(''); }, 2500);
+      pageSel = path; render();
     }
     bindSuggest(input, { pages: true, skip: function () { return false; }, onPick: function (it) { addPage(it.path); } });
-    card.querySelector('[data-addpath]').addEventListener('click', function () { addPage(input.value); });
-
     return card;
+  }
+  /* The rule a page would fall back to if its own were removed. */
+  function effectiveRuleAbove(path) {
+    var best = null;
+    draft.routes.forEach(function (r) {
+      if (r.path !== path && path.indexOf(r.path + '/') === 0 && (!best || r.path.length > best.path.length)) best = r;
+    });
+    return best;
   }
 
   /* -- tools ------------------------------------------------------------------ */
@@ -833,15 +875,6 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
       blurb: 'Who can open each tool. A tool follows the page it lives under ' +
              'until it has a rule of its own — pick a level here and it gets one.',
       noun: 'tool', head: 'Tool', items: TOOLS
-    });
-  }
-
-  function templatesCard() {
-    return accessCard({
-      title: 'Templates',
-      blurb: 'Who can see the templates. The first row covers the Templates page and all five ' +
-             'previews; give a single template its own level to open or close just that one.',
-      noun: 'template', head: 'Template', items: TEMPLATES, skipFromCount: 1
     });
   }
 
@@ -985,7 +1018,14 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
     });
     return f.slice(0, 8);
   }
+  function templateItems(q) {
+    var ql = q.trim().toLowerCase().replace(/^\//, '');
+    return TEMPLATES.slice(1).filter(function (t) { return !ql || t.name.toLowerCase().indexOf(ql) > -1 || t.path.toLowerCase().indexOf(ql) > -1; }).map(function (t) {
+      return { kind: 'page', group: 'Templates', path: t.path, title: t.name, rule: effOf(t.path).access };
+    });
+  }
   function buildItems(q, opts) {
+    if (opts.templates) return templateItems(q);
     if (opts.pages) return pageItems(q);
     var items = [], ql = q.trim().toLowerCase();
     if (opts.teams) {
@@ -1017,7 +1057,7 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
     var html = '', last = '';
     sgItems.forEach(function (it, i) {
       if (it.kind === 'page') {
-        if (!last) { html += '<div class="ac-sg__h">Pages</div>'; last = 'Pages'; }
+        if (!last) { html += '<div class="ac-sg__h">' + (it.group || 'Pages') + '</div>'; last = it.group || 'Pages'; }
         var tag = it.rule === null ? 'No rule of its own' : (it.rule === 'internal' ? 'Open to everyone' : levelLabel(it.rule));
         html += '<button type="button" class="ac-sg__o" role="option" data-i="' + i + '" aria-selected="' + (i === sgActive) + '"><span class="ac-av ac-av--team">' + icon('globe') + '</span>' +
           '<span class="ac-sg__t"><span class="ac-sg__n">' + esc(it.path) + '</span><span class="ac-sg__e">' + (it.title ? esc(it.title) + ' · ' : '') + esc(tag) + '</span></span></button>';
@@ -1596,8 +1636,8 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
     mount.appendChild(toolsCard());
     mount.appendChild(templatesCard());
     mount.appendChild(pagesCard());
-    mount.appendChild(peopleCard());
     mount.appendChild(lanesCard());
+    mount.appendChild(peopleCard());
     paintTabs();
     paintBar();
   }

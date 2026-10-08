@@ -1,0 +1,63 @@
+{
+  "id": "alfred",
+  "name": "Alfred",
+  "role": "Rework",
+  "lead": false,
+  "status": "live",
+  "owner": "Utsav",
+  "summary": "Takes the design-system items Utsav sends back and fixes them, then tells Utsav when each is ready to look at again. Works in the item's own thread.",
+  "routine": {
+    "id": "trig_01SD4LLhLYMQtdF1QhNndj5u",
+    "url": "https://claude.ai/code/routines/trig_01SD4LLhLYMQtdF1QhNndj5u",
+    "model": "claude-sonnet-5-5",
+    "tools": [
+      "Bash",
+      "Read",
+      "Write",
+      "Edit",
+      "Glob",
+      "Grep"
+    ]
+  },
+  "reachedBy": [
+    "An item sent back for rework in Design System review",
+    "A reply in the thread of one of his pings, which Bruce passes on"
+  ],
+  "schedule": [
+    "A sweep every day at 9pm IST (15:30 UTC)"
+  ],
+  "does": [
+    "Fixes a sent-back item as its note says, on a branch of his own",
+    "Merges and publishes his own rework through scripts/merge-rework.sh, which allows hub paths only",
+    "Answers in the item's thread, and says when it is ready to look at again"
+  ],
+  "never": [
+    "Touches anything outside the hub's own pages",
+    "Decides a review: approve, rework and reject are Utsav's",
+    "Merges anything that is not his own rework"
+  ],
+  "limits": [
+    "Hub paths only, enforced by the merge script"
+  ],
+  "memory": {
+    "durable": "agents/alfred/memory.md",
+    "perPerson": "None",
+    "log": "The item's own GitHub issue thread, one per item"
+  },
+  "links": [
+    {
+      "label": "Design System review",
+      "href": "/internal/design-system#review"
+    }
+  ],
+  "prompt": {
+    "where": "The routine in claude.ai",
+    "inGit": false,
+    "why": "The repo is public, so his prompt and guardrails are not committed yet."
+  },
+  "cost": {
+    "basis": "About 60,000 tokens a run, assumed: his instructions, the item, the files he changes, the check and his comment. A run is one comment he posts.",
+    "run": 60000,
+    "measured": []
+  }
+}

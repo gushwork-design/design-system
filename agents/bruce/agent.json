@@ -1,0 +1,84 @@
+{
+  "id": "bruce",
+  "name": "Bruce",
+  "role": "Lead, front door",
+  "lead": true,
+  "status": "live",
+  "owner": "Utsav",
+  "summary": "The hub's design agent in Slack and the one person everyone talks to. He hands over brand files, builds pages, answers questions about the system, passes messages to Utsav, and hands work to the agent who owns it. He reports to his creator, Utsav, every day.",
+  "routine": {
+    "id": "trig_01FH24f9onvDx9Sq4XGABByz",
+    "url": "https://claude.ai/code/routines/trig_01FH24f9onvDx9Sq4XGABByz",
+    "model": "claude-sonnet-5-5",
+    "tools": [
+      "Bash",
+      "Read",
+      "Write",
+      "Edit",
+      "Glob",
+      "Grep"
+    ]
+  },
+  "reachedBy": [
+    "A Slack DM",
+    "@Bruce in a channel",
+    "Slack's agent pane"
+  ],
+  "schedule": [
+    "A morning note to Utsav every day at 9am IST, from a GitHub Action (no model call)",
+    "A ping to Utsav within 30 minutes of Alfred finishing a fix or getting stuck, from a GitHub Action (no model call)"
+  ],
+  "does": [
+    "Hands over brand files: the logo in any colour and format, the colours, the fonts, the tokens",
+    "Builds a one-pager, landing page, deck or banner on the design system and sends a staging link and a screenshot",
+    "Points to the right template and the prompt to use with it",
+    "Answers questions about the hub, the design system, templates and tools from the repo",
+    "Passes a teammate's message to Utsav as a real DM, and says so only after Slack confirms",
+    "Remembers short notes about each person",
+    "For Utsav: a morning note every day, access notices, system checks, reworks, hub changes, and an honest log of every message he sent"
+  ],
+  "never": [
+    "Merges anyone else's PR, pushes to main, or releases the plugin",
+    "Records a review decision for anyone",
+    "Changes Vercel, Slack or GitHub settings, or touches secrets, or prints a token",
+    "Deletes or renames anything for a teammate",
+    "Sends a message on Utsav's behalf without his explicit send"
+  ],
+  "limits": [
+    "Teammates: 3 runs a day and 40 chats a day",
+    "Utsav: no cap"
+  ],
+  "memory": {
+    "durable": "agents/bruce/memory.md",
+    "perPerson": "Short notes about each person, in the hub's private store, read and written through /api/bruce-memory",
+    "log": "Every turn he is asked for, in the hub's store: Analytics, Bruce"
+  },
+  "links": [
+    {
+      "label": "Conversations and usage",
+      "href": "/admin/agents#bruce"
+    },
+    {
+      "label": "His page",
+      "href": "/internal/staging/bruce/"
+    },
+    {
+      "label": "Slack app manifest",
+      "href": "https://github.com/gushwork-design/design-system/blob/main/slack/bruce-app-manifest.yml"
+    }
+  ],
+  "prompt": {
+    "where": "The routine in claude.ai",
+    "inGit": false,
+    "why": "The repo is public, so his prompt and guardrails are not committed yet."
+  },
+  "cost": {
+    "basis": "Every DM starts at about 29,000 tokens: his instructions and the files he must read first, measured from the repo at about 4 characters a token. A chat then adds about 4,000 and a run about 90,000, both assumed.",
+    "start": 29000,
+    "chat": 4000,
+    "run": 90000,
+    "measured": [
+      "start"
+    ]
+  }
+}

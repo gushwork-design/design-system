@@ -235,6 +235,10 @@
       "destination": "/api/gw?action=tasks"
     },
     {
+      "source": "/api/agents",
+      "destination": "/api/gw?action=agents"
+    },
+    {
       "source": "/api/approvals",
       "destination": "/api/gw?action=approvals"
     },

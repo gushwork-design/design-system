@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agents — Gushwork Design</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="Every agent on the design team: how it is doing, how healthy it is and what it needs from you.">
+<script>try{var c=localStorage.getItem('gw-theme-choice'),t=c==='dark'||c==='light'?c:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20x%3D%221%22%20y%3D%221%22%20width%3D%2278%22%20height%3D%2278%22%20rx%3D%2219%22%20fill%3D%22%230070ff%22%20stroke%3D%22%230061e0%22%20stroke-width%3D%222%22%2F%3E%3Cg%20transform%3D%22translate%2819.2%2019.2%29%20scale%280.52%29%22%3E%3Cpath%20d%3D%22M76.6088%204.56344C77.5025%202.36058%2075.8495%200%2073.4723%200H9.14286C4.0934%200%200%204.0934%200%209.14286V66.7778C0%2072.018%205.17081%2075.6829%209.9603%2073.5568C40.8494%2059.8449%2064.3785%2034.7075%2076.6088%204.56344Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3Cpath%20d%3D%22M32.5161%2080C31.4022%2080%2030.9357%2078.5531%2031.8259%2077.8835C54.9007%2060.5265%2071.4338%2035.8047%2078.7658%208.0522C78.9403%207.39154%2080%207.51618%2080%208.19951V70.8571C80%2075.9066%2075.9066%2080%2070.8571%2080H32.5161Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="/foundation/tokens.css">
+<link rel="stylesheet" href="/shell.css?v=ghost9">
+<link rel="stylesheet" href="/admin/bruce-panel.css?v=1">
+<script src="/shell.js?v=ghost9" defer></script>
+<script src="/admin/bruce-panel.js?v=1" defer></script>
+<style>
+/* /admin/agents — the design team's agents (8 Oct 2026). One underlined tab row: All agents, then one tab per agent, the lead first.
+   The point of the page is four answers: is it healthy, what is it doing, how is it doing, and what does it need from you. Everything else
+   (what it does and never does, memory, limits, the prompt) is folded away under "About". The definitions are agents/ in git, built into
+   agents-data.json; the activity comes from what the hub can already see: Bruce's log, the health checks and Alfred's GitHub threads.
+   Nothing here is a secret: the repo is public. Token figures are ESTIMATES, built from the numbers in each agent's `cost`. */
+body[data-gw-page="agents"] .sg__main { grid-column: 1 / -1; max-width: 1120px; gap: var(--gw-space-24); }
+body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw-space-8); }
+#ag-app[hidden] { display: none; }
+#ag-state:empty { display: none; }
+#ag-app, #ag-panel { display: grid; gap: var(--gw-space-32); }
+#ag-panel > * { min-width: 0; }
+
+/* the bar: underlined tabs only, like the other pages; the period and refresh sit in a row inside the content, as on Analytics */
+.ag-bar { position: sticky; top: 0; z-index: 6; background: var(--s-panel-bg); margin-top: calc(var(--gw-space-8) * -1); padding-top: var(--gw-space-8); align-self: stretch;
+  display: flex; align-items: center; gap: var(--gw-space-16); box-shadow: inset 0 -1px 0 var(--s-card-border); }
+@media (max-width: 767px) { .ag-bar { top: 76px; } }
+.ag-tabs { display: flex; gap: var(--gw-space-24); overflow-x: auto; scrollbar-width: none; max-width: 100%; }
+.ag-tabs::-webkit-scrollbar { display: none; }
+.ag-tab { all: unset; box-sizing: border-box; position: relative; height: 40px; padding: 0 2px; display: inline-flex; align-items: center; gap: var(--gw-space-8); cursor: pointer; white-space: nowrap;
+  font: var(--gw-text-body-14-med); color: var(--s-body); }
+.ag-tab:hover, .ag-tab[aria-selected="true"] { color: var(--s-heading); }
+.ag-tab[aria-selected="true"]::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; border-radius: 2px 2px 0 0; background: var(--s-heading); }
+.ag-tab:focus-visible { outline: 2px solid var(--gw-color-primary-500); outline-offset: 2px; border-radius: var(--gw-radius-4); }
+.ag-tab i { font-style: normal; width: 8px; height: 8px; border-radius: 2px; background: var(--s-nav-sel); flex: none; }
+.ag-tab i.ok, .ag-dot.ok { background: var(--gw-color-green-500, #10b981); } .ag-tab i.warn, .ag-dot.warn { background: var(--gw-color-yellow-500); } .ag-tab i.fail, .ag-dot.fail { background: var(--gw-color-red-500, #ef4444); }
+:root { --ag-tabs-bg: var(--gw-color-neutral-50); --ag-tabs-line: var(--gw-color-neutral-100); --ag-tab-fg: var(--gw-color-neutral-900); --ag-tab-hover: var(--gw-color-neutral-100); --ag-tab-on-bg: var(--gw-color-black); --ag-tab-on-fg: var(--gw-color-white); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ag-tabs-bg: var(--gw-color-neutral-900); --ag-tabs-line: var(--gw-color-neutral-900); --ag-tab-fg: var(--gw-color-white); --ag-tab-hover: var(--gw-color-neutral-800); --ag-tab-on-bg: var(--gw-color-white); --ag-tab-on-fg: var(--gw-color-black); } }
+:root[data-theme="dark"] { --ag-tabs-bg: var(--gw-color-neutral-900); --ag-tabs-line: var(--gw-color-neutral-900); --ag-tab-fg: var(--gw-color-white); --ag-tab-hover: var(--gw-color-neutral-800); --ag-tab-on-bg: var(--gw-color-white); --ag-tab-on-fg: var(--gw-color-black); }
+.ag-ctrl { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-16); flex-wrap: wrap; }
+.ag-pills { display: inline-flex; height: 36px; padding: var(--gw-space-4); gap: var(--gw-space-4); border-radius: var(--gw-radius-12); background: var(--ag-tabs-bg); box-shadow: inset 0 0 0 1px var(--ag-tabs-line); }
+.ag-pill { height: 28px; padding: 0 var(--gw-space-12); border: 0; border-radius: var(--gw-radius-8); background: none; font: var(--gw-text-button-12); color: var(--ag-tab-fg); cursor: pointer; transition: background var(--gw-motion-fast); }
+.ag-pill:hover { background: var(--ag-tab-hover); }
+.ag-pill[aria-selected="true"] { background: var(--ag-tab-on-bg); color: var(--ag-tab-on-fg); }
+.ag-pill:focus-visible { outline: 2px solid var(--gw-color-primary-500); outline-offset: 2px; }
+.gw-iconbtn[aria-busy="true"] svg { animation: ag-spin 1s linear infinite; }
+@keyframes ag-spin { to { transform: rotate(360deg); } } @media (prefers-reduced-motion: reduce) { .gw-iconbtn[aria-busy="true"] svg { animation: none; } }
+
+.ag-note { padding: var(--gw-space-24); border-radius: var(--gw-radius-16); background: var(--s-card-bg); box-shadow: inset 0 0 0 1px var(--s-card-border); font: var(--gw-text-body-14-reg); color: var(--s-body); }
+.ag-note b { display: block; font: var(--gw-text-body-16-sem); color: var(--s-heading); margin-bottom: var(--gw-space-4); }
+.ag-empty { margin: 0; padding: var(--gw-space-8); font: var(--gw-text-body-14-reg); color: var(--s-body); }
+
+/* pictures, chips, buttons */
+.ag-pic { width: 40px; height: 40px; flex: none; border-radius: var(--gw-radius-10); display: grid; place-items: center; font: 700 16px/1 var(--gw-font-display); color: var(--s-heading); background: var(--s-nav-sel); }
+.ag-pic--bruce { background: var(--gw-color-primary-100) url(/assets/bruce-avatar.png) center / cover no-repeat; }
+.ag-pic--alfred { background: var(--gw-color-primary-500); color: var(--gw-color-white); }
+.ag-pic--lg { width: 56px; height: 56px; border-radius: var(--gw-radius-16); font-size: 22px; }
+.ag-pic--sm { width: 28px; height: 28px; border-radius: var(--gw-radius-8); font-size: 12px; }
+.ag-tag { display: inline-flex; align-items: center; height: 22px; padding: 0 var(--gw-space-8); border-radius: var(--gw-radius-4); font: var(--gw-text-body-12-med); background: var(--s-nav-sel); color: var(--s-heading); white-space: nowrap; }
+.ag-tag--gap { background: var(--gw-color-yellow-alpha-10); color: var(--gw-color-yellow-600); }
+:root[data-theme="dark"] .ag-tag--gap { color: var(--gw-color-yellow-300); }
+.ag-b { display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px; border-radius: var(--gw-radius-8); font: var(--gw-text-body-12-med); white-space: nowrap; flex: none; }
+.ag-b::before { content: ''; width: 6px; height: 6px; border-radius: 2px; background: currentColor; }
+.ag-b--ok { background: var(--gw-color-green-alpha-10, rgba(16,185,129,.12)); color: var(--gw-color-green-700, #047857); }
+.ag-b--warn { background: var(--gw-color-yellow-alpha-10); color: var(--gw-color-yellow-600); }
+.ag-b--fail { background: var(--gw-color-red-alpha-10); color: var(--gw-color-red-600); }
+.ag-b--unknown { background: var(--s-nav-sel); color: var(--s-body); }
+:root[data-theme="dark"] .ag-b--ok { color: var(--gw-color-green-300, #6ee7b7); } :root[data-theme="dark"] .ag-b--warn { color: var(--gw-color-yellow-300); } :root[data-theme="dark"] .ag-b--fail { color: var(--gw-color-red-300); }
+.ag-btn { height: 32px; padding: 0 var(--gw-space-12); border-radius: var(--gw-radius-8); border: 0; cursor: pointer; font: var(--gw-text-button-12, var(--gw-text-body-12-med)); display: inline-flex; align-items: center; justify-content: center; white-space: nowrap; flex: none;
+  background: none; color: var(--s-heading); box-shadow: inset 0 0 0 1px var(--s-card-border); transition: background var(--gw-motion-fast); text-decoration: none; }
+.ag-btn:hover { background: var(--s-nav-hover); }
+.ag-btn:focus-visible { outline: 2px solid var(--gw-color-primary-500); outline-offset: 2px; }
+
+/* the headline, then sections */
+.ag-lead h2 { margin: 0; font: 600 28px/1.2 var(--gw-font-display); color: var(--s-heading); }
+.ag-lead p { margin: var(--gw-space-8) 0 0; font: var(--gw-text-body-16-reg, var(--gw-text-body-14-reg)); color: var(--s-body); max-width: 70ch; }
+.ag-sec { display: grid; gap: var(--gw-space-12); min-width: 0; }
+.ag-sec__h { display: flex; align-items: baseline; justify-content: space-between; gap: var(--gw-space-12); flex-wrap: wrap; }
+.ag-sec__h h3 { margin: 0; font: 600 16px/1.3 var(--gw-font-display); color: var(--s-heading); }
+.ag-sec__h a, .ag-sec__h span { font: var(--gw-text-body-14-reg); color: var(--s-body); text-decoration: none; }
+.ag-sec__h a:hover { color: var(--s-heading); }
+.ag-list { border-radius: var(--gw-radius-16); background: var(--s-card-bg); box-shadow: inset 0 0 0 1px var(--s-card-border); overflow: hidden; }
+.ag-row { display: flex; align-items: center; gap: var(--gw-space-12); padding: var(--gw-space-12) var(--gw-space-16); border-top: 1px solid var(--s-card-border); min-width: 0; color: inherit; text-decoration: none; }
+.ag-row:first-child { border-top: 0; }
+a.ag-row:hover { background: var(--s-nav-hover); }
+.ag-row__t { flex: 1; min-width: 0; font: var(--gw-text-body-14-reg); color: var(--s-body); }
+.ag-row__t b { display: block; font: var(--gw-text-body-14-med); color: var(--s-heading); overflow-wrap: anywhere; }
+.ag-row__t span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ag-row__t--wrap span { white-space: normal; }
+.ag-row time, .ag-row small { font: var(--gw-text-body-12-reg); color: var(--s-body); white-space: nowrap; flex: none; }
+@media (max-width: 640px) { .ag-row { flex-wrap: wrap; } .ag-row__t { flex-basis: calc(100% - 44px); } }
+
+/* the agent cards on the overview */
+.ag-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gw-space-16); }
+@media (max-width: 960px) { .ag-cards { grid-template-columns: minmax(0, 1fr); } }
+.ag-card { all: unset; box-sizing: border-box; display: flex; flex-direction: column; gap: var(--gw-space-16); padding: var(--gw-space-20); min-width: 0; cursor: pointer; border-radius: var(--gw-radius-16); background: var(--s-card-bg); box-shadow: inset 0 0 0 1px var(--s-card-border); transition: background var(--gw-motion-fast); }
+.ag-card:hover { background: var(--s-nav-hover); }
+.ag-card:focus-visible { outline: 2px solid var(--gw-color-primary-500); outline-offset: 2px; }
+.ag-card__top { display: flex; align-items: center; gap: var(--gw-space-12); }
+.ag-card__top > div { flex: 1; min-width: 0; }
+.ag-card__top b, .ag-hero b { display: block; font: 600 18px/1.25 var(--gw-font-display); color: var(--s-heading); }
+.ag-card__top small, .ag-hero small { display: block; font: var(--gw-text-body-12-reg); color: var(--s-body); }
+.ag-card__now { margin: 0; font: var(--gw-text-body-14-reg); color: var(--s-body); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; min-height: 60px; }
+.ag-card__foot { margin-top: auto; padding-top: var(--gw-space-12); border-top: 1px solid var(--s-card-border); display: flex; align-items: center; gap: var(--gw-space-8); font: var(--gw-text-body-13-med, 500 13px/1.4 var(--gw-font-body)); color: var(--s-heading); }
+.ag-card__foot.is-quiet { color: var(--s-body); font-weight: 400; }
+.ag-card__foot .ag-dot { margin-top: 0; }
+.ag-dot { width: 8px; height: 8px; border-radius: 2px; background: var(--s-nav-sel); flex: none; }
+
+/* a few numbers, divided by straight lines */
+.ag-st { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; }
+.ag-st > div { padding: 0 var(--gw-space-12); border-left: 1px solid var(--s-card-border); min-width: 0; }
+.ag-st > div:first-child { padding-left: 0; border-left: 0; }
+.ag-st b { display: block; font: 500 20px/1.2 var(--gw-font-display); color: var(--s-heading); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.ag-st span { display: block; margin-top: 2px; font: var(--gw-text-body-12-reg); color: var(--s-body); overflow-wrap: anywhere; }
+.ag-card .ag-st { align-items: start; }
+.ag-st--big { padding: var(--gw-space-20); border-radius: var(--gw-radius-16); background: var(--s-card-bg); box-shadow: inset 0 0 0 1px var(--s-card-border); }
+.ag-st--big b { font-size: 28px; }
+.ag-st--big > div { padding: 0 var(--gw-space-20); }
+.ag-st--big > div:first-child { padding-left: 0; }
+@media (max-width: 640px) { .ag-st--big { grid-auto-flow: row; gap: var(--gw-space-16); } .ag-st--big > div, .ag-st--big > div:first-child { padding: 0; border-left: 0; } }
+.ag-foot { margin: 0; font: var(--gw-text-body-12-reg); color: var(--s-body); }
+
+/* one agent's page */
+.ag-hero { display: flex; align-items: flex-start; gap: var(--gw-space-16); flex-wrap: wrap; }
+.ag-hero > div { flex: 1; min-width: 220px; }
+.ag-hero p { margin: var(--gw-space-8) 0 0; font: var(--gw-text-body-14-reg); color: var(--s-body); max-width: 70ch; }
+.ag-oks { display: flex; flex-wrap: wrap; gap: var(--gw-space-8) var(--gw-space-16); padding: var(--gw-space-12) var(--gw-space-16); border-top: 1px solid var(--s-card-border); font: var(--gw-text-body-13-reg, 400 13px/1.4 var(--gw-font-body)); color: var(--s-body); }
+.ag-oks:first-child { border-top: 0; }
+.ag-oks span { display: inline-flex; align-items: center; gap: var(--gw-space-8); }
+
+/* Bruce's analytics sit in his tab, under the same page header. The panel brings its own sections and drawer. */
+#ag-bruce-slot { min-width: 0; }
+.ag-ctrl[hidden] { display: none; }
+#ag-bruce-slot .ul-sec { margin-top: var(--gw-space-8); }
+#ag-bruce-slot .br-m4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.ag-btn[data-tab] { font: inherit; font: var(--gw-text-button-12, var(--gw-text-body-12-med)); }
+
+/* about, folded away */
+.ag-how { border-radius: var(--gw-radius-16); box-shadow: inset 0 0 0 1px var(--s-card-border); }
+.ag-how > summary { cursor: pointer; list-style: none; padding: var(--gw-space-16) var(--gw-space-20); font: var(--gw-text-body-14-med); color: var(--s-heading); display: flex; align-items: center; gap: var(--gw-space-8); }
+.ag-how > summary::-webkit-details-marker { display: none; }
+.ag-how > summary::before { content: "\203A"; transition: transform var(--gw-motion-fast); color: var(--s-body); }
+.ag-how[open] > summary::before { transform: rotate(90deg); }
+.ag-how > summary:focus-visible { outline: 2px solid var(--gw-color-primary-500); outline-offset: 2px; border-radius: var(--gw-radius-16); }
+.ag-about { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gw-space-24) var(--gw-space-32); padding: var(--gw-space-4) var(--gw-space-20) var(--gw-space-24); }
+@media (max-width: 800px) { .ag-about { grid-template-columns: minmax(0, 1fr); } }
+.ag-about h4 { margin: 0 0 var(--gw-space-8); font: 600 12px/1.3 var(--gw-font-body); letter-spacing: .04em; text-transform: uppercase; color: var(--s-group-label, var(--s-body)); }
+.ag-about p { margin: 0; font: var(--gw-text-body-14-reg); color: var(--s-body); }
+.ag-about p + p { margin-top: var(--gw-space-8); }
+.ag-about a { color: var(--s-heading); text-underline-offset: 2px; }
+.ag-ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--gw-space-8); }
+.ag-ul li { position: relative; padding-left: var(--gw-space-16); font: var(--gw-text-body-14-reg); color: var(--s-heading); }
+.ag-ul li::before { content: ""; position: absolute; left: 0; top: 8px; width: 6px; height: 6px; border-radius: var(--gw-radius-4); background: var(--gw-color-primary-500); }
+.ag-ul--never li::before { background: var(--s-body); }
+.ag-ul--mem li { font-size: 13px; color: var(--s-body); } .ag-ul--mem li strong { color: var(--s-heading); font-weight: 600; }
+.ag-links { display: flex; gap: var(--gw-space-8); flex-wrap: wrap; grid-column: 1 / -1; }
+.ag-add { margin: 0; font: var(--gw-text-body-14-reg); color: var(--s-body); } .ag-add a { color: var(--s-heading); text-underline-offset: 2px; }
+</style>
+</head>
+<body data-gw-page="agents">
+
+<div class="sg">
+
+  <header class="sg__hd">
+    <h1>Agents</h1>
+    <p>Every agent on the design team: how it is doing, how healthy it is and what it needs from you</p>
+  </header>
+
+  <main class="sg__main">
+    <div class="ag-bar">
+      <div class="ag-tabs" id="ag-tabs" role="tablist" aria-label="Agents"></div>
+    </div>
+    <div id="ag-state"></div>
+    <div id="ag-app" hidden>
+      <div class="ag-ctrl" id="ag-ctrl">
+        <div class="ag-pills" role="tablist" aria-label="Period"><button type="button" class="ag-pill" role="tab" data-p="7" aria-selected="true">7 days</button><button type="button" class="ag-pill" role="tab" data-p="30" aria-selected="false">30 days</button></div>
+        <button class="gw-iconbtn" id="ag-refresh" type="button" aria-label="Refresh" data-tip="Refresh" data-tip-end><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z"/></svg></button>
+      </div>
+      <div id="ag-panel" role="tabpanel" tabindex="-1"></div>
+      <div id="ag-park" hidden><div id="ag-bruce" class="ul-scope"></div></div>
+    </div>
+  </main>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+  function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
+  function clip(t, n) { t = String(t || '').replace(/\s+/g, ' ').trim(); return t.length > n ? t.slice(0, n - 1) + '…' : t; }
+  var DAY = 86400000;
+  function ago(ms) { var s = Math.max(0, Math.round(ms / 1000)); if (s < 60) return 'just now'; var m = Math.round(s / 60); if (m < 60) return m + ' min ago'; var h = Math.round(m / 60); if (h < 48) return h + ' h ago'; return Math.round(h / 24) + ' days ago'; }
+  function agoShort(ms) { var m = Math.round(ms / 60000); if (m < 60) return m + ' min'; var h = Math.round(m / 60); if (h < 48) return h + ' h'; return Math.round(h / 24) + ' days'; }
+  function tok(n) { return n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1e3 ? Math.round(n / 1e3) + 'k' : String(Math.round(n)); }
+  var TOPIC = { 'pass-on': 'Pass on to Utsav', status: 'Status check', access: 'Access', brand: 'Brand files', build: 'Build a page', template: 'Templates and tools', hub: 'Hub and system', about: 'About Bruce', other: 'No clear lane' };
+  var STATE_LABEL = { ok: 'Running well', warn: 'Worth a look', fail: 'Needs attention', unknown: 'Cannot tell yet' };
+  var REVIEW = '/internal/design-system#review';
+  var S = { data: null, health: null, healthErr: '', bruce: null, bruceErr: '', owner: '', alfred: null, alfredErr: '', period: '7', tab: 'all', at: 0, busy: false };
+
+  /* ---------- who ---------- */
+  function agent(id) { return S.data.agents.filter(function (a) { return a.id === id; })[0]; }
+  function pic(a, cls) { return '<span class="ag-pic ag-pic--' + esc(a.id) + (cls ? ' ' + cls : '') + '" aria-hidden="true">' + (a.id === 'bruce' ? '' : esc(a.name.charAt(0))) + '</span>'; }
+  function initial(n) { return esc(String(n || '?').trim().charAt(0).toUpperCase() || '?'); }
+  function badge(state, label) { return '<span class="ag-b ag-b--' + esc(state) + '">' + esc(label || STATE_LABEL[state] || state) + '</span>'; }
+  function days() { return +S.period; }
+  function inWindow(at) { return at.getTime() >= Date.now() - days() * DAY; }
+  function ext(href) { return /^https?:/.test(href) ? ' target="_blank" rel="noopener noreferrer"' : ''; }
+
+  /* ---------- when Doc and Alfred next run ---------- */
+  function docNext() { var t = new Date(); t.setUTCHours(4, 0, 0, 0); for (var i = 0; i < 9; i++) { var w = t.getUTCDay(); if ((w === 1 || w === 4) && t.getTime() > Date.now()) return t.getTime(); t = new Date(t.getTime() + DAY); } return 0; }
+  function docRunCount(n) { var c = 0, from = Date.now() - n * DAY, d = new Date(from); d.setUTCHours(4, 0, 0, 0); for (var t = d.getTime(); t <= Date.now(); t += DAY) { var w = new Date(t).getUTCDay(); if ((w === 1 || w === 4) && t >= from) c++; } return c; }
+  function alfredRunsIn(n) { if (!S.alfred) return 0; var from = Date.now() - n * DAY, t = 0; Object.keys(S.alfred.byDay || {}).forEach(function (k) { if (Date.parse(k + 'T12:00:00Z') >= from) t += S.alfred.byDay[k]; }); return t; }
+
+  /* ---------- health: the checks that matter to each agent ---------- */
+  var HEALTH_IDS = { bruce: ['bruce', 'slack', 'anthropic'], alfred: ['trigger', 'github', 'bypass'], doc: null };
+  function healthOf(id) {
+    var checks = S.health && S.health.checks; if (!checks) return { status: 'unknown', rows: [] };
+    var ids = HEALTH_IDS[id], rows = ids ? checks.filter(function (c) { return ids.indexOf(c.id) !== -1; }) : checks;
+    var rank = { ok: 0, unknown: 1, warn: 2, fail: 3 }, worst = 'ok';
+    rows.forEach(function (c) { if ((rank[c.status] || 0) > rank[worst]) worst = c.status; });
+    return { status: rows.length ? worst : 'unknown', rows: rows };
+  }
+  function healthNeeds(h) {
+    return h.rows.filter(function (c) { return c.status === 'fail' || c.status === 'warn'; }).map(function (c) {
+      return { key: 'check:' + c.id, health: true, text: c.name + (c.fix ? ': ' + c.fix : c.detail ? ': ' + c.detail : ''), cta: 'Open system health', href: '/admin/system-health' };
+    });
+  }
+
+  /* ---------- Bruce's log, read as the Bruce tab on Analytics does ---------- */
+  /* "Hide my activity" is one preference, shared with Analytics: it leaves the owner's own asks out of the counts too. */
+  function hideOn() { try { return localStorage.getItem('gw-analytics-hide-me') === '1'; } catch (e) { return false; } }
+  function bruceRows() { return (S.bruce || []).filter(function (r) { return r.kind !== 'sent' && inWindow(r.at) && !(hideOn() && S.owner && r.user === S.owner); }); }
+  function isGap(r) { return r.topic === 'other' || r.kind === 'failed' || r.kind === 'capped'; }
+  function bruceTokens(r, a) { var c = a.cost; return r.kind === 'run' ? c.start + c.run : r.kind === 'chat' ? c.start + c.chat : 0; }
+
+  /* ---------- one summary per agent, which the overview and the tabs both read ----------
+     state: ok / warn / fail / unknown.  doing: one sentence.  stats: three numbers that say how it is doing.
+     needs: what the agent wants from Utsav, each with where to go. */
+  function summary(id) {
+    var a = agent(id), h = healthOf(id), out = { a: a, id: id, known: true, state: h.status, doing: '', stats: [], needs: healthNeeds(h), tokens: 0, sessions: 0, last: 0 };
+    var worse = function (s) { var rank = { ok: 0, unknown: 1, warn: 2, fail: 3 }; if ((rank[s] || 0) > (rank[out.state] || 0)) out.state = s; };
+    if (id === 'bruce') {
+      if (!S.bruce) { out.known = false; out.state = 'unknown'; out.doing = S.bruceErr || 'Reading his log'; return out; }
+      var rows = bruceRows(), all = (S.bruce || []).filter(function (r) { return r.kind !== 'sent'; }), gaps = rows.filter(isGap), people = {};
+      rows.forEach(function (r) { people[r.user] = 1; });
+      out.sessions = rows.filter(function (r) { return r.kind === 'run' || r.kind === 'chat'; }).length; out.tokens = rows.reduce(function (n, r) { return n + bruceTokens(r, a); }, 0);
+      var latest = all.slice().sort(function (x, y) { return y.at - x.at; })[0]; out.last = latest ? latest.at.getTime() : 0;
+      out.doing = latest ? 'Last asked ' + ago(Date.now() - out.last) + ' by ' + latest.name + ': “' + clip(latest.text, 80) + '”' : 'Nobody has asked him anything yet';
+      out.stats = [{ n: rows.length ? (rows.length - gaps.length) + ' of ' + rows.length : '0', l: 'asks handled' }, { n: String(Object.keys(people).length), l: 'people asked' }, { n: String(rows.filter(function (r) { return r.kind === 'run'; }).length), l: 'page builds and edits' }];
+      if (gaps.length) {
+        var broken = gaps.filter(function (r) { return r.kind === 'failed' || r.kind === 'capped'; }).length, unsorted = gaps.length - broken;
+        worse('warn');
+        out.needs.unshift({ key: 'bruce:gaps', text: plural(gaps.length, 'ask') + ' to read: ' + [broken ? broken + ' failed or hit the daily cap' : '', unsorted ? unsorted + ' that matched none of his topics' : ''].filter(Boolean).join(', ') + '.', cta: 'Read them', href: '#bruce-look' });
+      }
+    } else if (id === 'alfred') {
+      var al = S.alfred;
+      if (!al) { out.known = false; out.state = 'unknown'; out.doing = S.alfredErr || 'Reading his threads'; return out; }
+      var c = al.counts, total = c.ready + c.stuck + c.queued, runs = alfredRunsIn(days());
+      out.sessions = runs; out.tokens = runs * a.cost.run; out.last = al.lastRunAt ? Date.parse(al.lastRunAt) : 0;
+      out.doing = (total ? 'Working through the items you sent back. ' : 'Nothing on his plate right now. ') + (out.last ? 'Last worked ' + ago(Date.now() - out.last) + '.' : 'No run seen yet.') + ' Sweeps every night at 9pm IST.';
+      out.stats = [{ n: total ? c.ready + ' of ' + total : '0', l: 'items finished' }, { n: String(c.stuck), l: 'waiting on your answer' }, { n: String(runs), l: 'runs in ' + S.period + ' days' }];
+      if (c.stuck) { worse('warn'); out.needs.unshift({ key: 'alfred:stuck', text: 'Waiting on your answer for ' + plural(c.stuck, 'item'), cta: 'Answer them', href: REVIEW }); }
+      if (c.ready) out.needs.unshift({ key: 'alfred:ready', text: plural(c.ready, 'item') + ' finished, ready for you to check', cta: 'Check them', href: REVIEW });
+    } else if (id === 'doc') {
+      if (!S.health) { out.known = false; out.state = 'unknown'; out.doing = S.healthErr || 'Reading the checks'; return out; }
+      var rows2 = S.health.checks, okn = rows2.filter(function (x) { return x.status === 'ok'; }).length, snap = S.health.snapshotAt ? Date.parse(S.health.snapshotAt) : 0, nx = docNext();
+      var runsD = docRunCount(days()); out.sessions = runsD; out.tokens = runsD * a.cost.run; out.last = snap;
+      out.doing = 'Checks the whole hub every Monday and Thursday and reports what he finds. ' + (snap ? 'Last report ' + ago(Date.now() - snap) + '.' : 'No report yet.');
+      out.stats = [{ n: okn + ' of ' + rows2.length, l: 'checks healthy' }, { n: snap ? agoShort(Date.now() - snap) : 'None', l: snap ? 'since the last report' : 'last report' }, { n: nx ? new Date(nx).toLocaleDateString(undefined, { weekday: 'short' }) : '—', l: nx ? 'next report, ' + new Date(nx).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }) : 'next report' }];
+    }
+    return out;
+  }
+  function stateLabel(s) {
+    if (!s.known) return 'Cannot tell yet';
+    if (s.id === 'alfred' && s.state === 'warn') return 'Waiting on you';
+    if (s.id === 'doc') return s.state === 'fail' ? 'Found problems' : s.state === 'warn' ? 'Found warnings' : 'All clear';
+    return STATE_LABEL[s.state];
+  }
+  function sums() { return S.data.agents.map(function (a) { return summary(a.id); }); }
+  function allNeeds(list) {
+    var seen = {}, out = [];
+    list.forEach(function (s) { s.needs.forEach(function (n) { if (seen[n.key]) return; seen[n.key] = 1; out.push({ n: n, a: s.a }); }); });
+    return out;
+  }
+
+  /* ---------- the tab row ---------- */
+  function tabs() {
+    var items = [{ id: 'all', label: 'All agents' }].concat(S.data.agents.map(function (a) { return { id: a.id, label: a.name }; }));
+    $('ag-tabs').innerHTML = items.map(function (t) {
+      var dot = t.id === 'all' ? '' : '<i class="' + (S.health ? summary(t.id).state : '') + '" aria-hidden="true"></i>';
+      return '<button type="button" class="ag-tab" role="tab" data-tab="' + esc(t.id) + '" aria-selected="' + (t.id === S.tab) + '">' + dot + esc(t.label) + '</button>';
+    }).join('');
+  }
+
+  /* ---------- All agents ---------- */
+  function needRow(item, withWho) {
+    var n = item.n, a = item.a;
+    return '<div class="ag-row">' + (withWho ? pic(a, 'ag-pic--sm') : '') + '<div class="ag-row__t ag-row__t--wrap">' + (withWho ? '<b>' + esc(a.name) + '</b>' : '') + '<span>' + esc(n.text) + '</span></div>' +
+      (n.href === '#bruce-look' ? '<button type="button" class="ag-btn" data-tab="bruce" data-scroll="br-h-look">' + esc(n.cta) + '</button>'
+        : '<a class="ag-btn" href="' + esc(n.href) + '"' + ext(n.href) + '>' + esc(n.cta) + '</a>') + '</div>';
+  }
+  function renderAll() {
+    var list = sums(), needs = allNeeds(list), loading = list.some(function (s) { return !s.known; }) && !needs.length;
+    var names = needs.map(function (x) { return x.a.name; }).filter(function (v, i, arr) { return arr.indexOf(v) === i; });
+    var head = needs.length ? plural(needs.length, 'thing') + ' to look at' : loading ? 'Checking the agents' : 'Everything is running';
+    var sub = needs.length ? names.join(', ').replace(/, ([^,]*)$/, ' and $1') + (names.length === 1 ? ' has' : ' have') + ' something for you.' : loading ? 'Some of them have not answered yet.' : 'All ' + list.length + ' agents are healthy and nothing is waiting on you.';
+    var html = '<section class="ag-lead"><h2>' + esc(head) + '</h2><p>' + esc(sub) + '</p></section>';
+    html += '<section class="ag-sec"><div class="ag-sec__h"><h3>The team</h3><span>' + esc(list.length + ' agents, ' + (S.data.agents.filter(function (a) { return a.lead; })[0] || {}).name + ' leads') + '</span></div><div class="ag-cards">' +
+      list.map(function (s) {
+        var mine = s.needs.length;
+        return '<button type="button" class="ag-card" data-tab="' + esc(s.id) + '"><span class="ag-card__top">' + pic(s.a) + '<div><b>' + esc(s.a.name) + '</b><small>' + esc(s.a.role) + '</small></div>' + badge(s.state, stateLabel(s)) + '</span>' +
+          '<p class="ag-card__now">' + esc(s.doing) + '</p>' +
+          (s.known ? '<span class="ag-st">' + s.stats.map(function (t) { return '<div><b>' + esc(t.n) + '</b><span>' + esc(t.l) + '</span></div>'; }).join('') + '</span>' : '') +
+          '<span class="ag-card__foot' + (mine ? '' : ' is-quiet') + '"><i class="ag-dot ' + (mine ? 'warn' : s.known ? 'ok' : '') + '" aria-hidden="true"></i>' + (mine ? esc(plural(mine, 'thing') + ' for you') : s.known ? 'Nothing needed from you' : 'Waiting for data') + '</span></button>';
+      }).join('') + '</div></section>';
+    if (needs.length) {
+      var shown = needs.slice(0, 6);
+      html += '<section class="ag-sec"><div class="ag-sec__h"><h3>Needs you</h3></div><div class="ag-list">' + shown.map(function (x) { return needRow(x, true); }).join('') + '</div>' +
+        (needs.length > shown.length ? '<p class="ag-foot">And ' + (needs.length - shown.length) + ' more, in the agents’ own tabs.</p>' : '') + '</section>';
+    }
+    html += '<p class="ag-add">Each agent is recorded in git, with its memory. To add one, see <a href="https://github.com/gushwork-design/design-system/blob/main/agents/README.md" target="_blank" rel="noopener noreferrer">agents/README</a>.</p>';
+    return html;
+  }
+
+  /* ---------- one agent ---------- */
+  function ulist(items, cls) { return '<ul class="ag-ul' + (cls ? ' ' + cls : '') + '">' + items.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>'; }
+  function mdList(t) {
+    var items = String(t || '').split('\n').filter(function (l) { return /^- /.test(l); }).map(function (l) { return '<li>' + esc(l.slice(2)).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/`([^`]+)`/g, '$1') + '</li>'; });
+    return items.length ? '<ul class="ag-ul ag-ul--mem">' + items.join('') + '</ul>' : '<p>Nothing written down yet.</p>';
+  }
+  function sec(title, right, body) { return '<section class="ag-sec"><div class="ag-sec__h"><h3>' + esc(title) + '</h3>' + (right || '') + '</div>' + body + '</section>'; }
+  function hero(s) {
+    return '<section class="ag-hero">' + pic(s.a, 'ag-pic--lg') + '<div><b>' + esc(s.a.name) + '</b><small>' + esc(s.a.role) + (s.a.lead ? ' · leads the team' : '') + '</small><p>' + esc(s.doing) + '</p></div>' + badge(s.state, stateLabel(s)) + '</section>';
+  }
+  function statsBlock(s) {
+    if (!s.known) return '';
+    return '<div class="ag-sec"><div class="ag-st ag-st--big">' + s.stats.map(function (t) { return '<div><b>' + esc(t.n) + '</b><span>' + esc(t.l) + '</span></div>'; }).join('') + '</div>' +
+      '<p class="ag-foot">' + (s.tokens ? 'Used about ' + tok(s.tokens) + ' tokens in ' + S.period + ' days across ' + plural(s.sessions, 'session') + '. An estimate: nothing reports real token counts.' : 'No sessions in this period.') + '</p></div>';
+  }
+  function needsBlock(s) {
+    var mine = s.needs.filter(function (n) { return !n.health; });
+    return mine.length ? sec('Needs from you', '', '<div class="ag-list">' + mine.map(function (n) { return needRow({ n: n, a: s.a }, false); }).join('') + '</div>') : '';
+  }
+  function healthBlock(s) {
+    var h = healthOf(s.id);
+    if (!S.health) return sec('Health', '', '<div class="ag-list"><p class="ag-empty">' + esc(S.healthErr || 'Reading the checks') + '</p></div>');
+    if (!h.rows.length) return sec('Health', '', '<div class="ag-list"><p class="ag-empty">No checks cover this agent yet.</p></div>');
+    var bad = h.rows.filter(function (c) { return c.status !== 'ok'; }), good = h.rows.filter(function (c) { return c.status === 'ok'; });
+    var body = bad.map(function (c) {
+      return '<div class="ag-row"><i class="ag-dot ' + esc(c.status) + '" aria-hidden="true"></i><div class="ag-row__t ag-row__t--wrap"><b>' + esc(c.name) + '</b><span>' + esc(c.detail || '') + (c.fix ? ' To do: ' + esc(c.fix) : '') + '</span></div></div>';
+    }).join('') + (good.length ? '<div class="ag-oks">' + good.map(function (c) { return '<span><i class="ag-dot ok" aria-hidden="true"></i>' + esc(c.name) + '</span>'; }).join('') + '</div>' : '');
+    return sec('Health', s.id === 'doc' ? '<a href="/admin/system-health">Open system health</a>' : '<span>' + (bad.length ? plural(bad.length, 'check') + ' to look at' : 'all ' + h.rows.length + ' checks pass') + '</span>', '<div class="ag-list">' + body + '</div>');
+  }
+  function about(a) {
+    var d = S.data, route = (d.routing || []).filter(function (r) { return r.agent === a.id; })[0];
+    return '<details class="ag-how"><summary>About ' + esc(a.name) + ': what he does, what he never does, his memory</summary><div class="ag-about">' +
+      '<div class="ag-links">' + (a.links || []).concat([{ label: 'Routine in claude.ai', href: a.routine.url }]).map(function (l) { return '<a class="ag-btn" href="' + esc(l.href) + '"' + ext(l.href) + '>' + esc(l.label) + '</a>'; }).join('') + '</div>' +
+      '<div><h4>What he does</h4>' + ulist(a.does) + '</div><div><h4>What he never does</h4>' + ulist(a.never, 'ag-ul--never') + '</div>' +
+      '<div><h4>Reached by</h4>' + ulist(a.reachedBy) + '<h4 style="margin-top:16px">Runs</h4>' + ulist(a.schedule) + '</div>' +
+      '<div><h4>Limits</h4>' + ulist(a.limits) + (route ? '<h4 style="margin-top:16px">Handed work by the lead</h4><p>' + esc(route.when) + ' (' + esc(route.status) + ')</p>' : '') + '</div>' +
+      '<div><h4>Memory</h4><p>' + esc(a.memory.perPerson) + '</p><p><a href="https://github.com/gushwork-design/design-system/blob/main/' + esc(a.memory.durable) + '" target="_blank" rel="noopener noreferrer">' + esc(a.memory.durable) + '</a> in git</p>' + mdList(a.memoryText) + '</div>' +
+      '<div><h4>Model and prompt</h4><p>' + esc(a.routine.model) + ', with ' + esc(a.routine.tools.join(', ')) + '.</p><p>' + esc(a.prompt.where) + (a.prompt.inGit ? '' : '. Not in git: ' + esc(a.prompt.why)) + '</p><h4 style="margin-top:16px">How tokens are estimated</h4><p>' + esc(a.cost.basis) + '</p></div>' +
+      '</div></details>';
+  }
+
+  function renderBruce() {
+    var s = summary('bruce'), a = s.a, html = hero(s);
+    if (!s.known) return html + healthBlock(s) + about(a);
+    /* His analytics (conversations, what people use him for, what it costs, the asks worth a look) live in bruce-panel.js and are moved into
+       this slot after the page is drawn; see mountBruce. */
+    return html + needsBlock(s) + '<div id="ag-bruce-slot"></div>' + healthBlock(s) + about(a);
+  }
+  var brucePanel = null;
+  function parkBruce() { var h = $('ag-bruce'); if (h && h.parentNode !== $('ag-park')) $('ag-park').appendChild(h); }
+  function mountBruce() {
+    var slot = $('ag-bruce-slot'); if (!slot) return;
+    if (!brucePanel && window.mountBrucePanel) {
+      brucePanel = window.mountBrucePanel($('ag-bruce'));
+      brucePanel.onHide = function () { render(); };          /* the counts on the overview follow the switch too */
+      brucePanel.start();
+    }
+    slot.appendChild($('ag-bruce'));
+  }
+
+  function renderAlfred() {
+    var s = summary('alfred'), a = s.a, al = S.alfred, html = hero(s);
+    if (!s.known) return html + healthBlock(s) + about(a);
+    var order = { stuck: 0, ready: 1, queued: 2 }, th = al.threads.slice().sort(function (x, y) { return (order[x.state] - order[y.state]) || (Date.parse(y.lastAt || 0) - Date.parse(x.lastAt || 0)); }), shown = th.slice(0, 6);
+    html += needsBlock(s) + statsBlock(s);
+    html += sec('His items', th.length ? '<a href="' + REVIEW + '">All ' + th.length + ' in review</a>' : '', shown.length ? '<div class="ag-list">' + shown.map(function (t) {
+      var tag = { ready: 'Ready for you', stuck: 'Waiting on you', queued: 'Queued' }[t.state];
+      return '<a class="ag-row" href="' + esc(t.url) + '" target="_blank" rel="noopener noreferrer"><div class="ag-row__t"><b>' + esc(t.scope + '/' + t.key) + '</b><span>' + esc(clip(t.note || 'No note yet', 120)) + '</span></div><span class="ag-tag' + (t.state === 'stuck' ? ' ag-tag--gap' : '') + '">' + esc(tag) + '</span><time>' + (t.lastAt ? esc(ago(Date.now() - Date.parse(t.lastAt))) : '') + '</time></a>';
+    }).join('') + '</div>' + (th.length > shown.length ? '<p class="ag-foot">And ' + (th.length - shown.length) + ' more.</p>' : '') : '<div class="ag-list"><p class="ag-empty">No rework items in the last ' + (al.days || 30) + ' days.</p></div>');
+    return html + healthBlock(s) + about(a);
+  }
+
+  function renderDoc() {
+    var s = summary('doc'), a = s.a, html = hero(s);
+    if (!s.known) return html + healthBlock(s) + about(a);
+    return html + statsBlock(s) + healthBlock(s) + about(a);
+  }
+
+  function render() {
+    tabs();
+    parkBruce();
+    var html = S.tab === 'bruce' ? renderBruce() : S.tab === 'alfred' ? renderAlfred() : S.tab === 'doc' ? renderDoc() : renderAll();
+    $('ag-panel').innerHTML = html;
+    $('ag-ctrl').hidden = S.tab === 'bruce';                      /* his panel has its own periods and refresh */
+    if (S.tab === 'bruce') mountBruce();
+    document.querySelectorAll('.ag-pill').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-p') === S.period)); });
+    tip();
+  }
+  /* "Updated 2 min ago" lives in the refresh button's tooltip, as on the other pages. */
+  function tip() { $('ag-refresh').setAttribute('data-tip', S.at ? 'Updated ' + ago(Date.now() - S.at) + ' · click to refresh' : 'Refresh'); }
+  function setTab(id, push) {
+    if (id !== 'all' && !agent(id)) id = 'all';
+    S.tab = id; render();
+    if (push) { try { history.replaceState(null, '', '#' + id); } catch (e) { location.hash = id; } }
+  }
+
+  /* ---------- loading: each source on its own, so one failing leaves the rest ---------- */
+  function loadBruce() {
+    return fetch('/api/bruce-memory?log=1', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) {
+      if (r.status === 401 || r.status === 403) { S.bruceErr = 'Owners only'; return null; } if (!r.ok) throw new Error('http'); return r.json();
+    }).then(function (j) {
+      if (!j) return; if (!j.configured) { S.bruceErr = 'No store connected, so nothing is logged'; return; }
+      S.owner = String(j.owner || ''); S.bruce = (j.rows || []).map(function (r) { var d = new Date(r.at); return isNaN(d.getTime()) ? null : { at: d, user: String(r.user || ''), name: String(r.name || r.user || ''), kind: String(r.kind || 'run'), thread: !!r.thread, text: String(r.text || ''), topic: r.topic || (r.kind === 'sent' ? '' : 'other') }; }).filter(Boolean);
+    }).catch(function () { S.bruceErr = 'Could not read his log'; });
+  }
+  function loadHealth() {
+    return fetch('/api/health', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error('http'); return r.json(); }).then(function (j) { S.health = j && j.checks ? j : null; if (!S.health) S.healthErr = 'The checks returned nothing'; }).catch(function () { S.healthErr = 'Could not run the checks'; });
+  }
+  function loadAlfred() {
+    return fetch('/api/agents?days=30', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.json(); }).then(function (j) {
+      if (!j || !j.configured) { S.alfredErr = 'The site has no GitHub token, so his threads cannot be read'; return; }
+      S.alfred = j.alfred; S.alfred.days = j.days;
+    }).catch(function () { S.alfredErr = 'Could not read his threads'; });
+  }
+  function loadAll() {
+    if (S.busy) return; S.busy = true; $('ag-refresh').setAttribute('aria-busy', 'true');
+    var done = function () { S.at = Date.now(); S.busy = false; $('ag-refresh').removeAttribute('aria-busy'); render(); };
+    return Promise.all([loadBruce().then(render), loadHealth().then(render), loadAlfred().then(render)]).then(done, done);
+  }
+
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest && e.target.closest('[data-tab]');
+    if (t) {
+      setTab(t.getAttribute('data-tab'), true);
+      var to = t.getAttribute('data-scroll'), target = to && $(to);
+      if (target) target.scrollIntoView({ block: 'start' }); else window.scrollTo({ top: 0 });
+      return;
+    }
+    var p = e.target.closest && e.target.closest('.ag-pill'); if (p) { S.period = p.getAttribute('data-p'); render(); }
+  });
+  $('ag-tabs').addEventListener('keydown', function (ev) {
+    var ids = [].slice.call(document.querySelectorAll('.ag-tab')).map(function (b) { return b.getAttribute('data-tab'); }), i = ids.indexOf(S.tab);
+    if (ev.key === 'ArrowRight' || ev.key === 'ArrowLeft') { ev.preventDefault(); var n = ids[(i + (ev.key === 'ArrowRight' ? 1 : ids.length - 1)) % ids.length]; setTab(n, true); var b = document.querySelector('.ag-tab[data-tab="' + n + '"]'); if (b) b.focus(); }
+  });
+  $('ag-refresh').addEventListener('click', loadAll);
+  window.addEventListener('hashchange', function () { if (S.data) setTab(location.hash.slice(1) || 'all', false); });
+  setInterval(tip, 15000);
+
+  fetch('/admin/agents-data.json', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.json(); }).then(function (data) {
+    S.data = data; var want = location.hash.slice(1); S.tab = want && (want === 'all' || agent(want)) ? want : 'all';
+    $('ag-app').hidden = false; render(); loadAll();
+  }).catch(function () { $('ag-state').innerHTML = '<div class="ag-note"><b>Could not load the agents</b>Try again in a moment.</div>'; });
+})();
+</script>
+</body></html>
