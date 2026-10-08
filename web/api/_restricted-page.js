@@ -39,12 +39,11 @@ export const COPY = {
 /* The same words for a page private to a staging lane: the team is who answers, so the page says so. */
 export function copyFor(lane) {
   if (!lane) return COPY;
-  const team = `the ${lane} team`;
   return {
     ...COPY,
-    idle:     { ...COPY.idle, text: `This page is private to ${team}. Ask for access and they’ll get a message to approve it.` },
-    sent:     { ...COPY.sent, text: `${team.charAt(0).toUpperCase() + team.slice(1)} has been asked. You’ll get a Slack message once it’s decided, and this page opens by itself when the answer is yes.` },
-    declined: { ...COPY.declined, text: `${team.charAt(0).toUpperCase() + team.slice(1)} didn’t approve access this time. If you still need this page, ask them directly.` },
+    idle:     { ...COPY.idle, text: `This page is private to the ${lane} team. Ask for access and the person who published it will get a message to approve it.` },
+    sent:     { ...COPY.sent, text: 'The person who published it has been asked. You’ll get a Slack message once it’s decided, and this page opens by itself when the answer is yes.' },
+    declined: { ...COPY.declined, text: 'The person who published it didn’t approve access this time. If you still need this page, ask them directly.' },
   };
 }
 

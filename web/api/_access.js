@@ -311,7 +311,12 @@ export function normalise(raw) {
           .map(s => String(s).trim().toLowerCase()).filter(Boolean),
         people: emails(r.people)
       };
-      if (access === 'lane') out.lane = lane;
+      if (access === 'lane') {
+        out.lane = lane;
+        /* Who published the page. The request for access goes to them and the owner, and only they can answer. */
+        const c = String((r && r.creator) || '').trim().toLowerCase();
+        if (c.includes('@')) out.creator = c;
+      }
       return out;
     })
     .filter(Boolean);
@@ -406,7 +411,7 @@ export function laneMembers(rules, lane) {
    is never loosened by a page inside it: in both cases the page is left as the owner set it and the note says so.
 
    Pure: returns { rules, changed, note }. */
-export function setPageVisibility(rules, lane, page, visibility) {
+export function setPageVisibility(rules, lane, page, visibility, creator = '') {
   const path = `/internal/staging/${lane}/${page}`;
   const exact = rules.routes.find(r => r.path === path);
   const ours = exact && exact.access === 'lane' && exact.lane === lane;
@@ -419,7 +424,7 @@ export function setPageVisibility(rules, lane, page, visibility) {
         ? 'This page sits under a public rule the owner set, so it was left as is.'
         : 'The owner has already set who can open this lane, so the page follows that.' };
     }
-    return { rules: { ...rules, routes: [...rules.routes, { path, access: 'lane', lane, groups: [], people: [] }] }, changed: true, note: '' };
+    return { rules: { ...rules, routes: [...rules.routes, { path, access: 'lane', lane, ...(creator ? { creator: String(creator).toLowerCase() } : {}), groups: [], people: [] }] }, changed: true, note: '' };
   }
   if (ours) return { rules: { ...rules, routes: rules.routes.filter(r => r !== exact) }, changed: true, note: '' };
   return { rules, changed: false, note: '' };

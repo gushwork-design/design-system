@@ -396,6 +396,13 @@ not make a Vercel project for it. When the person says "publish this to the gtm 
 The scripts are in the plugin's `scripts/` folder: this skill's base directory (shown when it loads) is
 `.../skills/gushwork-web`, so they are at `../../scripts/`. Call them by that full path.
 
+0. **Ask where it is going, before anything else.** When the person says "publish this", ask one question with
+   options: *the <lane> staging lane* or *somewhere else*. Find their lane or lanes with
+   `bash <scripts>/publish-staging.sh lanes`; if they are on more than one, offer each by name, and if they are on none,
+   tell them to ask the owner to add them in Access Control. This publishes only to a team's staging lane. If they
+   say *somewhere else* (another team's lane they are not on, the live site, anywhere that is not staging), do not
+   publish: say plainly that this only puts pages on their own staging lane, that going anywhere else is the owner's
+   call, and offer to keep the page ready.
 1. **Ask who can open it, then start from the scaffold,** which already passes the checks. One question, with two
    options: *only the <lane> team* or *everyone at Gushwork*. Do not guess it and do not default it; a page nobody
    chose a setting for is open or hidden by accident. Then:
@@ -414,7 +421,7 @@ The scripts are in the plugin's `scripts/` folder: this skill's base directory (
    `bash <scripts>/publish-staging.sh logout` disconnects.
 4. The page is live a minute or two after it says Committed. Publishing the same name again replaces its files.
    A person outside the team who opens a private page sees a Restricted screen and can ask for access; Bruce then
-   messages the owner and the whole lane in Slack, and any one of them can approve or decline.
+   messages the owner and the person who published the page, and either of them can approve or decline.
 
 What the checks refuse, so the page is built right the first time: a missing `index.html`, a `<base href>` that
 is not `/internal/staging/<lane>/<page>/`, no `noindex`, any file type that is not static, any file over 3 MB

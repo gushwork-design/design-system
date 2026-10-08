@@ -357,6 +357,7 @@ const live = () => normalise(rulesJson.access);
 {
   const base = normalise({ routes: [{ path: '/internal', access: 'internal' }], lanes: { gtm: { people: ['a@gushwork.ai'] } } });
   let c = setPageVisibility(base, 'gtm', 'p', 'lane');
+  t('the creator is recorded when given', setPageVisibility(base, 'gtm', 'p2', 'lane', 'Sam@Gushwork.ai').rules.routes.at(-1).creator, 'sam@gushwork.ai');
   t('private adds one rule for the exact page', [c.changed, c.rules.routes.at(-1)], [true, { path: '/internal/staging/gtm/p', access: 'lane', lane: 'gtm', groups: [], people: [] }]);
   t('asking again changes nothing', setPageVisibility(c.rules, 'gtm', 'p', 'lane').changed, false);
   c = setPageVisibility(c.rules, 'gtm', 'p', 'org');
@@ -450,11 +451,12 @@ let q;
   q = await asReq('priya@gushwork.ai');
   const dms = slackLog.filter((c) => c.method === 'chat.postMessage');
   t('the request is accepted', [q.status, q.body.state], [200, 'pending']);
-  t('Bruce tells the owner and the whole lane, and not the person asking', dms.map((d) => d.body.channel).sort(), ['UOWNER', 'USAM', 'USWAP']);
-  t('the message says it is the team\'s page', JSON.stringify(dms[0].body.blocks).includes('private to the *gtm* team'), true);
+  t('Bruce tells the owner and the page\'s creator, and no one else: not the rest of the lane, not the person asking', dms.map((d) => d.body.channel).sort(), ['UOWNER', 'USAM']);
+  t('the message says whose page it is', [JSON.stringify(dms[0].body.blocks).includes('private to the *gtm* team'), JSON.stringify(dms[0].body.blocks).includes('published by *sam@gushwork.ai*')], [true, true]);
   t('and every message carries Approve and Decline', dms.every((d) => JSON.stringify(d.body.blocks).includes('gw_access_approve')), true);
   const id = reqId('priya@gushwork.ai');
-  t('the request remembers every message it went out in', JSON.parse(kvData.get(`gw:accreq:${id}`)).dms.length, 3);
+  t('the request remembers every message it went out in', JSON.parse(kvData.get(`gw:accreq:${id}`)).dms.length, 2);
+  t('the rule remembers who published the page', live().routes.find((r) => r.path === PAGE_PATH).creator, 'sam@gushwork.ai');
 }
 const press = (id, who, approve) => ({
   user: { id: who }, channel: { id: 'D' + who }, message: { ts: ((JSON.parse(kvData.get(`gw:accreq:${id}`)).dms || []).find((d) => d.channel === 'D' + who) || { ts: '1' }).ts, blocks: [{ block_id: `acc:${id}`, type: 'actions' }] },
@@ -467,16 +469,20 @@ const press = (id, who, approve) => ({
   await answerRequest(press(id, 'UNOBODY', true), true, 'xoxb-test', new Set(['UOWNER']));
   t('someone not on the lane cannot answer', [slackLog.some((c) => c.method === 'chat.postEphemeral'), vercelWrites.length - w0, JSON.parse(kvData.get(`gw:accreq:${id}`)).status], [true, 0, 'open']);
   slackLog.length = 0;
+  await answerRequest(press(id, 'USWAP', true), true, 'xoxb-test', new Set(['UOWNER']));
+  t('nor can another member of the lane: only the creator and the owner', [slackLog.some((c) => c.method === 'chat.postEphemeral'), vercelWrites.length - w0, JSON.parse(kvData.get(`gw:accreq:${id}`)).status], [true, 0, 'open']);
+  slackLog.length = 0;
+  slackLog.length = 0;
   await answerRequest(press(id, 'USAM', true), true, 'xoxb-test', new Set(['UOWNER']));
   const rule = live().routes.find((r) => r.path === PAGE_PATH);
-  t('a member of the lane can approve', [JSON.parse(kvData.get(`gw:accreq:${id}`)).status, rule.access, rule.people], ['approved', 'lane', ['priya@gushwork.ai']]);
+  t('the creator can approve', [JSON.parse(kvData.get(`gw:accreq:${id}`)).status, rule.access, rule.people], ['approved', 'lane', ['priya@gushwork.ai']]);
   t('the person can now open it, and nothing else widened', [decide(PAGE_PATH, { email: 'priya@gushwork.ai' }, live()), decide('/internal/staging/gtm/other', { email: 'priya@gushwork.ai' }, live())], ['allow', 'allow']);
-  t('everyone who was told sees it is answered, by whom', slackLog.filter((c) => c.method === 'chat.update').map((c) => c.body.channel).sort(), ['DUOWNER', 'DUSAM', 'DUSWAP']);
+  t('everyone who was told sees it is answered, by whom', slackLog.filter((c) => c.method === 'chat.update').map((c) => c.body.channel).sort(), ['DUOWNER', 'DUSAM']);
   t('the line says who approved', slackLog.some((c) => c.method === 'chat.update' && /Approved by sam@gushwork.ai/.test(c.body.text)), true);
   t('the person is told in Slack', slackLog.some((c) => c.method === 'chat.postMessage' && c.body.channel === 'UPRIYA'), true);
   slackLog.length = 0;
   const w1 = vercelWrites.length;
-  await answerRequest(press(id, 'USWAP', true), true, 'xoxb-test', new Set(['UOWNER']));
+  await answerRequest(press(id, 'UOWNER', true), true, 'xoxb-test', new Set(['UOWNER']));
   t('a second press changes nothing', [vercelWrites.length - w1, slackLog.filter((c) => c.method === 'chat.update').length > 0], [0, true]);
 }
 {
@@ -486,7 +492,15 @@ const press = (id, who, approve) => ({
   const id = reqId('nobody@gushwork.ai');
   await answerRequest(press(id, 'UOWNER', false), false, 'xoxb-test', new Set(['UOWNER']));
   t('the owner can always answer, and a decline grants nothing', [JSON.parse(kvData.get(`gw:accreq:${id}`)).status, decide(PAGE_PATH, { email: 'nobody@gushwork.ai' }, live())], ['declined', 'forbid']);
-  t('the decline tells them to ask the team', slackLog.some((c) => c.method === 'chat.postMessage' && c.body.channel === 'UNOBODY' && /ask the gtm team/.test(c.body.text)), true);
+  t('the decline tells them to ask the person who published it', slackLog.some((c) => c.method === 'chat.postMessage' && c.body.channel === 'UNOBODY' && /ask the person who published it/.test(c.body.text)), true);
+}
+{
+  // an older private page with no recorded creator: the owner alone is told
+  seedRules();
+  rulesJson.access.routes.push({ path: '/internal/staging/gtm/old', access: 'lane', lane: 'gtm', groups: [], people: [] }); invalidateRules();
+  slackLog.length = 0;
+  await asReq('priya@gushwork.ai', '/internal/staging/gtm/old');
+  t('no recorded creator: only the owner is told', slackLog.filter((c) => c.method === 'chat.postMessage').map((c) => c.body.channel), ['UOWNER']);
 }
 {
   // an ordinary restricted page is unchanged: only the owner is told

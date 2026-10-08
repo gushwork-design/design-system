@@ -17,10 +17,10 @@
      · An owners-only page cannot be granted (owners come from the environment, not the rules): the page offers no
        request, and a request for one is refused here as well.
 
-   A PAGE PRIVATE TO A STAGING LANE (the publisher chose "only my team", rule access 'lane'). The request goes to the lane's
-     team as well as the owner: Bruce DMs every member he can find in Slack, with the same Approve and Decline. Any one of them
-     can answer, and the others' messages then change to say who did. A lane member is recognised by their Slack email being on
-     the lane (canPublish), read live, so pressing the button needs no allow-list entry; the owner can always answer.
+   A PAGE PRIVATE TO A STAGING LANE (the publisher chose "only my team", rule access 'lane'). The request goes to the owner and
+     to the person who published the page, and to no one else: Bruce DMs those two, with the same Approve and Decline. Either
+     can answer, and the other's message then changes to say who did. Nobody else on the lane is told or can answer; the
+     creator is recognised by the email on their Slack account. A page with no recorded creator goes to the owner alone.
 
    WHAT KEEPS IT QUIET
      · One open request per person per page for 24 hours, and at most ten requests an hour per person. A repeat gets
@@ -33,7 +33,7 @@
 
 import crypto from 'node:crypto';
 import { COOKIE, verify, readCookie, sessionSecret } from './_session.js';
-import { loadRules, decide, ruleFor, describeAccess, grantPage, saveRules, invalidate, canPublish, laneMembers } from './_access.js';
+import { loadRules, decide, ruleFor, describeAccess, grantPage, saveRules, invalidate } from './_access.js';
 import { titleFor } from './_restricted-page.js';
 
 export { titleFor };
@@ -74,9 +74,9 @@ export function normPath(raw) {
 }
 
 /* The DM to the owner. Pure. */
-export function requestBlocks({ id, email, path, title, label, at, lane }) {
+export function requestBlocks({ id, email, path, title, label, at, lane, creator }) {
   const when = new Date(at || Date.now()).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', timeZone: 'Asia/Kolkata' });
-  const who = lane ? `\nIt is private to the *${lane}* team, so anyone on the team (or the owner) can answer.` : '';
+  const who = lane ? `\nIt is private to the *${lane}* team${creator ? ` and was published by *${creator}*` : ''}. ${creator ? 'You or the owner' : 'The owner'} can answer.` : '';
   return [
     { type: 'section', text: { type: 'mrkdwn', text: `*Access request*\n*${email}* wants to open *${title}* (\`${path}\`).${who}` } },
     { type: 'context', elements: [{ type: 'mrkdwn', text: `The page is set to: ${label} · signed in with Google · ${when} IST` }] },
@@ -194,32 +194,28 @@ export default async function handler(req, res) {
 
     const at = Date.now();
     const title = titleFor(path);
-    const blocks = requestBlocks({ id, email, path, title, label: describeAccess(rule).label, at, lane });
+    /* Who is told: the owner always, and for a lane's page the person who published it (never the person asking). */
+    const creator = lane && rule.creator && rule.creator !== email ? rule.creator : '';
+    const blocks = requestBlocks({ id, email, path, title, label: describeAccess(rule).label, at, lane, creator });
     const text = `Access request: ${email} wants to open ${title}.`;
-
-    /* Who is told: the owner always, and for a lane's page every member Bruce can find in Slack (never the person asking). */
     const dms = [];
     const post = async (channel) => {
       try { const m = await slack(token, 'chat.postMessage', { channel, text, blocks }); dms.push({ channel: m.channel || channel, ts: m.ts }); return true; }
       catch { return false; }
     };
-    const ownerOk = await post(owner);
-    if (lane) {
-      const seen = new Set([owner]);
-      for (const member of laneMembers(rules, lane).filter((e) => e !== email).slice(0, 12)) {
-        try {
-          const u = await slack(token, 'users.lookupByEmail', { email: member }, true);
-          if (u.user && u.user.id && !seen.has(u.user.id)) { seen.add(u.user.id); await post(u.user.id); }
-        } catch { /* not in Slack, or no email scope: they are simply not told */ }
-      }
+    await post(owner);
+    if (creator) {
+      try {
+        const u = await slack(token, 'users.lookupByEmail', { email: creator }, true);
+        if (u.user && u.user.id && u.user.id !== owner) await post(u.user.id);
+      } catch { /* not in Slack, or no email scope: only the owner is told */ }
     }
     if (!dms.length) {
       /* Nothing reached anyone, so nothing is waiting: release the slot and say so. */
       await redis(cfg, [['DEL', by]]).catch(() => {});
       return json(res, 502, { error: 'The request did not reach Slack.' });
     }
-    await redis(cfg, [['SET', `gw:accreq:${id}`, JSON.stringify({ email, path, title, at, status: 'open', lane, dms }), 'EX', REQUEST_TTL]]);
-    void ownerOk;
+    await redis(cfg, [['SET', `gw:accreq:${id}`, JSON.stringify({ email, path, title, at, status: 'open', lane, creator, dms }), 'EX', REQUEST_TTL]]);
     return json(res, 200, { state: 'pending' });
   } catch (e) {
     return json(res, 502, { error: 'The request did not go through.' });
@@ -246,19 +242,18 @@ export async function answerRequest(payload, approve, token, owners = null) {
     const targets = [{ channel, ts }, ...((rec && rec.dms) || []).filter((d) => !(d.channel === channel && d.ts === ts))];
     for (const d of targets) {
       const b = d.channel === channel && d.ts === ts ? blocks
-        : requestBlocks({ id, email: rec.email, path: rec.path, title: rec.title, label: '', at: rec.at, lane: rec.lane });
+        : requestBlocks({ id, email: rec.email, path: rec.path, title: rec.title, label: '', at: rec.at, lane: rec.lane, creator: rec.creator });
       await slack(token, 'chat.update', { channel: d.channel, ts: d.ts, text: line, blocks: answeredBlocks(b, id, line) }).catch(() => {});
     }
   };
   if (!rec) return slack(token, 'chat.update', { channel, ts, text: 'That request has expired.', blocks: answeredBlocks(blocks, id, 'That request has expired.') }).catch(() => {});
 
-  /* Who may answer: the owner, or (for a lane's page) anyone on that lane, recognised by the email on their Slack account. */
+  /* Who may answer: the owner, or (for a lane's page) the person who published it, recognised by the email on their Slack account. */
   let who = '';
   if (owners && !owners.has(clicker)) {
-    const mail = rec.lane ? await emailOfSlackUser(token, clicker) : '';
-    invalidate();
-    if (!rec.lane || !mail || !canPublish(mail, rec.lane, await loadRules())) {
-      return slack(token, 'chat.postEphemeral', { channel, user: clicker, text: rec.lane ? `Only the ${rec.lane} team can answer this.` : 'Only the owner can answer this.' }).catch(() => {});
+    const mail = rec.lane && rec.creator ? await emailOfSlackUser(token, clicker) : '';
+    if (!mail || mail !== rec.creator) {
+      return slack(token, 'chat.postEphemeral', { channel, user: clicker, text: rec.lane ? 'Only the person who published this page, or the owner, can answer this.' : 'Only the owner can answer this.' }).catch(() => {});
     }
     who = mail;
   }
@@ -266,7 +261,7 @@ export async function answerRequest(payload, approve, token, owners = null) {
   if (rec.status !== 'open') return updateAll(`Already ${rec.status}${rec.answeredBy ? ' by ' + rec.answeredBy : ''}.`);
 
   const set = (status) => redis(cfg, [['SET', `gw:accreq:${id}`, JSON.stringify({ ...rec, status, by: clicker, answeredBy: who || 'the owner', answered: Date.now() }), 'EX', REQUEST_TTL]]);
-  const askWho = rec.lane ? `the ${rec.lane} team` : 'Utsav';
+  const askWho = rec.lane ? 'the person who published it' : 'Utsav';
 
   if (!approve) {
     await set('declined');

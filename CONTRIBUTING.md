@@ -20,11 +20,13 @@ Access Control, Staging lanes. Everyone in the organisation can open the pages.
 `/internal/staging/connect`. You sign in as yourself, type the code, press Connect. That is the only step you do;
 it is remembered for 90 days (`publish-staging.sh logout` disconnects).
 
+**Where it goes.** When you say "publish this", Claude first asks whether you mean your lane's staging (it lists your lanes) or somewhere else. It only publishes to a staging lane you are on; anywhere else, including the live site, is the owner's call.
+
 **Who can open it.** Your Claude asks, and the answer is saved in `staging.json` (`visibility`): *only your team* (the people
 on the lane) or *everyone at Gushwork*. A private page gets one rule that follows the lane's team live, so leaving the
 lane closes it at once; you can only narrow your own page, and a rule the owner set is never overridden. Someone outside
-the team who opens it sees "Restricted page" and can ask for access; Bruce messages the owner and every lane member in
-Slack with Approve and Decline, and any one of them can answer.
+the team who opens it sees "Restricted page" and can ask for access; Bruce messages the owner and the person who published the page
+(and no one else) in Slack with Approve and Decline, and either can answer.
 
 The page is live a minute or two after it says Committed, and the Staging index lists it under Team pages by
 itself, from the `staging.json` the script writes. Publishing the same name again replaces its files.

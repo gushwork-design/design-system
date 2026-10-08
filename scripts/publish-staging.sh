@@ -4,6 +4,7 @@
 #
 #   bash publish-staging.sh <lane> <page> <folder>            publish ./<folder> to /internal/staging/<lane>/<page>
 #   bash publish-staging.sh --check <lane> <page> <folder>    run the checks, publish nothing
+#   bash publish-staging.sh lanes                             which lanes you can publish to (ask this before choosing one)
 #   bash publish-staging.sh login                             connect this computer (done for you the first time)
 #   bash publish-staging.sh logout                            disconnect this computer
 #
@@ -24,11 +25,11 @@ set -euo pipefail
 HOST="${GW_HUB:-https://design.gushwork.ai}"
 TOKEN_FILE="${GW_PUBLISH_TOKEN_FILE:-$HOME/.config/gushwork/publish-token}"
 
-usage() { sed -n '2,24p' "$0" | sed 's/^# \{0,1\}//' >&2; exit 2; }
+usage() { sed -n '2,25p' "$0" | sed 's/^# \{0,1\}//' >&2; exit 2; }
 
 CMD="publish"
 case "${1:-}" in
-  login|logout) CMD="$1"; shift ;;
+  login|logout|lanes) CMD="$1"; shift ;;
   --check) CMD="check"; shift ;;
   -h|--help|"") usage ;;
 esac
@@ -102,6 +103,17 @@ if cmd == "logout":
         try: os.remove(token_file)
         except OSError: pass
     print("✔ Disconnected. This computer can no longer publish."); sys.exit(0)
+
+if cmd == "lanes":
+    token = saved() or login()
+    st, out = call("me", None, token)
+    if st == 401:
+        token = login(); st, out = call("me", None, token)
+    lanes = out.get("lanes", []) if st == 200 else []
+    if st != 200:
+        sys.exit(out.get("error") or "Could not look that up.")
+    print("You can publish to: " + ", ".join(lanes) if lanes else "You are not on any staging lane yet. Ask the owner to add you in Access Control.")
+    sys.exit(0)
 
 if len(args) != 3 or not os.path.isdir(args[2]):
     sys.exit("Usage: publish-staging.sh [--check] <lane> <page> <folder>")

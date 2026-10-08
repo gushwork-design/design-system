@@ -179,8 +179,9 @@ The email signature creator and the employee ID card generator were redesigned i
     narrow, only their own page, and a rule the owner set is never replaced or loosened. The rule is written before the
     commit, so a private page is never open to the company, even briefly. A private page is not in the static Staging
     index; the hub tells the index which ones each person may see. Someone refused asks for access from the Restricted
-    screen, and Bruce DMs the owner and every lane member he can find in Slack, with Approve and Decline; any one answers,
-    and the rest of the messages change to say who did.
+    screen, and Bruce DMs the owner and the person who published the page, and no one else, with Approve and Decline; either
+    answers and the other message changes to say who did. Asked first, before every publish: the staging lane, or somewhere else
+    (which this does not do).
 
 ## Left open (the owner's call)
 

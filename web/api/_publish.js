@@ -359,7 +359,7 @@ export default async function handler(req, res) {
   let change;
   try {
     invalidate();                                              // read the rules as they are now, not as cached
-    change = setPageVisibility(await loadRules(), sub.lane, sub.page, vis);
+    change = setPageVisibility(await loadRules(), sub.lane, sub.page, vis, who.email);
     if (change.changed) {
       if (!storeId() || !process.env.VERCEL_API_TOKEN) {
         return json(res, 503, { error: 'Private pages need the access rules store, which is not connected yet. Nothing was published.' });
