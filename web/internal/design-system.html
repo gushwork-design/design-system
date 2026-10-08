@@ -1695,7 +1695,7 @@ body[data-gw-page="design-system"] .sg__main { max-width: 1120px; }
      Slack pings use it, so a ping is one tap from the decision. */
   var PENDING_OPEN = null;
   function openPending() {
-    if (!PENDING_OPEN || !BYID[PENDING_OPEN] || !$('rv')) return;
+    if (!PENDING_OPEN || !BYID[PENDING_OPEN]) return;   /* the drawer element is made by openDrawer, so it cannot be required here: a link straight to an item never opened it */
     var id = PENDING_OPEN; PENDING_OPEN = null; openDrawer(id, null);
   }
   function renderReview(d) {

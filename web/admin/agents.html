@@ -33,6 +33,8 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
 #ag-panel .gd-table__cell { overflow: visible; white-space: normal; text-overflow: clip; overflow-wrap: break-word; }
 #ag-panel .gd-table__cell--flex { flex-wrap: wrap; row-gap: var(--gw-space-4); }
 #ag-panel .gd-table__avatar { font-size: 11px; }
+/* a row that opens a conversation shows the hand, like the links and cards that open something */
+#ag-panel .gd-table__row:is([data-u], [data-go]) { cursor: pointer; }
 /* the table's last row must not sit on the card's bottom edge, or its background covers the border between the rounded corners */
 #ag-panel .gd-card--flush > .gd-card__body--bleed { padding-bottom: var(--gw-space-8); }
 /* a collapsed card shows a chevron at its right edge: down while closed, up while open */
@@ -334,7 +336,8 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
     if (th.length) {
       var rows = th.slice(0, 8).map(function (t) {
         var tone = { ready: 'good', stuck: 'warn', queued: 'neutral' }[t.state], lbl = { ready: 'Ready for you', stuck: 'Waiting on you', queued: 'Queued' }[t.state];
-        return { cells: ['<a class="gd-table__link" href="' + esc(REVIEW + '/' + encodeURIComponent(t.scope) + '/' + encodeURIComponent(t.key)) + '">' + esc(t.scope + '/' + t.key) + '</a>', esc(clip(t.note || 'No note yet', 140)), badge(tone, lbl), t.lastAt ? '<time datetime="' + esc(t.lastAt) + '">' + esc(ago(Date.now() - Date.parse(t.lastAt))) + '</time>' : ''], t: ['', t.note || '', '', ''] };
+        var go = REVIEW + '/' + encodeURIComponent(t.scope) + '/' + encodeURIComponent(t.key);
+        return { attrs: ' data-go="' + esc(go) + '"', cells: ['<a class="gd-table__link" href="' + esc(go) + '">' + esc(t.scope + '/' + t.key) + '</a>', esc(clip(t.note || 'No note yet', 140)), badge(tone, lbl), t.lastAt ? '<time datetime="' + esc(t.lastAt) + '">' + esc(ago(Date.now() - Date.parse(t.lastAt))) + '</time>' : ''], t: ['', t.note || '', '', ''] };
       });
       html += card('His items', th.length > 8 ? 'Latest 8 of ' + th.length + '. All of them are in review.' : '', table('His items', [{ h: 'Item', w: '220px', strong: true }, { h: 'Note', w: 'minmax(0,1fr)', title: true, muted: true }, { h: 'State', w: '150px', flex: true }, { h: 'When', w: '110px', muted: true }], rows), { flush: true,
         actions: '<a class="gd-btn gd-btn--sm" href="' + REVIEW + '">Open review</a>' });
@@ -541,6 +544,8 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
   }
 
   document.addEventListener('click', function (e) {
+    var go = e.target.closest && e.target.closest('[data-go]');
+    if (go && $('ag-panel').contains(go) && !e.target.closest('a, button')) { location.href = go.getAttribute('data-go'); return; }
     var u = e.target.closest && e.target.closest('[data-u]');
     if (u && $('ag-panel').contains(u)) { e.preventDefault(); openConv(u.getAttribute('data-u')); return; }
     var t = e.target.closest && e.target.closest('#ag-panel [data-tab], #ag-tabs [data-tab]');
