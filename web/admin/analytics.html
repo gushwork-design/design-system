@@ -51,6 +51,7 @@ body[data-gw-page="analytics"] .sg__main > * { min-width: 0; }
   --ul-field-fg:   var(--gw-color-neutral-900);
   --ul-field-ph:   var(--gw-color-neutral-400);
   --ul-tabs-bg:    var(--gw-color-neutral-50);
+  --ul-bubble-bruce: var(--gw-color-neutral-50);
   --ul-tabs-line:  var(--gw-color-neutral-100);
   --ul-tab-fg:     var(--gw-color-neutral-900);
   --ul-tab-hover:  var(--gw-color-neutral-100);
@@ -96,6 +97,7 @@ body[data-gw-page="analytics"] .sg__main > * { min-width: 0; }
     --ul-field-fg:   var(--gw-color-white);
     --ul-field-ph:   var(--gw-color-neutral-400);
     --ul-tabs-bg:    var(--gw-color-neutral-900);
+    --ul-bubble-bruce: var(--gw-color-neutral-850);
     --ul-tabs-line:  var(--gw-color-neutral-900);
     --ul-tab-fg:     var(--gw-color-white);
     --ul-tab-hover:  var(--gw-color-neutral-800);       /* one step LIGHTER than the neutral-900 track, as light mode is one step darker than its track; the library draws no dark tab hover, so this is derived, not read */
@@ -141,6 +143,7 @@ body[data-gw-page="analytics"] .sg__main > * { min-width: 0; }
     --ul-field-fg:   var(--gw-color-white);
     --ul-field-ph:   var(--gw-color-neutral-400);
     --ul-tabs-bg:    var(--gw-color-neutral-900);
+    --ul-bubble-bruce: var(--gw-color-neutral-850);
     --ul-tabs-line:  var(--gw-color-neutral-900);
     --ul-tab-fg:     var(--gw-color-white);
     --ul-tab-hover:  var(--gw-color-neutral-800);       /* one step LIGHTER than the neutral-900 track, as light mode is one step darker than its track; the library draws no dark tab hover, so this is derived, not read */
@@ -321,14 +324,23 @@ body[data-gw-page="analytics"] .sg__main > * { min-width: 0; }
 /* Bruce's conversation (R67): what a person said and what Bruce answered, read from the Slack DM. The person's lines sit on
    the right in the selected fill, Bruce's on the left in the quiet one. */
 .ul-dlg--conv { width: min(680px, calc(100vw - 32px)); }
-.br-msgs { display: flex; flex-direction: column; gap: var(--gw-space-16); padding-top: var(--gw-space-8); }
-.br-msg { display: flex; flex-direction: column; gap: var(--gw-space-4); max-width: 88%; }
+.br-msgs { display: flex; flex-direction: column; gap: var(--gw-space-16); padding-top: var(--gw-space-4); }
+.br-msg { display: flex; gap: var(--gw-space-8); max-width: 94%; align-items: flex-start; }
 .br-msg--bruce { align-self: flex-start; }
-.br-msg--person { align-self: flex-end; align-items: flex-end; }
+.br-msg--person { align-self: flex-end; flex-direction: row-reverse; }
+.br-msg__c { display: flex; flex-direction: column; gap: var(--gw-space-4); min-width: 0; }
+.br-msg--person .br-msg__c { align-items: flex-end; }
+.br-pic { width: 28px; height: 28px; flex: none; border-radius: var(--gw-radius-8); display: grid; place-items: center; font: 600 11px/1 var(--gw-font-body);
+  background: var(--ul-hdr-bg); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); color: var(--ul-value); }
+.br-pic--bruce { background: var(--gw-color-primary-100) url(/assets/bruce-avatar.png) center / cover no-repeat; box-shadow: none; }
+.br-pic--ghost { visibility: hidden; }
 .br-msg__who { font: var(--gw-text-body-12-med); color: var(--ul-sub); }
 .br-msg__t { margin: 0; padding: var(--gw-space-12) var(--gw-space-16); border-radius: var(--gw-radius-12); font: var(--gw-text-body-14-reg); white-space: pre-wrap; overflow-wrap: anywhere; }
-.br-msg--bruce .br-msg__t { background: var(--ul-tabs-bg); color: var(--ul-value); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }   /* the edge, because the fill equals the dialog in dark */
+.br-msg--bruce .br-msg__t { background: var(--ul-bubble-bruce); color: var(--ul-value); box-shadow: inset 0 0 0 1px var(--ul-hdr-line); }   /* a real fill in both themes: in dark it was the panel's own colour */
 .br-msg--person .br-msg__t { background: var(--ul-tab-on-bg); color: var(--ul-tab-on-fg); }
+.br-msg__t strong { font-weight: 600; }
+.br-msg__t em { font-style: italic; }
+.br-msg__t code { font: inherit; padding: 0 var(--gw-space-4); border-radius: var(--gw-radius-4); background: var(--ul-hdr-line); }
 .br-msg__f { font: var(--gw-text-body-12-med); color: var(--ul-sub); }
 /* Bruce conversations (8 Oct 2026): a DM-style list, one row per person, latest first; a click opens a drawer. */
 .br-m4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -336,9 +348,10 @@ body[data-gw-page="analytics"] .sg__main > * { min-width: 0; }
 @media (max-width: 600px) { .br-m4 { grid-template-columns: minmax(0, 1fr); } }
 .br-cl { list-style: none; margin: 0; padding: 0 var(--gw-space-4); display: flex; flex-direction: column; }
 .br-ci { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: var(--gw-space-12); align-items: center; width: 100%; text-align: left;
-  padding: var(--gw-space-12) var(--gw-space-8); border: 0; border-radius: var(--gw-radius-8); background: none; cursor: pointer; color: inherit;
-  box-shadow: inset 0 -1px 0 var(--ul-row-line); transition: background var(--gw-motion-fast); }
+  padding: var(--gw-space-12) var(--gw-space-8); border: 0; border-bottom: 1px solid var(--ul-row-line); border-radius: 0; background: none; cursor: pointer; color: inherit;
+  transition: background var(--gw-motion-fast); }
 .br-ci:hover { background: var(--ul-row-hover); }
+.br-cl li:last-child .br-ci, .br-lks .br-lk:last-child { border-bottom: 0; }
 .br-ci:focus-visible, .br-ub:focus-visible, .br-lk:focus-visible { outline: 2px solid var(--gw-color-primary-500); outline-offset: -2px; }
 .br-av { width: 40px; height: 40px; border-radius: var(--gw-radius-10); background: var(--ul-circle); color: var(--ul-value); display: grid; place-items: center; font: var(--gw-text-body-14-sem); flex: none; }
 .br-av--lg { width: 48px; height: 48px; border-radius: var(--gw-radius-12); }
@@ -363,28 +376,60 @@ body[data-gw-page="analytics"] .sg__main > * { min-width: 0; }
 @media (max-width: 600px) { .br-ub { grid-template-columns: 110px minmax(0, 1fr) 32px; } }
 .br-lks { padding: 0 var(--gw-space-4) var(--gw-space-8); display: flex; flex-direction: column; }
 .br-lk { display: grid; grid-template-columns: 120px 140px auto minmax(0, 1fr); gap: var(--gw-space-12); align-items: center; width: 100%; text-align: left; border: 0; background: none; cursor: pointer; color: inherit;
-  padding: var(--gw-space-12) var(--gw-space-8); border-radius: var(--gw-radius-8); box-shadow: inset 0 -1px 0 var(--ul-row-line); transition: background var(--gw-motion-fast); }
+  padding: var(--gw-space-12) var(--gw-space-8); border-bottom: 1px solid var(--ul-row-line); border-radius: 0; transition: background var(--gw-motion-fast); }
 .br-lk:hover { background: var(--ul-row-hover); }
 .br-lk > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--gw-text-body-14-reg); color: var(--ul-cell); }
 .br-lk > span:nth-child(2) { color: var(--ul-value); font-weight: 500; }
 @media (max-width: 760px) { .br-lk { grid-template-columns: minmax(0, 1fr) auto; } .br-lk > span:nth-child(1), .br-lk > span:nth-child(2) { grid-column: 1 / -1; } }
+.br-how { padding: 0 var(--gw-space-8) var(--gw-space-8); }
+.br-how summary { cursor: pointer; font: var(--gw-text-body-14-med); color: var(--ul-sub); list-style: none; display: inline-flex; align-items: center; gap: var(--gw-space-4); padding: var(--gw-space-4) 0; }
+.br-how summary::-webkit-details-marker { display: none; }
+.br-how summary::before { content: "\203A"; display: inline-block; transition: transform var(--gw-motion-fast); }
+.br-how[open] summary::before { transform: rotate(90deg); }
+.br-how summary:hover { color: var(--ul-value); }
+.br-how summary:focus-visible { outline: 2px solid var(--gw-color-primary-500); outline-offset: 2px; border-radius: var(--gw-radius-4); }
+.br-how ul { margin: var(--gw-space-8) 0 0; padding-left: var(--gw-space-20); display: flex; flex-direction: column; gap: var(--gw-space-8); font: var(--gw-text-body-14-reg); color: var(--ul-cell); }
+.br-how li b { color: var(--ul-value); font-weight: 500; }
 .br-note { padding: 0 var(--gw-space-8); font: var(--gw-text-body-14-reg); color: var(--ul-sub); }
 .br-empty { padding: var(--gw-space-24) var(--gw-space-8); font: var(--gw-text-body-14-reg); color: var(--ul-sub); }
-/* the drawer: a dialog pinned to the right edge, so focus is trapped, Esc closes and the backdrop dims the page */
-.br-drawer { position: fixed; inset: 0 0 0 auto; margin: 0; width: min(580px, 100vw); max-width: none; height: 100dvh; max-height: none; padding: 0; border: 0; border-radius: var(--gw-radius-16) 0 0 var(--gw-radius-16);
-  background: var(--ul-field-bg); color: var(--ul-value); box-shadow: inset 0 0 0 1px var(--ul-hdr-line), var(--gw-shadow-s4); display: none; flex-direction: column; }
-.br-drawer[open] { display: flex; animation: br-slide 320ms ease-out; }
-.br-drawer::backdrop { background: rgba(0, 0, 0, 0.4); }
-@keyframes br-slide { from { transform: translateX(24px); opacity: 0; } }
-@media (prefers-reduced-motion: reduce) { .br-drawer[open] { animation: none; } }
-@media (max-width: 600px) { .br-drawer { border-radius: 0; } }
-.br-dh { display: flex; gap: var(--gw-space-12); align-items: center; padding: var(--gw-space-20) var(--gw-space-16) var(--gw-space-12) var(--gw-space-24); }
-.br-dh h2 { margin: 0; font: var(--gw-text-body-18-sem); color: var(--ul-value); display: flex; gap: var(--gw-space-8); align-items: center; }
-.br-dh p { margin: 2px 0 0; font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
-.br-dh .ul-dlg__x { margin-left: auto; }
-.br-dtags { display: flex; flex-wrap: wrap; gap: var(--gw-space-4); padding: 0 var(--gw-space-24) var(--gw-space-12); }
-.br-dtabs { padding: 0 var(--gw-space-24) var(--gw-space-12); }
-.br-db { flex: 1; min-height: 0; overflow-y: auto; padding: 0 var(--gw-space-24) var(--gw-space-24); border-top: 1px solid var(--ul-hdr-line); }
+/* the drawer, in the shape of the Design System review drawer (8 Oct 2026): a scrim, a panel pinned right with a hairline and a soft
+   shadow, a small label over a display-face title, prev / next / expand / close, then labelled sections with hairline rows. */
+.br-scrim { position: fixed; inset: 0; z-index: 80; background: rgba(13, 13, 13, .38); }
+.br-rv { position: fixed; top: 0; right: 0; bottom: 0; z-index: 81; width: min(560px, 100vw); display: flex; flex-direction: column; background: var(--s-panel-bg); outline: 0;
+  box-shadow: inset 1px 0 0 var(--ul-hdr-line), -28px 0 56px -28px rgba(0, 0, 0, .4); transition: width .22s ease; }
+.br-rv[hidden], .br-scrim[hidden] { display: none; }
+.br-rv--wide { width: min(1180px, calc(100vw - 48px)); }
+@media (prefers-reduced-motion: reduce) { .br-rv { transition: none; } }
+html.br-open { overflow: hidden; }
+.br-h { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--gw-space-12); padding: var(--gw-space-20) var(--gw-space-24) var(--gw-space-16); box-shadow: inset 0 -1px 0 var(--ul-hdr-line); }
+.br-h__t { min-width: 0; }
+.br-h__s { font: var(--gw-text-body-12-reg); color: var(--ul-sub); }
+.br-h h2 { margin: 4px 0 0; font: 600 22px/1.2 var(--gw-font-display); color: var(--ul-value); overflow-wrap: anywhere; display: flex; gap: var(--gw-space-8); align-items: center; flex-wrap: wrap; }
+.br-h__r { display: flex; align-items: center; gap: var(--gw-space-8); flex: none; }
+.br-x { all: unset; box-sizing: border-box; cursor: pointer; width: 28px; height: 28px; display: grid; place-items: center; border-radius: var(--gw-radius-8); color: var(--ul-cell); font: 500 16px/1 var(--gw-font-body); }
+.br-x:hover { background: var(--ul-tab-hover); color: var(--ul-value); }
+.br-x:disabled { opacity: .3; cursor: default; background: none; }
+.br-x:focus-visible, .br-ex:focus-visible { outline: var(--gw-focus-ring, 2px solid var(--gw-color-primary-500)); outline-offset: 2px; }
+.br-ex { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 var(--gw-space-12); border-radius: var(--gw-radius-8); color: var(--ul-ctl-fg); font: 500 12.5px/1 var(--gw-font-body); }
+.br-ex:hover { background: var(--ul-ctl-hover); }
+.br-ex svg { width: 14px; height: 14px; flex: none; }
+.br-ex kbd { margin-left: 2px; padding: 0 var(--gw-space-4); min-width: 16px; height: 16px; display: inline-grid; place-items: center; border-radius: var(--gw-radius-4); font: var(--gw-text-body-12-med); opacity: .5; background: var(--ul-tabs-bg); }
+@media (hover: none) { .br-ex kbd { display: none; } }
+.br-dtabs { padding: var(--gw-space-12) var(--gw-space-24) 0; }
+.br-body { flex: 1; min-height: 0; overflow-y: auto; padding: var(--gw-space-20) var(--gw-space-24); display: flex; flex-direction: column; gap: var(--gw-space-32); }
+.br-sec { display: flex; flex-direction: column; gap: var(--gw-space-12); min-width: 0; }
+.br-sec > h3 { margin: 0; font: 600 12px/1.3 var(--gw-font-body); letter-spacing: .04em; text-transform: uppercase; color: var(--ul-sub); }
+.br-cols { display: flex; flex-direction: column; gap: var(--gw-space-32); }
+.br-rv--wide .br-cols { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: var(--gw-space-32); align-items: start; }
+.br-rv--wide .br-sec--det { grid-column: 2; grid-row: 1; position: sticky; top: 0; }
+.br-rv--wide .br-sec--thread { grid-column: 1; grid-row: 1; }
+.br-dl { display: flex; flex-direction: column; }
+.br-d { display: flex; justify-content: space-between; gap: var(--gw-space-16); padding: var(--gw-space-8) 0; box-shadow: inset 0 -1px 0 var(--ul-hdr-line); font: var(--gw-text-body-13-reg, 400 13px/1.5 var(--gw-font-body)); }
+.br-d:last-child { box-shadow: none; }
+.br-d span { color: var(--ul-sub); }
+.br-d b { font-weight: 500; color: var(--ul-value); text-align: right; overflow-wrap: anywhere; }
+.br-d--text { flex-direction: column; gap: var(--gw-space-8); }
+.br-tags { display: flex; flex-wrap: wrap; gap: var(--gw-space-4); }
 .br-day { align-self: center; font: var(--gw-text-body-12-med); color: var(--ul-sub); background: var(--ul-tabs-bg); border-radius: var(--gw-radius-full); padding: 2px var(--gw-space-12); margin: var(--gw-space-8) 0; position: sticky; top: var(--gw-space-8); }
 .br-thr { font: var(--gw-text-body-12-med); color: var(--ul-sub); }
 .br-log { display: flex; flex-direction: column; padding-top: var(--gw-space-8); }
@@ -883,23 +928,35 @@ body[data-gw-page="analytics"] .sg__hd { border-bottom: 0; padding-bottom: var(-
         <div class="ul-metrics br-m4" id="br-talk"></div>
       </section>
 
+      <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="br-h-cost">
+        <div class="ul-sh"><div class="ul-sh__t"><h2 id="br-h-cost">What it costs</h2><span class="ul-sh__q" id="br-q-cost">estimated, not measured</span></div></div>
+        <div class="ul-metrics br-m4" id="br-cost"></div>
+        <details class="br-how"><summary>How the estimate works</summary><div id="br-how"></div></details>
+      </section>
+
       <section class="ul-sec" style="margin-top: var(--gw-space-24)" aria-labelledby="br-h-look">
         <div class="ul-sh"><div class="ul-sh__t"><h2 id="br-h-look">Worth a look</h2><span class="ul-sh__q" id="br-q-look"></span></div></div>
         <p class="br-note">Asks he had no clear lane for, and runs that failed or hit the cap. Each one is a gap to fill or a skill to teach him.</p>
         <div class="br-lks" id="br-look"></div>
       </section>
 
-      <dialog class="br-drawer" id="br-drawer" aria-labelledby="br-d-t">
-        <div class="br-dh"><span class="br-av br-av--lg" id="br-d-av" aria-hidden="true"></span>
-          <div><h2 id="br-d-t">Conversation</h2><p id="br-d-sub"></p></div>
-          <button type="button" class="ul-dlg__x" id="br-d-x" aria-label="Close">&times;</button></div>
-        <div class="br-dtags" id="br-d-tags"></div>
+      <div class="br-scrim" id="br-scrim" hidden></div>
+      <aside class="br-rv" id="br-drawer" role="dialog" aria-modal="true" aria-labelledby="br-d-t" tabindex="-1" hidden>
+        <div class="br-h">
+          <div class="br-h__t"><div class="br-h__s" id="br-d-s">Conversation</div><h2 id="br-d-t">Conversation</h2></div>
+          <div class="br-h__r">
+            <button type="button" class="br-x" id="br-d-prev" aria-label="Previous conversation" title="Previous (←)">‹</button>
+            <button type="button" class="br-x" id="br-d-next" aria-label="Next conversation" title="Next (→)">›</button>
+            <button type="button" class="br-ex" id="br-d-ex" aria-expanded="false" aria-keyshortcuts="E"></button>
+            <button type="button" class="br-x" id="br-d-x" aria-label="Close" title="Close (Esc)">&times;</button>
+          </div>
+        </div>
         <div class="br-dtabs"><div class="ul-tabs" role="tablist" aria-label="Conversation views">
           <button class="ul-tab" role="tab" data-dt="chat" aria-selected="true">Conversation</button>
           <button class="ul-tab" role="tab" data-dt="shared" aria-selected="false" id="br-t-shared">Shared</button>
           <button class="ul-tab" role="tab" data-dt="log" aria-selected="false">Log</button></div></div>
-        <div class="br-db" id="br-d-b" aria-live="polite"></div>
-      </dialog>
+        <div class="br-body" id="br-d-b" aria-live="polite"></div>
+      </aside>
     </div>
     </div>
 
@@ -2455,9 +2512,14 @@ window.__anRefilter = {};
   function fmtDay(d) { return d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }); }
   function fmtTime(d) { return d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }); }
   function clip(t, n) { t = String(t || ''); return t.length > n ? t.slice(0, n - 1) + '…' : t; }
-  var KIND = { run: 'Run', capped: 'Capped', 'to-alfred': 'To Alfred', failed: 'Failed', sent: 'Sent' };
+  var KIND = { run: 'Run', chat: 'Chat', capped: 'Capped', 'to-alfred': 'To Alfred', failed: 'Failed', sent: 'Sent' };
   var TOPIC = { 'pass-on': 'Pass on to Utsav', status: 'Status check', access: 'Access', brand: 'Brand files', build: 'Build a page', template: 'Templates and tools', hub: 'Hub and system', about: 'About Bruce', other: 'No clear lane' };
-  var S = { status: 'loading', rows: [], rowsAll: [], period: '30', busy: false, fetchedAt: 0, owner: '', cap: 3, topic: '', convs: [], dm: {}, seq: 0, openUser: '', tab: 'chat' };
+  /* What a Bruce session costs, ESTIMATED. Nothing here is measured: run records carry no token counts and the hub cannot read the plan's
+     usage card. The first figure is measured from the repo files (about 4 characters a token); the other two are assumptions to tune. */
+  var TOK = { start: 29000, chat: 4000, run: 90000 };
+  function tokensOf(r) { return r.kind === 'run' ? TOK.start + TOK.run : r.kind === 'chat' ? TOK.start + TOK.chat : 0; }   /* capped, failed and passed-to-Alfred start no Bruce session */
+  function tok(n) { return n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1e3 ? Math.round(n / 1e3) + 'k' : String(Math.round(n)); }
+  var S = { status: 'loading', rows: [], rowsAll: [], period: '30', busy: false, fetchedAt: 0, owner: '', cap: 3, topic: '', convs: [], dm: {}, seq: 0, openUser: '', tab: 'chat', order: [], i: -1, wide: false, usage: null };
 
   function parse(raw) {
     var out = [];
@@ -2498,7 +2560,7 @@ window.__anRefilter = {};
   function renderAll() {
     var rows = scoped(), asks = rows.filter(isAsk), convs = conversations(rows); S.convs = convs;
     var today = new Date().toISOString().slice(0, 10);
-    var runs = asks.filter(function (r) { return r.kind === 'run'; }).length;
+    var runs = asks.filter(function (r) { return r.kind === 'run'; }).length, chats = asks.filter(function (r) { return r.kind === 'chat'; }).length;
     var follow = asks.filter(function (r) { return r.thread; }).length;
     var tc = {}; asks.forEach(function (r) { tc[r.topic] = (tc[r.topic] || 0) + 1; });
     var tops = Object.keys(tc).sort(function (a, b) { return tc[b] - tc[a]; });
@@ -2506,12 +2568,13 @@ window.__anRefilter = {};
     var talkedToday = convs.filter(function (c) { return c.last.toISOString().slice(0, 10) === today; }).length;
     $('br-metrics').innerHTML =
       metric('Conversations', String(convs.length), talkedToday ? talkedToday + ' talked to him today' : (convs.length ? 'last one ' + ago(Date.now() - convs[0].last.getTime()) : 'nobody has asked yet')) +
-      metric('Asks', String(asks.length), runs + ' runs, each a cloud session on your account') +
+      metric('Runs', String(runs), 'real work: a build, a check, a rework or an edit' + (chats ? '. Plus ' + plural(chats, 'chat') + ', which cost little' : '')) +
       metric('Follow-ups', pct(follow, asks.length), 'asked inside an existing thread') +
       metric('Top use', lanes.length ? TOPIC[lanes[0]] : '—', lanes.length ? pct(tc[lanes[0]], asks.length) + ' of asks' : 'nothing yet');
 
     /* conversations, newest first, optionally narrowed to one topic */
     var shown = S.topic ? convs.filter(function (c) { return c.topics[S.topic]; }) : convs;
+    S.order = shown.map(function (c) { return c.user; });
     $('br-q-conv').textContent = plural(shown.length, 'conversation') + ', latest first' + (S.topic ? ', about ' + TOPIC[S.topic].toLowerCase() : '');
     $('br-clear').hidden = !S.topic;
     $('br-convs').innerHTML = shown.length ? '<ul class="br-cl">' + shown.map(function (c) {
@@ -2542,37 +2605,66 @@ window.__anRefilter = {};
       metric('Asks per person', convs.length ? (asks.length / convs.length).toFixed(1) : '—', 'more than one means it is being reused') +
       metric('Came back', pct(back, convs.length), 'people who asked on more than one day');
 
+    /* what it costs: an estimate, per the TOK constants above */
+    var u = S.usage, resetAt = u && u.weekly && Date.parse(u.weekly.resetsAt) ? Date.parse(u.weekly.resetsAt) : 0;
+    var weekFrom = resetAt ? resetAt - 7 * DAY : Date.now() - 7 * DAY;
+    var periodTok = asks.reduce(function (n, r) { return n + tokensOf(r); }, 0);
+    var weekTok = S.rows.filter(function (r) { return isAsk(r) && r.at.getTime() >= weekFrom; }).reduce(function (n, r) { return n + tokensOf(r); }, 0);
+    var started = asks.filter(function (r) { return tokensOf(r) > 0; }).length;
+    var snapAge = u && Date.parse(u.at) ? Date.now() - Date.parse(u.at) : 0;
+    $('br-q-cost').textContent = 'estimated, not measured';
+    $('br-cost').innerHTML =
+      metric('Tokens, this period', started ? '≈ ' + tok(periodTok) : '—', started ? 'about ' + tok(periodTok / started) + ' for each of ' + plural(started, 'session') + ' he started' : 'no sessions yet') +
+      metric('Tokens, this week', '≈ ' + tok(weekTok), resetAt ? 'since the weekly limit reset on ' + new Date(weekFrom).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }) : 'the last 7 days') +
+      metric('Your weekly limit', u && u.weekly ? u.weekly.percentUsed + '% used' : '—', u && u.weekly ? 'everything on your account, as of ' + fmtWhen(new Date(u.at)) + (snapAge > 2 * DAY ? ' (' + Math.round(snapAge / DAY) + ' days old)' : '') + '. Resets in ' + Math.max(0, Math.round((resetAt - Date.now()) / DAY * 10) / 10) + ' days' : 'no snapshot found') +
+      metric('Bruce’s share of it', 'Not known', 'the plan reports a percentage of a limit it does not publish in tokens, so a share would be a guess');
+    $('br-how').innerHTML = '<ul>' +
+      '<li><b>' + tok(TOK.start) + ' tokens to start, measured.</b> Before he does anything, every DM makes him read his instructions (4.5k), CONTRIBUTING.md (5.1k), DECISIONS.md from R45 on (18.1k) and voice.md (1.3k). Sizes are taken from the repo files at about 4 characters a token. This is most of what a chat costs.</li>' +
+      '<li><b>+' + tok(TOK.chat) + ' for a chat, assumed.</b> Reading the thread, one reply, a memory note.</li>' +
+      '<li><b>+' + tok(TOK.run) + ' for a run, assumed.</b> A skill, a template, the page itself, a screenshot. Builds vary a lot; change TOK in this page to match what you see.</li>' +
+      '<li><b>Nothing</b> for capped, failed and passed-to-Alfred asks: they start no Bruce session.</li>' +
+      '<li><b>Not a bill.</b> Re-reads of the same context are cached and weigh less on a plan. Use it to compare weeks, and chats against runs.</li>' +
+      '<li><b>Your weekly limit</b> comes from a dated snapshot of the plan’s usage card (<code>admin/bruce-usage.json</code>), because the hub cannot read it live. Refresh the file to update it.</li></ul>';
+
     /* worth a look */
     var gaps = asks.filter(function (r) { return r.topic === 'other' || r.kind === 'failed' || r.kind === 'capped'; }).sort(function (a, b) { return b.at - a.at; }).slice(0, 8);
     $('br-q-look').textContent = gaps.length ? plural(gaps.length, 'ask') + ', newest first' : '';
     $('br-look').innerHTML = gaps.length ? gaps.map(function (r) {
       return '<button type="button" class="br-lk" data-u="' + esc(r.user) + '"><span>' + esc(fmtWhen(r.at)) + '</span><span>' + esc(r.name) + '</span>' +
-        (r.kind === 'run' ? tag(r.topic, 0) : badge(r.kind)) + '<span>' + (r.thread ? '↳ ' : '') + esc(r.text || '—') + '</span></button>';
+        (r.kind === 'run' || r.kind === 'chat' ? tag(r.topic, 0) : badge(r.kind)) + '<span>' + (r.thread ? '↳ ' : '') + esc(r.text || '—') + '</span></button>';
     }).join('') : '<p class="br-empty">Nothing to fix. Every ask landed in a lane.</p>';
   }
 
-  /* ---------- the drawer ---------- */
-  var dlg = $('br-drawer');
+  /* ---------- the drawer: the same shape as the Design System review drawer ---------- */
+  var drawer = $('br-drawer'), scrim = $('br-scrim'), lastFocus = null;
+  var EXPAND_SVG = '<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M216,48V96a8,8,0,0,1-16,0V67.31l-42.34,42.35a8,8,0,0,1-11.32-11.32L188.69,56H160a8,8,0,0,1,0-16h48A8,8,0,0,1,216,48ZM98.34,146.34,56,188.69V160a8,8,0,0,0-16,0v48a8,8,0,0,0,8,8H96a8,8,0,0,0,0-16H67.31l42.35-42.34a8,8,0,0,0-11.32-11.32Z"/></svg>', COLLAPSE_SVG = '<svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M152,104V56a8,8,0,0,1,16,0V84.69l42.34-42.35a8,8,0,0,1,11.32,11.32L179.31,96H208a8,8,0,0,1,0,16H160A8,8,0,0,1,152,104ZM96,152H48a8,8,0,0,0,0,16H76.69L34.34,210.34a8,8,0,0,0,11.32,11.32L88,179.31V208a8,8,0,0,0,16,0V160A8,8,0,0,0,96,152Z"/></svg>';
   function personRows(user) { return S.rowsAll.filter(function (r) { return r.user === user; }).sort(function (a, b) { return b.at - a.at; }); }
-  function drawerHead(c, all) {
-    var asks = all.filter(isAsk), first = all.length ? all[all.length - 1].at : c.last, tc = {};
-    asks.forEach(function (r) { tc[r.topic] = (tc[r.topic] || 0) + 1; });
-    $('br-d-av').textContent = String(c.name || '?').trim().charAt(0).toUpperCase() || '?';
-    $('br-d-t').innerHTML = esc(c.name) + (c.role === 'owner' ? ' <span class="ul-badge">Owner</span>' : '');
-    $('br-d-sub').textContent = plural(asks.length, 'ask') + ' in all · first asked ' + fmtWhen(first) + ' · last ' + ago(Date.now() - c.last.getTime());
-    $('br-d-tags').innerHTML = Object.keys(tc).sort(function (a, b) { return tc[b] - tc[a]; }).map(function (t) { return tag(t, tc[t]); }).join('');
-  }
   function note(title, text) { return '<p class="br-empty"><b>' + esc(title) + '</b><br>' + esc(text) + '</p>'; }
-  function linkify(t) { return esc(t).replace(/(https?:\/\/[^\s<]*[^\s<.,;:!?)\]'"])/g, function (u) { return '<a href="' + u + '" target="_blank" rel="noopener noreferrer">' + u + '</a>'; }); }
+  function linkify(t) {
+    /* Slack's own light formatting, read back: *bold*, _italic_ and `code`, and every link live. Links are cut before the
+       punctuation that follows them, and only http(s) is ever made a link. */
+    return String(t).split(/(https?:\/\/[^\s<]+)/g).map(function (p, i) {
+      if (i % 2) {
+        var m = p.match(/^(.*?)([.,;:!?)\]'"]*)$/), u = m[1], tail = m[2];
+        return '<a href="' + esc(u) + '" target="_blank" rel="noopener noreferrer">' + esc(u) + '</a>' + esc(tail);
+      }
+      return esc(p).replace(/`([^`\n]+)`/g, '<code>$1</code>').replace(/\*([^*\n]+)\*/g, '<strong>$1</strong>').replace(/(^|[\s(])_([^_\n]+)_(?=$|[\s).,;:!?])/g, '$1<em>$2</em>');
+    }).join('');
+  }
   function kb(n) { return n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB' : n >= 1024 ? Math.round(n / 1024) + ' KB' : n ? n + ' B' : ''; }
   function fileChip(f) {
-    var label = esc(f.name) + (f.type ? ' \u00b7 ' + esc(f.type) : '');
+    var label = esc(f.name) + (f.type ? ' · ' + esc(f.type) : '');
     return f.url && /^https:\/\//.test(f.url) ? '<a class="br-fc" href="' + esc(f.url) + '" target="_blank" rel="noopener noreferrer">' + label + '</a>' : '<span class="br-fc">' + label + '</span>';
   }
-  function bubble(m, prev) {
-    var inThread = m.reply;
-    return '<div class="br-msg br-msg--' + (m.from === 'bruce' ? 'bruce' : 'person') + '"><span class="br-msg__who">' + esc(m.name) + ' \u00b7 ' + esc(fmtTime(new Date(m.at))) + (inThread ? ' \u00b7 <span class="br-thr">\u21b3 in a thread</span>' : '') + '</span>' +
-      (m.text ? '<p class="br-msg__t">' + linkify(m.text) + '</p>' : '') + (m.files && m.files.length ? '<span class="br-msg__f">' + m.files.map(fileChip).join('') + '</span>' : '') + '</div>';
+  function pic(m, ghost) {
+    return m.from === 'bruce' ? '<span class="br-pic br-pic--bruce' + (ghost ? ' br-pic--ghost' : '') + '" role="img" aria-label="Bruce"></span>'
+      : '<span class="br-pic' + (ghost ? ' br-pic--ghost' : '') + '" aria-hidden="true">' + initial(m.name) + '</span>';
+  }
+  function bubble(m, prev, newDay) {
+    var ghost = !!prev && !newDay && prev.from === m.from;     /* the same sender again: no second picture */
+    return '<div class="br-msg br-msg--' + (m.from === 'bruce' ? 'bruce' : 'person') + '">' + pic(m, ghost) + '<div class="br-msg__c"><span class="br-msg__who">' + esc(m.name) + ' · ' + esc(fmtTime(new Date(m.at))) +
+      (m.reply ? ' · <span class="br-thr">↳ in a thread</span>' : '') + '</span>' +
+      (m.text ? '<p class="br-msg__t">' + linkify(m.text) + '</p>' : '') + (m.files && m.files.length ? '<span class="br-msg__f">' + m.files.map(fileChip).join('') + '</span>' : '') + '</div></div>';
   }
   function host(u) { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (e) { return u; } }
   function sharedOf(j) {
@@ -2584,26 +2676,32 @@ window.__anRefilter = {};
     return { files: files.reverse(), links: links.reverse() };
   }
   function setShared(j) { var n = j && j.ok ? (function (x) { return x.files.length + x.links.length; })(sharedOf(j)) : 0; $('br-t-shared').textContent = 'Shared' + (n ? ' ' + n : ''); }
-  function renderShared(j) {
-    var b = $('br-d-b');
-    if (!j) { b.innerHTML = '<p class="br-empty">Reading the DM from Slack\u2026</p>'; return; }
-    if (!j.ok) { renderChat(j); return; }
-    var sh = sharedOf(j);
-    if (!sh.files.length && !sh.links.length) { b.innerHTML = note('No links or files yet', 'Nothing has been shared in this DM.'); return; }
-    function who(x) { return esc(x.m.name) + ' \u00b7 ' + esc(fmtWhen(new Date(x.m.at))); }
-    var html = '<div class="br-shg">';
-    if (sh.files.length) html += '<h3>Files (' + sh.files.length + ')</h3>' + sh.files.map(function (x) {
-      return '<div class="br-sh"><div><b>' + esc(x.f.name) + '</b><small>' + who(x) + (x.f.type ? ' \u00b7 ' + esc(x.f.type) : '') + (x.f.size ? ' \u00b7 ' + esc(kb(x.f.size)) : '') + '</small></div>' +
-        (x.f.url && /^https:\/\//.test(x.f.url) ? '<a href="' + esc(x.f.url) + '" target="_blank" rel="noopener noreferrer">Open in Slack</a>' : '') + '</div>';
-    }).join('');
-    if (sh.links.length) html += '<h3>Links (' + sh.links.length + ')</h3>' + sh.links.map(function (x) {
-      return '<div class="br-sh"><div><b>' + esc(x.l.label || host(x.l.url)) + '</b><small>' + who(x) + ' \u00b7 ' + esc(host(x.l.url)) + '</small></div>' +
-        '<a href="' + esc(x.l.url) + '" target="_blank" rel="noopener noreferrer">Open</a></div>';
-    }).join('');
-    b.innerHTML = html + '</div>'; b.scrollTop = 0;
+  function dRow(k, v) { return '<div class="br-d"><span>' + esc(k) + '</span><b>' + v + '</b></div>'; }
+  function detailsHtml(c, all) {
+    var asks = all.filter(isAsk), first = all.length ? all[all.length - 1].at : c.last, tc = {};
+    asks.forEach(function (r) { tc[r.topic] = (tc[r.topic] || 0) + 1; });
+    var runs = asks.filter(function (r) { return r.kind === 'run'; }).length, chats = asks.filter(function (r) { return r.kind === 'chat'; }).length;
+    var tags = Object.keys(tc).sort(function (a, b) { return tc[b] - tc[a]; }).map(function (t) { return tag(t, tc[t]); }).join('') || '<span class="br-d"><span>None yet</span></span>';
+    return '<section class="br-sec br-sec--det"><h3>Details</h3><div class="br-dl">' +
+      dRow('First asked', esc(fmtWhen(first))) + dRow('Last asked', esc(fmtWhen(c.last)) + ' <span>(' + esc(ago(Date.now() - c.last.getTime())) + ')</span>') +
+      dRow('Asks', esc(plural(asks.length, 'ask')) + ' <span>(' + runs + ' run' + (runs === 1 ? '' : 's') + ', ' + chats + ' chat' + (chats === 1 ? '' : 's') + ')</span>') +
+      dRow('Tokens (est.)', '\u2248 ' + esc(tok(asks.reduce(function (n, r) { return n + tokensOf(r); }, 0)))) +
+      dRow('Role', c.role === 'owner' ? 'Owner' : 'Teammate') + '<div class="br-d br-d--text"><span>Topics</span><div class="br-tags">' + tags + '</div></div></div></section>';
   }
-  function renderChat(j) {
-    var b = $('br-d-b');
+  function cur() { var u = S.openUser; return { c: S.convs.filter(function (x) { return x.user === u; })[0] || { user: u, name: (S.rowsAll.filter(function (r) { return r.user === u; })[0] || {}).name || u, role: 'teammate', last: new Date(), asks: [], topics: {} }, all: personRows(u) }; }
+  function drawerHead() {
+    var x = cur(), n = S.order.length, i = S.i;
+    $('br-d-s').textContent = 'Conversation' + (i >= 0 && n > 1 ? ' · ' + (i + 1) + ' of ' + n : '');
+    $('br-d-t').innerHTML = esc(x.c.name) + (x.c.role === 'owner' ? ' <span class="ul-badge">Owner</span>' : '');
+    $('br-d-prev').disabled = !(i > 0); $('br-d-next').disabled = !(i >= 0 && i < n - 1);
+  }
+  function syncWide() {
+    drawer.classList.toggle('br-rv--wide', !!S.wide);
+    var b = $('br-d-ex'); b.innerHTML = (S.wide ? COLLAPSE_SVG + 'Collapse' : EXPAND_SVG + 'Expand') + '<kbd aria-hidden="true">E</kbd>';
+    b.setAttribute('aria-expanded', String(!!S.wide)); b.title = S.wide ? 'Collapse the drawer (E)' : 'Open the drawer out (E)';
+  }
+  function renderThread(j) {
+    var b = $('br-thread'); if (!b) return;
     if (!j) { b.innerHTML = '<p class="br-empty">Reading the DM from Slack…</p>'; return; }
     if (!j.ok) {
       b.innerHTML = j.reason === 'scope' ? note('Slack won’t let the site read this yet', 'Bruce’s Slack app is missing a permission' + (j.needed ? ' (' + j.needed + ')' : '') + '. Add it in the app’s settings, reinstall the app, then open this again. The Log tab still works.')
@@ -2614,46 +2712,87 @@ window.__anRefilter = {};
     var html = '<div class="br-msgs">', day = '', prev = null;
     if (j.truncated) html += '<p class="br-dnote">Showing the newest ' + j.messages.length + ' messages. Older ones are in Slack.</p>';
     j.messages.forEach(function (m) {
-      var d = new Date(m.at), dl = fmtDay(d); if (dl !== day) { day = dl; html += '<span class="br-day">' + esc(dl) + '</span>'; }
-      html += bubble(m, prev); prev = m;
+      var dl = fmtDay(new Date(m.at)), nd = dl !== day; if (nd) { day = dl; html += '<span class="br-day">' + esc(dl) + '</span>'; }
+      html += bubble(m, prev, nd); prev = m;
     });
     b.innerHTML = html + '</div>';
-    b.scrollTop = b.scrollHeight;
+    var body = $('br-d-b'); body.scrollTop = body.scrollHeight;       /* the newest message, like a DM */
+  }
+  function renderShared(j) {
+    var b = $('br-d-b');
+    if (!j) { b.innerHTML = '<p class="br-empty">Reading the DM from Slack…</p>'; return; }
+    if (!j.ok) { b.innerHTML = '<section class="br-sec"><h3>Shared</h3><div id="br-thread"></div></section>'; renderThread(j); return; }
+    var sh = sharedOf(j);
+    if (!sh.files.length && !sh.links.length) { b.innerHTML = '<section class="br-sec"><h3>Shared</h3>' + note('No links or files yet', 'Nothing has been shared in this DM.') + '</section>'; return; }
+    function who(x) { return esc(x.m.name) + ' · ' + esc(fmtWhen(new Date(x.m.at))); }
+    var html = '';
+    if (sh.files.length) html += '<section class="br-sec"><h3>Files (' + sh.files.length + ')</h3><div class="br-dl">' + sh.files.map(function (x) {
+      return '<div class="br-sh"><div><b>' + esc(x.f.name) + '</b><small>' + who(x) + (x.f.type ? ' · ' + esc(x.f.type) : '') + (x.f.size ? ' · ' + esc(kb(x.f.size)) : '') + '</small></div>' +
+        (x.f.url && /^https:\/\//.test(x.f.url) ? '<a href="' + esc(x.f.url) + '" target="_blank" rel="noopener noreferrer">Open in Slack</a>' : '') + '</div>';
+    }).join('') + '</div></section>';
+    if (sh.links.length) html += '<section class="br-sec"><h3>Links (' + sh.links.length + ')</h3><div class="br-dl">' + sh.links.map(function (x) {
+      return '<div class="br-sh"><div><b>' + esc(x.l.label || host(x.l.url)) + '</b><small>' + who(x) + ' · ' + esc(host(x.l.url)) + '</small></div>' +
+        '<a href="' + esc(x.l.url) + '" target="_blank" rel="noopener noreferrer">Open</a></div>';
+    }).join('') + '</div></section>';
+    b.innerHTML = html; b.scrollTop = 0;
   }
   function renderLog() {
-    var all = personRows(S.openUser), b = $('br-d-b');
-    b.innerHTML = all.length ? '<div class="br-log">' + all.map(function (r) {
+    var x = cur(), b = $('br-d-b');
+    b.innerHTML = '<section class="br-sec"><h3>Log</h3>' + (x.all.length ? '<div class="br-log">' + x.all.map(function (r) {
       return '<div class="br-lr"><time datetime="' + r.at.toISOString() + '">' + esc(fmtWhen(r.at)) + '</time><span>' + (r.kind === 'sent' ? '<span class="ul-badge">Sent</span>' : badge(r.kind) + ' ' + tag(r.topic, 0)) + '</span>' +
         '<p>' + (r.kind === 'sent' ? '→ ' + esc(r.to || 'someone') + ': ' : (r.thread ? '↳ ' : '')) + esc(r.text || '—') + '</p></div>';
-    }).join('') + '</div><p class="br-dnote">Everything the log holds for this person: the first 200 characters of each ask, and each message Bruce reported sending. What he answered is in the Conversation tab, and what was shared is in Shared.</p>' : '<p class="br-empty">No logged turns.</p>';
+    }).join('') + '</div><p class="br-dnote">Everything the log holds for this person: the first 200 characters of each ask, and each message Bruce reported sending. What he answered is in the Conversation tab, and what was shared is in Shared.</p>' : '<p class="br-empty">No logged turns.</p>') + '</section>';
     b.scrollTop = 0;
   }
   function showTab(t) {
     S.tab = t;
-    dlg.querySelectorAll('.ul-tab[data-dt]').forEach(function (x) { x.setAttribute('aria-selected', String(x.getAttribute('data-dt') === t)); });
-    if (t === 'log') renderLog(); else if (t === 'shared') renderShared(S.dm[S.openUser] || null); else renderChat(S.dm[S.openUser] || null);
+    drawer.querySelectorAll('.ul-tab[data-dt]').forEach(function (x) { x.setAttribute('aria-selected', String(x.getAttribute('data-dt') === t)); });
+    var x = cur(), b = $('br-d-b');
+    if (t === 'log') renderLog();
+    else if (t === 'shared') renderShared(S.dm[S.openUser] || null);
+    else { b.innerHTML = '<div class="br-cols">' + detailsHtml(x.c, x.all) + '<section class="br-sec br-sec--thread"><h3>Conversation</h3><div id="br-thread"></div></section></div>'; renderThread(S.dm[S.openUser] || null); }
   }
-  function openConv(user) {
-    var c = S.convs.filter(function (x) { return x.user === user; })[0];
-    if (!c) { c = { user: user, name: (S.rowsAll.filter(function (r) { return r.user === user; })[0] || {}).name || user, role: 'teammate', last: new Date(), asks: [], topics: {} }; }
-    S.openUser = user; var all = personRows(user); drawerHead(c, all); setShared(S.dm[user]); showTab('chat');
-    if (!dlg.open) dlg.showModal();
-    if (S.dm[user]) { renderChat(S.dm[user]); return; }
+  function loadDM(user, all) {
+    if (S.dm[user]) { setShared(S.dm[user]); return; }
     var seq = ++S.seq, ch = (all.filter(function (r) { return r.ch; })[0] || {}).ch || '';
     fetch('/api/bruce-memory?dm=1&user=' + encodeURIComponent(user) + (ch ? '&ch=' + encodeURIComponent(ch) : ''), { credentials: 'same-origin', cache: 'no-store' })
       .then(function (res) { return res.json().catch(function () { return { ok: false, reason: 'slack', detail: 'Unexpected answer.' }; }); })
-      .then(function (j) { if (j && j.ok) S.dm[user] = j; if (seq !== S.seq || S.openUser !== user) return; setShared(j); if (S.tab === 'chat') renderChat(j); else if (S.tab === 'shared') renderShared(j); })
-      .catch(function () { if (seq === S.seq && S.tab !== 'log') renderChat({ ok: false, detail: 'Try again in a moment.' }); });
+      .then(function (j) { if (j && j.ok) S.dm[user] = j; if (seq !== S.seq || S.openUser !== user) return; setShared(j); if (S.tab === 'chat') renderThread(j); else if (S.tab === 'shared') renderShared(j); })
+      .catch(function () { if (seq === S.seq && S.openUser === user && S.tab !== 'log') renderThread({ ok: false, detail: 'Try again in a moment.' }); });
   }
-  dlg.querySelectorAll('.ul-tab[data-dt]').forEach(function (b) { b.addEventListener('click', function () { showTab(b.getAttribute('data-dt')); }); });
-  $('br-d-x').addEventListener('click', function () { dlg.close(); });
-  dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });   /* a click on the backdrop */
+  function openConv(user) {
+    if (drawer.hidden) { lastFocus = document.activeElement; drawer.hidden = false; scrim.hidden = false; document.documentElement.classList.add('br-open'); S.wide = false; syncWide(); }
+    S.openUser = user; S.i = S.order.indexOf(user);
+    drawerHead(); setShared(S.dm[user]); showTab('chat'); drawer.focus();
+    loadDM(user, personRows(user));
+  }
+  function closeConv() {
+    drawer.hidden = true; scrim.hidden = true; document.documentElement.classList.remove('br-open'); S.openUser = ''; S.seq++;
+    if (lastFocus && lastFocus.focus) { try { lastFocus.focus(); } catch (e) {} }
+  }
+  function step(d) { var n = S.order[S.i + d]; if (n) openConv(n); }
+  drawer.querySelectorAll('.ul-tab[data-dt]').forEach(function (b) { b.addEventListener('click', function () { showTab(b.getAttribute('data-dt')); }); });
+  $('br-d-x').addEventListener('click', closeConv);
+  scrim.addEventListener('click', closeConv);
+  $('br-d-prev').addEventListener('click', function () { step(-1); });
+  $('br-d-next').addEventListener('click', function () { step(1); });
+  $('br-d-ex').addEventListener('click', function () { S.wide = !S.wide; syncWide(); });
+  document.addEventListener('keydown', function (ev) {
+    if (drawer.hidden) return;
+    var typing = /^(TEXTAREA|INPUT)$/.test((ev.target || {}).tagName || ''), mod = ev.metaKey || ev.ctrlKey || ev.altKey;
+    if (ev.key === 'Escape') { closeConv(); return; }
+    if (typing || mod) return;
+    if (ev.key === 'ArrowLeft') { ev.preventDefault(); step(-1); }
+    else if (ev.key === 'ArrowRight') { ev.preventDefault(); step(1); }
+    else if (ev.key.toLowerCase() === 'e') { ev.preventDefault(); $('br-d-ex').click(); }
+  });
   ROOT.addEventListener('click', function (e) {
     var t = e.target.closest && e.target.closest('[data-u], [data-t]'); if (!t || !ROOT.contains(t)) return;
     if (t.hasAttribute('data-u')) { openConv(t.getAttribute('data-u')); return; }
     var topic = t.getAttribute('data-t'); S.topic = S.topic === topic ? '' : topic; renderAll();
   });
   $('br-clear').addEventListener('click', function () { S.topic = ''; renderAll(); });
+  syncWide();
 
   function renderBlocked(kind) {
     var copy = { signin: ['Sign in to see this', 'Bruce’s log is for the owner.'], forbidden: ['Owners only', 'Bruce’s log shows who asked him what. Only an owner can see it.'],
@@ -2668,6 +2807,7 @@ window.__anRefilter = {};
     updated();
   }
   function updated() { $('br-updated').textContent = S.fetchedAt ? 'Updated ' + ago(Date.now() - S.fetchedAt) : ''; }
+  function loadUsage() { return fetch('/admin/bruce-usage.json', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { S.usage = j && j.weekly ? j : null; }).catch(function () { S.usage = null; }); }
   function load() {
     if (S.busy) return; S.busy = true; S.dm = {}; $('br-refresh').setAttribute('aria-busy', 'true');
     fetch(API, { credentials: 'same-origin', cache: 'no-store' }).then(function (r) {
@@ -2681,7 +2821,7 @@ window.__anRefilter = {};
       S.owner = String(j.owner || ''); S.cap = Number(j.cap) || 3;
       S.rowsAll = parse(j.rows || []); S.rows = hideMe(S.rowsAll); S.fetchedAt = Date.now();
       S.status = S.rowsAll.length ? 'ready' : 'empty';
-    }).catch(function () { S.status = 'error'; }).then(function () { S.busy = false; $('br-refresh').removeAttribute('aria-busy'); render(); });
+    }).catch(function () { S.status = 'error'; }).then(loadUsage).then(function () { S.busy = false; $('br-refresh').removeAttribute('aria-busy'); render(); });
   }
   $('br-refresh').innerHTML = icon('arrow-clockwise');
   ROOT.querySelectorAll('.ul-tab[data-period]').forEach(function (b) { b.addEventListener('click', function () { S.period = b.getAttribute('data-period'); render(); }); });

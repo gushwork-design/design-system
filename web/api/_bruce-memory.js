@@ -36,6 +36,14 @@
    opens a drawer: the whole DM read live from Slack (readDM, owner only, nothing stored) beside the log's own turns.
    The privacy line is unchanged: what Bruce ANSWERED still lives only in Slack.
 
+   RUN OR CHAT (Utsav, 8 Oct 2026: "say hi to Utsav shouldn't count as a run, it's just a conversation; a run is where a skill
+   is triggered or too many tokens are used; replying to a text doesn't consume that much"). Every DM still starts one cloud
+   session, but only some asks are WORK. weightOf says which, from the words: building, hub changes and checks, an edit to
+   something he made, or a long brief are runs; a pass-on, a status check, a question about him, a file or a template lookup
+   is a chat. Runs spend the daily cap below. Chats have their own much larger guard (BRUCE_DM_CHAT_CAP, default 40), so a
+   friendly teammate is never told "no" for saying thanks, and a loop still cannot run away. It is a guess from the text,
+   not a measurement; measuring skills and tokens per session is the next step.
+
    THE CAP. Everyone may DM Bruce (Utsav: "let's open it for all people"), every run spends his account, so each person
    other than him gets BRUCE_DAILY_CAP runs a day (default 3, his call). The count is per person per day, kept here too.
    ========================================================================= */
@@ -99,18 +107,24 @@ export function dailyCap() {
   const n = Number(process.env.BRUCE_DAILY_CAP);
   return Number.isFinite(n) && n >= 0 ? n : 3;
 }
+export function dmChatCap() {
+  const n = Number(process.env.BRUCE_DM_CHAT_CAP);
+  return Number.isFinite(n) && n >= 0 ? n : 40;
+}
 
-/* Counts this run. Returns { allowed, used, cap }. With no store, nothing is counted and everyone is allowed. */
-export async function takeRun(user, { uncapped = false, f = fetch, now = new Date() } = {}) {
-  const cap = dailyCap();
-  const cfg = store(); if (!cfg) return { allowed: true, used: 0, cap };
-  const day = now.toISOString().slice(0, 10), key = `gw:bruce:runs:${day}`;
-  if (uncapped) { await redis(cfg, [['HINCRBY', key, user, '1'], ['EXPIRE', key, '2592000']], f); return { allowed: true, used: 0, cap }; }
+/* Counts this ask. `bucket` is 'runs' (work, the small cap) or 'chats' (conversation, the big one). Returns { allowed, used, cap, bucket }.
+   With no store, nothing is counted and everyone is allowed. */
+export async function takeRun(user, { uncapped = false, f = fetch, now = new Date(), bucket = 'runs' } = {}) {
+  const chats = bucket === 'chats';
+  const cap = chats ? dmChatCap() : dailyCap();
+  const cfg = store(); if (!cfg) return { allowed: true, used: 0, cap, bucket };
+  const day = now.toISOString().slice(0, 10), key = `gw:bruce:${chats ? 'chats' : 'runs'}:${day}`;
+  if (uncapped) { await redis(cfg, [['HINCRBY', key, user, '1'], ['EXPIRE', key, '2592000']], f); return { allowed: true, used: 0, cap, bucket }; }
   const [{ result }] = await redis(cfg, [['HGET', key, user]], f);
   const used = Number(result) || 0;
-  if (used >= cap) return { allowed: false, used, cap };
+  if (used >= cap) return { allowed: false, used, cap, bucket };
   await redis(cfg, [['HINCRBY', key, user, '1'], ['EXPIRE', key, '2592000']], f);
-  return { allowed: true, used: used + 1, cap };
+  return { allowed: true, used: used + 1, cap, bucket };
 }
 
 /* ---- the run log ---- */
@@ -146,6 +160,18 @@ const TOPIC_RULES = [
   ['hub', /\b(rework|checks?|drift|tests?|release|merge|delete|remove|rename|staging|hub|review|approve|approval)\b/i],
   ['about', /\b(who are you|what (can|do|are) you|how do you|help|hello|hi|hey|thanks?|thank you)\b/i],
 ];
+/* Is this ask work (a run) or a conversation (a chat)? See RUN OR CHAT above. */
+const CHAT_TOPICS = ['pass-on', 'status', 'about', 'access'];
+const EDIT_RE = /\b(change|update|fix|add|remove|swap|replace|rename|redo|rewrite|shorten|lengthen|bigger|smaller|darker|lighter|instead|should be|make it|turn it)\b/i;
+export function weightOf(text) {
+  const t = String(text || '').trim();
+  if (t.length > 280) return 'run';                 /* a brief */
+  const topic = topicOf(t);
+  if (CHAT_TOPICS.includes(topic)) return 'chat';
+  if (topic === 'build' || topic === 'hub') return 'run';
+  return EDIT_RE.test(t) ? 'run' : 'chat';          /* brand, template, other: a lookup, unless it edits something */
+}
+
 export function topicOf(text) {
   const t = String(text || '').trim();
   for (const [name, re] of TOPIC_RULES) if (re.test(t)) return name;
@@ -153,7 +179,7 @@ export function topicOf(text) {
 }
 
 /* One row per turn Bruce was asked for. `kind`: run (a Bruce run started), capped (refused at the daily cap),
-   to-alfred (a reply passed to Alfred's thread), failed (the trigger did not fire), sent (a message Bruce reported sending
+   chat (a conversation, not work), to-alfred (a reply passed to Alfred's thread), failed (the trigger did not fire), sent (a message Bruce reported sending
    to `to`; `user` is who the run was for). Never throws. */
 export async function logRun(row, f = fetch) {
   const cfg = store(); if (!cfg) return false;
@@ -320,7 +346,10 @@ export default async function handler(req, res) {
     try {
       const rows = await readLog();
       if (rows === null) return res.status(200).json({ configured: false, rows: [] });
-      for (const r of rows) if (r.kind !== 'sent' && !r.topic) r.topic = topicOf(r.text);   /* rows logged before topics existed */
+      for (const r of rows) {
+        if (r.kind !== 'sent' && !r.topic) r.topic = topicOf(r.text);                   /* rows logged before topics existed */
+        if (r.kind === 'run' && weightOf(r.text) === 'chat') r.kind = 'chat';            /* and before runs and chats were told apart */
+      }
       return res.status(200).json({ configured: true, rows, owner: String(process.env.OWNER_SLACK_ID || ''), cap: dailyCap() });
     } catch { return res.status(502).json({ error: 'Could not read the log.' }); }
   }
