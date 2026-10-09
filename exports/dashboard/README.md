@@ -46,7 +46,7 @@ Fonts (Vert Grotesk Display, Inter) and icons come from the plugin, not from thi
 | [`inputs.md`](inputs.md) | text-input, textarea, select, multi-select, combobox, search-field, checkbox, radio, toggle, form-field, form-section, setting-row, unsaved-changes-bar, date-range-picker, time-range-bar, datetime-field, timezone-select, query-builder |
 | [`tables.md`](tables.md) | data-table, table-cell-types, row-selection, bulk-action-bar, column-menu, row-actions-menu, pagination, table-states, log-viewer, histogram |
 | [`filtering.md`](filtering.md) | table-toolbar, filter-chip, filter-builder, saved-views |
-| [`data-display.md`](data-display.md) | card, stat-card, metric-strip, delta-pill, badge, status-dot, progress-bar, ring, legend, key-value-list, activity-timeline, checklist, avatar, avatar-group, agent-status-card, tag, status-banner, status-list, incident-row, issue-summary |
+| [`data-display.md`](data-display.md) | card, stat-card, metric-strip, delta-pill, badge, status-dot, progress-bar, ring, legend, key-value-list, activity-timeline, checklist, avatar, avatar-group, agent-status-card, message-thread, tag, status-banner, status-list, incident-row, issue-summary |
 | [`charts.md`](charts.md) | chart-frame, line-chart, area-chart, bar-chart, horizontal-bar-chart, donut-chart, breakdown-bar, sparkline, heatmap, funnel, uptime-bar, legend-table, chart-tooltip |
 | [`feedback.md`](feedback.md) | toast, banner, empty-state, skeleton, unavailable-state, board |
 | [`overlays.md`](overlays.md) | tooltip, popover, modal, confirm-dialog, drawer, docked-panel, coachmark, command-palette |

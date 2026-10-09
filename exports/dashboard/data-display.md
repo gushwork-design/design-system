@@ -126,6 +126,16 @@ Rules that apply to the whole set: a figure that can change carries `gd-num` (ta
 
 **Tokens.** `--gd-card-bg`, `--gd-border`, `--gd-border-strong`, `--gd-card-pad`, `--gd-gap`, `--gd-text`, `--gd-text-body`, `--gd-text-muted`, `--gw-text-body-16-sem`, radius 16. **Accessibility.** One link per card; the avatar has a label; the badge text is real text. **Provenance.** NEW: drawn for the hub's Agents page (9 Oct 2026), composed from the library's card edge, avatar and badge; pending library review.
 
+## Message thread
+
+**Purpose.** A conversation read back the way Slack shows it: who said what and when, in order. Use it where a person reads a DM or a thread (the hub's Bruce drawer). Not for composing (the assistant panel has the composer), not for a chat with bubbles (the assistant panel's thread), and not for a log of events (activity timeline).
+
+**Anatomy.** `.gd-thread[role=log]` > `.gd-thread__day` (a pill on a hairline, one per day) and `.gd-msg` rows: a `gd-avatar`, then `.gd-msg__main` with `.gd-msg__head` (the name in `b`, a `gd-badge gd-badge--neutral` "Agent" for a bot, the time in `time`, an optional `.gd-msg__note` such as "in a thread"), `.gd-msg__text` and `.gd-msg__files` (library tags). A message from the same person straight after one is `.gd-msg--cont`: no picture or name, the time shows on hover (`.gd-msg__time-only`).
+```html
+<div class="gd-thread" role="log"><div class="gd-thread__day"><span>Thu, 8 Oct</span></div><div class="gd-msg"><span class="gd-avatar gd-avatar--team" data-gd-avatar="Bruce" role="img" aria-label="Bruce"></span><div class="gd-msg__main"><div class="gd-msg__head"><b>Bruce</b><span class="gd-badge gd-badge--neutral">Agent</span><time>5:42 PM</time></div><div class="gd-msg__text">Your mock is up on staging.</div></div></div></div>
+```
+**States.** Rest; hover tints the row (`--gd-row-hover`). Everyone is on the left; there are no bubbles. **Tokens.** `--gd-row-hover`, `--gd-border`, `--gd-border-strong`, `--gd-text`, `--gd-text-muted`, `--gw-text-body-14-sem/-reg`, `--gw-text-body-12-med/-reg`, radius 8. **Accessibility.** `role="log"`; the time is a `time` element; the avatar carries a label. **Provenance.** NEW: drawn for the hub's Bruce drawer (9 Oct 2026) after Utsav asked for it to look like Slack; composed from the library's avatar, badge and tag; pending library review.
+
 ## Status banner
 
 **Purpose.** The headline state of a system: "All systems operational" with icon, a live badge and the period selector. **Anatomy.** `.gd-status-banner[data-status=operational|degraded|outage|maintenance]` > `.gd-status-icon`, `__text` (`__title` with live badge, `__sub`), `__period` (slot for a select from Inputs). A non-operational state tints the whole banner with the status pair. Icons (Phosphor fill): check-circle, warning, x-circle, wrench; always with the text, never colour alone. **Provenance.** NEW: reference Mobbin OpenAI status, Twingate, incident.io, Better Stack; pending library review.
