@@ -77,12 +77,14 @@ export function defaultRules() {
          api/_usage-log.js, which the data cannot be read without. */
       { path: '/admin/analytics', access: 'owner', groups: [], people: [] },
       { path: '/admin/system-health', access: 'owner', groups: [], people: [] },
-      /* Drop Studio (staging): everyone in the organisation. It was the owner alone from 8 Oct 2026 ("start
-         phase 1 with the owner gate") and opened to the org on 9 Oct 2026 ("keep permission for everyone in the
-         org") so the team can react to it. Anyone in the org can browse, download, make a picture request and
-         answer ChatGPT's question; accepting, changing or discarding a picture stays the owner's, checked in
-         api/_drop-studio.js and not by this rule. */
-      { path: '/internal/staging/drop-studio', access: 'internal', groups: [], people: [] },
+      /* Drop Studio (staging): named people, grown one at a time in Access Control. It was the owner alone from
+         8 Oct 2026 ("start phase 1 with the owner gate"), everyone in the org for a day from 9 Oct 2026 ("keep
+         permission for everyone in the org"), and a named list from 9 Oct 2026 ("give access to swapnil, and in
+         future to other people too"). Admins pass any people rule, so the hub's admins can open it as well.
+         Everyone the gate admits can look; making things happen (creating an agent, asking for a picture,
+         accepting, changing or discarding one) stays the owner's, checked in api/_drop-studio.js and not here.
+         The live store carries the same rule with the same first name on it; this is the fallback it falls to. */
+      { path: '/internal/staging/drop-studio', access: 'people', groups: [], people: ['swapnil.sinha@gushwork.ai'] },
       /* Task board (staging): the owner alone to start (Utsav, 8 Oct 2026). It holds tasks Bruce lifted from his
          Slack, so it opens to others one person at a time in Access Control, not by default. api/_tasks.js checks
          this same path with decide() on every request, so the page and the list cannot disagree. */

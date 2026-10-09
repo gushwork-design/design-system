@@ -71,7 +71,7 @@ t('non-addresses are filtered out of the admin list', normalise({ routes: [{ pat
    usage log, analytics and system health, and the one public ad lander. This used to assert just the first two and went stale
    as routes were added; it now names them all so adding one is a deliberate edit here. */
 t('the compiled fallback routes and their tiers', defaultRules().routes.map(r => r.access),
-  ['admin', 'internal', 'internal', 'internal', 'admin', 'internal', 'owner', 'owner', 'owner', 'internal', 'owner', 'public']);   // /library and /previews became internal on 3 Oct 2026; /agents on 7 Oct; /admin/system-health is the third owner page; Drop Studio opened to the org on 9 Oct; the task board (staging) is the owner's alone from 8 Oct
+  ['admin', 'internal', 'internal', 'internal', 'admin', 'internal', 'owner', 'owner', 'owner', 'people', 'owner', 'public']);   // /library and /previews became internal on 3 Oct 2026; /agents on 7 Oct; /admin/system-health is the third owner page; Drop Studio is named people since 9 Oct (it was the org for a day); the task board (staging) is the owner's alone from 8 Oct
 t('previews: an ordinary teammate is let in (internal tier since 3 Oct 2026)', decide('/previews/web/button.html', S('sam@gushwork.ai'), normalise(defaultRules())), 'allow');
 
 /* The usage log lists who ran a session. It is the owner tier, so an admin who is not an
@@ -91,7 +91,9 @@ t('system health: an admin who is not an owner is forbidden',
   decide('/admin/system-health', S('priya@gushwork.ai'), { ...compiled, admins: ['priya@gushwork.ai'] }), 'forbid');
 t('system health: an owner is let in', decide('/admin/system-health', S('utsav.singh@gushwork.ai'), compiled), 'allow');
 t('analytics: an owner is let in', decide('/admin/analytics', S('utsav.singh@gushwork.ai'), compiled), 'allow');
-t('drop studio: an ordinary teammate is let in (the org, since 9 Oct 2026)', decide('/internal/staging/drop-studio', S('sam@gushwork.ai'), compiled), 'allow');
+t('drop studio: an ordinary teammate is kept out until named in Access Control (9 Oct 2026)', decide('/internal/staging/drop-studio', S('sam@gushwork.ai'), compiled), 'forbid');
+t('drop studio: the first named person is let in', decide('/internal/staging/drop-studio', S('swapnil.sinha@gushwork.ai'), compiled), 'allow');
+t('drop studio: an admin is let in without being named', decide('/internal/staging/drop-studio', S('priya@gushwork.ai'), { ...compiled, admins: ['priya@gushwork.ai'] }), 'allow');
 t('drop studio: someone outside the organisation is kept out', decide('/internal/staging/drop-studio', S('sam@example.com'), compiled), 'forbid');
 t('task board: the owner is let in', decide('/internal/staging/tasks', S('utsav.singh@gushwork.ai'), compiled), 'allow');
 t('task board: an ordinary teammate is kept out until Access Control opens it', decide('/internal/staging/tasks', S('sam@gushwork.ai'), compiled), 'forbid');
