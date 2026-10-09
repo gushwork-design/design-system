@@ -41,6 +41,9 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
 .ag-face img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; transform: scale(var(--ag-z, 1)); transform-origin: var(--ag-x, 50%) var(--ag-y, 50%); }
 .gd-agent-status .gd-avatar.ag-face { --gd-avatar-size: 48px; }
 /* tokens on a team card: the estimate and the agent's share of the team's, over a thin bar */
+/* waiting for an agent's data: the library's spinner recipe (a 2px ring with a clear top, 700ms), as on its inputs and buttons */
+.ag-spin { width: 14px; height: 14px; flex: none; align-self: center; border-radius: 50%; border: 2px solid var(--gd-text-muted); border-top-color: transparent; animation: gd-spin 700ms linear infinite; }
+@media (prefers-reduced-motion: reduce) { .ag-spin { animation-duration: 2.4s; } }
 /* the agents' weekly total on All agents: one number, one bar split by agent */
 .ag-week { display: flex; flex-direction: column; gap: var(--gw-space-12); }
 .ag-week__row { display: flex; align-items: baseline; justify-content: space-between; gap: var(--gw-space-12); flex-wrap: wrap; }
@@ -307,8 +310,9 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
   }
 
   /* an agent's estimated tokens in the chosen period and its share of the team's total; an estimate, as everywhere on this page */
-  function use(s, total) {
-    if (!s.known) return '<span class="ag-use"><span class="ag-use__row"><span>Tokens ' + esc(periodText()) + '</span><span>Waiting for data</span></span></span>';
+  function use(s, total, ready) {
+    if (!s.known) return '<span class="ag-use"><span class="ag-use__row"><span>Tokens ' + esc(periodText()) + '</span><span class="ag-spin" role="status" aria-label="Waiting for data"></span></span></span>';
+    if (!ready) return '<span class="ag-use"><span class="ag-use__row"><span>Tokens ' + esc(periodText()) + '</span><b>' + (s.tokens ? '≈ ' + tok(s.tokens) : 'None') + '</b></span></span>';   /* a share of the team needs every agent's number, so none until they have all loaded */
     var share = total ? s.tokens / total : 0, pct = !s.tokens ? '0%' : share < 0.01 ? '<1%' : Math.round(share * 100) + '%';
     return '<span class="ag-use"><span class="ag-use__row"><span>Tokens ' + esc(periodText()) + '</span><b>' + (s.tokens ? '≈ ' + tok(s.tokens) : 'None') + ' · ' + pct + ' of the team</b></span>' +
       '<span class="ag-use__bar" role="img" aria-label="' + pct + ' of the team\u2019s estimated tokens"><i style="width:' + Math.round(share * 100) + '%"></i></span></span>';
@@ -328,13 +332,13 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
 
   /* ---------- All agents ---------- */
   function renderAll() {
-    var list = sums(), needs = allNeeds(list), total = list.reduce(function (n, s) { return n + (s.known ? s.tokens : 0); }, 0);
+    var list = sums(), needs = allNeeds(list), total = list.reduce(function (n, s) { return n + (s.known ? s.tokens : 0); }, 0), ready = list.every(function (s) { return s.known; });
     /* the team: the one new component on this page, the agent status card (see the library's data-display doc) */
     var html = '<section class="ag-team" aria-label="The team"><div class="gd-card__titles" style="margin-bottom:var(--gd-gap)"><h3 class="gd-card__title">The team</h3></div><div class="gd-grid">' +
       list.map(function (s) {
         return '<div class="gd-span-4"><a class="gd-agent-status" href="#' + esc(s.id) + '" data-tab="' + esc(s.id) + '"><span class="gd-agent-status__top">' + (pic(s.a) ? '<span class="gd-avatar gd-avatar--lg ag-face" role="img" aria-label="' + esc(s.a.name) + '">' + pic(s.a) + '</span>' : '<span class="gd-avatar gd-avatar--team gd-avatar--lg" data-gd-avatar="' + esc(s.a.name) + '" role="img" aria-label="' + esc(s.a.name) + '"></span>') + '' +
           '<span class="gd-agent-status__who"><b>' + esc(s.a.name) + '</b><small>' + esc(s.a.role) + '</small></span>' + badge(TONE[s.state], stateLabel(s)) + '</span>' +
-          '<span class="gd-agent-status__now">' + esc(s.doing) + '</span>' + use(s, total) + '</a></div>';
+          '<span class="gd-agent-status__now">' + esc(s.doing) + '</span>' + use(s, total, ready) + '</a></div>';
       }).join('') + '</div></section>';
     html += weekCard(list);   /* under the agent cards, above what needs you */
     html += needsCard(needs, true);

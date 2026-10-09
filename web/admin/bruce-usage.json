@@ -1,7 +1,8 @@
 {
   "note": "A dated snapshot of the plan limits shown in Claude's usage card, for the Bruce tab's What it costs section. The hub cannot read these itself; refresh the file when you want the number current.",
-  "at": "2026-10-08T15:01:09Z",
+  "at": "2026-10-09T03:43:00Z",
   "plan": "Team",
-  "weekly": { "percentUsed": 29, "resetsAt": "2026-10-13T05:00:00Z" },
-  "fiveHour": { "percentUsed": 21, "resetsAt": "2026-10-08T17:30:00Z" }
+  "seat": "Premium",
+  "weekly": { "percentUsed": 36, "resetsAt": "2026-10-13T05:00:00Z" },
+  "fiveHour": { "percentUsed": 3, "resetsAt": "2026-10-09T08:12:00Z" }
 }
