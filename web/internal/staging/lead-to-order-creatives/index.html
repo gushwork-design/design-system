@@ -27,121 +27,124 @@ body.raw .grid{display:block}
 body.raw .frame{border:0;border-radius:0;width:1080px;height:1080px;aspect-ratio:auto}
 
 /* ---------- the creative ---------- */
-.ad{width:1080px;height:1080px;padding:80px;display:flex;flex-direction:column;position:relative;
-    font-family:var(--gw-font-body);background:var(--gw-color-white);color:var(--gw-color-black)}
-.ad--blue{background:var(--gw-color-primary-500);color:var(--gw-color-white)}
-.ad--ink{background:var(--gw-color-black);color:var(--gw-color-white)}
-.ad--soft{background:var(--gw-color-primary-25)}
-.ad .logo{height:80px;width:421px;display:block}
-.ad .tag{margin-top:48px;font:600 28px/1.2 var(--gw-font-body);letter-spacing:-0.006em;color:var(--gw-color-primary-500)}
-.ad--blue .tag,.ad--ink .tag{color:var(--gw-color-primary-200)}
-.ad h3{margin:16px 0 0;font-family:var(--gw-font-display);font-weight:700;font-size:92px;line-height:1.1;max-width:900px}
-.ad .viz{margin-top:auto;margin-bottom:40px}
-.ad .foot{display:flex;align-items:center;justify-content:space-between;margin-top:auto}
-.ad .viz + .foot{margin-top:0}
-.ad .cta{height:84px;padding:0 44px;display:inline-flex;align-items:center;border-radius:var(--gw-radius-full);
-         background:var(--gw-color-black);color:var(--gw-color-white);font:600 32px/1 var(--gw-font-body)}
-.ad--blue .cta{background:var(--gw-color-white);color:var(--gw-color-black)}
-.ad--ink .cta{background:var(--gw-color-primary-500)}
-.ad .url{font:500 28px/1 var(--gw-font-body);color:var(--gw-color-neutral-600)}
-.ad--blue .url,.ad--ink .url{color:var(--gw-color-primary-100)}
+.ad{width:1080px;height:1080px;padding:72px 72px 64px;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;overflow:hidden;
+    font-family:var(--gw-font-body);color:var(--gw-color-white);
+    background:radial-gradient(circle at 50% 38%,var(--gw-color-primary-400) 0,var(--gw-color-primary-500) 55%,var(--gw-color-primary-600) 100%)}
+.ad::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.35;
+    background-image:radial-gradient(var(--gw-color-primary-200) 2px,transparent 2.5px);background-size:36px 36px}
+.ad > *{position:relative}
+.ad .logo{height:56px;width:auto;display:block}
+.ad h3{margin:44px 0 0;font-family:var(--gw-font-display);font-weight:700;font-size:100px;line-height:1.04;letter-spacing:-0.02em;max-width:940px}
+.ad h3 em{font-style:normal;color:var(--gw-color-green-100)}
+.ad h3 s{text-decoration-thickness:8px}
+.ad .viz{flex:none;margin-top:auto;width:100%;text-align:left}
+.ad .cta{flex:none;margin-top:40px;height:92px;padding:0 56px;display:inline-flex;align-items:center;gap:16px;border-radius:var(--gw-radius-full);
+         background:var(--gw-color-green-100);color:var(--gw-color-black);font:600 34px/1 var(--gw-font-body);box-shadow:0 12px 32px rgba(0,0,0,.18)}
+.ad.tight h3{font-size:84px;margin-top:32px}
+.ad.tight .head{padding-bottom:18px;margin-bottom:20px}
+.ad.tight .price{font-size:76px}
+.ad.tight .flag{margin-top:20px;padding:16px 24px}
+.ad.tight .card{padding:28px 40px}
 
-/* mock UI */
-.card{background:var(--gw-color-white);color:var(--gw-color-black);border:2px solid var(--gw-color-neutral-100);border-radius:var(--gw-radius-20);padding:32px}
-.ad--blue .card,.ad--ink .card{border-color:transparent}
-.row{display:flex;align-items:center;justify-content:space-between;gap:24px;font:500 32px/1.2 var(--gw-font-body)}
-.row + .row{margin-top:24px;padding-top:24px;border-top:2px solid var(--gw-color-neutral-100)}
-.row small{display:block;font:400 24px/1.3 var(--gw-font-body);color:var(--gw-color-neutral-600);margin-top:4px}
-.pill{display:inline-flex;align-items:center;height:48px;padding:0 20px;border-radius:var(--gw-radius-full);font:600 24px/1 var(--gw-font-body);white-space:nowrap}
+/* mock product card, in the reference's shape: agent header, status pill, content */
+.card{background:var(--gw-color-white);color:var(--gw-color-black);border-radius:var(--gw-radius-20);padding:36px 40px;box-shadow:0 20px 48px rgba(0,0,0,.22)}
+.head{display:flex;align-items:center;gap:24px;padding-bottom:24px;border-bottom:2px solid var(--gw-color-neutral-100);margin-bottom:28px}
+.av{flex:none;width:76px;height:76px;border-radius:50%;background:var(--gw-color-primary-500);color:var(--gw-color-white);display:grid;place-items:center;font:700 36px/1 var(--gw-font-display)}
+.head b{display:block;font:700 36px/1.15 var(--gw-font-display)}
+.head small{display:block;font:400 26px/1.3 var(--gw-font-body);color:var(--gw-color-neutral-600)}
+.head .pill{margin-left:auto}
+.pill{display:inline-flex;align-items:center;height:52px;padding:0 24px;border-radius:var(--gw-radius-full);font:600 26px/1 var(--gw-font-body);white-space:nowrap}
 .pill--ok{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
 .pill--bad{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
-.pill--warn{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
 .pill--blue{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+.log{list-style:none;margin:0;padding:0}
+.log li{display:flex;align-items:center;gap:24px;font:500 32px/1.3 var(--gw-font-body)}
+.log li + li{margin-top:22px}
+.log li::before{content:"";flex:none;width:18px;height:18px;border-radius:50%;background:var(--gw-color-neutral-600)}
+.log li .pill{margin-left:8px}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:24px}
-.price{font:700 88px/1 var(--gw-font-display);margin-top:12px}
-.lab{font:600 24px/1.2 var(--gw-font-body);color:var(--gw-color-neutral-600);text-transform:none}
-.flag{margin-top:24px;display:flex;align-items:center;gap:16px;background:var(--gw-color-red-25);border:2px solid var(--gw-color-red-200);color:var(--gw-color-red-700);border-radius:var(--gw-radius-16);padding:20px 28px;font:600 30px/1.2 var(--gw-font-body)}
-.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative}
-.step{text-align:center;position:relative;font:600 26px/1.2 var(--gw-font-body)}
-.step i{display:block;width:56px;height:56px;border-radius:50%;margin:0 auto 16px;background:var(--gw-color-primary-500);border:6px solid var(--gw-color-white);position:relative;z-index:1;box-shadow:0 0 0 2px var(--gw-color-primary-500)}
-.step:not(:last-child)::after{content:"";position:absolute;top:27px;left:50%;width:100%;height:4px;background:var(--gw-color-primary-500)}
-.step.last i{background:var(--gw-color-green-500);box-shadow:0 0 0 2px var(--gw-color-green-500)}
-.line{display:block;width:100%;height:240px}
+.lab{font:600 26px/1.2 var(--gw-font-body);color:var(--gw-color-neutral-600)}
+.price{font:700 92px/1 var(--gw-font-display);margin-top:10px}
+.flag{margin-top:28px;background:var(--gw-color-red-25);border:2px solid var(--gw-color-red-200);color:var(--gw-color-red-700);border-radius:var(--gw-radius-16);padding:20px 28px;font:600 32px/1.2 var(--gw-font-body)}
+.steps{display:grid;grid-template-columns:repeat(5,1fr);position:relative;padding-top:6px}
+.step{text-align:center;position:relative;font:500 25px/1.2 var(--gw-font-body);color:var(--gw-color-neutral-600)}
+.step i{display:block;width:48px;height:48px;border-radius:50%;margin:0 auto 16px;background:var(--gw-color-white);border:4px solid var(--gw-color-neutral-200);position:relative;z-index:1}
+.step.done{color:var(--gw-color-black);font-weight:600}
+.step.done i{background:var(--gw-color-primary-500);border-color:var(--gw-color-primary-500)}
+.step:not(:last-child)::after{content:"";position:absolute;top:26px;left:50%;width:100%;height:4px;background:var(--gw-color-neutral-200)}
+.step.done:not(:last-child)::after{background:var(--gw-color-primary-500)}
+.line{display:block;width:100%;height:200px}
+.big{font:700 64px/1 var(--gw-font-display)}
 </style></head>
 <body>
 <div class="page">
   <h1>Lead to order and order to cash creatives</h1>
-  <p>Six static ads, 1080 by 1080, one per line of the brief. Headlines are the brief's own words. The mock screens use sample figures and invented labels, not real customer data.</p>
+  <p>Six static ads, 1080 by 1080, one per line of the brief. Headlines are the brief's own words, in the layout of the reference. The mock screens use sample figures and invented labels, not real customer data.</p>
   <div class="grid">
 
-    <div class="cell"><h2>1 · Lead to order · slow quote</h2><div class="frame"><section class="ad ad--blue" id="ad1">
+    <div class="cell"><h2>1 · Lead to order · slow quote</h2><div class="frame"><section class="ad" id="ad1">
       <img class="logo" src="/assets/logo/gushwork-logo-white.svg" alt="Gushwork">
-      <div class="tag">Lead to order</div>
-      <h3>Don't lose your customers to a slow quote.</h3>
+      <h3>Don't lose your customers to a <em>slow quote.</em></h3>
       <div class="viz"><div class="card">
-        <div class="row"><div>RFQ received<small>Tuesday, 9:12 am</small></div><span class="pill pill--blue">Inbox</span></div>
-        <div class="row"><div>Quote sent<small>Tuesday, 2:40 pm</small></div><span class="pill pill--ok">Same day</span></div>
+        <div class="head"><span class="av">Q</span><div><b>RFQ-2208</b><small>Quotes agent</small></div><span class="pill pill--blue">Working</span></div>
+        <ul class="log"><li>RFQ received, Tuesday 9:12 am</li><li>Quote built and sent <span class="pill pill--ok">Same day</span></li></ul>
       </div></div>
-      <div class="foot"><span class="cta">Book a Demo</span><span class="url">gushwork.ai</span></div>
+      <span class="cta">Book a Demo <span aria-hidden="true">→</span></span>
     </section></div></div>
 
-    <div class="cell"><h2>2 · Lead to order · same-day quotes</h2><div class="frame"><section class="ad ad--soft" id="ad2">
-      <img class="logo" src="/assets/logo/gushwork-logo-original.svg" alt="Gushwork">
-      <div class="tag">Lead to order</div>
-      <h3>Generate quotes the same day the RFQ hits your inbox.</h3>
-      <div class="foot"><span class="cta">Book a Demo</span><span class="url">gushwork.ai</span></div>
-    </section></div></div>
-
-    <div class="cell"><h2>3 · Order to cash · quote vs PO</h2><div class="frame"><section class="ad" id="ad3">
-      <img class="logo" src="/assets/logo/gushwork-logo-original.svg" alt="Gushwork">
-      <div class="tag">Order to cash</div>
-      <h3>Your quote said $4.20. Their PO says $3.80.</h3>
-      <div class="viz"><div class="card" style="background:var(--gw-color-neutral-25)">
-        <div class="two">
-          <div><div class="lab">Your quote</div><div class="price">$4.20</div></div>
-          <div><div class="lab">Their PO</div><div class="price" style="color:var(--gw-color-red-600)">$3.80</div></div>
-        </div>
-        <div class="flag">Price mismatch caught before it shipped</div>
-      </div></div>
-      <div class="foot"><span class="cta">Book a Demo</span><span class="url">gushwork.ai</span></div>
-    </section></div></div>
-
-    <div class="cell"><h2>4 · Order to cash · PO tracking</h2><div class="frame"><section class="ad ad--ink" id="ad4">
+    <div class="cell"><h2>2 · Lead to order · same-day quotes</h2><div class="frame"><section class="ad" id="ad2">
       <img class="logo" src="/assets/logo/gushwork-logo-white.svg" alt="Gushwork">
-      <div class="tag">Order to cash</div>
-      <h3>Every PO tracked from start to finish.</h3>
-      <div class="viz"><div class="card"><div class="steps">
-        <div class="step"><i></i>PO received</div>
-        <div class="step"><i></i>Confirmed</div>
-        <div class="step"><i></i>Shipped</div>
-        <div class="step last"><i></i>Paid</div>
-      </div></div></div>
-      <div class="foot"><span class="cta">Book a Demo</span><span class="url">gushwork.ai</span></div>
-    </section></div></div>
-
-    <div class="cell"><h2>5 · Order to cash · DSO</h2><div class="frame"><section class="ad ad--blue" id="ad5">
-      <img class="logo" src="/assets/logo/gushwork-logo-white.svg" alt="Gushwork">
-      <div class="tag">Order to cash</div>
-      <h3>Reduce DSO without adding headcount.</h3>
+      <h3>Generate quotes the <em>same day</em> the RFQ hits your inbox.</h3>
       <div class="viz"><div class="card">
-        <div class="lab" style="margin-bottom:8px">Days sales outstanding · illustrative</div>
-        <svg class="line" viewBox="0 0 800 240" preserveAspectRatio="none" aria-hidden="true">
-          <polyline fill="none" stroke="var(--gw-color-primary-500)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" points="10,40 140,60 270,90 400,100 530,150 660,175 790,200"/>
-          <circle cx="790" cy="200" r="14" fill="var(--gw-color-primary-500)"/>
+        <div class="head"><span class="av">Q</span><div><b>Quote Q-1092</b><small>Quotes agent</small></div><span class="pill pill--ok">Sent</span></div>
+        <ul class="log"><li>Read RFQ from inbox</li><li>Built quote and sent to the customer</li></ul>
+      </div></div>
+      <span class="cta">Book a Demo <span aria-hidden="true">→</span></span>
+    </section></div></div>
+
+    <div class="cell"><h2>3 · Order to cash · quote vs PO</h2><div class="frame"><section class="ad tight" id="ad3">
+      <img class="logo" src="/assets/logo/gushwork-logo-white.svg" alt="Gushwork">
+      <h3>Your quote said $4.20. Their PO says <em>$3.80.</em></h3>
+      <div class="viz"><div class="card">
+        <div class="head"><span class="av">O</span><div><b>PO-4471</b><small>Order agent</small></div><span class="pill pill--bad">Mismatch</span></div>
+        <div class="two"><div><div class="lab">Your quote</div><div class="price">$4.20</div></div>
+        <div><div class="lab">Their PO</div><div class="price" style="color:var(--gw-color-red-600)">$3.80</div></div></div>
+        <div class="flag">Caught before it shipped</div>
+      </div></div>
+      <span class="cta">Book a Demo <span aria-hidden="true">→</span></span>
+    </section></div></div>
+
+    <div class="cell"><h2>4 · Order to cash · PO tracking</h2><div class="frame"><section class="ad" id="ad4">
+      <img class="logo" src="/assets/logo/gushwork-logo-white.svg" alt="Gushwork">
+      <h3>Every PO, tracked <em>from start to finish.</em></h3>
+      <div class="viz"><div class="card">
+        <div class="head"><span class="av">O</span><div><b>Purchase order · PO-4471</b><small>Order agent</small></div><span class="pill pill--ok">On track</span></div>
+        <div class="steps"><div class="step done"><i></i>PO received</div><div class="step done"><i></i>Confirmed</div><div class="step done"><i></i>Shipped</div><div class="step"><i></i>Delivered</div><div class="step"><i></i>Paid</div></div>
+      </div></div>
+      <span class="cta">Book a Demo <span aria-hidden="true">→</span></span>
+    </section></div></div>
+
+    <div class="cell"><h2>5 · Order to cash · DSO</h2><div class="frame"><section class="ad" id="ad5">
+      <img class="logo" src="/assets/logo/gushwork-logo-white.svg" alt="Gushwork">
+      <h3>Reduce DSO <em>without adding headcount.</em></h3>
+      <div class="viz"><div class="card">
+        <div class="head"><span class="av">C</span><div><b>Days sales outstanding</b><small>Cash agent · illustrative</small></div><span class="pill pill--ok">Falling</span></div>
+        <svg class="line" viewBox="0 0 800 200" preserveAspectRatio="none" aria-hidden="true">
+          <polyline fill="none" stroke="var(--gw-color-primary-500)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" points="10,30 140,50 270,80 400,90 530,130 660,155 790,175"/>
+          <circle cx="790" cy="175" r="14" fill="var(--gw-color-primary-500)"/>
         </svg>
       </div></div>
-      <div class="foot"><span class="cta">Book a Demo</span><span class="url">gushwork.ai</span></div>
+      <span class="cta">Book a Demo <span aria-hidden="true">→</span></span>
     </section></div></div>
 
-    <div class="cell"><h2>6 · Order to cash · overdue follow-up</h2><div class="frame"><section class="ad ad--soft" id="ad6">
-      <img class="logo" src="/assets/logo/gushwork-logo-original.svg" alt="Gushwork">
-      <div class="tag">Order to cash</div>
-      <h3>Automatic follow up on overdue invoices.</h3>
+    <div class="cell"><h2>6 · Order to cash · overdue follow-up</h2><div class="frame"><section class="ad" id="ad6">
+      <img class="logo" src="/assets/logo/gushwork-logo-white.svg" alt="Gushwork">
+      <h3><em>Automatic</em> follow up on overdue invoices.</h3>
       <div class="viz"><div class="card">
-        <div class="row"><div>Invoice INV-1042<small>12 days overdue</small></div><span class="pill pill--bad">Overdue</span></div>
-        <div class="row"><div>Reminder sent to accounts payable<small>Automatically, no one chased</small></div><span class="pill pill--ok">Sent</span></div>
+        <div class="head"><span class="av">C</span><div><b>Invoice INV-1042</b><small>Cash agent</small></div><span class="pill pill--bad">12 days overdue</span></div>
+        <ul class="log"><li>Reminder sent to accounts payable <span class="pill pill--ok">Sent</span></li><li>Next follow up scheduled</li></ul>
       </div></div>
-      <div class="foot"><span class="cta">Book a Demo</span><span class="url">gushwork.ai</span></div>
+      <span class="cta">Book a Demo <span aria-hidden="true">→</span></span>
     </section></div></div>
 
   </div>
