@@ -133,6 +133,7 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
             <button type="button" role="tab" class="gd-tabs__tab" aria-selected="false" tabindex="-1" data-dt="details">Details</button>
             <button type="button" role="tab" class="gd-tabs__tab" aria-selected="false" tabindex="-1" data-dt="shared" id="ag-d-shared">Shared</button>
             <button type="button" role="tab" class="gd-tabs__tab" aria-selected="false" tabindex="-1" data-dt="log">Log</button>
+            <button type="button" role="tab" class="gd-tabs__tab" aria-selected="false" tabindex="-1" data-dt="suggest">Suggest</button>
           </div></div></div>
           <div class="gd-drawer__tools">
             <span id="ag-d-badge"></span>
@@ -613,12 +614,42 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
         (r.kind === 'sent' ? badge('neutral', 'Sent') + ' → ' + esc(r.to || 'someone') + ': ' : badge(tone === 'info' ? 'neutral' : tone, KIND[r.kind] || r.kind) + ' ' + tag(TOPIC[r.topic] || r.topic) + ' ' + (r.thread ? '↳ ' : '')) + esc(r.text || '—') + '</span></div><time class="gd-timeline__time" datetime="' + r.at.toISOString() + '">' + esc(fmtWhen(r.at)) + '</time></li>';
     }).join('') + '</ol><p class="gd-card__desc" style="margin-top:12px">Everything the log holds for this person: the first 200 characters of each ask, and each message Bruce reported sending. What he answered is in Conversation, and what was shared is in Shared.</p>';
   }
+  /* Suggest: a note for Bruce about how to handle this person. It is not a message: nothing is sent to them or to Slack. */
+  function suggestHTML(c) {
+    return '<p class="gd-card__desc">Tell Bruce what he could do differently with ' + esc(c.name) + '. This is a note for him, not a message: nothing is sent to ' + esc(c.name) + ' or to Slack, and Bruce reads it the next time they talk.</p>' +
+      '<div class="gd-field" style="margin-top:16px"><label class="gd-field__label" for="ag-sg-text">Your suggestion</label><textarea id="ag-sg-text" class="gd-textarea" rows="4" maxlength="500" placeholder="For example: ask who the audience is before building a one-pager"></textarea></div>' +
+      '<div style="display:flex;align-items:center;gap:12px;margin-top:12px"><button type="button" class="gd-btn gd-btn--primary" id="ag-sg-save">Save suggestion</button><span class="gd-card__desc" id="ag-sg-note" role="status"></span></div>' +
+      '<h4 class="gd-card__title" style="margin:24px 0 8px">Saved for Bruce</h4><div id="ag-sg-list"><p class="gd-card__desc">Reading…</p></div>';
+  }
+  function suggestListHTML(rows) {
+    if (!rows.length) return '<p class="gd-card__desc">Nothing yet. What you save here shows up below.</p>';
+    return '<div class="gd-thread" role="log">' + rows.map(function (r) {
+      var d = new Date(r.at);
+      return '<div class="gd-msg"><span class="gd-avatar gd-avatar--team" data-gd-avatar="Utsav" role="img" aria-label="You"></span><div class="gd-msg__main"><div class="gd-msg__head"><b>You</b><time>' + esc(fmtWhen(d)) + '</time></div><div class="gd-msg__text">' + esc(r.text) + '</div></div></div>';
+    }).join('') + '</div>';
+  }
+  function loadSuggestions(user) {
+    fetch('/api/bruce-memory?suggest=1&user=' + encodeURIComponent(user), { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+      var box = $('ag-sg-list'); if (!box || S.openUser !== user || S.dtab !== 'suggest') return;
+      box.innerHTML = j ? suggestListHTML(j.suggestions || []) : '<p class="gd-card__desc">Could not read what was saved.</p>';
+    }).catch(function () { var box = $('ag-sg-list'); if (box) box.innerHTML = '<p class="gd-card__desc">Could not read what was saved.</p>'; });
+  }
+  function saveSuggestion() {
+    var ta = $('ag-sg-text'), note = $('ag-sg-note'), btn = $('ag-sg-save'), text = ta ? ta.value.trim() : '', c = cur().c;
+    if (!text) { note.textContent = 'Write the suggestion first.'; return; }
+    btn.setAttribute('aria-busy', 'true'); note.textContent = '';
+    fetch('/api/bruce-memory?suggest=1', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ user: S.openUser, name: c.name, text: text }) })
+      .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+      .then(function () { btn.removeAttribute('aria-busy'); if ($('ag-sg-text')) { $('ag-sg-text').value = ''; note.textContent = 'Saved. Bruce reads it next time.'; loadSuggestions(S.openUser); } })
+      .catch(function () { btn.removeAttribute('aria-busy'); note.textContent = 'Could not save that. Try again.'; });
+  }
   function showDTab(t) {
     S.dtab = t;
     document.querySelectorAll('#ag-d-tabs .gd-tabs__tab').forEach(function (b) { var on = b.getAttribute('data-dt') === t; b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1; });
     var x = cur(), b = $('ag-d-body');
     if (t === 'log') b.innerHTML = logHTML();
     else if (t === 'shared') b.innerHTML = sharedHTML(S.dm[S.openUser] || null);
+    else if (t === 'suggest') { b.innerHTML = suggestHTML(x.c); loadSuggestions(S.openUser); }
     else if (t === 'details') b.innerHTML = '<h4 class="gd-card__title">Details</h4>' + detailsKv(x.c, x.all);
     else { b.innerHTML = '<div id="ag-thread">' + threadHTML(S.dm[S.openUser] || null) + '</div>'; toNewest(); }
   }
@@ -694,7 +725,8 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
       return;
     }
     var p = e.target.closest && e.target.closest('#ag-period .gd-tabs__tab'); if (p) { S.period = p.getAttribute('data-value'); render(); return; }
-    var dt = e.target.closest && e.target.closest('#ag-d-tabs [data-dt]'); if (dt) { showDTab(dt.getAttribute('data-dt')); }
+    var dt = e.target.closest && e.target.closest('#ag-d-tabs [data-dt]'); if (dt) { showDTab(dt.getAttribute('data-dt')); return; }
+    if (e.target.closest && e.target.closest('#ag-sg-save')) saveSuggestion();
   });
   $('ag-tabs').addEventListener('keydown', function (ev) {
     var ids = [].slice.call(document.querySelectorAll('#ag-tabs .gd-tabs__tab')).map(function (b) { return b.getAttribute('data-tab'); }), i = ids.indexOf(S.tab);

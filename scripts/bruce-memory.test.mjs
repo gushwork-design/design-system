@@ -243,4 +243,27 @@ store['gw:bruce:log'] = [JSON.stringify({ at: new Date().toISOString(), user: 'U
   JSON.stringify({ at: new Date().toISOString(), user: 'U1', name: 'A', role: 'teammate', kind: 'run', text: 'make me a one-pager for sales', thread: 0, used: 1 })];
 const oldRows = (await M.readLog(f));
 ok('readLog returns old rows untouched (the mapping happens in the endpoint)', oldRows.length === 2 && oldRows.every((x) => x.kind === 'run'));
+// suggestions for Bruce (9 Oct 2026): a note about one person's chat, owner only, never a message
+const sg = async (method, cookie, extra = {}) => { let status = 0, out = null; await M.default({ method, query: extra.query || { suggest: '1' }, body: extra.body, headers: { cookie } }, { status(s) { status = s; return this; }, json(o) { out = o; return this; }, setHeader() {}, end() {} }); return { status, out }; };
+const ownerCk = await ck('utsav.singh@gushwork.ai');
+store = {}; cmds.length = 0; let slackCalls = 0;
+globalThis.fetch = async (url, init) => { if (String(url).includes('slack.com')) { slackCalls++; return { ok: true, json: async () => ({ ok: true }) }; } return f(url, init); };
+let g2 = await sg('POST', '', { body: { user: 'U0PRIYA01', name: 'Priya', text: 'ask who the audience is' } });
+ok('suggest: signed out is 401', g2.status === 401);
+g2 = await sg('POST', await ck('sam@gushwork.ai'), { body: { user: 'U0PRIYA01', name: 'Priya', text: 'x' } });
+ok('suggest: a teammate is 403 and nothing is stored', g2.status === 403 && !store['gw:bruce:suggest']);
+g2 = await sg('POST', ownerCk, { body: { user: 'U0PRIYA01', name: 'Priya', text: '   ' } });
+ok('suggest: an empty suggestion is 400', g2.status === 400);
+g2 = await sg('POST', ownerCk, { body: { user: 'not an id', name: 'Priya', text: 'hello' } });
+ok('suggest: a bad person id is 400', g2.status === 400);
+g2 = await sg('POST', ownerCk, { body: { user: 'U0PRIYA01', name: 'Priya', text: '  ask who the\n audience is  ' } });
+ok('suggest: the owner saves one', g2.status === 200 && g2.out.suggestion.text === 'ask who the audience is' && store['gw:bruce:suggest'].length === 1, JSON.stringify(g2));
+ok('suggest: it becomes a note Bruce reads for that person', (await M.readNotes('U0PRIYA01', f)).some((n) => /Suggestion from Utsav.*ask who the audience is/.test(n)));
+ok('suggest: it is not a message (no Slack call)', slackCalls === 0);
+await sg('POST', ownerCk, { body: { user: 'U0ISHA0001', name: 'Isha', text: 'keep it short' } });
+g2 = await sg('GET', ownerCk, { query: { suggest: '1', user: 'U0PRIYA01' } });
+ok('suggest: the owner reads back only that person\'s', g2.status === 200 && g2.out.suggestions.length === 1 && g2.out.suggestions[0].name === 'Priya', JSON.stringify(g2));
+g2 = await sg('GET', await ck('sam@gushwork.ai'), { query: { suggest: '1', user: 'U0PRIYA01' } });
+ok('suggest: a teammate cannot read them', g2.status === 403 && !g2.out.suggestions);
+globalThis.fetch = realFetch;
 console.log(`${pass} passed, ${fail} failed`); process.exit(fail ? 1 : 0);
