@@ -24,6 +24,7 @@ reports its own stale date.**
 
 | Version | Date | What changed | Commit | Session |
 |---|---|---|---|---|
+| **v2.0.9** | 09 Oct 2026 12:55 | Every build shows a ghost while it waits on data, and the message-thread component gains an optional per-message action | [`63e2434`](https://github.com/gushwork-design/design-system/commit/63e2434eb2cbf5503effa74957bf15719c968116) | [Bruce chats and suggestions](claude://resume/9f52f5e7-37de-4f0f-90da-96e2d1366e24) |
 | **v2.0.8** | 08 Oct 2026 19:47 | Teams publish their own staging pages from the plugin, into a lane Access Control gives them, each open to the company or private to its team | [`de731af`](https://github.com/gushwork-design/design-system/commit/de731af200aa32edd6c12dcd36d3183d9bb5127d) | [Staging lanes](claude://resume/9f52f5e7-37de-4f0f-90da-96e2d1366e24) |
 | **v2.0.7** | 08 Oct 2026 15:01 | A restricted page you can request access from, approved from Slack through Bruce | [`6a7c897`](https://github.com/gushwork-design/design-system/commit/6a7c89733a2581dc81217729834598cce5cdffe2) | [Opens most page name and no new-chat greeting](claude://resume/16dfcbc4-fd1c-497a-bc67-d1c7fb2da3ac) |
 | **v2.0.6** | 08 Oct 2026 02:00 | Fix the dashboard's counting figures printing wrong in a PDF | [`ddccdf3`](https://github.com/gushwork-design/design-system/commit/ddccdf3880e90378ac947a23df387c55cd300bef) | [Opens most page name and no new-chat greeting](claude://resume/16dfcbc4-fd1c-497a-bc67-d1c7fb2da3ac) |
