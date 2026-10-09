@@ -41,14 +41,17 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
 .ag-face img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; transform: scale(var(--ag-z, 1)); transform-origin: var(--ag-x, 50%) var(--ag-y, 50%); }
 .gd-agent-status .gd-avatar.ag-face { --gd-avatar-size: 48px; }
 /* tokens on a team card: the estimate and the agent's share of the team's, over a thin bar */
-/* the account's weekly limit on All agents: one number, one bar */
-.ag-limit { display: flex; flex-direction: column; gap: var(--gw-space-12); }
-.ag-limit__row { display: flex; align-items: baseline; justify-content: space-between; gap: var(--gw-space-12); }
-.ag-limit__row b { font: 500 28px/1.2 var(--gw-font-display); color: var(--gd-text); font-feature-settings: "tnum" 1; }
-.ag-limit__row span { font: var(--gw-text-body-14-reg); color: var(--gd-text-muted); }
-.ag-limit__bar { height: 8px; border-radius: 4px; background: var(--gd-border); overflow: hidden; }
-.ag-limit__bar > i { display: block; height: 100%; border-radius: 4px; background: var(--gd-ink); }
-.ag-limit__note { margin: 0; font: var(--gw-text-body-12-reg); color: var(--gd-text-muted); }
+/* the agents' weekly total on All agents: one number, one bar split by agent */
+.ag-week { display: flex; flex-direction: column; gap: var(--gw-space-12); }
+.ag-week__row { display: flex; align-items: baseline; justify-content: space-between; gap: var(--gw-space-12); flex-wrap: wrap; }
+.ag-week__row b { font: 500 28px/1.2 var(--gw-font-display); color: var(--gd-text); font-feature-settings: "tnum" 1; }
+.ag-week__row span { font: var(--gw-text-body-14-reg); color: var(--gd-text-muted); }
+.ag-week__bar { display: flex; gap: 2px; height: 8px; border-radius: 4px; background: var(--gd-border); overflow: hidden; }
+.ag-week__bar > i { display: block; height: 100%; min-width: 2px; }
+.ag-week__legend { display: flex; flex-wrap: wrap; gap: var(--gw-space-4) var(--gw-space-24); font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
+.ag-week__key { display: inline-flex; align-items: center; gap: var(--gw-space-8); }
+.ag-week__key > i { width: 8px; height: 8px; border-radius: 2px; flex: none; }
+.ag-week__key b { color: var(--gd-text); font-weight: 600; font-feature-settings: "tnum" 1; }
 .ag-use { display: flex; flex-direction: column; gap: var(--gw-space-8); }
 .ag-use__row { display: flex; align-items: baseline; justify-content: space-between; gap: var(--gw-space-12); font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
 .ag-use__row b { font: var(--gw-text-body-14-sem); color: var(--gd-text); font-feature-settings: "tnum" 1; }
@@ -311,13 +314,16 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
       '<span class="ag-use__bar" role="img" aria-label="' + pct + ' of the team\u2019s estimated tokens"><i style="width:' + Math.round(share * 100) + '%"></i></span></span>';
   }
 
-  /* how much of the account's weekly limit is used: the plan reports one account-wide percentage (a dated snapshot), so this is the total, not a split by agent */
-  function limitCard() {
-    var u = S.usage; if (!u || !u.weekly) return '';
-    var pct = Math.max(0, Math.min(100, Math.round(u.weekly.percentUsed))), resets = Date.parse(u.weekly.resetsAt), age = Date.parse(u.at) ? Date.now() - Date.parse(u.at) : 0;
-    return card('Weekly usage limit', 'Everything on your account, not only the agents', '<div class="ag-limit"><div class="ag-limit__row"><b>' + pct + '% used</b><span>' + (resets ? 'Resets ' + esc(new Date(resets).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' })) : '') + '</span></div>' +
-      '<div class="ag-limit__bar" role="img" aria-label="' + pct + '% of the weekly limit used"><i style="width:' + pct + '%"></i></div>' +
-      '<p class="ag-limit__note">As of ' + esc(fmtWhen(new Date(u.at))) + (age > 2 * DAY ? ' (' + Math.round(age / DAY) + ' days old)' : '') + '. A dated snapshot: the hub cannot read the live number.</p></div>');
+  /* the agents' own weekly total, since the weekly limit last reset: all three together and who used what. The plan reports only an account-wide percentage of the limit (it covers everything on the account), so the agents' share of the limit cannot be shown, only their estimated tokens */
+  function weekCard(list) {
+    var rows = list.filter(function (s) { return s.known; }).map(function (s) { return { s: s, t: weekTokens(s) }; }), total = rows.reduce(function (n, r) { return n + r.t; }, 0);
+    if (!rows.length) return '';
+    var u = S.usage, resetAt = u && u.weekly && Date.parse(u.weekly.resetsAt) ? Date.parse(u.weekly.resetsAt) : 0, tone = ['var(--gd-ink)', 'var(--gd-text-muted)', 'var(--gd-border-strong)'];
+    var bar = rows.map(function (r, i) { return r.t ? '<i style="width:' + (r.t / total * 100) + '%;background:' + tone[i % 3] + '" title="' + esc(r.s.a.name) + '"></i>' : ''; }).join('');
+    var legend = rows.map(function (r, i) { return '<span class="ag-week__key"><i style="background:' + tone[i % 3] + '"></i>' + esc(r.s.a.name) + ' <b>' + (r.t ? '≈ ' + tok(r.t) : 'None') + '</b></span>'; }).join('');
+    return card('Agents this week', 'Estimated tokens since the weekly limit reset' + (resetAt ? ' on ' + new Date(resetAt - 7 * DAY).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }) : ''),
+      '<div class="ag-week"><div class="ag-week__row"><b>' + (total ? '≈ ' + tok(total) + ' tokens' : 'None yet') + '</b>' + (resetAt ? '<span>Limit resets ' + esc(new Date(resetAt).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' })) + '</span>' : '') + '</div>' +
+      '<div class="ag-week__bar" role="img" aria-label="Estimated tokens this week by agent">' + bar + '</div><div class="ag-week__legend">' + legend + '</div></div>');
   }
 
   /* ---------- All agents ---------- */
@@ -330,7 +336,7 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
           '<span class="gd-agent-status__who"><b>' + esc(s.a.name) + '</b><small>' + esc(s.a.role) + '</small></span>' + badge(TONE[s.state], stateLabel(s)) + '</span>' +
           '<span class="gd-agent-status__now">' + esc(s.doing) + '</span>' + use(s, total) + '</a></div>';
       }).join('') + '</div></section>';
-    html += limitCard();   /* under the agent cards, above what needs you */
+    html += weekCard(list);   /* under the agent cards, above what needs you */
     html += needsCard(needs, true);
     html += '<p class="gd-card__desc">Each agent is recorded in git, with its memory. To add one, see <a class="gd-table__link" href="https://github.com/gushwork-design/design-system/blob/main/agents/README.md" target="_blank" rel="noopener noreferrer">agents/README</a>.</p>';
     return html;
@@ -364,12 +370,18 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
     rows.push(['Links', (a.links || []).concat([{ label: 'Routine in claude.ai', href: a.routine.url }]).map(function (l) { return '<a class="gd-table__link" href="' + esc(l.href) + '" target="_blank" rel="noopener noreferrer">' + esc(l.label) + '</a>'; }).join(' · ')]);
     return foldCard('ag-about', 'About ' + a.name, kv(rows, 'gd-key-value-list--stacked gd-key-value-list--ruled'));
   }
+  /* the tokens an agent used since the weekly limit last reset (estimated, as everywhere here) */
+  function weekStart() { var u = S.usage, resetAt = u && u.weekly && Date.parse(u.weekly.resetsAt) ? Date.parse(u.weekly.resetsAt) : 0; return resetAt ? resetAt - 7 * DAY : Date.now() - 7 * DAY; }
+  function weekTokens(s) {
+    var from = weekStart(), a = s.a;
+    return s.id === 'bruce' ? bruceAll().filter(function (r) { return r.at.getTime() >= from; }).reduce(function (n, r) { return n + bruceTokens(r, a); }, 0)
+      : (s.id === 'alfred' ? alfredRunsIn(from) : docRunCount(from)) * a.cost.run;
+  }
   /* usage and tokens: the same three tiles at the top of every agent's tab. The first two are this agent's estimate; the third is the account's weekly limit (one number, from a dated snapshot) */
   function usageTiles(s) {
     var a = s.a, u = S.usage, resetAt = u && u.weekly && Date.parse(u.weekly.resetsAt) ? Date.parse(u.weekly.resetsAt) : 0, weekFrom = resetAt ? resetAt - 7 * DAY : Date.now() - 7 * DAY;
     var snapAge = u && Date.parse(u.at) ? Date.now() - Date.parse(u.at) : 0, unit = s.id === 'bruce' ? 'session' : 'run';
-    var weekTok = s.id === 'bruce' ? bruceAll().filter(function (r) { return r.at.getTime() >= weekFrom; }).reduce(function (n, r) { return n + bruceTokens(r, a); }, 0)
-      : (s.id === 'alfred' ? alfredRunsIn(weekFrom) : docRunCount(weekFrom)) * a.cost.run;
+    var weekTok = weekTokens(s);
     return '<section aria-label="Usage and tokens"><div class="gd-card__titles" style="margin-bottom:var(--gd-gap)"><h3 class="gd-card__title">Usage and tokens</h3><p class="gd-card__desc">Estimated, not measured</p></div>' + stats([
       { n: 'Tokens ' + (S.period === 'today' ? 'today' : 'in ' + S.period + ' days'), v: s.sessions ? '≈ ' + tok(s.tokens) : '—', c: s.sessions ? 'about ' + tok(s.tokens / s.sessions) + ' for each of ' + plural(s.sessions, unit) : 'no ' + unit + 's yet' },
       { n: 'Tokens this week', v: '≈ ' + tok(weekTok), c: resetAt ? 'since the weekly limit reset on ' + new Date(weekFrom).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }) : 'the last 7 days' },
