@@ -38,9 +38,9 @@
 
    RUN OR CHAT (Utsav, 8 Oct 2026: "say hi to Utsav shouldn't count as a run, it's just a conversation; a run is where a skill
    is triggered or too many tokens are used; replying to a text doesn't consume that much"). Every DM still starts one cloud
-   session, but only some asks are WORK. weightOf says which, from the words: building, hub changes and checks, an edit to
-   something he made, or a long brief are runs; a pass-on, a status check, a question about him, a file or a template lookup
-   is a chat. Runs spend the daily cap below. Chats have their own much larger guard (BRUCE_DM_CHAT_CAP, default 40), so a
+   session, but only some asks are WORK. weightOf says which, from the words: making or changing a design thing, an order to run
+   or release something, or a long brief are runs; everything else (a pass-on, a status check, a question about him, a file or a
+   template lookup, a reminder, a talk about hub work) is a chat. Runs spend the daily cap below. Chats have their own much larger guard (BRUCE_DM_CHAT_CAP, default 40), so a
    friendly teammate is never told "no" for saying thanks, and a loop still cannot run away. It is a guess from the text,
    not a measurement; measuring skills and tokens per session is the next step.
 
@@ -160,16 +160,24 @@ const TOPIC_RULES = [
   ['hub', /\b(rework|checks?|drift|tests?|release|merge|delete|remove|rename|staging|hub|review|approve|approval)\b/i],
   ['about', /\b(who are you|what (can|do|are) you|how do you|help|hello|hi|hey|thanks?|thank you)\b/i],
 ];
-/* Is this ask work (a run) or a conversation (a chat)? See RUN OR CHAT above. */
+/* Is this ask work (a run) or a conversation (a chat)? See RUN OR CHAT above.
+   Utsav's rule, again (9 Oct 2026, after "what he worked on" listed chats as runs): a run is where a SKILL is triggered or a lot of
+   tokens are used. Talking about a page, asking where something is, telling him how to behave, or reminding him of something is a
+   chat, whatever words it contains. Nothing here can measure a skill or tokens yet (his cloud sessions report neither), so this
+   stands in for them: an ask is work only when it asks for a design thing to be MADE or CHANGED, or for a heavy job to be run, or
+   is a long brief. Everything else is a chat. Measuring is still the real fix. */
 const CHAT_TOPICS = ['pass-on', 'status', 'about', 'access'];
-const EDIT_RE = /\b(change|update|fix|add|remove|swap|replace|rename|redo|rewrite|shorten|lengthen|bigger|smaller|darker|lighter|instead|should be|make it|turn it)\b/i;
+const ARTIFACT_RE = /\b(one-?pagers?|landing|lander|pages?|decks?|slides?|banners?|posters?|flyers?|emails?|newsletters?|templates?|dashboards?|components?|logos?|svgs?|mock-?ups?|cards?|sections?|folds?|hero|forms?|footers?|navbar|case stud(y|ies)|reports?)\b/i;
+const MAKE_RE = /\b(build|make|create|design|draft|mock ?up|generate|produce|write)\b/i;
+const EDIT_RE = /\b(change|update|fix|add|remove|swap|replace|rename|redo|rewrite|shorten|lengthen|bigger|smaller|darker|lighter)\b/i;
+const HEAVY_RE = /^\W*(?:(?:please|pls|can you|could you|would you|will you)\s+)?(run|rework|rebuild|redo|release|publish|deploy)\b/i;   /* an order for a heavy job, not a mention */
+const BRIEF_RE = /^\W*(?:an?\s+)?(one-?pagers?|landing pages?|decks?|banners?|posters?|flyers?|newsletters?|case stud(?:y|ies))\b/i;   /* "One-pager for sales, ops leads" */
 export function weightOf(text) {
   const t = String(text || '').trim();
-  if (t.length > 280) return 'run';                 /* a brief */
-  const topic = topicOf(t);
-  if (CHAT_TOPICS.includes(topic)) return 'chat';
-  if (topic === 'build' || topic === 'hub') return 'run';
-  return EDIT_RE.test(t) ? 'run' : 'chat';          /* brand, template, other: a lookup, unless it edits something */
+  if (t.length > 280) return 'run';                 /* a brief: a lot of tokens */
+  if (CHAT_TOPICS.includes(topicOf(t))) return 'chat';
+  if (HEAVY_RE.test(t) || BRIEF_RE.test(t)) return 'run';
+  return ARTIFACT_RE.test(t) && (MAKE_RE.test(t) || EDIT_RE.test(t)) ? 'run' : 'chat';   /* make or change a design thing: a skill runs */
 }
 
 export function topicOf(text) {
