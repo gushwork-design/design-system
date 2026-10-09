@@ -38,6 +38,7 @@ import dropStudio from './_drop-studio.js';
 import accessRequest from './_access-request.js';
 import publish from './_publish.js';
 import tasks from './_tasks.js';
+import pluginAccess from './_plugin-access.js';
 
 const ROUTES = {
   'log-usage': logUsage,
@@ -58,6 +59,7 @@ const ROUTES = {
   'access-request': accessRequest,
   'publish': publish,
   'tasks': tasks,
+  'plugin-access': pluginAccess,
 };
 
 export default async function handler(req, res) {

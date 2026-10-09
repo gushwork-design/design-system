@@ -250,3 +250,21 @@ With the variables set and a fresh deploy:
   returns a 403 page, and the ADMIN group is absent from the sidebar.
 - `curl -s https://<host>/exports/dashboard/component-registry.json | head -c 40`
   still returns JSON with no cookie.
+
+---
+
+## Plugin access (R67, 9 Oct 2026)
+
+Separate from page access. The Claude Code plugin is public to install, so the gate is at the plugin's first
+session: `scripts/check-access.sh` asks `GET /api/plugin-access?email=` where the signed-in account stands, and
+`scripts/gate-skill.sh` (PreToolUse on Skill) refuses the `gushwork-*` skills while the answer is not `allowed`.
+A `@gushwork.ai` address is allowed on the domain alone and never asks. An outside address is `none` until it
+asks (`POST /api/plugin-access`, which DMs the owner from Bruce with Allow / Deny), then `pending`, then
+`allowed` or `denied`; denied means the plugin uninstalls itself on that machine. Anyone with a usage row from
+before `GW_PLUGIN_GATE_SINCE` (default 10 Oct 2026) is let in the first time they ask, by Utsav's ruling.
+
+Decisions: admins and owners from `/admin/access-control#plugin` or the New users table on `/admin/analytics`
+(`POST /api/plugin-access?decide=1`, session cookie, live rules); from Slack only the owner, because only the
+owner gets the DM. The list is one KV hash, `gw:plugin-access`. No store → everyone is allowed, so a KV outage
+never locks the company out. The address is self-reported from the person's own Claude config: this stops the
+casual outsider, not someone who edits a file.

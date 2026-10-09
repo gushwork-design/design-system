@@ -1,14 +1,14 @@
 {
   "$comment": [
     "Claude Code hooks for the Gushwork design system. NOT the same thing as scripts/hooks/,",
-    "which holds this repo's git hooks \u2014 those guard pushing, these run on a teammate's machine.",
+    "which holds this repo's git hooks — those guard pushing, these run on a teammate's machine.",
     "",
     "check-update.sh exists because two documented gaps had no code behind them: autoUpdate is",
     "per-machine and unsettable from repo settings, so it got skipped; and auto-update takes",
     "effect only on the NEXT start, so the session that could warn you is the one that does not",
     "know yet. See the header of scripts/check-update.sh.",
     "",
-    "check-approvals.sh is the last leg of REVIEW-LOOP.md \u2014 a \u2705 reaction in Slack queues an",
+    "check-approvals.sh is the last leg of REVIEW-LOOP.md — a ✅ reaction in Slack queues an",
     "approval, and this is where it re-enters a session so the pass can be recorded. It is a",
     "SEPARATE hook on purpose: one hook emits one JSON envelope, so two notices need two",
     "scripts, and a broken approvals endpoint must not be able to silence the stale-version",
@@ -36,15 +36,27 @@
     "every other row), and a closed laptop or a crash simply means the last skill, file or artifact row",
     "carries the most recent figures instead.",
     "",
-    "There is no greeting hook. greet.sh opened every new chat with \"Hey Utsav, fresh chat \u2014 you're on",
+    "There is no greeting hook. greet.sh opened every new chat with \"Hey Utsav, fresh chat — you're on",
     "Gushwork design system v2.0.1\" (R48, 5 Oct 2026) and was removed on 7 Oct 2026 (R62): the plugin now",
-    "speaks only through check-update.sh, and only when a flagged release is ahead of this copy."
+    "speaks only through check-update.sh, and only when a flagged release is ahead of this copy.",
+    "",
+    "check-access.sh (R67, 9 Oct 2026) asks the hub whether this account may use the plugin. The repo is public,",
+    "so anyone can install it; an address outside the company is stopped before the skills load and offered",
+    "uninstall or request access. It writes one state file; gate-skill.sh, the PreToolUse hook on Skill, reads",
+    "it and refuses the gushwork-* skills while the answer is not \"allowed\" — the part that makes the gate real.",
+    "Company addresses never leave the machine for this: the script answers \"allowed\" on the domain alone. Fails",
+    "open on any error, so a hub outage cannot lock the company out of its own design system."
   ],
   "hooks": {
     "SessionStart": [
       {
         "matcher": "startup|resume",
         "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/scripts/check-access.sh",
+            "timeout": 10
+          },
           {
             "type": "command",
             "command": "\"${CLAUDE_PLUGIN_ROOT}\"/scripts/check-update.sh",
@@ -63,6 +75,18 @@
           {
             "type": "command",
             "command": "\"${CLAUDE_PLUGIN_ROOT}\"/scripts/brand-rule.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Skill",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/scripts/gate-skill.sh",
             "timeout": 5
           }
         ]

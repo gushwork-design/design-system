@@ -270,6 +270,10 @@
     {
       "source": "/api/drop-studio",
       "destination": "/api/gw?action=drop-studio"
+    },
+    {
+      "source": "/api/plugin-access",
+      "destination": "/api/gw?action=plugin-access"
     }
   ],
   "functions": {

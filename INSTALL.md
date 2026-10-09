@@ -33,8 +33,11 @@ collaborator**, and make sure git can authenticate:
 gh auth login && gh auth setup-git
 ```
 
-> The repo is public at the time of writing, so this check passes for everyone. It becomes a
-> real gate when the repo goes private — access will be granted per person.
+> The repo is public, so this check passes for everyone. The gate is at the first session instead:
+> the plugin is for Gushwork accounts, and an account outside the company is stopped before the
+> skills load and offered two things — uninstall, or request access. A request reaches Utsav in
+> Slack and on the hub's Access Control page, and the plugin unlocks by itself at the next session
+> once it is granted. Nothing to reinstall.
 
 ---
 
