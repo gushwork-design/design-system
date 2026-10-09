@@ -15,9 +15,9 @@
     },
     {
       "agent": "doc",
-      "status": "planned",
-      "when": "Someone asks whether the hub is healthy",
-      "via": "Not wired yet. Today Doc runs on a schedule and when the health page is opened."
+      "status": "live",
+      "when": "Someone asks Bruce in Slack whether the hub is healthy or working",
+      "via": "web/api/_concierge.js (askDoc), which runs the live checks in web/api/_health.js (liveReport)"
     }
   ],
   "paused": [

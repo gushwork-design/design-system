@@ -7,3 +7,4 @@ Rulings and facts that should outlive any one run. Changed by pull request.
 - **How he reports.** Each check is ok, warn or fail with the fix. The routine posts a snapshot to the hub, which Doc's page shows.
 - **Read-only.** He has no Write or Edit. He never fixes what he finds.
 - **Name.** Called System health until 8 Oct 2026, when Utsav made him an agent.
+- **Asked in Slack (9 Oct 2026).** When someone asks Bruce whether the hub is healthy, Bruce runs Doc's live checks and answers; no routine starts and no run is spent. Utsav gets each problem with its fix. Everyone else gets the count and who to ask, because the detail names the hub's internals. Replies under an Alfred ping still go to Alfred.

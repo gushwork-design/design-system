@@ -381,10 +381,16 @@ export default async function handler(req, res, ctxIn) {
   if (!session || !session.email) return json(res, 401, { error: 'Not signed in.' });
   if (!isOwner(session.email)) return json(res, 403, { error: 'Owners only.' });
 
+  return json(res, 200, await liveReport(ctx));
+}
+
+/* The live checks plus the routine's last snapshot, as the owner's page shows them. Doc's Slack route (_concierge.js askDoc)
+   reads the same thing, so what Bruce says and what the page says cannot disagree. */
+export async function liveReport(ctx = makeCtx()) {
   const [run, snap] = await Promise.all([runChecks(ctx), readSnapshot(ctx)]);
   const extra = fromSnapshot(snap, ctx.now);
   const all = [...run.checks, ...extra];
   const counts = { ok: 0, warn: 0, fail: 0, unknown: 0 };
   for (const x of all) counts[x.status]++;
-  return json(res, 200, { at: run.at, areas: AREAS, checks: all, counts, snapshotAt: snap ? snap.at : null });
+  return { at: run.at, areas: AREAS, checks: all, counts, snapshotAt: snap ? snap.at : null };
 }
