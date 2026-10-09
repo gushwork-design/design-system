@@ -425,6 +425,21 @@ export default async function handler(req, res) {
       return res.status(200).json(await readDM({ token: process.env.SLACK_BOT_TOKEN, user: String(q.user || ''), ch: String(q.ch || '') }));
     } catch { return res.status(502).json({ ok: false, reason: 'slack', detail: 'Could not reach Slack.' }); }
   }
+  /* A send made by the "Bruce send" workflow reports itself here, signed with the bot token (see scripts/bruce-send.mjs): it has no per-run
+     token, since no run is involved. It is for the owner, who is the one asking for it. Only `sent` rows are accepted this way. */
+  if (req.method === 'POST' && req.headers['x-bruce-send-sig']) {
+    let body = req.body; if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
+    const it = body && Array.isArray(body.sent) && body.sent.length === 1 ? body.sent[0] : null;
+    const ts = Number(req.headers['x-bruce-send-ts']);
+    const key = process.env.SLACK_BOT_TOKEN || '';
+    if (!it || !key || !Number.isFinite(ts) || Math.abs(Date.now() / 1000 - ts) > 300) return res.status(401).json({ error: 'bad or stale signature' });
+    const want = crypto.createHmac('sha256', key).update(`${ts}.${String(it.to || '')}.${String(it.text || '').slice(0, 200)}`).digest('hex');
+    const got = String(req.headers['x-bruce-send-sig']);
+    const okSig = got.length === want.length && crypto.timingSafeEqual(Buffer.from(got), Buffer.from(want));
+    const owner = String(process.env.OWNER_SLACK_ID || '');
+    if (!okSig || !owner) return res.status(401).json({ error: 'bad or stale signature' });
+    return res.status(200).json({ ok: true, sent: await logSent(owner, [it]) });
+  }
   const token = String(req.headers.authorization || '').replace(/^Bearer\s+/i, '');
   const user = readToken(token);
   if (!user) return res.status(401).json({ error: 'bad or expired token' });
