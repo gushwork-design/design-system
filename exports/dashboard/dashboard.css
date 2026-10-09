@@ -3278,7 +3278,7 @@ a.gd-hbar__row:hover, a.gd-hbar__row.is-hover { background: var(--gd-hover-bg); 
 /* --- access-denied-screen: the empty-state shape (.gd-empty from 60-feedback) on the auth page ---- */
 .gd .gd-auth__card--denied { gap: var(--gw-space-24); padding: var(--gw-space-40) var(--gw-space-32) var(--gw-space-32); align-items: center; text-align: center; }
 .gd .gd-auth__card--denied .gd-empty { padding: 0; max-width: none; gap: var(--gw-space-20); }
-.gd .gd-auth__card--denied .gd-empty__badge { width: 48px; height: 48px; border-radius: var(--gw-radius-12); background: var(--gd-auth-field); box-shadow: inset 0 0 0 1px var(--gd-border-strong); }   /* selected-bg equals the card in dark and vanishes */
+.gd .gd-auth__card--denied .gd-empty__badge { width: 48px; height: 48px; border-radius: var(--gw-radius-12); background: var(--gd-accent); color: var(--gw-color-white); box-shadow: none; }   /* a solid block with a white glyph, in the data-and-status blue, in every state (9 Oct 2026: the grey tile with a coloured glyph read as bland) */
 .gd .gd-auth__card--denied .gd-empty__badge svg { width: 20px; height: 20px; }
 .gd .gd-auth__card--denied .gd-empty__title { font: var(--gw-text-body-20-sem); letter-spacing: var(--gw-text-body-20-sem-tracking); }
 .gd .gd-auth__card--denied .gd-empty__text { font: var(--gw-text-body-14-reg); letter-spacing: var(--gw-text-body-14-reg-tracking); }
@@ -3287,9 +3287,8 @@ a.gd-hbar__row:hover, a.gd-hbar__row.is-hover { background: var(--gd-hover-bg); 
 
 /* --- access-denied-screen, request access (R66): the page they asked for next to who they are, an answer line, and the
    states after pressing Request access. The badge is the same rounded square; it takes the check glyph once the
-   request is sent, in the good tone (a glyph, not small text). ----------------------------------------------------- */
+   request is sent, in the same blue (not green: blue carries status here). ----------------------------------------------------- */
 .gd .gd-auth__facts { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--gw-space-8); max-width: 100%; }
-.gd .gd-auth__card--denied .gd-empty--sent .gd-empty__badge { color: var(--gd-good); }
 .gd .gd-auth__note { margin: 0; min-height: 1lh; color: var(--gd-text-muted); font: var(--gw-text-body-12-med); letter-spacing: var(--gw-text-body-12-med-tracking); text-align: center; text-wrap: balance; }
 .gd .gd-auth__note--error { color: var(--gd-tone-bad-fg); }
 .gd .gd-auth__note[hidden] { display: none; }
