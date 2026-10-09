@@ -10,6 +10,7 @@ ok('a token for one user cannot be bent to another', M.readToken(tok.replace('U1
 ok('a token signed elsewhere is refused', M.readToken(M.mintToken('U1', t0, 'other'), t0, 'sec') === null);
 let store = {}; const cmds = [];
 const f = async (url, init) => { const c = JSON.parse(init.body); cmds.push(...c); return { ok: true, json: async () => c.map(([op, key, ...a]) => {
+  if (op === 'HMGET') return { result: a.map((k) => (store[key] || {})[k] || null) };
   if (op === 'HGET') return { result: (store[key] || {})[a[0]] || null };
   if (op === 'HINCRBY') { store[key] = store[key] || {}; store[key][a[0]] = (store[key][a[0]] || 0) + 1; return { result: store[key][a[0]] }; }
   if (op === 'LPUSH') { store[key] = [a[0], ...(store[key] || [])]; return { result: store[key].length }; }
@@ -265,5 +266,23 @@ g2 = await sg('GET', ownerCk, { query: { suggest: '1', user: 'U0PRIYA01' } });
 ok('suggest: the owner reads back only that person\'s', g2.status === 200 && g2.out.suggestions.length === 1 && g2.out.suggestions[0].name === 'Priya', JSON.stringify(g2));
 g2 = await sg('GET', await ck('sam@gushwork.ai'), { query: { suggest: '1', user: 'U0PRIYA01' } });
 ok('suggest: a teammate cannot read them', g2.status === 403 && !g2.out.suggestions);
+globalThis.fetch = realFetch;
+// a suggestion can point at one message; and profile pictures (9 Oct 2026)
+store = {}; cmds.length = 0;
+globalThis.fetch = f;
+g2 = await sg('POST', ownerCk, { body: { user: 'U0PRIYA01', name: 'Priya', text: 'lead with the file', about: { text: '  Here is   the logo,\n and more ', from: 'bruce', name: 'Bruce', at: 1760000000000 } } });
+ok('suggest: a message can be attached', g2.status === 200 && g2.out.suggestion.about.text === 'Here is the logo, and more' && g2.out.suggestion.about.from === 'bruce', JSON.stringify(g2));
+ok('suggest: the note names the message', (await M.readNotes('U0PRIYA01', f)).some((n) => /on your message "Here is the logo, and more": lead with the file/.test(n)));
+g2 = await sg('GET', ownerCk, { query: { suggest: '1', user: 'U0PRIYA01' } });
+ok('suggest: the attached message reads back', g2.out.suggestions[0].about && g2.out.suggestions[0].about.text.startsWith('Here is'));
+store = {}; let infoCalls = 0;
+const picF = async (url, init) => { if (String(url).includes('users.info')) { infoCalls++; const id = new URL(url).searchParams.get('user'); return { ok: true, json: async () => ({ ok: true, user: { profile: { image_72: id === 'U0NOPIC001' ? 'http://evil.example/x.png' : 'https://avatars.slack-edge.com/' + id + '.png' } } }) }; } return f(url, init); };
+let pics = await M.slackPics('xoxb', ['U0PRIYA01', 'U0ISHA0001', 'U0NOPIC001', 'nope'], { f: picF });
+ok('pics: looked up, https Slack hosts only, bad ids skipped', pics.U0PRIYA01 === 'https://avatars.slack-edge.com/U0PRIYA01.png' && pics.U0ISHA0001 && !pics.U0NOPIC001 && !pics.nope && infoCalls === 3, JSON.stringify(pics));
+infoCalls = 0; pics = await M.slackPics('xoxb', ['U0PRIYA01', 'U0ISHA0001'], { f: picF });
+ok('pics: kept after the first look', infoCalls === 0 && Object.keys(pics).length === 2);
+infoCalls = 0; store = {}; pics = await M.slackPics('xoxb', ['U0AAAAAAA1', 'U0AAAAAAA2', 'U0AAAAAAA3'], { f: picF, max: 2 });
+ok('pics: at most max lookups per call', infoCalls === 2 && Object.keys(pics).length === 2);
+ok('pics: no token, no cache, nothing', Object.keys(await M.slackPics('', ['U0ZZZZZZZ1'], { f: picF })).length === 0);
 globalThis.fetch = realFetch;
 console.log(`${pass} passed, ${fail} failed`); process.exit(fail ? 1 : 0);

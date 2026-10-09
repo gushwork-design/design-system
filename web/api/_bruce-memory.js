@@ -55,7 +55,7 @@ import { isOwner } from './_access.js';
 const MAX_NOTES = 30;
 const LOG_KEY = 'gw:bruce:log';
 const MAX_LOG = 3000;
-const NAMES_KEY = 'gw:slack:names';
+const NAMES_KEY = 'gw:slack:names', PICS_KEY = 'gw:slack:pics';
 const TOKEN_HOURS = 6;
 const CH = /^[CDG][A-Z0-9]{6,}$/, TS = /^\d{9,}\.\d{3,6}$/, UID = /^[UW][A-Z0-9]{6,}$/;
 
@@ -107,13 +107,16 @@ export async function addNotes(user, lines, f = fetch) {
    Slack. It is kept in a list the page shows back, and added to Bruce's notes on that person, so he reads it in his next run with them
    (his notes arrive with the run, newest first). Owner only. */
 const SUGGEST_KEY = 'gw:bruce:suggest', MAX_SUGGEST = 200;
-export async function addSuggestion(user, name, text, f = fetch) {
+export async function addSuggestion(user, name, text, f = fetch, about = null) {
   const cfg = store(); if (!cfg || !UID.test(String(user || ''))) return false;
   const t = String(text || '').replace(/\s+/g, ' ').trim().slice(0, 500);
   if (!t) return false;
   const row = { at: new Date().toISOString(), user: String(user), name: String(name || user).replace(/\s+/g, ' ').trim().slice(0, 80), text: t };
+  /* `about`: the message the owner was pointing at when they wrote it (hovering a message in the drawer) */
+  const q = about && typeof about === 'object' ? String(about.text || '').replace(/\s+/g, ' ').trim().slice(0, 240) : '';
+  if (q) row.about = { text: q, from: about.from === 'bruce' ? 'bruce' : 'person', name: String(about.name || '').replace(/\s+/g, ' ').trim().slice(0, 80), at: Number(about.at) || 0 };
   await redis(cfg, [['LPUSH', SUGGEST_KEY, JSON.stringify(row)], ['LTRIM', SUGGEST_KEY, '0', String(MAX_SUGGEST - 1)]], f);
-  await addNotes(row.user, ['Suggestion from Utsav, for how you handle them: ' + t.slice(0, 190)], f);
+  await addNotes(row.user, [q ? 'Suggestion from Utsav, on ' + (row.about.from === 'bruce' ? 'your' : 'their') + ' message "' + q.slice(0, 60) + '": ' + t.slice(0, 110) : 'Suggestion from Utsav, for how you handle them: ' + t.slice(0, 190)], f);
   return row;
 }
 export async function readSuggestions(user, f = fetch) {
@@ -167,6 +170,33 @@ export async function slackName(token, user, f = fetch) {
   }
   if (name && cfg) { try { await redis(cfg, [['HSET', NAMES_KEY, user, name]], f); } catch { /* fine */ } }
   return name || user;
+}
+
+/* A person's Slack profile picture (Utsav, 9 Oct 2026: "show the real profile picture"). Cached like the names. `users` is looked up
+   in one read; the ones with no cached picture are asked of Slack, at most `max` per call so a long list does not hit its rate limit
+   (the rest fill in on the next call). Only https URLs on Slack's own picture hosts are kept, since the page shows them as images.
+   Returns { id: url } for the ones it has. */
+const PIC_OK = /^https:\/\/(avatars\.slack-edge\.com|secure\.gravatar\.com|[a-z0-9-]+\.slack-edge\.com)\//;
+export async function slackPics(token, users, { f = fetch, max = 12 } = {}) {
+  const ids = [...new Set((users || []).map(String).filter((u) => UID.test(u)))].slice(0, 80);
+  const out = {}; if (!ids.length) return out;
+  const cfg = store();
+  if (cfg) {
+    try { const [{ result }] = await redis(cfg, [['HMGET', PICS_KEY, ...ids]], f); (result || []).forEach((v, i) => { if (v && PIC_OK.test(String(v))) out[ids[i]] = String(v); }); } catch { /* look them up */ }
+  }
+  if (!token) return out;
+  let asked = 0;
+  for (const id of ids) {
+    if (out[id] || asked >= max) continue;
+    asked++;
+    try {
+      const r = await f(`https://slack.com/api/users.info?user=${encodeURIComponent(id)}`, { headers: { authorization: `Bearer ${token}` } });
+      const j = await r.json(); const pr = j && j.ok && j.user && j.user.profile;
+      const url = pr ? String(pr.image_72 || pr.image_48 || '') : '';
+      if (PIC_OK.test(url)) { out[id] = url; if (cfg) { try { await redis(cfg, [['HSET', PICS_KEY, id, url]], f); } catch { /* fine */ } } }
+    } catch { /* no picture for them yet */ }
+  }
+  return out;
 }
 
 /* What an ask is about, from its words. First rule wins, so the order matters. Plain rules on purpose: it has to be
@@ -394,6 +424,7 @@ export async function readDM({ token, user, ch }, f = fetch) {
     if (r.ok) (r.messages || []).forEach((m) => { if (!all.has(m.ts)) all.set(m.ts, m); });   /* the parent is in both; keep the history copy */
   }
   const person = await slackName(token, user, f);
+  const pic = (await slackPics(token, [user], { f }))[user] || '';
   const messages = [...all.values()].sort((a, b) => Number(a.ts) - Number(b.ts)).map((m) => ({
     from: m.user === user ? 'person' : 'bruce',
     name: m.user === user ? person : 'Bruce',
@@ -404,7 +435,7 @@ export async function readDM({ token, user, ch }, f = fetch) {
     links: linksOf(m.text),
     files: (m.files || []).slice(0, 6).map(fileOf),
   })).filter((m) => m.text || m.files.length);
-  return { ok: true, channel, person, messages: messages.slice(-400), truncated: !!cursor || messages.length > 400 };
+  return { ok: true, channel, person, pic, messages: messages.slice(-400), truncated: !!cursor || messages.length > 400 };
 }
 
 /* ---- the endpoint: GET reads the caller's notes, POST { notes: [...] } adds to them. Bearer = the per-run token. ---- */
@@ -418,7 +449,7 @@ export default async function handler(req, res) {
     try {
       if (req.method === 'GET') return res.status(200).json({ suggestions: await readSuggestions(String(req.query.user || '')) });
       let body = req.body; if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
-      const row = await addSuggestion(body && body.user, body && body.name, body && body.text);
+      const row = await addSuggestion(body && body.user, body && body.name, body && body.text, fetch, body && body.about);
       return row ? res.status(200).json({ ok: true, suggestion: row }) : res.status(400).json({ error: 'Nothing to save.' });
     } catch { return res.status(502).json({ error: 'Could not save that.' }); }
   }
@@ -435,7 +466,8 @@ export default async function handler(req, res) {
         if (r.kind !== 'sent' && !r.topic) r.topic = topicOf(r.text);                   /* rows logged before topics existed */
         if (!r.reported && r.kind === 'run' && weightOf(r.text) === 'chat') r.kind = 'chat';   /* no report from his session: the words stand in */
       }
-      return res.status(200).json({ configured: true, rows: shown, owner: String(process.env.OWNER_SLACK_ID || ''), cap: dailyCap() });
+      const pics = await slackPics(process.env.SLACK_BOT_TOKEN, shown.map((r) => r.user)).catch(() => ({}));
+      return res.status(200).json({ configured: true, rows: shown, pics, owner: String(process.env.OWNER_SLACK_ID || ''), cap: dailyCap() });
     } catch { return res.status(502).json({ error: 'Could not read the log.' }); }
   }
   // ?conversation=1&user=U…[&ch=D…&ts=…][&at=ms]: the owner reads one thread of a DM, live from Slack. Owner only; nothing is kept.

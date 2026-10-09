@@ -133,7 +133,7 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
             <button type="button" role="tab" class="gd-tabs__tab" aria-selected="false" tabindex="-1" data-dt="details">Details</button>
             <button type="button" role="tab" class="gd-tabs__tab" aria-selected="false" tabindex="-1" data-dt="shared" id="ag-d-shared">Shared</button>
             <button type="button" role="tab" class="gd-tabs__tab" aria-selected="false" tabindex="-1" data-dt="log">Log</button>
-            <button type="button" role="tab" class="gd-tabs__tab" aria-selected="false" tabindex="-1" data-dt="suggest">Suggest</button>
+            <button type="button" role="tab" class="gd-tabs__tab" aria-selected="false" tabindex="-1" data-dt="suggest" id="ag-d-suggest">Suggest</button>
           </div></div></div>
           <div class="gd-drawer__tools">
             <span id="ag-d-badge"></span>
@@ -181,12 +181,16 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
   var STATE_LABEL = { ok: 'Running well', warn: 'Worth a look', fail: 'Needs attention', unknown: 'Cannot tell yet' };
   var TONE = { ok: 'good', warn: 'warn', fail: 'bad', unknown: 'neutral' };
   var REVIEW = '/internal/design-system#review';
-  var S = { data: null, health: null, healthErr: '', bruce: null, bruceErr: '', owner: '', cap: 3, usage: null, alfred: null, alfredErr: '', period: '7', tab: 'all', at: 0, busy: false,
+  var S = { sg: {}, pics: {}, data: null, health: null, healthErr: '', bruce: null, bruceErr: '', owner: '', cap: 3, usage: null, alfred: null, alfredErr: '', period: '7', tab: 'all', at: 0, busy: false,
             dm: {}, seq: 0, openUser: '', dtab: 'chat', order: [], convs: [] };
 
   /* ---------- small library pieces ---------- */
   function badge(tone, label) { return '<span class="gd-badge gd-badge--' + tone + '">' + esc(label) + '</span>'; }
   function tag(label, tone) { return '<span class="gd-tag' + (tone ? ' gd-tag--' + tone : '') + '"><span class="gd-tag__label">' + esc(label) + '</span></span>'; }
+  /* a person's own Slack picture where we have it, the first letter where we do not */
+  var PICRE = /^https:\/\//;
+  function picOf(user) { var u = S.pics && S.pics[user]; return u && PICRE.test(u) ? u : ''; }
+  function faceTile(user, name) { var u = picOf(user); return '<span class="gd-table__avatar' + (u ? ' ag-face' : '') + '" aria-hidden="true">' + (u ? '<img src="' + esc(u) + '" alt="" loading="lazy" referrerpolicy="no-referrer">' : initial(name)) + '</span>'; }
   function initial(n) { return esc(String(n || '?').trim().charAt(0).toUpperCase() || '?'); }
   function card(title, desc, body, o) {
     o = o || {};
@@ -500,7 +504,7 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
         var tags = Object.keys(c.topics).sort(function (x, y) { return c.topics[y] - c.topics[x]; }).slice(0, 2).map(function (t) { return tag(TOPIC[t] + (c.topics[t] > 1 ? ' ×' + c.topics[t] : ''), t === 'other' ? 'warn' : ''); }).join('');
         var pv = c.preview ? (c.preview.by === 'bruce' ? 'Bruce: ' : (c.preview.thread ? '↳ ' : '')) + c.preview.text : '';
         return { attrs: ' data-u="' + esc(c.user) + '"', t: ['', pv, '', '', ''], cells: [
-          '<span class="gd-table__avatar" aria-hidden="true">' + initial(c.name) + '</span><span class="gd-table__who"><a class="gd-table__link" href="#" data-u="' + esc(c.user) + '">' + esc(c.name) + '</a>' + (c.role === 'owner' ? '<small>Owner</small>' : '') + '</span>' + (isNew(c.user) ? badge('info', 'New') : ''),
+          faceTile(c.user, c.name) + '<span class="gd-table__who"><a class="gd-table__link" href="#" data-u="' + esc(c.user) + '">' + esc(c.name) + '</a>' + (c.role === 'owner' ? '<small>Owner</small>' : '') + '</span>' + (isNew(c.user) ? badge('info', 'New') : ''),
           esc(clip(pv, 140)), tags, String(c.asks.length), '<time datetime="' + c.last.toISOString() + '">' + esc(ago(Date.now() - c.last.getTime())) + '</time>'] };
       })) : empty('no-results', 'No chats in this period', 'Try a longer period.'), { flush: !!convs.length });
 
@@ -512,7 +516,7 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
       { h: 'Person', w: 'minmax(190px,1fr)', flex: true }, { h: 'Started using him', w: '160px', muted: true }, { h: 'Last asked', w: '130px', muted: true }, { h: 'Asks', w: '70px', num: true }, { h: 'Runs', w: '70px', num: true }],
       users.slice(0, 20).map(function (u) {
         return { attrs: ' data-u="' + esc(u.user) + '"', cells: [
-          '<span class="gd-table__avatar" aria-hidden="true">' + initial(u.name) + '</span><span class="gd-table__who"><a class="gd-table__link" href="#" data-u="' + esc(u.user) + '">' + esc(u.name) + '</a>' + (u.role === 'owner' ? '<small>Owner</small>' : '') + '</span>' + (isNew(u.user) ? badge('info', 'New') : ''),
+          faceTile(u.user, u.name) + '<span class="gd-table__who"><a class="gd-table__link" href="#" data-u="' + esc(u.user) + '">' + esc(u.name) + '</a>' + (u.role === 'owner' ? '<small>Owner</small>' : '') + '</span>' + (isNew(u.user) ? badge('info', 'New') : ''),
           '<time datetime="' + u.first.toISOString() + '">' + esc(fmtWhen(u.first)) + '</time>', '<time datetime="' + u.last.toISOString() + '">' + esc(ago(Date.now() - u.last.getTime())) + '</time>', String(u.asks), String(u.runs)] };
       })), { flush: true, foot: users.length > 20 ? '<span class="gd-card__desc">Showing the newest 20 of ' + users.length + '.</span>' : '' });
 
@@ -581,13 +585,13 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
        under it, a day line between days, and no second picture for a message straight after one from the same person. */
     var html = '<div class="gd-thread" role="log">', day = '', prevFrom = '', prevAt = 0;
     if (j.truncated) html += '<p class="gd-card__desc">Showing the newest ' + j.messages.length + ' messages. Older ones are in Slack.</p>';
-    j.messages.forEach(function (m) {
+    j.messages.forEach(function (m, mi) {
       var d = new Date(m.at), dl = fmtDay(d), bot = m.from === 'bruce', newDay = dl !== day;
       var files = (m.files || []).map(function (f) { var l = esc(f.name) + (f.type ? ' · ' + esc(f.type) : ''); return f.url && /^https:\/\//.test(f.url) ? '<a class="gd-tag" href="' + esc(f.url) + '" target="_blank" rel="noopener noreferrer"><span class="gd-tag__label">' + l + '</span></a>' : tag(f.name); }).join('');
       if (newDay) html += '<div class="gd-thread__day"><span>' + esc(dl) + '</span></div>';
       var cont = !newDay && prevFrom === m.from && (d.getTime() - prevAt) < 5 * 60e3;       /* the same sender within five minutes */
-      html += '<div class="gd-msg' + (cont ? ' gd-msg--cont' : '') + '">' +
-        (cont ? '' : (bot ? '<span class="gd-msg__pic" role="img" aria-label="Bruce" style="background-image:url(/assets/agents/bruce.jpg)"></span>' : '<span class="gd-avatar gd-avatar--team" data-gd-avatar="' + esc(m.name) + '" role="img" aria-label="' + esc(m.name) + '"></span>')) +
+      html += '<div class="gd-msg' + (cont ? ' gd-msg--cont' : '') + '" data-i="' + mi + '"><button type="button" class="gd-btn gd-btn--sm gd-msg__act" data-sg-open="' + mi + '" aria-label="Suggest something to Bruce about this message"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M176 232a8 8 0 0 1-8 8H88a8 8 0 0 1 0-16h80a8 8 0 0 1 8 8Zm40-128a87.55 87.55 0 0 1-33.64 69.21A16.24 16.24 0 0 0 176 186v6a16 16 0 0 1-16 16H96a16 16 0 0 1-16-16v-6a16 16 0 0 0-6.23-12.66A87.59 87.59 0 0 1 40 104.49C39.74 56.83 78.26 17.14 125.88 16A88 88 0 0 1 216 104Z"/></svg>Suggest</button>' +
+        (cont ? '' : (bot ? '<span class="gd-msg__pic" role="img" aria-label="Bruce" style="background-image:url(/assets/agents/bruce.jpg)"></span>' : (j.pic && PICRE.test(j.pic) ? '<span class="gd-msg__pic" role="img" aria-label="' + esc(m.name) + '" style="background-image:url(' + esc(j.pic) + ');background-size:cover;background-position:center"></span>' : '<span class="gd-avatar gd-avatar--team" data-gd-avatar="' + esc(m.name) + '" role="img" aria-label="' + esc(m.name) + '"></span>'))) +
         '<div class="gd-msg__main">' + (cont ? '' : '<div class="gd-msg__head"><b>' + esc(m.name) + '</b>' + (bot ? badge('neutral', 'Agent') : '') + '<time>' + esc(fmtTime(d)) + '</time>' + (m.reply ? '<span class="gd-msg__note">in a thread</span>' : '') + '</div>') +
         (m.text ? '<div class="gd-msg__text">' + linkify(m.text) + '</div>' : '') + (files ? '<div class="gd-msg__files">' + files + '</div>' : '') + '</div></div>';
       day = dl; prevFrom = m.from; prevAt = d.getTime();
@@ -625,11 +629,37 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
     if (!rows.length) return '<p class="gd-card__desc">Nothing yet. What you save here shows up below.</p>';
     return '<div class="gd-thread" role="log">' + rows.map(function (r) {
       var d = new Date(r.at);
-      return '<div class="gd-msg"><span class="gd-avatar gd-avatar--team" data-gd-avatar="Utsav" role="img" aria-label="You"></span><div class="gd-msg__main"><div class="gd-msg__head"><b>You</b><time>' + esc(fmtWhen(d)) + '</time></div><div class="gd-msg__text">' + esc(r.text) + '</div></div></div>';
+      var me = picOf(S.owner);
+      return '<div class="gd-msg">' + (me ? '<span class="gd-msg__pic" role="img" aria-label="You" style="background-image:url(' + esc(me) + ');background-size:cover;background-position:center"></span>' : '<span class="gd-avatar gd-avatar--team" data-gd-avatar="Utsav" role="img" aria-label="You"></span>') + '<div class="gd-msg__main"><div class="gd-msg__head"><b>You</b><time>' + esc(fmtWhen(d)) + '</time></div>' +
+        (r.about && r.about.text ? '<blockquote class="gd-msg__quote">' + esc(r.about.from === 'bruce' ? 'Bruce' : (r.about.name || 'They')) + ': ' + esc(clip(r.about.text, 160)) + '</blockquote>' : '') + '<div class="gd-msg__text">' + esc(r.text) + '</div></div></div>';
     }).join('') + '</div>';
+  }
+  function setSuggested(user, rows) { S.sg[user] = rows; if (S.openUser === user) $('ag-d-suggest').textContent = 'Suggest' + (rows.length ? ' ' + rows.length : ''); }
+  /* Suggest on one message: the side box under it. It saves a note for Bruce with the message attached, and it shows in the Suggest tab. */
+  function closeSide() { document.querySelectorAll('.gd-msg--side').forEach(function (m) { m.classList.remove('gd-msg--side'); var b = m.querySelector('.gd-msg__side'); if (b) b.remove(); }); }
+  function openSide(i) {
+    var j = S.dm[S.openUser], m = j && j.messages && j.messages[i], row = document.querySelector('#ag-thread .gd-msg[data-i="' + i + '"]'); if (!m || !row) return;
+    var was = row.classList.contains('gd-msg--side'); closeSide(); if (was) return;
+    row.classList.add('gd-msg--side');
+    var name = m.from === 'bruce' ? 'Bruce' : m.name;
+    row.querySelector('.gd-msg__main').insertAdjacentHTML('beforeend', '<div class="gd-msg__side"><blockquote class="gd-msg__quote">' + esc(name) + ': ' + esc(clip(m.text || '', 160)) + '</blockquote>' +
+      '<textarea class="gd-textarea" rows="3" maxlength="500" placeholder="What could Bruce do differently here? Only he reads it." aria-label="Your suggestion"></textarea>' +
+      '<div class="gd-msg__side-foot"><button type="button" class="gd-btn gd-btn--sm gd-btn--primary" data-sg-go="' + i + '">Save to Suggest</button><button type="button" class="gd-btn gd-btn--sm" data-sg-x>Cancel</button><span class="gd-card__desc" role="status"></span></div></div>');
+    var ta = row.querySelector('.gd-msg__side textarea'); if (ta) ta.focus();
+  }
+  function saveSide(i) {
+    var j = S.dm[S.openUser], m = j && j.messages && j.messages[i], row = document.querySelector('#ag-thread .gd-msg[data-i="' + i + '"]'); if (!m || !row) return;
+    var ta = row.querySelector('.gd-msg__side textarea'), note = row.querySelector('.gd-msg__side .gd-card__desc'), btn = row.querySelector('[data-sg-go]'), text = ta ? ta.value.trim() : '', c = cur().c, user = S.openUser;
+    if (!text) { note.textContent = 'Write the suggestion first.'; return; }
+    btn.setAttribute('aria-busy', 'true'); note.textContent = '';
+    fetch('/api/bruce-memory?suggest=1', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ user: user, name: c.name, text: text, about: { text: m.text || '', from: m.from, name: m.name, at: m.at } }) })
+      .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+      .then(function () { closeSide(); loadSuggestions(user); })
+      .catch(function () { btn.removeAttribute('aria-busy'); note.textContent = 'Could not save that. Try again.'; });
   }
   function loadSuggestions(user) {
     fetch('/api/bruce-memory?suggest=1&user=' + encodeURIComponent(user), { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+      if (j) setSuggested(user, j.suggestions || []);
       var box = $('ag-sg-list'); if (!box || S.openUser !== user || S.dtab !== 'suggest') return;
       box.innerHTML = j ? suggestListHTML(j.suggestions || []) : '<p class="gd-card__desc">Could not read what was saved.</p>';
     }).catch(function () { var box = $('ag-sg-list'); if (box) box.innerHTML = '<p class="gd-card__desc">Could not read what was saved.</p>'; });
@@ -665,7 +695,7 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
   }
   function openConv(user, keepTab) {
     var d = $('ag-drawer');
-    S.openUser = user; drawerHead(); setShared(S.dm[user]); showDTab(keepTab && S.dtab ? S.dtab : 'chat');       /* stepping to the next chat stays on the tab you are on */
+    S.openUser = user; drawerHead(); setShared(S.dm[user]); setSuggested(user, S.sg[user] || []); loadSuggestions(user); showDTab(keepTab && S.dtab ? S.dtab : 'chat');       /* stepping to the next chat stays on the tab you are on */
     if (!d.open && window.GD && GD.feedback) GD.feedback.open(d); else if (!d.open && d.showModal) d.showModal();
     loadDM(user, personRows(user));
   }
@@ -692,7 +722,7 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
       if (r.status === 401 || r.status === 403) { S.bruceErr = 'Owners only'; return null; } if (!r.ok) throw new Error('http'); return r.json();
     }).then(function (j) {
       if (!j) return; if (!j.configured) { S.bruceErr = 'No store connected, so nothing is logged'; return; }
-      S.owner = String(j.owner || ''); S.cap = Number(j.cap) || 3; S.dm = {};
+      S.pics = j.pics && typeof j.pics === 'object' ? j.pics : {}; S.owner = String(j.owner || ''); S.cap = Number(j.cap) || 3; S.dm = {};
       S.bruce = (j.rows || []).map(function (r) { var d = new Date(r.at); return isNaN(d.getTime()) ? null : { at: d, user: String(r.user || ''), name: String(r.name || r.user || ''), role: r.role === 'owner' ? 'owner' : 'teammate', kind: String(r.kind || 'run'), thread: !!r.thread, text: String(r.text || ''), topic: r.topic || (r.kind === 'sent' ? '' : 'other'), to: String(r.toName || ''), toId: String(r.to || ''), ch: String(r.ch || ''), skills: Array.isArray(r.skills) ? r.skills : [], tokens: Number(r.tokens) || 0, reported: !!r.reported }; }).filter(Boolean);
     }).catch(function () { S.bruceErr = 'Could not read his log'; });
   }
@@ -726,7 +756,10 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
     }
     var p = e.target.closest && e.target.closest('#ag-period .gd-tabs__tab'); if (p) { S.period = p.getAttribute('data-value'); render(); return; }
     var dt = e.target.closest && e.target.closest('#ag-d-tabs [data-dt]'); if (dt) { showDTab(dt.getAttribute('data-dt')); return; }
-    if (e.target.closest && e.target.closest('#ag-sg-save')) saveSuggestion();
+    if (e.target.closest && e.target.closest('#ag-sg-save')) { saveSuggestion(); return; }
+    var so = e.target.closest && e.target.closest('[data-sg-open]'); if (so) { openSide(+so.getAttribute('data-sg-open')); return; }
+    var sg = e.target.closest && e.target.closest('[data-sg-go]'); if (sg) { saveSide(+sg.getAttribute('data-sg-go')); return; }
+    if (e.target.closest && e.target.closest('[data-sg-x]')) closeSide();
   });
   $('ag-tabs').addEventListener('keydown', function (ev) {
     var ids = [].slice.call(document.querySelectorAll('#ag-tabs .gd-tabs__tab')).map(function (b) { return b.getAttribute('data-tab'); }), i = ids.indexOf(S.tab);
