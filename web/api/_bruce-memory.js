@@ -532,7 +532,7 @@ export default async function handler(req, res) {
         if (r.kind !== 'sent' && !r.topic) r.topic = topicOf(r.text);                   /* rows logged before topics existed */
         if (!r.reported && r.kind === 'run' && weightOf(r.text) === 'chat') r.kind = 'chat';   /* no report from his session: the words stand in */
       }
-      const pics = await slackPics(process.env.SLACK_BOT_TOKEN, shown.map((r) => r.user)).catch(() => ({}));
+      const pics = await slackPics(process.env.SLACK_BOT_TOKEN, shown.flatMap((r) => [r.user, r.to])).catch(() => ({}));
       return res.status(200).json({ configured: true, rows: shown, pics, owner: String(process.env.OWNER_SLACK_ID || ''), cap: dailyCap() });
     } catch { return res.status(502).json({ error: 'Could not read the log.' }); }
   }
