@@ -306,11 +306,9 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
     /* the team: the one new component on this page, the agent status card (see the library's data-display doc) */
     var html = '<section class="ag-team" aria-label="The team"><div class="gd-card__titles" style="margin-bottom:var(--gd-gap)"><h3 class="gd-card__title">The team</h3></div><div class="gd-grid">' +
       list.map(function (s) {
-        var n = s.needs.length;
         return '<div class="gd-span-4"><a class="gd-agent-status" href="#' + esc(s.id) + '" data-tab="' + esc(s.id) + '"><span class="gd-agent-status__top">' + (pic(s.a) ? '<span class="gd-avatar gd-avatar--lg ag-face" role="img" aria-label="' + esc(s.a.name) + '">' + pic(s.a) + '</span>' : '<span class="gd-avatar gd-avatar--team gd-avatar--lg" data-gd-avatar="' + esc(s.a.name) + '" role="img" aria-label="' + esc(s.a.name) + '"></span>') + '' +
           '<span class="gd-agent-status__who"><b>' + esc(s.a.name) + '</b><small>' + esc(s.a.role) + '</small></span>' + badge(TONE[s.state], stateLabel(s)) + '</span>' +
-          '<span class="gd-agent-status__now">' + esc(s.doing) + '</span>' + use(s, total) +
-          '<span class="gd-agent-status__foot">' + (n ? badge('warn', plural(n, 'thing') + ' for you') : '<span>' + (s.known ? 'Nothing needed from you' : 'Waiting for data') + '</span>') + '</span></a></div>';
+          '<span class="gd-agent-status__now">' + esc(s.doing) + '</span>' + use(s, total) + '</a></div>';
       }).join('') + '</div></section>';
     html += needsCard(needs, true);
     html += '<p class="gd-card__desc">Each agent is recorded in git, with its memory. To add one, see <a class="gd-table__link" href="https://github.com/gushwork-design/design-system/blob/main/agents/README.md" target="_blank" rel="noopener noreferrer">agents/README</a>.</p>';
