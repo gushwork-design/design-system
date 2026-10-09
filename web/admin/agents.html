@@ -637,9 +637,9 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
   }
   /* Suggest: a note for Bruce about how to handle this person. It is not a message: nothing is sent to them or to Slack. */
   function suggestHTML(c) {
-    return '<p class="gd-card__desc">Tell Bruce what he could do differently with ' + esc(c.name) + '. This is a note for him, not a message: nothing is sent to ' + esc(c.name) + ' or to Slack, and Bruce reads it the next time they talk.</p>' +
+    return '<p class="gd-card__desc">Tell Bruce what he could do differently with ' + esc(c.name) + '. This is a note for him, not a message: nothing is sent to ' + esc(c.name) + '. When you save, Bruce reads it straight away and replies in your DM with how he will apply it.</p>' +
       '<div class="gd-field" style="margin-top:16px"><label class="gd-field__label" for="ag-sg-text">Your suggestion</label><textarea id="ag-sg-text" class="gd-textarea" rows="4" maxlength="500" placeholder="For example: ask who the audience is before building a one-pager"></textarea></div>' +
-      '<div style="display:flex;align-items:center;gap:12px;margin-top:12px"><button type="button" class="gd-btn gd-btn--primary" id="ag-sg-save">Save suggestion</button><span class="gd-card__desc" id="ag-sg-note" role="status"></span></div>' +
+      '<div style="margin-top:12px"><label class="gd-check"><input type="checkbox" id="ag-sg-pat"><span class="gd-check__box"></span><span class="gd-check__label">Also make this a pattern for everyone</span></label></div><div style="display:flex;align-items:center;gap:12px;margin-top:12px"><button type="button" class="gd-btn gd-btn--primary" id="ag-sg-save">Save suggestion</button><span class="gd-card__desc" id="ag-sg-note" role="status"></span></div>' +
       '<h4 class="gd-card__title" style="margin:24px 0 8px">Saved for Bruce</h4><div id="ag-sg-list">' + ghostThread(2) + '</div>';
   }
   function suggestListHTML(rows) {
@@ -647,7 +647,7 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
     return '<div class="gd-thread" role="log">' + rows.map(function (r) {
       var d = new Date(r.at);
       var me = picOf(S.owner);
-      return '<div class="gd-msg" data-sid="' + esc(r.id || r.at) + '"><span class="gd-msg__acts"><button type="button" class="gd-btn gd-btn--sm" data-pt-open="' + esc(r.id || r.at) + '" aria-label="Make this a pattern for everyone">Make a pattern</button><button type="button" class="gd-btn gd-btn--sm" data-sg-del="' + esc(r.id || r.at) + '" aria-label="Delete this suggestion">Delete</button></span>' + (me ? '<span class="gd-msg__pic" role="img" aria-label="You" style="background-image:url(' + esc(me) + ');background-size:cover;background-position:center"></span>' : '<span class="gd-avatar gd-avatar--team" data-gd-avatar="Utsav" role="img" aria-label="You"></span>') + '<div class="gd-msg__main"><div class="gd-msg__head"><b>You</b><time>' + esc(fmtWhen(d)) + '</time></div>' +
+      return '<div class="gd-msg" data-sid="' + esc(r.id || r.at) + '"><span class="gd-msg__acts"><button type="button" class="gd-btn gd-btn--sm" data-pt-open="' + esc(r.id || r.at) + '" aria-label="Make this a pattern for everyone">Make a pattern</button><button type="button" class="gd-btn gd-btn--sm" data-sg-del="' + esc(r.id || r.at) + '" aria-label="Delete this suggestion">Delete</button></span>' + (me ? '<span class="gd-msg__pic" role="img" aria-label="You" style="background-image:url(' + esc(me) + ');background-size:cover;background-position:center"></span>' : '<span class="gd-avatar gd-avatar--team" data-gd-avatar="Utsav" role="img" aria-label="You"></span>') + '<div class="gd-msg__main"><div class="gd-msg__head"><b>You</b><time>' + esc(fmtWhen(d)) + '</time>' + (r.pattern ? '<span class="ag-pat-b">' + badge('info', 'Pattern') + '</span>' : '') + '</div>' +
         (r.about && r.about.text ? '<blockquote class="gd-msg__quote">' + esc(r.about.from === 'bruce' ? 'Bruce' : (r.about.name || 'They')) + ': ' + esc(clip(r.about.text, 160)) + '</blockquote>' : '') + '<div class="gd-msg__text">' + esc(r.text) + '</div></div></div>';
     }).join('') + '</div>';
   }
@@ -660,8 +660,8 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
     row.classList.add('gd-msg--side');
     var name = m.from === 'bruce' ? 'Bruce' : m.name;
     row.querySelector('.gd-msg__main').insertAdjacentHTML('beforeend', '<div class="gd-msg__side"><blockquote class="gd-msg__quote">' + esc(name) + ': ' + esc(clip(m.text || '', 160)) + '</blockquote>' +
-      '<textarea class="gd-textarea" rows="3" maxlength="500" placeholder="What could Bruce do differently here? Only he reads it." aria-label="Your suggestion"></textarea>' +
-      '<div class="gd-msg__side-foot"><button type="button" class="gd-btn gd-btn--sm gd-btn--primary" data-sg-go="' + i + '">Save to Suggest</button><button type="button" class="gd-btn gd-btn--sm" data-sg-x>Cancel</button><span class="gd-card__desc" role="status"></span></div></div>');
+      '<textarea class="gd-textarea" rows="3" maxlength="500" placeholder="What could Bruce do differently here? Saving starts Bruce, and he replies in your DM." aria-label="Your suggestion"></textarea>' +
+      '<div><label class="gd-check"><input type="checkbox" data-sg-pat><span class="gd-check__box"></span><span class="gd-check__label">Also make this a pattern for everyone</span></label></div><div class="gd-msg__side-foot"><button type="button" class="gd-btn gd-btn--sm gd-btn--primary" data-sg-go="' + i + '">Save to Suggest</button><button type="button" class="gd-btn gd-btn--sm" data-sg-x>Cancel</button><span class="gd-card__desc" role="status"></span></div></div>');
     var ta = row.querySelector('.gd-msg__side textarea'); if (ta) ta.focus();
   }
   function saveSide(i) {
@@ -669,9 +669,9 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
     var ta = row.querySelector('.gd-msg__side textarea'), note = row.querySelector('.gd-msg__side .gd-card__desc'), btn = row.querySelector('[data-sg-go]'), text = ta ? ta.value.trim() : '', c = cur().c, user = S.openUser;
     if (!text) { note.textContent = 'Write the suggestion first.'; return; }
     btn.setAttribute('aria-busy', 'true'); note.textContent = '';
-    fetch('/api/bruce-memory?suggest=1', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ user: user, name: c.name, text: text, about: { text: m.text || '', from: m.from, name: m.name, at: m.at } }) })
+    fetch('/api/bruce-memory?suggest=1', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ user: user, name: c.name, text: text, about: { text: m.text || '', from: m.from, name: m.name, at: m.at }, pattern: !!(row.querySelector('[data-sg-pat]') && row.querySelector('[data-sg-pat]').checked) }) })
       .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
-      .then(function () { closeSide(); loadSuggestions(user); })
+      .then(function (j) { afterSaved(j); btn.removeAttribute('aria-busy'); btn.hidden = true; note.textContent = runNote(j); loadSuggestions(user); setTimeout(closeSide, 3500); })
       .catch(function () { btn.removeAttribute('aria-busy'); note.textContent = 'Could not save that. Try again.'; });
   }
   /* Make a pattern: the owner turns a suggestion into one for everyone, editing it first (take out names). It shows on Bruce's tab. */
@@ -715,6 +715,9 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
       S.patterns.map(function (p) { return { cells: [esc(p.text), '<time datetime="' + esc(p.at) + '">' + esc(fmtWhen(new Date(p.at))) + '</time>', '<button type="button" class="gd-btn gd-btn--sm" data-pt-del="' + esc(p.id) + '">Delete</button>'] }; }));
     return foldCard('ag-pat', 'How Bruce talks to people' + (S.patterns && S.patterns.length ? ' · ' + S.patterns.length : ''), body);
   }
+  /* what the owner is told after a save: whether Bruce was started (he replies in the owner's DM), or why not */
+  function runNote(j) { return j && j.run && j.run.fired ? 'Saved. Bruce is reading it, and replies in your DM.' : 'Saved. Bruce could not be started' + (j && j.run && j.run.why ? ' (' + j.run.why + ')' : '') + ', so he reads it on his next run.'; }
+  function afterSaved(j) { if (j && j.suggestion && j.suggestion.pattern) loadPatterns().then(function () { if (S.tab === 'bruce') render(); }); }
   function deleteSuggestion(id, btn) {
     var user = S.openUser; btn.setAttribute('aria-busy', 'true');
     fetch('/api/bruce-memory?suggest=1', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ user: user, remove: id }) })
@@ -733,9 +736,9 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
     var ta = $('ag-sg-text'), note = $('ag-sg-note'), btn = $('ag-sg-save'), text = ta ? ta.value.trim() : '', c = cur().c;
     if (!text) { note.textContent = 'Write the suggestion first.'; return; }
     btn.setAttribute('aria-busy', 'true'); note.textContent = '';
-    fetch('/api/bruce-memory?suggest=1', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ user: S.openUser, name: c.name, text: text }) })
+    fetch('/api/bruce-memory?suggest=1', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ user: S.openUser, name: c.name, text: text, pattern: !!($('ag-sg-pat') && $('ag-sg-pat').checked) }) })
       .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
-      .then(function () { btn.removeAttribute('aria-busy'); if ($('ag-sg-text')) { $('ag-sg-text').value = ''; note.textContent = 'Saved. Bruce reads it next time.'; loadSuggestions(S.openUser); } })
+      .then(function (j) { btn.removeAttribute('aria-busy'); afterSaved(j); if ($('ag-sg-text')) { $('ag-sg-text').value = ''; if ($('ag-sg-pat')) $('ag-sg-pat').checked = false; note.textContent = runNote(j); loadSuggestions(S.openUser); } })
       .catch(function () { btn.removeAttribute('aria-busy'); note.textContent = 'Could not save that. Try again.'; });
   }
   function showDTab(t) {

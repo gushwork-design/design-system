@@ -51,6 +51,7 @@
 import crypto from 'node:crypto';
 import { sessionSecret, COOKIE, verify, readCookie } from './_session.js';
 import { isOwner } from './_access.js';
+import { fireBruce } from './_concierge.js';
 
 const MAX_NOTES = 30;
 const LOG_KEY = 'gw:bruce:log';
@@ -107,11 +108,12 @@ export async function addNotes(user, lines, f = fetch) {
    Slack. It is kept in a list the page shows back, and added to Bruce's notes on that person, so he reads it in his next run with them
    (his notes arrive with the run, newest first). Owner only. */
 const SUGGEST_KEY = 'gw:bruce:suggest', MAX_SUGGEST = 200;
-export async function addSuggestion(user, name, text, f = fetch, about = null) {
+export async function addSuggestion(user, name, text, f = fetch, about = null, pattern = false) {
   const cfg = store(); if (!cfg || !UID.test(String(user || ''))) return false;
   const t = String(text || '').replace(/\s+/g, ' ').trim().slice(0, 500);
   if (!t) return false;
   const at = new Date().toISOString(), row = { id: at + '.' + Math.random().toString(36).slice(2, 6), at, user: String(user), name: String(name || user).replace(/\s+/g, ' ').trim().slice(0, 80), text: t };
+  if (pattern) row.pattern = true;
   /* `about`: the message the owner was pointing at when they wrote it (hovering a message in the drawer) */
   const q = about && typeof about === 'object' ? String(about.text || '').replace(/\s+/g, ' ').trim().slice(0, 240) : '';
   if (q) row.about = { text: q, from: about.from === 'bruce' ? 'bruce' : 'person', name: String(about.name || '').replace(/\s+/g, ' ').trim().slice(0, 80), at: Number(about.at) || 0 };
@@ -143,6 +145,32 @@ export async function readSuggestions(user, f = fetch) {
   const out = [];
   for (const raw of result || []) { try { const o = JSON.parse(raw); if (o && o.at && (!user || o.user === user)) out.push(o); } catch { /* skip */ } }
   return out.slice(0, 30);
+}
+
+/* Saving a suggestion starts a Bruce run (Utsav, 9 Oct 2026: "saving should start a run", every save). The hub posts one line in the owner's
+   own DM with Bruce, as the anchor, and starts Bruce in that thread with what was saved; he replies there, once, with how he will
+   apply it. That reply is the check that he took it in. It goes to the owner only: never to the person the suggestion is about, and
+   he is told not to message anyone else or change anything. Best effort: the suggestion is saved either way. */
+export async function startSuggestionRun(row, { pattern = false, env = process.env, f = fetch } = {}) {
+  const token = env.SLACK_BOT_TOKEN, owner = env.OWNER_SLACK_ID;
+  if (!token || !owner || !UID.test(String(owner))) return { fired: false, why: 'the Slack app is not set up' };
+  try {
+    const o = await slackForm(token, 'conversations.open', { users: owner }, f);
+    const channel = o && o.ok && o.channel && o.channel.id;
+    if (!channel) return { fired: false, why: 'could not open your DM with Bruce' };
+    const about = row.about && row.about.text ? ` about ${row.about.from === 'bruce' ? 'your' : 'their'} message "${row.about.text.slice(0, 120)}"` : '';
+    const anchor = await slackForm(token, 'chat.postMessage', { channel, unfurl_links: 'false', text: `Suggestion saved for ${row.name}${pattern ? ' (a pattern for everyone)' : ''}: ${row.text.slice(0, 300)}` }, f);
+    if (!anchor || !anchor.ok || !anchor.ts) return { fired: false, why: 'could not post in your DM with Bruce' };
+    const ask = `Utsav saved a suggestion in the hub for how you handle ${row.name}${about}: "${row.text}". ` + (pattern ? 'He also marked it a pattern, so it applies to everyone from now on and is listed under "how to interact with people". ' : '') +
+      'Reply here, in one or two short sentences, with what you will do differently and with whom. Do not message anyone else, do not build or change anything, and do not repeat his words back.';
+    let notes = [], patterns = [], memoryToken = '';
+    try { notes = await readNotes(owner, f); } catch { /* fine */ }
+    try { patterns = (await readPatterns(f)).map((p) => p.text); } catch { /* fine */ }
+    try { memoryToken = mintToken(owner); } catch { /* fine */ }
+    const r = await fireBruce({ user: owner, channel, ts: anchor.ts, thread_ts: anchor.ts, text: ask }, env, f, { owner: true, notes, patterns, memoryToken, agent: false });
+    if (r.fired) { try { await logRun({ user: owner, name: 'Utsav', role: 'owner', kind: 'chat', text: `Saved a suggestion for ${row.name}: ${row.text}` }, f); } catch { /* fine */ } }
+    return r;
+  } catch { return { fired: false, why: 'could not reach Slack' }; }
 }
 
 /* ---- patterns: how to interact with people (Utsav, 9 Oct 2026) ----
@@ -501,8 +529,11 @@ export default async function handler(req, res) {
       if (req.method === 'GET') return res.status(200).json({ suggestions: await readSuggestions(String(req.query.user || '')) });
       let body = req.body; if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
       if (body && body.remove) return (await deleteSuggestion(String(body.user || ''), String(body.remove))) ? res.status(200).json({ ok: true }) : res.status(404).json({ error: 'No such suggestion.' });
-      const row = await addSuggestion(body && body.user, body && body.name, body && body.text, fetch, body && body.about);
-      return row ? res.status(200).json({ ok: true, suggestion: row }) : res.status(400).json({ error: 'Nothing to save.' });
+      const row = await addSuggestion(body && body.user, body && body.name, body && body.text, fetch, body && body.about, !!(body && body.pattern));
+      if (!row) return res.status(400).json({ error: 'Nothing to save.' });
+      if (row.pattern) { try { await addPattern(row.text); } catch { /* the suggestion is saved either way */ } }
+      const run = await startSuggestionRun(row, { pattern: !!row.pattern });
+      return res.status(200).json({ ok: true, suggestion: row, run: { fired: !!run.fired, why: run.fired ? '' : String(run.why || '') } });
     } catch { return res.status(502).json({ error: 'Could not save that.' }); }
   }
   // ?patterns=1: the owner's list of how-to-interact patterns. GET reads, POST { text } adds, POST { remove: id } deletes. Owner only.
