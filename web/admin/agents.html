@@ -97,7 +97,6 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
 }
 .ag-ctrl { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-16); flex-wrap: wrap; }
 .ag-ctrl[hidden] { display: none; }
-#ag-d-bar { position: sticky; top: calc(var(--gd-card-pad) * -1); z-index: 1; margin-top: calc(var(--gd-card-pad) * -1); padding: var(--gd-card-pad) 0 var(--gw-space-12); background: var(--gd-raised-bg, var(--gd-card-bg)); }   /* covers the drawer's top padding too, so nothing scrolls past above it */
 </style>
 </head>
 <body data-gw-page="agents">
@@ -129,21 +128,21 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
 
       <dialog class="gd-drawer" id="ag-drawer" aria-labelledby="ag-d-title">
         <div class="gd-drawer__head">
-          <div><div class="gd-drawer__sub" id="ag-d-sub">Conversation</div><h2 class="gd-drawer__title" id="ag-d-title">Conversation</h2></div>
-          <div class="gd-drawer__tools">
-            <button type="button" class="gd-iconbtn" id="ag-d-prev" aria-label="Previous conversation"><svg viewBox="0 0 256 256" fill="currentColor" width="16" height="16" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"/></svg></button>
-            <button type="button" class="gd-iconbtn" id="ag-d-next" aria-label="Next conversation"><svg viewBox="0 0 256 256" fill="currentColor" width="16" height="16" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></button>
-            <button type="button" class="gd-fb-close" data-gd-drawer-wide aria-pressed="false" aria-label="Open the drawer out"><svg viewBox="0 0 256 256" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M136,40V216a8,8,0,0,1-16,0V40a8,8,0,0,1,16,0ZM96,120H35.31l18.35-18.34A8,8,0,0,0,42.34,90.34l-32,32a8,8,0,0,0,0,11.32l32,32a8,8,0,0,0,11.32-11.32L35.31,136H96a8,8,0,0,0,0-16Zm149.66,2.34-32-32a8,8,0,0,0-11.32,11.32L220.69,120H160a8,8,0,0,0,0,16h60.69l-18.35,18.34a8,8,0,0,0,11.32,11.32l32-32A8,8,0,0,0,245.66,122.34Z"/></svg></button>
-            <button type="button" class="gd-fb-close" data-gd-close aria-label="Close"><svg viewBox="0 0 256 256" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button>
-          </div>
-        </div>
-        <div class="gd-drawer__body">
-          <div id="ag-d-bar"><div class="gd-tabs gd-tabs--pill" id="ag-d-tabs" role="tablist" aria-label="Conversation views">
+          <div><div class="gd-drawer__sub" id="ag-d-sub">Conversation</div><h2 class="gd-drawer__title" id="ag-d-title">Conversation</h2><div style="margin-top: var(--gw-space-12)"><div class="gd-tabs gd-tabs--pill" id="ag-d-tabs" role="tablist" aria-label="Conversation views">
             <button type="button" role="tab" class="gd-tabs__tab" aria-selected="true" tabindex="0" data-dt="chat">Chat</button>
             <button type="button" role="tab" class="gd-tabs__tab" aria-selected="false" tabindex="-1" data-dt="details">Details</button>
             <button type="button" role="tab" class="gd-tabs__tab" aria-selected="false" tabindex="-1" data-dt="shared" id="ag-d-shared">Shared</button>
             <button type="button" role="tab" class="gd-tabs__tab" aria-selected="false" tabindex="-1" data-dt="log">Log</button>
-          </div></div>
+          </div></div></div>
+          <div class="gd-drawer__tools">
+            <button type="button" class="gd-iconbtn" id="ag-d-prev" aria-label="Previous chat" title="Previous (←)"><svg viewBox="0 0 256 256" fill="currentColor" width="16" height="16" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"/></svg></button>
+            <button type="button" class="gd-iconbtn" id="ag-d-next" aria-label="Next chat" title="Next (→)"><svg viewBox="0 0 256 256" fill="currentColor" width="16" height="16" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></button>
+            <button type="button" class="gd-fb-close" data-gd-drawer-wide aria-pressed="false" aria-label="Open the drawer out" title="Open the drawer out (E)"><svg viewBox="0 0 256 256" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M136,40V216a8,8,0,0,1-16,0V40a8,8,0,0,1,16,0ZM96,120H35.31l18.35-18.34A8,8,0,0,0,42.34,90.34l-32,32a8,8,0,0,0,0,11.32l32,32a8,8,0,0,0,11.32-11.32L35.31,136H96a8,8,0,0,0,0-16Zm149.66,2.34-32-32a8,8,0,0,0-11.32,11.32L220.69,120H160a8,8,0,0,0,0,16h60.69l-18.35,18.34a8,8,0,0,0,11.32,11.32l32-32A8,8,0,0,0,245.66,122.34Z"/></svg></button>
+            <button type="button" class="gd-fb-close" data-gd-close aria-label="Close" title="Close (Esc)"><svg viewBox="0 0 256 256" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button>
+          </div>
+        </div>
+        <div class="gd-drawer__body">
+          
           <div id="ag-d-body" aria-live="polite"></div>
         </div>
       </dialog>
@@ -539,8 +538,18 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
     return String(t).split(/(https?:\/\/[^\s<]+)/g).map(function (p, i) {
       if (i % 2) { var m = p.match(/^(.*?)([.,;:!?)\]'"]*)$/), u = m[1], tail = m[2]; return '<a class="gd-table__link" href="' + esc(u) + '" target="_blank" rel="noopener noreferrer">' + esc(u) + '</a>' + esc(tail); }
       return esc(p).replace(/`([^`\n]+)`/g, '<code>$1</code>').replace(/\*([^*\n]+)\*/g, '<strong>$1</strong>').replace(/(^|[\s(])_([^_\n]+)_(?=$|[\s).,;:!?])/g, '$1<em>$2</em>');
-    }).join('');
+    }).map(emojify).join('');
   }
+  var EMOJI = { rocket: '🚀', white_check_mark: '✅', heavy_check_mark: '✔️', check: '✔️', x: '❌', warning: '⚠️', eyes: '👀', tada: '🎉', sparkles: '✨', fire: '🔥', '100': '💯', bulb: '💡', memo: '📝', pencil: '📝', pencil2: '✏️',
+    '+1': '👍', thumbsup: '👍', '-1': '👎', thumbsdown: '👎', pray: '🙏', raised_hands: '🙌', clap: '👏', wave: '👋', ok_hand: '👌', muscle: '💪', point_right: '👉', point_left: '👈', point_up: '👆', point_down: '👇',
+    smile: '😄', smiley: '😃', grin: '😁', grinning: '😀', joy: '😂', sweat_smile: '😅', laughing: '😆', wink: '😉', blush: '😊', heart_eyes: '😍', sunglasses: '😎', thinking_face: '🤔', slightly_smiling_face: '🙂', upside_down_face: '🙃',
+    neutral_face: '😐', confused: '😕', disappointed: '😞', cry: '😢', sob: '😭', scream: '😱', rage: '😡', sleeping: '😴', relieved: '😌', hugging_face: '🤗', face_palm: '🤦', shrug: '🤷', heart: '❤️', blue_heart: '💙', green_heart: '💚',
+    broken_heart: '💔', star: '⭐', star2: '🌟', zap: '⚡', boom: '💥', bug: '🐛', hammer_and_wrench: '🛠️', wrench: '🔧', gear: '⚙️', package: '📦', link: '🔗', lock: '🔒', unlock: '🔓', key: '🔑', calendar: '📅', date: '📅',
+    clock1: '🕐', hourglass: '⌛', hourglass_flowing_sand: '⏳', email: '📧', envelope: '✉️', speech_balloon: '💬', mega: '📣', loudspeaker: '📢', bell: '🔔', pushpin: '📌', paperclip: '📎', chart_with_upwards_trend: '📈',
+    bar_chart: '📊', art: '🎨', computer: '💻', iphone: '📱', globe_with_meridians: '🌐', mag: '🔍', trophy: '🏆', gift: '🎁', coffee: '☕', pizza: '🍕', beer: '🍺', sunny: '☀️', cloud: '☁️', moon: '🌙', rainbow: '🌈',
+    arrow_right: '➡️', arrow_left: '⬅️', arrow_up: '⬆️', arrow_down: '⬇️', white_circle: '⚪', red_circle: '🔴', large_blue_circle: '🔵', green_circle: '🟢', yellow_circle: '🟡', question: '❓', exclamation: '❗', information_source: 'ℹ️',
+    no_entry: '⛔', stop_sign: '🛑', construction: '🚧', checkered_flag: '🏁', handshake: '🤝', brain: '🧠', robot_face: '🤖', ghost: '👻', cat: '🐱', dog: '🐶' };
+  function emojify(h) { return h.replace(/:(skin-tone-[2-6]):/g, '').replace(/:([a-z0-9_+\-]+):/g, function (m, n) { return EMOJI.hasOwnProperty(n) ? EMOJI[n] : m; }); }
   function kb(n) { return n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB' : n >= 1024 ? Math.round(n / 1024) + ' KB' : n ? n + ' B' : ''; }
   function host(u) { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (e) { return u; } }
   function cur() { var u = S.openUser, c = S.convs.filter(function (x) { return x.user === u; })[0]; return { c: c || { user: u, name: (personRows(u)[0] || {}).name || u, role: 'teammate', last: new Date(), asks: [], topics: {} }, all: personRows(u) }; }
@@ -577,7 +586,7 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
       if (newDay) html += '<div class="gd-thread__day"><span>' + esc(dl) + '</span></div>';
       var cont = !newDay && prevFrom === m.from && (d.getTime() - prevAt) < 5 * 60e3;       /* the same sender within five minutes */
       html += '<div class="gd-msg' + (cont ? ' gd-msg--cont' : '') + '">' +
-        (cont ? '' : (bot ? '<img class="gd-msg__pic" src="/assets/bruce-avatar.png" alt="Bruce">' : '<span class="gd-avatar gd-avatar--team" data-gd-avatar="' + esc(m.name) + '" role="img" aria-label="' + esc(m.name) + '"></span>')) +
+        (cont ? '' : (bot ? '<span class="gd-msg__pic" role="img" aria-label="Bruce" style="background-image:url(/assets/agents/bruce.jpg)"></span>' : '<span class="gd-avatar gd-avatar--team" data-gd-avatar="' + esc(m.name) + '" role="img" aria-label="' + esc(m.name) + '"></span>')) +
         '<div class="gd-msg__main">' + (cont ? '' : '<div class="gd-msg__head"><b>' + esc(m.name) + '</b>' + (bot ? badge('neutral', 'Agent') : '') + '<time>' + esc(fmtTime(d)) + '</time>' + (m.reply ? '<span class="gd-msg__note">in a thread</span>' : '') + '</div>') +
         (m.text ? '<div class="gd-msg__text">' + linkify(m.text) + '</div>' : '') + (files ? '<div class="gd-msg__files">' + files + '</div>' : '') + '</div></div>';
       day = dl; prevFrom = m.from; prevAt = d.getTime();
@@ -699,6 +708,7 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
   document.addEventListener('keydown', function (ev) {
     var d = $('ag-drawer'); if (!d.open || /^(TEXTAREA|INPUT)$/.test((ev.target || {}).tagName || '') || ev.metaKey || ev.ctrlKey || ev.altKey) return;
     if (ev.key === 'ArrowLeft') { ev.preventDefault(); step(-1); } else if (ev.key === 'ArrowRight') { ev.preventDefault(); step(1); }
+    else if (ev.key.toLowerCase() === 'e') { ev.preventDefault(); var w = d.querySelector('[data-gd-drawer-wide]'); if (w) w.click(); }
   });
   window.addEventListener('hashchange', function () { if (S.data) setTab(location.hash.slice(1) || 'all', false); });
   setInterval(function () { if (S.tab === 'bruce' && !document.hidden && !S.busy) loadBruce().then(function () { if (S.tab === 'bruce') render(); }); }, 30000);
