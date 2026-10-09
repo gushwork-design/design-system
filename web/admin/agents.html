@@ -35,7 +35,9 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
 #ag-panel .gd-table__avatar { font-size: 11px; border-radius: 20%; }   /* the same rounded square as the team cards' avatar (.gd-avatar), never a circle */
 /* a row that opens a conversation shows the hand, like the links and cards that open something */
 #ag-panel .gd-table__row:is([data-u], [data-go]), #ag-panel .gd-table__row:is([data-u], [data-go]) * { cursor: pointer; }   /* the hand over the whole row, children included */
-#ag-panel:focus, #ag-panel:focus-visible { outline: none; }   /* the panel is a container, not a control: no ring around everything when a drawer hands focus back to it */
+/* no focus states on this page: no ring on the tabs, pills, buttons, links, rows or the panel (Utsav, 30 Sep and 2 Oct: "focus states not needed anywhere"). Everything stays focusable and keyboard-operable; it just draws nothing */
+body[data-gw-page="agents"] .sg__main :focus-visible, body[data-gw-page="agents"] #ag-drawer :focus-visible, #ag-panel:focus { outline: none; }
+body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) input:focus-visible ~ * { outline: none; }   /* the switch draws its ring on the track beside the input */
 /* an agent's picture: the mascot, framed on its face (the framing is in the agent's record) */
 .ag-face { position: relative; overflow: hidden; }
 .ag-face img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; transform: scale(var(--ag-z, 1)); transform-origin: var(--ag-x, 50%) var(--ag-y, 50%); }
