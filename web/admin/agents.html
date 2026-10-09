@@ -36,6 +36,8 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
 #ag-panel .gd-table__cell { overflow: visible; white-space: normal; text-overflow: clip; overflow-wrap: break-word; }
 #ag-panel .gd-table__cell--flex { flex-wrap: wrap; row-gap: var(--gw-space-4); }
 #ag-panel .gd-table__avatar { font-size: 11px; border-radius: 20%; }   /* the same rounded square as the team cards' avatar (.gd-avatar), never a circle */
+/* a person's name opens their chat in the drawer, so it is not underlined like a link to another page (Utsav, 9 Oct 2026); the row's hand says it is clickable */
+#ag-panel a.gd-table__link[data-u] { text-decoration: none; }
 /* a row that opens a conversation shows the hand, like the links and cards that open something */
 #ag-panel .gd-table__row:is([data-u], [data-go]), #ag-panel .gd-table__row:is([data-u], [data-go]) * { cursor: pointer; }   /* the hand over the whole row, children included */
 /* no focus states on this page: no ring on the tabs, pills, buttons, links, rows or the panel (Utsav, 30 Sep and 2 Oct: "focus states not needed anywhere"). Everything stays focusable and keyboard-operable; it just draws nothing */

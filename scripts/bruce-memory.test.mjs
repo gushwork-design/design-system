@@ -319,5 +319,10 @@ ok('patterns: Bruce can read them for a run', (await M.readPatterns(f)).length =
 g2 = await pt('POST', ownerCk, { remove: 'nope' }); ok('patterns: deleting an unknown id is 404', g2.status === 404);
 g2 = await pt('POST', ownerCk, { remove: patId });
 ok('patterns: delete removes just that one', g2.status === 200 && (await M.readPatterns(f)).length === 1 && (await M.readPatterns(f))[0].text === 'keep replies short');
+// the log endpoint carries pictures for the people who were only messaged, too
+store = { 'gw:bruce:log': [JSON.stringify({ at: new Date().toISOString(), user: 'U0OWNER01', name: 'Utsav', role: 'owner', kind: 'sent', text: 'hi', to: 'U0DARSHIL1', toName: 'Darshil', thread: 0 })] };
+process.env.SLACK_BOT_TOKEN = 'xoxb'; globalThis.fetch = picF;
+g2 = await sg('GET', ownerCk, { query: { log: '1' } });
+ok('log: pictures cover a person who was only messaged', g2.status === 200 && g2.out.pics && g2.out.pics.U0DARSHIL1 && g2.out.pics.U0OWNER01, JSON.stringify(g2.out && g2.out.pics));
 globalThis.fetch = realFetch;
 console.log(`${pass} passed, ${fail} failed`); process.exit(fail ? 1 : 0);
