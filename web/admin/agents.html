@@ -51,6 +51,9 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
 #ag-panel .gd-card--flush > .gd-card__body--bleed { padding-bottom: var(--gw-space-8); }
 /* a collapsed card shows a chevron at its right edge: down while closed, up while open */
 #ag-panel .gd-card__titles:has(> .gd-card__toggle) { flex: 1 1 auto; }
+/* a heading is the title and its subtitle on one line, as on Analytics (.ul-sh): 16px semibold, 16px regular muted, 8px apart on the baseline. The library's card head stacks a 14px subtitle under the title; on a narrow card the subtitle wraps under it */
+#ag-panel .gd-card__titles { flex-direction: row; flex-wrap: wrap; align-items: baseline; column-gap: var(--gw-space-8); row-gap: var(--gw-space-2); }
+#ag-panel .gd-card__titles > .gd-card__desc { font: var(--gw-text-body-16-reg); letter-spacing: var(--gw-text-body-16-reg-tracking); }
 #ag-panel .gd-card__toggle { width: 100%; justify-content: space-between; }
 #ag-panel .gd-card__toggle > svg { width: 16px; height: 16px; }
 #ag-panel .gd-card__toggle[aria-expanded="false"] > svg { transform: none; }
