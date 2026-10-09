@@ -24,6 +24,7 @@ reports its own stale date.**
 
 | Version | Date | What changed | Commit | Session |
 |---|---|---|---|---|
+| **v2.1.1** | 09 Oct 2026 13:54 | Plugin gate decides on the first skill call too (a mid-session install in a cloud container skipped it), and reads a cloud container's git identity | [`69a33f9`](https://github.com/gushwork-design/design-system/commit/69a33f989a943bc98b1f3ab05b62fb2b95145b9f) | [Plugin access gate](claude://resume/eb126861-26bf-4da5-a6ce-7fb9a164d462) |
 | **v2.1.0** | 09 Oct 2026 13:16 | Plugin access gate: an account outside gushwork.ai is stopped at session start and can request access; answered from Slack, Access Control or Analytics (R67) | [`9168b39`](https://github.com/gushwork-design/design-system/commit/9168b3902c1ad39059cb776fffc3e1bd0adbecf1) | [Plugin access gate](claude://resume/eb126861-26bf-4da5-a6ce-7fb9a164d462) |
 | **v2.0.9** | 09 Oct 2026 12:56 | ghost while loading, per-message action (#485) | [`86a0179`](https://github.com/gushwork-design/design-system/commit/86a01798409f2264de72837f42a1b3cffb1e8971) | — |
 | **v2.0.8** | 08 Oct 2026 19:47 | Teams publish their own staging pages from the plugin, into a lane Access Control gives them, each open to the company or private to its team | [`de731af`](https://github.com/gushwork-design/design-system/commit/de731af200aa32edd6c12dcd36d3183d9bb5127d) | [Staging lanes](claude://resume/9f52f5e7-37de-4f0f-90da-96e2d1366e24) |
