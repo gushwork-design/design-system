@@ -241,6 +241,8 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
 
   /* ---------- Bruce's log ---------- */
   function bruceAll() { return (S.bruce || []).filter(function (r) { return r.kind !== 'sent' && !mine(r); }); }
+  /* the messages Bruce reported sending on someone's behalf (the log's "sent" rows), newest first, in the chosen period */
+  function bruceSent() { return (S.bruce || []).filter(function (r) { return r.kind === 'sent' && !mine(r) && inWindow(r.at); }).sort(function (x, y) { return y.at - x.at; }); }
   function bruceRows() { return bruceAll().filter(function (r) { return inWindow(r.at); }); }
   function isGap(r) { return r.topic === 'other' || r.kind === 'failed' || r.kind === 'capped'; }
   function bruceTokens(r, a) { var c = a.cost; return r.kind === 'run' ? c.start + c.run : r.kind === 'chat' ? c.start + c.chat : 0; }
@@ -471,6 +473,13 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
           '<span class="gd-table__avatar" aria-hidden="true">' + initial(c.name) + '</span><span class="gd-table__who"><a class="gd-table__link" href="#" data-u="' + esc(c.user) + '">' + esc(c.name) + '</a>' + (c.role === 'owner' ? '<small>Owner</small>' : '') + '</span>' + (isNew(c.user) ? badge('info', 'New') : ''),
           (c.ask.thread ? '↳ ' : '') + esc(clip(c.ask.text, 140)), tags, String(c.asks.length), '<time datetime="' + c.last.toISOString() + '">' + esc(ago(Date.now() - c.last.getTime())) + '</time>'] };
       })) : empty('no-results', 'Nobody asked in this period', 'Try a longer period.'), { flush: !!convs.length });
+
+    /* 2b. the messages he sent: who he sent to, for whom, and what; a row opens the asker's conversation */
+    var sent = bruceSent();
+    html += card('Messages he sent', sent.length ? plural(sent.length, 'message') + (sent.length > 8 ? ', latest 8' : '') + ', newest first' : '', sent.length ? table('Messages he sent', [
+      { h: 'When', w: '150px', muted: true }, { h: 'Sent to', w: '150px', strong: true }, { h: 'Asked by', w: '170px' }, { h: 'Message', w: 'minmax(0,1fr)', title: true }],
+      sent.slice(0, 8).map(function (r) { return { attrs: ' data-u="' + esc(r.user) + '"', t: ['', '', '', r.text], cells: ['<time datetime="' + r.at.toISOString() + '">' + esc(fmtWhen(r.at)) + '</time>', esc(r.to || 'Someone'), esc(r.name), esc(clip(r.text, 140))] }; }))
+      : empty('no-results', 'He sent nothing in this period', 'When Bruce passes a message on to someone, it shows up here.'), { flush: !!sent.length });
 
     /* 3. what he worked on: the runs; nothing to show, nothing drawn */
     var work = rows.filter(function (r) { return r.kind === 'run'; }).sort(function (x, y) { return y.at - x.at; });
