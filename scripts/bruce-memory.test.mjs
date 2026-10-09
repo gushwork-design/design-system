@@ -176,6 +176,13 @@ W('One-pager for sales, audience ops leads', 'run'); W('make me a landing page',
 W('the logo should be in original color, change the headline too', 'run'); W('can you make the logo purple and add a cat', 'run');
 W('x '.repeat(150), 'run');
 W('tell Utsav to change the date', 'chat');
+// 9 Oct 2026: real asks from the log that were wrongly counted as runs
+W('then how can you check whom did you message?', 'chat'); W('when i ask, always keep it honest and make sure you tell everything you did', 'chat');
+W('Share the agent marketplace staging link', 'chat'); W('i cant see any componenets you changes in the waiting list in review on hub?', 'chat');
+W('Will merge it later, remind me at 10am', 'chat'); W('Remove you reacting eyes to every message, fills up the activity inbox on slack.', 'chat');
+W('Instead, send a message that you are working and give an eta, keep the language humane and dont repeat a foxed template.', 'chat');
+W('<https://design.gushwork.ai/internal/staging/ai-marketplace|design.gushwork.ai/internal/staging/ai-marketplace>', 'chat');
+W('can you rework the pricing page', 'run'); W('please publish it', 'run'); W('change the hero headline on the lander', 'run');
 // the cap: runs and chats are counted apart, and chats have their own, bigger guard
 process.env.BRUCE_DAILY_CAP = '1'; process.env.BRUCE_DM_CHAT_CAP = '3';
 store = {}; const nowW = new Date('2026-10-08T10:00:00Z');
