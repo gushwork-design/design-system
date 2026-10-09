@@ -29,7 +29,8 @@ if [ -f "$STATE" ]; then
 import json, os, sys, time
 try: d = json.load(open(os.environ["GW_F"]))
 except Exception: sys.exit(1)
-sys.exit(0 if time.time() - float(d.get("checkedAt", 0)) < 3600 else 1)' 2>/dev/null && STALE=0
+ttl = 300 if d.get("state") == "unreachable" else 3600     # a network miss is retried soon; a real answer stands an hour
+sys.exit(0 if time.time() - float(d.get("checkedAt", 0)) < ttl else 1)' 2>/dev/null && STALE=0
 fi
 CHECK="$(cd "$(dirname "$0")" && pwd)/check-access.sh"          # its sibling, wherever this copy lives
 if [ "$STALE" = 1 ] && [ -f "$CHECK" ]; then
@@ -59,6 +60,7 @@ why = {
     "none": "The Gushwork design-system plugin is for Gushwork accounts, and " + who + " is outside the company. Offer the person two options: uninstall the plugin (`claude plugin uninstall gushwork-design@gushwork`), or request access (run `bash \"" + root + "/scripts/request-access.sh\" \"<optional one-line note>\"` and read its answer back).",
     "pending": "An access request for " + who + " is waiting for Utsav at Gushwork. The Gushwork skills stay off until it is granted; the plugin unlocks by itself at the next session.",
     "denied": "Access to the Gushwork design system was not granted for " + who + ", and the plugin is removing itself. Say so in one sentence.",
+    "unreachable": "Gushwork could not be reached to check whether " + who + " (an account outside the company) may use the design system, so the Gushwork skills are off for now. The check needs https://gushwork-design.vercel.app; in a Claude Code cloud sandbox that domain must be allowed in the sandbox network settings. It is retried on every skill call.",
 }.get(state, "The Gushwork skills are switched off for " + who + ".")
 print(json.dumps({"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": why}}))' 2>/dev/null
 exit 0

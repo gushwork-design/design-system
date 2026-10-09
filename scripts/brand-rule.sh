@@ -25,7 +25,7 @@
 STATE="${GW_ACCESS_STATE:-$HOME/.claude/gushwork/access.json}"
 if [ -f "$STATE" ] && GW_F="$STATE" python3 -c '
 import json, os, sys
-try: sys.exit(0 if json.load(open(os.environ["GW_F"])).get("state") in ("pending", "denied", "none") else 1)
+try: sys.exit(0 if json.load(open(os.environ["GW_F"])).get("state") in ("pending", "denied", "none", "unreachable") else 1)
 except Exception: sys.exit(1)' 2>/dev/null; then exit 0; fi
 
 python3 - <<'PY' 2>/dev/null || true

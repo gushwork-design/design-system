@@ -25,9 +25,11 @@
 # casual outsider and the install-by-accident, not against someone who edits a file. Making the repo
 # private is the only thing that stops an old copy updating; this stops a new copy working.
 #
-# FAIL OPEN. No python3, no curl, no identity, no network, a hub that errors: the answer is "allowed"
-# and nothing is printed. A gate that locks the company out of its own design system on a VPN is a
-# gate that gets ripped out. Always exit 0 — a non-zero exit prints a hook-error notice every session.
+# FAIL OPEN FOR THE COMPANY, CLOSED FOR OUTSIDERS. No python3, no curl, no identity: "allowed", nothing
+# printed. A company address never asks the network, so no outage can lock the company out of its own
+# design system. An outside address with no answer and nothing known stays off until the hub answers
+# (9 Oct 2026: a cloud sandbox that could not reach the hub had been waved through). Always exit 0 —
+# a non-zero exit prints a hook-error notice every session.
 #
 # TRY IT
 #   GW_ACCESS_EMAIL=someone@gmail.com GW_ACCESS_URL="file://$PWD/fixture.json" \
@@ -109,12 +111,16 @@ try:
 except Exception:
     print("")' 2>/dev/null)"
 
-# No answer: keep whatever we knew, else fail open. Silent either way.
+# No answer. Keep whatever we knew (an allowed answer from an earlier session still stands). With nothing known,
+# an OUTSIDE address stays off: this point is only reached for one (company addresses never ask the network),
+# and 9 Oct 2026 showed why failing open here is wrong — a personal account in a cloud sandbox that could not
+# reach the hub was waved through as "allowed · unreachable". The sandbox can allow the hub's domain; until it
+# does, the skills stay off for that account. Re-asked on every start and every skill call, so it clears itself.
 if [ -z "$STATE_NOW" ]; then
-  [ -f "$STATE" ] || write_state allowed unreachable
-  exit 0
+  [ -f "$STATE" ] && exit 0
+  STATE_NOW=unreachable
 fi
-write_state "$STATE_NOW" hub
+write_state "$STATE_NOW" "$([ "$STATE_NOW" = unreachable ] && echo network || echo hub)"
 [ "$STATE_NOW" = allowed ] && exit 0
 
 # ── denied: the plugin removes itself, detached, so the session never waits on it ────────────
@@ -152,6 +158,13 @@ elif s == "pending":
     ctx = (common + "An access request from this account is already waiting for Utsav at Gushwork; the plugin unlocks by itself on the "
            "next session once it is granted. Say so in one sentence if the person asks about it or tries to use the design system, and "
            "offer `" + un + "` if they would rather remove it. Do not use any gushwork-* skill.")
+elif s == "unreachable":
+    msg = "Gushwork design system: could not reach Gushwork to check this account, so the skills are off for now."
+    ctx = (common.replace("which is outside the company, so", "which is outside the company, and Gushwork could not be reached to check whether it is allowed, so") +
+           "Say so in one sentence if the person tries to use the design system: the check needs https://gushwork-design.vercel.app, which this "
+           "machine or sandbox could not reach; in a Claude Code cloud sandbox that domain has to be allowed in the sandbox network "
+           "settings. The plugin checks again at every session start and every skill call. Offer `" + un + "` if they would rather remove it. "
+           "Do not use any gushwork-* skill.")
 else:
     msg = "Gushwork design system: access was not granted for this account. The plugin is removing itself."
     ctx = (common + "Access was not granted for this account, and the plugin is uninstalling itself now (it is gone at the next "
