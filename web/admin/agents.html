@@ -296,7 +296,7 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
   function use(s, total) {
     if (!s.known) return '<span class="ag-use"><span class="ag-use__row"><span>Tokens ' + esc(periodText()) + '</span><span>Waiting for data</span></span></span>';
     var share = total ? s.tokens / total : 0, pct = !s.tokens ? '0%' : share < 0.01 ? '<1%' : Math.round(share * 100) + '%';
-    return '<span class="ag-use"><span class="ag-use__row"><span>Tokens ' + esc(periodText()) + '</span><b>' + (s.tokens ? '≈ ' + tok(s.tokens) : 'None') + ' · ' + pct + '</b></span>' +
+    return '<span class="ag-use"><span class="ag-use__row"><span>Tokens ' + esc(periodText()) + '</span><b>' + (s.tokens ? '≈ ' + tok(s.tokens) : 'None') + ' · ' + pct + ' of the team</b></span>' +
       '<span class="ag-use__bar" role="img" aria-label="' + pct + ' of the team\u2019s estimated tokens"><i style="width:' + Math.round(share * 100) + '%"></i></span></span>';
   }
 
@@ -343,16 +343,26 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
     rows.push(['Links', (a.links || []).concat([{ label: 'Routine in claude.ai', href: a.routine.url }]).map(function (l) { return '<a class="gd-table__link" href="' + esc(l.href) + '" target="_blank" rel="noopener noreferrer">' + esc(l.label) + '</a>'; }).join(' · ')]);
     return foldCard('ag-about', 'About ' + a.name, kv(rows, 'gd-key-value-list--stacked gd-key-value-list--ruled'));
   }
+  /* usage and tokens: the same three tiles at the top of every agent's tab. The first two are this agent's estimate; the third is the account's weekly limit (one number, from a dated snapshot) */
+  function usageTiles(s) {
+    var a = s.a, u = S.usage, resetAt = u && u.weekly && Date.parse(u.weekly.resetsAt) ? Date.parse(u.weekly.resetsAt) : 0, weekFrom = resetAt ? resetAt - 7 * DAY : Date.now() - 7 * DAY;
+    var snapAge = u && Date.parse(u.at) ? Date.now() - Date.parse(u.at) : 0, unit = s.id === 'bruce' ? 'session' : 'run';
+    var weekTok = s.id === 'bruce' ? bruceAll().filter(function (r) { return r.at.getTime() >= weekFrom; }).reduce(function (n, r) { return n + bruceTokens(r, a); }, 0)
+      : (s.id === 'alfred' ? alfredRunsIn(weekFrom) : docRunCount(weekFrom)) * a.cost.run;
+    return '<section aria-label="Usage and tokens"><div class="gd-card__titles" style="margin-bottom:var(--gd-gap)"><h3 class="gd-card__title">Usage and tokens</h3><p class="gd-card__desc">Estimated, not measured</p></div>' + stats([
+      { n: 'Tokens ' + (S.period === 'today' ? 'today' : 'in ' + S.period + ' days'), v: s.sessions ? '≈ ' + tok(s.tokens) : '—', c: s.sessions ? 'about ' + tok(s.tokens / s.sessions) + ' for each of ' + plural(s.sessions, unit) : 'no ' + unit + 's yet' },
+      { n: 'Tokens this week', v: '≈ ' + tok(weekTok), c: resetAt ? 'since the weekly limit reset on ' + new Date(weekFrom).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }) : 'the last 7 days' },
+      { n: 'Your weekly limit', v: u && u.weekly ? u.weekly.percentUsed + '% used' : '—', c: u && u.weekly ? 'everything on your account, as of ' + fmtWhen(new Date(u.at)) + (snapAge > 2 * DAY ? ' (' + Math.round(snapAge / DAY) + ' days old)' : '') : 'no snapshot found' }]) + '</section>';
+  }
   function statsCard(s) {
     if (!s.known) return '';
-    return stats(s.stats.map(function (t) { return { n: t.n, v: t.v }; })) +
-      '<p class="gd-card__desc">' + (s.tokens ? 'Used about ' + tok(s.tokens) + ' tokens ' + periodText() + ' across ' + plural(s.sessions, 'session') + '. An estimate: nothing reports real token counts.' : 'No sessions in this period.') + '</p>';
+    return stats(s.stats.map(function (t) { return { n: t.n, v: t.v }; }));
   }
   function renderAlfred() {
     var s = summary('alfred'), a = s.a, al = S.alfred;
     if (!s.known) return card('Alfred', '', empty('error', 'Could not read his threads', s.doing)) + healthCard(s) + aboutCard(a);
     var order = { stuck: 0, ready: 1, queued: 2 }, th = al.threads.slice().sort(function (x, y) { return (order[x.state] - order[y.state]) || (Date.parse(y.lastAt || 0) - Date.parse(x.lastAt || 0)); });
-    var html = needsCard(s.needs.filter(function (n) { return !n.health; }).map(function (n) { return { n: n, a: a }; }), false, 'Needs from you') + statsCard(s);
+    var html = usageTiles(s) + needsCard(s.needs.filter(function (n) { return !n.health; }).map(function (n) { return { n: n, a: a }; }), false, 'Needs from you') + statsCard(s);
     if (th.length) {
       var rows = th.slice(0, 8).map(function (t) {
         var tone = { ready: 'good', stuck: 'warn', queued: 'neutral' }[t.state], lbl = { ready: 'Ready for you', stuck: 'Waiting on you', queued: 'Queued' }[t.state];
@@ -367,7 +377,7 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
   function renderDoc() {
     var s = summary('doc'), a = s.a;
     if (!s.known) return card('Doc', '', empty('error', 'Could not read the checks', s.doing)) + aboutCard(a);
-    return statsCard(s) + healthCard(s) + aboutCard(a);
+    return usageTiles(s) + statsCard(s) + healthCard(s) + aboutCard(a);
   }
 
   /* ---------- Bruce: five things ---------- */
@@ -387,7 +397,15 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
     var firstBy = {};
     bruceAll().forEach(function (r) { var f = firstBy[r.user]; if (!f || r.at < f.at) firstBy[r.user] = r; });
     var isNew = function (u) { return firstBy[u] && firstBy[u].at.getTime() > Date.now() - DAY; };
-    var html = '';
+    /* usage and tokens first, as on every agent's tab, then how the estimate works */
+    var cost = a.cost, html = usageTiles(s);
+    html += foldCard('ag-how', 'How the estimate works', kv([
+      [tok(cost.start) + ' tokens to start', 'Before he does anything, every DM makes him read his instructions and the project’s rules. This is most of what a chat costs.'],
+      ['+' + tok(cost.chat) + ' for a chat', 'Assumed: reading the thread, one reply, a memory note.'],
+      ['+' + tok(cost.run) + ' for a run', 'Assumed: a skill, a template, the page itself, a screenshot. Builds vary a lot.'],
+      ['Nothing', 'For capped, failed and passed-to-Alfred asks: they start no Bruce session.'],
+      ['Not a bill', 'Re-reads of the same context are cached and weigh less on a plan. Use it to compare weeks, and chats against runs.'],
+      ['Your weekly limit', 'Comes from a dated snapshot of the plan’s usage card (admin/bruce-usage.json), because the hub cannot read it live.']], 'gd-key-value-list--stacked gd-key-value-list--ruled'));
 
     /* 1. conversations; a New tag for anyone whose first ask came in the last day */
     html += card('Conversations', convs.length ? plural(convs.length, 'conversation') + ', latest first' : '', convs.length ? table('Conversations', [
@@ -398,23 +416,6 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
           '<span class="gd-table__avatar" aria-hidden="true">' + initial(c.name) + '</span><span class="gd-table__who"><a class="gd-table__link" href="#" data-u="' + esc(c.user) + '">' + esc(c.name) + '</a>' + (c.role === 'owner' ? '<small>Owner</small>' : '') + '</span>' + (isNew(c.user) ? badge('info', 'New') : ''),
           (c.ask.thread ? '↳ ' : '') + esc(clip(c.ask.text, 140)), tags, String(c.asks.length), '<time datetime="' + c.last.toISOString() + '">' + esc(ago(Date.now() - c.last.getTime())) + '</time>'] };
       })) : empty('no-results', 'Nobody asked in this period', 'Try a longer period.'), { flush: !!convs.length });
-
-    /* 2. usage and tokens, estimated */
-    var cost = a.cost, u = S.usage, resetAt = u && u.weekly && Date.parse(u.weekly.resetsAt) ? Date.parse(u.weekly.resetsAt) : 0, weekFrom = resetAt ? resetAt - 7 * DAY : Date.now() - 7 * DAY;
-    var tk = function (r) { return bruceTokens(r, a); };
-    var periodTok = rows.reduce(function (n, r) { return n + tk(r); }, 0), weekTok = bruceAll().filter(function (r) { return r.at.getTime() >= weekFrom; }).reduce(function (n, r) { return n + tk(r); }, 0);
-    var started = rows.filter(function (r) { return tk(r) > 0; }).length, snapAge = u && Date.parse(u.at) ? Date.now() - Date.parse(u.at) : 0;
-    html += '<section aria-label="Usage and tokens"><div class="gd-card__titles" style="margin-bottom:var(--gd-gap)"><h3 class="gd-card__title">Usage and tokens</h3><p class="gd-card__desc">Estimated, not measured</p></div>' + stats([
-      { n: 'Tokens ' + (S.period === 'today' ? 'today' : 'in ' + S.period + ' days'), v: started ? '≈ ' + tok(periodTok) : '—', c: started ? 'about ' + tok(periodTok / started) + ' for each of ' + plural(started, 'session') + ' he started' : 'no sessions yet' },
-      { n: 'Tokens this week', v: '≈ ' + tok(weekTok), c: resetAt ? 'since the weekly limit reset on ' + new Date(weekFrom).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }) : 'the last 7 days' },
-      { n: 'Your weekly limit', v: u && u.weekly ? u.weekly.percentUsed + '% used' : '—', c: u && u.weekly ? 'everything on your account, as of ' + fmtWhen(new Date(u.at)) + (snapAge > 2 * DAY ? ' (' + Math.round(snapAge / DAY) + ' days old)' : '') : 'no snapshot found' }]) + '</section>';
-    html += foldCard('ag-how', 'How the estimate works', kv([
-      [tok(cost.start) + ' tokens to start', 'Before he does anything, every DM makes him read his instructions and the project’s rules. This is most of what a chat costs.'],
-      ['+' + tok(cost.chat) + ' for a chat', 'Assumed: reading the thread, one reply, a memory note.'],
-      ['+' + tok(cost.run) + ' for a run', 'Assumed: a skill, a template, the page itself, a screenshot. Builds vary a lot.'],
-      ['Nothing', 'For capped, failed and passed-to-Alfred asks: they start no Bruce session.'],
-      ['Not a bill', 'Re-reads of the same context are cached and weigh less on a plan. Use it to compare weeks, and chats against runs.'],
-      ['Your weekly limit', 'Comes from a dated snapshot of the plan’s usage card (admin/bruce-usage.json), because the hub cannot read it live.']], 'gd-key-value-list--stacked gd-key-value-list--ruled'));
 
     /* 3. what he worked on: the runs; nothing to show, nothing drawn */
     var work = rows.filter(function (r) { return r.kind === 'run'; }).sort(function (x, y) { return y.at - x.at; });
