@@ -40,6 +40,10 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
 .ag-face { position: relative; overflow: hidden; }
 .ag-face img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; transform: scale(var(--ag-z, 1)); transform-origin: var(--ag-x, 50%) var(--ag-y, 50%); }
 .gd-agent-status .gd-avatar.ag-face { --gd-avatar-size: 48px; }
+/* the card on the agent's own tab: full width, not a link (no hand, no hover lift), and no three-line reserve for the text */
+#ag-panel .gd-agent-status.ag-solo { cursor: default; }
+#ag-panel .gd-agent-status.ag-solo:hover { box-shadow: inset 0 0 0 1px var(--gd-border); }
+#ag-panel .gd-agent-status.ag-solo .gd-agent-status__now { min-height: 0; }
 /* tokens on a team card: the estimate and the agent's share of the team's, over a thin bar */
 /* waiting for an agent's data: the library's spinner recipe (a 2px ring with a clear top, 700ms), as on its inputs and buttons */
 .ag-spin { width: 14px; height: 14px; flex: none; align-self: center; border-radius: 50%; border: 2px solid var(--gd-text-muted); border-top-color: transparent; animation: gd-spin 700ms linear infinite; }
@@ -330,15 +334,29 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
       '<div class="ag-week__bar" role="img" aria-label="Estimated tokens this week by agent">' + bar + '</div><div class="ag-week__legend">' + legend + '</div></div>');
   }
 
+  /* an agent's status card: picture, name, role, state, what it is doing, and its tokens. On All agents it links to the agent's tab; on the tab itself it is the same card, full width and not a link */
+  function agentCard(s, total, ready, solo) {
+    var open = solo ? '<div class="gd-agent-status ag-solo">' : '<a class="gd-agent-status" href="#' + esc(s.id) + '" data-tab="' + esc(s.id) + '">';
+    return open + '<span class="gd-agent-status__top">' + (pic(s.a) ? '<span class="gd-avatar gd-avatar--lg ag-face" role="img" aria-label="' + esc(s.a.name) + '">' + pic(s.a) + '</span>' : '<span class="gd-avatar gd-avatar--team gd-avatar--lg" data-gd-avatar="' + esc(s.a.name) + '" role="img" aria-label="' + esc(s.a.name) + '"></span>') + '' +
+          '<span class="gd-agent-status__who"><b>' + esc(s.a.name) + '</b><small>' + esc(s.a.role) + '</small></span>' + badge(TONE[s.state], stateLabel(s)) + '</span>' +
+          '<span class="gd-agent-status__now">' + esc(s.doing) + '</span>' + use(s, total, ready) + '</' + (solo ? 'div' : 'a') + '>';
+  }
+
+  /* the agent's own card, full width, at the top of its tab */
+  function soloCard(id) {
+    var list = sums(), me = list.filter(function (x) { return x.id === id; })[0];
+    if (!me) return '';
+    var total = list.reduce(function (n, x) { return n + (x.known ? x.tokens : 0); }, 0), ready = list.every(function (x) { return x.known; });
+    return '<section aria-label="' + esc(me.a.name) + '">' + agentCard(me, total, ready, true) + '</section>';
+  }
+
   /* ---------- All agents ---------- */
   function renderAll() {
     var list = sums(), needs = allNeeds(list), total = list.reduce(function (n, s) { return n + (s.known ? s.tokens : 0); }, 0), ready = list.every(function (s) { return s.known; });
     /* the team: the one new component on this page, the agent status card (see the library's data-display doc) */
     var html = '<section class="ag-team" aria-label="The team"><div class="gd-card__titles" style="margin-bottom:var(--gd-gap)"><h3 class="gd-card__title">The team</h3></div><div class="gd-grid">' +
       list.map(function (s) {
-        return '<div class="gd-span-4"><a class="gd-agent-status" href="#' + esc(s.id) + '" data-tab="' + esc(s.id) + '"><span class="gd-agent-status__top">' + (pic(s.a) ? '<span class="gd-avatar gd-avatar--lg ag-face" role="img" aria-label="' + esc(s.a.name) + '">' + pic(s.a) + '</span>' : '<span class="gd-avatar gd-avatar--team gd-avatar--lg" data-gd-avatar="' + esc(s.a.name) + '" role="img" aria-label="' + esc(s.a.name) + '"></span>') + '' +
-          '<span class="gd-agent-status__who"><b>' + esc(s.a.name) + '</b><small>' + esc(s.a.role) + '</small></span>' + badge(TONE[s.state], stateLabel(s)) + '</span>' +
-          '<span class="gd-agent-status__now">' + esc(s.doing) + '</span>' + use(s, total, ready) + '</a></div>';
+        return '<div class="gd-span-4">' + agentCard(s, total, ready, false) + '</div>';
       }).join('') + '</div></section>';
     html += weekCard(list);   /* under the agent cards, above what needs you */
     html += needsCard(needs, true);
@@ -565,7 +583,7 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
     tabs();
     $('ag-me-box').checked = hideOn();
     $('ag-ctrl').hidden = false;
-    $('ag-panel').innerHTML = S.tab === 'bruce' ? renderBruce() : S.tab === 'alfred' ? renderAlfred() : S.tab === 'doc' ? renderDoc() : renderAll();
+    $('ag-panel').innerHTML = (S.tab === 'all' ? '' : soloCard(S.tab)) + (S.tab === 'bruce' ? renderBruce() : S.tab === 'alfred' ? renderAlfred() : S.tab === 'doc' ? renderDoc() : renderAll());
     document.querySelectorAll('#ag-period .gd-tabs__tab').forEach(function (b) { var on = b.getAttribute('data-value') === S.period; b.setAttribute('aria-checked', String(on)); b.tabIndex = on ? 0 : -1; });
     $('ag-refresh').setAttribute('data-tip', S.at ? 'Updated ' + ago(Date.now() - S.at) + ' · click to refresh' : 'Refresh');
   }
