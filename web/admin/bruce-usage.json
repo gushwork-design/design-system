@@ -4,5 +4,7 @@
   "plan": "Team",
   "seat": "Premium",
   "weekly": { "percentUsed": 36, "resetsAt": "2026-10-13T05:00:00Z" },
-  "fiveHour": { "percentUsed": 3, "resetsAt": "2026-10-09T08:12:00Z" }
+  "fiveHour": { "percentUsed": 3, "resetsAt": "2026-10-09T08:12:00Z" },
+  "limitTokens": 85000000,
+  "limitNote": "ESTIMATE, not published by the plan. Implied weekly limit = tokens used in this Mac's Claude Code sessions (input + output + cache writes) between the weekly reset and a snapshot, divided by the % used. 29% on 8 Oct and 36% on 9 Oct imply 89M and 85M; the change between them implies 66M. Use about 85M, give or take a quarter. Refresh with the snapshot."
 }
