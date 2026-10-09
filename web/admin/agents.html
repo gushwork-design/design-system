@@ -32,7 +32,7 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
 #ag-panel .gd-table__body > .gd-table__row { padding-block: var(--gw-space-8); }
 #ag-panel .gd-table__cell { overflow: visible; white-space: normal; text-overflow: clip; overflow-wrap: break-word; }
 #ag-panel .gd-table__cell--flex { flex-wrap: wrap; row-gap: var(--gw-space-4); }
-#ag-panel .gd-table__avatar { font-size: 11px; }
+#ag-panel .gd-table__avatar { font-size: 11px; border-radius: 20%; }   /* the same rounded square as the team cards' avatar (.gd-avatar), never a circle */
 /* a row that opens a conversation shows the hand, like the links and cards that open something */
 #ag-panel .gd-table__row:is([data-u], [data-go]), #ag-panel .gd-table__row:is([data-u], [data-go]) * { cursor: pointer; }   /* the hand over the whole row, children included */
 #ag-panel:focus, #ag-panel:focus-visible { outline: none; }   /* the panel is a container, not a control: no ring around everything when a drawer hands focus back to it */
@@ -41,6 +41,14 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
 .ag-face img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; transform: scale(var(--ag-z, 1)); transform-origin: var(--ag-x, 50%) var(--ag-y, 50%); }
 .gd-agent-status .gd-avatar.ag-face { --gd-avatar-size: 48px; }
 /* tokens on a team card: the estimate and the agent's share of the team's, over a thin bar */
+/* the account's weekly limit on All agents: one number, one bar */
+.ag-limit { display: flex; flex-direction: column; gap: var(--gw-space-12); }
+.ag-limit__row { display: flex; align-items: baseline; justify-content: space-between; gap: var(--gw-space-12); }
+.ag-limit__row b { font: 500 28px/1.2 var(--gw-font-display); color: var(--gd-text); font-feature-settings: "tnum" 1; }
+.ag-limit__row span { font: var(--gw-text-body-14-reg); color: var(--gd-text-muted); }
+.ag-limit__bar { height: 8px; border-radius: 4px; background: var(--gd-border); overflow: hidden; }
+.ag-limit__bar > i { display: block; height: 100%; border-radius: 4px; background: var(--gd-ink); }
+.ag-limit__note { margin: 0; font: var(--gw-text-body-12-reg); color: var(--gd-text-muted); }
 .ag-use { display: flex; flex-direction: column; gap: var(--gw-space-8); }
 .ag-use__row { display: flex; align-items: baseline; justify-content: space-between; gap: var(--gw-space-12); font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
 .ag-use__row b { font: var(--gw-text-body-14-sem); color: var(--gd-text); font-feature-settings: "tnum" 1; }
@@ -303,11 +311,20 @@ body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw
       '<span class="ag-use__bar" role="img" aria-label="' + pct + ' of the team\u2019s estimated tokens"><i style="width:' + Math.round(share * 100) + '%"></i></span></span>';
   }
 
+  /* how much of the account's weekly limit is used: the plan reports one account-wide percentage (a dated snapshot), so this is the total, not a split by agent */
+  function limitCard() {
+    var u = S.usage; if (!u || !u.weekly) return '';
+    var pct = Math.max(0, Math.min(100, Math.round(u.weekly.percentUsed))), resets = Date.parse(u.weekly.resetsAt), age = Date.parse(u.at) ? Date.now() - Date.parse(u.at) : 0;
+    return card('Weekly usage limit', 'Everything on your account, not only the agents', '<div class="ag-limit"><div class="ag-limit__row"><b>' + pct + '% used</b><span>' + (resets ? 'Resets ' + esc(new Date(resets).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' })) : '') + '</span></div>' +
+      '<div class="ag-limit__bar" role="img" aria-label="' + pct + '% of the weekly limit used"><i style="width:' + pct + '%"></i></div>' +
+      '<p class="ag-limit__note">As of ' + esc(fmtWhen(new Date(u.at))) + (age > 2 * DAY ? ' (' + Math.round(age / DAY) + ' days old)' : '') + '. A dated snapshot: the hub cannot read the live number.</p></div>');
+  }
+
   /* ---------- All agents ---------- */
   function renderAll() {
     var list = sums(), needs = allNeeds(list), total = list.reduce(function (n, s) { return n + (s.known ? s.tokens : 0); }, 0);
     /* the team: the one new component on this page, the agent status card (see the library's data-display doc) */
-    var html = '<section class="ag-team" aria-label="The team"><div class="gd-card__titles" style="margin-bottom:var(--gd-gap)"><h3 class="gd-card__title">The team</h3></div><div class="gd-grid">' +
+    var html = limitCard() + '<section class="ag-team" aria-label="The team"><div class="gd-card__titles" style="margin-bottom:var(--gd-gap)"><h3 class="gd-card__title">The team</h3></div><div class="gd-grid">' +
       list.map(function (s) {
         return '<div class="gd-span-4"><a class="gd-agent-status" href="#' + esc(s.id) + '" data-tab="' + esc(s.id) + '"><span class="gd-agent-status__top">' + (pic(s.a) ? '<span class="gd-avatar gd-avatar--lg ag-face" role="img" aria-label="' + esc(s.a.name) + '">' + pic(s.a) + '</span>' : '<span class="gd-avatar gd-avatar--team gd-avatar--lg" data-gd-avatar="' + esc(s.a.name) + '" role="img" aria-label="' + esc(s.a.name) + '"></span>') + '' +
           '<span class="gd-agent-status__who"><b>' + esc(s.a.name) + '</b><small>' + esc(s.a.role) + '</small></span>' + badge(TONE[s.state], stateLabel(s)) + '</span>' +
