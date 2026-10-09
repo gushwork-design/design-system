@@ -132,8 +132,8 @@ async function call(req, ctx) {
   await handler({ method: 'GET', headers: {}, query: {}, ...req }, res, ctx);
   return { code: res.code, json: res.body ? JSON.parse(res.body) : null };
 }
-const cookie = COOKIE + '=' + await sign({ email: 'utsav.singh@gushwork.ai', exp: Math.floor(NOW / 1000) + 600 }, 'test-secret');
-const other = COOKIE + '=' + await sign({ email: 'ana@gushwork.ai', exp: Math.floor(NOW / 1000) + 600 }, 'test-secret');
+const cookie = COOKIE + '=' + await sign({ email: 'utsav.singh@gushwork.ai', exp: Math.floor(Date.now() / 1000) + 600 }, 'test-secret');
+const other = COOKIE + '=' + await sign({ email: 'ana@gushwork.ai', exp: Math.floor(Date.now() / 1000) + 600 }, 'test-secret');
 process.env.SESSION_SECRET = 'test-secret';
 
 let out = await call({}, ctxFor(goodEnv, happy()));
