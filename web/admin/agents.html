@@ -97,6 +97,7 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
 }
 .ag-ctrl { display: flex; align-items: center; justify-content: space-between; gap: var(--gw-space-16); flex-wrap: wrap; }
 .ag-ctrl[hidden] { display: none; }
+#ag-d-bar { position: sticky; top: calc(var(--gd-card-pad) * -1); z-index: 1; margin-top: calc(var(--gd-card-pad) * -1); padding: var(--gd-card-pad) 0 var(--gw-space-12); background: var(--gd-raised-bg, var(--gd-card-bg)); }   /* covers the drawer's top padding too, so nothing scrolls past above it */
 </style>
 </head>
 <body data-gw-page="agents">
@@ -137,12 +138,13 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
           </div>
         </div>
         <div class="gd-drawer__body">
-          <div class="gd-tabs gd-tabs--pill" id="ag-d-tabs" role="tablist" aria-label="Conversation views">
-            <button type="button" role="tab" class="gd-tabs__tab" aria-selected="true" tabindex="0" data-dt="chat">Conversation</button>
+          <div id="ag-d-bar"><div class="gd-tabs gd-tabs--pill" id="ag-d-tabs" role="tablist" aria-label="Conversation views">
+            <button type="button" role="tab" class="gd-tabs__tab" aria-selected="true" tabindex="0" data-dt="chat">Chat</button>
+            <button type="button" role="tab" class="gd-tabs__tab" aria-selected="false" tabindex="-1" data-dt="details">Details</button>
             <button type="button" role="tab" class="gd-tabs__tab" aria-selected="false" tabindex="-1" data-dt="shared" id="ag-d-shared">Shared</button>
             <button type="button" role="tab" class="gd-tabs__tab" aria-selected="false" tabindex="-1" data-dt="log">Log</button>
-          </div>
-          <div id="ag-d-body" aria-live="polite" style="margin-top: var(--gw-space-16)"></div>
+          </div></div>
+          <div id="ag-d-body" aria-live="polite"></div>
         </div>
       </dialog>
     </div>
@@ -252,8 +254,6 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
   /* ---------- Bruce's log ---------- */
   function bruceAll() { return (S.bruce || []).filter(function (r) { return r.kind !== 'sent' && !mine(r); }); }
   /* the messages Bruce reported sending on someone's behalf (the log's "sent" rows), newest first, in the chosen period */
-  /* Hide my activity does not apply here: a message Bruce sent to someone else is the record of what he did, and the sends made on the owner's word are logged under the owner, so hiding them would hide the very thing this list is for. */
-  function bruceSent() { return (S.bruce || []).filter(function (r) { return r.kind === 'sent' && inWindow(r.at); }).sort(function (x, y) { return y.at - x.at; }); }
   function bruceRows() { return bruceAll().filter(function (r) { return inWindow(r.at); }); }
   function isGap(r) { return r.topic === 'other' || r.kind === 'failed' || r.kind === 'capped'; }
   function bruceTokens(r, a) { if (r.tokens) return r.tokens; var c = a.cost; return r.kind === 'run' ? c.start + c.run : r.kind === 'chat' ? c.start + c.chat : 0; }
@@ -458,18 +458,27 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
   }
 
   /* ---------- Bruce: five things ---------- */
-  function conversations(rows) {
+  /* Chats, the way a chat app lists them: one row per person, the most recent activity first, and a message from Bruce counts as
+     activity as much as one to him (a DM he sent moves that person's chat to the top). Sends to a channel are not a person's chat. */
+  function chats(rows) {
     var by = {};
+    function mk(user, name, role, at) { return by[user] || (by[user] = { user: user, name: name, role: role, asks: [], topics: {}, last: at, preview: null }); }
     rows.forEach(function (r) {
-      var c = by[r.user] || (by[r.user] = { user: r.user, name: r.name, role: r.role, asks: [], topics: {}, last: r.at, ask: null });
-      c.asks.push(r); c.topics[r.topic] = (c.topics[r.topic] || 0) + 1; if (!c.ask || r.at > c.ask.at) c.ask = r; if (r.at > c.last) c.last = r.at; if (r.role === 'owner') c.role = 'owner';
+      var c = mk(r.user, r.name, r.role, r.at);
+      c.asks.push(r); c.topics[r.topic] = (c.topics[r.topic] || 0) + 1; if (r.at > c.last) c.last = r.at; if (r.role === 'owner') c.role = 'owner';
+      if (!c.preview || r.at > c.preview.at) c.preview = { by: 'person', text: r.text, thread: r.thread, at: r.at };
+    });
+    (S.bruce || []).filter(function (r) { return r.kind === 'sent' && /^[UW]/.test(r.toId) && inWindow(r.at) && !(hideOn() && S.owner && r.toId === S.owner); }).forEach(function (r) {
+      var c = mk(r.toId, r.to || r.toId, r.toId === S.owner ? 'owner' : 'teammate', r.at);
+      if (r.at > c.last) c.last = r.at;
+      if (!c.preview || r.at > c.preview.at) c.preview = { by: 'bruce', text: r.text, thread: false, at: r.at };
     });
     return Object.keys(by).map(function (k) { return by[k]; }).sort(function (a, b) { return b.last - a.last; });
   }
   function renderBruce() {
     var s = summary('bruce'), a = s.a;
     if (!s.known) return card('Bruce', '', empty('error', 'Could not read his log', s.doing)) + healthCard(s) + aboutCard(a);
-    var rows = bruceRows(), convs = conversations(rows); S.convs = convs; S.order = convs.map(function (c) { return c.user; });
+    var rows = bruceRows(), convs = chats(rows); S.convs = convs; S.order = convs.map(function (c) { return c.user; });
     if (!bruceAll().length) return card('Bruce', '', empty('first-use', 'Nobody has asked him anything yet', 'His conversations, usage and the asks that need you appear here once someone messages him in Slack.')) + healthCard(s, true) + aboutCard(a);
     var firstBy = {};
     bruceAll().forEach(function (r) { var f = firstBy[r.user]; if (!f || r.at < f.at) firstBy[r.user] = r; });
@@ -484,22 +493,28 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
       ['Not a bill', 'Re-reads of the same context are cached and weigh less on a plan. Use it to compare weeks, and chats against runs.'],
       ['Your weekly limit', 'Comes from a dated snapshot of the plan’s usage card (admin/bruce-usage.json), because the hub cannot read it live.']], 'gd-key-value-list--stacked gd-key-value-list--ruled'));
 
-    /* 1. conversations; a New tag for anyone whose first ask came in the last day */
-    html += card('Conversations', convs.length ? plural(convs.length, 'conversation') + ', latest first' : '', convs.length ? table('Conversations', [
-      { h: 'Person', w: 'minmax(190px,1fr)', flex: true }, { h: 'Last ask', w: 'minmax(0,2fr)', title: true, muted: true }, { h: 'About', w: 'minmax(150px,1fr)', flex: true }, { h: 'Asks', w: '64px', num: true }, { h: 'When', w: '110px', muted: true }],
+    /* 1. chats: latest activity first; a New tag for anyone whose first ask came in the last day */
+    html += card('Chats', convs.length ? plural(convs.length, 'chat') + ', latest activity first' : '', convs.length ? table('Chats', [
+      { h: 'Person', w: 'minmax(190px,1fr)', flex: true }, { h: 'Latest message', w: 'minmax(0,2fr)', title: true, muted: true }, { h: 'About', w: 'minmax(150px,1fr)', flex: true }, { h: 'Asks', w: '64px', num: true }, { h: 'When', w: '110px', muted: true }],
       convs.map(function (c) {
         var tags = Object.keys(c.topics).sort(function (x, y) { return c.topics[y] - c.topics[x]; }).slice(0, 2).map(function (t) { return tag(TOPIC[t] + (c.topics[t] > 1 ? ' ×' + c.topics[t] : ''), t === 'other' ? 'warn' : ''); }).join('');
-        return { attrs: ' data-u="' + esc(c.user) + '"', t: ['', c.ask.text, '', '', ''], cells: [
+        var pv = c.preview ? (c.preview.by === 'bruce' ? 'Bruce: ' : (c.preview.thread ? '↳ ' : '')) + c.preview.text : '';
+        return { attrs: ' data-u="' + esc(c.user) + '"', t: ['', pv, '', '', ''], cells: [
           '<span class="gd-table__avatar" aria-hidden="true">' + initial(c.name) + '</span><span class="gd-table__who"><a class="gd-table__link" href="#" data-u="' + esc(c.user) + '">' + esc(c.name) + '</a>' + (c.role === 'owner' ? '<small>Owner</small>' : '') + '</span>' + (isNew(c.user) ? badge('info', 'New') : ''),
-          (c.ask.thread ? '↳ ' : '') + esc(clip(c.ask.text, 140)), tags, String(c.asks.length), '<time datetime="' + c.last.toISOString() + '">' + esc(ago(Date.now() - c.last.getTime())) + '</time>'] };
-      })) : empty('no-results', 'Nobody asked in this period', 'Try a longer period.'), { flush: !!convs.length });
+          esc(clip(pv, 140)), tags, String(c.asks.length), '<time datetime="' + c.last.toISOString() + '">' + esc(ago(Date.now() - c.last.getTime())) + '</time>'] };
+      })) : empty('no-results', 'No chats in this period', 'Try a longer period.'), { flush: !!convs.length });
 
-    /* 2b. the messages he sent: who he sent to, for whom, and what; a row opens the asker's conversation */
-    var sent = bruceSent();
-    html += card('Messages he sent', sent.length ? plural(sent.length, 'message') + (sent.length > 8 ? ', latest 8' : '') + ', newest first' : '', sent.length ? table('Messages he sent', [
-      { h: 'When', w: '150px', muted: true }, { h: 'Sent to', w: '150px', strong: true }, { h: 'Asked by', w: '170px' }, { h: 'Message', w: 'minmax(0,1fr)', title: true }],
-      sent.slice(0, 8).map(function (r) { return { attrs: ' data-u="' + esc(r.user) + '"', t: ['', '', '', r.text], cells: ['<time datetime="' + r.at.toISOString() + '">' + esc(fmtWhen(r.at)) + '</time>', esc(r.to || 'Someone'), esc(r.name), esc(clip(r.text, 140))] }; }))
-      : empty('no-results', 'He sent nothing in this period', 'When Bruce passes a message on to someone, it shows up here.'), { flush: !!sent.length });
+    /* 2. Bruce users: everyone who has ever asked him, newest first (not limited to the period) */
+    var ub = {};
+    bruceAll().forEach(function (r) { var u = ub[r.user] || (ub[r.user] = { user: r.user, name: r.name, role: r.role, first: r.at, last: r.at, asks: 0, runs: 0 }); if (r.at < u.first) u.first = r.at; if (r.at > u.last) u.last = r.at; u.asks++; if (r.kind === 'run') u.runs++; if (r.role === 'owner') u.role = 'owner'; });
+    var users = Object.keys(ub).map(function (k) { return ub[k]; }).sort(function (x, y) { return y.first - x.first; });
+    html += card('Bruce users', plural(users.length, 'person', 'people') + ' ' + (users.length === 1 ? 'has' : 'have') + ' used him, newest first', table('Bruce users', [
+      { h: 'Person', w: 'minmax(190px,1fr)', flex: true }, { h: 'Started using him', w: '160px', muted: true }, { h: 'Last asked', w: '130px', muted: true }, { h: 'Asks', w: '70px', num: true }, { h: 'Runs', w: '70px', num: true }],
+      users.slice(0, 20).map(function (u) {
+        return { attrs: ' data-u="' + esc(u.user) + '"', cells: [
+          '<span class="gd-table__avatar" aria-hidden="true">' + initial(u.name) + '</span><span class="gd-table__who"><a class="gd-table__link" href="#" data-u="' + esc(u.user) + '">' + esc(u.name) + '</a>' + (u.role === 'owner' ? '<small>Owner</small>' : '') + '</span>' + (isNew(u.user) ? badge('info', 'New') : ''),
+          '<time datetime="' + u.first.toISOString() + '">' + esc(fmtWhen(u.first)) + '</time>', '<time datetime="' + u.last.toISOString() + '">' + esc(ago(Date.now() - u.last.getTime())) + '</time>', String(u.asks), String(u.runs)] };
+      })), { flush: true, foot: users.length > 20 ? '<span class="gd-card__desc">Showing the newest 20 of ' + users.length + '.</span>' : '' });
 
     /* 3. what he worked on: the runs; nothing to show, nothing drawn */
     var work = rows.filter(function (r) { return r.kind === 'run'; }).sort(function (x, y) { return y.at - x.at; });
@@ -519,7 +534,7 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
   }
 
   /* ---------- the conversation drawer ---------- */
-  function personRows(user) { return (S.bruce || []).filter(function (r) { return r.user === user; }).sort(function (a, b) { return b.at - a.at; }); }
+  function personRows(user) { return (S.bruce || []).filter(function (r) { return r.kind === 'sent' ? r.toId === user : r.user === user; }).sort(function (a, b) { return b.at - a.at; }); }
   function linkify(t) {
     return String(t).split(/(https?:\/\/[^\s<]+)/g).map(function (p, i) {
       if (i % 2) { var m = p.match(/^(.*?)([.,;:!?)\]'"]*)$/), u = m[1], tail = m[2]; return '<a class="gd-table__link" href="' + esc(u) + '" target="_blank" rel="noopener noreferrer">' + esc(u) + '</a>' + esc(tail); }
@@ -531,7 +546,7 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
   function cur() { var u = S.openUser, c = S.convs.filter(function (x) { return x.user === u; })[0]; return { c: c || { user: u, name: (personRows(u)[0] || {}).name || u, role: 'teammate', last: new Date(), asks: [], topics: {} }, all: personRows(u) }; }
   function drawerHead() {
     var x = cur(), i = S.order.indexOf(S.openUser), n = S.order.length;
-    $('ag-d-sub').textContent = 'Conversation' + (i >= 0 && n > 1 ? ' · ' + (i + 1) + ' of ' + n : '');
+    $('ag-d-sub').textContent = 'Chat' + (i >= 0 && n > 1 ? ' · ' + (i + 1) + ' of ' + n : '');
     $('ag-d-title').innerHTML = esc(x.c.name) + (x.c.role === 'owner' ? ' ' + badge('neutral', 'Owner') : '');
     $('ag-d-prev').disabled = !(i > 0); $('ag-d-next').disabled = !(i >= 0 && i < n - 1);
   }
@@ -595,14 +610,17 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
     var x = cur(), b = $('ag-d-body');
     if (t === 'log') b.innerHTML = logHTML();
     else if (t === 'shared') b.innerHTML = sharedHTML(S.dm[S.openUser] || null);
-    else b.innerHTML = '<h4 class="gd-card__title">Details</h4>' + detailsKv(x.c, x.all) + '<h4 class="gd-card__title" style="margin:20px 0 12px">Conversation</h4><div id="ag-thread">' + threadHTML(S.dm[S.openUser] || null) + '</div>';
+    else if (t === 'details') b.innerHTML = '<h4 class="gd-card__title">Details</h4>' + detailsKv(x.c, x.all);
+    else { b.innerHTML = '<div id="ag-thread">' + threadHTML(S.dm[S.openUser] || null) + '</div>'; toNewest(); }
   }
+  /* Like a chat app: the newest message is in view, and scrolling up goes back through the older ones. */
+  function toNewest() { var sc = $('ag-d-body').closest('.gd-drawer__body'); if (sc) sc.scrollTop = sc.scrollHeight; }
   function loadDM(user, all) {
     if (S.dm[user]) { setShared(S.dm[user]); return; }
     var seq = ++S.seq, ch = (all.filter(function (r) { return r.ch; })[0] || {}).ch || '';
     fetch('/api/bruce-memory?dm=1&user=' + encodeURIComponent(user) + (ch ? '&ch=' + encodeURIComponent(ch) : ''), { credentials: 'same-origin', cache: 'no-store' })
       .then(function (res) { return res.json().catch(function () { return { ok: false, reason: 'slack', detail: 'Unexpected answer.' }; }); })
-      .then(function (j) { if (j && j.ok) S.dm[user] = j; if (seq !== S.seq || S.openUser !== user) return; setShared(j); if (S.dtab === 'chat') { var t = $('ag-thread'); if (t) t.innerHTML = threadHTML(j); } else if (S.dtab === 'shared') $('ag-d-body').innerHTML = sharedHTML(j); })
+      .then(function (j) { if (j && j.ok) S.dm[user] = j; if (seq !== S.seq || S.openUser !== user) return; setShared(j); if (S.dtab === 'chat') { var t = $('ag-thread'); if (t) { t.innerHTML = threadHTML(j); toNewest(); } } else if (S.dtab === 'shared') $('ag-d-body').innerHTML = sharedHTML(j); })
       .catch(function () { if (seq === S.seq && S.openUser === user && S.dtab === 'chat') { var t = $('ag-thread'); if (t) t.innerHTML = threadHTML({ ok: false, detail: 'Try again in a moment.' }); } });
   }
   function openConv(user) {
@@ -635,7 +653,7 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
     }).then(function (j) {
       if (!j) return; if (!j.configured) { S.bruceErr = 'No store connected, so nothing is logged'; return; }
       S.owner = String(j.owner || ''); S.cap = Number(j.cap) || 3; S.dm = {};
-      S.bruce = (j.rows || []).map(function (r) { var d = new Date(r.at); return isNaN(d.getTime()) ? null : { at: d, user: String(r.user || ''), name: String(r.name || r.user || ''), role: r.role === 'owner' ? 'owner' : 'teammate', kind: String(r.kind || 'run'), thread: !!r.thread, text: String(r.text || ''), topic: r.topic || (r.kind === 'sent' ? '' : 'other'), to: String(r.toName || ''), ch: String(r.ch || ''), skills: Array.isArray(r.skills) ? r.skills : [], tokens: Number(r.tokens) || 0, reported: !!r.reported }; }).filter(Boolean);
+      S.bruce = (j.rows || []).map(function (r) { var d = new Date(r.at); return isNaN(d.getTime()) ? null : { at: d, user: String(r.user || ''), name: String(r.name || r.user || ''), role: r.role === 'owner' ? 'owner' : 'teammate', kind: String(r.kind || 'run'), thread: !!r.thread, text: String(r.text || ''), topic: r.topic || (r.kind === 'sent' ? '' : 'other'), to: String(r.toName || ''), toId: String(r.to || ''), ch: String(r.ch || ''), skills: Array.isArray(r.skills) ? r.skills : [], tokens: Number(r.tokens) || 0, reported: !!r.reported }; }).filter(Boolean);
     }).catch(function () { S.bruceErr = 'Could not read his log'; });
   }
   function loadUsage() { return fetch('/admin/bruce-usage.json', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { S.usage = j && j.weekly ? j : null; }).catch(function () { S.usage = null; }); }
@@ -683,6 +701,7 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
     if (ev.key === 'ArrowLeft') { ev.preventDefault(); step(-1); } else if (ev.key === 'ArrowRight') { ev.preventDefault(); step(1); }
   });
   window.addEventListener('hashchange', function () { if (S.data) setTab(location.hash.slice(1) || 'all', false); });
+  setInterval(function () { if (S.tab === 'bruce' && !document.hidden && !S.busy) loadBruce().then(function () { if (S.tab === 'bruce') render(); }); }, 30000);
   setInterval(function () { if (S.at) $('ag-refresh').setAttribute('data-tip', 'Updated ' + ago(Date.now() - S.at) + ' · click to refresh'); }, 15000);
 
   fetch('/admin/agents-data.json', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.json(); }).then(function (data) {
