@@ -2769,6 +2769,33 @@ a.gd-hbar__row:hover, a.gd-hbar__row.is-hover { background: var(--gd-hover-bg); 
 .gd .gd-agent-status__foot { display: flex; align-items: center; gap: var(--gw-space-8); margin-top: auto; padding-top: var(--gd-gap); border-top: 1px solid var(--gd-border);
   font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
 
+/* ==== 59-message-thread.css ==== */
+/* ============================================================================================================================
+   59-message-thread.css — message-thread (NEW, 9 Oct 2026; pending library review). A conversation read the way Slack shows it: a
+   picture, a bold name with the time beside it, the words under that, and a message from the same person straight after one
+   carries no second picture. Drawn for the hub's Bruce drawer, where an owner reads a DM back. Built from tokens and the library's
+   avatar, badge and tag; the day line is a quiet pill on a hairline.
+   ========================================================================================================================== */
+.gd .gd-thread { display: flex; flex-direction: column; min-width: 0; }
+.gd .gd-thread__day { display: flex; align-items: center; justify-content: center; position: relative; margin: var(--gw-space-16) 0 var(--gw-space-8); }
+.gd .gd-thread__day::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--gd-border); }
+.gd .gd-thread__day > span { position: relative; padding: var(--gw-space-4) var(--gw-space-12); border-radius: var(--gw-radius-full); background: var(--gd-raised-bg, var(--gd-card-bg)); box-shadow: inset 0 0 0 1px var(--gd-border-strong);
+  font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
+.gd .gd-msg { display: flex; align-items: flex-start; gap: var(--gw-space-12); padding: var(--gw-space-8) var(--gw-space-8); margin: 0 calc(var(--gw-space-8) * -1); border-radius: var(--gw-radius-8); min-width: 0; }
+.gd .gd-msg:hover { background: var(--gd-row-hover); }
+.gd .gd-msg > .gd-avatar { flex: none; }
+.gd .gd-msg--cont { padding-block: var(--gw-space-4); }
+.gd .gd-msg--cont::before { content: ""; flex: none; width: 32px; }
+.gd .gd-msg__main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: var(--gw-space-4); }
+.gd .gd-msg__head { display: flex; align-items: baseline; flex-wrap: wrap; gap: var(--gw-space-8); min-width: 0; }
+.gd .gd-msg__head b { font: var(--gw-text-body-14-sem); color: var(--gd-text); }
+.gd .gd-msg__head time, .gd .gd-msg__note { font: var(--gw-text-body-12-reg); color: var(--gd-text-muted); }
+.gd .gd-msg__text { font: var(--gw-text-body-14-reg); color: var(--gd-text); overflow-wrap: anywhere; white-space: pre-wrap; }
+.gd .gd-msg__text > * { white-space: normal; }
+.gd .gd-msg__files { display: flex; flex-wrap: wrap; gap: var(--gw-space-8); }
+.gd .gd-msg--cont .gd-msg__time-only { font: var(--gw-text-body-12-reg); color: var(--gd-text-muted); opacity: 0; transition: opacity var(--gw-motion-fast); }
+.gd .gd-msg--cont:hover .gd-msg__time-only { opacity: 1; }
+
 /* ==== 60-feedback.css ==== */
 /* ============================================================================
    Gushwork dashboard — 60 feedback, overlays and views

@@ -551,14 +551,20 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
     if (!j) return '<p class="gd-card__desc">Reading the DM from Slack…</p>';
     if (!j.ok) return empty('error', j.reason === 'scope' ? 'Slack won’t let the site read this yet' : 'Could not read this conversation', j.reason === 'scope' ? 'Bruce’s Slack app is missing a permission' + (j.needed ? ' (' + j.needed + ')' : '') + '. Add it in the app’s settings, reinstall the app, then open this again. The Log tab still works.' : (j.detail || j.error || 'Try again in a moment. The Log tab still works.'));
     if (!j.messages.length) return empty('first-use', 'Nothing in this DM', 'Slack returned no messages.');
-    var html = '<div class="gd-ask__thread" role="log" style="padding:0;overflow:visible">', day = '';
+    /* Slack's way of reading a DM (the library's message-thread): a picture, the name in bold with the time beside it, the words
+       under it, a day line between days, and no second picture for a message straight after one from the same person. */
+    var html = '<div class="gd-thread" role="log">', day = '', prevFrom = '', prevAt = 0;
     if (j.truncated) html += '<p class="gd-card__desc">Showing the newest ' + j.messages.length + ' messages. Older ones are in Slack.</p>';
     j.messages.forEach(function (m) {
-      var d = new Date(m.at), dl = fmtDay(d), meta = esc(m.name) + ' · ' + (dl !== day ? esc(dl) + ', ' : '') + esc(fmtTime(d)) + (m.reply ? ' · in a thread' : ''); day = dl;
-      var files = (m.files || []).map(function (f) { var l = esc(f.name) + (f.type ? ' · ' + esc(f.type) : ''); return f.url && /^https:\/\//.test(f.url) ? '<a class="gd-tag" href="' + esc(f.url) + '" target="_blank" rel="noopener noreferrer"><span class="gd-tag__label">' + l + '</span></a>' : tag(f.name); }).join(' ');
-      var inner = (m.text ? '<span>' + linkify(m.text) + '</span>' : '') + (files ? '<span>' + files + '</span>' : '');
-      html += m.from === 'bruce' ? '<div class="gd-ask__msg gd-ask__msg--bruce"><div class="gd-ask__bubble"><small class="gd-card__desc">' + meta + '</small>' + inner + '</div></div>'
-        : '<div class="gd-ask__msg gd-ask__msg--me"><small class="gd-card__desc">' + meta + '</small><div class="gd-ask__bubble">' + inner + '</div></div>';
+      var d = new Date(m.at), dl = fmtDay(d), bot = m.from === 'bruce', newDay = dl !== day;
+      var files = (m.files || []).map(function (f) { var l = esc(f.name) + (f.type ? ' · ' + esc(f.type) : ''); return f.url && /^https:\/\//.test(f.url) ? '<a class="gd-tag" href="' + esc(f.url) + '" target="_blank" rel="noopener noreferrer"><span class="gd-tag__label">' + l + '</span></a>' : tag(f.name); }).join('');
+      if (newDay) html += '<div class="gd-thread__day"><span>' + esc(dl) + '</span></div>';
+      var cont = !newDay && prevFrom === m.from && (d.getTime() - prevAt) < 5 * 60e3;       /* the same sender within five minutes */
+      html += '<div class="gd-msg' + (cont ? ' gd-msg--cont' : '') + '">' +
+        (cont ? '' : '<span class="gd-avatar gd-avatar--team" data-gd-avatar="' + esc(m.name) + '" role="img" aria-label="' + esc(m.name) + '"></span>') +
+        '<div class="gd-msg__main">' + (cont ? '' : '<div class="gd-msg__head"><b>' + esc(m.name) + '</b>' + (bot ? badge('neutral', 'Agent') : '') + '<time>' + esc(fmtTime(d)) + '</time>' + (m.reply ? '<span class="gd-msg__note">in a thread</span>' : '') + '</div>') +
+        (m.text ? '<div class="gd-msg__text">' + linkify(m.text) + '</div>' : '') + (files ? '<div class="gd-msg__files">' + files + '</div>' : '') + '</div></div>';
+      day = dl; prevFrom = m.from; prevAt = d.getTime();
     });
     return html + '</div>';
   }
