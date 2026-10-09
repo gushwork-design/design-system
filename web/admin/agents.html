@@ -184,7 +184,7 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
   var STATE_LABEL = { ok: 'Running well', warn: 'Worth a look', fail: 'Needs attention', unknown: 'Cannot tell yet' };
   var TONE = { ok: 'good', warn: 'warn', fail: 'bad', unknown: 'neutral' };
   var REVIEW = '/internal/design-system#review';
-  var S = { sg: {}, pics: {}, data: null, health: null, healthErr: '', bruce: null, bruceErr: '', owner: '', cap: 3, usage: null, alfred: null, alfredErr: '', period: '7', tab: 'all', at: 0, busy: false,
+  var S = { sg: {}, pics: {}, patterns: null, patternsErr: '', data: null, health: null, healthErr: '', bruce: null, bruceErr: '', owner: '', cap: 3, usage: null, alfred: null, alfredErr: '', period: '7', tab: 'all', at: 0, busy: false,
             dm: {}, seq: 0, openUser: '', dtab: 'chat', order: [], convs: [] };
 
   /* ---------- small library pieces ---------- */
@@ -537,7 +537,7 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
         gaps.slice(0, 8).map(function (r) { return { attrs: ' data-u="' + esc(r.user) + '"', t: ['', '', '', r.text], cells: ['<time datetime="' + r.at.toISOString() + '">' + esc(fmtWhen(r.at)) + '</time>', '<a class="gd-table__link" href="#" data-u="' + esc(r.user) + '">' + esc(r.name) + '</a>',
           r.kind === 'failed' ? badge('bad', 'Failed') : r.kind === 'capped' ? badge('warn', 'Hit the daily cap') : badge('warn', 'No clear lane'), esc(r.text)] }; })), { flush: true, foot: legend }) + '</div>';
     }
-    return html + healthCard(s, true) + aboutCard(a);
+    return html + patternsCard() + healthCard(s, true) + aboutCard(a);
   }
 
   /* ---------- the conversation drawer ---------- */
@@ -645,7 +645,7 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
     return '<div class="gd-thread" role="log">' + rows.map(function (r) {
       var d = new Date(r.at);
       var me = picOf(S.owner);
-      return '<div class="gd-msg"><button type="button" class="gd-btn gd-btn--sm gd-msg__act" data-sg-del="' + esc(r.id || r.at) + '" aria-label="Delete this suggestion">Delete</button>' + (me ? '<span class="gd-msg__pic" role="img" aria-label="You" style="background-image:url(' + esc(me) + ');background-size:cover;background-position:center"></span>' : '<span class="gd-avatar gd-avatar--team" data-gd-avatar="Utsav" role="img" aria-label="You"></span>') + '<div class="gd-msg__main"><div class="gd-msg__head"><b>You</b><time>' + esc(fmtWhen(d)) + '</time></div>' +
+      return '<div class="gd-msg" data-sid="' + esc(r.id || r.at) + '"><span class="gd-msg__acts"><button type="button" class="gd-btn gd-btn--sm" data-pt-open="' + esc(r.id || r.at) + '" aria-label="Make this a pattern for everyone">Make a pattern</button><button type="button" class="gd-btn gd-btn--sm" data-sg-del="' + esc(r.id || r.at) + '" aria-label="Delete this suggestion">Delete</button></span>' + (me ? '<span class="gd-msg__pic" role="img" aria-label="You" style="background-image:url(' + esc(me) + ');background-size:cover;background-position:center"></span>' : '<span class="gd-avatar gd-avatar--team" data-gd-avatar="Utsav" role="img" aria-label="You"></span>') + '<div class="gd-msg__main"><div class="gd-msg__head"><b>You</b><time>' + esc(fmtWhen(d)) + '</time></div>' +
         (r.about && r.about.text ? '<blockquote class="gd-msg__quote">' + esc(r.about.from === 'bruce' ? 'Bruce' : (r.about.name || 'They')) + ': ' + esc(clip(r.about.text, 160)) + '</blockquote>' : '') + '<div class="gd-msg__text">' + esc(r.text) + '</div></div></div>';
     }).join('') + '</div>';
   }
@@ -671,6 +671,47 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
       .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
       .then(function () { closeSide(); loadSuggestions(user); })
       .catch(function () { btn.removeAttribute('aria-busy'); note.textContent = 'Could not save that. Try again.'; });
+  }
+  /* Make a pattern: the owner turns a suggestion into one for everyone, editing it first (take out names). It shows on Bruce's tab. */
+  function openPattern(id) {
+    var row = document.querySelector('#ag-sg-list .gd-msg[data-sid="' + id + '"]'), sug = (S.sg[S.openUser] || []).filter(function (r) { return (r.id || r.at) === id; })[0]; if (!row || !sug) return;
+    var was = row.classList.contains('gd-msg--side'); closeSide(); if (was) return;
+    row.classList.add('gd-msg--side');
+    row.querySelector('.gd-msg__main').insertAdjacentHTML('beforeend', '<div class="gd-msg__side"><p class="gd-card__desc">Bruce reads this before every run, for everyone. Write it as a habit, without names.</p>' +
+      '<textarea class="gd-textarea" rows="3" maxlength="240" aria-label="The pattern">' + esc(sug.text) + '</textarea>' +
+      '<div class="gd-msg__side-foot"><button type="button" class="gd-btn gd-btn--sm gd-btn--primary" data-pt-go="' + esc(id) + '">Save pattern</button><button type="button" class="gd-btn gd-btn--sm" data-sg-x>Cancel</button><span class="gd-card__desc" role="status"></span></div></div>');
+    var ta = row.querySelector('.gd-msg__side textarea'); if (ta) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }
+  }
+  function savePattern(id) {
+    var row = document.querySelector('#ag-sg-list .gd-msg[data-sid="' + id + '"]'); if (!row) return;
+    var ta = row.querySelector('.gd-msg__side textarea'), note = row.querySelector('.gd-msg__side .gd-card__desc:last-child'), btn = row.querySelector('[data-pt-go]'), text = ta ? ta.value.trim() : '';
+    if (!text) { note.textContent = 'Write the pattern first.'; return; }
+    btn.setAttribute('aria-busy', 'true'); note.textContent = '';
+    fetch('/api/bruce-memory?patterns=1', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text: text }) })
+      .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+      .then(function () { closeSide(); loadPatterns().then(function () { if (S.tab === 'bruce') render(); }); var n = row.querySelector('.gd-msg__head'); if (n && !n.querySelector('.ag-pat-b')) n.insertAdjacentHTML('beforeend', '<span class="ag-pat-b">' + badge('info', 'Pattern') + '</span>'); })
+      .catch(function () { btn.removeAttribute('aria-busy'); note.textContent = 'Could not save that. Try again.'; });
+  }
+  function loadPatterns() {
+    return fetch('/api/bruce-memory?patterns=1', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+      .then(function (j) { S.patterns = j.patterns || []; S.patternsErr = ''; }).catch(function () { S.patternsErr = 'Could not read the patterns.'; });
+  }
+  function deletePattern(id, btn) {
+    btn.setAttribute('aria-busy', 'true');
+    fetch('/api/bruce-memory?patterns=1', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ remove: id }) })
+      .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+      .then(function () { return loadPatterns(); }).then(function () { if (S.tab === 'bruce') render(); })
+      .catch(function () { btn.removeAttribute('aria-busy'); btn.textContent = 'Try again'; });
+  }
+  /* Bruce's tab: the patterns he is handed before every run, as a quiet fold. */
+  function patternsCard() {
+    var body;
+    if (S.patternsErr) body = '<p class="gd-card__desc">' + esc(S.patternsErr) + '</p>';
+    else if (!S.patterns) body = ghostThread(2);
+    else if (!S.patterns.length) body = '<p class="gd-card__desc">None yet. Open a chat, go to its Suggest tab and press Make a pattern on a suggestion that should apply to everyone.</p>';
+    else body = '<p class="gd-card__desc">Bruce reads these before every run, with each person’s own notes. Newest first.</p>' + table('Patterns', [{ h: 'Pattern', w: 'minmax(0,1fr)' }, { h: 'Added', w: '120px' }, { h: '', w: '96px' }],
+      S.patterns.map(function (p) { return { cells: [esc(p.text), '<time datetime="' + esc(p.at) + '">' + esc(fmtWhen(new Date(p.at))) + '</time>', '<button type="button" class="gd-btn gd-btn--sm" data-pt-del="' + esc(p.id) + '">Delete</button>'] }; }));
+    return foldCard('ag-pat', 'How Bruce talks to people' + (S.patterns && S.patterns.length ? ' · ' + S.patterns.length : ''), body);
   }
   function deleteSuggestion(id, btn) {
     var user = S.openUser; btn.setAttribute('aria-busy', 'true');
@@ -761,7 +802,7 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
   function loadAll() {
     if (S.busy) return; S.busy = true; $('ag-refresh').setAttribute('aria-busy', 'true');
     var done = function () { S.at = Date.now(); S.busy = false; $('ag-refresh').removeAttribute('aria-busy'); render(); };
-    return Promise.all([loadBruce().then(render), loadUsage().then(render), loadHealth().then(render), loadAlfred().then(render)]).then(done, done);
+    return Promise.all([loadBruce().then(render), loadUsage().then(render), loadHealth().then(render), loadAlfred().then(render), loadPatterns().then(render)]).then(done, done);
   }
 
   document.addEventListener('click', function (e) {
@@ -780,6 +821,9 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
     var dt = e.target.closest && e.target.closest('#ag-d-tabs [data-dt]'); if (dt) { showDTab(dt.getAttribute('data-dt')); return; }
     if (e.target.closest && e.target.closest('#ag-sg-save')) { saveSuggestion(); return; }
     var so = e.target.closest && e.target.closest('[data-sg-open]'); if (so) { openSide(+so.getAttribute('data-sg-open')); return; }
+    var po = e.target.closest && e.target.closest('[data-pt-open]'); if (po) { openPattern(po.getAttribute('data-pt-open')); return; }
+    var pg = e.target.closest && e.target.closest('[data-pt-go]'); if (pg) { savePattern(pg.getAttribute('data-pt-go')); return; }
+    var pd = e.target.closest && e.target.closest('[data-pt-del]'); if (pd) { deletePattern(pd.getAttribute('data-pt-del'), pd); return; }
     var sd = e.target.closest && e.target.closest('[data-sg-del]'); if (sd) { deleteSuggestion(sd.getAttribute('data-sg-del'), sd); return; }
     var sg = e.target.closest && e.target.closest('[data-sg-go]'); if (sg) { saveSide(+sg.getAttribute('data-sg-go')); return; }
     if (e.target.closest && e.target.closest('[data-sg-x]')) closeSide();

@@ -145,6 +145,39 @@ export async function readSuggestions(user, f = fetch) {
   return out.slice(0, 30);
 }
 
+/* ---- patterns: how to interact with people (Utsav, 9 Oct 2026) ----
+   A suggestion is about one person. A pattern is one the owner has decided applies to everyone, written without names ("ask who the
+   audience is before building a one-pager"). The owner promotes a suggestion in the drawer (editing it first); Bruce is never the one
+   who decides what is a pattern. Kept in a short list and handed to every run with the person's own notes. Owner only. */
+const PATTERN_KEY = 'gw:bruce:patterns', MAX_PATTERNS = 20;
+export async function readPatterns(f = fetch) {
+  const cfg = store(); if (!cfg) return [];
+  const [{ result }] = await redis(cfg, [['LRANGE', PATTERN_KEY, '0', String(MAX_PATTERNS - 1)]], f);
+  const out = [];
+  for (const raw of result || []) { try { const o = JSON.parse(raw); if (o && o.id && o.text) out.push(o); } catch { /* skip */ } }
+  return out;
+}
+export async function addPattern(text, f = fetch) {
+  const cfg = store(); if (!cfg) return false;
+  const t = String(text || '').replace(/\s+/g, ' ').trim().slice(0, 240);
+  if (!t) return false;
+  const have = await readPatterns(f);
+  const same = have.find((p) => p.text.toLowerCase() === t.toLowerCase());
+  if (same) return same;                                                              /* pressing twice must not add it twice */
+  const at = new Date().toISOString(), row = { id: at + '.' + Math.random().toString(36).slice(2, 6), at, text: t };
+  await redis(cfg, [['LPUSH', PATTERN_KEY, JSON.stringify(row)], ['LTRIM', PATTERN_KEY, '0', String(MAX_PATTERNS - 1)]], f);
+  return row;
+}
+export async function deletePattern(id, f = fetch) {
+  const cfg = store(); if (!cfg || !id) return false;
+  const [{ result }] = await redis(cfg, [['LRANGE', PATTERN_KEY, '0', String(MAX_PATTERNS - 1)]], f);
+  for (const raw of result || []) {
+    let o; try { o = JSON.parse(raw); } catch { continue; }
+    if (o && o.id === String(id)) { await redis(cfg, [['LREM', PATTERN_KEY, '1', raw]], f); return true; }
+  }
+  return false;
+}
+
 /* ---- the daily cap ---- */
 export function dailyCap() {
   const n = Number(process.env.BRUCE_DAILY_CAP);
@@ -470,6 +503,20 @@ export default async function handler(req, res) {
       if (body && body.remove) return (await deleteSuggestion(String(body.user || ''), String(body.remove))) ? res.status(200).json({ ok: true }) : res.status(404).json({ error: 'No such suggestion.' });
       const row = await addSuggestion(body && body.user, body && body.name, body && body.text, fetch, body && body.about);
       return row ? res.status(200).json({ ok: true, suggestion: row }) : res.status(400).json({ error: 'Nothing to save.' });
+    } catch { return res.status(502).json({ error: 'Could not save that.' }); }
+  }
+  // ?patterns=1: the owner's list of how-to-interact patterns. GET reads, POST { text } adds, POST { remove: id } deletes. Owner only.
+  if (req.query && req.query.patterns && (req.method === 'GET' || req.method === 'POST')) {
+    const session = await verify(readCookie(req.headers.cookie, COOKIE), sessionSecret());
+    if (!session || !session.email) return res.status(401).json({ error: 'Not signed in.' });
+    if (!isOwner(session.email)) return res.status(403).json({ error: 'Owners only.' });
+    res.setHeader('Cache-Control', 'no-store, private');
+    try {
+      if (req.method === 'GET') return res.status(200).json({ patterns: await readPatterns() });
+      let body = req.body; if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
+      if (body && body.remove) return (await deletePattern(String(body.remove))) ? res.status(200).json({ ok: true }) : res.status(404).json({ error: 'No such pattern.' });
+      const row = await addPattern(body && body.text);
+      return row ? res.status(200).json({ ok: true, pattern: row }) : res.status(400).json({ error: 'Nothing to save.' });
     } catch { return res.status(502).json({ error: 'Could not save that.' }); }
   }
   // ?log=1: the owner's view of every Bruce turn, for /admin/analytics#bruce. Session cookie, owner only, like the usage log.

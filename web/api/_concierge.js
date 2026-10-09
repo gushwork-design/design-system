@@ -433,10 +433,11 @@ export async function fireBruce(event, env = process.env, f = fetch, extra = {})
   const url = env.GW_BRUCE_TRIGGER_URL || '', token = env.GW_BRUCE_TRIGGER_TOKEN || '';
   if (!url || !token) return { fired: false, why: 'not set' };
   const notes = (extra.notes || []).length ? ['memory (your notes on this person, newest first):', ...extra.notes.map((n) => `- ${n}`)] : ['memory: nothing yet'];
+  const pats = (extra.patterns || []).length ? ['how to interact with people (patterns Utsav has set; they apply to everyone, newest first):', ...extra.patterns.map((n) => `- ${n}`)] : [];
   const ctx = contextOf(event);
   const text = [`Slack DM from <@${event.user}>.`, `user: ${event.user}`, `role: ${extra.owner ? 'owner' : 'teammate'}`, `channel: ${event.channel}`, `thread_ts: ${event.thread_ts || event.ts}`, `message_ts: ${event.ts}`,
     `in_thread: ${event.thread_ts ? 'yes' : 'no'}`, `agent_session: ${extra.agent ? 'yes' : 'no'}`, ...(ctx ? [`looking_at: ${ctx}`] : []),
-    ...(extra.memoryToken ? [`memory_token: ${extra.memoryToken}`] : []), ...notes, `message:`, String(event.text || '').slice(0, 4000)].join('\n');
+    ...(extra.memoryToken ? [`memory_token: ${extra.memoryToken}`] : []), ...notes, ...pats, `message:`, String(event.text || '').slice(0, 4000)].join('\n');
   try {
     const r = await f(url, {
       method: 'POST',
@@ -565,7 +566,7 @@ export async function handleMessage(event, deps) {
       const replyTs = event.thread_ts || event.ts;
       const isOwner = !!ownerId && event.user === ownerId;
       // Every run spends Utsav's account, so everyone but him has a daily cap. Past it, the concierge still answers.
-      let quota = { allowed: true, used: 0, cap: 0 }, notes = [], memoryToken = '';
+      let quota = { allowed: true, used: 0, cap: 0 }, notes = [], patterns = [], memoryToken = '';
       /* A run is work (a skill, a build, a check); a chat is a conversation (8 Oct 2026). Only runs spend the small cap. */
       const weight = memory && memory.weightOf ? memory.weightOf(event.text) : 'run';
       if (memory) {
@@ -579,11 +580,12 @@ export async function handleMessage(event, deps) {
           return { did: 'capped', used: quota.used };
         }
         try { notes = await memory.readNotes(event.user); } catch { /* fine without */ }
+        try { patterns = (await memory.readPatterns()).map((p) => p.text); } catch { /* fine without */ }
         try { memoryToken = memory.mintToken(event.user); } catch { /* fine without */ }
       }
       // "Bruce is typing…" rather than the session's "Stop Bruce" spinner (Utsav, 6 Oct 2026). Slack clears it when Bruce posts.
       if (inPane && !(await setTyping(token, event))) await setStatus(token, event, 'processing');
-      const run = await fire(event, undefined, undefined, { owner: isOwner, notes, memoryToken, agent: inPane });
+      const run = await fire(event, undefined, undefined, { owner: isOwner, notes, patterns, memoryToken, agent: inPane });
       if (memory) await log(memory, token, event, { role: isOwner ? 'owner' : 'teammate', kind: run.fired ? (weight === 'run' ? 'run' : 'chat') : 'failed', used: quota.used });
       if (!run.fired) {
         await slack(token, 'chat.postMessage', { channel: event.channel, thread_ts: replyTs, text: `I couldn’t start on that (${run.why}). Check GW_BRUCE_TRIGGER_URL and GW_BRUCE_TRIGGER_TOKEN on the site.` });
