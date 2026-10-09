@@ -111,6 +111,27 @@ export async function listRecords(cfg) {
   return out.sort((a, b) => (b.at || 0) - (a.at || 0));
 }
 
+/* "Seen, not asked" (9 Oct 2026, Utsav: "make the plugin tab also show seen but not asked"): every outside address in
+   the usage log that has no record here yet, so the owner can decide before the person ever asks. Pure, so it is
+   tested without a store. `since` marks who would be let in on first ask (the grandfather rule). */
+export function seenNotAsked(records, usageRows, domain, since = gateSince(), now = Date.now()) {
+  const known = new Set(records.map((r) => r.email));
+  const by = new Map();
+  for (const raw of usageRows || []) {
+    let r; try { r = typeof raw === 'string' ? JSON.parse(raw) : raw; } catch { continue; }
+    const email = normEmail(r && r.email);
+    if (!email || onDomain(email, domain) || known.has(email)) continue;
+    const at = Date.parse(r.at); if (!Number.isFinite(at)) continue;
+    const u = by.get(email) || { email, state: 'seen', first: at, last: at, version: '', sessions: 0, before: false };
+    if (at < u.first) u.first = at;
+    if (at >= u.last) { u.last = at; if (r.version) u.version = clean(r.version, 32); }
+    if ((r.event || 'session-start') === 'session-start') u.sessions++;
+    if (since && at < since) u.before = true;
+    by.set(email, u);
+  }
+  return [...by.values()].filter((u) => now - u.last < 1000 * 60 * 60 * 24 * 90).sort((a, b) => b.last - a.last);
+}
+
 /* Was this address using the plugin before the gate shipped? One scan of the usage log, then remembered. */
 async function grandfathered(cfg, email) {
   const since = gateSince();
@@ -268,8 +289,12 @@ export default async function handler(req, res) {
     if (!isAdmin(me, rules)) return json(res, 403, { error: 'Admins only.' });
     if (!cfg) return json(res, 200, { configured: false, domain: allowedDomain(), since: gateSince(), people: [] });
     if (req.method === 'GET') {
-      try { return json(res, 200, { configured: true, domain: allowedDomain(), since: gateSince(), people: await listRecords(cfg) }); }
-      catch { return json(res, 502, { error: 'Could not read the list.' }); }
+      try {
+        const people = await listRecords(cfg);
+        const [rows] = await redis(cfg, [['LRANGE', USAGE_KEY, '0', '-1']]);
+        const seen = seenNotAsked(people, (rows && rows.result) || [], allowedDomain());
+        return json(res, 200, { configured: true, domain: allowedDomain(), since: gateSince(), people: people.concat(seen) });
+      } catch { return json(res, 502, { error: 'Could not read the list.' }); }
     }
     let body = req.body;
     if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = null; } }

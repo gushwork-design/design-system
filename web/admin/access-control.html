@@ -1667,10 +1667,18 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
     if (p.state === 'pending' && p.at) facts.push('asked ' + agoShort(Date.now() - p.at));
     if (p.state !== 'pending' && p.decidedAt) facts.push((p.state === 'allowed' ? 'allowed ' : 'denied ') + agoShort(Date.now() - p.decidedAt) + (p.by ? ' by ' + p.by : ''));
     if (p.state === 'allowed' && p.by === 'grandfathered') facts = ['was using it before the gate, let in'];
+    if (p.state === 'seen') {
+      facts = [];
+      if (p.version) facts.push('plugin ' + p.version);
+      facts.push(p.sessions + (p.sessions === 1 ? ' session' : ' sessions'));
+      if (p.last) facts.push('last seen ' + agoShort(Date.now() - p.last));
+      facts.push(p.before ? 'used it before the gate, so it is let in when it asks' : 'has not asked');
+    }
     if (p.note) facts.push('“' + p.note + '”');
     var busy = plug.busy === p.email ? ' disabled' : '';
     var b = function (act, label, cls) { return '<button class="ac-btn ac-btn--sm' + (cls || '') + '" type="button" data-plug="' + act + '" data-e="' + esc(p.email) + '"' + busy + '>' + label + '</button>'; };
     var acts = p.state === 'pending' ? b('allow', 'Allow', ' ac-btn--primary') + b('deny', 'Deny', ' ac-btn--danger')
+      : p.state === 'seen' ? b('allow', 'Allow') + b('deny', 'Deny', ' ac-btn--danger')
       : p.state === 'allowed' ? b('deny', 'Revoke', ' ac-btn--danger')
       : b('allow', 'Allow') + b('clear', 'Forget');
     return '<div class="ac-mem ac-mem--plug">' + avatarHTML(p.email, true) +
@@ -1684,7 +1692,7 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
     if (!plug.configured) h += '<div class="ac-note">' + icon('info') + '<span>No store is connected, so the plugin lets everyone in and nothing can be recorded here.</span></div>';
     if (plug.note) h += '<div class="ac-note ac-note--warn">' + icon('info') + '<span>' + esc(plug.note) + '</span></div>';
     h += '<form class="ac-ppl__new" data-plugadd><input class="ac-field" type="email" placeholder="Allow an address outside ' + esc(meta.domain) + ' before they ask" aria-label="Address to allow" data-1p-ignore="true" data-lpignore="true" data-form-type="other"><button class="ac-btn" type="submit">Allow</button></form>';
-    var groups = [['pending', 'Waiting for an answer'], ['allowed', 'Allowed'], ['denied', 'Denied']];
+    var groups = [['pending', 'Waiting for an answer'], ['seen', 'Seen, not asked'], ['allowed', 'Allowed'], ['denied', 'Denied']];
     var any = false;
     groups.forEach(function (g) {
       var rows = plug.people.filter(function (p) { return p.state === g[0]; });
@@ -1696,7 +1704,7 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
     return h;
   }
   function pluginCard() {
-    var card = el('<section class="ac-card"><div class="ac-card__hd"><div><h3>Plugin</h3><p>Who outside ' + esc(meta.domain) + ' may use the Claude Code plugin. Everyone at ' + esc(meta.domain) + ' is allowed without being listed. Decisions here apply at once; the plugin asks at every session start.</p></div></div>' +
+    var card = el('<section class="ac-card"><div class="ac-card__hd"><div><h3>Plugin</h3><p>Who outside ' + esc(meta.domain) + ' may use the Claude Code plugin. Everyone at ' + esc(meta.domain) + ' is allowed without being listed. Decisions here apply at once; the plugin asks at every session start. Seen, not asked lists outside addresses the usage log has heard from that have not asked yet, so you can decide first.</p></div></div>' +
       '<div class="ac-card__body"><div class="ac-ppl__main" data-plug></div></div></section>');
     var body = card.querySelector('[data-plug]');
     var draw = function () { body.innerHTML = plugBodyHTML(); };
