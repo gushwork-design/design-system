@@ -10,7 +10,7 @@ with the numbers and charts that prove it. It is shorter and lighter than a dash
 or a PDF, and never edited in place. It looks like the Gushwork design hub because it is built from the same
 components, minus the app shell.
 
-Announce at the start: **"Using the Gushwork reports skill — v2.1.0, updated 9 Oct 2026."**
+Announce at the start: **"Using the Gushwork reports skill — v2.1.1, updated 9 Oct 2026."**
 
 That version and date are stamped into this file, so **a stale copy reports its own stale date**. If the user asks
 whether they are up to date, check for real:
