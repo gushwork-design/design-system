@@ -32,10 +32,12 @@ command -v claude >/dev/null 2>&1 || fail \
 if ! git ls-remote --exit-code "https://github.com/$REPO.git" HEAD >/dev/null 2>&1; then
   fail "git can't reach $REPO.
 
-  The repo is private, so you need two things:
-    1. access — ask Utsav to add you as a collaborator
-    2. authenticated git on this machine — the simplest route is:
+  The repo is public, so this is almost always git itself: it isn't authenticated, or this
+  machine's network blocks github.com. The simplest route is:
          gh auth login          (then: gh auth setup-git)
+
+  Who may USE the plugin is decided separately, at the first session: a Gushwork account is
+  allowed on the spot; any other account is offered uninstall or request access.
 
   Check it with:
     git ls-remote https://github.com/$REPO.git HEAD"
