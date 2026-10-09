@@ -111,13 +111,31 @@ export async function addSuggestion(user, name, text, f = fetch, about = null) {
   const cfg = store(); if (!cfg || !UID.test(String(user || ''))) return false;
   const t = String(text || '').replace(/\s+/g, ' ').trim().slice(0, 500);
   if (!t) return false;
-  const row = { at: new Date().toISOString(), user: String(user), name: String(name || user).replace(/\s+/g, ' ').trim().slice(0, 80), text: t };
+  const at = new Date().toISOString(), row = { id: at + '.' + Math.random().toString(36).slice(2, 6), at, user: String(user), name: String(name || user).replace(/\s+/g, ' ').trim().slice(0, 80), text: t };
   /* `about`: the message the owner was pointing at when they wrote it (hovering a message in the drawer) */
   const q = about && typeof about === 'object' ? String(about.text || '').replace(/\s+/g, ' ').trim().slice(0, 240) : '';
   if (q) row.about = { text: q, from: about.from === 'bruce' ? 'bruce' : 'person', name: String(about.name || '').replace(/\s+/g, ' ').trim().slice(0, 80), at: Number(about.at) || 0 };
   await redis(cfg, [['LPUSH', SUGGEST_KEY, JSON.stringify(row)], ['LTRIM', SUGGEST_KEY, '0', String(MAX_SUGGEST - 1)]], f);
-  await addNotes(row.user, [q ? 'Suggestion from Utsav, on ' + (row.about.from === 'bruce' ? 'your' : 'their') + ' message "' + q.slice(0, 60) + '": ' + t.slice(0, 110) : 'Suggestion from Utsav, for how you handle them: ' + t.slice(0, 190)], f);
+  await addNotes(row.user, [suggestionNote(row)], f);
   return row;
+}
+/* the line Bruce's notes carry for a suggestion; deleting the suggestion removes exactly this line */
+function suggestionNote(row) {
+  const q = row.about && row.about.text;
+  return q ? 'Suggestion from Utsav, on ' + (row.about.from === 'bruce' ? 'your' : 'their') + ' message "' + q.slice(0, 60) + '": ' + row.text.slice(0, 110) : 'Suggestion from Utsav, for how you handle them: ' + row.text.slice(0, 190);
+}
+/* Deleting takes it out of the list and out of Bruce's notes on that person, so he stops acting on it. Identified by who and when. */
+export async function deleteSuggestion(user, id, f = fetch) {
+  const cfg = store(); if (!cfg || !UID.test(String(user || '')) || !id) return false;
+  const [{ result }] = await redis(cfg, [['LRANGE', SUGGEST_KEY, '0', String(MAX_SUGGEST - 1)]], f);
+  for (const raw of result || []) {
+    let o; try { o = JSON.parse(raw); } catch { continue; }
+    if (!o || o.user !== user || (o.id || o.at) !== String(id)) continue;
+    const line = `${o.at.slice(0, 10)}: ${suggestionNote(o).replace(/\s+/g, ' ').trim().slice(0, 240)}`;
+    await redis(cfg, [['LREM', SUGGEST_KEY, '1', raw], ['LREM', `gw:bruce:mem:${user}`, '1', line]], f);
+    return true;
+  }
+  return false;
 }
 export async function readSuggestions(user, f = fetch) {
   const cfg = store(); if (!cfg) return [];
@@ -449,6 +467,7 @@ export default async function handler(req, res) {
     try {
       if (req.method === 'GET') return res.status(200).json({ suggestions: await readSuggestions(String(req.query.user || '')) });
       let body = req.body; if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
+      if (body && body.remove) return (await deleteSuggestion(String(body.user || ''), String(body.remove))) ? res.status(200).json({ ok: true }) : res.status(404).json({ error: 'No such suggestion.' });
       const row = await addSuggestion(body && body.user, body && body.name, body && body.text, fetch, body && body.about);
       return row ? res.status(200).json({ ok: true, suggestion: row }) : res.status(400).json({ error: 'Nothing to save.' });
     } catch { return res.status(502).json({ error: 'Could not save that.' }); }

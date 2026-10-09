@@ -19,6 +19,9 @@
 body[data-gw-page="agents"] .sg__main { grid-column: 1 / -1; max-width: 1120px; gap: var(--gw-space-24); }
 body[data-gw-page="agents"] .sg__hd { border-bottom: 0; padding-bottom: var(--gw-space-8); }
 #ag-app[hidden], #ag-state:empty { display: none; }
+/* loading ghosts (Utsav, 9 Oct 2026): the real layout in grey, one ghost per element. Sizes below are chosen to match the real name, line and card heights. */
+#ag-drawer .gd-ghost { background: var(--gd-border-strong); }   /* the library's ghost colour is the drawer's own surface in dark, so one step stronger here */
+.ag-gh-name { height: 14px; width: 96px; } .ag-gh-line { height: 14px; } .ag-gh-msg .gd-ghost--avatar { border-radius: 20%; }
 #ag-panel { display: grid; gap: var(--gw-space-24); }
 #ag-panel > * { min-width: 0; }
 .ag-bar { position: sticky; top: 0; z-index: 6; background: var(--s-panel-bg); margin-top: calc(var(--gw-space-8) * -1); padding-top: var(--gw-space-8); align-self: stretch;
@@ -577,8 +580,20 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
     return kv([['First asked', esc(fmtWhen(first))], ['Last asked', esc(fmtWhen(c.last)) + ' (' + esc(ago(Date.now() - c.last.getTime())) + ')'], ['Asks', esc(plural(asks.length, 'ask')) + ' (' + runs + ' run' + (runs === 1 ? '' : 's') + ', ' + chats + ' chat' + (chats === 1 ? '' : 's') + ')'],
       ['Tokens (est.)', esc(tok(t))], ['Topics', Object.keys(tc).sort(function (x, y) { return tc[y] - tc[x]; }).map(function (k) { return tag(TOPIC[k] + (tc[k] > 1 ? ' ×' + tc[k] : ''), k === 'other' ? 'warn' : ''); }).join(' ') || '—']], 'gd-key-value-list--ruled');
   }
+  /* the ghost of a conversation: a picture, a short name and two lines of text, a few times over. Shown while Slack is read. */
+  function ghostThread(n) {
+    var w = [92, 64, 80, 48, 70], html = '<div class="gd-thread" role="status" aria-busy="true" aria-label="Reading the DM from Slack">';
+    for (var i = 0; i < n; i++) html += '<div class="gd-msg ag-gh-msg"><span class="gd-ghost gd-ghost--avatar"></span><div class="gd-msg__main"><span class="gd-ghost ag-gh-name"></span><span class="gd-ghost ag-gh-line" style="width:' + w[i % 5] + '%"></span><span class="gd-ghost ag-gh-line" style="width:' + w[(i + 2) % 5] / 1.6 + '%"></span></div></div>';
+    return html + '</div>';
+  }
+  function ghostPage() {
+    var cards = '', rows = '';
+    for (var i = 0; i < 3; i++) cards += '<div class="gd-span-4"><span class="gd-ghost gd-ghost--block" style="height:132px"></span></div>';
+    for (var k = 0; k < 5; k++) rows += '<div class="gd-ghost-row"><span class="gd-ghost gd-ghost--avatar" style="border-radius:20%;width:24px;height:24px"></span><span class="gd-ghost ag-gh-line" style="width:18%"></span><span class="gd-ghost ag-gh-line" style="width:46%"></span></div>';
+    return '<div role="status" aria-busy="true" aria-label="Loading the agents" style="display:grid;gap:var(--gw-space-24)"><div class="gd-grid">' + cards + '</div><span class="gd-ghost gd-ghost--title"></span><div>' + rows + '</div></div>';
+  }
   function threadHTML(j) {
-    if (!j) return '<p class="gd-card__desc">Reading the DM from Slack…</p>';
+    if (!j) return ghostThread(5);
     if (!j.ok) return empty('error', j.reason === 'scope' ? 'Slack won’t let the site read this yet' : 'Could not read this conversation', j.reason === 'scope' ? 'Bruce’s Slack app is missing a permission' + (j.needed ? ' (' + j.needed + ')' : '') + '. Add it in the app’s settings, reinstall the app, then open this again. The Log tab still works.' : (j.detail || j.error || 'Try again in a moment. The Log tab still works.'));
     if (!j.messages.length) return empty('first-use', 'Nothing in this DM', 'Slack returned no messages.');
     /* Slack's way of reading a DM (the library's message-thread): a picture, the name in bold with the time beside it, the words
@@ -599,7 +614,7 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
     return html + '</div>';
   }
   function sharedHTML(j) {
-    if (!j) return '<p class="gd-card__desc">Reading the DM from Slack…</p>';
+    if (!j) return ghostThread(3);
     if (!j.ok) return threadHTML(j);
     var sh = sharedOf(j);
     if (!sh.files.length && !sh.links.length) return empty('first-use', 'No links or files yet', 'Nothing has been shared in this DM.');
@@ -623,14 +638,14 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
     return '<p class="gd-card__desc">Tell Bruce what he could do differently with ' + esc(c.name) + '. This is a note for him, not a message: nothing is sent to ' + esc(c.name) + ' or to Slack, and Bruce reads it the next time they talk.</p>' +
       '<div class="gd-field" style="margin-top:16px"><label class="gd-field__label" for="ag-sg-text">Your suggestion</label><textarea id="ag-sg-text" class="gd-textarea" rows="4" maxlength="500" placeholder="For example: ask who the audience is before building a one-pager"></textarea></div>' +
       '<div style="display:flex;align-items:center;gap:12px;margin-top:12px"><button type="button" class="gd-btn gd-btn--primary" id="ag-sg-save">Save suggestion</button><span class="gd-card__desc" id="ag-sg-note" role="status"></span></div>' +
-      '<h4 class="gd-card__title" style="margin:24px 0 8px">Saved for Bruce</h4><div id="ag-sg-list"><p class="gd-card__desc">Reading…</p></div>';
+      '<h4 class="gd-card__title" style="margin:24px 0 8px">Saved for Bruce</h4><div id="ag-sg-list">' + ghostThread(2) + '</div>';
   }
   function suggestListHTML(rows) {
     if (!rows.length) return '<p class="gd-card__desc">Nothing yet. What you save here shows up below.</p>';
     return '<div class="gd-thread" role="log">' + rows.map(function (r) {
       var d = new Date(r.at);
       var me = picOf(S.owner);
-      return '<div class="gd-msg">' + (me ? '<span class="gd-msg__pic" role="img" aria-label="You" style="background-image:url(' + esc(me) + ');background-size:cover;background-position:center"></span>' : '<span class="gd-avatar gd-avatar--team" data-gd-avatar="Utsav" role="img" aria-label="You"></span>') + '<div class="gd-msg__main"><div class="gd-msg__head"><b>You</b><time>' + esc(fmtWhen(d)) + '</time></div>' +
+      return '<div class="gd-msg"><button type="button" class="gd-btn gd-btn--sm gd-msg__act" data-sg-del="' + esc(r.id || r.at) + '" aria-label="Delete this suggestion">Delete</button>' + (me ? '<span class="gd-msg__pic" role="img" aria-label="You" style="background-image:url(' + esc(me) + ');background-size:cover;background-position:center"></span>' : '<span class="gd-avatar gd-avatar--team" data-gd-avatar="Utsav" role="img" aria-label="You"></span>') + '<div class="gd-msg__main"><div class="gd-msg__head"><b>You</b><time>' + esc(fmtWhen(d)) + '</time></div>' +
         (r.about && r.about.text ? '<blockquote class="gd-msg__quote">' + esc(r.about.from === 'bruce' ? 'Bruce' : (r.about.name || 'They')) + ': ' + esc(clip(r.about.text, 160)) + '</blockquote>' : '') + '<div class="gd-msg__text">' + esc(r.text) + '</div></div></div>';
     }).join('') + '</div>';
   }
@@ -656,6 +671,13 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
       .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
       .then(function () { closeSide(); loadSuggestions(user); })
       .catch(function () { btn.removeAttribute('aria-busy'); note.textContent = 'Could not save that. Try again.'; });
+  }
+  function deleteSuggestion(id, btn) {
+    var user = S.openUser; btn.setAttribute('aria-busy', 'true');
+    fetch('/api/bruce-memory?suggest=1', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ user: user, remove: id }) })
+      .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+      .then(function () { loadSuggestions(user); })
+      .catch(function () { btn.removeAttribute('aria-busy'); btn.textContent = 'Try again'; });
   }
   function loadSuggestions(user) {
     fetch('/api/bruce-memory?suggest=1&user=' + encodeURIComponent(user), { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
@@ -758,6 +780,7 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
     var dt = e.target.closest && e.target.closest('#ag-d-tabs [data-dt]'); if (dt) { showDTab(dt.getAttribute('data-dt')); return; }
     if (e.target.closest && e.target.closest('#ag-sg-save')) { saveSuggestion(); return; }
     var so = e.target.closest && e.target.closest('[data-sg-open]'); if (so) { openSide(+so.getAttribute('data-sg-open')); return; }
+    var sd = e.target.closest && e.target.closest('[data-sg-del]'); if (sd) { deleteSuggestion(sd.getAttribute('data-sg-del'), sd); return; }
     var sg = e.target.closest && e.target.closest('[data-sg-go]'); if (sg) { saveSide(+sg.getAttribute('data-sg-go')); return; }
     if (e.target.closest && e.target.closest('[data-sg-x]')) closeSide();
   });
@@ -780,8 +803,9 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
   setInterval(function () { if (S.tab === 'bruce' && !document.hidden && !S.busy) loadBruce().then(function () { if (S.tab === 'bruce') render(); }); }, 30000);
   setInterval(function () { if (S.at) $('ag-refresh').setAttribute('data-tip', 'Updated ' + ago(Date.now() - S.at) + ' · click to refresh'); }, 15000);
 
+  $('ag-state').innerHTML = ghostPage();
   fetch('/admin/agents-data.json', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.json(); }).then(function (data) {
-    S.data = data; var want = location.hash.slice(1); S.tab = want && (want === 'all' || agent(want)) ? want : 'all';
+    S.data = data; $('ag-state').innerHTML = ''; var want = location.hash.slice(1); S.tab = want && (want === 'all' || agent(want)) ? want : 'all';
     $('ag-app').hidden = false; render(); loadAll();
   }).catch(function () { $('ag-state').innerHTML = empty('error', 'Could not load the agents', 'Try again in a moment.'); });
 })();
