@@ -2798,14 +2798,15 @@ a.gd-hbar__row:hover, a.gd-hbar__row.is-hover { background: var(--gd-hover-bg); 
 .gd .gd-msg--cont:hover .gd-msg__time-only { opacity: 1; }
 /* A message's own action (Utsav, 9 Oct 2026: a Suggest option on hover, like Claude's side chat): a small button at the top right that shows on hover or keyboard focus,
    and, once pressed, a side box under the message with the note field. Both are drawn from the library's button and textarea. */
-.gd .gd-msg__act { position: absolute; top: var(--gw-space-4); right: var(--gw-space-8); opacity: 0; transition: opacity var(--gw-motion-fast); }
-.gd .gd-msg:hover > .gd-msg__act, .gd .gd-msg:focus-within > .gd-msg__act, .gd .gd-msg--side > .gd-msg__act { opacity: 1; }
+.gd .gd-msg__act, .gd .gd-msg__acts { position: absolute; top: var(--gw-space-4); right: var(--gw-space-8); opacity: 0; transition: opacity var(--gw-motion-fast); }
+.gd .gd-msg__acts { display: flex; gap: var(--gw-space-8); }                      /* more than one action: wrap them in .gd-msg__acts */
+.gd .gd-msg:hover > :is(.gd-msg__act, .gd-msg__acts), .gd .gd-msg:focus-within > :is(.gd-msg__act, .gd-msg__acts), .gd .gd-msg--side > :is(.gd-msg__act, .gd-msg__acts) { opacity: 1; }
 .gd .gd-msg--side { background: var(--gd-row-hover); }
 .gd .gd-msg__side { display: flex; flex-direction: column; gap: var(--gw-space-8); margin-top: var(--gw-space-8); padding: var(--gw-space-12); border-radius: var(--gw-radius-12); background: var(--gd-card-bg); box-shadow: inset 0 0 0 1px var(--gd-border-strong); }
 .gd .gd-msg__side .gd-textarea { min-height: 72px; }
 .gd .gd-msg__side-foot { display: flex; align-items: center; gap: var(--gw-space-8); }
 .gd .gd-msg__quote { margin: 0; padding-left: var(--gw-space-12); border-left: 2px solid var(--gd-border-strong); font: var(--gw-text-body-12-reg); color: var(--gd-text-muted); overflow-wrap: anywhere; }
-@media (hover: none) { .gd .gd-msg__act { opacity: 1; } }
+@media (hover: none) { .gd .gd-msg__act, .gd .gd-msg__acts { opacity: 1; } }
 
 /* ==== 60-feedback.css ==== */
 /* ============================================================================

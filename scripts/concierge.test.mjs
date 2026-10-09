@@ -1,7 +1,7 @@
 // Bruce the concierge (web/api/_concierge.js) and how the Slack events handler routes to him.
 // No network and no model: Slack and Upstash are pretended. Run: node scripts/concierge.test.mjs
 import crypto from 'node:crypto';
-import { buildCatalog, missingFiles, understand, compose, SITE, ownerMention } from '../web/api/_concierge.js';
+import { buildCatalog, missingFiles, understand, compose, SITE, ownerMention, fireBruce } from '../web/api/_concierge.js';
 import { FAQ, EXAMPLES } from '../web/api/_bruce-faq.js';
 
 process.env.SLACK_SIGNING_SECRET = 'sig-secret';
@@ -201,11 +201,14 @@ t('end to end: a DM that is not a file ask starts Bruce, no reaction and is logg
   const logged = [];
   const runs = {}; const mem = { logRun: async (r) => { logged.push(r); return true; }, slackName: async (t, u) => 'Name of ' + u,
     takeRun: async (u, { uncapped }) => { runs[u] = (runs[u] || 0) + 1; return uncapped ? { allowed: true, used: 0, cap: 3 } : { allowed: runs[u] <= 2, used: runs[u], cap: 2 }; },
-    readNotes: async (u) => (u === 'UUTSAV' ? ['2026-10-05: prefers the original logo colour'] : []), mintToken: (u) => `tok-${u}` };
+    readNotes: async (u) => (u === 'UUTSAV' ? ['2026-10-05: prefers the original logo colour'] : []), mintToken: (u) => `tok-${u}`, readPatterns: async () => [{ id: 'p1', text: 'ask who it is for' }] };
   const open = { ...deps, bruceUsers: new Set(), ownerId: 'UUTSAV', memory: mem, fire: async (ev, e, f, extra) => { fired.push({ u: ev.user, ...extra }); return { fired: true }; } };
   fired.length = 0; calls.length = 0;
   o = await handleMessage(ev('can you check the publish?', 'UTEAM'), open);
   t('with no list set, a teammate gets Bruce', [o.did, fired[0].owner, fired[0].memoryToken], ['bruce', false, 'tok-UTEAM']);
+  t('every run is handed the owner\'s patterns', fired[0].patterns, ['ask who it is for']);
+  { let body = ''; await fireBruce({ user: 'UTEAM', channel: 'D1', ts: '1.1', text: 'hi' }, process.env, async (u, i) => { body = JSON.parse(i.body).text; return { ok: true }; }, { notes: ['2026-10-05: likes dark'], patterns: ['ask who it is for'] });
+    t('the run message carries the patterns after the person\'s notes', [body.includes('- 2026-10-05: likes dark'), /how to interact with people[^\n]*\n- ask who it is for\nmessage:/.test(body)], [true, true]); }
   await handleMessage(ev('and again?', 'UTEAM'), open);
   calls.length = 0;
   o = await handleMessage(ev('third one', 'UTEAM'), open);
