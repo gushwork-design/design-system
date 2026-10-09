@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lead to order creatives — Gushwork Design</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="Six static ad creatives, 1080 by 1080, for the lead to order and order to cash offer.">
+<link rel="icon" href="/assets/logo/gushwork-symbol-original.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/foundation/tokens.css">
+<style>
+/* Six 1080 x 1080 static ads, built as HTML so the real logo file and the two brand faces are used.
+   Canvas type is sized for a feed image, so it runs larger than the web ramp; family, weight and
+   every colour still come from tokens. Visuals are illustrative mock UI with sample figures only. */
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--gw-color-neutral-50);color:var(--gw-color-neutral-900);font:var(--gw-text-body-16-reg);-webkit-font-smoothing:antialiased}
+.page{max-width:1440px;margin:0 auto;padding:var(--gw-space-24) var(--gw-space-16) var(--gw-space-64)}
+.page h1{margin:0 0 var(--gw-space-8);font:var(--gw-text-h5-bold);color:var(--gw-color-black)}
+.page > p{margin:0 0 var(--gw-space-32);color:var(--gw-color-neutral-600);max-width:70ch}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));gap:var(--gw-space-24)}
+.cell h2{margin:0 0 var(--gw-space-8);font:var(--gw-text-body-14-med);color:var(--gw-color-neutral-600)}
+.frame{position:relative;width:100%;aspect-ratio:1/1;border-radius:var(--gw-radius-12);overflow:hidden;border:1px solid var(--gw-color-neutral-100)}
+.frame .ad{position:absolute;top:0;left:0;transform-origin:0 0}
+body.raw{background:transparent}
+body.raw .page{padding:0;max-width:none}
+body.raw .page > h1,body.raw .page > p,body.raw .cell h2{display:none}
+body.raw .grid{display:block}
+body.raw .frame{border:0;border-radius:0;width:1080px;height:1080px;aspect-ratio:auto}
+
+/* ---------- the creative ---------- */
+.ad{width:1080px;height:1080px;padding:80px;display:flex;flex-direction:column;position:relative;
+    font-family:var(--gw-font-body);background:var(--gw-color-white);color:var(--gw-color-black)}
+.ad--blue{background:var(--gw-color-primary-500);color:var(--gw-color-white)}
+.ad--ink{background:var(--gw-color-black);color:var(--gw-color-white)}
+.ad--soft{background:var(--gw-color-primary-25)}
+.ad .logo{height:80px;width:421px;display:block}
+.ad .tag{margin-top:48px;font:600 28px/1.2 var(--gw-font-body);letter-spacing:-0.006em;color:var(--gw-color-primary-500)}
+.ad--blue .tag,.ad--ink .tag{color:var(--gw-color-primary-200)}
+.ad h3{margin:16px 0 0;font-family:var(--gw-font-display);font-weight:700;font-size:92px;line-height:1.1;max-width:900px}
+.ad .viz{margin-top:auto;margin-bottom:40px}
+.ad .foot{display:flex;align-items:center;justify-content:space-between;margin-top:auto}
+.ad .viz + .foot{margin-top:0}
+.ad .cta{height:84px;padding:0 44px;display:inline-flex;align-items:center;border-radius:var(--gw-radius-full);
+         background:var(--gw-color-black);color:var(--gw-color-white);font:600 32px/1 var(--gw-font-body)}
+.ad--blue .cta{background:var(--gw-color-white);color:var(--gw-color-black)}
+.ad--ink .cta{background:var(--gw-color-primary-500)}
+.ad .url{font:500 28px/1 var(--gw-font-body);color:var(--gw-color-neutral-600)}
+.ad--blue .url,.ad--ink .url{color:var(--gw-color-primary-100)}
+
+/* mock UI */
+.card{background:var(--gw-color-white);color:var(--gw-color-black);border:2px solid var(--gw-color-neutral-100);border-radius:var(--gw-radius-20);padding:32px}
+.ad--blue .card,.ad--ink .card{border-color:transparent}
+.row{display:flex;align-items:center;justify-content:space-between;gap:24px;font:500 32px/1.2 var(--gw-font-body)}
+.row + .row{margin-top:24px;padding-top:24px;border-top:2px solid var(--gw-color-neutral-100)}
+.row small{display:block;font:400 24px/1.3 var(--gw-font-body);color:var(--gw-color-neutral-600);margin-top:4px}
+.pill{display:inline-flex;align-items:center;height:48px;padding:0 20px;border-radius:var(--gw-radius-full);font:600 24px/1 var(--gw-font-body);white-space:nowrap}
+.pill--ok{background:var(--gw-color-green-50);color:var(--gw-color-green-700)}
+.pill--bad{background:var(--gw-color-red-50);color:var(--gw-color-red-700)}
+.pill--warn{background:var(--gw-color-yellow-50);color:var(--gw-color-yellow-700)}
+.pill--blue{background:var(--gw-color-primary-50);color:var(--gw-color-primary-700)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.price{font:700 88px/1 var(--gw-font-display);margin-top:12px}
+.lab{font:600 24px/1.2 var(--gw-font-body);color:var(--gw-color-neutral-600);text-transform:none}
+.flag{margin-top:24px;display:flex;align-items:center;gap:16px;background:var(--gw-color-red-25);border:2px solid var(--gw-color-red-200);color:var(--gw-color-red-700);border-radius:var(--gw-radius-16);padding:20px 28px;font:600 30px/1.2 var(--gw-font-body)}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative}
+.step{text-align:center;position:relative;font:600 26px/1.2 var(--gw-font-body)}
+.step i{display:block;width:56px;height:56px;border-radius:50%;margin:0 auto 16px;background:var(--gw-color-primary-500);border:6px solid var(--gw-color-white);position:relative;z-index:1;box-shadow:0 0 0 2px var(--gw-color-primary-500)}
+.step:not(:last-child)::after{content:"";position:absolute;top:27px;left:50%;width:100%;height:4px;background:var(--gw-color-primary-500)}
+.step.last i{background:var(--gw-color-green-500);box-shadow:0 0 0 2px var(--gw-color-green-500)}
+.line{display:block;width:100%;height:240px}
+</style></head>
+<body>
+<div class="page">
+  <h1>Lead to order and order to cash creatives</h1>
+  <p>Six static ads, 1080 by 1080, one per line of the brief. Headlines are the brief's own words. The mock screens use sample figures and invented labels, not real customer data.</p>
+  <div class="grid">
+
+    <div class="cell"><h2>1 · Lead to order · slow quote</h2><div class="frame"><section class="ad ad--blue" id="ad1">
+      <img class="logo" src="/assets/logo/gushwork-logo-white.svg" alt="Gushwork">
+      <div class="tag">Lead to order</div>
+      <h3>Don't lose your customers to a slow quote.</h3>
+      <div class="viz"><div class="card">
+        <div class="row"><div>RFQ received<small>Tuesday, 9:12 am</small></div><span class="pill pill--blue">Inbox</span></div>
+        <div class="row"><div>Quote sent<small>Tuesday, 2:40 pm</small></div><span class="pill pill--ok">Same day</span></div>
+      </div></div>
+      <div class="foot"><span class="cta">Book a Demo</span><span class="url">gushwork.ai</span></div>
+    </section></div></div>
+
+    <div class="cell"><h2>2 · Lead to order · same-day quotes</h2><div class="frame"><section class="ad ad--soft" id="ad2">
+      <img class="logo" src="/assets/logo/gushwork-logo-original.svg" alt="Gushwork">
+      <div class="tag">Lead to order</div>
+      <h3>Generate quotes the same day the RFQ hits your inbox.</h3>
+      <div class="foot"><span class="cta">Book a Demo</span><span class="url">gushwork.ai</span></div>
+    </section></div></div>
+
+    <div class="cell"><h2>3 · Order to cash · quote vs PO</h2><div class="frame"><section class="ad" id="ad3">
+      <img class="logo" src="/assets/logo/gushwork-logo-original.svg" alt="Gushwork">
+      <div class="tag">Order to cash</div>
+      <h3>Your quote said $4.20. Their PO says $3.80.</h3>
+      <div class="viz"><div class="card" style="background:var(--gw-color-neutral-25)">
+        <div class="two">
+          <div><div class="lab">Your quote</div><div class="price">$4.20</div></div>
+          <div><div class="lab">Their PO</div><div class="price" style="color:var(--gw-color-red-600)">$3.80</div></div>
+        </div>
+        <div class="flag">Price mismatch caught before it shipped</div>
+      </div></div>
+      <div class="foot"><span class="cta">Book a Demo</span><span class="url">gushwork.ai</span></div>
+    </section></div></div>
+
+    <div class="cell"><h2>4 · Order to cash · PO tracking</h2><div class="frame"><section class="ad ad--ink" id="ad4">
+      <img class="logo" src="/assets/logo/gushwork-logo-white.svg" alt="Gushwork">
+      <div class="tag">Order to cash</div>
+      <h3>Every PO tracked from start to finish.</h3>
+      <div class="viz"><div class="card"><div class="steps">
+        <div class="step"><i></i>PO received</div>
+        <div class="step"><i></i>Confirmed</div>
+        <div class="step"><i></i>Shipped</div>
+        <div class="step last"><i></i>Paid</div>
+      </div></div></div>
+      <div class="foot"><span class="cta">Book a Demo</span><span class="url">gushwork.ai</span></div>
+    </section></div></div>
+
+    <div class="cell"><h2>5 · Order to cash · DSO</h2><div class="frame"><section class="ad ad--blue" id="ad5">
+      <img class="logo" src="/assets/logo/gushwork-logo-white.svg" alt="Gushwork">
+      <div class="tag">Order to cash</div>
+      <h3>Reduce DSO without adding headcount.</h3>
+      <div class="viz"><div class="card">
+        <div class="lab" style="margin-bottom:8px">Days sales outstanding · illustrative</div>
+        <svg class="line" viewBox="0 0 800 240" preserveAspectRatio="none" aria-hidden="true">
+          <polyline fill="none" stroke="var(--gw-color-primary-500)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" points="10,40 140,60 270,90 400,100 530,150 660,175 790,200"/>
+          <circle cx="790" cy="200" r="14" fill="var(--gw-color-primary-500)"/>
+        </svg>
+      </div></div>
+      <div class="foot"><span class="cta">Book a Demo</span><span class="url">gushwork.ai</span></div>
+    </section></div></div>
+
+    <div class="cell"><h2>6 · Order to cash · overdue follow-up</h2><div class="frame"><section class="ad ad--soft" id="ad6">
+      <img class="logo" src="/assets/logo/gushwork-logo-original.svg" alt="Gushwork">
+      <div class="tag">Order to cash</div>
+      <h3>Automatic follow up on overdue invoices.</h3>
+      <div class="viz"><div class="card">
+        <div class="row"><div>Invoice INV-1042<small>12 days overdue</small></div><span class="pill pill--bad">Overdue</span></div>
+        <div class="row"><div>Reminder sent to accounts payable<small>Automatically, no one chased</small></div><span class="pill pill--ok">Sent</span></div>
+      </div></div>
+      <div class="foot"><span class="cta">Book a Demo</span><span class="url">gushwork.ai</span></div>
+    </section></div></div>
+
+  </div>
+</div>
+<script>
+(function(){
+  var raw = /[?&]raw\b/.test(location.search);
+  if (raw) document.body.classList.add('raw');
+  function fit(){
+    document.querySelectorAll('.frame').forEach(function(f){
+      var ad = f.firstElementChild;
+      ad.style.transform = raw ? 'none' : 'scale(' + (f.clientWidth / 1080) + ')';
+    });
+  }
+  fit(); addEventListener('resize', fit);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+})();
+</script>
+</body></html>
