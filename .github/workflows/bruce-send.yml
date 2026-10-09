@@ -12,6 +12,10 @@ on:
       text:
         description: The exact message, as approved
         required: true
+      log_only:
+        description: Only record a message that was already sent (so it shows in Messages he sent); sends nothing
+        required: false
+        default: 'false'
 
 permissions:
   contents: read
@@ -24,6 +28,7 @@ jobs:
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       TO: ${{ inputs.to }}
       TEXT: ${{ inputs.text }}
+      LOG_ONLY: ${{ inputs.log_only }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

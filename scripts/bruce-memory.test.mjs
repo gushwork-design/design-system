@@ -133,6 +133,26 @@ rr2 = M.attachReports([R('report', 'UA', 1, { skills: ['x'] }), R('run', 'UA', 3
 ok('a report cannot answer an ask that came after it', rr2.length === 1 && !rr2[0].reported);
 rr2 = M.attachReports([R('capped', 'UA', 1), R('report', 'UA', 5, { skills: ['x'] })]);
 ok('a capped or failed ask keeps its kind', rr2[0].kind === 'capped');
+// a send from the "Bruce send" workflow reports itself with an HMAC over the bot token (no per-run token is involved)
+{
+  const crypto = await import('node:crypto');
+  process.env.SLACK_BOT_TOKEN = 'xoxb-test-key'; process.env.OWNER_SLACK_ID = 'U0OWNER01';
+  const sigFor = (ts, to, text) => crypto.createHmac('sha256', 'xoxb-test-key').update(`${ts}.${to}.${text}`).digest('hex');
+  const hit = async (headers, body) => { let status = 0, out = null; await M.default({ method: 'POST', query: {}, body, headers }, { status(s2) { status = s2; return this; }, json(o) { out = o; return this; }, setHeader() {}, end() {} }); return { status, out }; };
+  store['gw:bruce:log'] = [];
+  const nowS = Math.floor(Date.now() / 1000);
+  let g = await hit({ 'x-bruce-send-ts': String(nowS), 'x-bruce-send-sig': sigFor(nowS, 'U0PRIYA01', 'the plugin update') }, { sent: [{ to: 'U0PRIYA01', text: 'the plugin update' }] });
+  ok('a signed workflow send is recorded for the owner', g.status === 200 && g.out.sent === 1 && JSON.parse(store['gw:bruce:log'][0]).user === 'U0OWNER01' && JSON.parse(store['gw:bruce:log'][0]).kind === 'sent', JSON.stringify(g));
+  g = await hit({ 'x-bruce-send-ts': String(nowS), 'x-bruce-send-sig': 'a'.repeat(64) }, { sent: [{ to: 'U0PRIYA01', text: 'x' }] });
+  ok('a wrong signature is refused', g.status === 401);
+  g = await hit({ 'x-bruce-send-ts': String(nowS), 'x-bruce-send-sig': sigFor(nowS, 'U0PRIYA01', 'one thing') }, { sent: [{ to: 'U0PRIYA01', text: 'another thing' }] });
+  ok('a signature for other text is refused', g.status === 401);
+  const old = nowS - 3600;
+  g = await hit({ 'x-bruce-send-ts': String(old), 'x-bruce-send-sig': sigFor(old, 'U0PRIYA01', 'late') }, { sent: [{ to: 'U0PRIYA01', text: 'late' }] });
+  ok('a stale signature is refused', g.status === 401);
+  g = await hit({ 'x-bruce-send-ts': String(nowS), 'x-bruce-send-sig': sigFor(nowS, 'U0PRIYA01', 'a') }, { sent: [{ to: 'U0PRIYA01', text: 'a' }, { to: 'U0PRIYA01', text: 'b' }] });
+  ok('only one send at a time is accepted this way', g.status === 401);
+}
 globalThis.fetch = realFetch;
 // conversations: what an ask is about, and the whole DM (R55 addendum, 8 Oct 2026)
 const T = (text, want) => ok(`topic: "${text}" is ${want}`, M.topicOf(text) === want, M.topicOf(text));
