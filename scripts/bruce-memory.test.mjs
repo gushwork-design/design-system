@@ -249,7 +249,12 @@ ok('readLog returns old rows untouched (the mapping happens in the endpoint)', o
 const sg = async (method, cookie, extra = {}) => { let status = 0, out = null; await M.default({ method, query: extra.query || { suggest: '1' }, body: extra.body, headers: { cookie } }, { status(s) { status = s; return this; }, json(o) { out = o; return this; }, setHeader() {}, end() {} }); return { status, out }; };
 const ownerCk = await ck('utsav.singh@gushwork.ai');
 store = {}; cmds.length = 0; let slackCalls = 0;
-globalThis.fetch = async (url, init) => { if (String(url).includes('slack.com')) { slackCalls++; return { ok: true, json: async () => ({ ok: true }) }; } return f(url, init); };
+const slackLog = [], triggers = []; process.env.GW_BRUCE_TRIGGER_URL = 'https://trigger.test/fire'; process.env.GW_BRUCE_TRIGGER_TOKEN = 't';
+globalThis.fetch = async (url, init) => { const u = String(url);
+  if (u.includes('slack.com/api/')) { const m = u.split('/api/')[1]; slackLog.push({ m, b: Object.fromEntries(new URLSearchParams((init && init.body) || '')) });
+    return { ok: true, json: async () => (m === 'conversations.open' ? { ok: true, channel: { id: 'D0OWNER001' } } : m === 'chat.postMessage' ? { ok: true, ts: '1760000000.000100' } : { ok: true }) }; }
+  if (u.startsWith('https://trigger.test')) { triggers.push(JSON.parse(init.body).text); return { ok: true, json: async () => ({}) }; }
+  return f(url, init); };
 let g2 = await sg('POST', '', { body: { user: 'U0PRIYA01', name: 'Priya', text: 'ask who the audience is' } });
 ok('suggest: signed out is 401', g2.status === 401);
 g2 = await sg('POST', await ck('sam@gushwork.ai'), { body: { user: 'U0PRIYA01', name: 'Priya', text: 'x' } });
@@ -261,12 +266,23 @@ ok('suggest: a bad person id is 400', g2.status === 400);
 g2 = await sg('POST', ownerCk, { body: { user: 'U0PRIYA01', name: 'Priya', text: '  ask who the\n audience is  ' } });
 ok('suggest: the owner saves one', g2.status === 200 && g2.out.suggestion.text === 'ask who the audience is' && store['gw:bruce:suggest'].length === 1, JSON.stringify(g2));
 ok('suggest: it becomes a note Bruce reads for that person', (await M.readNotes('U0PRIYA01', f)).some((n) => /Suggestion from Utsav.*ask who the audience is/.test(n)));
-ok('suggest: it is not a message (no Slack call)', slackCalls === 0);
+ok('suggest: it is not a message to the person: Slack is only used in the owner\'s own DM', slackLog.length > 0 && slackLog.every((x) => x.m === 'conversations.open' ? x.b.users === 'U0OWNER01' : x.b.channel === 'D0OWNER001') && !slackLog.some((x) => /U0PRIYA01/.test(JSON.stringify(x.b))));
+ok('suggest: saving starts one Bruce run, in a thread under a line posted in the owner\'s DM', g2.out.run.fired === true && triggers.length === 1 && /thread_ts: 1760000000\.000100/.test(triggers[0]) && /channel: D0OWNER001/.test(triggers[0]) && /ask who the audience is/.test(triggers[0]) && /Do not message anyone else/.test(triggers[0]), triggers[0]);
+ok('suggest: a plain suggestion is not marked a pattern', !g2.out.suggestion.pattern && !/pattern/.test(triggers[0].split('message:')[1] || '') );
 await sg('POST', ownerCk, { body: { user: 'U0ISHA0001', name: 'Isha', text: 'keep it short' } });
 g2 = await sg('GET', ownerCk, { query: { suggest: '1', user: 'U0PRIYA01' } });
 ok('suggest: the owner reads back only that person\'s', g2.status === 200 && g2.out.suggestions.length === 1 && g2.out.suggestions[0].name === 'Priya', JSON.stringify(g2));
 g2 = await sg('GET', await ck('sam@gushwork.ai'), { query: { suggest: '1', user: 'U0PRIYA01' } });
 ok('suggest: a teammate cannot read them', g2.status === 403 && !g2.out.suggestions);
+// the pattern checkbox saves it as a pattern too and says so to Bruce; a failed start still saves
+store = {}; triggers.length = 0; slackLog.length = 0;
+g2 = await sg('POST', ownerCk, { body: { user: 'U0PRIYA01', name: 'Priya', text: 'tell people once it is handled', pattern: true } });
+ok('suggest: marked a pattern, it is saved as one as well', g2.status === 200 && g2.out.suggestion.pattern === true && (await M.readPatterns(f)).some((p) => p.text === 'tell people once it is handled'));
+ok('suggest: and Bruce is told it is a pattern', /marked it a pattern/.test(triggers[0] || ''), triggers[0]);
+delete process.env.GW_BRUCE_TRIGGER_URL; triggers.length = 0;
+g2 = await sg('POST', ownerCk, { body: { user: 'U0PRIYA01', name: 'Priya', text: 'one more' } });
+ok('suggest: if Bruce cannot be started it is still saved, and the page is told why', g2.status === 200 && g2.out.run.fired === false && !!g2.out.run.why && (await sg('GET', ownerCk, { query: { suggest: '1', user: 'U0PRIYA01' } })).out.suggestions.length === 2);
+process.env.GW_BRUCE_TRIGGER_URL = 'https://trigger.test/fire';
 globalThis.fetch = realFetch;
 // a suggestion can point at one message; and profile pictures (9 Oct 2026)
 store = {}; cmds.length = 0;
