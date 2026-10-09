@@ -42,7 +42,7 @@ def account_email():
         except Exception:
             pass
     return ""
-print((account_email() or os.environ.get("GW_GIT_EMAIL", "")).strip().lower()[:160])' 2>/dev/null)"
+print((account_email() or os.environ.get("GW_GIT_EMAIL", "") or os.environ.get("GIT_AUTHOR_EMAIL", "") or os.environ.get("GIT_COMMITTER_EMAIL", "") or os.environ.get("EMAIL", "")).strip().lower()[:160])' 2>/dev/null)"
 [ -n "$EMAIL" ] || { echo "No signed-in account was found, so there is nobody to request access for."; exit 0; }
 
 BODY="$(GW_E="$EMAIL" GW_V="$VERSION" GW_N="$NOTE" python3 -c '

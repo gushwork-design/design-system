@@ -127,7 +127,7 @@ def session_hash():
         return ""
     return hashlib.sha256(sid.encode()).hexdigest()[:12] if sid else ""
 row = {
-    "email": (account_email() or os.environ.get("GW_GIT_EMAIL", ""))[:160],
+    "email": (account_email() or os.environ.get("GW_GIT_EMAIL", "") or os.environ.get("GIT_AUTHOR_EMAIL", "") or os.environ.get("GIT_COMMITTER_EMAIL", "") or os.environ.get("EMAIL", ""))[:160],
     "version": os.environ.get("GW_VER", "")[:32],
     "event": "session-start",
 }
