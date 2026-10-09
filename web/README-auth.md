@@ -266,5 +266,7 @@ before `GW_PLUGIN_GATE_SINCE` (default 10 Oct 2026) is let in the first time the
 Decisions: admins and owners from `/admin/access-control#plugin` or the New users table on `/admin/analytics`
 (`POST /api/plugin-access?decide=1`, session cookie, live rules); from Slack only the owner, because only the
 owner gets the DM. The list is one KV hash, `gw:plugin-access`. No store → everyone is allowed, so a KV outage
-never locks the company out. The address is self-reported from the person's own Claude config: this stops the
+never locks the company out. On the plugin side a company address never asks the network; an outside address that gets
+no answer and has nothing cached stays off until the hub answers (a Claude Code cloud sandbox has to allow
+`gushwork-design.vercel.app` in its network settings, which also lets its usage rows through). The address is self-reported from the person's own Claude config: this stops the
 casual outsider, not someone who edits a file.
