@@ -24,6 +24,7 @@ reports its own stale date.**
 
 | Version | Date | What changed | Commit | Session |
 |---|---|---|---|---|
+| **v2.1.2** | 09 Oct 2026 14:42 | Plugin gate: an outside address stays off when the hub cannot be reached (Claude Code on the web blocks the hub's domain unless allowed) | [`9927007`](https://github.com/gushwork-design/design-system/commit/992700767dc7f2ae6c5af885b2594f188f92d3b1) | [Plugin access gate](claude://resume/eb126861-26bf-4da5-a6ce-7fb9a164d462) |
 | **v2.1.1** | 09 Oct 2026 13:54 | Plugin gate decides on the first skill call too (a mid-session install in a cloud container skipped it), and reads a cloud container's git identity | [`69a33f9`](https://github.com/gushwork-design/design-system/commit/69a33f989a943bc98b1f3ab05b62fb2b95145b9f) | [Plugin access gate](claude://resume/eb126861-26bf-4da5-a6ce-7fb9a164d462) |
 | **v2.1.0** | 09 Oct 2026 13:16 | Plugin access gate: an account outside gushwork.ai is stopped at session start and can request access; answered from Slack, Access Control or Analytics (R67) | [`9168b39`](https://github.com/gushwork-design/design-system/commit/9168b3902c1ad39059cb776fffc3e1bd0adbecf1) | [Plugin access gate](claude://resume/eb126861-26bf-4da5-a6ce-7fb9a164d462) |
 | **v2.0.9** | 09 Oct 2026 12:56 | ghost while loading, per-message action (#485) | [`86a0179`](https://github.com/gushwork-design/design-system/commit/86a01798409f2264de72837f42a1b3cffb1e8971) | — |
