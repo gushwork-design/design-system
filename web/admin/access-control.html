@@ -532,6 +532,17 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
   .ac-row--lane { grid-template-columns: minmax(0, 1fr) 44px; }
   .ac-row--lane .ac-row__path { grid-column: 1; }
 }
+
+/* Plugin tab (R67). Its group headers and row actions must survive the phone rules above, which hide the rail's
+   sections and a member row's right-hand side: on a phone the actions drop under the address instead. */
+.ac-plug__sec { padding: var(--gw-space-16) var(--gw-space-12) var(--gw-space-4); font: var(--gw-text-body-12-med); text-transform: uppercase; color: var(--gw-color-neutral-600); }
+:root[data-theme="dark"] .ac-plug__sec { color: var(--gw-color-neutral-400); }
+.ac-mem--plug { grid-template-columns: 36px minmax(0, 1fr) auto; }
+.ac-mem--plug .ac-mem__r { display: flex; }
+@media (max-width: 760px) {
+  .ac-mem--plug { grid-template-columns: 36px minmax(0, 1fr); row-gap: var(--gw-space-8); }
+  .ac-mem--plug .ac-mem__r { grid-column: 2; }
+}
 </style>
 </head>
 <body data-gw-page="access-control">
@@ -1621,6 +1632,91 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
 
   /* -- boot --------------------------------------------------------------- */
 
+  /* ── Plugin (R67, 9 Oct 2026) ── who OUTSIDE the company may use the Claude Code plugin. The repo is public, so anyone can
+     install it; an outside address is stopped at its first session and offered uninstall or request access. A request lands
+     here, on Analytics and as a Slack DM to the owner, and any of the three can answer. Decisions apply at once (they are not
+     part of the Save bar): the plugin asks the hub at every session start. Everyone at the company is allowed without a row. */
+  var plug = { status: 'loading', people: [], configured: true, busy: '' };
+  function plugLoad(then) {
+    fetch('/api/plugin-access?list=1', { credentials: 'same-origin', cache: 'no-store' })
+      .then(function (r) { return r.json().then(function (b) { return { ok: r.ok, b: b }; }); })
+      .then(function (out) {
+        if (!out.ok) throw new Error(out.b && out.b.error || 'Could not load.');
+        plug.status = 'ok'; plug.people = out.b.people || []; plug.configured = out.b.configured !== false;
+      })
+      .catch(function () { plug.status = 'error'; })
+      .then(function () { if (then) then(); });
+  }
+  function plugDecide(email, decision, then) {
+    plug.busy = email;
+    fetch('/api/plugin-access?decide=1', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, decision: decision }) })
+      .then(function (r) { return r.json().then(function (b) { return { ok: r.ok, b: b }; }); })
+      .then(function (out) { if (!out.ok) throw new Error(out.b && out.b.error || 'It did not save.'); plug.note = ''; })
+      .catch(function (e) { plug.note = String(e.message || e); })
+      .then(function () { plug.busy = ''; plugLoad(then); });
+  }
+  function agoShort(ms) {
+    var m = Math.round(ms / 60000); if (m < 60) return (m < 1 ? 'just now' : m + ' min ago');
+    var h = Math.round(m / 60); if (h < 48) return h + ' h ago';
+    return Math.round(h / 24) + ' days ago';
+  }
+  function plugRow(p) {
+    var facts = [];
+    if (p.version) facts.push('plugin ' + p.version);
+    if (p.state === 'pending' && p.at) facts.push('asked ' + agoShort(Date.now() - p.at));
+    if (p.state !== 'pending' && p.decidedAt) facts.push((p.state === 'allowed' ? 'allowed ' : 'denied ') + agoShort(Date.now() - p.decidedAt) + (p.by ? ' by ' + p.by : ''));
+    if (p.state === 'allowed' && p.by === 'grandfathered') facts = ['was using it before the gate, let in'];
+    if (p.note) facts.push('“' + p.note + '”');
+    var busy = plug.busy === p.email ? ' disabled' : '';
+    var b = function (act, label, cls) { return '<button class="ac-btn ac-btn--sm' + (cls || '') + '" type="button" data-plug="' + act + '" data-e="' + esc(p.email) + '"' + busy + '>' + label + '</button>'; };
+    var acts = p.state === 'pending' ? b('allow', 'Allow', ' ac-btn--primary') + b('deny', 'Deny', ' ac-btn--danger')
+      : p.state === 'allowed' ? b('deny', 'Revoke', ' ac-btn--danger')
+      : b('allow', 'Allow') + b('clear', 'Forget');
+    return '<div class="ac-mem ac-mem--plug">' + avatarHTML(p.email, true) +
+      '<div class="ac-mem__t"><span class="ac-mem__n">' + esc(p.email) + '</span><span class="ac-mem__e">' + esc(facts.join(' · ')) + '</span></div>' +
+      '<div class="ac-mem__r">' + acts + '</div></div>';
+  }
+  function plugBodyHTML() {
+    if (plug.status === 'loading') return '<div class="ac-ppl__none">Loading…</div>';
+    if (plug.status === 'error') return '<div class="ac-note ac-note--warn">' + icon('info') + '<span>Could not load the list. Reload the page to try again.</span></div>';
+    var h = '';
+    if (!plug.configured) h += '<div class="ac-note">' + icon('info') + '<span>No store is connected, so the plugin lets everyone in and nothing can be recorded here.</span></div>';
+    if (plug.note) h += '<div class="ac-note ac-note--warn">' + icon('info') + '<span>' + esc(plug.note) + '</span></div>';
+    h += '<form class="ac-ppl__new" data-plugadd><input class="ac-field" type="email" placeholder="Allow an address outside ' + esc(meta.domain) + ' before they ask" aria-label="Address to allow" data-1p-ignore="true" data-lpignore="true" data-form-type="other"><button class="ac-btn" type="submit">Allow</button></form>';
+    var groups = [['pending', 'Waiting for an answer'], ['allowed', 'Allowed'], ['denied', 'Denied']];
+    var any = false;
+    groups.forEach(function (g) {
+      var rows = plug.people.filter(function (p) { return p.state === g[0]; });
+      if (!rows.length) return;
+      any = true;
+      h += '<div class="ac-plug__sec">' + g[1] + ' · ' + rows.length + '</div><div class="ac-ppl__list">' + rows.map(plugRow).join('') + '</div>';
+    });
+    if (!any) h += '<div class="ac-ppl__none">Nobody outside ' + esc(meta.domain) + ' has asked yet. An outside address that installs the plugin is stopped at its first session and offered two things: uninstall, or request access. A request shows up here, on Analytics, and as a message from Bruce to the owner.</div>';
+    return h;
+  }
+  function pluginCard() {
+    var card = el('<section class="ac-card"><div class="ac-card__hd"><div><h3>Plugin</h3><p>Who outside ' + esc(meta.domain) + ' may use the Claude Code plugin. Everyone at ' + esc(meta.domain) + ' is allowed without being listed. Decisions here apply at once; the plugin asks at every session start.</p></div></div>' +
+      '<div class="ac-card__body"><div class="ac-ppl__main" data-plug></div></div></section>');
+    var body = card.querySelector('[data-plug]');
+    var draw = function () { body.innerHTML = plugBodyHTML(); };
+    draw();
+    if (plug.status === 'loading') plugLoad(draw);
+    body.addEventListener('click', function (ev) {
+      var b = ev.target.closest('[data-plug]'); if (!b || b.disabled) return;
+      plugDecide(b.dataset.e, b.dataset.plug, draw); draw();
+    });
+    body.addEventListener('submit', function (ev) {
+      var f = ev.target.closest('[data-plugadd]'); if (!f) return;
+      ev.preventDefault();
+      var v = String(f.querySelector('input').value || '').trim().toLowerCase();
+      if (!v || v.indexOf('@') < 0) return;
+      if (isInternalEmail(v)) { plug.note = 'Everyone at ' + meta.domain + ' is allowed already.'; draw(); return; }
+      plugDecide(v, 'allow', draw);
+    });
+    return card;
+  }
+
   function render() {
     var mount = document.getElementById('ac-sections');
     mount.innerHTML = '';
@@ -1638,6 +1734,7 @@ body[data-gw-page="access-control"] .sg__hd { border-bottom: 0; padding-bottom: 
     mount.appendChild(pagesCard());
     mount.appendChild(lanesCard());
     mount.appendChild(peopleCard());
+    mount.appendChild(pluginCard());
     paintTabs();
     paintBar();
   }

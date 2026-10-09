@@ -20,6 +20,14 @@
 #
 # Test it by hand:   bash scripts/brand-rule.sh | python3 -m json.tool
 
+# Quiet while the gate is closed (R67): a rule that says "use the gushwork skills" to an account whose skills are
+# refused would contradict scripts/check-access.sh in the same breath. Allowed, no file, or an unreadable one → speak.
+STATE="${GW_ACCESS_STATE:-$HOME/.claude/gushwork/access.json}"
+if [ -f "$STATE" ] && GW_F="$STATE" python3 -c '
+import json, os, sys
+try: sys.exit(0 if json.load(open(os.environ["GW_F"])).get("state") in ("pending", "denied", "none") else 1)
+except Exception: sys.exit(1)' 2>/dev/null; then exit 0; fi
+
 python3 - <<'PY' 2>/dev/null || true
 import json
 rule = (

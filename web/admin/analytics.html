@@ -309,6 +309,9 @@ body[data-gw-page="analytics"] .sg__main > * { min-width: 0; }
 .ul-link { flex: none; white-space: nowrap; border: 0; background: none; padding: 0; cursor: pointer; font: var(--gw-text-body-14-med); color: var(--ul-sub); transition: color var(--gw-motion-fast); }
 .ul-link:hover { color: var(--ul-value); }
 .ul-link[hidden] { display: none; }
+/* Plugin access (R67): the Allow / Deny links on an outside address in New users, sized to the 12px cell. */
+.ul-link--sm { font: var(--gw-text-body-12-med); }
+.ul-link--sm:disabled { color: var(--ul-disabled); cursor: default; }
 .ul-big { margin: 0; font: var(--gw-text-body-24-sem, 600 24px/1.2 var(--gw-font-body)); color: var(--ul-value); }
 .ul-vmid { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: var(--gw-space-16) 0; }
 .ul-dlg { width: min(640px, calc(100vw - 32px)); max-height: min(560px, calc(100vh - 64px)); padding: 0; border: 0; border-radius: var(--gw-radius-16);
@@ -1591,11 +1594,35 @@ window.__anRefilter = {};
     S.newPage = Math.min(Math.max(1, S.newPage || 1), pages);
     var th = function (t) { return '<div role="columnheader"><span class="ul-th"><span class="ul-th--plain">' + esc(t) + '</span></span></div>'; };
     var c = function (t, cls, title) { return '<div class="ul-c ' + (cls || '') + '" role="cell" title="' + esc(title || t) + '">' + esc(t) + '</div>'; };
-    host.innerHTML = '<div class="ul-tbl" role="table" style="--vs-cols:minmax(200px,1.6fr) minmax(120px,1fr) 110px 100px minmax(140px,1fr)"><div class="ul-row ul-row--h" role="row">' +
+    /* An address outside the company carries a chip saying where it stands with the plugin, and the owner can answer
+       from the row: Allow, Deny, Revoke. Company addresses are allowed by domain and carry nothing. */
+    var who = function (e) {
+      var P = S.plug;
+      if (!P || !e || e.slice(e.lastIndexOf('@') + 1) === P.domain) return c(e, 'ul-c--who');
+      var p = P.by[e], st = p ? p.state : 'none';
+      var tag = st === 'allowed' ? ['ok', 'Allowed'] : st === 'pending' ? ['warn', 'Waiting'] : st === 'denied' ? ['bad', 'Denied'] : ['', 'Outside'];
+      var b = function (act, label) { return '<button class="ul-link ul-link--sm" type="button" data-plug="' + act + '" data-e="' + esc(e) + '">' + label + '</button>'; };
+      var acts = st === 'pending' ? b('allow', 'Allow') + b('deny', 'Deny') : st === 'allowed' ? b('deny', 'Revoke') : st === 'denied' ? b('allow', 'Allow') : b('allow', 'Allow') + b('deny', 'Deny');
+      var title = st === 'pending' ? 'Asked to use the plugin' + (p && p.note ? ': \u201C' + p.note + '\u201D' : '') : st === 'allowed' ? 'Allowed to use the plugin' + (p && p.by === 'grandfathered' ? ' (was using it before the gate)' : p && p.by ? ' by ' + p.by : '') : st === 'denied' ? 'Not allowed; the plugin removes itself on their machine' : 'Outside the company, has not asked';
+      return '<div class="ul-c ul-c--whotag" role="cell" title="' + esc(title) + '"><span>' + esc(e) + '</span><span class="ul-badge' + (tag[0] ? ' ul-badge--' + tag[0] : '') + '">' + tag[1] + '</span>' + acts + '</div>';
+    };
+    host.innerHTML = '<div class="ul-tbl" role="table" style="--vs-cols:minmax(260px,2fr) minmax(120px,1fr) 110px 100px minmax(140px,1fr)"><div class="ul-row ul-row--h" role="row">' +
       ['Person', 'First seen', 'Started on', 'Sessions', 'First skill'].map(th).join('') + '</div>' +
       (list.length ? list.slice((S.newPage - 1) * NEW_PER, S.newPage * NEW_PER).map(function (u) {
-        return '<div class="ul-row ul-row--d" role="row">' + c(u.email, 'ul-c--who') + c(ago(Date.now() - u.first.getTime()), '', u.first.toISOString()) + c(u.version || '—') + c(String(u.sess)) + c(u.skill || '—') + '</div>';
+        return '<div class="ul-row ul-row--d" role="row">' + who(u.email) + c(ago(Date.now() - u.first.getTime()), '', u.first.toISOString()) + c(u.version || '—') + c(String(u.sess)) + c(u.skill || '—') + '</div>';
       }).join('') : '<div class="ul-empty"><div class="ul-empty__copy"><h2>Nobody new in this period</h2></div></div>') + '</div>';
+    host.querySelectorAll('[data-plug]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        b.disabled = true;
+        fetch('/api/plugin-access?decide=1', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: b.getAttribute('data-e'), decision: b.getAttribute('data-plug') }) })
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (j) {
+            if (j && S.plug) S.plug.by[j.email] = Object.assign(S.plug.by[j.email] || {}, { state: j.state, by: window.anMe.email || 'you', decidedAt: Date.now() });
+            renderNew(m);
+          }).catch(function () { b.disabled = false; });
+      });
+    });
     pg.hidden = list.length <= NEW_PER;
     if (!pg.hidden) {
       pg.innerHTML = '<div class="ul-pg__l"><span class="ul-pg__t">' + ((S.newPage - 1) * NEW_PER + 1) + '–' + Math.min(S.newPage * NEW_PER, list.length) + ' of ' + list.length + '</span></div>' +
@@ -2017,6 +2044,16 @@ window.__anRefilter = {};
     }).catch(function () { S.status = 'error'; }).then(function () {
       S.busy = false; $('ul-refresh').removeAttribute('aria-busy'); render();
     });
+    /* Plugin access (R67): where each outside address stands, for the chip and the Allow / Deny on its New users row.
+       Fetched beside the log, never in its way: the table draws without it and redraws when it lands. */
+    fetch('/api/plugin-access?list=1', { credentials: 'same-origin', cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) {
+        if (!j) return;
+        S.plug = { domain: String(j.domain || 'gushwork.ai').toLowerCase(), by: {} };
+        (j.people || []).forEach(function (p) { S.plug.by[p.email] = p; });
+        if (S.status === 'ready') render();
+      }).catch(function () {});
   }
 
   /* ── wiring: bound once. Everything that is re-rendered is delegated from a stable parent,

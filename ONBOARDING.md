@@ -46,6 +46,12 @@ never records your prompts. It exists so we can see whether the design system
 is being used, what for, and who is running an old version. To turn it off, set
 `GW_NO_USAGE_PING=1` in your shell.
 
+**Who can use it.** The plugin is for Gushwork accounts. At every session start it checks the
+signed-in account: a `@gushwork.ai` address is allowed on the spot and nothing leaves your machine
+for it. An account outside the company is asked once — uninstall, or request access — and its
+Gushwork skills stay off until Utsav grants it (from Slack, Access Control or Analytics). A denied
+account's plugin removes itself.
+
 Separately from the plugin, the design hub website notes which work email signs in and which of its pages that
 email opens (the page and the time, no IP address or browser details), visible only to the owner. The
 `GW_NO_USAGE_PING` switch does not affect it; it is part of using the site.

@@ -16,6 +16,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { answerRequest } from './_access-request.js';
+import { answerPluginRequest } from './_plugin-access.js';
 
 const SITE = (process.env.SITE_BASE || 'https://design.gushwork.ai').replace(/\/$/, '');
 const VERB = { pass: 'Approved', rework: 'Sent back', reject: 'Rejected' };
@@ -102,6 +103,12 @@ export async function handleAction(payload, deps) {
     const first = (payload.actions || [])[0] || {};
     if (first.action_id === 'gw_access_approve' || first.action_id === 'gw_access_decline') {
       await answerRequest(payload, first.action_id === 'gw_access_approve', token, allowed);
+      return undefined;
+    }
+    /* Plugin access (R67): the DM only ever goes to the owner, so only the owner's allow-list may answer it. */
+    if (first.action_id === 'gw_plugin_approve' || first.action_id === 'gw_plugin_deny') {
+      if (!allowed.has(user)) return undefined;
+      await answerPluginRequest(payload, first.action_id === 'gw_plugin_approve', token);
       return undefined;
     }
   }
