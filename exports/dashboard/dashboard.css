@@ -2783,7 +2783,8 @@ a.gd-hbar__row:hover, a.gd-hbar__row.is-hover { background: var(--gd-hover-bg); 
   font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
 .gd .gd-msg { display: flex; align-items: flex-start; gap: var(--gw-space-12); padding: var(--gw-space-8) var(--gw-space-8); margin: 0 calc(var(--gw-space-8) * -1); border-radius: var(--gw-radius-8); min-width: 0; }
 .gd .gd-msg:hover { background: var(--gd-row-hover); }
-.gd .gd-msg > .gd-avatar { flex: none; }
+.gd .gd-msg > .gd-avatar, .gd .gd-msg > .gd-msg__pic { flex: none; }
+.gd .gd-msg__pic { width: 32px; height: 32px; border-radius: 20%; object-fit: cover; display: block; }    /* an agent's own picture, in the avatar's size and corner */
 .gd .gd-msg--cont { padding-block: var(--gw-space-4); }
 .gd .gd-msg--cont::before { content: ""; flex: none; width: 32px; }
 .gd .gd-msg__main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: var(--gw-space-4); }

@@ -252,7 +252,8 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
   /* ---------- Bruce's log ---------- */
   function bruceAll() { return (S.bruce || []).filter(function (r) { return r.kind !== 'sent' && !mine(r); }); }
   /* the messages Bruce reported sending on someone's behalf (the log's "sent" rows), newest first, in the chosen period */
-  function bruceSent() { return (S.bruce || []).filter(function (r) { return r.kind === 'sent' && !mine(r) && inWindow(r.at); }).sort(function (x, y) { return y.at - x.at; }); }
+  /* Hide my activity does not apply here: a message Bruce sent to someone else is the record of what he did, and the sends made on the owner's word are logged under the owner, so hiding them would hide the very thing this list is for. */
+  function bruceSent() { return (S.bruce || []).filter(function (r) { return r.kind === 'sent' && inWindow(r.at); }).sort(function (x, y) { return y.at - x.at; }); }
   function bruceRows() { return bruceAll().filter(function (r) { return inWindow(r.at); }); }
   function isGap(r) { return r.topic === 'other' || r.kind === 'failed' || r.kind === 'capped'; }
   function bruceTokens(r, a) { if (r.tokens) return r.tokens; var c = a.cost; return r.kind === 'run' ? c.start + c.run : r.kind === 'chat' ? c.start + c.chat : 0; }
@@ -522,7 +523,7 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
   function linkify(t) {
     return String(t).split(/(https?:\/\/[^\s<]+)/g).map(function (p, i) {
       if (i % 2) { var m = p.match(/^(.*?)([.,;:!?)\]'"]*)$/), u = m[1], tail = m[2]; return '<a class="gd-table__link" href="' + esc(u) + '" target="_blank" rel="noopener noreferrer">' + esc(u) + '</a>' + esc(tail); }
-      return esc(p).replace(/`([^`\n]+)`/g, '<code>$1</code>').replace(/\*([^*\n]+)\*/g, '<strong>$1</strong>');
+      return esc(p).replace(/`([^`\n]+)`/g, '<code>$1</code>').replace(/\*([^*\n]+)\*/g, '<strong>$1</strong>').replace(/(^|[\s(])_([^_\n]+)_(?=$|[\s).,;:!?])/g, '$1<em>$2</em>');
     }).join('');
   }
   function kb(n) { return n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB' : n >= 1024 ? Math.round(n / 1024) + ' KB' : n ? n + ' B' : ''; }
@@ -561,7 +562,7 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
       if (newDay) html += '<div class="gd-thread__day"><span>' + esc(dl) + '</span></div>';
       var cont = !newDay && prevFrom === m.from && (d.getTime() - prevAt) < 5 * 60e3;       /* the same sender within five minutes */
       html += '<div class="gd-msg' + (cont ? ' gd-msg--cont' : '') + '">' +
-        (cont ? '' : '<span class="gd-avatar gd-avatar--team" data-gd-avatar="' + esc(m.name) + '" role="img" aria-label="' + esc(m.name) + '"></span>') +
+        (cont ? '' : (bot ? '<img class="gd-msg__pic" src="/assets/bruce-avatar.png" alt="Bruce">' : '<span class="gd-avatar gd-avatar--team" data-gd-avatar="' + esc(m.name) + '" role="img" aria-label="' + esc(m.name) + '"></span>')) +
         '<div class="gd-msg__main">' + (cont ? '' : '<div class="gd-msg__head"><b>' + esc(m.name) + '</b>' + (bot ? badge('neutral', 'Agent') : '') + '<time>' + esc(fmtTime(d)) + '</time>' + (m.reply ? '<span class="gd-msg__note">in a thread</span>' : '') + '</div>') +
         (m.text ? '<div class="gd-msg__text">' + linkify(m.text) + '</div>' : '') + (files ? '<div class="gd-msg__files">' + files + '</div>' : '') + '</div></div>';
       day = dl; prevFrom = m.from; prevAt = d.getTime();
