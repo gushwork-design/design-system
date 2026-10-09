@@ -102,6 +102,28 @@ export async function addNotes(user, lines, f = fetch) {
   return clean.length;
 }
 
+/* ---- suggestions: what the owner thinks Bruce could do differently (Utsav, 9 Oct 2026) ----
+   Written in the Bruce drawer on the Agents page, about one person's chat. It is NOT a message: nothing is sent to that person or to
+   Slack. It is kept in a list the page shows back, and added to Bruce's notes on that person, so he reads it in his next run with them
+   (his notes arrive with the run, newest first). Owner only. */
+const SUGGEST_KEY = 'gw:bruce:suggest', MAX_SUGGEST = 200;
+export async function addSuggestion(user, name, text, f = fetch) {
+  const cfg = store(); if (!cfg || !UID.test(String(user || ''))) return false;
+  const t = String(text || '').replace(/\s+/g, ' ').trim().slice(0, 500);
+  if (!t) return false;
+  const row = { at: new Date().toISOString(), user: String(user), name: String(name || user).replace(/\s+/g, ' ').trim().slice(0, 80), text: t };
+  await redis(cfg, [['LPUSH', SUGGEST_KEY, JSON.stringify(row)], ['LTRIM', SUGGEST_KEY, '0', String(MAX_SUGGEST - 1)]], f);
+  await addNotes(row.user, ['Suggestion from Utsav, for how you handle them: ' + t.slice(0, 190)], f);
+  return row;
+}
+export async function readSuggestions(user, f = fetch) {
+  const cfg = store(); if (!cfg) return [];
+  const [{ result }] = await redis(cfg, [['LRANGE', SUGGEST_KEY, '0', String(MAX_SUGGEST - 1)]], f);
+  const out = [];
+  for (const raw of result || []) { try { const o = JSON.parse(raw); if (o && o.at && (!user || o.user === user)) out.push(o); } catch { /* skip */ } }
+  return out.slice(0, 30);
+}
+
 /* ---- the daily cap ---- */
 export function dailyCap() {
   const n = Number(process.env.BRUCE_DAILY_CAP);
@@ -387,6 +409,19 @@ export async function readDM({ token, user, ch }, f = fetch) {
 
 /* ---- the endpoint: GET reads the caller's notes, POST { notes: [...] } adds to them. Bearer = the per-run token. ---- */
 export default async function handler(req, res) {
+  // ?suggest=1: the owner writes, and reads back, suggestions for Bruce about one person's chat. Session cookie, owner only. Sends nothing.
+  if (req.query && req.query.suggest && (req.method === 'GET' || req.method === 'POST')) {
+    const session = await verify(readCookie(req.headers.cookie, COOKIE), sessionSecret());
+    if (!session || !session.email) return res.status(401).json({ error: 'Not signed in.' });
+    if (!isOwner(session.email)) return res.status(403).json({ error: 'Owners only.' });
+    res.setHeader('Cache-Control', 'no-store, private');
+    try {
+      if (req.method === 'GET') return res.status(200).json({ suggestions: await readSuggestions(String(req.query.user || '')) });
+      let body = req.body; if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
+      const row = await addSuggestion(body && body.user, body && body.name, body && body.text);
+      return row ? res.status(200).json({ ok: true, suggestion: row }) : res.status(400).json({ error: 'Nothing to save.' });
+    } catch { return res.status(502).json({ error: 'Could not save that.' }); }
+  }
   // ?log=1: the owner's view of every Bruce turn, for /admin/analytics#bruce. Session cookie, owner only, like the usage log.
   if (req.method === 'GET' && req.query && req.query.log) {
     const session = await verify(readCookie(req.headers.cookie, COOKIE), sessionSecret());
