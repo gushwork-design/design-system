@@ -255,7 +255,7 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
   function bruceSent() { return (S.bruce || []).filter(function (r) { return r.kind === 'sent' && !mine(r) && inWindow(r.at); }).sort(function (x, y) { return y.at - x.at; }); }
   function bruceRows() { return bruceAll().filter(function (r) { return inWindow(r.at); }); }
   function isGap(r) { return r.topic === 'other' || r.kind === 'failed' || r.kind === 'capped'; }
-  function bruceTokens(r, a) { var c = a.cost; return r.kind === 'run' ? c.start + c.run : r.kind === 'chat' ? c.start + c.chat : 0; }
+  function bruceTokens(r, a) { if (r.tokens) return r.tokens; var c = a.cost; return r.kind === 'run' ? c.start + c.run : r.kind === 'chat' ? c.start + c.chat : 0; }
 
   /* one summary per agent: state, one sentence on what it is doing, and what it wants from Utsav */
   function summary(id) {
@@ -502,8 +502,8 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
 
     /* 3. what he worked on: the runs; nothing to show, nothing drawn */
     var work = rows.filter(function (r) { return r.kind === 'run'; }).sort(function (x, y) { return y.at - x.at; });
-    if (work.length) html += card('What he worked on', plural(work.length, 'run') + (work.length > 8 ? ', latest 8' : '') + ', newest first', table('Runs', [{ h: 'When', w: '150px', muted: true }, { h: 'Person', w: '150px', strong: true }, { h: 'About', w: '170px', flex: true }, { h: 'Ask', w: 'minmax(0,1fr)', title: true }],
-      work.slice(0, 8).map(function (r) { return { attrs: ' data-u="' + esc(r.user) + '"', t: ['', '', '', r.text], cells: ['<time datetime="' + r.at.toISOString() + '">' + esc(fmtWhen(r.at)) + '</time>', '<a class="gd-table__link" href="#" data-u="' + esc(r.user) + '">' + esc(r.name) + '</a>', tag(TOPIC[r.topic] || r.topic), esc(r.text)] }; })), { flush: true });
+    if (work.length) html += card('What he worked on', plural(work.length, 'run') + (work.length > 8 ? ', latest 8' : '') + ', newest first', table('Runs', [{ h: 'When', w: '150px', muted: true }, { h: 'Person', w: '150px', strong: true }, { h: 'Skills', w: '220px', flex: true }, { h: 'Ask', w: 'minmax(0,1fr)', title: true }],
+      work.slice(0, 8).map(function (r) { return { attrs: ' data-u="' + esc(r.user) + '"', t: ['', '', '', r.text], cells: ['<time datetime="' + r.at.toISOString() + '">' + esc(fmtWhen(r.at)) + '</time>', '<a class="gd-table__link" href="#" data-u="' + esc(r.user) + '">' + esc(r.name) + '</a>', (r.skills.length ? r.skills.map(function (k) { return tag(k.replace(/^gushwork-design:/, '')); }).join(' ') : tag(TOPIC[r.topic] || r.topic)), esc(r.text)] }; })), { flush: true });
 
     /* 4. what he needs from you; only when there is something */
     var gaps = rows.filter(isGap).sort(function (x, y) { return y.at - x.at; });
@@ -628,7 +628,7 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
     }).then(function (j) {
       if (!j) return; if (!j.configured) { S.bruceErr = 'No store connected, so nothing is logged'; return; }
       S.owner = String(j.owner || ''); S.cap = Number(j.cap) || 3; S.dm = {};
-      S.bruce = (j.rows || []).map(function (r) { var d = new Date(r.at); return isNaN(d.getTime()) ? null : { at: d, user: String(r.user || ''), name: String(r.name || r.user || ''), role: r.role === 'owner' ? 'owner' : 'teammate', kind: String(r.kind || 'run'), thread: !!r.thread, text: String(r.text || ''), topic: r.topic || (r.kind === 'sent' ? '' : 'other'), to: String(r.toName || ''), ch: String(r.ch || '') }; }).filter(Boolean);
+      S.bruce = (j.rows || []).map(function (r) { var d = new Date(r.at); return isNaN(d.getTime()) ? null : { at: d, user: String(r.user || ''), name: String(r.name || r.user || ''), role: r.role === 'owner' ? 'owner' : 'teammate', kind: String(r.kind || 'run'), thread: !!r.thread, text: String(r.text || ''), topic: r.topic || (r.kind === 'sent' ? '' : 'other'), to: String(r.toName || ''), ch: String(r.ch || ''), skills: Array.isArray(r.skills) ? r.skills : [], tokens: Number(r.tokens) || 0, reported: !!r.reported }; }).filter(Boolean);
     }).catch(function () { S.bruceErr = 'Could not read his log'; });
   }
   function loadUsage() { return fetch('/admin/bruce-usage.json', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { S.usage = j && j.weekly ? j : null; }).catch(function () { S.usage = null; }); }

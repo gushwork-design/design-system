@@ -193,7 +193,8 @@ export async function logRun(row, f = fetch) {
   const cfg = store(); if (!cfg) return false;
   const r = { at: new Date().toISOString(), user: String(row.user || ''), name: String(row.name || row.user || ''), role: row.role === 'owner' ? 'owner' : 'teammate',
     kind: String(row.kind || 'run'), thread: row.thread ? 1 : 0, text: String(row.text || '').replace(/\s+/g, ' ').trim().slice(0, 200), used: Number(row.used) || 0 };
-  if (r.kind !== 'sent') r.topic = TOPICS.includes(row.topic) ? row.topic : topicOf(r.text);
+  if (r.kind !== 'sent' && r.kind !== 'report') r.topic = TOPICS.includes(row.topic) ? row.topic : topicOf(r.text);
+  if (r.kind === 'report') { r.skills = cleanSkills(row.skills); if (Number(row.tokens) > 0) r.tokens = Math.round(Number(row.tokens)); }
   if (UID.test(String(row.to || '')) || CH.test(String(row.to || ''))) { r.to = String(row.to); r.toName = String(row.toName || row.to).replace(/\s+/g, ' ').trim().slice(0, 80); }
   if (CH.test(String(row.ch || ''))) r.ch = String(row.ch);
   if (TS.test(String(row.ts || ''))) r.ts = String(row.ts);
@@ -215,6 +216,46 @@ export async function logSent(user, items, { f = fetch, token = process.env.SLAC
     }
     return kept;
   } catch { return 0; }
+}
+
+/* ---- the run report: what his session actually did (Utsav, 9 Oct 2026: a run is where a skill was used or many tokens were spent) ----
+   At the end of a session Bruce POSTs { run: { skills: ["gushwork-web", ...], tokens: 123000 } } with the same per-run token he uses for
+   `sent`. `skills` is what he invoked through the Skill tool, which he can see; `tokens` is optional, since a session cannot read its own
+   count. The report is its own log row (kind `report`); attachReports folds it into the ask it answers when the log is read, and then
+   the report, not the words of the ask, says whether it was a run. An ask with no report keeps the word-based guess (weightOf). */
+export const HEAVY_TOKENS = 80000;
+export function cleanSkills(list) {
+  const out = [];
+  for (const x of Array.isArray(list) ? list : []) {
+    const n = String(x || '').trim().slice(0, 60);
+    if (/^[\w:.\-\/ ]{1,60}$/.test(n) && !out.includes(n)) out.push(n);
+    if (out.length >= 8) break;
+  }
+  return out;
+}
+export async function logReport(user, run, { f = fetch } = {}) {
+  try {
+    if (!user || !run || typeof run !== 'object') return false;
+    const role = user === String(process.env.OWNER_SLACK_ID || '') ? 'owner' : 'teammate';
+    return await logRun({ user, name: user, role, kind: 'report', skills: run.skills, tokens: run.tokens }, f);
+  } catch { return false; }
+}
+/* Fold each report into the latest ask of the same person that came before it (within the run token's six hours) and not already
+   reported. Returns the rows without the report rows. Mutates the ask rows: skills, tokens, reported, and kind (a run only if a
+   skill ran or the tokens were heavy; otherwise a chat). Capped, failed and to-alfred asks keep their kind. */
+export function attachReports(rows) {
+  const asc = rows.filter((r) => r.kind === 'report').sort((a, b) => Date.parse(a.at) - Date.parse(b.at));
+  const asks = rows.filter((r) => r.kind === 'run' || r.kind === 'chat').sort((a, b) => Date.parse(a.at) - Date.parse(b.at));
+  const claimed = new Set();
+  for (const rep of asc) {
+    const t = Date.parse(rep.at); let hit = null;
+    for (const a of asks) { const at = Date.parse(a.at); if (a.user === rep.user && at <= t && t - at <= TOKEN_HOURS * 3600e3 && !claimed.has(a)) hit = a; }
+    if (!hit) continue;
+    claimed.add(hit);
+    hit.skills = rep.skills || []; if (rep.tokens) hit.tokens = rep.tokens; hit.reported = true;
+    hit.kind = (hit.skills.length || (rep.tokens || 0) >= HEAVY_TOKENS) ? 'run' : 'chat';
+  }
+  return rows.filter((r) => r.kind !== 'report');
 }
 
 export async function readLog(f = fetch) {
@@ -354,11 +395,12 @@ export default async function handler(req, res) {
     try {
       const rows = await readLog();
       if (rows === null) return res.status(200).json({ configured: false, rows: [] });
-      for (const r of rows) {
+      const shown = attachReports(rows);
+      for (const r of shown) {
         if (r.kind !== 'sent' && !r.topic) r.topic = topicOf(r.text);                   /* rows logged before topics existed */
-        if (r.kind === 'run' && weightOf(r.text) === 'chat') r.kind = 'chat';            /* and before runs and chats were told apart */
+        if (!r.reported && r.kind === 'run' && weightOf(r.text) === 'chat') r.kind = 'chat';   /* no report from his session: the words stand in */
       }
-      return res.status(200).json({ configured: true, rows, owner: String(process.env.OWNER_SLACK_ID || ''), cap: dailyCap() });
+      return res.status(200).json({ configured: true, rows: shown, owner: String(process.env.OWNER_SLACK_ID || ''), cap: dailyCap() });
     } catch { return res.status(502).json({ error: 'Could not read the log.' }); }
   }
   // ?conversation=1&user=U…[&ch=D…&ts=…][&at=ms]: the owner reads one thread of a DM, live from Slack. Owner only; nothing is kept.
@@ -397,7 +439,8 @@ export default async function handler(req, res) {
       let body = req.body; if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
       const n = await addNotes(user, Array.isArray(body && body.notes) ? body.notes : []);
       const sent = await logSent(user, body && body.sent);
-      return res.status(200).json({ ok: true, added: n, sent });
+      const run = body && body.run ? await logReport(user, body.run) : undefined;
+      return res.status(200).json({ ok: true, added: n, sent, ...(run === undefined ? {} : { run }) });
     }
     return res.status(405).json({ error: 'GET or POST' });
   } catch (e) { return res.status(502).json({ error: String(e.message || e).slice(0, 120) }); }
