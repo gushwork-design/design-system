@@ -16,10 +16,29 @@
 set -u
 command -v python3 >/dev/null 2>&1 || exit 0
 STATE="${GW_ACCESS_STATE:-$HOME/.claude/gushwork/access.json}"
+ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
+
+# No state, or a stale one: decide now, quietly, before the skill runs. The SessionStart hook only runs at
+# session start, and a plugin installed mid-session (the usual path in a cloud container, which never
+# restarts) has had no session start since. 9 Oct 2026: a personal account installed and ran gushwork-web
+# in the same session, straight past the gate, because this file did not exist yet and the gate let the
+# missing file through. Now the missing file is the cue to go and look. Still fails open on any error.
+STALE=1
+if [ -f "$STATE" ]; then
+  GW_F="$STATE" python3 -c '
+import json, os, sys, time
+try: d = json.load(open(os.environ["GW_F"]))
+except Exception: sys.exit(1)
+sys.exit(0 if time.time() - float(d.get("checkedAt", 0)) < 3600 else 1)' 2>/dev/null && STALE=0
+fi
+CHECK="$(cd "$(dirname "$0")" && pwd)/check-access.sh"          # its sibling, wherever this copy lives
+if [ "$STALE" = 1 ] && [ -f "$CHECK" ]; then
+  GW_ACCESS_QUIET=1 GW_ACCESS_STATE="$STATE" CLAUDE_PLUGIN_ROOT="$ROOT" bash "$CHECK" </dev/null >/dev/null 2>&1 || true
+fi
 [ -f "$STATE" ] || exit 0
 INPUT=""
 [ -t 0 ] || IFS= read -r -t 2 -d '' INPUT 2>/dev/null || true
-GW_IN="$INPUT" GW_F="$STATE" python3 -c '
+GW_IN="$INPUT" GW_F="$STATE" GW_R="$ROOT" python3 -c '
 import json, os, re, sys
 try:
     skill = str((json.loads(os.environ["GW_IN"] or "{}").get("tool_input") or {}).get("skill") or "")
@@ -35,8 +54,9 @@ state = d.get("state")
 if state in (None, "", "allowed"):
     sys.exit(0)
 who = d.get("email") or "this account"
+root = os.environ.get("GW_R", "")
 why = {
-    "none": "The Gushwork design-system plugin is for Gushwork accounts, and " + who + " is outside the company. Offer the person two options: uninstall the plugin (`claude plugin uninstall gushwork-design@gushwork`), or request access (run the plugin'"'"'s scripts/request-access.sh).",
+    "none": "The Gushwork design-system plugin is for Gushwork accounts, and " + who + " is outside the company. Offer the person two options: uninstall the plugin (`claude plugin uninstall gushwork-design@gushwork`), or request access (run `bash \"" + root + "/scripts/request-access.sh\" \"<optional one-line note>\"` and read its answer back).",
     "pending": "An access request for " + who + " is waiting for Utsav at Gushwork. The Gushwork skills stay off until it is granted; the plugin unlocks by itself at the next session.",
     "denied": "Access to the Gushwork design system was not granted for " + who + ", and the plugin is removing itself. Say so in one sentence.",
 }.get(state, "The Gushwork skills are switched off for " + who + ".")

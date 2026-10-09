@@ -9,7 +9,8 @@
 # a grant lands here on the person's next session with no reinstall.
 #
 # WHAT IT DOES, in order
-#   1. Who is signed in — the Claude account's address, git's user.email as the fallback. The same
+#   1. Who is signed in — the Claude account's address, then git's user.email, then GIT_AUTHOR_EMAIL /
+#      GIT_COMMITTER_EMAIL / EMAIL from the environment (what a cloud container usually has). The same
 #      identity the usage ping sends, so this and the Analytics page always agree on who someone is.
 #   2. On the company domain → allowed, nothing to say. Most sessions end here in a millisecond.
 #   3. Otherwise ask the hub where the address stands (3s cap, cached 1h when allowed, re-asked every
@@ -68,7 +69,7 @@ def account_email():
         except Exception:
             pass
     return ""
-print((account_email() or os.environ.get("GW_GIT_EMAIL", "")).strip().lower()[:160])' 2>/dev/null)"
+print((account_email() or os.environ.get("GW_GIT_EMAIL", "") or os.environ.get("GIT_AUTHOR_EMAIL", "") or os.environ.get("GIT_COMMITTER_EMAIL", "") or os.environ.get("EMAIL", "")).strip().lower()[:160])' 2>/dev/null)"
 
 mkdir -p "$(dirname "$STATE")" 2>/dev/null || exit 0
 
@@ -130,6 +131,9 @@ if [ "$STATE_NOW" = denied ] && [ -z "${GW_NO_AUTO_PULL:-}" ]; then
 fi
 
 # ── say it ────────────────────────────────────────────────────────────────────────────────
+# GW_ACCESS_QUIET=1: decide and write the state, print nothing. scripts/gate-skill.sh uses it when a session has no
+# state yet — the plugin was installed mid-session, which is the normal path in a cloud container that never restarts.
+[ -z "${GW_ACCESS_QUIET:-}" ] || exit 0
 GW_S="$STATE_NOW" GW_E="$EMAIL" GW_R="$ROOT" GW_P="$PLUGIN" python3 -c '
 import json, os
 s, e, root, plugin = os.environ["GW_S"], os.environ["GW_E"], os.environ["GW_R"], os.environ["GW_P"]

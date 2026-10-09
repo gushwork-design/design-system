@@ -150,7 +150,7 @@ def version():
 SESS = hashlib.sha256(sid.encode()).hexdigest()[:12]
 
 def out(event, **extra):
-    row = {"email": (account_email() or os.environ.get("GW_GIT_EMAIL", ""))[:160],
+    row = {"email": (account_email() or os.environ.get("GW_GIT_EMAIL", "") or os.environ.get("GIT_AUTHOR_EMAIL", "") or os.environ.get("GIT_COMMITTER_EMAIL", "") or os.environ.get("EMAIL", ""))[:160],
            "version": version(), "event": event, "sess": SESS}
     row.update(extra)
     print(json.dumps(row))
