@@ -29,7 +29,7 @@ function json(res, status, body) {
 
    WITHOUT THE SCOPE (or the token) it says so and falls back to the people who have signed in to the hub, so the picker
    still suggests someone, just not everyone. The page shows which source it is using. */
-const DIR_KEY = 'gw:directory';
+const DIR_KEY = 'gw:directory:v2';   /* v2: the first version cached an empty Slack answer's fallback list for an hour */
 const DIR_TTL = 3600;
 
 function kvCfg() {
@@ -46,6 +46,7 @@ async function kvPipe(cfg, cmds) {
 /* The Slack people list, or { error } saying why not. Pure of caching. */
 export async function fetchSlackPeople(token, domain) {
   const out = [];
+  const stats = { members: 0, withEmail: 0 };
   let cursor = '';
   for (let page = 0; page < 10; page++) {                       // 10 pages of 200 is 2000 people, far past this company
     const q = new URLSearchParams({ limit: '200', ...(cursor ? { cursor } : {}) });
@@ -56,6 +57,7 @@ export async function fetchSlackPeople(token, domain) {
       if (u.deleted || u.is_bot || u.id === 'USLACKBOT' || u.is_restricted || u.is_ultra_restricted) continue;
       const p = u.profile || {};
       const email = String(p.email || '').toLowerCase();
+      stats.members++; if (email) stats.withEmail++;
       if (!email.endsWith('@' + domain)) continue;
       out.push({ email, name: String(p.real_name || p.display_name || u.real_name || u.name || email).slice(0, 80), avatar: String(p.image_48 || '').startsWith('https://') ? p.image_48 : '', title: String(p.title || '').slice(0, 80) });
     }
@@ -63,7 +65,7 @@ export async function fetchSlackPeople(token, domain) {
     if (!cursor) break;
   }
   out.sort((a, b) => a.name.localeCompare(b.name));
-  return { people: out };
+  return { people: out, stats };
 }
 
 async function directory() {
@@ -77,6 +79,10 @@ async function directory() {
   if (token) {
     const got = await fetchSlackPeople(token, domain);
     if (got.error) source = { slack: got.error === 'missing_scope' ? 'missing_scope' : 'error', detail: got.error };
+    else if (!got.people.length && got.stats && got.stats.members && !got.stats.withEmail) {
+      /* Slack answered, and listed people, but with no email on any of them: the token does not have users:read.email yet. */
+      source = { slack: 'missing_scope', detail: 'Slack listed ' + got.stats.members + ' people with no email address, so the bot token does not have users:read.email.' };
+    } else if (!got.people.length) source = { slack: 'empty', detail: 'Slack listed ' + (got.stats ? got.stats.members : 0) + ' people, none with a ' + domain + ' address.' };
     else { people = got.people; source = { slack: 'ok' }; }
   }
   /* Whoever has signed in to the hub, as a floor: names unknown, but the address is real. */
@@ -90,7 +96,7 @@ async function directory() {
     } catch { /* no floor */ }
   }
   const out = { people, source, at: Date.now() };
-  if (cfg && source.slack === 'ok') { try { await kvPipe(cfg, [['SET', DIR_KEY, JSON.stringify(out), 'EX', String(DIR_TTL)]]); } catch { /* uncached is fine */ } }
+  if (cfg && source.slack === 'ok' && people.length) {   /* only a real Slack answer is kept; a fallback list is rebuilt every time */ try { await kvPipe(cfg, [['SET', DIR_KEY, JSON.stringify(out), 'EX', String(DIR_TTL)]]); } catch { /* uncached is fine */ } }
   return out;
 }
 

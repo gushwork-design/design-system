@@ -348,6 +348,20 @@ const mem = (id, email, over = {}, prof = {}) => ({ id, deleted: false, is_bot: 
   r = await call(accessApi, { headers: owner, query: { directory: '1' } });
   t('without the scope it falls back to people who have signed in, and says why', [r.body.source.slack, r.body.people.map((p) => p.email).sort()], ['missing_scope', ['amy@gushwork.ai', 'zed@gushwork.ai']]);
   slackError = '';
+
+  /* Slack answers, lists people, but with no email on any of them: the token does not have users:read.email yet. That is a missing
+     scope, it must say so, and the fallback list it falls back to must NOT be cached (it was, for an hour, in the first version). */
+  const keep = slackMembers;
+  slackMembers = [mem('U1', '', {}, { email: '' }), mem('U2', '', {}, { email: '' })];
+  kvData.clear(); slackCalls = 0;
+  kvData.set('__list:gw:visits', [JSON.stringify({ email: 'zed@gushwork.ai' })]);
+  r = await call(accessApi, { headers: owner, query: { directory: '1' } });
+  t('people with no email mean a missing scope, said plainly', [r.body.source.slack, /no email/.test(r.body.source.detail || '')], ['missing_scope', true]);
+  r = await call(accessApi, { headers: owner, query: { directory: '1' } });
+  t('and the fallback list is not cached, so fixing the scope shows at once', [r.body.cached, slackCalls], [undefined, 2]);
+  slackMembers = keep;
+  r = await call(accessApi, { headers: owner, query: { directory: '1' } });
+  t('once Slack has the emails the real list comes back', [r.body.source.slack, r.body.people.length], ['ok', 3]);
 }
 
 /* ── 11. the restricted screens ───────────────────────────────────────────────────────────────────────────────────────── */
