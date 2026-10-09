@@ -1,9 +1,0 @@
-{
-  "title": "Staging lane test",
-  "blurb": "A throwaway page that proves publishing into a staging lane works.",
-  "owner": "utsav.singh@gushwork.ai",
-  "visibility": "lane",
-  "lane": "gtm",
-  "publishedBy": "utsav.singh@gushwork.ai",
-  "publishedAt": "2026-10-09T04:25:17.824Z"
-}

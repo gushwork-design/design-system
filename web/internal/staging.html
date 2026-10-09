@@ -331,6 +331,14 @@
     .then(function (j) {
       var sec = document.getElementById('team-pages');
       if (!j || !j.pages || !j.pages.length || !sec) return;
+      /* A page that was taken out of git can still be in the hub's private index; only list the ones that really open. A check that
+         cannot be made (offline, a blip) keeps the entry, so nothing disappears by accident. */
+      return Promise.all(j.pages.map(function (p) {
+        return fetch(p.path, { method: 'HEAD', credentials: 'same-origin' }).then(function (r) { return r.status === 404 ? null : p; }, function () { return p; });
+      })).then(function (alive) { j.pages = alive.filter(Boolean); return j; });
+    }).then(function (j) {
+      var sec = document.getElementById('team-pages');
+      if (!j || !j.pages || !j.pages.length || !sec) return;
       var tb = sec.querySelector('tbody');
       var ICON = '<span class="st-pv" style="display:grid;place-items:center"><svg viewBox="0 0 256 256" fill="var(--gw-color-neutral-400)" aria-hidden="true" style="width:24px;height:24px"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z"/></svg></span>';
       var ARROW = '<svg viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg>';
