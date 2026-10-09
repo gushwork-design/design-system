@@ -60,6 +60,7 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
 .ag-week__legend { display: flex; flex-wrap: wrap; gap: var(--gw-space-4) var(--gw-space-24); font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
 .ag-week__key { display: inline-flex; align-items: center; gap: var(--gw-space-8); }
 .ag-week__key > i { width: 8px; height: 8px; border-radius: 2px; flex: none; }
+.ag-week__note { margin: 0; font: var(--gw-text-body-12-reg); color: var(--gd-text-muted); }
 .ag-week__key b { color: var(--gd-text); font-weight: 600; font-feature-settings: "tnum" 1; }
 .ag-use { display: flex; flex-direction: column; gap: var(--gw-space-8); }
 .ag-use__row { display: flex; align-items: baseline; justify-content: space-between; gap: var(--gw-space-12); font: var(--gw-text-body-12-med); color: var(--gd-text-muted); }
@@ -155,6 +156,9 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
   var DAY = 86400000;
   function ago(ms) { var s = Math.max(0, Math.round(ms / 1000)); if (s < 60) return 'just now'; var m = Math.round(s / 60); if (m < 60) return m + ' min ago'; var h = Math.round(m / 60); if (h < 48) return h + ' h ago'; return Math.round(h / 24) + ' days ago'; }
   function agoShort(ms) { var m = Math.round(ms / 60000); if (m < 60) return m + ' min'; var h = Math.round(m / 60); if (h < 48) return h + ' h'; return Math.round(h / 24) + ' days'; }
+  /* the plan's weekly limit in tokens, and a token count as a share of it. The plan publishes only a percentage, so the limit is an ESTIMATE kept in the usage snapshot (limitTokens) */
+  function limitTok() { var u = S.usage; return u && +u.limitTokens > 0 ? +u.limitTokens : 0; }
+  function limitPct(t) { var p = t / limitTok() * 100; return !t ? '0%' : p < 0.1 ? '<0.1%' : p < 10 ? '≈' + p.toFixed(1) + '%' : '≈' + Math.round(p) + '%'; }
   function tok(n) { return n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1e3 ? Math.round(n / 1e3) + 'k' : String(Math.round(n)); }
   function fmtWhen(d) { return d.toLocaleString(undefined, { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }); }
   function fmtTime(d) { return d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }); }
@@ -320,6 +324,11 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
   /* an agent's estimated tokens in the chosen period and its share of the team's total; an estimate, as everywhere on this page */
   function use(s, total, ready) {
     if (!s.known) return '<span class="ag-use"><span class="ag-use__row"><span>Tokens ' + esc(periodText()) + '</span><span class="ag-spin" role="status" aria-label="Waiting for data"></span></span></span>';
+    if (limitTok()) {   /* this week's tokens as a share of the weekly limit; the bar is the whole limit */
+      var wt = weekTokens(s), lp = limitPct(wt);
+      return '<span class="ag-use"><span class="ag-use__row"><span>This week</span><b>' + (wt ? '≈ ' + tok(wt) : 'None') + ' · ' + lp + ' of limit</b></span>' +
+        '<span class="ag-use__bar" role="img" aria-label="' + lp + ' of your weekly limit"><i style="width:' + Math.min(100, wt / limitTok() * 100) + '%;min-width:' + (wt ? '2px' : '0') + '"></i></span></span>';
+    }
     if (!ready) return '<span class="ag-use"><span class="ag-use__row"><span>Tokens ' + esc(periodText()) + '</span><b>' + (s.tokens ? '≈ ' + tok(s.tokens) : 'None') + '</b></span></span>';   /* a share of the team needs every agent's number, so none until they have all loaded */
     var share = total ? s.tokens / total : 0, pct = !s.tokens ? '0%' : share < 0.01 ? '<1%' : Math.round(share * 100) + '%';
     return '<span class="ag-use"><span class="ag-use__row"><span>Tokens ' + esc(periodText()) + '</span><b>' + (s.tokens ? '≈ ' + tok(s.tokens) : 'None') + ' · ' + pct + ' of the team</b></span>' +
@@ -331,11 +340,12 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
     var rows = list.filter(function (s) { return s.known; }).map(function (s) { return { s: s, t: weekTokens(s) }; }), total = rows.reduce(function (n, r) { return n + r.t; }, 0);
     if (!rows.length) return '';
     var u = S.usage, resetAt = u && u.weekly && Date.parse(u.weekly.resetsAt) ? Date.parse(u.weekly.resetsAt) : 0, tone = ['var(--gd-ink)', 'var(--gd-text-muted)', 'var(--gd-border-strong)'];
-    var bar = rows.map(function (r, i) { return r.t ? '<i style="width:' + (r.t / total * 100) + '%;background:' + tone[i % 3] + '" title="' + esc(r.s.a.name) + '"></i>' : ''; }).join('');
-    var legend = rows.map(function (r, i) { return '<span class="ag-week__key"><i style="background:' + tone[i % 3] + '"></i>' + esc(r.s.a.name) + ' <b>' + (r.t ? '≈ ' + tok(r.t) : 'None') + '</b></span>'; }).join('');
+    var L = limitTok(), whole = L || total;   /* with a limit the bar is the whole weekly limit and each agent a slice of it */
+    var bar = rows.map(function (r, i) { return r.t ? '<i style="min-width:2px;width:' + Math.min(100, r.t / whole * 100) + '%;background:' + tone[i % 3] + '" title="' + esc(r.s.a.name) + '"></i>' : ''; }).join('');
+    var legend = rows.map(function (r, i) { return '<span class="ag-week__key"><i style="background:' + tone[i % 3] + '"></i>' + esc(r.s.a.name) + ' <b>' + (r.t ? '≈ ' + tok(r.t) + (L ? ' · ' + limitPct(r.t) : '') : 'None') + '</b></span>'; }).join('');
     return card('Agents this week', 'Estimated tokens since the weekly limit reset' + (resetAt ? ' on ' + new Date(resetAt - 7 * DAY).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }) : ''),
-      '<div class="ag-week"><div class="ag-week__row"><b>' + (total ? '≈ ' + tok(total) + ' tokens' : 'None yet') + '</b>' + (resetAt ? '<span>Limit resets ' + esc(new Date(resetAt).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' })) + '</span>' : '') + '</div>' +
-      '<div class="ag-week__bar" role="img" aria-label="Estimated tokens this week by agent">' + bar + '</div><div class="ag-week__legend">' + legend + '</div></div>');
+      '<div class="ag-week"><div class="ag-week__row"><b>' + (total ? '≈ ' + tok(total) + ' tokens' : 'None yet') + '</b>' + (L ? '<span>' + limitPct(total) + ' of your weekly limit' + (resetAt ? ' · resets ' + esc(new Date(resetAt).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' })) : '') + '</span>' : resetAt ? '<span>Limit resets ' + esc(new Date(resetAt).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' })) + '</span>' : '') + '</div>' +
+      '<div class="ag-week__bar" role="img" aria-label="Estimated tokens this week by agent">' + bar + '</div><div class="ag-week__legend">' + legend + '</div>' + (L ? '<p class="ag-week__note">The limit is an estimate: about ' + Math.round(L / 1e6) + 'M tokens, worked out from the plan\u2019s % used and the tokens used on this Mac, give or take a quarter. The plan does not publish it.</p>' : '') + '</div>');
   }
 
   /* an agent's status card: picture, name, role, state, what it is doing, and its tokens. On All agents it links to the agent's tab; on the tab itself it is the same card, full width and not a link */
@@ -410,7 +420,7 @@ body[data-gw-page="agents"] .sg__main :is(.gd-toggle, .gd-check, .gd-radio) inpu
     var weekTok = weekTokens(s);
     return '<section aria-label="Usage and tokens"><div class="gd-card__titles" style="margin-bottom:var(--gd-gap)"><h3 class="gd-card__title">Usage and tokens</h3><p class="gd-card__desc">Estimated, not measured</p></div>' + stats([
       { n: 'Tokens ' + (S.period === 'today' ? 'today' : 'in ' + S.period + ' days'), v: s.sessions ? '≈ ' + tok(s.tokens) : '—', c: s.sessions ? 'about ' + tok(s.tokens / s.sessions) + ' for each of ' + plural(s.sessions, unit) : 'no ' + unit + 's yet' },
-      { n: 'Tokens this week', v: '≈ ' + tok(weekTok), c: resetAt ? 'since the weekly limit reset on ' + new Date(weekFrom).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }) : 'the last 7 days' },
+      { n: 'Tokens this week', v: '≈ ' + tok(weekTok), c: limitTok() ? limitPct(weekTok) + ' of your weekly limit' + (resetAt ? ', since ' + new Date(weekFrom).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }) : '') : resetAt ? 'since the weekly limit reset on ' + new Date(weekFrom).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }) : 'the last 7 days' },
       { n: 'Your weekly limit', v: u && u.weekly ? u.weekly.percentUsed + '% used' : '—', c: u && u.weekly ? 'everything on your account, as of ' + fmtWhen(new Date(u.at)) + (snapAge > 2 * DAY ? ' (' + Math.round(snapAge / DAY) + ' days old)' : '') : 'no snapshot found' }]) + '</section>';
   }
   function statsCard(s) {
