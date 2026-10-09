@@ -163,6 +163,20 @@ function pickLogos(catalog, words) {
   return { chosen, hints };
 }
 
+/* "Is the hub healthy", "is the site down", "anything broken", "hub status", "ask Doc". Strict on purpose: it hands the
+   question to Doc, so a stray "working" ("the logo isn't working in Figma") must not trigger it. A question about the hub, the
+   site or the system, with a state word; or a health/status word on its own beside one of those. */
+const HUB_WORDS = String.raw`(?:hub|site|website|design system|system|bruce|login|sign-?in|everything|anything|plugin|library)`;
+const STATE_WORDS = String.raw`(?:up|down|working|broken|healthy|unhealthy|ok|okay|fine|alive|failing|fails|live|running|OK)`;
+const HEALTH_ASKS = [
+  new RegExp(String.raw`\b(?:is|are|was|were)\b[^?.!]{0,30}\b${HUB_WORDS}\b[^?.!]{0,30}\b${STATE_WORDS}\b`, 'i'),
+  new RegExp(String.raw`\b${HUB_WORDS}\b (?:health|status|down|outage)\b`, 'i'),
+  /\b(?:health|status) (?:check|report)\b/i,
+  /\b(?:(?:is|was) )?(?:anything|something) (?:broken|down|failing|wrong)\b/i,
+  /\b(?:ask|check with|tell) doc\b|^\s*doc\b[,:]?/i,
+];
+export function asksHealth(raw) { return HEALTH_ASKS.some((re) => re.test(String(raw || ''))); }
+
 export function understand(text, catalog) {
   const words = normalise(text);
   const format = words.find((w) => FORMATS.has(w));
@@ -228,10 +242,11 @@ export function understand(text, catalog) {
     if (pages.length) parts.push({ type: 'pages', entries: pages.filter((r) => r.s === pages[0].s).map((r) => r.x) });
   }
   const designRequest = has(words, DESIGN_VERBS) && !parts.some((p) => p.type === 'tools' || p.type === 'assets' || p.type === 'faq');
+  const health = asksHealth(raw) && !parts.some((p) => p.type === 'assets' || p.type === 'templates') && !designRequest;
   // A message that only wraps things up ("thanks", "ok cool", "perfect", a lone 👍). Ends a Bruce thread without a run.
-  const closing = !parts.length && !designRequest && raw.length <= 60 && !/\?/.test(raw) &&
+  const closing = !parts.length && !designRequest && !health && raw.length <= 60 && !/\?/.test(raw) &&
     (thanksOnly || /^(ok(ay)?|k|cool|great|perfect|nice|done|got it|sounds good|all good|that'?s (all|it)|bye|lgtm|works|looks good|:\+1:|:thumbsup:|:ok_hand:|:pray:|👍|🙏|👌)( (thanks|cool|great|perfect|done|for now))*[.! ]*$/.test(raw));
-  return { parts, designRequest, help, greeting: greetingOnly, thanks: thanksOnly, closing };
+  return { parts, designRequest, help, greeting: greetingOnly, thanks: thanksOnly, closing, health };
 }
 
 /* ---------------------------------------------------------------- writing the answer */
@@ -256,6 +271,7 @@ export const HELP = [
   '• “White logo svg”, “the fonts” or “brand colours”',
   '• “Which template for a case study?”',
   '• “How do I install the Claude plugin?”',
+  '• “Is the hub healthy?” and Doc will check',
   'For a build, tell me who it’s for, the offer and the call to action, and I’ll handle the rest. Say thanks when we’re done and I’ll take the hint.',
 ].join('\n');
 
@@ -452,6 +468,26 @@ export async function replyToAlfred(ping, text) {
   return { ok: true, fired: run.fired };
 }
 
+/* A question about whether the hub is healthy is for Doc (agents/registry.json routing, R69). Doc is read-only and his checks
+   are code, so this runs them now (the same report his page on Agents shows) rather than starting a routine and waiting for
+   it. The owner gets each problem with its fix; anyone else gets how many there are and who to ask, because the detail names
+   the hub's internals. Never throws: a report that cannot be made says so. */
+export async function askDoc(asker = {}, seam = {}) {
+  let report;
+  try { const liveReport = seam.liveReport || (await import('./_health.js')).liveReport; report = await liveReport(); } catch { return { ok: false, why: 'the checks would not run' }; }
+  const bad = report.checks.filter((x) => x.status === 'fail' || x.status === 'warn').sort((a, b) => (a.status === 'fail' ? 0 : 1) - (b.status === 'fail' ? 0 : 1));
+  const fails = bad.filter((x) => x.status === 'fail').length, total = report.checks.length;
+  const unknown = report.counts.unknown || 0;
+  const tail = unknown ? ` ${unknown} ${unknown === 1 ? 'check' : 'checks'} couldn’t be run.` : '';
+  const page = link('/admin/agents#doc', 'Doc’s page');
+  if (!bad.length) return { ok: true, text: `Doc says the hub is healthy: all ${total - unknown} checks that ran are fine.${tail}${asker.owner ? ` Detail on ${page}.` : ''}` };
+  const head = fails ? `Doc found ${fails} ${fails === 1 ? 'thing' : 'things'} not working and ${bad.length - fails} to keep an eye on.` : `The hub is up. Doc has ${bad.length} to keep an eye on.`;
+  if (!asker.owner) return { ok: true, text: `${head} The detail is Utsav’s to read, so ask ${ownerMention()} if it’s getting in your way.` };
+  const lines = bad.slice(0, 6).map((x) => `• *${x.name}* (${x.status}): ${x.detail}${x.fix ? ` Fix: ${x.fix}` : ''}`);
+  if (bad.length > 6) lines.push(`…and ${bad.length - 6} more on ${page}.`);
+  return { ok: true, text: [head + tail, ...lines, `Full report on ${page}.`].join('\n') };
+}
+
 /* One row in Bruce's log (R55 addendum). Waited on, so a function that returns right after does not drop it; never throws. */
 async function log(memory, token, event, extra) {
   if (!memory || !memory.logRun) return;
@@ -475,7 +511,7 @@ export function forBruce(u) {
  * so the caller can still answer 200 and Slack does not retry.
  */
 export async function handleMessage(event, deps) {
-  const { token, root, owners = new Set(), bruceUsers = new Set(), ownerId = '', fire = fireBruce, findPing = pingOf, toAlfred = replyToAlfred, memory = null, agent = false } = deps;
+  const { token, root, owners = new Set(), bruceUsers = new Set(), ownerId = '', fire = fireBruce, findPing = pingOf, toAlfred = replyToAlfred, toDoc = askDoc, memory = null, agent = false } = deps;
   const inPane = agent && !!event.thread_ts;   // an agent-pane session is a thread in the DM
   // Bruce is open to everyone in a DM (Utsav, 5 Oct 2026); BRUCE_USER_IDS, when set, narrows it to a list again.
   const mayAskBruce = (id) => bruceUsers.size ? bruceUsers.has(id) : true;
@@ -511,6 +547,16 @@ export async function handleMessage(event, deps) {
         await slack(token, 'chat.postMessage', { channel: event.channel, thread_ts: event.thread_ts, text: `I couldn’t pass that to Alfred (${out.why}). Reply in the item’s drawer instead.` });
         return { did: 'to-alfred-failed' };
       }
+    }
+    // "Is the hub healthy?" is for Doc, in a DM or a channel. No model and no run, so it never touches the daily cap.
+    if (u.health && (isDm ? mayAskBruce(event.user) : true)) {
+      const isOwner = !!ownerId && event.user === ownerId;
+      let out;
+      try { out = await toDoc({ owner: isOwner, user: event.user }); } catch { out = { ok: false, why: 'the checks would not run' }; }
+      if (memory) await log(memory, token, event, { role: isOwner ? 'owner' : 'teammate', kind: 'to-doc' });
+      await slack(token, 'chat.postMessage', { channel: event.channel, ...(threadTs ? { thread_ts: threadTs } : {}), unfurl_links: false,
+        text: out.ok ? out.text : `I couldn’t get Doc’s answer (${out.why}). His page on Agents has the live checks: ${link('/admin/agents#doc', 'open it')} (owners only).` });
+      return { did: out.ok ? 'to-doc' : 'to-doc-failed' };
     }
     // Utsav's own DM: Bruce proper. No reaction (they filled the Slack activity inbox, 6 Oct 2026); the routine answers in the thread.
     // In a thread he is already talking to Bruce in, every follow-up is for Bruce, even one that names a logo or a font:

@@ -327,5 +327,46 @@ t('a stop press is acknowledged and dropped', [r.code, r.body.ignored], [200, 'a
 r = await post({ type: 'event_callback', event_id: 'Ev9', event: { type: 'reaction_added', reaction: 'white_check_mark', user: 'UOWNER', item: { ts: '1.1' } } });
 t('the ✅ review loop still takes its own path', [r.code, calls.length], [200, 0]);
 
+
+/* ---- Doc: "is the hub healthy?" goes to him, not to a Bruce run ---- */
+{
+  const { asksHealth, handleMessage: hm, askDoc } = await import('../web/api/_concierge.js');
+  for (const q of ['is the hub healthy?', 'is the site down', 'is everything working', 'hub status', 'ask Doc', 'anything broken?', 'Doc, is the library ok']) ok(`asks health: ${q}`, asksHealth(q));
+  for (const q of ['the logo is not working in figma', 'is the logo working?', 'white logo svg', 'Build a one-pager for X', 'how do I install the plugin', 'which template for a case study?', 'thanks']) ok(`not health: ${q}`, !asksHealth(q));
+  t('a health question is not a design request or a close', [understand('is the hub healthy?', catalog).health, understand('is the hub healthy?', catalog).designRequest, understand('ask Doc', catalog).closing], [true, false, false]);
+
+  const sent = [], asked = [], logged = [];
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = async (url, init) => { const m = String(url).split('/api/')[1]; sent.push({ method: m, body: JSON.parse(init.body) }); return { ok: true, json: async () => ({ ok: true }) }; };
+  const docDeps = (out) => ({ token: 'xoxb-test', root: '.', ownerId: 'UUTSAV', toDoc: async (who) => { asked.push(who); return out; },
+    fire: async () => { throw new Error('Bruce must not be started for a health question'); }, memory: { logRun: async (r) => { logged.push(r.kind); }, slackName: async () => 'x', takeRun: async () => { throw new Error('no run is spent'); }, weightOf: () => 'run', readNotes: async () => [], mintToken: () => '' } });
+  const dm = (text, user = 'UASKER', extra = {}) => ({ type: 'message', channel_type: 'im', user, channel: 'D1', ts: '900.1', text, ...extra });
+  let o = await hm(dm('is the hub healthy?'), docDeps({ ok: true, text: 'Doc says the hub is healthy' }));
+  t('a DM health question goes to Doc, answered in the DM, no Bruce run and no quota', [o.did, asked.at(-1), sent.at(-1).method, sent.at(-1).body.text, logged.at(-1)], ['to-doc', { owner: false, user: 'UASKER' }, 'chat.postMessage', 'Doc says the hub is healthy', 'to-doc']);
+  o = await hm(dm('is the hub healthy?', 'UUTSAV'), docDeps({ ok: true, text: 'x' }));
+  t('Utsav is told apart by his Slack ID', asked.at(-1), { owner: true, user: 'UUTSAV' });
+  o = await hm(dm('is the hub healthy?', 'UASKER', { thread_ts: '800.1', ts: '900.2' }), docDeps({ ok: true, text: 'x' }));
+  t('inside a thread it answers in that thread, not as a new Bruce run', [o.did, sent.at(-1).body.thread_ts], ['to-doc', '800.1']);
+  o = await hm({ type: 'app_mention', channel: 'C9', user: 'UASKER', ts: '901.1', text: '<@UBRUCE> is the site down' }, docDeps({ ok: true, text: 'x' }));
+  t('a channel mention is answered under the message', [o.did, sent.at(-1).body.thread_ts], ['to-doc', '901.1']);
+  o = await hm(dm('is the hub healthy?'), docDeps({ ok: false, why: 'the checks would not run' }));
+  t('when the checks cannot run it says so and points at his page', [o.did, sent.at(-1).body.text.includes('the checks would not run')], ['to-doc-failed', true]);
+  o = await hm(dm('which template for a case study?'), { ...docDeps({ ok: true, text: 'x' }), memory: null });
+  t('a template question is still the concierge, never Doc', o.did, 'answered');
+
+  const fakeReport = (checks) => async () => ({ liveReport: async () => ({ checks, counts: checks.reduce((c, x) => (c[x.status]++, c), { ok: 0, warn: 0, fail: 0, unknown: 0 }) }) });
+  const withReport = async (checks, who) => { const mod = await import('../web/api/_health.js'); const orig = mod.liveReport; /* ES module bindings are live and read-only: askDoc imports it by name, so swap via the test seam */ return askDoc(who, { liveReport: async () => ({ checks, counts: checks.reduce((c, x) => (c[x.status]++, c), { ok: 0, warn: 0, fail: 0, unknown: 0 }) }) }); };
+  const C = (id, status, detail = '', fix = '') => ({ id, name: id, status, detail, fix });
+  let r = await withReport([C('store', 'ok'), C('deploy', 'ok')], { owner: false });
+  ok('all fine: says healthy, counts the checks, no link for a teammate', r.text.startsWith('Doc says the hub is healthy: all 2') && !r.text.includes('/admin/agents'), r.text);
+  r = await withReport([C('store', 'fail', 'KV is down', 'check the Upstash token'), C('cert', 'warn', 'expires in 9 days')], { owner: false });
+  ok('a teammate gets the count and who to ask, never the detail', r.text.includes('1 thing not working and 1 to keep an eye on') && !r.text.includes('KV') && !r.text.includes('Upstash'), r.text);
+  r = await withReport([C('store', 'fail', 'KV is down', 'check the Upstash token'), C('cert', 'warn', 'expires in 9 days')], { owner: true });
+  ok('the owner gets each problem with its fix, failures first', r.text.includes('*store* (fail): KV is down Fix: check the Upstash token') && r.text.indexOf('store') < r.text.indexOf('cert'), r.text);
+  r = await withReport([C('a', 'ok'), C('b', 'unknown')], { owner: false });
+  ok('a check that could not run is said, not counted as fine', r.text.includes('all 1 checks') && r.text.includes('1 check couldn’t be run'), r.text);
+  globalThis.fetch = realFetch;
+}
+
 console.log(`${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

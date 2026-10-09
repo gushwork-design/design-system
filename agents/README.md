@@ -44,5 +44,5 @@ Its record and memory change here, by pull request. Its prompt, for now, changes
 
 ## Not yet
 
-- The lead's routing is still written into `web/api/_concierge.js` (Alfred only). `registry.json` already describes it; reading it from the registry is the next step, so adding an agent needs no code.
+- The lead's routing is still written into `web/api/_concierge.js` (Alfred and Doc). `registry.json` already describes it; reading it from the registry is the next step, so adding an agent needs no code.
 - One run log for every agent. Today only Bruce's turns are logged (Analytics, Bruce); Alfred's runs are read from his GitHub comments, and Doc's from his schedule and his last report.

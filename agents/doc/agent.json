@@ -18,7 +18,8 @@
     ]
   },
   "reachedBy": [
-    "Doc's page on Agents, which runs the live checks when opened"
+    "Doc's page on Agents, which runs the live checks when opened",
+    "Bruce, in Slack: \"is the hub healthy?\" in a DM or a channel. Everyone gets an answer; only Utsav gets the detail"
   ],
   "schedule": [
     "Every Monday and Thursday at 04:00 UTC (09:30 IST)"
