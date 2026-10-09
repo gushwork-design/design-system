@@ -10,6 +10,7 @@ ok('a token for one user cannot be bent to another', M.readToken(tok.replace('U1
 ok('a token signed elsewhere is refused', M.readToken(M.mintToken('U1', t0, 'other'), t0, 'sec') === null);
 let store = {}; const cmds = [];
 const f = async (url, init) => { const c = JSON.parse(init.body); cmds.push(...c); return { ok: true, json: async () => c.map(([op, key, ...a]) => {
+  if (op === 'LREM') { const l = store[key] || []; const i = l.indexOf(a[1]); if (i >= 0) l.splice(i, 1); store[key] = l; return { result: i >= 0 ? 1 : 0 }; }
   if (op === 'HMGET') return { result: a.map((k) => (store[key] || {})[k] || null) };
   if (op === 'HGET') return { result: (store[key] || {})[a[0]] || null };
   if (op === 'HINCRBY') { store[key] = store[key] || {}; store[key][a[0]] = (store[key][a[0]] || 0) + 1; return { result: store[key][a[0]] }; }
@@ -284,5 +285,20 @@ ok('pics: kept after the first look', infoCalls === 0 && Object.keys(pics).lengt
 infoCalls = 0; store = {}; pics = await M.slackPics('xoxb', ['U0AAAAAAA1', 'U0AAAAAAA2', 'U0AAAAAAA3'], { f: picF, max: 2 });
 ok('pics: at most max lookups per call', infoCalls === 2 && Object.keys(pics).length === 2);
 ok('pics: no token, no cache, nothing', Object.keys(await M.slackPics('', ['U0ZZZZZZZ1'], { f: picF })).length === 0);
+globalThis.fetch = realFetch;
+// deleting a suggestion removes it from the list and from Bruce's notes
+store = {}; globalThis.fetch = f;
+g2 = await sg('POST', ownerCk, { body: { user: 'U0PRIYA01', name: 'Priya', text: 'ask who it is for' } });
+await sg('POST', ownerCk, { body: { user: 'U0PRIYA01', name: 'Priya', text: 'keep it short', about: { text: 'a long reply', from: 'bruce' } } });
+const sgAt = g2.out.suggestion.id;
+g2 = await sg('POST', await ck('sam@gushwork.ai'), { body: { user: 'U0PRIYA01', remove: sgAt } });
+ok('delete: a teammate is 403', g2.status === 403);
+g2 = await sg('POST', ownerCk, { body: { user: 'U0ISHA0001', remove: sgAt } });
+ok('delete: the wrong person is 404 and nothing goes', g2.status === 404 && store['gw:bruce:suggest'].length === 2);
+g2 = await sg('POST', ownerCk, { body: { user: 'U0PRIYA01', remove: sgAt } });
+const left = await sg('GET', ownerCk, { query: { suggest: '1', user: 'U0PRIYA01' } });
+const notesLeft = await M.readNotes('U0PRIYA01', f);
+ok('delete: one is gone from the list, the other stays', g2.status === 200 && left.out.suggestions.length === 1 && left.out.suggestions[0].text === 'keep it short', JSON.stringify(left.out));
+ok('delete: and from Bruce\'s notes', notesLeft.length === 1 && !notesLeft.some((n) => /ask who it is for/.test(n)) && /keep it short/.test(notesLeft[0]), JSON.stringify(notesLeft));
 globalThis.fetch = realFetch;
 console.log(`${pass} passed, ${fail} failed`); process.exit(fail ? 1 : 0);

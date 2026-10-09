@@ -52,6 +52,16 @@ A row that looks pressable and is not is worse than a missing hover.
    `State=Default`. A field's affordance is its caret, not a fill; it is not a click target.
 5. Hover transitions use `--gw-motion-fast`, switched off under `prefers-reduced-motion`.
 
+## Loading — a ghost, never words
+
+Standing rule for every build (Utsav, 9 Oct 2026: "add a ghost on load, make it a rule for all builds").
+
+- **Anything that waits on data shows a ghost of its real layout while it waits**: a page on first load, a drawer or panel that fetches, a tab, a list, a card. One ghost per real element (picture, name, line, value, row), at the real size and place, so nothing jumps when the data arrives. Never a blank area, a spinner on its own, or a line of text such as "Reading…" or "Loading…".
+- A dashboard uses the library's skeleton (`gd-ghost`, `gd-ghost-row`; `feedback.md`). A tool uses the shell's ghost (`gushwork-tools`). A page on another surface draws the same thing from its own tokens: the pulse, no shimmer, none under `prefers-reduced-motion`.
+- Mark the waiting region `aria-busy="true"` (or `role="status"` with a label) and give the ghost no text of its own.
+- Check the ghost against the surface it sits on, in both themes: the library's ghost colour can equal a drawer's own surface in dark. Use the next stronger token there.
+- A failure replaces the ghost with the error state and a retry, never leaves it pulsing.
+
 ## Sample and placeholder data
 
 When the numbers are yours rather than measured, the **`Sample data` marker is not optional.**

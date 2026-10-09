@@ -143,8 +143,9 @@ pending a ruling.
 5. **A drawn affordance must work.** Every `data-gd-*` hook in your markup must have a handler in
    `dashboard.js`; every `<button>` must do something. Ship the affordance only if the function exists.
 6. **A quantity that cannot be read is removed, never zeroed.** A `0` that means "not loaded" reads as "we
-   got no leads". Loading is a skeleton of the real layout; failure is per card, with a retry, never a
-   page-level wipe. See `feedback.md`.
+   got no leads". **Everything that waits on data shows a ghost of its real layout** (the page on first load,
+   a drawer, a tab, a list: `gd-ghost`), never a blank area or a "Reading…" line (R73, `foundation/states.md`).
+   Failure is per card, with a retry, never a page-level wipe. See `feedback.md`.
 7. **Invented numbers are visibly marked.** Most requests arrive without data. A plausible figure in a
    real-looking dashboard is indistinguishable from a measurement and gets screenshotted into a deck. Put
    `Sample data` in a Badge in the page header's title row, say in one line which numbers are illustrative,
