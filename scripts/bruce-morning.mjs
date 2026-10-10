@@ -15,7 +15,13 @@ const SITE = (process.env.SITE_BASE || 'https://design.gushwork.ai').replace(/\/
 const WAITING = new Set(['pending', 'expired', 'redone']);
 
 /* The note itself. Pure, so it can be tested. */
-export function compose({ items = [], blocked = [], publish = null }) {
+export function greeting(now = new Date()) {
+  // GitHub's scheduler can run late; the greeting follows the real IST hour so a 3.35pm note never says "Morning".
+  const h = Number(new Intl.DateTimeFormat('en-GB', { hour: 'numeric', hour12: false, timeZone: 'Asia/Kolkata' }).format(now)) % 24;
+  return h < 12 ? 'Morning.' : h < 17 ? 'Afternoon.' : 'Evening.';
+}
+
+export function compose({ items = [], blocked = [], publish = null, now = new Date() }) {
   const waiting = items.filter((i) => WAITING.has(i.state));
   const redone = waiting.filter((i) => i.state === 'redone');
   const lines = [];
@@ -27,7 +33,7 @@ export function compose({ items = [], blocked = [], publish = null }) {
   else if (blocked.length > 1) lines.push(`Alfred is stuck on ${blocked.length} items: ${blocked.slice(0, 4).map((b) => `<${itemLink(b.scope, b.key)}|${b.key}>`).join(', ')}${blocked.length > 4 ? ', and more' : ''}.`);
   if (publish && publish.conclusion === 'failure') lines.push(`The last publish failed, so the site is behind main. <${publish.html_url}|See the run>`);
   if (!lines.length) return '';
-  return ['Morning.', ...lines].join('\n');
+  return [greeting(now), ...lines].join('\n');
 }
 
 async function blockedThreads(f) {

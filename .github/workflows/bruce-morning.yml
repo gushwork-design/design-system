@@ -1,11 +1,11 @@
 # Bruce's morning note to Utsav in Slack (R55 addendum): what is waiting on him, what Alfred is stuck on, and whether the
-# site failed to publish. Two to four lines, silent when there is nothing. 9am IST = 03:30 UTC. No model call.
+# site failed to publish. Two to four lines, silent when there is nothing. 9am IST = 03:30 UTC; the cron fires at 03:07 (off the busy :00/:30 marks) because GitHub can run schedules hours late. No model call.
 # Uses the same two repository secrets as bruce-pings.yml: SLACK_BOT_TOKEN and OWNER_SLACK_ID.
 name: Bruce morning note
 
 on:
   schedule:
-    - cron: '30 3 * * *'
+    - cron: '7 3 * * *'
   workflow_dispatch:
 
 permissions:
